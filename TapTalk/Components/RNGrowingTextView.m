@@ -24,7 +24,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         [self xibSetup];
     }
     
@@ -34,7 +34,7 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     
-    if(self) {
+    if (self) {
         [self xibSetup];
     }
     
@@ -44,7 +44,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
-    if(self) {
+    if (self) {
         [self xibSetup];
         
     }
@@ -140,11 +140,11 @@
     
     self.textView.textContainerInset = UIEdgeInsetsMake(8.0f, -5.0f, 0.0f, 0.0f);
     
-    if(self.minimumHeight == 0.0f) {
+    if (self.minimumHeight == 0.0f) {
         self.minimumHeight = 28.0f;
     }
     
-    if(self.maximumHeight == 0.0f) {
+    if (self.maximumHeight == 0.0f) {
         self.maximumHeight = 97.0f;
     }
     
@@ -171,17 +171,17 @@ shouldChangeTextInRange:(NSRange)range
     
     _text = newString;
     
-    if([newString isEqualToString:@""]) {
+    if ([newString isEqualToString:@""]) {
         self.placeholderLabel.alpha = 1.0f;
         
-        if([self.delegate respondsToSelector:@selector(growingTextViewDidStopTyping:)]) {
+        if ([self.delegate respondsToSelector:@selector(growingTextViewDidStopTyping:)]) {
             [self.delegate growingTextViewDidStopTyping:self];
         }
     }
     else {
         self.placeholderLabel.alpha = 0.0f;
         
-        if([self.delegate respondsToSelector:@selector(growingTextViewDidStartTyping:)]) {
+        if ([self.delegate respondsToSelector:@selector(growingTextViewDidStartTyping:)]) {
             [self.delegate growingTextViewDidStartTyping:self];
         }
     }
@@ -194,7 +194,7 @@ shouldChangeTextInRange:(NSRange)range
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    if([self.delegate respondsToSelector:@selector(growingTextViewDidBeginEditing:)]) {
+    if ([self.delegate respondsToSelector:@selector(growingTextViewDidBeginEditing:)]) {
         [self.delegate growingTextViewDidBeginEditing:self];
     }
 }
@@ -212,17 +212,17 @@ shouldChangeTextInRange:(NSRange)range
     
     self.textView.text = text;
     
-    if([self.text isEqualToString:@""]) {
+    if ([self.text isEqualToString:@""]) {
         self.placeholderLabel.alpha = 1.0f;
         
-        if([self.delegate respondsToSelector:@selector(growingTextViewDidStopTyping:)]) {
+        if ([self.delegate respondsToSelector:@selector(growingTextViewDidStopTyping:)]) {
             [self.delegate growingTextViewDidStopTyping:self];
         }
     }
     else {
         self.placeholderLabel.alpha = 0.0f;
         
-        if([self.delegate respondsToSelector:@selector(growingTextViewDidStartTyping:)]) {
+        if ([self.delegate respondsToSelector:@selector(growingTextViewDidStartTyping:)]) {
             [self.delegate growingTextViewDidStartTyping:self];
         }
     }
@@ -235,7 +235,7 @@ shouldChangeTextInRange:(NSRange)range
     
     self.textView.text = text;
     
-    if([self.text isEqualToString:@""]) {
+    if ([self.text isEqualToString:@""]) {
         self.placeholderLabel.alpha = 1.0f;
     }
     else {
@@ -252,16 +252,16 @@ shouldChangeTextInRange:(NSRange)range
     
     self.textView.textContainer.size = CGSizeMake(self.textView.textContainer.size.width, containerHeight);
     
-    if(contentSize.height < self.minimumHeight) {
+    if (contentSize.height < self.minimumHeight) {
         contentSize.height = self.minimumHeight;
     }
     
-    if(contentSize.height > self.maximumHeight) {
+    if (contentSize.height > self.maximumHeight) {
         contentSize.height = self.maximumHeight;
     }
     
-    if(contentSize.height != CGRectGetHeight(self.frame)) {
-        if([self.delegate respondsToSelector:@selector(growingTextView:shouldChangeHeight:)]) {
+    if (contentSize.height != CGRectGetHeight(self.frame)) {
+        if ([self.delegate respondsToSelector:@selector(growingTextView:shouldChangeHeight:)]) {
             [self.delegate growingTextView:self shouldChangeHeight:contentSize.height];
         }
     }

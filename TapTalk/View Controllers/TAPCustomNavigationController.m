@@ -18,7 +18,7 @@
 - (id)initWithRootViewController:(UIViewController *)rootViewController {
     self = [super initWithRootViewController:rootViewController];
     
-    if(self) {
+    if (self) {
         self.navigationBar.translucent = NO;
     }
     

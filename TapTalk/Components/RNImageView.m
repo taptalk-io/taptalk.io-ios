@@ -20,7 +20,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
-    if(self) {
+    if (self) {
         [self initialization];
     }
     
@@ -30,7 +30,7 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     
-    if(self) {
+    if (self) {
         [self initialization];
     }
     
@@ -78,7 +78,7 @@
 }
 
 - (void)setImageWithURLString:(NSString *)urlString {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
@@ -86,14 +86,14 @@
     
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
     [imageCache diskImageExistsWithKey:urlString completion:^(BOOL isInCache) {
-        if(isInCache) {
+        if (isInCache) {
             //Image exist in disk, load from disk
             UIImage *savedImage = [imageCache imageFromDiskCacheForKey:urlString];
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.image = savedImage;
                 
-                if([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
+                if ([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
                     [self.delegate RNImageViewDidFinishLoadImage:self];
                 }
             });
@@ -114,11 +114,11 @@
                     //            [imageCache storeImage:image forKey:urlString];
                     [imageCache storeImage:image forKey:urlString completion:^{
                     }];
-                    if([self.imageURLString isEqualToString:[imageURL absoluteString]]) {
+                    if ([self.imageURLString isEqualToString:[imageURL absoluteString]]) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             self.image = image;
                             
-                            if([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
+                            if ([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
                                 [self.delegate RNImageViewDidFinishLoadImage:self];
                             }
                         });
@@ -130,7 +130,7 @@
 #endif
                     dispatch_async(dispatch_get_main_queue(), ^{
                         self.image = nil;
-                        if([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
+                        if ([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
                             [self.delegate RNImageViewDidFinishLoadImage:self];
                         }
                     });

@@ -25,7 +25,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
-    if(self) {
+    if (self) {
         self.backgroundColor = [UIColor clearColor];
         _firstLoadOverlayView = [[UIView alloc] initWithFrame:self.frame];
         self.firstLoadOverlayView.backgroundColor = [[TAPUtil getColor:@"04040F"] colorWithAlphaComponent:0.4f];

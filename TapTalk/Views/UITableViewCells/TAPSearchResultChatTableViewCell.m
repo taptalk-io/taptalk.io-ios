@@ -29,7 +29,7 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     
-    if(self) {
+    if (self) {
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 70.0f)];
         [self.contentView addSubview:self.bgView];
         
@@ -110,7 +110,7 @@
     BOOL isGroup = NO;
     BOOL isMuted = NO;
     BOOL isOnline = NO;
-    NSString *profileImageURL = TAP_DUMMY_IMAGE_URL;
+    NSString *profileImageURL = room.imageURL.thumbnail;
     //END DV Temp
     
     NSInteger numberOfUnreadMessage = [unreadMessageCount integerValue];

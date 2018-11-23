@@ -15,12 +15,14 @@
 
 @property (nonatomic, strong) NSString *messageID;
 @property (nonatomic, strong) NSString *localID;
+@property (nonatomic, strong) NSString *filterID;
 @property (nonatomic) TAPChatMessageType type;
 @property (nonatomic, strong) NSString *body;
 @property (nonatomic, strong) TAPRoomModel *room;
 @property (nonatomic, strong) NSString *recipientID;
 @property (nonatomic, strong) NSNumber *created;
 @property (nonatomic, strong) NSNumber *updated;
+@property (nonatomic, strong) NSNumber *deleted;
 @property (nonatomic, strong) TAPUserModel *user;
 @property (nonatomic) BOOL isDeleted;
 @property (nonatomic) BOOL isSending;

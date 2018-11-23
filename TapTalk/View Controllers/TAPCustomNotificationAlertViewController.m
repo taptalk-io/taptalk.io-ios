@@ -37,7 +37,7 @@
     [super loadView];
     
     CGFloat additionalSpacing = 20.0f;
-    if(IS_IPHONE_X_FAMILY) {
+    if (IS_IPHONE_X_FAMILY) {
         additionalSpacing = 44.0f;
     }
     
@@ -67,7 +67,7 @@
 #pragma mark - Custom Method
 
 - (void)checkMessageQueue {
-    if([self.messageQueueArray count] > 0) {
+    if ([self.messageQueueArray count] > 0) {
         TAPMessageModel *message = [self.messageQueueArray firstObject];
 //        [self.messageQueueArray removeObject:message];
         [self.messageQueueArray removeObjectAtIndex:0];
@@ -81,11 +81,11 @@
 
 - (void)showWithMessage:(TAPMessageModel *)message {
     
-    if([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         return;
     }
     
-    if([self.messageQueueArray count] != 0) {
+    if ([self.messageQueueArray count] != 0) {
         //Put message in queue
         [self.messageQueueArray addObject:message];
     }
@@ -101,7 +101,7 @@
     
 //    _messageShownCounter++;
     
-    if(self.view.alpha == 0.0f) {
+    if (self.view.alpha == 0.0f) {
         _messageShownCounter++;
         //Show animation
         [self fillDataWithMessage:message];
@@ -110,7 +110,7 @@
         _isOnShowAnimation = YES;
         
         [UIView animateWithDuration:0.3f animations:^{
-            if(self.messageShownCounter % 2 == 1) {
+            if (self.messageShownCounter % 2 == 1) {
                 //Odd Message, show first notification view
                 self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
             }
@@ -127,14 +127,14 @@
     }
     else {
         //Alert already shown, proceed queue
-        if(!self.isOnShowAnimation) {
+        if (!self.isOnShowAnimation) {
             
             _messageShownCounter++;
             
             [self fillDataWithMessage:message];
             
             [UIView animateWithDuration:0.3f animations:^{
-                if(self.messageShownCounter % 2 == 1) {
+                if (self.messageShownCounter % 2 == 1) {
                     //Odd Message, show first notification view
 //                    [self.view bringSubviewToFront:self.customNotificationAlertView.firstNotificationView];
                     self.customNotificationAlertView.firstNotificationView.layer.zPosition = 1;
@@ -168,7 +168,7 @@
 
 - (void)hideAfterDelay {
     [UIView animateWithDuration:0.3f animations:^{
-        if(self.messageShownCounter % 2 == 1) {
+        if (self.messageShownCounter % 2 == 1) {
             //Odd Message, show first notification view
             self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), -CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
         }
@@ -180,7 +180,7 @@
         self.view.alpha = 0.0f;
         _messageShownCounter = 0;
         
-        if(self.messageShownCounter % 2 == 1) {
+        if (self.messageShownCounter % 2 == 1) {
             _isTappedFirstNotificationButton = NO;
         }
         else {
@@ -191,13 +191,13 @@
 
 - (void)fillDataWithMessage:(TAPMessageModel *)message {
     
-    if(self.messageShownCounter == 0) {
+    if (self.messageShownCounter == 0) {
         return;
     }
     
     TAPUserModel *user = message.user;
-    //    NSString *profilePictureURL = user.imageURL.thumbnail;
-    NSString *profilePictureURL = TAP_DUMMY_IMAGE_URL; //DV Temp
+    NSString *profilePictureURL = user.imageURL.thumbnail;
+//    NSString *profilePictureURL = TAP_DUMMY_IMAGE_URL; //DV Temp
     NSString *nameString = message.user.fullname;
     NSString *messageString = message.body;
     NSString *contentImageURL = TAP_DUMMY_IMAGE_URL; //DV Temp
@@ -205,7 +205,7 @@
     BOOL isShowProfilePicture = NO;
     BOOL isShowContentImage = NO; //DV Temp
     
-    if(profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
+    if (profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
         //Hide profile picture
         isShowProfilePicture = NO;
     }
@@ -213,7 +213,7 @@
         isShowProfilePicture = YES;
     }
     
-    if(contentImageURL == nil || [contentImageURL isEqualToString:@""]) {
+    if (contentImageURL == nil || [contentImageURL isEqualToString:@""]) {
         //Hide content image
         isShowContentImage = NO;
     }
@@ -221,7 +221,7 @@
         isShowContentImage = YES;
     }
     
-    if(self.messageShownCounter % 2 == 1) {
+    if (self.messageShownCounter % 2 == 1) {
         //Odd message, show first notification view
         _currentFirstShownMessage = message;
         self.customNotificationAlertView.nameLabel.text = nameString;
@@ -238,7 +238,7 @@
 }
 
 - (void)showFirstAnimationWithProfileImage:(BOOL)hasProfileImage contentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
-    if(!hasProfileImage && !hasContentImage) {
+    if (!hasProfileImage && !hasContentImage) {
         //Hide profile picture & content image
         self.customNotificationAlertView.profilePictureImage.alpha = 0.0f;
         self.customNotificationAlertView.contentImageView.alpha = 0.0f;
@@ -252,7 +252,7 @@
         self.customNotificationAlertView.profilePictureImage.image = nil;
         self.customNotificationAlertView.contentImageView.image = nil;
     }
-    else if(!hasProfileImage) {
+    else if (!hasProfileImage) {
         //Hide profile picture
         self.customNotificationAlertView.profilePictureImage.alpha = 0.0f;
         self.customNotificationAlertView.contentImageView.alpha = 1.0f;
@@ -269,7 +269,7 @@
         self.customNotificationAlertView.profilePictureImage.image = nil;
         [self.customNotificationAlertView.contentImageView setImageWithURLString:contentImageURL];
     }
-    else if(!hasContentImage) {
+    else if (!hasContentImage) {
         //Hide Content Image
         self.customNotificationAlertView.contentImageView.alpha = 0.0f;
         self.customNotificationAlertView.profilePictureImage.alpha = 1.0f;
@@ -291,7 +291,14 @@
         self.customNotificationAlertView.profilePictureImage.alpha = 1.0f;
         self.customNotificationAlertView.contentImageView.alpha = 1.0f;
         
-        self.customNotificationAlertView.nameLabel.frame = CGRectMake(CGRectGetMaxX(self.customNotificationAlertView.profilePictureImage.frame) + 13.0f, 14.0f, CGRectGetWidth(self.customNotificationAlertView.frame) - (CGRectGetMaxX(self.customNotificationAlertView.profilePictureImage.frame) + 13.0f) - 16.0f, 17.0f);
+        CGFloat profilePictureImageRightGap = 8.0f;
+        CGFloat nameLabelRightGap = 8.0f;
+        CGFloat paddingRight = 8.0f;
+        
+        CGFloat nameLabelWidth = CGRectGetWidth(self.customNotificationAlertView.contentView.frame) - CGRectGetMaxX(self.customNotificationAlertView.profilePictureImage.frame) - profilePictureImageRightGap - nameLabelRightGap - CGRectGetWidth(self.customNotificationAlertView.contentImageView.frame) - paddingRight;
+        
+        
+        self.customNotificationAlertView.nameLabel.frame = CGRectMake(CGRectGetMaxX(self.customNotificationAlertView.profilePictureImage.frame) + 13.0f, 14.0f, nameLabelWidth, 17.0f);
         
         self.customNotificationAlertView.messageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.nameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.nameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.nameLabel.frame), 17.0f);
         
@@ -301,7 +308,7 @@
 }
 
 - (void)showSecondaryAnimationWithProfileImage:(BOOL)hasProfileImage contentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
-    if(!hasProfileImage && !hasContentImage) {
+    if (!hasProfileImage && !hasContentImage) {
         //Hide profile picture & content image
         self.customNotificationAlertView.secondaryProfilePictureImage.alpha = 0.0f;
         self.customNotificationAlertView.secondaryContentImageView.alpha = 0.0f;
@@ -315,7 +322,7 @@
         self.customNotificationAlertView.secondaryProfilePictureImage.image = nil;
         self.customNotificationAlertView.secondaryContentImageView.image = nil;
     }
-    else if(!hasProfileImage) {
+    else if (!hasProfileImage) {
         //Hide profile picture
         self.customNotificationAlertView.secondaryProfilePictureImage.alpha = 0.0f;
         self.customNotificationAlertView.secondaryContentImageView.alpha = 1.0f;
@@ -332,7 +339,7 @@
         self.customNotificationAlertView.secondaryProfilePictureImage.image = nil;
         [self.customNotificationAlertView.secondaryContentImageView setImageWithURLString:contentImageURL];
     }
-    else if(!hasContentImage) {
+    else if (!hasContentImage) {
         //Hide Content Image
         self.customNotificationAlertView.secondaryContentImageView.alpha = 0.0f;
         self.customNotificationAlertView.secondaryProfilePictureImage.alpha = 1.0f;
@@ -365,12 +372,12 @@
 
 
 - (void)notificationButtonDidTapped {
-    if(self.isTappedFirstNotificationButton == YES) {
+    if (self.isTappedFirstNotificationButton == YES) {
         return;
     }
     
     _isTappedFirstNotificationButton = YES;
-    if([self.delegate respondsToSelector:@selector(customNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:)]) {
+    if ([self.delegate respondsToSelector:@selector(customNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:)]) {
         [self.delegate customNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:self.currentFirstShownMessage];
     }
     _isTappedFirstNotificationButton = NO;
@@ -378,12 +385,12 @@
 }
 
 - (void)secondaryNotificationButtonDidTapped {
-    if(self.isTappedSecondNotificationButton == YES) {
+    if (self.isTappedSecondNotificationButton == YES) {
         return;
     }
     
     _isTappedSecondNotificationButton = YES;
-    if([self.delegate respondsToSelector:@selector(secondaryCustomNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:)]) {
+    if ([self.delegate respondsToSelector:@selector(secondaryCustomNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:)]) {
         [self.delegate secondaryCustomNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:self.currentSecondaryShownMessage];
     }
     _isTappedSecondNotificationButton = NO;

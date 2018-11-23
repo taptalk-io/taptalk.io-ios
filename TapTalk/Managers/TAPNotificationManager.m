@@ -31,7 +31,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         //Add chat manager delegate
         [[TAPChatManager sharedManager] addDelegate:self];
         _isViewIsAddedToSubview = NO;
@@ -76,7 +76,7 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSString *accessToken = [TAPDataManager getAccessToken];
-    if(![accessToken isEqualToString:@""] && accessToken != nil) {
+    if (![accessToken isEqualToString:@""] && accessToken != nil) {
         BOOL isDebug = NO;
 #ifdef DEBUG
         isDebug = YES;
@@ -104,7 +104,7 @@
     NSLog(@"Did receive notification: %@", [userInfo description]);
 #endif
     
-    if([[userInfo valueForKeyPath:@"aps.content-available"] boolValue] == NO) {
+    if ([[userInfo valueForKeyPath:@"aps.content-available"] boolValue] == NO) {
         //Not a silent push, ignore notification
         return;
     }
@@ -112,17 +112,37 @@
     NSDictionary *messageDictionary = [NSDictionary dictionary];
     messageDictionary = [userInfo valueForKeyPath:@"data.message"];
     
+    //DV Temp
+    //DV Note - Temporary add incoming notification to prefs
+//    NSString *localID = [messageDictionary objectForKey:@"localID"];
+//    NSMutableArray *pushNotificationArray = [[NSMutableArray alloc] init];
+//    NSMutableArray *obtainedArray = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_INCOMING_PUSH_NOTIFICATION valid:nil];
+//    
+//    if (pushNotificationArray == nil) {
+//        pushNotificationArray = [[NSMutableArray alloc] init];
+//    }
+//    else {
+//        [pushNotificationArray addObjectsFromArray:obtainedArray];
+//    }
+//    
+//    [pushNotificationArray addObject:localID];
+//
+//    [[NSUserDefaults standardUserDefaults] setSecureObject:pushNotificationArray forKey:TAP_PREFS_INCOMING_PUSH_NOTIFICATION];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
+    //END DV Temp
+    
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
+    
     [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldNotShowNotification:YES isNeedDecrypted:YES];
 }
 
 - (void)handleIncomingMessage:(TAPMessageModel *)message shouldNotShowNotification:(BOOL)shouldNotShowNotification isNeedDecrypted:(BOOL)isNeedDecrypted {
-    if(message == nil) {
+    if (message == nil) {
         return;
     }
     
     TAPMessageModel *decryptedMessage = [TAPMessageModel new];
-    if(isNeedDecrypted) {
+    if (isNeedDecrypted) {
         //Decrypt message
         decryptedMessage = [TAPEncryptorManager decryptMessage:message];
     }
@@ -130,9 +150,9 @@
         decryptedMessage = message;
     }
     
-    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         //Handling local push notification
-        if([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
+        if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
             UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
             content.title = decryptedMessage.user.fullname;
             NSString *messageText = decryptedMessage.body;
@@ -169,29 +189,31 @@
 
             [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
         }
+        
+        //Update message delivery status to API
+        [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredFromPushNotificationWithMessage:decryptedMessage];
     }
     else if (![message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID]) {
         [self showInAppNotificationWithMessage:decryptedMessage];
     }
-    
 }
 
 - (void)showInAppNotificationWithMessage:(TAPMessageModel *)message {
-//    if([message.type integerValue] == ChatMessageTypeNewUser || [message.type integerValue] == ChatMessageTypeUserLeave) {
+//    if ([message.type integerValue] == ChatMessageTypeNewUser || [message.type integerValue] == ChatMessageTypeUserLeave) {
 //        return;
 //    }
     
-    if([TAPChatManager sharedManager].activeUser.userID == nil || [[TAPChatManager sharedManager].activeUser.userID isEqualToString:@""]) {
+    if ([TAPChatManager sharedManager].activeUser.userID == nil || [[TAPChatManager sharedManager].activeUser.userID isEqualToString:@""]) {
         //Do not show if user id nil
         return;
     }
     
-    if([[TapTalk sharedInstance] roomListViewController].isViewAppear) {
+    if ([[TapTalk sharedInstance] roomListViewController].isViewAppear) {
         //Do not show if currently in room list
         return;
     }
     
-    if(!self.isViewIsAddedToSubview) {
+    if (!self.isViewIsAddedToSubview) {
         [self initCustomNotificationAlertViewController];
     }
     
@@ -199,7 +221,7 @@
 }
 
 - (void)initCustomNotificationAlertViewController {
-    if([TapTalk sharedInstance].activeWindow != nil) {
+    if ([TapTalk sharedInstance].activeWindow != nil) {
         [TapTalk sharedInstance].customNotificationAlertViewController.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 66.0f + 20.0f);
         [TapTalk sharedInstance].customNotificationAlertViewController.delegate = self;
         [[TapTalk sharedInstance].activeWindow addSubview:[TapTalk sharedInstance].customNotificationAlertViewController.view];
@@ -210,17 +232,17 @@
 - (void)handleTappedNotificationWithUserInfo:(NSDictionary *)userInfo {
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:userInfo];
 
-    if([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+    if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
         [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
     }
 }
 
 - (void)removeReadLocalNotificationWithMessage:(TAPMessageModel *)message {
     //Handling local push notification
-    if([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
+    if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
         [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
             
-            for(NSInteger counter = 0; counter < [notifications count]; counter++) {
+            for (NSInteger counter = 0; counter < [notifications count]; counter++) {
                 UNNotification *notification = [notifications objectAtIndex:counter];
                 NSString *identifier = notification.request.identifier;
                 NSDictionary *userInfoDictionary = notification.request.content.userInfo;
@@ -229,7 +251,7 @@
                 NSString *obtainedLocalID = message.localID;
                 NSString *obtainedRoomID = message.room.roomID;
                 
-                if([identifier isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
+                if ([identifier isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
                     //Cancelling local notification
                     [[UNUserNotificationCenter currentNotificationCenter]
                      removeDeliveredNotificationsWithIdentifiers:@[identifier]];

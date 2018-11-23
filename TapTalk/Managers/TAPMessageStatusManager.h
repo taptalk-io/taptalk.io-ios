@@ -10,22 +10,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol TAPMessageStatusManagerDelegate <NSObject>
-
-@optional
-
-- (void)messageStatusManagerDidUpdateReadMessageWithData:(NSArray *)messageArray;
-
-@end
-
-
 @interface TAPMessageStatusManager : NSObject
 
 + (TAPMessageStatusManager *)sharedManager;
 
-#warning Do not forget to remove the delegate object, since an object can't weak retained in an array, also please remove this delegate before dealloc or the delegate will always retained
-- (void)addDelegate:(id <TAPMessageStatusManagerDelegate>)delegate;
-- (void)removeDelegate:(id <TAPMessageStatusManagerDelegate>)delegate;
+- (void)triggerUpdateStatus;
+- (void)stopTimerUpdateStatus;
+- (void)markMessageAsReadWithMessage:(TAPMessageModel *)message;
+- (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message;
+- (void)filterAndUpdateBulkMessageStatusToDeliveredWithArray:(NSArray *)messageArray;
+- (void)markMessageAsDeliveredFromPushNotificationWithMessage:(TAPMessageModel *)message;
 
 @end
 

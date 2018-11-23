@@ -27,7 +27,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
 
     }
     
@@ -43,14 +43,14 @@
     NSNumber *savedTimeIntervalNumber = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP valid:nil];
     NSTimeInterval savedTimeInterval = [savedTimeIntervalNumber doubleValue];
     
-    if(savedTimeIntervalNumber == nil) {
+    if (savedTimeIntervalNumber == nil) {
         NSNumber *savedTime = [[NSNumber alloc] initWithDouble:currentTimeInterval];
         [[NSUserDefaults standardUserDefaults] setSecureObject:savedTime forKey:TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP];
     }
     else {
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_async(queue, ^{
-            if(currentTimeInterval - savedTimeInterval > kExecuteCountdown) {
+            if (currentTimeInterval - savedTimeInterval > kExecuteCountdown) {
                 //Last execution has been more than 7 days
                 //Get all last message
                 __block NSArray *lastMessagesArray = [NSArray array];

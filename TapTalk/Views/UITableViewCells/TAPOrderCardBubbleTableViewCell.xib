@@ -36,7 +36,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p4f-fJ-pds">
-                        <rect key="frame" x="9" y="8" width="280" height="637.5"/>
+                        <rect key="frame" x="24" y="8" width="280" height="637.5"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BQ1-H4-XaB">
                                 <rect key="frame" x="0.0" y="0.0" width="280" height="32"/>
@@ -167,7 +167,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aju-zW-dOL">
                                         <rect key="frame" x="0.0" y="0.0" width="280" height="24"/>
                                         <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="11"/>
-                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="textColor" red="0.035294117647058823" green="0.69803921568627447" blue="0.56862745098039214" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l93-UU-E2l" userLabel="Separator View">
@@ -178,7 +178,7 @@
                                         </constraints>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" red="1" green="0.70588235294117641" blue="0.2196078431372549" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <color key="backgroundColor" red="0.93333333333333335" green="0.98039215686274506" blue="0.97254901960784312" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="aju-zW-dOL" secondAttribute="trailing" id="0Cg-sZ-d1e"/>
                                     <constraint firstAttribute="bottom" secondItem="l93-UU-E2l" secondAttribute="bottom" id="Fp8-ZS-bmh"/>
@@ -626,20 +626,11 @@
                                         <attributedString key="attributedText">
                                             <fragment>
                                                 <string key="content">The Expert has marked this order as finish. 
-</string>
-                                                <attributes>
-                                                    <font key="NSFont" size="12" name="Lato-Bold"/>
-                                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" lineSpacing="1" defaultTabInterval="28" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
-                                                        <tabStops/>
-                                                    </paragraphStyle>
-                                                </attributes>
-                                            </fragment>
-                                            <fragment>
-                                                <string key="content">Please continue to review. 
+Please continue to review. 
 If the status is not suitable, you can
 </string>
                                                 <attributes>
-                                                    <font key="NSFont" size="12" name="Lato-Regular"/>
+                                                    <font key="NSFont" metaFont="cellTitle"/>
                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" lineSpacing="1" defaultTabInterval="28" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                         <tabStops/>
                                                     </paragraphStyle>
@@ -648,7 +639,7 @@ If the status is not suitable, you can
                                             <fragment content="report this order. ">
                                                 <attributes>
                                                     <color key="NSColor" red="0.92941176470588238" green="0.16078431372549018" blue="0.16078431372549018" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <font key="NSFont" size="12" name="Lato-Regular"/>
+                                                    <font key="NSFont" metaFont="cellTitle"/>
                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" lineSpacing="1" defaultTabInterval="28" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                         <tabStops/>
                                                     </paragraphStyle>
@@ -955,7 +946,7 @@ If the status is not suitable, you can
                         </constraints>
                     </view>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Izi-5M-vDl">
-                        <rect key="frame" x="9" y="653.5" width="280" height="28"/>
+                        <rect key="frame" x="24" y="653.5" width="280" height="28"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2HM-rY-hLF">
                                 <rect key="frame" x="70" y="0.0" width="140" height="28"/>
@@ -1007,15 +998,17 @@ If the status is not suitable, you can
                         </constraints>
                     </view>
                 </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="Izi-5M-vDl" firstAttribute="top" secondItem="p4f-fJ-pds" secondAttribute="bottom" constant="8" id="149-uF-b0t"/>
                     <constraint firstItem="p4f-fJ-pds" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="3DU-p2-aoe"/>
-                    <constraint firstAttribute="trailing" secondItem="Izi-5M-vDl" secondAttribute="trailing" constant="31" id="C8m-yt-tLD"/>
                     <constraint firstItem="Izi-5M-vDl" firstAttribute="top" secondItem="p4f-fJ-pds" secondAttribute="bottom" constant="8" id="JI7-E6-hF2"/>
+                    <constraint firstItem="Izi-5M-vDl" firstAttribute="trailing" secondItem="p4f-fJ-pds" secondAttribute="trailing" id="dXq-AD-ZRI"/>
                     <constraint firstAttribute="bottom" secondItem="Izi-5M-vDl" secondAttribute="bottom" constant="8" id="lLz-nR-RzD"/>
-                    <constraint firstAttribute="trailing" secondItem="p4f-fJ-pds" secondAttribute="trailing" constant="31" id="opI-vW-hy5"/>
+                    <constraint firstAttribute="trailing" secondItem="p4f-fJ-pds" secondAttribute="trailing" constant="16" id="opI-vW-hy5"/>
                 </constraints>
             </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="activeOrderLabel" destination="xQr-R1-2SN" id="Gal-2p-oXu"/>
                 <outlet property="activeOrderView" destination="0tS-1g-YGF" id="ArA-gH-TFy"/>
@@ -1060,6 +1053,7 @@ If the status is not suitable, you can
                 <outlet property="notesView" destination="0jq-51-JTO" id="v26-ia-IZs"/>
                 <outlet property="notesViewHeightLayoutConstraint" destination="O3a-fT-o3E" id="F7V-WC-QCf"/>
                 <outlet property="orderCardView" destination="p4f-fJ-pds" id="8Ha-r3-vh9"/>
+                <outlet property="orderCardViewLeadingConstraint" destination="opI-vW-hy5" id="6T3-zl-77r"/>
                 <outlet property="orderIDLabel" destination="0Ab-tf-2Ch" id="ICz-qV-HC8"/>
                 <outlet property="orderStatusButton" destination="w2f-Y5-jNb" id="rmf-EG-4sN"/>
                 <outlet property="orderStatusLabel" destination="p3V-aM-NEV" id="G0U-Nj-k1c"/>
@@ -1094,7 +1088,7 @@ If the status is not suitable, you can
         </tableViewCell>
     </objects>
     <resources>
-        <image name="TAPIconInfo" width="16" height="16"/>
-        <image name="TAPIconWhiteArrow" width="16" height="16"/>
+        <image name="TAPIconInfo" width="12" height="12"/>
+        <image name="TAPIconWhiteArrow" width="8" height="14"/>
     </resources>
 </document>

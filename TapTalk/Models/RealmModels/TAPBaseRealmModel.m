@@ -126,7 +126,7 @@
                 NSMutableArray *convertedArray = [NSMutableArray array];
                 RLMArray *realmArray = [self valueForKey:propertyName];
                 
-                for(int arrayCounter = 0; arrayCounter < [realmArray count]; arrayCounter++){
+                for (int arrayCounter = 0; arrayCounter < [realmArray count]; arrayCounter++){
                     [convertedArray addObject:[[realmArray objectAtIndex:counter] toDictionary]];
                 }
                 [dictionary setObject:convertedArray forKey:propertyName];

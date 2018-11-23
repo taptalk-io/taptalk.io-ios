@@ -22,6 +22,7 @@
 #import "TAPCustomAccessoryView.h"
 
 #import "TAPProductListBubbleTableViewCell.h" //DV Temp
+#import "TAPOrderCardBubbleTableViewCell.h" //CS Temp
 
 static const NSInteger kShowChatAnchorOffset = 70.0f;
 static const NSInteger kChatAnchorDefaultBottomConstraint = 63.0f;
@@ -77,7 +78,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 @property (nonatomic) long apiBeforeLastCreated;
 @property (nonatomic) BOOL isLastPage;
-@property (nonatomic) BOOL isViewAppeared;
+@property (nonatomic) BOOL isViewWillAppeared;
+@property (nonatomic) BOOL isViewDidAppeared;
 @property (nonatomic) KeyboardState keyboardState;
 @property (nonatomic) BOOL isKeyboardWasShowed;
 @property (nonatomic) BOOL isKeyboardShowed;
@@ -94,6 +96,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
+@property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
 
 - (IBAction)sendButtonDidTapped:(id)sender;
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
@@ -109,7 +112,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray toTop:(BOOL)toTop;
 - (void)sortAndFilterMessageArray;
 - (void)updateMessageModelValueWithMessage:(TAPMessageModel *)message;
-- (void)callAPIAfterAndUpdateUI;
+- (void)callAPIAfterAndUpdateUIAndScrollToTop:(BOOL)scrollToTop;
 - (void)saveMessageDraft;
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification;
 - (void)checkAnchorUnreadLabel;
@@ -118,6 +121,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)timerRefreshLastSeen;
 - (void)updateLastSeenWithTimestamp:(NSTimeInterval)timestamp;
 - (void)processMessageAsRead:(TAPMessageModel *)message;
+- (void)processVisibleMessageAsRead;
 
 @end
 
@@ -132,7 +136,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [UIView setAnimationDelay:0.0];
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
     [UIView performWithoutAnimation:^{
-        self.tableView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - 52.0f);
+        self.tableView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - kInputMessageAccessoryViewHeight - [TAPUtil safeAreaBottomPadding]);
     }];
     [UIView commitAnimations];
     
@@ -141,11 +145,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityStatusChange:) name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
+    
     self.navigationController.delegate = self;
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
     self.navigationController.interactivePopGestureRecognizer.enabled = YES;
     
-    if(IS_IPHONE_X_FAMILY) {
+    if (IS_IPHONE_X_FAMILY) {
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
     }
     
@@ -171,16 +177,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
     
     [self.tableView setTransform:CGAffineTransformMakeRotation(-M_PI)];
-    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 10.0f);
+    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 10.0f);
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     
     [UIView commitAnimations];
     
-    self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 8.0f, 0.0f);
-    
-//    self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-//    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, 0.0f);
+
     self.view.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
     
     //TitleView
@@ -220,7 +224,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     //RightBarButton
     UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
     RNImageView *rightBarImageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
-    [rightBarImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //DV Temp
+    [rightBarImageView setImageWithURLString:room.imageURL.thumbnail];
     
     rightBarImageView.layer.cornerRadius = CGRectGetHeight(rightBarImageView.frame) / 2.0f;
     rightBarImageView.clipsToBounds = YES;
@@ -286,7 +290,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    _isViewAppeared = YES;
+    _isViewWillAppeared = YES;
     
     self.connectionStatusViewController.view.frame = CGRectMake(CGRectGetMinX(self.connectionStatusViewController.view.frame), CGRectGetMinY(self.connectionStatusViewController.view.frame), CGRectGetWidth(self.connectionStatusViewController.view.frame), self.connectionStatusHeight);
 //    self.view.backgroundColor = [UIColor redColor];
@@ -306,26 +310,34 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    _isViewDidAppeared = YES;
+    
     [self.navigationController.interactivePopGestureRecognizer addTarget:self
                                                                   action:@selector(handleNavigationPopGesture:)];
     
-    [UIView performWithoutAnimation:^{
-        [self.messageTextView becameFirstResponder];
-    }];
+    if (self.keyboardHeight == 0.0f) {
+        [UIView performWithoutAnimation:^{
+            [self.messageTextView becameFirstResponder];
+        }];
+        
+        [UIView performWithoutAnimation:^{
+            [self.messageTextView resignFirstResponder];
+        }];
+    }
     
-    [UIView performWithoutAnimation:^{
-        [self.messageTextView resignFirstResponder];
-    }];
+    [self processVisibleMessageAsRead];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    _isViewAppeared = NO;
+    _isViewWillAppeared = NO;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
+    
+    _isViewDidAppeared = NO;
     
     [self.navigationController.interactivePopGestureRecognizer removeTarget:self action:@selector(handleNavigationPopGesture:)];
 }
@@ -337,6 +349,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
 }
 
 #pragma mark - Data Source
@@ -378,8 +391,26 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
     if ([self.messageArray count] != 0) {
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
+        
+        //DV Note - For product list bubble
+        //DV Temp
+//        [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
+//        TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//        return cell;
+        //END DV Temp
+        
+        //CS Note - For order card bubble
+        //CS Temp
+        
+//        [tableView registerNib:[TAPOrderCardBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPOrderCardBubbleTableViewCell description]];
+//        TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//        return cell;
+        //END CS Temp
         
         if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
             //My Chat
@@ -394,7 +425,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 
                 [cell setMessage:message];
 
-                if(self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
+                if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                     [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
                 }
                 else {
@@ -433,7 +464,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 [cell setMessage:editedMessage];
                 //End Temp
                 
-                if(self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
+                if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                     [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
                 }
                 else {
@@ -455,19 +486,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
             [cell setMessage:message];
 
-            if(self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
+            if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                 [cell showStatusLabel:YES animated:NO];
             }
             else {
                 [cell showStatusLabel:NO animated:NO];
             }
-            
-            //DV Note - For product list bubble
-            //DV Temp
-//            [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
-//            TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
-//            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            //END DV Temp
             
             return cell;
         }
@@ -481,18 +505,25 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if([self.messageArray count] == 0) {
+    if ([self.messageArray count] == 0) {
         return;
     }
     
+    //Process message as Read, remove local notification and call API read
+    TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
+    if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+        //Their chat
+        [self processMessageAsRead:message];
+    }
+    
     //Check and remove unread count message array
-    if([self.anchorUnreadMessageArray count] > 0) {
+    if ([self.anchorUnreadMessageArray count] > 0) {
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
         [self removeMessageFromAnchorUnreadArray:message];
     }
     
     //Retreive before message
-    if(indexPath.row == [self.messageArray count] - 5) {
+    if (indexPath.row == [self.messageArray count] - 5) {
         [self retrieveExistingMessages];
     }
 }
@@ -520,12 +551,18 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
         
         [self.view layoutIfNeeded];
+        
+        if (tableViewYContentInset <= self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight) {
+            //set keyboard state to default
+            _keyboardState = keyboardStateDefault;
+            [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+        }
     }];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(scrollView.contentOffset.y > kShowChatAnchorOffset) {
-        if(self.chatAnchorButton.alpha != 1.0f) {
+    if (scrollView.contentOffset.y > kShowChatAnchorOffset) {
+        if (self.chatAnchorButton.alpha != 1.0f) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.chatAnchorButton.alpha = 1.0f;
             }];
@@ -534,7 +571,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
     }
     else {
-        if(self.chatAnchorButton.alpha != 0.0f) {
+        if (self.chatAnchorButton.alpha != 0.0f) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.chatAnchorButton.alpha = 0.0f;
                 self.chatAnchorBadgeView.alpha = 0.0f;
@@ -542,12 +579,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
         
         //Check scrolled pending array
-        if(!self.isOnScrollPendingChecking) {
+        if (!self.isOnScrollPendingChecking) {
             _isOnScrollPendingChecking = YES;
             
             NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
             
-            if(numberOfPendingArray > 0) {
+            if (numberOfPendingArray > 0) {
                 //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
                 [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
                 
@@ -569,16 +606,16 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     CGFloat touchYPosition = positionInView.y + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO];
 
-    if(self.isKeyboardShowed && touchYPosition >= keyboardMinYPositionInView && self.keyboardHeight != keyboardAndAccessoryViewHeight && self.isScrollViewDragged) {
+    if (self.isKeyboardShowed && touchYPosition >= keyboardMinYPositionInView && self.keyboardHeight != keyboardAndAccessoryViewHeight && self.isScrollViewDragged) {
         CGFloat keyboardHeightDifference = touchYPosition - keyboardMinYPositionInView;
         
-        if(keyboardHeightDifference < 0.0f) {
+        if (keyboardHeightDifference < 0.0f) {
             keyboardHeightDifference = 0.0f;
         }
         
         CGFloat chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + (totalKeyboardHeight - keyboardHeightDifference) - kInputMessageAccessoryViewHeight;
     
-        if(chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint) {
+        if (chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint) {
             chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint;
         }
         self.chatAnchorButtonBottomConstrait.constant = chatAnchorBottomConstraint;
@@ -587,13 +624,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 #pragma mark UINavigationController
 - (void)handleNavigationPopGesture:(UIGestureRecognizer *)gestureRecognizer {
-    if(gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
         [self performSelector:@selector(checkIfNeedCloseRoomAfterDelay) withObject:nil afterDelay:0.5f];
     }
 }
 
 - (void)checkIfNeedCloseRoomAfterDelay {
-    if(!self.isViewAppeared) {
+    if (!self.isViewWillAppeared) {
         [self.lastSeenTimer invalidate];
         _lastSeenTimer = nil;
         [self destroySequence];
@@ -611,44 +648,29 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
-    
-    //Check if message exist in Message Pointer Dictionary
-    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
-    
-    if(currentMessage != nil) {
-        //Message exist in dictionary
-        [self handleMessageFromSocket:message];
-    }
-    else {
-        //Message not exist in dictionary
-        if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
-            //Bottom table view not seen, put message to holder array and insert the message when user scroll to bottom
-            [self.scrolledPendingMessageArray insertObject:message atIndex:0];
-            
-            //Add message to messageDictionary first to lower load time (pending message will be inserted to messageArray at scrollViewDidScroll and chatAnchorButtonDidTapped)
-            [self.messageDictionary setObject:message forKey:message.localID];
-            
-            [self addMessageToAnchorUnreadArray:message];
-        }
-        else {
-            //Bottom table view visible, insert message normally
-            [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
-            
-            NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-            [self.tableView beginUpdates];
-            [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            [self.tableView endUpdates];
-        }
+    if (![message.room.roomID isEqualToString:self.currentRoom.roomID]) {
+        //If message don't have the same room id, reject message
+        return;
     }
     
-    [self checkEmptyState];
+    [self handleMessageFromSocket:message];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
+    if (![message.room.roomID isEqualToString:self.currentRoom.roomID]) {
+        //If message don't have the same room id, reject message
+        return;
+    }
+    
     [self handleMessageFromSocket:message];
 }
 
 - (void)chatManagerDidReceiveDeleteMessageInActiveRoom:(TAPMessageModel *)message {
+    if (![message.room.roomID isEqualToString:self.currentRoom.roomID]) {
+        //If message don't have the same room id, reject message
+        return;
+    }
+    
     [self handleMessageFromSocket:message];
 }
 
@@ -731,7 +753,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 
                 [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                     //animation
-                    if(isMyCell) {
+                    if (isMyCell) {
                         [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
                     }
                     else {
@@ -836,7 +858,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             
             [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                 //animation
-                if(isMyCell) {
+                if (isMyCell) {
                     [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
                 }
                 else {
@@ -938,7 +960,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     self.connectionStatusHeight = height;
     [UIView animateWithDuration:0.2f animations:^{
         //change frame
-        self.tableViewTopConstraint.constant = height;
+        self.tableViewTopConstraint.constant = height - 50.0f;
         [self.view layoutIfNeeded];
     }];
 }
@@ -951,7 +973,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 #pragma mark UIImagePickerController
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
-        if([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:@"public.image"]) {
+        if ([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:@"public.image"]) {
             //IMAGE TYPE
             UIImage *selectedImage;
             if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
@@ -980,77 +1002,127 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)handleMessageFromSocket:(TAPMessageModel *)message {
-    //Update message into array and dictionary
-    //Need to take message before data updated to get current sending state
+    //Check if message exist in Message Pointer Dictionary
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
     
-    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    BOOL isSendingAnimation = NO;
-    if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
-        //My Message
-        if (currentMessage.isSending) {
-            //Message was sending
-            isSendingAnimation = YES;
-            NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
+    if(currentMessage != nil) {
+        //Message exist in dictionary
+        
+        //Update message into array and dictionary
+        //Need to take message before data updated to get current sending state
+        TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
+        
+        TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+        
+        BOOL isSendingAnimation = NO;
+        BOOL setAsDelivered = NO;
+        BOOL setAsRead = NO;
+        
+        if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
+            //My Message
+            if (currentMessage.isSending) {
+                //Message was sending
+                isSendingAnimation = YES;
+                NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
+            }
+            
+            if(!currentMessage.isDelivered && message.isDelivered) {
+                setAsDelivered = YES;
+            }
+            
+            if(!currentMessage.isRead && message.isRead) {
+                setAsRead = YES;
+            }
         }
-    }
-    
-    //Update message data
-    [self updateMessageModelValueWithMessage:message];
-    
-    //Update view
-    if (isSendingAnimation) {
+        
+        //Update message data
+        [self updateMessageModelValueWithMessage:message];
+        
+        //Update view
         NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
         NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-        [cell animateSendingIcon];
+        
+        if (isSendingAnimation) {
+            [cell animateSendingIcon];
+        }
+        else if (setAsDelivered) {
+            [cell setAsDelivered];
+        }
+        else if (setAsRead) {
+            [cell setAsRead];
+        }
+        else {
+            [cell setMessage:message];
+            
+//        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+//        [self.tableView reloadData];
+        }
     }
     else {
-        [self.tableView reloadData];
+        //Message not exist in dictionary
+        if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
+            //Bottom table view not seen, put message to holder array and insert the message when user scroll to bottom
+            [self.scrolledPendingMessageArray insertObject:message atIndex:0];
+            
+            //Add message to messageDictionary first to lower load time (pending message will be inserted to messageArray at scrollViewDidScroll and chatAnchorButtonDidTapped)
+            [self.messageDictionary setObject:message forKey:message.localID];
+            
+            [self addMessageToAnchorUnreadArray:message];
+        }
+        else {
+            //Bottom table view visible, insert message normally
+            [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
+            
+            NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+            [self.tableView beginUpdates];
+            [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            [self.tableView endUpdates];
+        }
     }
     
-    if(self.tableView.contentOffset.y == 0) {
-        //Only scroll if table view is at bottom
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
-    }
+    [self checkEmptyState];
 }
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
-    NSLog(@"--SHOW");
     CGFloat accessoryViewAndSafeAreaHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
     
     //set initial keyboard height to prevent wrong keyboard height usage
-    if(self.initialKeyboardHeight == 0.0f && keyboardHeight != accessoryViewAndSafeAreaHeight) {
+    if (self.initialKeyboardHeight == 0.0f && keyboardHeight != accessoryViewAndSafeAreaHeight) {
         self.initialKeyboardHeight = keyboardHeight;
     }
     
     if (self.keyboardHeight == 0.0f) {
         //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
-        if(keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
+        if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
             _keyboardHeight = keyboardHeight;
         }
     }
     CGFloat tempHeight = 0.0f;
     if (keyboardHeight > self.keyboardHeight) {
         //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
-        if(keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
+        if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
             tempHeight = self.keyboardHeight;
             _keyboardHeight = keyboardHeight;
         }
     }
     
+    //handle change keyboard height if keyboard is change to emoji
+    if (keyboardHeight > self.initialKeyboardHeight && keyboardHeight != accessoryViewAndSafeAreaHeight) {
+        _keyboardHeight = keyboardHeight;
+    }
+    
+    //set keyboard height to initial height
+    if (keyboardHeight == self.initialKeyboardHeight) {
+        _keyboardHeight = self.initialKeyboardHeight;
+    }
+    
     if (self.isKeyboardShowed) {
-        CGFloat additionalSpace = 0.0f;
-        if(IS_IPHONE_X_FAMILY) {
-            additionalSpace = [TAPUtil safeAreaBottomPadding] + [TAPUtil safeAreaTopPadding] - 20.0f;
-        }
-        [UIView performWithoutAnimation:^{
-            self.keyboardViewController.view.frame = CGRectMake(0.0f, -additionalSpace, CGRectGetWidth([UIScreen mainScreen].bounds), self.keyboardHeight);
-        }];
+        [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
     }
     
     //reject if scrollView is being dragged
-    if(self.isScrollViewDragged) {
+    if (self.isScrollViewDragged) {
         return;
     }
     
@@ -1061,7 +1133,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         CGFloat newYContentOffset = self.tableView.contentOffset.y - keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
-        if(newYContentOffset < -tableViewYContentInset) {
+        if (newYContentOffset < -tableViewYContentInset) {
             newYContentOffset = -tableViewYContentInset;
         }
         [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
@@ -1069,11 +1141,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         [self.view layoutIfNeeded];
         
         if (!self.isKeyboardShowed) {
-            CGFloat additionalSpace = 0.0f;
-            if(IS_IPHONE_X_FAMILY) {
-                additionalSpace = [TAPUtil safeAreaBottomPadding] + [TAPUtil safeAreaTopPadding] - 20.0f;
-            }
-            self.keyboardViewController.view.frame = CGRectMake(0.0f, -additionalSpace, CGRectGetWidth([UIScreen mainScreen].bounds), self.keyboardHeight);
+            [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
         }
     } completion:^(BOOL finished) {
         //Do something after animation completed.
@@ -1083,16 +1151,18 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
     }];
     
-    _isKeyboardShowed = YES;
+    if (keyboardHeight != accessoryViewAndSafeAreaHeight) {
+        _isKeyboardShowed = YES;
+    }
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
-    NSLog(@"--HIDE");
+    
     //set default keyboard height including accessory view height
     _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding;
     
     //reject if scrollView is being dragged
-    if(self.isScrollViewDragged) {
+    if (self.isScrollViewDragged) {
         return;
     }
     
@@ -1103,7 +1173,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         self.keyboardOptionButton.alpha = 1.0f;
         self.messageViewLeftConstraint.constant = 4.0f;
         
-        if(IS_IPHONE_X_FAMILY) {
+        if (IS_IPHONE_X_FAMILY) {
             self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
         }
         else {
@@ -1144,12 +1214,17 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     NSString *currentMessage = [TAPUtil nullToEmptyString:self.messageTextView.text];
     currentMessage = [currentMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
-    if(![currentMessage isEqualToString:@""]) {
+    if (![currentMessage isEqualToString:@""]) {
         [[TAPChatManager sharedManager] sendTextMessage:currentMessage];
         self.messageTextView.text = @"";
     }
     else {
         self.messageTextView.text = @"";
+    }
+    
+    if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
+        //Only scroll if table view is at bottom
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
     
     [self checkEmptyState];
@@ -1160,7 +1235,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         _keyboardState = keyboardStateOptions;
         
         [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
-        self.keyboardViewController.keyboardHeight = self.keyboardHeight;
+        [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
         
         self.secondaryTextField.inputView = self.keyboardViewController.inputView;
         if (IS_IPHONE_X_FAMILY) {
@@ -1307,6 +1382,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self.lastSeenTimer invalidate];
     _lastSeenTimer = nil;
     [self destroySequence];
+    
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -1320,12 +1396,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)checkEmptyState {
     if ([self.messageArray count] == 0) {
-        if(self.emptyView.alpha == 1.0f) {
+        if (self.emptyView.alpha == 1.0f) {
             return;
         }
         
         //show empty chat
         //WK Temp
+        TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+        
         TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
         NSString *roomName = room.name;
         NSString *emptyTitleString = [NSString stringWithFormat:@"%@ is an expert\ndon’t forget to check out her services!", roomName];
@@ -1346,13 +1424,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         self.senderImageView.layer.borderWidth = 4.0f;
         self.senderImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
         self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame) / 2.0f;
-        [self.senderImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //DV Temp
+        [self.senderImageView setImageWithURLString:activeUser.imageURL.thumbnail];
         self.senderImageView.backgroundColor = [UIColor clearColor];
         
         self.recipientImageView.layer.borderWidth = 4.0f;
         self.recipientImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
         self.recipientImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame) / 2.0f;
-        [self.recipientImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //DV Temp
+        [self.recipientImageView setImageWithURLString:room.imageURL.thumbnail];
         self.recipientImageView.backgroundColor = [UIColor clearColor];
         
         [UIView animateWithDuration:0.0f animations:^{
@@ -1360,7 +1438,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }];
     }
     else {
-        if(self.emptyView.alpha == 0.0f) {
+        if (self.emptyView.alpha == 0.0f) {
             return;
         }
         
@@ -1391,7 +1469,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     NSTimeInterval createdDate = [date timeIntervalSince1970] * 1000.0f;
     
     [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[NSNumber numberWithDouble:createdDate] limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *messageArray) {
-        if([messageArray count] == 0) {
+        if ([messageArray count] == 0) {
             //No chat history, first time chat
             [self checkEmptyState];
             
@@ -1416,7 +1494,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             NSNumber *maxCreated = latestMessage.created;
             
             NSNumber *lastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
-            if([lastUpdated longLongValue] == 0 || lastUpdated == nil) {
+            if ([lastUpdated longLongValue] == 0 || lastUpdated == nil) {
                 //First time call, set minCreated to lastUpdated preference
                 [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:minCreated];
             }
@@ -1426,9 +1504,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
                 //Update View
                 [self updateMessageDataAndUIWithMessages:messageArray toTop:YES];
+                
+                //Update leftover message status to delivered
+                if ([messageArray count] != 0) {
+                    [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
+                }
 
                 //Call API Before Message if count < 50
-                if([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
+                if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
                     [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:roomID maxCreated:minCreated];
                 }
 
@@ -1451,13 +1534,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)retrieveExistingMessages {
     //Prevent retreive before message if already last page
-    if(self.isLastPage) {
+    if (self.isLastPage) {
         return;
     }
     
     TAPMessageModel *lastMessage = [self.messageArray lastObject];
     
-    if(self.apiBeforeLastCreated == [lastMessage.created longLongValue]) {
+    if (self.apiBeforeLastCreated == [lastMessage.created longLongValue]) {
         return;
     }
     
@@ -1469,7 +1552,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
         
         //Call API Before when message array less than limit (50)
-        if([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
+        if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
             [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:lastMessage.room.roomID maxCreated:lastMessage.created];
         }
     } failure:^(NSError *error) {
@@ -1479,10 +1562,10 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:(NSString *)roomID maxCreated:(NSNumber *)maxCreated {
     //Call API Get Before Message
-    if([self.loadedMaxCreated longLongValue] != [maxCreated longLongValue]) {
+    if ([self.loadedMaxCreated longLongValue] != [maxCreated longLongValue]) {
         _loadedMaxCreated = maxCreated;
         [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated success:^(NSArray *messageArray, BOOL hasMore) {
-            if([messageArray count] != 0) {
+            if ([messageArray count] != 0) {
                 
                 _isLastPage = !hasMore;
                 
@@ -1506,9 +1589,9 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray toTop:(BOOL)toTop {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        for(TAPMessageModel *message in messageArray) {
+        for (TAPMessageModel *message in messageArray) {
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
-            if(currentMessage != nil) {
+            if (currentMessage != nil) {
                 //Message exist in dictionary
                 [self updateMessageModelValueWithMessage:message];
             }
@@ -1516,7 +1599,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 //Message not exist in dictionary
                 NSInteger index = 0;
                 
-                if(!toTop) {
+                if (!toTop) {
                     index = [self.messageArray count];
                 }
                 
@@ -1529,7 +1612,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
             
-            if(toTop) {
+            if (toTop) {
                 //RN To Do - Scroll to "Unread Message" marker after implemented
                 [self.tableView scrollsToTop];
             }
@@ -1571,22 +1654,38 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     currentMessage.isDeleted = message.isDeleted;
     currentMessage.isSending = message.isSending;
     currentMessage.isFailedSend = message.isFailedSend;
+    currentMessage.isRead = message.isRead;
+    currentMessage.isDelivered = message.isDelivered;
+    currentMessage.isHidden = message.isHidden;
 }
 
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer {
+    [self.keyboardViewController setKeyboardHeight:0.0f];
     [UIView animateWithDuration:0.2f animations:^{
         self.secondaryTextField.inputView.frame = CGRectMake(CGRectGetMinX(self.secondaryTextField.inputView.frame), 0.0f, CGRectGetWidth(self.secondaryTextField.inputView.frame), CGRectGetHeight(self.secondaryTextField.inputView.frame));
     }];
+    
+    //set keyboard state to default
+    _keyboardState = keyboardStateDefault;
+    [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+    
     [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
 }
 
-- (void)callAPIAfterAndUpdateUI {
+- (void)callAPIAfterAndUpdateUIAndScrollToTop:(BOOL)scrollToTop {
     TAPRoomModel *roomData = [TAPChatManager sharedManager].activeRoom;
     NSString *roomID = roomData.roomID;
     
     [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:self.minCreatedMessage success:^(NSArray *messageArray) {
         //Update View
-        [self updateMessageDataAndUIWithMessages:messageArray toTop:YES];
+        [self updateMessageDataAndUIWithMessages:messageArray toTop:scrollToTop];
+        
+        //Update leftover message status to delivered
+        if ([messageArray count] != 0) {
+            [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
+        }
+        
     } failure:^(NSError *error) {
         
     }];
@@ -1605,13 +1704,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification {
-    [self callAPIAfterAndUpdateUI];
+    [self callAPIAfterAndUpdateUIAndScrollToTop:YES];
 }
 
 - (IBAction)chatAnchorButtonDidTapped:(id)sender {
     NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
     
-    if(numberOfPendingArray > 0) {
+    if (numberOfPendingArray > 0) {
         //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
         [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
         
@@ -1629,8 +1728,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)checkAnchorUnreadLabel {
-    if([self.anchorUnreadMessageArray count] <= 0) {
-        if(self.chatAnchorBadgeView.alpha != 0.0f) {
+    if ([self.anchorUnreadMessageArray count] <= 0) {
+        if (self.chatAnchorBadgeView.alpha != 0.0f) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.chatAnchorBadgeView.alpha = 0.0f;
             }];
@@ -1639,7 +1738,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         self.chatAnchorBadgeLabel.text = @"0";
     }
     else {
-        if(self.chatAnchorBadgeView.alpha != 1.0f && self.chatAnchorButton.alpha == 1.0f) {
+        if (self.chatAnchorBadgeView.alpha != 1.0f && self.chatAnchorButton.alpha == 1.0f) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.chatAnchorBadgeView.alpha = 1.0f;
             }];
@@ -1650,14 +1749,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)addMessageToAnchorUnreadArray:(TAPMessageModel *)message {
-    if(![self.anchorUnreadMessageArray containsObject:message]) {
+    if (![self.anchorUnreadMessageArray containsObject:message]) {
         [self.anchorUnreadMessageArray addObject:message];
         [self checkAnchorUnreadLabel];
     }
 }
 
 - (void)removeMessageFromAnchorUnreadArray:(TAPMessageModel *)message {
-    if([self.anchorUnreadMessageArray containsObject:message]) {
+    if ([self.anchorUnreadMessageArray containsObject:message]) {
         [self.anchorUnreadMessageArray removeObject:message];
         [self checkAnchorUnreadLabel];
     }
@@ -1697,7 +1796,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if(IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_10_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -1738,7 +1837,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if(IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_10_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -1774,25 +1873,25 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     [self isShowOnlineDotStatus:NO];
     
-    if(timestamp < 0) {
+    if (timestamp < 0) {
         lastSeenString = NSLocalizedString(@"Active Now", @"");
         [self isShowOnlineDotStatus:YES];
     }
-    else if(timestamp == 0) {
+    else if (timestamp == 0) {
         lastSeenString = @"";
     }
-    else if(timeGap <= midnightTimeGap) {
-        if(timeGap < 60.0f) {
+    else if (timeGap <= midnightTimeGap) {
+        if (timeGap < 60.0f) {
             //Set recently
             lastSeenString = NSLocalizedString(@"Last seen recently", @"");
         }
-        else if(timeGap < 3600.0f) {
+        else if (timeGap < 3600.0f) {
             //Set minutes before
             NSInteger numberOfMinutes = floor(timeGap/60.0f);
             
             NSString *minuteString = NSLocalizedString(@"minutes", @"");
             
-            if(timeGap < 120.0f) {
+            if (timeGap < 120.0f) {
                 minuteString = NSLocalizedString(@"minute", @"");
             }
             
@@ -1804,31 +1903,31 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             
             NSString *hourString = NSLocalizedString(@"hours", @"");
             
-            if(timeGap < 120.0f) {
+            if (timeGap < 120.0f) {
                 hourString = NSLocalizedString(@"hour", @"");
             }
             
             lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfHours, hourString];
         }
     }
-    else if(timeGap <= 86400.0f * 6 + midnightTimeGap) {
+    else if (timeGap <= 86400.0f * 6 + midnightTimeGap) {
         //Set days ago
         
         NSInteger numberOfDays = floor(timeGap/86400.0f);
         
-        if(numberOfDays == 0) {
+        if (numberOfDays == 0) {
             numberOfDays = 1;
         }
         
         NSString *dayString = NSLocalizedString(@"days", @"");
         
-        if(timeGap < 86400.0f) {
+        if (timeGap < 86400.0f) {
             dayString = NSLocalizedString(@"day", @"");
         }
         
         lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfDays, dayString];
     }
-    else if(timeGap <= 86400.0f*7 + midnightTimeGap) {
+    else if (timeGap <= 86400.0f*7 + midnightTimeGap) {
         //Set a week ago
         lastSeenString = @"Last seen a week ago";
     }
@@ -1852,7 +1951,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)isShowOnlineDotStatus:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f, 7.0f, 7.0f);
         self.userStatusView.alpha = 1.0f;
         self.userStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 3.0f, 0.0f, 0.0f, 16.0f);
@@ -1875,15 +1974,53 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)processMessageAsRead:(TAPMessageModel *)message {
     BOOL isRead = message.isRead;
-    if(!isRead) {
-        //Remove local notification and send read status to server
+    
+    if(!self.isViewDidAppeared) {
+        //Do not process mark as read if from first view layout, visible message will be processed at processVisibleMessageAsRead
+        return;
+    }
+    
+    if(isRead) {
+        //Do not process if message has been read
+        return;
+    }
+    
+    //Remove local notification and send read status to server
+    NSLog(@"READ MESSAGE: %@", message.body);
+    
+    message.isRead = YES;
+    
+    //Call Message Status Manager mark as read call API
+    [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
+    
+    //Call Notification Manager remove local notification
+    [[TAPNotificationManager sharedManager] removeReadLocalNotificationWithMessage:message];
+    
+    //Call chat manager to decrease unread bubble in room list
+    [[TAPChatManager sharedManager] decreaseUnreadMessageForRoomID:message.room.roomID];
+}
+
+- (void)processVisibleMessageAsRead {
+    NSArray *visibleCellIndexPathArray = [self.tableView indexPathsForVisibleRows];
+    
+    for(NSIndexPath *indexPath in visibleCellIndexPathArray) {
+        TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
         
-        //DV Temp
-        //TODO
-        //Call Message Status Manager mark as read call API
-        
-        //Call Notification Manager remove local notification
-        //        [[TAPNotificationManager sharedManager] removeReadLocalNotificationWithMessage:message];
+        [self processMessageAsRead:currentMessage];
+    }
+}
+
+- (void)reachabilityStatusChange:(NSNotification *)notification {
+    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+        if (self.isNeedRefreshOnNetworkDown) {
+            //Update data from API when network down and reconnect
+            [self callAPIAfterAndUpdateUIAndScrollToTop:NO];
+            
+            _isNeedRefreshOnNetworkDown = NO;
+        }
+    }
+    else {
+        _isNeedRefreshOnNetworkDown = YES;
     }
 }
 

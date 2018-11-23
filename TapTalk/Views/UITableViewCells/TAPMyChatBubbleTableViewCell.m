@@ -9,6 +9,13 @@
 #import "TAPMyChatBubbleTableViewCell.h"
 #import "TAPGradientView.h"
 
+typedef NS_ENUM(NSInteger, TAPMyChatBubbleStatus) {
+    TAPMyChatBubbleStatusSending,
+    TAPMyChatBubbleStatusSent,
+    TAPMyChatBubbleStatusDelivered,
+    TAPMyChatBubbleStatusRead
+};
+
 @interface TAPMyChatBubbleTableViewCell()
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
@@ -42,6 +49,10 @@
 
 @property (strong, nonatomic) TAPGradientView *gradientView;
 
+@property (nonatomic) BOOL isOnSendingAnimation;
+@property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
+@property (nonatomic) BOOL isShouldChangeStatusAsRead;
+
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)retryButtonDidTapped:(id)sender;
@@ -49,6 +60,7 @@
 - (void)showReplyView:(BOOL)show withMessasge:(TAPMessageModel *)message;
 - (void)hideStatusLabelConstraintUpdateStatusIcon:(BOOL)updateStatusIcon;
 - (void)hideStatusLabelAlpha;
+- (void)setStatusIconUIWithStatus:(TAPMyChatBubbleStatus)status;
 
 @end
 
@@ -105,7 +117,7 @@
     _message = message;
     
     //WK Temp
-    BOOL isReply;
+    BOOL isReply = NO;
 //    if ([message.messageID integerValue] % 2 == 1) {
 //        isReply = YES;
 //    }
@@ -118,33 +130,22 @@
     if (!message.isFailedSend) {
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
+        
         if (message.isRead) {
             //MESSAGE IS READ BY RECIPIENT
-            self.statusIconRightConstraint.constant = 2.0f;
-            self.chatBubbleRightConstraint.constant = 16.0f;
-            self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconReadChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.statusIconImageView.alpha = 1.0f;
+            [self setStatusIconUIWithStatus:TAPMyChatBubbleStatusRead];
         }
         else if (message.isDelivered) {
             //MESSAGE IS DELIVERED TO RECIPIENT
-            self.statusIconRightConstraint.constant = 2.0f;
-            self.chatBubbleRightConstraint.constant = 16.0f;
-            self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDeliveredChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.statusIconImageView.alpha = 1.0f;
+            [self setStatusIconUIWithStatus:TAPMyChatBubbleStatusDelivered];
         }
         else if (message.isSending) {
             //MESSAGE IS BEING SENT
-            self.statusIconRightConstraint.constant = -17.0f;
-            self.chatBubbleRightConstraint.constant = 32.0f;
-            self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.sendingIconImageView.alpha = 1.0f;
+            [self setStatusIconUIWithStatus:TAPMyChatBubbleStatusSending];
         }
         else {
             //MESSAGE IS SENT
-            self.statusIconRightConstraint.constant = 2.0f;
-            self.chatBubbleRightConstraint.constant = 16.0f;
-            self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.statusIconImageView.alpha = 1.0f;
+            [self setStatusIconUIWithStatus:TAPMyChatBubbleStatusSent];
         }
     }
     else {
@@ -165,6 +166,8 @@
 }
 
 - (void)animateSendingIcon {
+    _isOnSendingAnimation = YES;
+    
     self.chatBubbleRightConstraint.constant = 32.0f;
     self.sendingIconLeftConstraint.constant = 4.0f;
     self.sendingIconImageView.alpha = 1.0f;
@@ -192,7 +195,41 @@
         [self.contentView layoutIfNeeded];
     } completion:^(BOOL finished) {
         self.sendingIconBottomConstraint.constant = -5.0f;
+        
+        _isOnSendingAnimation = NO;
+        
+        if(self.isShouldChangeStatusAsDelivered) {
+            //Change status to delivered after sending animation is done
+            _isShouldChangeStatusAsDelivered = NO;
+            [self setAsDelivered];
+        }
+        
+        if(self.isShouldChangeStatusAsRead) {
+            //Change status to read after sending animation is done
+            _isShouldChangeStatusAsRead = NO;
+            [self setAsRead];
+        }
     }];
+}
+
+- (void)setAsDelivered {
+    if(self.isOnSendingAnimation) {
+        //Don't change status if cell is animate sending, change when animation done
+        _isShouldChangeStatusAsDelivered = YES;
+        return;
+    }
+    
+    [self setStatusIconUIWithStatus:TAPMyChatBubbleStatusDelivered];
+}
+
+- (void)setAsRead {
+    if(self.isOnSendingAnimation) {
+        //Don't change status if cell is animate sending, change when animation done
+        _isShouldChangeStatusAsDelivered = YES;
+        return;
+    }
+    
+    [self setStatusIconUIWithStatus:TAPMyChatBubbleStatusRead];
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
@@ -217,14 +254,14 @@
         
         NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
         NSString *lastMessageDateString = @"";
-        if(timeGap <= midnightTimeGap) {
+        if (timeGap <= midnightTimeGap) {
             //Today
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
             lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
         }
-        else if(timeGap <= 86400.0f + midnightTimeGap) {
+        else if (timeGap <= 86400.0f + midnightTimeGap) {
             //Yesterday
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
@@ -245,7 +282,7 @@
         
         CGFloat animationDuration = 0.2f;
         
-        if(!animated) {
+        if (!animated) {
             animationDuration = 0.0f;
         }
         
@@ -344,7 +381,7 @@
     self.replyButtonRightConstraint.constant = -28.0f;
     self.statusIconBottomConstraint.constant = 2.0f;
     
-    if(updateStatusIcon) {
+    if (updateStatusIcon) {
         self.statusIconImageView.alpha = 1.0f;
     }
 }
@@ -353,4 +390,36 @@
     self.chatBubbleButton.userInteractionEnabled = YES;
     self.statusLabel.alpha = 0.0f;
 }
+
+- (void)setStatusIconUIWithStatus:(TAPMyChatBubbleStatus)status {
+    if (status == TAPMyChatBubbleStatusRead) {
+        //MESSAGE IS READ BY RECIPIENT
+        self.statusIconRightConstraint.constant = 2.0f;
+        self.chatBubbleRightConstraint.constant = 16.0f;
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconReadChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.alpha = 1.0f;
+    }
+    else if (status == TAPMyChatBubbleStatusDelivered) {
+        //MESSAGE IS DELIVERED TO RECIPIENT
+        self.statusIconRightConstraint.constant = 2.0f;
+        self.chatBubbleRightConstraint.constant = 16.0f;
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDeliveredChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.alpha = 1.0f;
+    }
+    else if (status == TAPMyChatBubbleStatusSent) {
+        //MESSAGE IS SENT
+        self.statusIconRightConstraint.constant = 2.0f;
+        self.chatBubbleRightConstraint.constant = 16.0f;
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.alpha = 1.0f;
+    }
+    else if (status == TAPMyChatBubbleStatusSending) {
+        //MESSAGE IS BEING SENT
+        self.statusIconRightConstraint.constant = -17.0f;
+        self.chatBubbleRightConstraint.constant = 32.0f;
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.sendingIconImageView.alpha = 1.0f;
+    }
+}
+
 @end

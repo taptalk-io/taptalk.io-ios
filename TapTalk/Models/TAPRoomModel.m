@@ -18,7 +18,7 @@
     
     NSString *roomID = @"";
     
-    if(currentUserIDInteger <= otherUserIDInteger) {
+    if (currentUserIDInteger <= otherUserIDInteger) {
         roomID = [NSString stringWithFormat:@"%li-%li", (long)currentUserIDInteger, (long)otherUserIDInteger];
     }
     else {

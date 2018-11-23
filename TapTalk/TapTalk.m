@@ -35,7 +35,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
         
@@ -58,7 +58,7 @@
         //Send Push Token to server
         NSString *pushToken = [[TAPNotificationManager sharedManager] pushToken];
         
-        if(pushToken != nil) {
+        if (pushToken != nil) {
 
             BOOL isDebug = NO;
 #ifdef DEBUG
@@ -90,7 +90,7 @@
 - (BOOL)isAuthenticated {
     NSString *accessToken = [TAPDataManager getAccessToken];
     
-    if(accessToken == nil || [accessToken isEqualToString:@""]) {
+    if (accessToken == nil || [accessToken isEqualToString:@""]) {
         return NO;
     }
     
@@ -129,6 +129,9 @@
     //Clean database message that is more than 1 month old every 1 week.
     [TAPOldDataManager runCleaningOldDataSequence];
     
+    //Set TapTalk Environment to ConnectionManager (For define SocketURL)
+    [[TAPConnectionManager sharedManager] setSocketURLWithTapTalkEnvironment:self.environment];
+    
     //Validate and refresh access token
     [[TAPConnectionManager sharedManager] validateToken];
 }
@@ -161,6 +164,19 @@
     //Call to run room list view controller sequence
     self.roomListViewController.isShouldNotLoadFromAPI = NO;
     [self.roomListViewController viewLoadedSequence];
+    
+    
+    //DV Temp
+    //Temporary show log notification prefs
+//    NSMutableArray *pushNotificationArray = [[NSMutableArray alloc] init];
+//    pushNotificationArray = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_INCOMING_PUSH_NOTIFICATION valid:nil];
+//    
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Log Push Notification"
+//                                                    message:[NSString stringWithFormat:@"COUNT DICT NOTIFICATION: %ld", (long)[pushNotificationArray count]]
+//                                                   delegate:self
+//                                          cancelButtonTitle:@"OK"
+//                                          otherButtonTitles:nil];
+//    [alert show];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -177,13 +193,16 @@
 
     [[TAPChatManager sharedManager] removeAllBackgroundSequenceTaskWithApplication:application];
 
-    if([TAPChatManager sharedManager].activeUser != nil) {
+    if ([TAPChatManager sharedManager].activeUser != nil) {
         //User active
         [[TAPConnectionManager sharedManager] connect];
     }
 
     //Start trigger timer to save new message
     [[TAPChatManager sharedManager] triggerSaveNewMessage];
+    
+    //Start trigger timer to update read and delivered message status
+    [[TAPMessageStatusManager sharedManager] triggerUpdateStatus];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -214,7 +233,7 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
         return;
     }
     
@@ -263,17 +282,17 @@
     
     NSString *versionFromPrefs = @"";
     
-    if([versionObject isKindOfClass:[NSNumber class]]) {
+    if ([versionObject isKindOfClass:[NSNumber class]]) {
         versionFromPrefs = [versionObject stringValue];
     }
-    else if([versionObject isKindOfClass:[NSString class]]) {
+    else if ([versionObject isKindOfClass:[NSString class]]) {
         versionFromPrefs = versionObject;
     }
     
-    if(versionFromPrefs == nil || [versionFromPrefs isEqualToString:@""]){
+    if (versionFromPrefs == nil || [versionFromPrefs isEqualToString:@""]){
         [self resetPersistent];
     }
-    else if(APP_VERSION_GREATER_THAN(versionFromPrefs)) {
+    else if (APP_VERSION_GREATER_THAN(versionFromPrefs)) {
         
     }
     else {
@@ -293,7 +312,7 @@
 #pragma mark - Delegate
 #pragma mark TAPNotificationManager
 - (void)notificationManagerDidHandleTappedNotificationWithMessage:(TAPMessageModel *)message {
-    if([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:)]) {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:)]) {
         [self.delegate tapTalkDidTappedNotificationWithMessage:message];
     }
 }
@@ -317,6 +336,7 @@
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
     
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.currentRoom = room;
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
@@ -327,13 +347,14 @@
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
     
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.currentRoom = room;
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
 - (void)shouldRefreshAuthTicket {
     [[TAPChatManager sharedManager] disconnect];
     
-    if([self.delegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
+    if ([self.delegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
         [self.delegate tapTalkShouldResetAuthTicket];
     }
 }

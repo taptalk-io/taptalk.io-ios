@@ -34,7 +34,7 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     
-    if(self) {
+    if (self) {
         _isShouldForceUpdateUnreadBubble = YES;
         
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 70.0f)];
@@ -117,7 +117,8 @@
     BOOL isGroup = NO;
     NSString *lastSender = message.room.name; //DV Note - For Group Only
     BOOL isMuted = NO;
-    NSString *profileImageURL = TAP_DUMMY_IMAGE_URL;
+    NSString *profileImageURL = message.room.imageURL.thumbnail;
+//    NSString *profileImageURL = roomList.lastMessage.user.imageURL.thumbnail;
     //END DV Temp
     
     NSInteger numberOfUnreadMessage = roomList.numberOfUnreadMessages;
@@ -146,14 +147,14 @@
     NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
     
     NSString *timeString = @"";
-    if(timeGap <= midnightTimeGap) {
+    if (timeGap <= midnightTimeGap) {
         //Today
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
         NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
         timeString = dateString;
     }
-    else if(timeGap <= 86400.0f + midnightTimeGap) {
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Yesterday
         timeString = NSLocalizedString(@"Yesterday", @"");
     }
@@ -171,18 +172,18 @@
     
     TAPMessageStatusType statusType = TAPMessageStatusTypeNone;
     NSString *currentUserID = [TAPChatManager sharedManager].activeUser.userID;
-    if([message.user.userID isEqualToString:currentUserID]) {
+    if ([message.user.userID isEqualToString:currentUserID]) {
         //last message is from ourself
-        if(message.isRead) {
+        if (message.isRead) {
             statusType = TAPMessageStatusTypeRead;
         }
-        else if(message.isDelivered) {
+        else if (message.isDelivered) {
             statusType = TAPMessageStatusTypeDelivered;
         }
-        else if(message.isSending) {
+        else if (message.isSending) {
             statusType = TAPMessageStatusTypeSending;
         }
-        else if(message.isFailedSend) {
+        else if (message.isFailedSend) {
             statusType = TAPMessageStatusTypeFailed;
         }
         else {
@@ -304,13 +305,13 @@
     }
     
     //Check if cell is reused, forece update unread bubble
-    if(self.isShouldForceUpdateUnreadBubble) {
+    if (self.isShouldForceUpdateUnreadBubble) {
         updateUnreadBubble = YES;
         _isShouldForceUpdateUnreadBubble = NO;
     }
     
     //Only update unread bubble when count unread from database
-    if(updateUnreadBubble) {
+    if (updateUnreadBubble) {
         //Unread bubble
         if (numberOfUnreadMessage == 0) {
             self.bubbleUnreadView.alpha = 0.0f;

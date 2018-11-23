@@ -10,8 +10,10 @@
 
 #import <AFNetworking/AFNetworking.h>
 
-#define kSocketURL @"wss://hp-dev.moselo.com:8080/pigeon"
-//#define kSocketURL @"wss://hp-staging.moselo.com:8080/pigeon"
+#define kSocketURLDevelopment @"wss://hp-dev.moselo.com:8080/pigeon"
+#define kSocketURLStaging @"wss://hp-staging.moselo.com:8080/pigeon"
+#define kSocketURLProduction @"wss://hp.moselo.com:8080/pigeon"
+
 //#define kSocketURL @"wss://echo.websocket.org"
 
 #define kSocketAutomaticallyReconnect YES
@@ -20,9 +22,10 @@
 
 @interface TAPConnectionManager () <SRWebSocketDelegate>
 
-@property(strong, nonatomic) SRWebSocket *webSocket;
-@property(nonatomic) NSInteger reconnectAttempt;
-@property(nonatomic) BOOL isShouldReconnect;
+@property (strong, nonatomic) SRWebSocket *webSocket;
+@property (strong, nonatomic) NSString *socketURL;
+@property (nonatomic) NSInteger reconnectAttempt;
+@property (nonatomic) BOOL isShouldReconnect;
 
 - (void)tryToReconnect;
 - (void)reconnect;
@@ -45,8 +48,9 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         _tapConnectionStatus = TAPConnectionManagerStatusTypeNotConnected;
+        _socketURL = [[NSString alloc] init];
     }
     
     return self;
@@ -69,7 +73,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_CONNECTED object:nil];
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerDidConnected)]) {
+    if ([self.delegate respondsToSelector:@selector(connectionManagerDidConnected)]) {
         [self.delegate connectionManagerDidConnected];
     }
 }
@@ -80,13 +84,20 @@
 #endif
 
     NSString *messageString = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-    NSDictionary *messageDictionary = [TAPUtil jsonObjectFromString:messageString];
     
-    NSString *eventName = [messageDictionary objectForKey:@"eventName"];
-    NSDictionary *dataDictionary = [messageDictionary objectForKey:@"data"];
+    //Seperate combined message from server if exist
+    NSArray *messageArray = [messageString componentsSeparatedByString:@"\n"];
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerDidReceiveNewEmit:parameter:)]) {
-        [self.delegate connectionManagerDidReceiveNewEmit:eventName parameter:dataDictionary];
+    //Loop for combined message from server
+    for (NSString *currentMessage in messageArray) {
+        NSDictionary *messageDictionary = [TAPUtil jsonObjectFromString:currentMessage];
+        
+        NSString *eventName = [messageDictionary objectForKey:@"eventName"];
+        NSDictionary *dataDictionary = [messageDictionary objectForKey:@"data"];
+        
+        if ([self.delegate respondsToSelector:@selector(connectionManagerDidReceiveNewEmit:parameter:)]) {
+            [self.delegate connectionManagerDidReceiveNewEmit:eventName parameter:dataDictionary];
+        }
     }
 }
 
@@ -99,7 +110,7 @@
     
     _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerDidReceiveError:)]) {
+    if ([self.delegate respondsToSelector:@selector(connectionManagerDidReceiveError:)]) {
         [self.delegate connectionManagerDidReceiveError:error];
     }
     
@@ -115,8 +126,8 @@
     
     _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
-        if(reason == nil) {
+    if ([self.delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
+        if (reason == nil) {
             reason = @"";
         }
         
@@ -141,7 +152,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_CONNECTING object:nil];
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerIsConnecting)]) {
+    if ([self.delegate respondsToSelector:@selector(connectionManagerIsConnecting)]) {
         [self.delegate connectionManagerIsConnecting];
     }
     
@@ -151,7 +162,7 @@
     [self validateToken];
         
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
-    NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:kSocketURL]];
+    NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
     NSString *appKey = [NSString stringWithFormat:@"%@:%@", TAP_APP_KEY_ID, TAP_APP_KEY_SECRET];
     NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];
     NSString *encodedAppKey = [base64Data base64EncodedStringWithOptions:0];
@@ -177,7 +188,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_RECONNECTING object:nil];
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerIsReconnecting)]) {
+    if ([self.delegate respondsToSelector:@selector(connectionManagerIsReconnecting)]) {
         [self.delegate connectionManagerIsReconnecting];
     }
     
@@ -219,24 +230,24 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_DISCONNECTED object:nil];
     
-    if([self.delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
+    if ([self.delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
         [self.delegate connectionManagerDidDisconnectedWithCode:1 reason:@"User close connection" cleanClose:YES];
     }
 }
 
 - (void)tryToReconnect {
-    if([TapTalk sharedInstance].instanceState == TapTalkInstanceStateInactive) {
+    if ([TapTalk sharedInstance].instanceState == TapTalkInstanceStateInactive) {
         //Don't reconnect if apps is in background and doesn't have background sequence task
         _reconnectAttempt = 0;
         return;
     }
     
-    if(self.isShouldReconnect) {
+    if (self.isShouldReconnect) {
         _reconnectAttempt++;
         
         CGFloat reconnectDelay = self.reconnectAttempt * kSocketReconnectDelay;
         
-        if(reconnectDelay > kSocketReconnectMaximumMultiplier) {
+        if (reconnectDelay > kSocketReconnectMaximumMultiplier) {
             //Set maximum reconnect delay if excedeed
             reconnectDelay = kSocketReconnectMaximumMultiplier;
         }
@@ -257,6 +268,18 @@
     } failure:^(NSError *error) {
         
     }];
+}
+
+- (void)setSocketURLWithTapTalkEnvironment:(TapTalkEnvironment)environment {
+    if (environment == TapTalkEnvironmentProduction) {
+        _socketURL = kSocketURLProduction;
+    }
+    else if (environment == TapTalkEnvironmentStaging) {
+        _socketURL = kSocketURLStaging;
+    }
+    else {
+        _socketURL = kSocketURLDevelopment;
+    }
 }
 
 @end

@@ -24,6 +24,8 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeGetUserByXCUserID,
     TAPAPIManagerTypeGetUserByUsername,
     TAPAPIManagerTypeUpdatePushNotification,
+    TAPAPIManagerTypeUpdateMessageDeliveryStatus,
+    TAPAPIManagerTypeUpdateMessageReadStatus
 };
 
 @interface TAPAPIManager : NSObject

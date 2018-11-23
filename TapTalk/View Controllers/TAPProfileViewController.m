@@ -49,7 +49,8 @@
     [self.profileView.navigationBackButton addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.profileView.backButton addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-    [self.profileView.profileImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //WK Temp - Dummy image url
+//    [self.profileView.profileImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //WK Temp - Dummy image url
+    [self.profileView.profileImageView setImageWithURLString:self.room.imageURL.thumbnail]; //WK Temp - Dummy image url
     
     self.profileView.nameLabel.text = self.room.name;
     self.profileView.navigationNameLabel.text = self.room.name;
@@ -162,7 +163,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     static NSString *cellID = @"UICollectionViewCell";
     [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:cellID];
     UICollectionViewCell *cell = (UICollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor blueColor];
     
     return cell;
 }

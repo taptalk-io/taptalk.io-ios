@@ -26,8 +26,9 @@
     [super viewDidLoad];
     self.inputView = self.customInputView;
     self.inputView.autoresizingMask = UIViewAutoresizingNone;
+    self.inputView.allowsSelfSizing = YES;
     self.view.autoresizingMask = UIViewAutoresizingNone;
-    self.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), self.keyboardHeight);
+    self.customInputViewHeightConstraint.constant = self.keyboardHeight;
 }
 
 #pragma mark - Data Source
@@ -91,5 +92,9 @@
 }
 
 #pragma mark - Custom Method
+- (void)setKeyboardHeight:(CGFloat)keyboardHeight {
+    _keyboardHeight = keyboardHeight;
+    self.customInputViewHeightConstraint.constant = self.keyboardHeight;
+}
 
 @end

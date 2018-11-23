@@ -205,14 +205,14 @@
     
     NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
     NSString *lastMessageDateString = @"";
-    if(timeGap <= midnightTimeGap) {
+    if (timeGap <= midnightTimeGap) {
         //Today
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
         NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
         lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
     }
-    else if(timeGap <= 86400.0f + midnightTimeGap) {
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Yesterday
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
@@ -273,8 +273,8 @@
     CGFloat imageWidth = image.size.width;
     CGFloat imageHeight = image.size.height;
     
-    if(imageWidth > imageHeight) {
-        if(imageWidth > self.maxWidth) {
+    if (imageWidth > imageHeight) {
+        if (imageWidth > self.maxWidth) {
             imageWidth = self.maxWidth;
             _cellWidth = imageWidth;
             
@@ -306,7 +306,7 @@
         }
     }
     else {
-        if(imageHeight > self.maxHeight) {
+        if (imageHeight > self.maxHeight) {
             imageHeight = self.maxHeight;
             _cellHeight = imageHeight;
             

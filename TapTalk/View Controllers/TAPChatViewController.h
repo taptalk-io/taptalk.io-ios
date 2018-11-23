@@ -11,4 +11,6 @@
 
 @interface TAPChatViewController : TAPBaseViewController
 
+@property (strong, nonatomic) TAPRoomModel *currentRoom;
+
 @end

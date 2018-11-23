@@ -87,7 +87,7 @@
 }
 
 - (void)isShowTwoOptionButton:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.leftButton.userInteractionEnabled = YES;
         self.leftButton.alpha = 1.0f;
     }
@@ -100,7 +100,7 @@
 - (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo {
     _popupInfoViewType = popupInfoViewType;
     
-    if(self.popupInfoViewType == TAPPopupInfoViewTypeErrorMessage) {
+    if (self.popupInfoViewType == TAPPopupInfoViewTypeErrorMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeAlert];
         self.titleLabel.text = title;
         self.detailLabel.text = detailInfo;
@@ -112,7 +112,7 @@
 
 - (void)setPopupInfoViewThemeType:(TAPPopupInfoViewThemeType)popupInfoViewThemeType {
     _popupInfoViewThemeType = popupInfoViewThemeType;
-    if(self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeAlert) {
+    if (self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeAlert) {
         [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
         

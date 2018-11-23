@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id<TAPKeyboardViewControllerDelegate> delegate;
 @property (nonatomic) CGFloat keyboardHeight;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *customInputViewHeightConstraint;
+
 @end
 
 NS_ASSUME_NONNULL_END

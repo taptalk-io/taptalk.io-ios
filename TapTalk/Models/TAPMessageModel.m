@@ -26,6 +26,11 @@
     messageForReturn.body = body;
     messageForReturn.localID = [messageForReturn generateLocalIDwithLength:32];
     messageForReturn.isSending = YES;
+    messageForReturn.isDeleted = NO;
+    messageForReturn.isFailedSend = NO;
+    messageForReturn.isRead = NO;
+    messageForReturn.isDelivered = NO;
+    messageForReturn.isHidden = NO;
     
     //Obtain other user ID
     NSString *roomID = room.roomID;
@@ -38,8 +43,8 @@
     NSString *otherUserID = @"";
     NSArray *userIDArray = [roomID componentsSeparatedByString:@"-"];
     
-    for(NSString *userID in userIDArray) {
-        if(![userID isEqualToString:currentUserID]) {
+    for (NSString *userID in userIDArray) {
+        if (![userID isEqualToString:currentUserID]) {
             otherUserID = userID;
         }
     }

@@ -101,6 +101,7 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *notesViewHeightLayoutConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *additionalCostViewHeightLayoutConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *discountViewHeightLayoutConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *orderCardViewLeadingConstraint;
 
 - (void)showMoreProductView:(BOOL)isShow;
 - (void)showCourierView:(BOOL)isShow;
@@ -133,6 +134,7 @@
     self.orderCardView.layer.borderWidth = 1.0f;
     self.orderCardView.layer.cornerRadius = 10.0f;
     self.orderCardView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.orderCardView.clipsToBounds = YES;
     
     self.additionalCostDotView.layer.cornerRadius = CGRectGetHeight(self.additionalCostDotView.frame) / 2.0f;
     self.discountDotView.layer.cornerRadius = CGRectGetHeight(self.additionalCostDotView.frame) / 2.0f;
@@ -175,6 +177,12 @@
     self.currentStatusView.layer.borderColor = [TAPUtil getColor:@"CCE7E2"].CGColor;
     self.currentStatusView.layer.borderWidth = 1.0f;
     
+    self.datePlaceholderLabel.text = NSLocalizedString(@"Due Date", @"");
+    self.timePlaceholderLabel.text = NSLocalizedString(@"Due Time", @"");
+    
+    //CS Temp
+    [self setOrderCardSenderType:OrderCardSenderTypeMy];
+    //END CS Temp
 }
 
 - (void)prepareForReuse {
@@ -190,7 +198,7 @@
 
 #pragma mark - Custom Method
 - (void)showMoreProductView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.moreProductHeightLayoutConstraint.constant = 25.0f;
     }
     else {
@@ -199,7 +207,7 @@
 }
 
 - (void)showCourierView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.courierViewHeightLayoutConstraint.constant = 48.0f;
     }
     else {
@@ -208,7 +216,7 @@
 }
 
 - (void)showNotesView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.notesViewHeightLayoutConstraint.constant = 48.0f;
     }
     else {
@@ -217,7 +225,7 @@
 }
 
 - (void)showAdditionalCostView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.additionalCostViewHeightLayoutConstraint.constant = 29.0f;
     }
     else {
@@ -226,7 +234,7 @@
 }
 
 - (void)showDiscountView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.discountViewHeightLayoutConstraint.constant = 29.0f;
     }
     else {
@@ -235,7 +243,7 @@
 }
 
 - (void)showAdditionalCostDotView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.additionalCostDotView.alpha = 1.0f;
     }
     else {
@@ -244,7 +252,7 @@
 }
 
 - (void)showDiscountDotView:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.discountDotView.alpha = 1.0f;
     }
     else {
@@ -284,56 +292,69 @@
 }
 
 - (IBAction)headerButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedHeaderButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedHeaderButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedHeaderButtonDidTapped];
     }
 }
 
 - (IBAction)orderStatusButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedOrderStatusButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedOrderStatusButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedOrderStatusButtonDidTapped];
     }
 }
 
 - (IBAction)reviewConfirmActionButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedReviewConfirmActionButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedReviewConfirmActionButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedReviewConfirmActionButtonDidTapped];
     }
 }
 
 - (IBAction)updateCostActionButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedUpdateCostActionButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedUpdateCostActionButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedUpdateCostActionButtonDidTapped];
     }
 }
 
 - (IBAction)confirmPaymentActionButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedConfirmPaymentActionButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedConfirmPaymentActionButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedConfirmPaymentActionButtonDidTapped];
     }
 }
 
 - (IBAction)reviewOrderActionButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedReviewOrderActionButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedReviewOrderActionButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedReviewOrderActionButtonDidTapped];
     }
 }
 
 - (IBAction)markFinishedActionButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedMarkFinishedActionButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedMarkFinishedActionButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedMarkFinishedActionButtonDidTapped];
     }
 }
 
 - (IBAction)expertMarkFinishedButtonDidTapped:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedExpertMarkFinishedButtonDidTapped)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedExpertMarkFinishedButtonDidTapped)]) {
         [self.delegate orderCardBubbleDidTappedExpertMarkFinishedButtonDidTapped];
     }
 }
 
 - (IBAction)currentStatusButton:(id)sender {
-    if([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedCurrentStatusButton)]) {
+    if ([self.delegate respondsToSelector:@selector(orderCardBubbleDidTappedCurrentStatusButton)]) {
         [self.delegate orderCardBubbleDidTappedCurrentStatusButton];
+    }
+}
+
+- (void)setOrderCardSenderType:(OrderCardSenderType *)orderCardSenderType {
+    _orderCardSenderType = orderCardSenderType;
+    if (self.orderCardSenderType == OrderCardSenderTypeMy) {
+        self.orderCardView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+        self.orderCardViewLeadingConstraint.constant = 16.0f;
+
+    }
+    else if (self.orderCardSenderType == OrderCardSenderTypeYour){
+        self.orderCardView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+        self.orderCardViewLeadingConstraint.constant = CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.orderCardView.frame) - 16.0f;
     }
 }
 

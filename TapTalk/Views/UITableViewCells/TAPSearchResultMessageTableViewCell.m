@@ -29,7 +29,7 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     
-    if(self) {
+    if (self) {
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 70.0f)];
         [self.contentView addSubview:self.bgView];
         
@@ -111,14 +111,14 @@
     NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
     
     NSString *timeString = @"";
-    if(timeGap <= midnightTimeGap) {
+    if (timeGap <= midnightTimeGap) {
         //Today
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
         NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
         timeString = dateString;
     }
-    else if(timeGap <= 86400.0f + midnightTimeGap) {
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Yesterday
         timeString = NSLocalizedString(@"Yesterday", @"");
     }
@@ -136,15 +136,15 @@
     
     TAPSearchResultMessageStatusType statusType = TAPSearchResultMessageStatusTypeNone;
     NSString *currentUserID = [TAPChatManager sharedManager].activeUser.userID;
-    if([message.user.userID isEqualToString:currentUserID]) {
+    if ([message.user.userID isEqualToString:currentUserID]) {
         //last message is from ourself
-        if(message.isRead) {
+        if (message.isRead) {
             statusType = TAPSearchResultMessageStatusTypeRead;
         }
-        else if(message.isDelivered) {
+        else if (message.isDelivered) {
             statusType = TAPSearchResultMessageStatusTypeDelivered;
         }
-        else if(message.isSending) {
+        else if (message.isSending) {
             statusType = TAPSearchResultMessageStatusTypeSending;
         }
         else {
@@ -153,7 +153,7 @@
     }
     else {
         //last message is from other user
-        if(message.isFailedSend) {
+        if (message.isFailedSend) {
             statusType = TAPSearchResultMessageStatusTypeFailed;
         }
     }

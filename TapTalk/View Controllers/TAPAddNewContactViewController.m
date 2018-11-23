@@ -8,11 +8,13 @@
 
 #import "TAPAddNewContactViewController.h"
 #import "TAPAddNewContactView.h"
+#import "TAPScanQRCodePopupView.h"
 #import <AFNetworking/AFNetworking.h>
 
 @interface TAPAddNewContactViewController () <UITextFieldDelegate>
 
 @property (strong, nonatomic) TAPAddNewContactView *addNewContactView;
+@property (strong, nonatomic) TAPScanQRCodePopupView *addContactPopupView;
 @property (strong, nonatomic) TAPUserModel *searchedUser;
 @property (strong, nonatomic) NSString *updatedString;
 
@@ -55,6 +57,13 @@
     [self.addNewContactView.searchBarView.searchTextField becomeFirstResponder];
     
     _wasFailedGetData = NO;
+    
+    _addContactPopupView = [[TAPScanQRCodePopupView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
+    [self.addContactPopupView.closePopupButton addTarget:self action:@selector(closePopupButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.addContactPopupView.chatNowButton addTarget:self action:@selector(userChatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.addContactPopupView showPopupView:NO animated:NO];
+    [self.navigationController.view addSubview:self.addContactPopupView];
+    [self.navigationController.view bringSubviewToFront:self.addContactPopupView];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityStatusChange:) name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
 }
@@ -127,12 +136,30 @@
 
 #pragma mark - Custom Method
 - (void)userChatNowButtonDidTapped {
+    [self.addContactPopupView setPopupViewToDefault];
+    [self.addContactPopupView showPopupView:NO animated:NO];
+    
     [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+    
+    //CS NOTE - Remove this VC in Navigation Stack to skip on pop
+    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
+    [navigationArray removeObject:self];
+    self.navigationController.viewControllers = navigationArray;
 }
 
 - (void)addUserToContactButtonDidTapped {
     [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
+        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
+        [self.addContactPopupView showPopupView:YES animated:YES];
+        [self.addContactPopupView animateExpandingView];
         [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
+        
+        //Refresh Contact List From API
+        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
+        } failure:^(NSError *error) {
+        }];
+        
     } failure:^(NSError *error) {
 #ifdef DEBUG
         NSLog(@"%@", error);
@@ -146,6 +173,10 @@
 
 - (void)addExpertToContactButtonDidTapped {
     [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
+        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
+        [self.addContactPopupView showPopupView:YES animated:YES];
+        [self.addContactPopupView animateExpandingView];
         [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
     } failure:^(NSError *error) {
 #ifdef DEBUG
@@ -203,13 +234,19 @@
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([AFNetworkReachabilityManager sharedManager].reachable) {
         //CONNECTION AVAILABLE
         if (self.wasFailedGetData) {
             //RE-CALL API
             [self reloadDataWithString];
         }
     }
+}
+
+- (void)closePopupButtonDidTapped {
+    [self.addContactPopupView setPopupViewToDefault];
+    [self.addContactPopupView showPopupView:NO animated:NO];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end

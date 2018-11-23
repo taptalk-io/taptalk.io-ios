@@ -27,7 +27,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
-    if(self) {
+    if (self) {
         
         self.backgroundColor = [UIColor clearColor];
         
@@ -71,7 +71,7 @@
         [self.overlayView addSubview:self.bottomBlackView];
         
         CGFloat additionalBottomGap = 12.0f;
-        if(IS_IPHONE_X_FAMILY) {
+        if (IS_IPHONE_X_FAMILY) {
             additionalBottomGap += [TAPUtil safeAreaBottomPadding];
         }
         
@@ -112,7 +112,7 @@
 #pragma mark - Custom Method
 - (void)setScanQRCodeViewType:(ScanQRCodeViewType)scanQRCodeViewType {
     _scanQRCodeViewType = scanQRCodeViewType;
-    if(self.scanQRCodeViewType == ScanQRCodeViewTypeScanQRCode) {
+    if (self.scanQRCodeViewType == ScanQRCodeViewTypeScanQRCode) {
         [UIView animateWithDuration:0.2f animations:^{
             [self.readerView start];
             
@@ -136,7 +136,7 @@
 
         }];
     }
-    else if(self.scanQRCodeViewType == ScanQRCodeViewTypeDisplayQRCode) {
+    else if (self.scanQRCodeViewType == ScanQRCodeViewTypeDisplayQRCode) {
         [UIView animateWithDuration:0.2f animations:^{
             [self.readerView stop];
             
@@ -149,7 +149,7 @@
             self.leftBlackView.backgroundColor = [UIColor whiteColor];
             self.rightBlackView.backgroundColor = [UIColor whiteColor];
             
-            self.scanBoundImageView.image = [UIImage imageNamed:@"" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.scanBoundImageView.image = nil;
             self.descriptionLabel.text = NSLocalizedString(@"To scan other's QR code, please tap the button below", @"");
             [self.QRCodeButton setTitle:NSLocalizedString(@"Scan a QR Code", @"") forState:UIControlStateNormal];
             self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];

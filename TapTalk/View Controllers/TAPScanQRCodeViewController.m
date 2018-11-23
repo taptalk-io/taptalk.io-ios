@@ -19,6 +19,7 @@
 
 @property (strong, nonatomic) TAPScanQRCodeView *scanQRCodeView;
 @property (strong, nonatomic) TAPScanQRCodePopupView *scanQRCodePopupView;
+@property (strong, nonatomic) TAPUserModel *searchedUser;
 @property (nonatomic) BOOL isProcessingQRCode;
 
 - (void)handleCodeInput:(NSString *)code;
@@ -76,14 +77,14 @@
 #pragma mark - Delegate
 #pragma mark ZBarReaderView
 - (void)readerView:(ZBarReaderView *)readerView didReadSymbols:(ZBarSymbolSet *)symbols fromImage:(UIImage *)image {
-    for(ZBarSymbol *symbol in symbols) {
+    for (ZBarSymbol *symbol in symbols) {
         [self handleCodeInput:symbol.data];
     }
 }
 
 #pragma mark - Custom Method
 - (void)handleCodeInput:(NSString *)code {
-    if(self.isProcessingQRCode) {
+    if (self.isProcessingQRCode) {
         return;
     }
     
@@ -94,6 +95,7 @@
     [self.scanQRCodePopupView setIsLoading:YES animated:YES];
     [TAPDataManager callAPIGetUserByUserID:code success:^(TAPUserModel *user) {
         
+        _searchedUser = user;
 //        _isProcessingQRCode = NO;
 //        [self.scanQRCodePopupView setIsLoading:NO animated:YES];
 //        [self.scanQRCodePopupView setPopupInfoWithUserData:user];
@@ -132,7 +134,7 @@
     
     self.scanQRCodeView.QRCodeButton.selected = !self.scanQRCodeView.QRCodeButton.selected;
     
-    if(self.scanQRCodeView.QRCodeButton.selected) {
+    if (self.scanQRCodeView.QRCodeButton.selected) {
         //Display user QR Code
         
         self.title = NSLocalizedString(@"My QR Code", @"");
@@ -172,11 +174,16 @@
 }
 
 - (void)chatNowButtonDidTapped {
-    //DV Temp
     _isProcessingQRCode = NO;
     [self.scanQRCodePopupView setPopupViewToDefault];
     [self.scanQRCodePopupView showPopupView:NO animated:NO];
-    //End Temp
+    
+    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+    
+    //CS Note - Remove this VC in Navigation Stack to skip on pop
+    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
+    [navigationArray removeObject:self];
+    self.navigationController.viewControllers = navigationArray;
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButton {

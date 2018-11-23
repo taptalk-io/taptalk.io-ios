@@ -29,6 +29,7 @@
 //DV Temp
 //DV Note - 14 Sept Temporary added for checking 1 on 1 chat
 #define TAP_PREFS_OTHER_USER_ID @"Prefs.otherUserID"
+#define TAP_PREFS_INCOMING_PUSH_NOTIFICATION @"Prefs.incomingPushNotification"
 //END DV Temp
 
 //Color

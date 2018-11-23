@@ -59,12 +59,9 @@
     
     self.title = NSLocalizedString(@"New Chat", @"");
     
-    [self showCustomBackButton];
+    [self showCustomCloseButton];
     
     _alphabetSectionTitles = [NSArray arrayWithObjects:@"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N", @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z", nil];
-    
-    //Load Contact List From Database
-    [self loadContactListFromDatabase];
     
     //Refresh Contact List From API
     [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
@@ -75,6 +72,13 @@
     
     _searchResultUserMutableArray = [NSMutableArray array];
     _updatedString = @"";
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    //Load Contact List From Database
+    [self loadContactListFromDatabase];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -270,7 +274,7 @@
             titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
             [header addSubview:titleLabel];
             
-            if([keysArray count] != 0) {
+            if ([keysArray count] != 0) {
                 titleLabel.text = [keysArray objectAtIndex:section - 1];
             }
             
@@ -349,17 +353,17 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if (tableView == self.addNewChatView.contactsTableView) {
-        if(indexPath.section == 0) {
-            if(indexPath.row == 0) {
+        if (indexPath.section == 0) {
+            if (indexPath.row == 0) {
                 //New Contact
                 TAPAddNewContactViewController *addNewContactViewController = [[TAPAddNewContactViewController alloc] init];
                 [self.navigationController pushViewController:addNewContactViewController animated:YES];
             }
-            else if(indexPath.row == 1) {
+            else if (indexPath.row == 1) {
                 //Scan QR Code
                 [self openScanQRCode];
             }
-            else if(indexPath.row == 2) {
+            else if (indexPath.row == 2) {
                 //New Group
                 TAPNewGroupViewController *createGroupViewController = [[TAPNewGroupViewController alloc] init]; //newGroupViewController
                 [self.navigationController pushViewController:createGroupViewController animated:YES];
@@ -379,7 +383,7 @@
             
             TAPUserModel *selectedUser = [userArray objectAtIndex:indexPath.row];
             NSString *selectedUsername = selectedUser.username;
-            if([currentUsername isEqualToString:selectedUsername]) {
+            if ([currentUsername isEqualToString:selectedUsername]) {
                 //SELECTED THE USER ITSELF
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:@"Cannot chat with yourself, please select other room" preferredStyle:UIAlertControllerStyleAlert];
                 
@@ -411,7 +415,7 @@
             
             TAPUserModel *selectedUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
             NSString *selectedUsername = selectedUser.username;
-            if([currentUsername isEqualToString:selectedUsername]) {
+            if ([currentUsername isEqualToString:selectedUsername]) {
                 //Chat with himself/herself
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:@"Cannot chat with yourself, please select other room" preferredStyle:UIAlertControllerStyleAlert];
                 
@@ -520,7 +524,9 @@
     else if (status == AVAuthorizationStatusNotDetermined) {
         //request
         [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-            [self openScanQRCode];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openScanQRCode];
+            });
         }];
     }
     else {
@@ -532,7 +538,7 @@
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if(IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_10_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {

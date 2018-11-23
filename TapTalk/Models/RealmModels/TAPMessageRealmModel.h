@@ -12,11 +12,13 @@
 
 @property (nonatomic, strong) NSString *messageID;
 @property (nonatomic, strong) NSString *localID;
+@property (nonatomic, strong) NSString *filterID;
 @property (nonatomic, strong) NSString *body;
 @property (nonatomic, strong) NSString *recipientID;
 @property (nonatomic) TAPChatMessageType type;
 @property (nonatomic, strong) NSNumber<RLMDouble> *created;
 @property (nonatomic, strong) NSNumber<RLMDouble> *updated;
+@property (nonatomic, strong) NSNumber<RLMDouble> *deleted;
 @property (nonatomic, strong) NSNumber<RLMBool> *isRead;
 @property (nonatomic, strong) NSNumber<RLMBool> *isDelivered;
 @property (nonatomic, strong) NSNumber<RLMBool> *isHidden;

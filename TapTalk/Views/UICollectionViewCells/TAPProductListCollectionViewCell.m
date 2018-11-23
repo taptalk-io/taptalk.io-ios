@@ -40,7 +40,7 @@
     self.backgroundContentView.layer.cornerRadius = 8.0f;
     self.backgroundContentView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner | kCALayerMinXMaxYCorner;
     
-    if(IS_IPHONE_4_7_INCH_AND_ABOVE) {
+    if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
         self.orderNowLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
         self.detailLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
     }

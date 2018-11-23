@@ -26,7 +26,7 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         
     }
     

@@ -105,14 +105,14 @@
         
         NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
         NSString *lastMessageDateString = @"";
-        if(timeGap <= midnightTimeGap) {
+        if (timeGap <= midnightTimeGap) {
             //Today
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
             lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
         }
-        else if(timeGap <= 86400.0f + midnightTimeGap) {
+        else if (timeGap <= 86400.0f + midnightTimeGap) {
             //Yesterday
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
@@ -133,7 +133,7 @@
         
         CGFloat animationDuration = 0.2f;
         
-        if(!animated) {
+        if (!animated) {
             animationDuration = 0.0f;
         }
         
@@ -151,7 +151,7 @@
     else {
         CGFloat animationDuration = 0.2f;
         
-        if(!animated) {
+        if (!animated) {
             animationDuration = 0.0f;
         }
         

@@ -86,6 +86,10 @@
                                         tableName:(NSString *)tableName
                                           success:(void (^)(void))success
                                           failure:(void (^)(NSError *error))failure;
++ (void)updateMessageDeliveryStatusToDatabaseWithData:(NSArray *)dataArray
+                                            tableName:(NSString *)tableName
+                                              success:(void (^)(void))success
+                                              failure:(void (^)(NSError *error))failure;
 + (void)deleteDatabaseMessageWithData:(NSArray *)dataArray
                             tableName:(NSString *)tableName
                               success:(void (^)(void))success
@@ -142,14 +146,10 @@
                                        isDebug:(BOOL)isDebug
                                        success:(void (^)(void))success
                                        failure:(void (^)(NSError *error))failure;
-
-//DV Temp
-+ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageArray
-                                        success:(void (^)(void))success
++ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageIDsArray
+                                        success:(void (^)(NSArray *updatedMessageIDsArray))success
                                         failure:(void (^)(NSError *error))failure;
-+ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
-                                       success:(void (^)(void))success
++ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageIDsArray
+                                       success:(void (^)(NSArray *updatedMessageIDsArray))success
                                        failure:(void (^)(NSError *error))failure;
-
-//END DV Temp
 @end

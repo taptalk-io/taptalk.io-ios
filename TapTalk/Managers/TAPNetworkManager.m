@@ -34,7 +34,7 @@ static const NSInteger kAPITimeOut = 300;
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         [[AFNetworkReachabilityManager sharedManager] startMonitoring];
         [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
             NSDictionary *statusDictionary = @{@"AFNetworkReachabilityNotificationStatusItem" : [NSNumber numberWithInteger:status]};
@@ -79,7 +79,7 @@ static const NSInteger kAPITimeOut = 300;
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"User-Agent"];
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];
     
-    if([TAPDataManager getAccessToken] != nil && ![[TAPDataManager getAccessToken] isEqualToString:@""]) {
+    if ([TAPDataManager getAccessToken] != nil && ![[TAPDataManager getAccessToken] isEqualToString:@""]) {
         NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
         [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     }
@@ -103,15 +103,15 @@ static const NSInteger kAPITimeOut = 300;
    progress:(void (^)(NSProgress *))progress
     success:(void (^)(NSURLSessionDataTask *, NSDictionary *))success
     failure:(void (^)(NSURLSessionDataTask *, NSError *))failure {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
-    if(parameters == nil) {
+    if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -139,15 +139,15 @@ static const NSInteger kAPITimeOut = 300;
     progress:(void (^)(NSProgress *))progress
      success:(void (^)(NSURLSessionDataTask *, NSDictionary *))success
      failure:(void (^)(NSURLSessionDataTask *, NSError *))failure {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
-    if(parameters == nil) {
+    if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -174,15 +174,15 @@ static const NSInteger kAPITimeOut = 300;
  parameters:(NSDictionary *)parameters
     success:(void (^)(NSURLSessionDataTask *, NSDictionary *))success
     failure:(void (^)(NSURLSessionDataTask *, NSError *))failure {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
-    if(parameters == nil) {
+    if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     }
@@ -201,15 +201,15 @@ static const NSInteger kAPITimeOut = 300;
     parameters:(NSDictionary *)parameters
        success:(void (^)(NSURLSessionDataTask *, NSDictionary *))success
        failure:(void (^)(NSURLSessionDataTask *, NSError *))failure {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
-    if(parameters == nil) {
+    if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     }
@@ -229,10 +229,10 @@ static const NSInteger kAPITimeOut = 300;
     
     NSArray *parameterKeyArray = [parameterDictionary allKeys];
     
-    for(NSInteger count = 0; count < [parameterKeyArray count]; count++) {
+    for (NSInteger count = 0; count < [parameterKeyArray count]; count++) {
         NSString *parameterKey = [parameterKeyArray objectAtIndex:count];
         
-        if(count > 0) {
+        if (count > 0) {
             [parameterString appendString:@"&"];
         }
         
@@ -275,15 +275,15 @@ static const NSInteger kAPITimeOut = 300;
     progress:(void (^)(NSProgress *uploadProgress))progress
      success:(void (^)(NSURLSessionDataTask *dataTask, NSDictionary *responseObject))success
      failure:(void (^)(NSURLSessionDataTask *dataTask, NSError *error))failure {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
-    if(parameters == nil) {
+    if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -316,15 +316,15 @@ refreshToken:(NSString *)refreshToken
     progress:(void (^)(NSProgress *uploadProgress))progress
      success:(void (^)(NSURLSessionDataTask *dataTask, NSDictionary *responseObject))success
      failure:(void (^)(NSURLSessionDataTask *dataTask, NSError *error))failure {
-    if(urlString == nil) {
+    if (urlString == nil) {
         urlString = @"";
     }
     
-    if(parameters == nil) {
+    if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         

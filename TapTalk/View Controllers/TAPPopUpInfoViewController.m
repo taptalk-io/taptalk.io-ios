@@ -36,20 +36,20 @@
 
 #pragma mark - Custom Method
 - (void)popUpInfoViewHandleDidTappedLeftButton {
-    if([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedLeftButton)]) {
+    if ([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedLeftButton)]) {
         [self.delegate popUpInfoViewControllerDidTappedLeftButton];
     }
 }
 
 - (void)popUpInfoViewHandleDidTappedRightButton {
-    if([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedSingleButtonOrRightButton)]) {
+    if ([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedSingleButtonOrRightButton)]) {
         [self.delegate popUpInfoViewControllerDidTappedSingleButtonOrRightButton];
     }
 }
 
 - (void)setPopUpInfoViewControllerType:(TAPPopUpInfoViewControllerType)popUpInfoViewControllerType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo {
     _popUpInfoViewControllerType = popUpInfoViewControllerType;
-    if(self.popUpInfoViewControllerType == TAPPopUpInfoViewControllerTypeErrorMessage) {
+    if (self.popUpInfoViewControllerType == TAPPopUpInfoViewControllerTypeErrorMessage) {
         [self.popUpInfoView setPopupInfoViewType:TAPPopupInfoViewTypeErrorMessage withTitle:title detailInformation:detailInfo];
         [self.popUpInfoView isShowTwoOptionButton:NO];
     }

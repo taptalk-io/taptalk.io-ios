@@ -60,9 +60,9 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
-    if(self) {
+    if (self) {
         //Base Popup View
-        if(IS_IPHONE_4_7_INCH_AND_ABOVE) {
+        if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
             _leftRightGap = 42.0f;
             _addedUserUsernameLabelBottomGap = 4.0f;
             _addedUserFullnameLabelBottomGap = 63.0f;
@@ -238,7 +238,7 @@
 #pragma mark - Custom Method
 - (void)showPopupView:(BOOL)isVisible animated:(BOOL)isAnimated {
     CGFloat animateDuration = 0.0f;
-    if(isAnimated) {
+    if (isAnimated) {
         animateDuration = 0.2f;
     }
     
@@ -263,13 +263,13 @@
     
     NSString *searchedUserID = user.userID;
     
-    if([currentUserID isEqualToString:searchedUserID]) {
+    if ([currentUserID isEqualToString:searchedUserID]) {
         //Scan theirselves
         [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeSelf userData:user];
     }
     
     //DV Temp
-    if(isContact) {
+    if (isContact) {
         //Already Friend
         [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeAlreadyFriend userData:user];
     }
@@ -288,24 +288,23 @@
     
     [self setScanQRCodePopupViewType:type];
     
-//    NSString *currentUserProfileImage = [TAPDataManager getActiveUser].imageURL.thumbnail;
-    NSString *currentUserProfileImage = TAP_DUMMY_IMAGE_URL; //DV Temp
+    NSString *currentUserProfileImage = [TAPDataManager getActiveUser].imageURL.thumbnail;
     currentUserProfileImage = [TAPUtil nullToEmptyString:currentUserProfileImage];
     [self.currentUserImageView setImageWithURLString:currentUserProfileImage];
     
     NSString *addedUserFullName = user.fullname;
     NSString *addedUserUsername = user.username;
-    NSString *addedUserProfileImage = TAP_DUMMY_IMAGE_URL; //DV Temp
+    NSString *addedUserProfileImage = user.imageURL.thumbnail;
     addedUserProfileImage = [TAPUtil nullToEmptyString:addedUserProfileImage];
     
-    [self.addedUserImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL];
+    [self.addedUserImageView setImageWithURLString:addedUserProfileImage];
     self.addedUserUsernameLabel.text = addedUserUsername;
     self.addedUserFullnameLabel.text = addedUserFullName;
     
-    if(type == ScanQRCodePopupViewTypeDefault) {
+    if (type == ScanQRCodePopupViewTypeDefault) {
         [self resizeToStandardPopupView];
     }
-    else if(type == ScanQRCodePopupViewTypeNewFriend) {
+    else if (type == ScanQRCodePopupViewTypeNewFriend) {
         //First time add user, showing icon add friend
         NSString *localizedTemplateSuccessHeaderString = NSLocalizedString(@"You have added ", @"");
         NSString *localizedTemplateSuccessFooterString = NSLocalizedString(@"to your contacts", @"");
@@ -329,7 +328,7 @@
         
         [self resizeToStandardPopupView];
     }
-    else if(type == ScanQRCodePopupViewTypeAlreadyFriend) {
+    else if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
         NSString *localizedTemplateSuccessString = NSLocalizedString(@"is already in your contacts", @"");
         self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@", addedUserUsername, localizedTemplateSuccessString];
         
@@ -351,7 +350,7 @@
         
         [self resizeToStandardPopupView];
     }
-    else if(type == ScanQRCodePopupViewTypeSelf) {
+    else if (type == ScanQRCodePopupViewTypeSelf) {
         [self resizeToSelfAddView];
     }
     
@@ -405,7 +404,7 @@
 }
 
 - (void)animateBouncePopupViewWithType:(ScanQRCodePopupViewType)type {
-    if(type == ScanQRCodePopupViewTypeNewFriend) {
+    if (type == ScanQRCodePopupViewTypeNewFriend) {
         //Showing Add To contact button
         self.greenView.alpha = 1.0f;
         self.selfInformedLabel.alpha = 0.0f;
@@ -418,7 +417,7 @@
         self.chatNowButton.alpha = 0.0f;
         self.chatNowButton.userInteractionEnabled = NO;
     }
-    else if(type == ScanQRCodePopupViewTypeAlreadyFriend) {
+    else if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
         self.greenView.alpha = 0.0f;
         self.selfInformedLabel.alpha = 0.0f;
         
@@ -430,7 +429,7 @@
         self.chatNowButton.alpha = 1.0f;
         self.chatNowButton.userInteractionEnabled = YES;
     }
-    else if(type == ScanQRCodePopupViewTypeSelf) {
+    else if (type == ScanQRCodePopupViewTypeSelf) {
         self.greenView.alpha = 0.0f;
         self.addContactButton.userInteractionEnabled = NO;
         self.chatNowButton.userInteractionEnabled = NO;
@@ -445,7 +444,7 @@
     
     self.whiteBaseView.alpha = 1.0f;
     
-    if(type == ScanQRCodePopupViewTypeAlreadyFriend) {
+    if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
         //Auto expanding when already friend
         [self performSelector:@selector(animateExpandingView) withObject:nil afterDelay:0.5f];
     }
@@ -454,17 +453,17 @@
 - (void)animateExpandingView {
     
     CGFloat additionalChangingHeight = 0.0f;
-    if(IS_IPHONE_4_7_INCH_AND_ABOVE) {
+    if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
         additionalChangingHeight = 40.0f;
     }
     else {
         additionalChangingHeight = 30.0f;
     }
     
-    if(self.scanQRCodePopupViewType == ScanQRCodePopupViewTypeAlreadyFriend) {
+    if (self.scanQRCodePopupViewType == ScanQRCodePopupViewTypeAlreadyFriend) {
         [self resizeFriendListViewChangingHeightWithFirstTimeAdd:NO];
     }
-    else if(self.scanQRCodePopupViewType == ScanQRCodePopupViewTypeNewFriend) {
+    else if (self.scanQRCodePopupViewType == ScanQRCodePopupViewTypeNewFriend) {
         [self resizeFriendListViewChangingHeightWithFirstTimeAdd:YES];
     }
     
@@ -521,11 +520,11 @@
 }
 
 - (void)resizeFriendListViewChangingHeightWithFirstTimeAdd:(BOOL)isFirstTime {
-    if(isFirstTime) {
+    if (isFirstTime) {
         //First time add user, showing icon add friend
         self.successAddContactImageView.alpha = 1.0f;
         
-        if(IS_IPHONE_4_7_INCH_AND_ABOVE) {
+        if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
             self.successAddUserLabelTopGap = 8.0f;
             self.addedUserLogoTopGap = 40.0f;
         }
@@ -583,11 +582,11 @@
 - (void)setIsLoading:(BOOL)isLoading animated:(BOOL)isAnimated {
     
     CGFloat duration = 0.0f;
-    if(isAnimated) {
+    if (isAnimated) {
         duration = 0.2f;
     }
     
-    if(isLoading) {
+    if (isLoading) {
         [UIView animateWithDuration:duration animations:^{
             self.loadingView.alpha = 0.4f;
             self.activityIndicatorLoading.alpha = 1.0f;

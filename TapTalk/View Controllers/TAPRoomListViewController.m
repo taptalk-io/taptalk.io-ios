@@ -30,6 +30,8 @@
 @property (strong, nonatomic) NSMutableArray *roomListArray;
 @property (strong, nonatomic) NSMutableDictionary *roomListDictionary;
 
+@property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
+
 - (void)mappingMessageArrayToRoomListArrayAndDictionary:(NSArray *)messageArray;
 - (void)insertRoomListToArrayAndDictionary:(TAPRoomListModel *)roomList atIndex:(NSInteger)index;
 - (void)runFullRefreshSequence;
@@ -54,6 +56,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityStatusChange:) name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
     
     //Add chat manager delegate
     [[TAPChatManager sharedManager] addDelegate:self];
@@ -121,6 +124,7 @@
 
 - (void)dealloc {
     [[TAPChatManager sharedManager] removeDelegate:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -191,7 +195,7 @@
     UITableViewRowAction *muteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSLog(@"Mute Did Tapped");
     }];
-    muteRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"vSlideActionMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    muteRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
     
     UITableViewRowAction *deleteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSLog(@"Delete Did Tapped");
@@ -248,6 +252,16 @@
 
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
     [self processMessageFromSocket:message];
+}
+
+- (void)chatManagerShouldDecreaseUnreadBubbleForRoomID:(NSString *)roomID {
+    TAPRoomListModel *currentRoomList = [self.roomListDictionary objectForKey:roomID];
+    
+    currentRoomList.numberOfUnreadMessages--;
+    
+    NSInteger cellRow = [self.roomListArray indexOfObject:currentRoomList];
+    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
 }
 
 #pragma mark UITextField
@@ -311,7 +325,8 @@
 
 - (void)addButtonDidTapped {
     TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
-    [self.navigationController pushViewController:addNewChatViewController animated:YES];
+    UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
+    [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
 }
 
 - (void)cancelButtonDidTapped {
@@ -320,12 +335,12 @@
 }
 
 - (void)mappingMessageArrayToRoomListArrayAndDictionary:(NSArray *)messageArray {
-    if(_roomListArray != nil) {
+    if (_roomListArray != nil) {
         [self.roomListArray removeAllObjects];
         _roomListArray = nil;
     }
     
-    if(_roomListDictionary != nil) {
+    if (_roomListDictionary != nil) {
         [self.roomListDictionary removeAllObjects];
         _roomListDictionary = nil;
     }
@@ -333,7 +348,7 @@
     _roomListDictionary = [[NSMutableDictionary alloc] init];
     _roomListArray = [[NSMutableArray alloc] init];
     
-    for(TAPMessageModel *message in messageArray) {
+    for (TAPMessageModel *message in messageArray) {
         TAPRoomModel *room = message.room;
         NSString *roomID = room.roomID;
         roomID = [TAPUtil nullToEmptyString:roomID];
@@ -353,15 +368,15 @@
 - (void)viewLoadedSequence {
     //Check if should show first loading view
     BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
-    if(!isDoneFirstSetup) {
+    if (!isDoneFirstSetup) {
         [self.setupRoomListView showFirstLoadingView:YES];
     }
     
-    if([TAPChatManager sharedManager].activeUser == nil) {
+    if ([TAPChatManager sharedManager].activeUser == nil) {
         return; //User not logged in
     }
     
-    if(self.isShouldNotLoadFromAPI) {
+    if (self.isShouldNotLoadFromAPI) {
         //Load from database only
         [self reloadLocalDataAndUpdateUILogicAnimated:NO];
     }
@@ -382,7 +397,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 BOOL isShouldAnimate = YES;
                 
-                if(self.roomListArray == nil || [self.roomListArray count] <= 0) {
+                if (self.roomListArray == nil || [self.roomListArray count] <= 0) {
                     isShouldAnimate = NO;
                 }
                 
@@ -405,7 +420,7 @@
     userID = [TAPUtil nullToEmptyString:userID];
     
     BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
-    if(!isDoneFirstSetup) {
+    if (!isDoneFirstSetup) {
         //First setup, run get room list and unread message
         [TAPDataManager callAPIGetMessageRoomListAndUnreadWithUserID:userID success:^(NSArray *messageArray) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -426,6 +441,12 @@
     //Not first setup, get new and updated message
     [TAPDataManager callAPIGetNewAndUpdatedMessageSuccess:^(NSArray *messageArray) {
         [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
+        
+        //Update leftover message status to delivered
+        if ([messageArray count] != 0) {
+            [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
+        }
+        
     } failure:^(NSError *error) {
         
     }];
@@ -461,14 +482,14 @@
 - (void)refreshViewAndQueryUnreadLogicWithMessageArray:(NSArray *)messageArray animateReloadData:(BOOL)animateReloadData {
     BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
     
-    if(!isDoneFirstSetup) {
+    if (!isDoneFirstSetup) {
         [self.roomListView showNoChatsView:NO];
     }
-    else if([self.roomListArray count] <= 0 && [messageArray count] <= 0) {
+    else if ([self.roomListArray count] <= 0 && [messageArray count] <= 0) {
         //Show no chat view
         [self.roomListView showNoChatsView:YES];
     }
-    else if([self.roomListArray count] <= 0 && [messageArray count] > 0) {
+    else if ([self.roomListArray count] <= 0 && [messageArray count] > 0) {
         //Show data first before query unread message
         [self.roomListView showNoChatsView:NO];
         [self mappingMessageArrayToRoomListArrayAndDictionary:messageArray];
@@ -486,18 +507,18 @@
         [self.roomListView showNoChatsView:NO];
         [self mappingMessageArrayToRoomListArrayAndDictionary:messageArray];
         
-        if(animateReloadData && self.isViewAppear) {
+        if (animateReloadData && self.isViewAppear) {
             //Update UI movement changes animation
-            for(NSInteger newIndex = 0; newIndex < [self.roomListArray count]; newIndex++) {
+            for (NSInteger newIndex = 0; newIndex < [self.roomListArray count]; newIndex++) {
                 TAPRoomListModel *newRoomList = [self.roomListArray objectAtIndex:newIndex];
                 
-                if(newRoomList == nil) {
+                if (newRoomList == nil) {
                     continue;
                 }
                 
                 TAPRoomListModel *oldRoomList = [oldRoomListDictionary objectForKey:newRoomList.lastMessage.room.roomID];
                 
-                if(oldRoomList == nil) {
+                if (oldRoomList == nil) {
                     //Room list not found in old data, so this is a new room
                     //Populate old data
                     [oldRoomListArray insertObject:newRoomList atIndex:newIndex];
@@ -511,7 +532,7 @@
                 
                 NSInteger oldIndex = [oldRoomListArray indexOfObject:oldRoomList];
                 
-                if(newIndex == oldIndex) {
+                if (newIndex == oldIndex) {
                     //Index is same, no need to move cell, just update data
                     [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
                     continue;
@@ -530,17 +551,17 @@
             //Handle room deletion
             NSArray *loopedRoomListArray = [NSArray arrayWithArray:oldRoomListArray];
             
-            for(NSInteger index = 0; index < [loopedRoomListArray count]; index++) {
+            for (NSInteger index = 0; index < [loopedRoomListArray count]; index++) {
                 TAPRoomListModel *oldRoomList = [oldRoomListArray objectAtIndex:index];
                 
-                if(oldRoomList == nil) {
+                if (oldRoomList == nil) {
                     continue;
                 }
                 
                 //Check if room list exist in new response
                 TAPRoomListModel *newRoomList = [self.roomListDictionary objectForKey:oldRoomList.lastMessage.room.roomID];
                 
-                if(newRoomList == nil) {
+                if (newRoomList == nil) {
                     //Data not exist, delete cell
                     NSInteger oldIndex = [oldRoomListArray indexOfObject:oldRoomList];
                     [oldRoomListArray removeObjectAtIndex:oldIndex];
@@ -549,7 +570,7 @@
                 }
             }
         }
-        else if(!self.isViewAppear) {
+        else if (!self.isViewAppear) {
             //View not appear, just reload table view without animation
             [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
                 [self.roomListView.roomListTableView reloadData];
@@ -566,7 +587,7 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         NSArray *roomListLocalArray = [NSArray arrayWithArray:self.roomListArray];
-        for(TAPRoomListModel *roomList in roomListLocalArray) {
+        for (TAPRoomListModel *roomList in roomListLocalArray) {
             TAPMessageModel *messageData = roomList.lastMessage;
             TAPRoomModel *roomData = messageData.room;
             NSString *roomIDString = roomData.roomID;
@@ -588,7 +609,7 @@
             }];
         }
         
-        if(reloadTableView) {
+        if (reloadTableView) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
                     [self.roomListView.roomListTableView reloadData];
@@ -604,11 +625,11 @@
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:messageRoomID];
     
-    if(roomList != nil) {
+    if (roomList != nil) {
         //Room is on the list
         TAPMessageModel *roomLastMessage = roomList.lastMessage;
         
-        if([roomLastMessage.localID isEqualToString:message.localID]) {
+        if ([roomLastMessage.localID isEqualToString:message.localID]) {
             //Last message is same, just updated, update the data only
             roomLastMessage.updated = message.updated;
             roomLastMessage.isDeleted = message.isDeleted;
@@ -626,7 +647,7 @@
             //Last message is different, move cell to top and update last message
             roomList.lastMessage = message;
 
-            if(![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //Message from other recipient, increment number of unread message
                 roomList.numberOfUnreadMessages++;
             }
@@ -636,7 +657,7 @@
 
             [self updateCellDataAtIndexPath:currentIndexPath updateUnreadBubble:YES];
 
-            if(currentIndexPath != 0) {
+            if (currentIndexPath != 0) {
                 //Move cell to top
                 [self.roomListArray removeObject:roomList];
                 [self.roomListArray insertObject:roomList atIndex:0];
@@ -659,13 +680,29 @@
 }
 
 - (void)updateCellDataAtIndexPath:(NSIndexPath *)indexPath updateUnreadBubble:(BOOL)updateUnreadBubble {
-    if(indexPath.row >= [self.roomListArray count]) {
+    if (indexPath.row >= [self.roomListArray count]) {
         return;
     }
     
     TAPRoomListTableViewCell *cell = [self.roomListView.roomListTableView cellForRowAtIndexPath:indexPath];
     TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
     [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:updateUnreadBubble];
+}
+
+- (void)reachabilityStatusChange:(NSNotification *)notification {
+    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+        if (self.isNeedRefreshOnNetworkDown) {
+            //Reload new data from API
+            _isShouldNotLoadFromAPI = NO;
+            [self viewLoadedSequence];
+            
+            _isNeedRefreshOnNetworkDown = NO;
+            
+        }
+    }
+    else {
+        _isNeedRefreshOnNetworkDown = YES;
+    }
 }
 
 @end

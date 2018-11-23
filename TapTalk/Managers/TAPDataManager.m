@@ -36,7 +36,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         //Add delegate to Connection Manager here
         _refreshTokenLock = [NSLock new];
     }
@@ -78,7 +78,7 @@
     
     TAPImageURLModel *roomImageURL = [TAPImageURLModel new];
     NSString *roomImageString = [dictionary objectForKey:@"roomImage"];
-    if([roomImageString isEqualToString:@""] || roomImageString == nil) {
+    if ([roomImageString isEqualToString:@""] || roomImageString == nil) {
         roomImageURL.thumbnail = @"";
         roomImageURL.fullsize = @"";
     }
@@ -117,7 +117,7 @@
     
     TAPImageURLModel *userImageURL = [TAPImageURLModel new];
     NSString *userImageString = [dictionary objectForKey:@"userImage"];
-    if([userImageString isEqualToString:@""] || userImageString == nil) {
+    if ([userImageString isEqualToString:@""] || userImageString == nil) {
         userImageURL.thumbnail = @"";
         userImageURL.fullsize = @"";
     }
@@ -143,7 +143,7 @@
     
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
     NSString *userRoleString = [dictionary objectForKey:@"userRole"];
-    if([userRoleString isEqualToString:@""] || userRoleString == nil) {
+    if ([userRoleString isEqualToString:@""] || userRoleString == nil) {
         userRole.userRoleID = @"";
         userRole.name = @"";
         userRole.iconURL = @"";
@@ -328,7 +328,7 @@
     
     TAPImageURLModel *imageURL = [TAPImageURLModel new];
     NSString *imageURLString = [dictionary objectForKey:@"imageURL"];
-    if([imageURLString isEqualToString:@""] || imageURLString == nil) {
+    if ([imageURLString isEqualToString:@""] || imageURLString == nil) {
         imageURL.thumbnail = @"";
         imageURL.fullsize = @"";
     }
@@ -399,7 +399,7 @@
     
     TAPImageURLModel *imageURL = [TAPImageURLModel new];
     NSString *imageURLString = [dictionary objectForKey:@"imageURL"];
-    if([imageURLString isEqualToString:@""] || imageURLString == nil) {
+    if ([imageURLString isEqualToString:@""] || imageURLString == nil) {
         imageURL.thumbnail = @"";
         imageURL.fullsize = @"";
     }
@@ -536,7 +536,9 @@
     username = [TAPUtil nullToEmptyString:username];
     [userMutableDictionary setValue:username forKey:@"username"];
     
-    NSString *imageURL = [userDictionary objectForKey:@"imageURL"];
+    NSDictionary *imageURLDictionary = [userDictionary objectForKey:@"imageURL"];
+    imageURLDictionary = [TAPUtil nullToEmptyDictionary:imageURLDictionary];
+    NSString *imageURL = [TAPUtil jsonStringFromObject:imageURLDictionary];
     imageURL = [TAPUtil nullToEmptyString:imageURL];
     [userMutableDictionary setValue:imageURL forKey:@"imageURL"];
     
@@ -619,7 +621,7 @@
 + (BOOL)isDataEmpty:(NSDictionary *)responseDictionary {
     NSDictionary *dataDictionary = [responseDictionary objectForKey:@"data"];
     
-    if(dataDictionary == nil || [dataDictionary allKeys].count == 0) {
+    if (dataDictionary == nil || [dataDictionary allKeys].count == 0) {
         return YES;
     }
     
@@ -629,26 +631,26 @@
 + (BOOL)isResponseSuccess:(NSDictionary *)responseDictionary {
     NSDictionary *errorDictionary = [responseDictionary objectForKey:@"error"];
     
-    if(errorDictionary == nil || [errorDictionary allKeys].count == 0) {
+    if (errorDictionary == nil || [errorDictionary allKeys].count == 0) {
         return YES;
     }
     
     NSInteger httpStatusCode = [[responseDictionary valueForKeyPath:@"status"] integerValue];
     
-//    if(errorCode == 299 || errorCode == 499) {
+//    if (errorCode == 299 || errorCode == 499) {
 //        //Success but need to refresh token = 299
 //        //Failed but need to refresh token = 499 - if errorCode == 499 need to reload API
 //
-//        if(errorCode == 299) {
+//        if (errorCode == 299) {
 //            BOOL isCallingAPIRefreshToken = [[NSUserDefaults standardUserDefaults] secretBoolForKey:PREFS_IS_CALLING_API_REFRESH_TOKEN];
-//            if(!isCallingAPIRefreshToken) {
+//            if (!isCallingAPIRefreshToken) {
 //                [TAPDataManager performSelector:@selector(callAPIRefreshToken) withObject:nil afterDelay:1.0f];
 //            }
 //        }
 //
 //        return YES;
 //    }
-    if([[NSString stringWithFormat:@"%li", (long)httpStatusCode] hasPrefix:@"2"]) {
+    if ([[NSString stringWithFormat:@"%li", (long)httpStatusCode] hasPrefix:@"2"]) {
         return YES;
     }
     
@@ -657,7 +659,7 @@
 
 
 + (void)setActiveUser:(TAPUserModel *)user {
-    if(user != nil) {
+    if (user != nil) {
         NSDictionary *userDictionary = [user toDictionary];
         
         //Update user in chat manager
@@ -671,7 +673,7 @@
 + (TAPUserModel *)getActiveUser {
     NSDictionary *userDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_ACTIVE_USER valid:nil];
     
-    if(userDictionary == nil) {
+    if (userDictionary == nil) {
         return nil;
     }
     
@@ -741,7 +743,7 @@
     NSString *queryClause = [NSString stringWithFormat:@"body CONTAINS[c] \'%@\'", alphaNumericSearchString];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryClause sortByColumnName:columnName isAscending:NO success:^(NSArray *resultArray) {
         NSMutableArray *modelArray = [NSMutableArray array];
-        for(NSInteger count = 0; count < [resultArray count]; count++) {
+        for (NSInteger count = 0; count < [resultArray count]; count++) {
             NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[resultArray objectAtIndex:count]];
             
             TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
@@ -762,12 +764,12 @@
     [TAPDatabaseManager loadMessageWithRoomID:roomID predicateString:predicateString numberOfItems:limit success:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         
-        if([messageArray count] == 0) {
+        if ([messageArray count] == 0) {
             success([NSArray array]);
         }
         else {
             NSMutableArray *modelArray = [NSMutableArray array];
-            for(NSInteger count = 0; count < [messageArray count]; count++) {
+            for (NSInteger count = 0; count < [messageArray count]; count++) {
                 NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray objectAtIndex:count]];
 
                 TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
@@ -775,7 +777,7 @@
                 
                 NSError *error;
                 
-                if(error) {
+                if (error) {
                     failure(error);
                     return;
                 }
@@ -797,12 +799,12 @@
     [TAPDatabaseManager loadAllDataFromDatabaseWithQuery:query tableName:kDatabaseTableMessage sortByKey:columnName ascending:isAscending success:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         
-        if([messageArray count] == 0) {
+        if ([messageArray count] == 0) {
             success([NSArray array]);
         }
         else {
             NSMutableArray *modelArray = [NSMutableArray array];
-            for(NSInteger count = 0; count < [messageArray count]; count++) {
+            for (NSInteger count = 0; count < [messageArray count]; count++) {
                 NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray objectAtIndex:count]];
                 
                 TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
@@ -810,7 +812,7 @@
                 
                 NSError *error;
                 
-                if(error) {
+                if (error) {
                     failure(error);
                     return;
                 }
@@ -828,7 +830,7 @@
     [TAPDatabaseManager loadRoomListSuccess:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         NSMutableArray *modelArray = [NSMutableArray array];
-        for(NSInteger count = 0; count < [messageArray count]; count++) {
+        for (NSInteger count = 0; count < [messageArray count]; count++) {
             NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray objectAtIndex:count]];
             
             TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
@@ -836,7 +838,7 @@
             
             NSError *error;
             
-            if(error) {
+            if (error) {
                 failure(error);
                 return;
             }
@@ -856,7 +858,7 @@
         NSMutableArray *obtainedArray = [NSMutableArray array];
         NSMutableArray *unreadCountArray = [NSMutableArray arrayWithCapacity:[resultArray count]];
         NSInteger __block counterLoop = 0;
-        for(NSDictionary *databaseDictionary in resultArray) {
+        for (NSDictionary *databaseDictionary in resultArray) {
             TAPRecentSearchModel *recentSearch = [TAPDataManager recentSearchModelFromDictionary:databaseDictionary];
             [obtainedArray addObject:recentSearch];
             [unreadCountArray addObject:@"0"];
@@ -885,7 +887,7 @@
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
         NSMutableArray *obtainedArray = [NSMutableArray array];
-        for(NSDictionary *databaseDictionary in resultArray) {
+        for (NSDictionary *databaseDictionary in resultArray) {
             TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:databaseDictionary error:nil];
             [obtainedArray addObject:message];
         }
@@ -908,7 +910,7 @@
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
         NSMutableArray *obtainedArray = [NSMutableArray array];
-        for(NSDictionary *databaseDictionary in resultArray) {
+        for (NSDictionary *databaseDictionary in resultArray) {
             TAPMessageModel *message = [TAPDataManager messageModelFromDictionary:databaseDictionary];
             [obtainedArray addObject:message];
         }
@@ -939,7 +941,7 @@
         databaseArray = resultArray;
         
         NSMutableDictionary *modelDictionary = [NSMutableDictionary dictionary];
-        for(NSInteger count = 0; count < [databaseArray count]; count++) {
+        for (NSInteger count = 0; count < [databaseArray count]; count++) {
             NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[databaseArray objectAtIndex:count]];
             
             TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
@@ -949,7 +951,7 @@
         
         queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\'", alphaNumericSearchString];
         [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact whereClauseQuery:queryClause sortByColumnName:@"fullname" isAscending:YES success:^(NSArray *resultArray) {
-            for(NSInteger count = 0; count < [resultArray count]; count++) {
+            for (NSInteger count = 0; count < [resultArray count]; count++) {
                 NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[resultArray objectAtIndex:count]];
                 
                 TAPUserModel *user = [TAPDataManager userModelFromDictionary:databaseDictionary];
@@ -1129,6 +1131,33 @@
     }];
 }
 
++ (void)updateMessageDeliveryStatusToDatabaseWithData:(NSArray *)dataArray
+                                            tableName:(NSString *)tableName
+                                              success:(void (^)(void))success
+                                              failure:(void (^)(NSError *error))failure {
+    if ([dataArray count] <= 0) {
+        success();
+    }
+    
+    NSMutableArray *messageDictionaryArray = [NSMutableArray array];
+    for (TAPMessageModel *message in dataArray) {
+        
+        //Changing isDelivered to true
+        message.isDelivered = YES;
+        
+        NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
+        messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
+        
+        [messageDictionaryArray addObject:messageDictionary];
+    }
+    
+    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
+        success();
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 + (void)deleteDatabaseMessageWithData:(NSArray *)dataArray
                             tableName:(NSString *)tableName
                               success:(void (^)(void))success
@@ -1277,14 +1306,14 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -1293,7 +1322,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success([NSString string]);
             return;
         }
@@ -1333,14 +1362,14 @@
     [[TAPNetworkManager sharedManager] post:requestURL authTicket:authTicket parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -1349,7 +1378,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success();
             return;
         }
@@ -1404,7 +1433,7 @@
         
         [self.refreshTokenLock lock];
         
-        if(self.isShouldRefreshToken) {
+        if (self.isShouldRefreshToken) {
             NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRefreshAccessToken];
             NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
             NSString *refreshToken = [TAPDataManager getRefreshToken];
@@ -1412,18 +1441,18 @@
             [[TAPNetworkManager sharedManager] post:requestURL refreshToken:refreshToken parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
                 
             } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-                if(![TAPDataManager isResponseSuccess:responseObject]) {
+                if (![TAPDataManager isResponseSuccess:responseObject]) {
                     NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
                     NSString *errorMessage = [errorDictionary objectForKey:@"message"];
                     errorMessage = [TAPUtil nullToEmptyString:errorMessage];
                     
                     NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
                     
-                    if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                    if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                         errorCode = 999;
                     }
                     
-                    if(errorCode >= 40103 && errorCode <= 40106) {
+                    if (errorCode >= 40103 && errorCode <= 40106) {
                         //Refresh token is invalid, ask business side to refresh auth ticket
                         [[TapTalk sharedInstance] shouldRefreshAuthTicket];
                     }
@@ -1439,7 +1468,7 @@
                     return;
                 }
                 
-                if([TAPDataManager isDataEmpty:responseObject]) {
+                if ([TAPDataManager isDataEmpty:responseObject]) {
                     _isShouldRefreshToken = NO;
                     [self.refreshTokenLock unlock];
                     
@@ -1523,7 +1552,7 @@
     [[TAPNetworkManager sharedManager] get:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                 [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:success failure:failure];
             } failure:^(NSError *error) {
@@ -1553,7 +1582,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
@@ -1563,7 +1592,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetMessageRoomListAndUnreadWithUserID:userID success:success failure:failure];
@@ -1575,7 +1604,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -1584,7 +1613,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success([NSArray array]);
             return;
         }
@@ -1593,7 +1622,7 @@
         messageArray = [TAPUtil nullToEmptyArray:messageArray];
     
         NSMutableArray *messageResultArray = [NSMutableArray array];
-        for(NSDictionary *messageDictionary in messageArray) {
+        for (NSDictionary *messageDictionary in messageArray) {
             TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
     
             //Decrypt message
@@ -1632,7 +1661,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -1641,7 +1670,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetNewAndUpdatedMessageSuccess:success failure:failure];
@@ -1653,7 +1682,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -1662,7 +1691,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success([NSArray array]);
             return;
         }
@@ -1671,7 +1700,7 @@
         messageArray = [TAPUtil nullToEmptyArray:messageArray];
         
         NSMutableArray *messageResultArray = [NSMutableArray array];
-        for(NSDictionary *messageDictionary in messageArray) {
+        for (NSDictionary *messageDictionary in messageArray) {
             TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
             
             //Decrypt message
@@ -1717,7 +1746,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
 
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -1726,7 +1755,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated success:success failure:failure];
@@ -1738,7 +1767,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
 
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
 
@@ -1747,7 +1776,7 @@
             return;
         }
 
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success([NSArray array]);
             return;
         }
@@ -1759,14 +1788,14 @@
         NSNumber *preferenceLastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
         
         NSMutableArray *messageResultArray = [NSMutableArray array];
-        for(NSDictionary *messageDictionary in messageArray) {
+        for (NSDictionary *messageDictionary in messageArray) {
             TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
             
             //Decrypt message
             TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
             [messageResultArray addObject:decryptedMessage];
             
-            if([preferenceLastUpdated longLongValue] < [message.updated longLongValue]) {
+            if ([preferenceLastUpdated longLongValue] < [message.updated longLongValue]) {
                 preferenceLastUpdated = [NSNumber numberWithLongLong:[message.updated longLongValue]];
             }
         }
@@ -1814,7 +1843,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
 
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -1823,7 +1852,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated success:success failure:failure];
@@ -1835,7 +1864,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
 
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
 
@@ -1844,7 +1873,7 @@
             return;
         }
 
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success([NSArray array], [NSDictionary dictionary]);
             return;
         }
@@ -1853,7 +1882,7 @@
         messageArray = [TAPUtil nullToEmptyArray:messageArray];
 
         NSMutableArray *messageResultArray = [NSMutableArray array];
-        for(NSDictionary *messageDictionary in messageArray) {
+        for (NSDictionary *messageDictionary in messageArray) {
             TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
 
             //Decrypt message
@@ -1900,7 +1929,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -1909,7 +1938,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetContactList:success failure:failure];
@@ -1921,7 +1950,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -1930,7 +1959,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success([NSArray array]);
             return;
         }
@@ -1940,36 +1969,39 @@
         userArray = [TAPUtil nullToEmptyArray:userArray];
         
         NSMutableArray *userResultArray = [NSMutableArray array];
-        /* WK NOTE - UNCOMMENT THIS CODE TO REMOVE TEMPORARY ADD CONTACTS TO DATABASE
-        for(NSDictionary *userDictionary in userArray) {
-            TAPContactModel *contact = [TAPContactModel new];
-            TAPUserModel *user = [TAPUserModel new];
+        // WK NOTE - UNCOMMENT THIS CODE TO REMOVE TEMPORARY ADD CONTACTS TO DATABASE
+        for (NSDictionary *userDictionary in userArray) {
+//            TAPContactModel *contact = [TAPContactModel new];
+            NSDictionary *obtainedUserDictionary = [userDictionary objectForKey:@"user"];
+            obtainedUserDictionary = [TAPUtil nullToEmptyDictionary:obtainedUserDictionary];
             
-            NSString *userID = [userDictionary objectForKey:@"userID"];
+            TAPUserModel *user = [TAPUserModel new];
+         
+            NSString *userID = [obtainedUserDictionary objectForKey:@"userID"];
             userID = [TAPUtil nullToEmptyString:userID];
             user.userID = userID;
-            
-            NSString *xcUserID = [userDictionary objectForKey:@"xcUserID"];
+         
+            NSString *xcUserID = [obtainedUserDictionary objectForKey:@"xcUserID"];
             xcUserID = [TAPUtil nullToEmptyString:xcUserID];
             user.xcUserID = xcUserID;
-            
-            NSString *fullname = [userDictionary objectForKey:@"fullname"];
+         
+            NSString *fullname = [obtainedUserDictionary objectForKey:@"fullname"];
             fullname = [TAPUtil nullToEmptyString:fullname];
             user.fullname = fullname;
-            
-            NSString *email = [userDictionary objectForKey:@"email"];
+         
+            NSString *email = [obtainedUserDictionary objectForKey:@"email"];
             email = [TAPUtil nullToEmptyString:email];
             user.email = email;
-            
-            NSString *phone = [userDictionary objectForKey:@"phone"];
+         
+            NSString *phone = [obtainedUserDictionary objectForKey:@"phone"];
             phone = [TAPUtil nullToEmptyString:phone];
             user.phone = phone;
-            
-            NSString *username = [userDictionary objectForKey:@"username"];
+         
+            NSString *username = [obtainedUserDictionary objectForKey:@"username"];
             username = [TAPUtil nullToEmptyString:username];
             user.username = username;
-            
-            NSDictionary *imageURLDictionary = [userDictionary objectForKey:@"imageURL"];
+         
+            NSDictionary *imageURLDictionary = [obtainedUserDictionary objectForKey:@"imageURL"];
             TAPImageURLModel *imageURL = [TAPImageURLModel new];
             NSString *thumbnail = [imageURLDictionary objectForKey:@"thumbnail"];
             thumbnail = [TAPUtil nullToEmptyString:thumbnail];
@@ -1980,224 +2012,458 @@
             imageURL.fullsize = fullsize;
             user.imageURL = imageURL;
             
-            NSDictionary *userRoleDictionary = [userDictionary objectForKey:@"userRole"];
+            NSDictionary *userRoleDictionary = [obtainedUserDictionary objectForKey:@"userRole"];
             TAPUserRoleModel *userRole = [TAPUserRoleModel new];
             NSString *userRoleID = [userRoleDictionary objectForKey:@"userRoleID"];
             userRoleID = [TAPUtil nullToEmptyString:userRoleID];
             userRole.userRoleID = userRoleID;
-            
+         
             NSString *name = [userRoleDictionary objectForKey:@"name"];
             name = [TAPUtil nullToEmptyString:name];
             userRole.name = name;
-            
+         
             NSString *iconURL = [userRoleDictionary objectForKey:@"iconURL"];
             iconURL = [TAPUtil nullToEmptyString:iconURL];
             userRole.iconURL = iconURL;
             user.userRole = userRole;
-            
-            NSNumber *lastLogin = [userDictionary objectForKey:@"lastLogin"];
+         
+            NSNumber *lastLogin = [obtainedUserDictionary objectForKey:@"lastLogin"];
             lastLogin = [TAPUtil nullToEmptyNumber:lastLogin];
             user.lastLogin = lastLogin;
-            
-            NSNumber *lastActivity = [userDictionary objectForKey:@"lastActivity"];
+         
+            NSNumber *lastActivity = [obtainedUserDictionary objectForKey:@"lastActivity"];
             lastActivity = [TAPUtil nullToEmptyNumber:lastActivity];
             user.lastActivity = lastActivity;
-            
-            NSNumber *created = [userDictionary objectForKey:@"created"];
+         
+            NSNumber *created = [obtainedUserDictionary objectForKey:@"created"];
             created = [TAPUtil nullToEmptyNumber:created];
             user.created = created;
-            
-            NSNumber *updated = [userDictionary objectForKey:@"updated"];
+         
+            NSNumber *updated = [obtainedUserDictionary objectForKey:@"updated"];
             updated = [TAPUtil nullToEmptyNumber:updated];
             user.updated = updated;
-            contact.user = user;
-            
+//            contact.user = user;
+//
             BOOL isRequestPending = [[userDictionary objectForKey:@"isRequestPending"] boolValue];
-            contact.isRequestPending = isRequestPending;
-            
+            user.isRequestPending = isRequestPending;
+
             BOOL isRequestAccepted = [[userDictionary objectForKey:@"isRequestAccepted"] boolValue];
-            contact.isRequestAccepted = isRequestAccepted;
+            user.isRequestAccepted = isRequestAccepted;
+            
+            [userResultArray addObject:user];
         }
-        WK NOTE - UNCOMMENT THIS CODE TO REMOVE TEMPORARY ADD CONTACTS TO DATABASE
-        */
+        //WK NOTE - UNCOMMENT THIS CODE TO REMOVE TEMPORARY ADD CONTACTS TO DATABASE
+        
         //WK Temp - add contacts to database
 
-        TAPUserModel *firstUser = [TAPUserModel new];
-        firstUser.userID = @"1";
-        firstUser.xcUserID = @"1";
-        firstUser.fullname = @"Ritchie Nathaniel";
-        firstUser.email = @"ritchie@moselo.com";
-        firstUser.phone = @"08979809026";
-        firstUser.username = @"ritchie";
-        firstUser.isRequestPending = NO;
-        firstUser.isRequestAccepted = YES;
+//        TAPUserModel *firstUser = [TAPUserModel new];
+//        firstUser.userID = @"1";
+//        firstUser.xcUserID = @"1";
+//        firstUser.fullname = @"Ritchie Nathaniel";
+//        firstUser.email = @"ritchie@moselo.com";
+//        firstUser.phone = @"08979809026";
+//        firstUser.username = @"ritchie";
+//        firstUser.isRequestPending = NO;
+//        firstUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *secondUser = [TAPUserModel new];
+//        secondUser.userID = @"2";
+//        secondUser.xcUserID = @"2";
+//        secondUser.fullname = @"Dominic Vedericho";
+//        secondUser.email = @"dominic@moselo.com";
+//        secondUser.phone = @"08979809026";
+//        secondUser.username = @"dominic";
+//        secondUser.isRequestPending = NO;
+//        secondUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirdUser = [TAPUserModel new];
+//        thirdUser.userID = @"3";
+//        thirdUser.xcUserID = @"3";
+//        thirdUser.fullname = @"Rionaldo Linggautama";
+//        thirdUser.email = @"rionaldo@moselo.com";
+//        thirdUser.phone = @"08979809026";
+//        thirdUser.username = @"rionaldo";
+//        thirdUser.isRequestPending = NO;
+//        thirdUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *fourthUser = [TAPUserModel new];
+//        fourthUser.userID = @"4";
+//        fourthUser.xcUserID = @"4";
+//        fourthUser.fullname = @"Kevin Reynaldo";
+//        fourthUser.email = @"kevin@moselo.com";
+//        fourthUser.phone = @"08979809026";
+//        fourthUser.username = @"kevin";
+//        fourthUser.isRequestPending = NO;
+//        fourthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *fifthUser = [TAPUserModel new];
+//        fifthUser.userID = @"5";
+//        fifthUser.xcUserID = @"5";
+//        fifthUser.fullname = @"Welly Kencana";
+//        fifthUser.email = @"welly@moselo.com";
+//        fifthUser.phone = @"08979809026";
+//        fifthUser.username = @"welly";
+//        fifthUser.isRequestPending = NO;
+//        fifthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *sixthUser = [TAPUserModel new];
+//        sixthUser.userID = @"6";
+//        sixthUser.xcUserID = @"6";
+//        sixthUser.fullname = @"Jony Lim";
+//        sixthUser.email = @"jony@moselo.com";
+//        sixthUser.phone = @"08979809026";
+//        sixthUser.username = @"jony";
+//        sixthUser.isRequestPending = NO;
+//        sixthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *seventhUser = [TAPUserModel new];
+//        seventhUser.userID = @"7";
+//        seventhUser.xcUserID = @"7";
+//        seventhUser.fullname = @"Michael Tansy";
+//        seventhUser.email = @"michael@moselo.com";
+//        seventhUser.phone = @"08979809026";
+//        seventhUser.username = @"michael";
+//        seventhUser.isRequestPending = NO;
+//        seventhUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *eighthUser = [TAPUserModel new];
+//        eighthUser.userID = @"8";
+//        eighthUser.xcUserID = @"8";
+//        eighthUser.fullname = @"Richard Fang";
+//        eighthUser.email = @"richard@moselo.com";
+//        eighthUser.phone = @"08979809026";
+//        eighthUser.username = @"richard";
+//        eighthUser.isRequestPending = NO;
+//        eighthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *ninthUser = [TAPUserModel new];
+//        ninthUser.userID = @"9";
+//        ninthUser.xcUserID = @"9";
+//        ninthUser.fullname = @"Erwin Andreas";
+//        ninthUser.email = @"erwin@moselo.com";
+//        ninthUser.phone = @"08979809026";
+//        ninthUser.username = @"erwin";
+//        ninthUser.isRequestPending = NO;
+//        ninthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *tenthUser = [TAPUserModel new];
+//        tenthUser.userID = @"10";
+//        tenthUser.xcUserID = @"10";
+//        tenthUser.fullname = @"Jefry Lorentono";
+//        tenthUser.email = @"jefry@moselo.com";
+//        tenthUser.phone = @"08979809026";
+//        tenthUser.username = @"jefry";
+//        tenthUser.isRequestPending = NO;
+//        tenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *eleventhUser = [TAPUserModel new];
+//        eleventhUser.userID = @"11";
+//        eleventhUser.xcUserID = @"11";
+//        eleventhUser.fullname = @"Cundy Sunardy";
+//        eleventhUser.email = @"cundy@moselo.com";
+//        eleventhUser.phone = @"08979809026";
+//        eleventhUser.username = @"cundy";
+//        eleventhUser.isRequestPending = NO;
+//        eleventhUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twelfthUser = [TAPUserModel new];
+//        twelfthUser.userID = @"12";
+//        twelfthUser.xcUserID = @"12";
+//        twelfthUser.fullname = @"Rizka Fatmawati";
+//        twelfthUser.email = @"rizka@moselo.com";
+//        twelfthUser.phone = @"08979809026";
+//        twelfthUser.username = @"rizka";
+//        twelfthUser.isRequestPending = NO;
+//        twelfthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirteenthUser = [TAPUserModel new];
+//        thirteenthUser.userID = @"13";
+//        thirteenthUser.xcUserID = @"13";
+//        thirteenthUser.fullname = @"Test 1";
+//        thirteenthUser.email = @"test1@moselo.com";
+//        thirteenthUser.phone = @"08979809026";
+//        thirteenthUser.username = @"test1";
+//        thirteenthUser.isRequestPending = NO;
+//        thirteenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *fourteenthUser = [TAPUserModel new];
+//        fourteenthUser.userID = @"14";
+//        fourteenthUser.xcUserID = @"14";
+//        fourteenthUser.fullname = @"Test 2";
+//        fourteenthUser.email = @"test2@moselo.com";
+//        fourteenthUser.phone = @"08979809026";
+//        fourteenthUser.username = @"test2";
+//        fourteenthUser.isRequestPending = NO;
+//        fourteenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *fifteenthUser = [TAPUserModel new];
+//        fifteenthUser.userID = @"15";
+//        fifteenthUser.xcUserID = @"15";
+//        fifteenthUser.fullname = @"Test 3";
+//        fifteenthUser.email = @"test3@moselo.com";
+//        fifteenthUser.phone = @"08979809026";
+//        fifteenthUser.username = @"test3";
+//        fifteenthUser.isRequestPending = NO;
+//        fifteenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *sixteenthUser = [TAPUserModel new];
+//        sixteenthUser.userID = @"17";
+//        sixteenthUser.xcUserID = @"16";
+//        sixteenthUser.fullname = @"Santo";
+//        sixteenthUser.email = @"santo@moselo.com";
+//        sixteenthUser.phone = @"08979809026";
+//        sixteenthUser.username = @"santo";
+//        sixteenthUser.isRequestPending = NO;
+//        sixteenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *seventeenthUser = [TAPUserModel new];
+//        seventeenthUser.userID = @"18";
+//        seventeenthUser.xcUserID = @"17";
+//        seventeenthUser.fullname = @"Veronica Dian";
+//        seventeenthUser.email = @"veronica@moselo.com";
+//        seventeenthUser.phone = @"08979809026";
+//        seventeenthUser.username = @"veronica";
+//        seventeenthUser.isRequestPending = NO;
+//        seventeenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *eighteenthUser = [TAPUserModel new];
+//        eighteenthUser.userID = @"19";
+//        eighteenthUser.xcUserID = @"18";
+//        eighteenthUser.fullname = @"Poppy Sibarani";
+//        eighteenthUser.email = @"poppy@moselo.com";
+//        eighteenthUser.phone = @"08979809026";
+//        eighteenthUser.username = @"poppy";
+//        eighteenthUser.isRequestPending = NO;
+//        eighteenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *nineteenthUser = [TAPUserModel new];
+//        nineteenthUser.userID = @"20";
+//        nineteenthUser.xcUserID = @"19";
+//        nineteenthUser.fullname = @"Axel Soedarsono";
+//        nineteenthUser.email = @"axel@moselo.com";
+//        nineteenthUser.phone = @"08979809026";
+//        nineteenthUser.username = @"axel";
+//        nineteenthUser.isRequestPending = NO;
+//        nineteenthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentiethUser = [TAPUserModel new];
+//        twentiethUser.userID = @"21";
+//        twentiethUser.xcUserID = @"20";
+//        twentiethUser.fullname = @"Ovita";
+//        twentiethUser.email = @"ovita@moselo.com";
+//        twentiethUser.phone = @"08979809026";
+//        twentiethUser.username = @"ovita";
+//        twentiethUser.isRequestPending = NO;
+//        twentiethUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentyFirstUser = [TAPUserModel new];
+//        twentyFirstUser.userID = @"22";
+//        twentyFirstUser.xcUserID = @"21";
+//        twentyFirstUser.fullname = @"Putri Prima";
+//        twentyFirstUser.email = @"putri@moselo.com";
+//        twentyFirstUser.phone = @"08979809026";
+//        twentyFirstUser.username = @"putri";
+//        twentyFirstUser.isRequestPending = NO;
+//        twentyFirstUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentySecondUser = [TAPUserModel new];
+//        twentySecondUser.userID = @"23";
+//        twentySecondUser.xcUserID = @"22";
+//        twentySecondUser.fullname = @"Amalia Nanda";
+//        twentySecondUser.email = @"amalia@moselo.com";
+//        twentySecondUser.phone = @"08979809026";
+//        twentySecondUser.username = @"amalia";
+//        twentySecondUser.isRequestPending = NO;
+//        twentySecondUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentyThirdUser = [TAPUserModel new];
+//        twentyThirdUser.userID = @"24";
+//        twentyThirdUser.xcUserID = @"23";
+//        twentyThirdUser.fullname = @"Ronal Gorba";
+//        twentyThirdUser.email = @"ronal@moselo.com";
+//        twentyThirdUser.phone = @"08979809026";
+//        twentyThirdUser.username = @"ronal";
+//        twentyThirdUser.isRequestPending = NO;
+//        twentyThirdUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentyFourthUser = [TAPUserModel new];
+//        twentyFourthUser.userID = @"25";
+//        twentyFourthUser.xcUserID = @"24";
+//        twentyFourthUser.fullname = @"Ardanti Wulandari";
+//        twentyFourthUser.email = @"ardanti@moselo.com";
+//        twentyFourthUser.phone = @"08979809026";
+//        twentyFourthUser.username = @"ardanti";
+//        twentyFourthUser.isRequestPending = NO;
+//        twentyFourthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentyFifthUser = [TAPUserModel new];
+//        twentyFifthUser.userID = @"26";
+//        twentyFifthUser.xcUserID = @"25";
+//        twentyFifthUser.fullname = @"Anita";
+//        twentyFifthUser.email = @"anita@moselo.com";
+//        twentyFifthUser.phone = @"08979809026";
+//        twentyFifthUser.username = @"anita";
+//        twentyFifthUser.isRequestPending = NO;
+//        twentyFifthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentySixthUser = [TAPUserModel new];
+//        twentySixthUser.userID = @"27";
+//        twentySixthUser.xcUserID = @"26";
+//        twentySixthUser.fullname = @"Kevin Fianto";
+//        twentySixthUser.email = @"kevin.fianto@moselo.com";
+//        twentySixthUser.phone = @"08979809026";
+//        twentySixthUser.username = @"kevinfianto";
+//        twentySixthUser.isRequestPending = NO;
+//        twentySixthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentySeventhUser = [TAPUserModel new];
+//        twentySeventhUser.userID = @"28";
+//        twentySeventhUser.xcUserID = @"27";
+//        twentySeventhUser.fullname = @"Dessy Silitonga";
+//        twentySeventhUser.email = @"dessy@moselo.com";
+//        twentySeventhUser.phone = @"08979809026";
+//        twentySeventhUser.username = @"dessy";
+//        twentySeventhUser.isRequestPending = NO;
+//        twentySeventhUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentyEightUser = [TAPUserModel new];
+//        twentyEightUser.userID = @"29";
+//        twentyEightUser.xcUserID = @"28";
+//        twentyEightUser.fullname = @"Neni Nurhasanah";
+//        twentyEightUser.email = @"neni@moselo.com";
+//        twentyEightUser.phone = @"08979809026";
+//        twentyEightUser.username = @"neni";
+//        twentyEightUser.isRequestPending = NO;
+//        twentyEightUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *twentyNinthUser = [TAPUserModel new];
+//        twentyNinthUser.userID = @"30";
+//        twentyNinthUser.xcUserID = @"29";
+//        twentyNinthUser.fullname = @"Bernama Sabur";
+//        twentyNinthUser.email = @"bernama@moselo.com";
+//        twentyNinthUser.phone = @"08979809026";
+//        twentyNinthUser.username = @"bernama";
+//        twentyNinthUser.isRequestPending = NO;
+//        twentyNinthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtiethUser = [TAPUserModel new];
+//        thirtiethUser.userID = @"31";
+//        thirtiethUser.xcUserID = @"30";
+//        thirtiethUser.fullname = @"William Raymond";
+//        thirtiethUser.email = @"william@moselo.com";
+//        thirtiethUser.phone = @"08979809026";
+//        thirtiethUser.username = @"william";
+//        thirtiethUser.isRequestPending = NO;
+//        thirtiethUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtyFirstUser = [TAPUserModel new];
+//        thirtyFirstUser.userID = @"32";
+//        thirtyFirstUser.xcUserID = @"31";
+//        thirtyFirstUser.fullname = @"Sarah Febrina";
+//        thirtyFirstUser.email = @"sarah@moselo.com";
+//        thirtyFirstUser.phone = @"08979809026";
+//        thirtyFirstUser.username = @"sarah";
+//        thirtyFirstUser.isRequestPending = NO;
+//        thirtyFirstUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtySecondUser = [TAPUserModel new];
+//        thirtySecondUser.userID = @"33";
+//        thirtySecondUser.xcUserID = @"32";
+//        thirtySecondUser.fullname = @"Retyan Arthasani";
+//        thirtySecondUser.email = @"retyan@moselo.com";
+//        thirtySecondUser.phone = @"08979809026";
+//        thirtySecondUser.username = @"retyan";
+//        thirtySecondUser.isRequestPending = NO;
+//        thirtySecondUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtyThirdUser = [TAPUserModel new];
+//        thirtyThirdUser.userID = @"34";
+//        thirtyThirdUser.xcUserID = @"33";
+//        thirtyThirdUser.fullname = @"Sekar Sari";
+//        thirtyThirdUser.email = @"sekar@moselo.com";
+//        thirtyThirdUser.phone = @"08979809026";
+//        thirtyThirdUser.username = @"sekar";
+//        thirtyThirdUser.isRequestPending = NO;
+//        thirtyThirdUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtyFourthUser = [TAPUserModel new];
+//        thirtyFourthUser.userID = @"35";
+//        thirtyFourthUser.xcUserID = @"34";
+//        thirtyFourthUser.fullname = @"Meilika";
+//        thirtyFourthUser.email = @"mei@moselo.com";
+//        thirtyFourthUser.phone = @"08979809026";
+//        thirtyFourthUser.username = @"mei";
+//        thirtyFourthUser.isRequestPending = NO;
+//        thirtyFourthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtyFifthUser = [TAPUserModel new];
+//        thirtyFifthUser.userID = @"36";
+//        thirtyFifthUser.xcUserID = @"35";
+//        thirtyFifthUser.fullname = @"Yuendry";
+//        thirtyFifthUser.email = @"yuen@moselo.com";
+//        thirtyFifthUser.phone = @"08979809026";
+//        thirtyFifthUser.username = @"yuendry";
+//        thirtyFifthUser.isRequestPending = NO;
+//        thirtyFifthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtySixthUser = [TAPUserModel new];
+//        thirtySixthUser.userID = @"37";
+//        thirtySixthUser.xcUserID = @"36";
+//        thirtySixthUser.fullname = @"Ervin";
+//        thirtySixthUser.email = @"ervin@moselo.com";
+//        thirtySixthUser.phone = @"08979809026";
+//        thirtySixthUser.username = @"ervin";
+//        thirtySixthUser.isRequestPending = NO;
+//        thirtySixthUser.isRequestAccepted = YES;
+//
+//        TAPUserModel *thirtySeventhUser = [TAPUserModel new];
+//        thirtySeventhUser.userID = @"38";
+//        thirtySeventhUser.xcUserID = @"37";
+//        thirtySeventhUser.fullname = @"Fauzi";
+//        thirtySeventhUser.email = @"fauzi@moselo.com";
+//        thirtySeventhUser.phone = @"08979809026";
+//        thirtySeventhUser.username = @"fauzi";
+//        thirtySeventhUser.isRequestPending = NO;
+//        thirtySeventhUser.isRequestAccepted = YES;
+//
+//        [userResultArray addObject:firstUser];
+//        [userResultArray addObject:secondUser];
+//        [userResultArray addObject:thirdUser];
+//        [userResultArray addObject:fourthUser];
+//        [userResultArray addObject:fifthUser];
+//        [userResultArray addObject:sixthUser];
+//        [userResultArray addObject:seventhUser];
+//        [userResultArray addObject:eighthUser];
+//        [userResultArray addObject:ninthUser];
+//        [userResultArray addObject:tenthUser];
+//        [userResultArray addObject:eleventhUser];
+//        [userResultArray addObject:twelfthUser];
+//        [userResultArray addObject:thirteenthUser];
+//        [userResultArray addObject:fourteenthUser];
+//        [userResultArray addObject:fifteenthUser];
+//        [userResultArray addObject:sixteenthUser];
+//        [userResultArray addObject:seventeenthUser];
+//        [userResultArray addObject:eighteenthUser];
+//        [userResultArray addObject:nineteenthUser];
+//        [userResultArray addObject:twentiethUser];
+//        [userResultArray addObject:twentyFirstUser];
+//        [userResultArray addObject:twentySecondUser];
+//        [userResultArray addObject:twentyThirdUser];
+//        [userResultArray addObject:twentyFourthUser];
+//        [userResultArray addObject:twentyFifthUser];
+//        [userResultArray addObject:twentySixthUser];
+//        [userResultArray addObject:twentySeventhUser];
+//        [userResultArray addObject:twentyEightUser];
+//        [userResultArray addObject:twentyNinthUser];
+//        [userResultArray addObject:thirtiethUser];
+//        [userResultArray addObject:thirtyFirstUser];
+//        [userResultArray addObject:thirtySecondUser];
+//        [userResultArray addObject:thirtyThirdUser];
+//        [userResultArray addObject:thirtyFourthUser];
+//        [userResultArray addObject:thirtyFifthUser];
+//        [userResultArray addObject:thirtySixthUser];
+//        [userResultArray addObject:thirtySeventhUser];
         
-        TAPUserModel *secondUser = [TAPUserModel new];
-        secondUser.userID = @"2";
-        secondUser.xcUserID = @"2";
-        secondUser.fullname = @"Dominic Vedericho";
-        secondUser.email = @"dominic@moselo.com";
-        secondUser.phone = @"08979809026";
-        secondUser.username = @"dominic";
-        secondUser.isRequestPending = NO;
-        secondUser.isRequestAccepted = YES;
-        
-        TAPUserModel *thirdUser = [TAPUserModel new];
-        thirdUser.userID = @"3";
-        thirdUser.xcUserID = @"3";
-        thirdUser.fullname = @"Rionaldo Linggautama";
-        thirdUser.email = @"rionaldo@moselo.com";
-        thirdUser.phone = @"08979809026";
-        thirdUser.username = @"rionaldo";
-        thirdUser.isRequestPending = NO;
-        thirdUser.isRequestAccepted = YES;
-        
-        TAPUserModel *fourthUser = [TAPUserModel new];
-        fourthUser.userID = @"4";
-        fourthUser.xcUserID = @"4";
-        fourthUser.fullname = @"Kevin Reynaldo";
-        fourthUser.email = @"kevin@moselo.com";
-        fourthUser.phone = @"08979809026";
-        fourthUser.username = @"kevin";
-        fourthUser.isRequestPending = NO;
-        fourthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *fifthUser = [TAPUserModel new];
-        fifthUser.userID = @"5";
-        fifthUser.xcUserID = @"5";
-        fifthUser.fullname = @"Welly Kencana";
-        fifthUser.email = @"welly@moselo.com";
-        fifthUser.phone = @"08979809026";
-        fifthUser.username = @"welly";
-        fifthUser.isRequestPending = NO;
-        fifthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *sixthUser = [TAPUserModel new];
-        sixthUser.userID = @"6";
-        sixthUser.xcUserID = @"6";
-        sixthUser.fullname = @"Jony Lim";
-        sixthUser.email = @"jony@moselo.com";
-        sixthUser.phone = @"08979809026";
-        sixthUser.username = @"jony";
-        sixthUser.isRequestPending = NO;
-        sixthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *seventhUser = [TAPUserModel new];
-        seventhUser.userID = @"7";
-        seventhUser.xcUserID = @"7";
-        seventhUser.fullname = @"Michael Tansy";
-        seventhUser.email = @"michael@moselo.com";
-        seventhUser.phone = @"08979809026";
-        seventhUser.username = @"michael";
-        seventhUser.isRequestPending = NO;
-        seventhUser.isRequestAccepted = YES;
-        
-        TAPUserModel *eighthUser = [TAPUserModel new];
-        eighthUser.userID = @"8";
-        eighthUser.xcUserID = @"8";
-        eighthUser.fullname = @"Richard Fang";
-        eighthUser.email = @"richard@moselo.com";
-        eighthUser.phone = @"08979809026";
-        eighthUser.username = @"richard";
-        eighthUser.isRequestPending = NO;
-        eighthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *ninthUser = [TAPUserModel new];
-        ninthUser.userID = @"9";
-        ninthUser.xcUserID = @"9";
-        ninthUser.fullname = @"Erwin Andreas";
-        ninthUser.email = @"erwin@moselo.com";
-        ninthUser.phone = @"08979809026";
-        ninthUser.username = @"erwin";
-        ninthUser.isRequestPending = NO;
-        ninthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *tenthUser = [TAPUserModel new];
-        tenthUser.userID = @"10";
-        tenthUser.xcUserID = @"10";
-        tenthUser.fullname = @"Jefry Lorentono";
-        tenthUser.email = @"jefry@moselo.com";
-        tenthUser.phone = @"08979809026";
-        tenthUser.username = @"jefry";
-        tenthUser.isRequestPending = NO;
-        tenthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *eleventhUser = [TAPUserModel new];
-        eleventhUser.userID = @"11";
-        eleventhUser.xcUserID = @"11";
-        eleventhUser.fullname = @"Cundy Sunardy";
-        eleventhUser.email = @"cundy@moselo.com";
-        eleventhUser.phone = @"08979809026";
-        eleventhUser.username = @"cundy";
-        eleventhUser.isRequestPending = NO;
-        eleventhUser.isRequestAccepted = YES;
-        
-        TAPUserModel *twelfthUser = [TAPUserModel new];
-        twelfthUser.userID = @"12";
-        twelfthUser.xcUserID = @"12";
-        twelfthUser.fullname = @"Rizka Fatmawati";
-        twelfthUser.email = @"rizka@moselo.com";
-        twelfthUser.phone = @"08979809026";
-        twelfthUser.username = @"rizka";
-        twelfthUser.isRequestPending = NO;
-        twelfthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *thirteenthUser = [TAPUserModel new];
-        thirteenthUser.userID = @"13";
-        thirteenthUser.xcUserID = @"13";
-        thirteenthUser.fullname = @"Test 1";
-        thirteenthUser.email = @"test1@moselo.com";
-        thirteenthUser.phone = @"08979809026";
-        thirteenthUser.username = @"test1";
-        thirteenthUser.isRequestPending = NO;
-        thirteenthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *fourteenthUser = [TAPUserModel new];
-        fourteenthUser.userID = @"14";
-        fourteenthUser.xcUserID = @"14";
-        fourteenthUser.fullname = @"Test 2";
-        fourteenthUser.email = @"test2@moselo.com";
-        fourteenthUser.phone = @"08979809026";
-        fourteenthUser.username = @"test2";
-        fourteenthUser.isRequestPending = NO;
-        fourteenthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *fifteenthUser = [TAPUserModel new];
-        fifteenthUser.userID = @"15";
-        fifteenthUser.xcUserID = @"15";
-        fifteenthUser.fullname = @"Test 3";
-        fifteenthUser.email = @"test3@moselo.com";
-        fifteenthUser.phone = @"08979809026";
-        fifteenthUser.username = @"test3";
-        fifteenthUser.isRequestPending = NO;
-        fifteenthUser.isRequestAccepted = YES;
-        
-        TAPUserModel *sixteenthUser = [TAPUserModel new];
-        sixteenthUser.userID = @"17";
-        sixteenthUser.xcUserID = @"16";
-        sixteenthUser.fullname = @"Santo";
-        sixteenthUser.email = @"santo@moselo.com";
-        sixteenthUser.phone = @"08979809026";
-        sixteenthUser.username = @"santo";
-        sixteenthUser.isRequestPending = NO;
-        sixteenthUser.isRequestAccepted = YES;
-        
-        [userResultArray addObject:firstUser];
-        [userResultArray addObject:secondUser];
-        [userResultArray addObject:thirdUser];
-        [userResultArray addObject:fourthUser];
-        [userResultArray addObject:fifthUser];
-        [userResultArray addObject:sixthUser];
-        [userResultArray addObject:seventhUser];
-        [userResultArray addObject:eighthUser];
-        [userResultArray addObject:ninthUser];
-        [userResultArray addObject:tenthUser];
-        [userResultArray addObject:eleventhUser];
-        [userResultArray addObject:twelfthUser];
-        [userResultArray addObject:thirteenthUser];
-        [userResultArray addObject:fourteenthUser];
-        [userResultArray addObject:fifteenthUser];
-        [userResultArray addObject:sixteenthUser];
         //End Temp
         
         //Insert To Database
@@ -2238,7 +2504,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2247,7 +2513,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIAddContactWithUserID:userID success:success failure:failure];
@@ -2259,7 +2525,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -2268,7 +2534,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success(@"");
             return;
         }
@@ -2310,7 +2576,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2319,7 +2585,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIRemoveContactWithUserID:userID success:success failure:failure];
@@ -2331,7 +2597,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -2340,7 +2606,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success(@"");
             return;
         }
@@ -2382,7 +2648,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2391,7 +2657,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetUserByUserID:userID success:success failure:failure];
@@ -2403,7 +2669,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -2412,7 +2678,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             TAPUserModel *user = [TAPUserModel new];
             success(user);
             return;
@@ -2456,7 +2722,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2465,7 +2731,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetUserByXCUserID:XCuserID success:success failure:failure];
@@ -2477,7 +2743,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -2486,7 +2752,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             TAPUserModel *user = [TAPUserModel new];
             success(user);
             return;
@@ -2530,7 +2796,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2539,7 +2805,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIGetUserByUsername:username success:success failure:failure];
@@ -2551,7 +2817,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -2560,7 +2826,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             TAPUserModel *user = [TAPUserModel new];
             success(user);
             return;
@@ -2604,7 +2870,7 @@
     [parameterDictionary setObject:token forKey:@"apnToken"];
     
     NSInteger isDebugInteger = 0;
-    if(isDebug) {
+    if (isDebug) {
         isDebugInteger = 1;
     }
     
@@ -2613,7 +2879,7 @@
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
     } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if(![self isResponseSuccess:responseObject]) {
+        if (![self isResponseSuccess:responseObject]) {
             NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
             NSString *errorMessage = [errorDictionary objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2622,7 +2888,7 @@
             errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
             NSInteger errorStatusCode = [errorStatusCodeString integerValue];
             
-            if(errorStatusCode == 401) {
+            if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIUpdatePushNotificationWithToken:token isDebug:isDebug success:success failure:failure];
@@ -2634,7 +2900,7 @@
             
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
-            if(errorMessage == nil || [errorMessage isEqualToString:@""]) {
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
                 errorCode = 999;
             }
             
@@ -2643,7 +2909,7 @@
             return;
         }
         
-        if([self isDataEmpty:responseObject]) {
+        if ([self isDataEmpty:responseObject]) {
             success();
             return;
         }
@@ -2668,22 +2934,148 @@
     }];
 }
 
-
-//DV Temp
-+ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageArray
-                                           success:(void (^)(void))success
++ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageIDsArray
+                                           success:(void (^)(NSArray *updatedMessageIDsArray))success
                                            failure:(void (^)(NSError *error))failure {
-    //DV Note
-    //TODO - wait until API Ready
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateMessageDeliveryStatus];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:messageIDsArray forKey:@"messageIDs"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if(errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:messageIDsArray success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success([NSArray array]);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSArray *updatedMessageIDsArray = [dataDictionary objectForKey:@"updatedMessageIDs"];
+        updatedMessageIDsArray = [TAPUtil nullToEmptyArray:updatedMessageIDsArray];
+        
+        success(updatedMessageIDsArray);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+#endif
+    }];
 }
 
-+ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
-                                        success:(void (^)(void))success
++ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageIDsArray
+                                        success:(void (^)(NSArray *updatedMessageIDsArray))success
                                         failure:(void (^)(NSError *error))failure {
-    //DV Note
-    //TODO - wait until API Ready
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateMessageReadStatus];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:messageIDsArray forKey:@"messageIDs"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if(errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:messageIDsArray success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success([NSArray array]);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSArray *updatedMessageIDsArray = [dataDictionary objectForKey:@"updatedMessageIDs"];
+        updatedMessageIDsArray = [TAPUtil nullToEmptyArray:updatedMessageIDsArray];
+        
+        success(updatedMessageIDsArray);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+#endif
+    }];
 }
-
-//END DV Temp
 
 @end

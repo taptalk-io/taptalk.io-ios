@@ -15,6 +15,7 @@
 @property (strong, nonatomic) TAPPopUpInfoViewController *popupInfoViewController;
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 - (void)backButtonDidTapped;
+- (void)closeButtonDidTapped;
 
 @end
 
@@ -64,14 +65,14 @@
     self.popupInfoViewController.view.alpha = 0.0f;
 
     //Checking if there any navigationController
-    if([self tabBarController] && ![[[self tabBarController] tabBar] isHidden]){
+    if ([self tabBarController] && ![[[self tabBarController] tabBar] isHidden]){
         //is visible
         [self.tabBarController.view addSubview:self.popupInfoViewController.view];
         [self.tabBarController.view bringSubviewToFront:self.popupInfoViewController.view];
 
     } else {
         //is not visible or do not exists so is not visible
-        if(self.navigationController != nil){
+        if (self.navigationController != nil){
             [self.navigationController.view addSubview:self.popupInfoViewController.view];
             [self.navigationController.view bringSubviewToFront:self.popupInfoViewController.view];
         }
@@ -203,6 +204,20 @@
 
 - (void)backButtonDidTapped {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)showCustomCloseButton {
+    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconCloseGreen" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    [self.navigationItem setRightBarButtonItem:barButtonItem];
+}
+
+- (void)closeButtonDidTapped {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)showPopupView:(BOOL)isVisible withPopupType:(TAPPopUpInfoViewControllerType *)type title:(NSString *)title detailInformation:(NSString *)detailInfo {

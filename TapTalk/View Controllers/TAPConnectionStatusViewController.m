@@ -38,7 +38,7 @@
 
     if ([AFNetworkReachabilityManager sharedManager].reachable) {
         _statusType = [TAPConnectionManager sharedManager].tapConnectionStatus;
-        if(self.statusType == TAPConnectionManagerStatusTypeNotConnected) {
+        if (self.statusType == TAPConnectionManagerStatusTypeNotConnected) {
             [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeNone];
         }
         else if (self.statusType == TAPConnectionManagerStatusTypeDisconnected) {
@@ -106,7 +106,7 @@
 }
 
 - (void)socketConnectingNotification:(NSNotification *)notification {
-    if([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([AFNetworkReachabilityManager sharedManager].reachable) {
         [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeConnecting];
     }
     else {
@@ -123,8 +123,8 @@
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if([AFNetworkReachabilityManager sharedManager].reachable) {
-        if([TAPConnectionManager sharedManager].tapConnectionStatus == TAPConnectionManagerStatusTypeNotConnected) {
+    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+        if ([TAPConnectionManager sharedManager].tapConnectionStatus == TAPConnectionManagerStatusTypeNotConnected) {
             [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeNone];
         }
         else if ([TAPConnectionManager sharedManager].tapConnectionStatus == TAPConnectionManagerStatusTypeDisconnected) {

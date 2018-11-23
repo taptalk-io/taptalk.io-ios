@@ -14,10 +14,10 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
-    if(self) {
+    if (self) {
         
         CGFloat contentViewYPosition = 20.0f;
-        if(IS_IPHONE_X_FAMILY) {
+        if (IS_IPHONE_X_FAMILY) {
             contentViewYPosition = 44.0f;
         }
         

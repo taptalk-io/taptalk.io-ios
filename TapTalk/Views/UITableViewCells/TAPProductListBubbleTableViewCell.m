@@ -40,7 +40,7 @@
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if(IS_IPHONE_4_7_INCH_AND_ABOVE) {
+    if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
         return CGSizeMake(270.0f, 347.0f);
     }
     else {

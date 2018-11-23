@@ -10,6 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, OrderCardSenderType) {
+    OrderCardSenderTypeMy = 0,
+    OrderCardSenderTypeYour = 1
+};
+
 @protocol OrderCardBubbleTableViewCellDelegate <NSObject>
 
 - (void)orderCardBubbleDidTappedHeaderButtonDidTapped;
@@ -27,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPOrderCardBubbleTableViewCell : TAPBaseXIBRotatedTableViewCell
 
 @property (weak, nonatomic) id<OrderCardBubbleTableViewCellDelegate> delegate;
+
+@property (nonatomic) OrderCardSenderType *orderCardSenderType;
 
 @end
 

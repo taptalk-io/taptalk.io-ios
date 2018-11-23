@@ -33,7 +33,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
         _delegatesArray = [[NSMutableArray alloc] init];
         _contactDictionary = [[NSMutableDictionary alloc] init];
     }
@@ -43,7 +43,7 @@
 
 #pragma mark - Custom Method
 - (void)addDelegate:(id)delegate {
-    if([self.delegatesArray containsObject:delegate]) {
+    if ([self.delegatesArray containsObject:delegate]) {
         return;
     }
     
@@ -58,7 +58,7 @@
 
 - (void)insertToContactDictionaryWithDataArray:(NSArray *)contactArray {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for(TAPUserModel *user in contactArray) {
+        for (TAPUserModel *user in contactArray) {
             [self.contactDictionary setObject:user forKey:user.userID];
         }
     });
@@ -97,8 +97,8 @@
 }
 
 - (void)updateContactWithUser:(TAPUserModel *)user {
-    for(id delegate in self.delegatesArray) {
-        if([delegate respondsToSelector:@selector(contactCacheManagerDidUpdateContactWithData:)]) {
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(contactCacheManagerDidUpdateContactWithData:)]) {
             [delegate contactCacheManagerDidUpdateContactWithData:user];
         }
     }

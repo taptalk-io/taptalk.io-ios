@@ -26,7 +26,7 @@
 + (NSInteger)daysDifferentBetweenDate:(NSDate *)date1 fromDate:(NSDate *)date2 {
     NSTimeInterval timeInterval = [date1 timeIntervalSinceDate:date2];
     
-    if(timeInterval < 0.0f) {
+    if (timeInterval < 0.0f) {
         timeInterval = timeInterval * -1.0f;
     }
     
@@ -88,7 +88,7 @@
 #pragma mark - Color
 + (UIColor *)getColor:(NSString *)hexColor {
     
-    if([hexColor isEqualToString:@""]){
+    if ([hexColor isEqualToString:@""]){
         return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
         
     }
@@ -117,34 +117,34 @@
     
     UIColor *backgroundColor = [TAPUtil getColor:@"B6E6F0"];
     
-    if(randomInteger == 1) {
+    if (randomInteger == 1) {
         backgroundColor = [TAPUtil getColor:@"B6E6F0"];
     }
-    else if(randomInteger == 2) {
+    else if (randomInteger == 2) {
         backgroundColor = [TAPUtil getColor:@"FDB2B9"];
     }
-    else if(randomInteger == 3) {
+    else if (randomInteger == 3) {
         backgroundColor = [TAPUtil getColor:@"F49AB6"];
     }
-    else if(randomInteger == 4) {
+    else if (randomInteger == 4) {
         backgroundColor = [TAPUtil getColor:@"D5C1E2"];
     }
-    else if(randomInteger == 5) {
+    else if (randomInteger == 5) {
         backgroundColor = [TAPUtil getColor:@"FDD292"];
     }
-    else if(randomInteger == 6) {
+    else if (randomInteger == 6) {
         backgroundColor = [TAPUtil getColor:@"FDC3A7"];
     }
-    else if(randomInteger == 7) {
+    else if (randomInteger == 7) {
         backgroundColor = [TAPUtil getColor:@"D0E69D"];
     }
-    else if(randomInteger == 8) {
+    else if (randomInteger == 8) {
         backgroundColor = [TAPUtil getColor:@"99D39E"];
     }
-    else if(randomInteger == 9) {
+    else if (randomInteger == 9) {
         backgroundColor = [TAPUtil getColor:@"A9DDC7"];
     }
-    else if(randomInteger == 10) {
+    else if (randomInteger == 10) {
         backgroundColor = [TAPUtil getColor:@"C6D3E9"];
     }
     
@@ -214,16 +214,16 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     CGSize targetSize = targetFrame.size;
     
     CGPoint thumbnailPoint = CGPointMake(0.0f, 0.0f);
-    if(isScaling && isCropping)thumbnailPoint = CGPointMake(0.0f, 0.0f);
-    else if(isScaling)thumbnailPoint = CGPointMake(0.0f, 0.0f);
-    else if(isCropping)thumbnailPoint = CGPointMake(-targetFrame.origin.x, -targetFrame.origin.y);
+    if (isScaling && isCropping)thumbnailPoint = CGPointMake(0.0f, 0.0f);
+    else if (isScaling)thumbnailPoint = CGPointMake(0.0f, 0.0f);
+    else if (isCropping)thumbnailPoint = CGPointMake(-targetFrame.origin.x, -targetFrame.origin.y);
     
     CGSize imageSize = sourceImage.size;
     
     CGFloat scaledWidth = targetSize.width;
     CGFloat scaledHeight = targetSize.height;
     
-    if(isScaling){
+    if (isScaling){
         scaledWidth = targetSize.width;
         scaledHeight = targetSize.height;
     }
@@ -235,7 +235,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     UIImage *newImage = nil;
     CGFloat scaleFactor = 0.0;
     
-    if(isScaling){
+    if (isScaling){
         if (CGSizeEqualToSize(imageSize, targetSize) == NO)
         {
             CGFloat widthFactor = targetSize.width / imageSize.width;
@@ -260,7 +260,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         }
     }
     
-    if(isCropping){
+    if (isCropping){
         //Crop Image
         UIGraphicsBeginImageContext(targetSize);
         
@@ -272,7 +272,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         [sourceImage drawInRect:thumbnailRect];
         
         newImage = UIGraphicsGetImageFromCurrentImageContext();
-        if(newImage == nil)NSLog(@"Faild to Crop Image");
+        if (newImage == nil)NSLog(@"Faild to Crop Image");
         
         //Pop Context
         UIGraphicsEndImageContext();
@@ -326,7 +326,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     
     NSMutableString* output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
     
-    for(int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
+    for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
         [output appendFormat:@"%02x", digest[i]];
     
     return output;
@@ -340,7 +340,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     
     NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
     
-    for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
+    for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
         [output appendFormat:@"%02x", digest[i]];
     
     return  output;
@@ -393,8 +393,8 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     
     int flag = 0;
     
-    for(int i = valueString.length - 1; i>=0; i--) {
-        if(flag % 3 == 0 && flag != 0) {
+    for (int i = valueString.length - 1; i>=0; i--) {
+        if (flag % 3 == 0 && flag != 0) {
             formattedCurrencyString = [NSString stringWithFormat:@"%c.%@", [valueString characterAtIndex:i], formattedCurrencyString];
         }
         else {
@@ -404,7 +404,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         flag++;
     }
     
-    if(currencySign != nil && ![currencySign isEqualToString:@""]) {
+    if (currencySign != nil && ![currencySign isEqualToString:@""]) {
         formattedCurrencyString = [NSString stringWithFormat:@"%@%@", currencySign, formattedCurrencyString];
     }
     
@@ -423,7 +423,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 
 #pragma mark - JSON
 + (NSString *)jsonStringFromObject:(id)json {
-    if(json == nil) {
+    if (json == nil) {
         return @"";
     }
     
@@ -443,7 +443,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (id)jsonObjectFromString:(NSString *)string {
-    if(string == nil || [string isEqualToString:@""]) {
+    if (string == nil || [string isEqualToString:@""]) {
         return nil;
     }
     
@@ -474,7 +474,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 + (CGRect)getStringConstrainedSizeWithString:(NSString *)string withFont:(UIFont *)font withConstrainedSize:(CGSize)size {
     CGRect countedRect = CGRectZero;
     
-    if([[[UIDevice currentDevice] systemVersion] floatValue] > 7.0f) {
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] > 7.0f) {
         //iOS 7 and up
         countedRect = [string boundingRectWithSize:size
                                            options:NSStringDrawingUsesLineFragmentOrigin
@@ -633,10 +633,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 + (void)logAllFontFamiliesAndName {
 #ifdef DEBUG
     NSLog(@"-------------------------------FONT-------------------------------");
-    for(NSString *fontFamily in [UIFont familyNames]) {
+    for (NSString *fontFamily in [UIFont familyNames]) {
         NSLog(@"%@", fontFamily);
         
-        for(NSString *fontName in [UIFont fontNamesForFamilyName:fontFamily]) {
+        for (NSString *fontName in [UIFont fontNamesForFamilyName:fontFamily]) {
             NSLog(@"     %@", fontName);
         }
     }
@@ -651,7 +651,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (NSDictionary *)parameterFromURLString:(NSString *)urlString {
-    if(urlString == nil) {
+    if (urlString == nil) {
         return [NSDictionary dictionary];
     }
     
@@ -663,10 +663,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     
-    for(NSString *parameterString in parameterSeparatedArray) {
+    for (NSString *parameterString in parameterSeparatedArray) {
         NSArray *keyValueArray = [parameterString componentsSeparatedByString:@"="];
         
-        if([keyValueArray count] < 2) {
+        if ([keyValueArray count] < 2) {
             //Skip key value parsing, key value not valid
             continue;
         }
@@ -674,7 +674,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         NSString *keyString = [keyValueArray firstObject];
         NSString *valueString = @"";
         
-        for(NSInteger count = 1; count < [keyValueArray count]; count++) {
+        for (NSInteger count = 1; count < [keyValueArray count]; count++) {
             //Reattach if string is separated by = parameter
             NSString *currentValueString = [keyValueArray objectAtIndex:count];
             valueString = [NSString stringWithFormat:@"%@%@", valueString, currentValueString];
@@ -690,7 +690,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (CGFloat)currentDeviceStatusBarHeight {
-    if(IS_IPHONE_X_FAMILY) {
+    if (IS_IPHONE_X_FAMILY) {
         return 44.0f;
     }
     
@@ -701,15 +701,15 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     NSInteger navigationBarHeight = 44.0f;
     NSInteger statusBarHeight = [TAPUtil currentDeviceStatusBarHeight];
     
-    if(IS_IPHONE_X_FAMILY) {
+    if (IS_IPHONE_X_FAMILY) {
         navigationBarHeight = 44.0f;
         
-        if(iPhoneXLargeLayout) {
+        if (iPhoneXLargeLayout) {
             navigationBarHeight = 101.0f;
         }
     }
     
-    if(statusBar) {
+    if (statusBar) {
         return navigationBarHeight + statusBarHeight;
     }
     
@@ -754,7 +754,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
           
           counter = counter + 1;
           
-          if([fileNameComponentsArray count] > 1) {
+          if ([fileNameComponentsArray count] > 1) {
               //has file extension
               extension = [fileNameComponentsArray lastObject];
               fileName = [fileNameWithExtension stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@".%@", extension] withString:@""];

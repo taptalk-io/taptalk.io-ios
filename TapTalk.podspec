@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
   #
 
   s.license      = "MIT"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+  # s.license      = s.source       = { :path => '.' }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -121,7 +121,7 @@ Pod::Spec.new do |s|
   # s.library   = "iconv"
   # s.libraries = "iconv", "xml2"
   
-  s.vendored_frameworks = 'WebP.framework'
+# s.vendored_frameworks = 'WebP.framework'
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -140,13 +140,12 @@ Pod::Spec.new do |s|
     s.dependency "JSONModel", "~> 1.1"
     s.dependency "Realm"
     s.dependency "SDWebImage", "~> 4.4.2"
-    s.dependency "SDWebImage/WebP"
     s.dependency "ZBarSDK", "~> 1.3"
     s.dependency "PodAsset"
     
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents = '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "Configs.h"', '#import "TAPConnectionManager.h"', '#import "TAPChatManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPOldDataManager.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "RNImageView.h"', '#import "PodAsset.h"', '#import "RNGrowingTextView.h"', '#import "TAPSearchBarView.h"'
+    s.prefix_header_contents = '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "Configs.h"', '#import "TAPConnectionManager.h"', '#import "TAPChatManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPMessageStatusManager.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "RNImageView.h"', '#import "PodAsset.h"', '#import "RNGrowingTextView.h"', '#import "TAPSearchBarView.h"'
     
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     

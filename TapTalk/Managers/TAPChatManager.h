@@ -24,6 +24,8 @@
 - (void)chatManagerDidReceiveDeleteMessageInActiveRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveDeleteMessageOnOtherRoom:(TAPMessageModel *)message;
 
+- (void)chatManagerShouldDecreaseUnreadBubbleForRoomID:(NSString *)roomID;
+
 //DV Temp
 - (void)chatManagerDidReceiveOnlineStatus:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveOfflineStatus:(TAPMessageModel *)message;
@@ -64,5 +66,6 @@
 - (void)saveIncomingMessageAndDisconnect;
 - (void)saveUnsentMessageAndDisconnect;
 - (void)triggerSaveNewMessage;
+- (void)decreaseUnreadMessageForRoomID:(NSString *)roomID;
 
 @end

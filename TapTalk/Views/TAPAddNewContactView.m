@@ -354,7 +354,7 @@
 
 #pragma mark - Custom Method
 - (void)isShowDefaultLabel:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         [UIView animateWithDuration:0.2f animations:^{
             self.defaultLabel.alpha = 1.0f;
         }];
@@ -367,7 +367,7 @@
 }
 
 - (void)isShowExpertVerifiedLogo:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.expertVerifiedImageView.alpha = 1.0f;
     }
     else {
@@ -376,7 +376,7 @@
 }
 
 - (void)setSearchViewLayoutWithType:(LayoutType)type {
-    if(type == LayoutTypeDefault) {
+    if (type == LayoutTypeDefault) {
         //Default View
         [UIView animateWithDuration:0.2f animations:^{
             self.defaultLabel.alpha = 1.0f;
@@ -384,7 +384,7 @@
             self.searchUserView.alpha = 0.0f;
         }];
     }
-    else if(type == LayoutTypeUser) {
+    else if (type == LayoutTypeUser) {
         //User View
         [UIView animateWithDuration:0.2f animations:^{
             self.defaultLabel.alpha = 0.0f;
@@ -392,7 +392,7 @@
             self.searchUserView.alpha = 1.0f;
         }];
     }
-    else if(type == LayoutTypeExpert) {
+    else if (type == LayoutTypeExpert) {
         //Expert View
         [UIView animateWithDuration:0.2f animations:^{
             self.defaultLabel.alpha = 0.0f;
@@ -403,7 +403,7 @@
 }
 
 - (void)setSearchExpertButtonWithType:(ButtonType)type {
-    if(type == ButtonTypeAdd) {
+    if (type == ButtonTypeAdd) {
         //Add to Contacts Button
         [UIView animateWithDuration:0.2f animations:^{
             self.expertChatNowButtonView.alpha = 0.0f;
@@ -415,7 +415,7 @@
             self.addExpertToContactButton.userInteractionEnabled = YES;
         }];
     }
-    else if(type == ButtonTypeChat) {
+    else if (type == ButtonTypeChat) {
         //Chat Now Button
         [UIView animateWithDuration:0.2f animations:^{
             self.expertChatNowButtonView.alpha = 1.0f;
@@ -430,7 +430,7 @@
 }
 
 - (void)setSearchUserButtonWithType:(ButtonType)type {
-    if(type == ButtonTypeAdd) {
+    if (type == ButtonTypeAdd) {
         //Add to Contacts Button
         [UIView animateWithDuration:0.2f animations:^{
             self.userChatNowButtonView.alpha = 0.0f;
@@ -442,7 +442,7 @@
             self.addUserToContactButton.userInteractionEnabled = YES;
         }];
     }
-    else if(type == ButtonTypeChat) {
+    else if (type == ButtonTypeChat) {
         //Chat Now Button
         [UIView animateWithDuration:0.2f animations:^{
             self.userChatNowButtonView.alpha = 1.0f;
@@ -475,7 +475,7 @@
     
     if ([userRole.userRoleID isEqualToString:@"0"]) { //WK Temp - Temporary @"0"
         TAPImageURLModel *imageURL = user.imageURL;
-        NSString *imageURLString = TAP_DUMMY_IMAGE_URL;
+        NSString *imageURLString = imageURL.thumbnail;
         
         self.userFullNameLabel.text = fullName;
         [self.userImageView setImageWithURLString:imageURLString];

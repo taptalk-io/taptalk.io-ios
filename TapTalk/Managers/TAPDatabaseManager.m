@@ -40,7 +40,7 @@
 - (id)init {
     self = [super init];
     
-    if(self) {
+    if (self) {
 
     }
     
@@ -63,7 +63,7 @@
     
     RLMResults *results = [NSClassFromString(tableName) allObjectsInRealm:realm];
     
-    if(![query isEqualToString:@""]) {
+    if (![query isEqualToString:@""]) {
         results = [results objectsWhere:query];
     }
     
@@ -197,7 +197,7 @@
         results = [results sortedResultsUsingKeyPath:@"created" ascending:NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateString];
         results = [results objectsWithPredicate:predicate];
-        if([results count] == 0) {
+        if ([results count] == 0) {
 //            dispatch_async(dispatch_get_main_queue(), ^{
                 success([NSArray array]);
 //            });
@@ -355,7 +355,7 @@
      dispatch_async(queue, ^{
          @autoreleasepool {
              NSMutableArray *resultArray = [NSMutableArray array];
-             for(NSDictionary *dataDictionary in dataArray) {
+             for (NSDictionary *dataDictionary in dataArray) {
                  id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
                  [resultArray addObject:resultRealmModel];
              }
@@ -387,7 +387,7 @@
     }
     
     NSMutableArray *resultArray = [NSMutableArray array];
-    for(NSDictionary *dataDictionary in dataArray) {
+    for (NSDictionary *dataDictionary in dataArray) {
         id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
         [resultArray addObject:resultRealmModel];
     }
@@ -418,7 +418,7 @@
     dispatch_async(queue, ^{
         @autoreleasepool {
             NSMutableArray *resultArray = [NSMutableArray array];
-            for(NSDictionary *dataDictionary in dataArray) {
+            for (NSDictionary *dataDictionary in dataArray) {
                 id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
                 [resultArray addObject:resultRealmModel];
             }
@@ -450,7 +450,7 @@
     }
     
     NSMutableArray *resultArray = [NSMutableArray array];
-    for(NSDictionary *dataDictionary in dataArray) {
+    for (NSDictionary *dataDictionary in dataArray) {
         id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
         [resultArray addObject:resultRealmModel];
     }
@@ -501,7 +501,7 @@
     dispatch_async(queue, ^{
         @autoreleasepool {
             NSMutableArray *resultArray = [NSMutableArray array];
-            for(NSDictionary *dataDictionary in dataArray) {
+            for (NSDictionary *dataDictionary in dataArray) {
                 id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
                 [resultArray addObject:resultRealmModel];
             }
@@ -541,7 +541,7 @@
                                          failure:(void (^)(NSError *error))failure {
     @autoreleasepool {
         NSMutableArray *resultArray = [NSMutableArray array];
-        for(NSDictionary *dataDictionary in dataArray) {
+        for (NSDictionary *dataDictionary in dataArray) {
             id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
             [resultArray addObject:resultRealmModel];
         }
@@ -654,7 +654,7 @@
     
     RLMResults *results = [TAPMessageRealmModel objectsInRealm:realm where:@"isSending == true"];
     
-    if([results count] != 0) {
+    if ([results count] != 0) {
         [realm beginWriteTransaction];
         for (TAPMessageRealmModel *messageRealmModel in results) {
             messageRealmModel.isSending = [NSNumber numberWithBool:NO];

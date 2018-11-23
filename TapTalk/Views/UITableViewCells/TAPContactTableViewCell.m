@@ -78,9 +78,9 @@
 
 #pragma mark - Custom Method
 - (void)setContactTableViewCellWithUser:(TAPUserModel *)user {
-    if(user.userID != nil) { //DV Temp
+    if (user.userID != nil) {
         NSString *contactName = user.fullname;
-        NSString *imageURL = TAP_DUMMY_IMAGE_URL; //DV Temp
+        NSString *imageURL = user.imageURL.thumbnail;
         [self.contactImageView setImageWithURLString:imageURL];
         NSMutableDictionary *contactNameAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat contactNameLetterSpacing = -0.2f;

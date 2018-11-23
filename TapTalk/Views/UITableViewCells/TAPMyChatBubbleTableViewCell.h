@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)animateSendingIcon;
+- (void)setAsDelivered;
+- (void)setAsRead;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
 
 @end
