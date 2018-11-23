@@ -1413,10 +1413,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         [emptyTitleAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f] forKey:NSFontAttributeName];
         [emptyTitleAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE] forKey:NSForegroundColorAttributeName];
         NSMutableAttributedString *emptyTitleAttributedString = [[NSMutableAttributedString alloc] initWithString:self.emptyTitleLabel.text];
-        NSRange roomNameRange = [self.emptyTitleLabel.text rangeOfString:roomName];
-        [emptyTitleAttributedString addAttributes:emptyTitleAttributesDictionary
-                                            range:roomNameRange];
-        self.emptyTitleLabel.attributedText = emptyTitleAttributedString;
+        
+        if(self.emptyTitleLabel.text != nil && ![self.emptyTitleLabel.text isEqualToString:@""]) {
+            NSRange roomNameRange = [self.emptyTitleLabel.text rangeOfString:roomName];
+            [emptyTitleAttributedString addAttributes:emptyTitleAttributesDictionary
+                                                range:roomNameRange];
+            self.emptyTitleLabel.attributedText = emptyTitleAttributedString;
+        }
         //End Temp
         
         self.emptyDescriptionLabel.text = @"Hey there! If you are looking for handmade gifts\nto give to someone special, please check out\nmy list of services and pricing below!";
@@ -2006,7 +2009,10 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     for(NSIndexPath *indexPath in visibleCellIndexPathArray) {
         TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
         
-        [self processMessageAsRead:currentMessage];
+        if (![currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            //Their chat
+            [self processMessageAsRead:currentMessage];
+        }
     }
 }
 

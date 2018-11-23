@@ -259,6 +259,10 @@
     
     currentRoomList.numberOfUnreadMessages--;
     
+    if(currentRoomList.numberOfUnreadMessages < 0) {
+        currentRoomList.numberOfUnreadMessages = 0;
+    }
+    
     NSInteger cellRow = [self.roomListArray indexOfObject:currentRoomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];

@@ -1131,8 +1131,9 @@
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
     for (TAPMessageModel *message in dataArray) {
 
-        //Changing isRead to true
+        //Changing isRead & isDelivered to true
         message.isRead = YES;
+        message.isDelivered = YES;
         
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];

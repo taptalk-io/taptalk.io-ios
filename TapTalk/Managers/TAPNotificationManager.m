@@ -150,6 +150,14 @@
         decryptedMessage = message;
     }
     
+    //Insert message to database
+    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[decryptedMessage] tableName:@"TAPMessageRealmModel" success:^{
+        //Update application badge
+        [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+    } failure:^(NSError *error) {
+        
+    }];
+    
     if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         //Handling local push notification
         if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
@@ -159,6 +167,8 @@
             content.body = messageText;
             content.sound = [UNNotificationSound soundNamed:NOTIFICATION_SOUND_NAME];
             content.userInfo = decryptedMessage.toDictionary;
+            content.threadIdentifier = decryptedMessage.room.roomID;
+            content.summaryArgument = decryptedMessage.user.fullname;
 
             // Deliver the notification after x second
             UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger
@@ -283,6 +293,10 @@
 
 - (void)updateApplicationBadgeCount {
     [TAPDataManager getDatabaseUnreadRoomCountWithActiveUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSInteger unreadRoomCount) {
+        if(unreadRoomCount < 0) {
+            unreadRoomCount = 0;
+        }
+        
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:unreadRoomCount];
     } failure:^(NSError *error) {
         

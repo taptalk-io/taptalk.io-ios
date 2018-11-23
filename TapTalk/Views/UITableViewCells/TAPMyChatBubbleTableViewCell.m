@@ -114,6 +114,12 @@ typedef NS_ENUM(NSInteger, TAPMyChatBubbleStatus) {
 
 #pragma mark - Custom Method
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
+    message.body = [TAPUtil nullToEmptyString:message.body];
+    
     _message = message;
     
     //WK Temp
