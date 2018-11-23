@@ -46,11 +46,14 @@
 + (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray))success
                                      failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllUnreadMessagesWithSuccess:(void (^)(NSArray *unreadMessages))success
-                                     failure:(void (^)(NSError *error))failure;
+                                        failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseUnreadMessagesInRoomWithRoomID:(NSString *)roomID
                                      activeUserID:(NSString *)activeUserID
                                           success:(void (^)(NSArray *unreadMessages))success
                                           failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
+                                           success:(void (^)(NSInteger unreadRoomCount))success
+                                           failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseContactSearchKeyword:(NSString *)keyword
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success

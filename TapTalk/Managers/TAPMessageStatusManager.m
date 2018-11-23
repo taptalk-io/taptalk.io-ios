@@ -280,4 +280,12 @@
     }];
 }
 
+- (BOOL)hasPendingProcess {
+    if([self.readMessageQueueArray count] == 0 && [self.deliveryMessageQueueArray count] == 0 && [[self.readMessageAPIRequestDictionary allKeys] count] == 0 && [[self.deliveredMessageAPIRequestDictionary allKeys] count] == 0) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 @end

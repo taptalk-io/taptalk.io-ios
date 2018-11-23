@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handleIncomingMessage:(TAPMessageModel *)message shouldNotShowNotification:(BOOL)shouldNotShowNotification isNeedDecrypted:(BOOL)isNeedDecrypted;
 - (void)handleTappedNotificationWithUserInfo:(NSDictionary *)userInfo;
 - (void)removeReadLocalNotificationWithMessage:(TAPMessageModel *)message;
+- (void)updateApplicationBadgeCount;
 
 @end
 

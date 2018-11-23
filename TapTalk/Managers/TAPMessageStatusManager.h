@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message;
 - (void)filterAndUpdateBulkMessageStatusToDeliveredWithArray:(NSArray *)messageArray;
 - (void)markMessageAsDeliveredFromPushNotificationWithMessage:(TAPMessageModel *)message;
+- (BOOL)hasPendingProcess;
 
 @end
 

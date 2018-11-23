@@ -281,4 +281,12 @@
     }
 }
 
+- (void)updateApplicationBadgeCount {
+    [TAPDataManager getDatabaseUnreadRoomCountWithActiveUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSInteger unreadRoomCount) {
+        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:unreadRoomCount];
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
 @end

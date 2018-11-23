@@ -263,7 +263,7 @@
     //RN To Do - Check file upload progress
     
     
-    if ((isPendingMessageExist || isFileUploadProgressExist) && self.checkPendingBackgroundTaskRetryAttempt < kMaximumRetryAttempt) {
+    if ((isPendingMessageExist || isFileUploadProgressExist || [[TAPMessageStatusManager sharedManager] hasPendingProcess]) && self.checkPendingBackgroundTaskRetryAttempt < kMaximumRetryAttempt) {
         _checkPendingBackgroundTaskRetryAttempt++;
     }
     else {
@@ -309,6 +309,7 @@
 }
 
 - (void)removeAllBackgroundSequenceTaskWithApplication:(UIApplication *)application {
+    [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
     _isEnterBackgroundSequenceActive = NO;
     [self.backgroundSequenceTimer invalidate];
     _backgroundSequenceTimer = nil;

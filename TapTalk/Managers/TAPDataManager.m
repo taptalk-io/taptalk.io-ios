@@ -922,6 +922,22 @@
     }];
 }
 
++ (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
+                                           success:(void (^)(NSInteger))success
+                                           failure:(void (^)(NSError *))failure {
+    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && !(userID LIKE '%@')", activeUserID];
+    
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"" isAscending:NO distinctBy:@"roomID" success:^(NSArray *resultArray) {
+        
+        resultArray = [TAPUtil nullToEmptyArray:resultArray];
+        
+        success([resultArray count]);
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 + (void)searchChatAndContactWithString:(NSString *)searchString
                                 SortBy:(NSString *)columnName
                                success:(void (^)(NSArray *roomArray, NSArray *unreadCountArray))success

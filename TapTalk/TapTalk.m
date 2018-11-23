@@ -141,6 +141,9 @@
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_WILL_RESIGN_ACTIVE object:application];
+    
+    //Update application notification bubble
+    [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
