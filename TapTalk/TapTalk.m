@@ -282,6 +282,9 @@
 - (void)handleException:(NSException *)exception {
     [[TAPChatManager sharedManager] saveUnsentMessageAndDisconnect];
     _instanceState = TapTalkInstanceStateInactive;
+    
+    //Send stop typing emit
+    [[TAPChatManager sharedManager] stopTyping];
 }
 
 #pragma mark - First Run Setup

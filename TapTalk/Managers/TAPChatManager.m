@@ -27,11 +27,13 @@
 - (void)stopTimerSaveNewMessage;
 - (void)runSendMessageSequenceWithMessage:(TAPMessageModel *)message;
 - (void)processMessageAsDelivered:(TAPMessageModel *)message;
+- (void)setIsTypingNo;
 
 @property (strong, nonatomic) NSMutableArray *delegatesArray;
 @property (strong, nonatomic) NSMutableArray *pendingMessageArray;
 @property (strong, nonatomic) NSMutableArray *incomingMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *waitingResponseDictionary;
+@property (strong, nonatomic) NSMutableDictionary *typingDictionary;
 @property (strong, nonatomic) NSTimer *saveNewMessageTimer;
 @property (strong, nonatomic) __block NSTimer *backgroundSequenceTimer;
 @property (nonatomic) NSInteger checkPendingBackgroundTaskRetryAttempt;
@@ -66,7 +68,7 @@
         _activeUser = [TAPDataManager getActiveUser];
         _checkPendingBackgroundTaskRetryAttempt = 0;
         _isEnterBackgroundSequenceActive = NO;
-        
+        _typingDictionary = [[NSMutableDictionary alloc] init];
         [[TAPConnectionManager sharedManager] addDelegate:self];
     }
     
@@ -121,6 +123,14 @@
     [self checkAndSendPendingMessage];
 }
 
+- (void)connectionManagerDidReceiveError:(NSError *)error {
+    _isTyping = NO;
+}
+
+- (void)connectionManagerDidDisconnectedWithCode:(NSInteger)code reason:(NSString *)reason cleanClose:(BOOL)clean {
+    _isTyping = NO;
+}
+
 #pragma mark - Custom Method
 - (void)connect {
     [[TAPConnectionManager sharedManager] connect];
@@ -148,6 +158,7 @@
     NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
     NSDictionary *parameterDictionary = @{@"roomID" : roomID};
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStartTyping parameters:parameterDictionary];
+    [self performSelector:@selector(setIsTypingNo) withObject:nil afterDelay:10.0f];
 }
 
 - (void)stopTyping {
@@ -435,6 +446,7 @@
 - (void)receiveStartTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     
     TAPTypingModel *typing = [[TAPTypingModel alloc] initWithDictionary:dataDictionary error:nil];
+    [self.typingDictionary setObject:typing forKey:typing.roomID];
     
     for (id delegate in self.delegatesArray) {
         if ([delegate respondsToSelector:@selector(chatManagerDidReceiveStartTyping:)]) {
@@ -445,7 +457,8 @@
 
 - (void)receiveStopTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     TAPTypingModel *typing = [[TAPTypingModel alloc] initWithDictionary:dataDictionary error:nil];
-
+    [self.typingDictionary removeObjectForKey:typing.roomID];
+    
     for (id delegate in self.delegatesArray) {
         if ([delegate respondsToSelector:@selector(chatManagerDidReceiveStopTyping:)]) {
             [delegate chatManagerDidReceiveStopTyping:typing];
@@ -601,6 +614,17 @@
         //Send delivered status to server
         [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
     }
+}
+
+- (BOOL)checkIsTypingWithRoomID:(NSString *)roomID {
+    if([self.typingDictionary objectForKey:roomID] != nil) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)setIsTypingNo {
+    _isTyping = NO;
 }
 
 @end

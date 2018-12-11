@@ -125,6 +125,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)processVisibleMessageAsRead;
 - (void)setAsTyping:(BOOL)typing;
 - (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
+- (void)setAsTypingNoAfterDelay;
 
 @end
 
@@ -246,7 +247,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
     self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
     
-    [self setAsTyping:NO];
+    [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID]];
     [self isShowOnlineDotStatus:NO];
     
     //RightBarButton
@@ -335,7 +336,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 //    [self performSelector:@selector(animateTypingDot1) withObject:nil afterDelay:0.0f];
 //    [self performSelector:@selector(animateTypingDot2) withObject:nil afterDelay:0.2f];
 //    [self performSelector:@selector(animateTypingDot3) withObject:nil afterDelay:0.4f];
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -2174,6 +2174,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     if(typing) {
         self.userTypingView.alpha = 1.0f;
         self.userDescriptionView.alpha = 0.0f;
+        [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
     }
     else {
         self.userTypingView.alpha = 0.0f;
@@ -2193,6 +2194,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     else {
         return @"";
     }
+}
+
+- (void)setAsTypingNoAfterDelay {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setAsTypingNoAfterDelay) object:nil];
+    self.userTypingView.alpha = 0.0f;
+    self.userDescriptionView.alpha = 1.0f;
 }
 
 @end

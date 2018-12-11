@@ -160,7 +160,7 @@
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
-        
+        [cell setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
         return cell;
     }
     
@@ -254,12 +254,20 @@
     [self processMessageFromSocket:message];
 }
 
-- (void)chatManagerDidReceiveStartTypingWithRoomID:(NSString *)roomID user:(TAPUserModel *)user {
-    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
+- (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
+    //    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
+    TAPRoomModel *room = [self.roomListDictionary objectForKey:typing.roomID];
+    NSInteger index = [self.roomListArray indexOfObject:room];
+    TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.roomListView.roomListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+    [cell setAsTyping:YES];
 }
 
-- (void)chatManagerDidReceiveStopTypingWithRoomID:(NSString *)roomID user:(TAPUserModel *)user {
-    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
+- (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
+    //    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
+    TAPRoomModel *room = [self.roomListDictionary objectForKey:typing.roomID];
+    NSInteger index = [self.roomListArray indexOfObject:room];
+    TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.roomListView.roomListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+    [cell setAsTyping:NO];
 }
 
 #pragma mark UITextField
