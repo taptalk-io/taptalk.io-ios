@@ -75,7 +75,7 @@
 
 - (void)insertContactToDatabaseWithUserData:(NSArray *)userDataArray {
     //Insert To Database
-    [TAPDataManager updateOrInsertDatabaseContactWithData:userDataArray tableName:@"TAPContactRealmModel" success:^{
+    [TAPDataManager updateOrInsertDatabaseContactWithData:userDataArray success:^{
         
     } failure:^(NSError *error) {
         

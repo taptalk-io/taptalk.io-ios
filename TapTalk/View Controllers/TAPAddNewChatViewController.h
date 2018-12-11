@@ -8,6 +8,14 @@
 
 #import "TAPBaseViewController.h"
 
+@protocol TAPAddNewChatViewControllerDelegate <NSObject>
+
+- (void)addNewChatViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user;
+
+@end
+
 @interface TAPAddNewChatViewController : TAPBaseViewController
+
+@property (weak, nonatomic) id<TAPAddNewChatViewControllerDelegate> delegate;
 
 @end

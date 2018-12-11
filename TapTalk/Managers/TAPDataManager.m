@@ -1029,7 +1029,6 @@
 }
 
 + (void)updateOrInsertDatabaseMessageWithData:(NSArray *)dataArray
-                                    tableName:(NSString *)tableName
                                       success:(void (^)(void))success
                                       failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1044,7 +1043,7 @@
         [messageDictionaryArray addObject:messageDictionary];
     }
     
-    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1052,7 +1051,6 @@
 }
 
 + (void)updateOrInsertDatabaseMessageInMainThreadWithData:(NSArray *)dataArray
-                                                tableName:(NSString *)tableName
                                                   success:(void (^)(void))success
                                                   failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1067,7 +1065,7 @@
         [messageDictionaryArray addObject:messageDictionary];
     }
     
-    [TAPDatabaseManager updateOrInsertDataToDatabaseInMainThreadWithData:messageDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager updateOrInsertDataToDatabaseInMainThreadWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1075,7 +1073,6 @@
 }
 
 + (void)updateOrInsertDatabaseRecentSearchWithData:(NSArray *)dataArray
-                                         tableName:(NSString *)tableName
                                            success:(void (^)(void))success
                                            failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1090,7 +1087,7 @@
         [recentSearchDictionaryArray addObject:recentSearchDictionary];
     }
     
-    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:recentSearchDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:recentSearchDictionaryArray tableName:kDatabaseTableRecentSearch success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1098,7 +1095,6 @@
 }
 
 + (void)updateOrInsertDatabaseContactWithData:(NSArray *)dataArray
-                                    tableName:(NSString *)tableName
                                       success:(void (^)(void))success
                                       failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1113,7 +1109,7 @@
         [userDictionaryArray addObject:userDictionary];
     }
     
-    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:userDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:userDictionaryArray tableName:kDatabaseTableContact success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1121,7 +1117,6 @@
 }
 
 + (void)updateMessageReadStatusToDatabaseWithData:(NSArray *)dataArray
-                                        tableName:(NSString *)tableName
                                           success:(void (^)(void))success
                                           failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1141,7 +1136,7 @@
         [messageDictionaryArray addObject:messageDictionary];
     }
     
-    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1149,7 +1144,6 @@
 }
 
 + (void)updateMessageDeliveryStatusToDatabaseWithData:(NSArray *)dataArray
-                                            tableName:(NSString *)tableName
                                               success:(void (^)(void))success
                                               failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1168,7 +1162,7 @@
         [messageDictionaryArray addObject:messageDictionary];
     }
     
-    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1176,7 +1170,6 @@
 }
 
 + (void)deleteDatabaseMessageWithData:(NSArray *)dataArray
-                            tableName:(NSString *)tableName
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
@@ -1191,7 +1184,7 @@
         [messageDictionaryArray addObject:messageDictionary];
     }
     
-    [TAPDatabaseManager deleteDataInDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
+    [TAPDatabaseManager deleteDataInDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -1211,6 +1204,15 @@
             failure(error);
         }];
     }
+}
+
++ (void)deleteDatabaseAllRecentSearchSuccess:(void (^)(void))success
+                                     failure:(void (^)(NSError *error))failure {
+    [TAPDatabaseManager deleteAllDataFromTableName:kDatabaseTableRecentSearch success:^{
+        success();
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
 }
 
 + (void)getDatabaseContactSearchKeyword:(NSString *)keyword
@@ -1247,7 +1249,7 @@
                             success:(void (^)(NSArray *resultArray))success
                             failure:(void (^)(NSError *error))failure {
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact 
-                            whereClauseQuery:@""
+                            whereClauseQuery:@"isContact = true"
                             sortByColumnName:columnName
                                  isAscending:YES
                                      success:^(NSArray *resultArray) {
@@ -1720,6 +1722,9 @@
         for (NSDictionary *messageDictionary in messageArray) {
             TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
             
+            //Add User to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
+            
             //Decrypt message
             TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
             
@@ -1750,6 +1755,12 @@
                               minCreated:(NSNumber *)minCreated
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure {
+    if(roomID == nil || [roomID isEqualToString:@""]) {
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"Input Error", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Room not found", @"")}];
+        failure(localizedError);
+        return;
+    }
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageRoomListAfter];
     
     //Obtain Last Updated Value
@@ -1821,7 +1832,7 @@
         [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:preferenceLastUpdated];
         
         //Insert To Database
-        [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray tableName:kDatabaseTableMessage success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
             
         } failure:^(NSError *error) {
             
@@ -1911,7 +1922,7 @@
         BOOL hasMore = [[dataDictionary objectForKey:@"hasMore"] boolValue];
  
         //Insert To Database
-        [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray tableName:kDatabaseTableMessage success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
             
         } failure:^(NSError *error) {
             
@@ -2066,6 +2077,11 @@
 
             BOOL isRequestAccepted = [[userDictionary objectForKey:@"isRequestAccepted"] boolValue];
             user.isRequestAccepted = isRequestAccepted;
+            
+            user.isContact = YES;
+            
+            //Add User to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
             
             [userResultArray addObject:user];
         }
@@ -2484,7 +2500,7 @@
         //End Temp
         
         //Insert To Database
-        [TAPDataManager updateOrInsertDatabaseContactWithData:userResultArray tableName:kDatabaseTableContact success:^{
+        [TAPDataManager updateOrInsertDatabaseContactWithData:userResultArray success:^{
             
         } failure:^(NSError *error) {
             
@@ -2951,10 +2967,17 @@
     }];
 }
 
-+ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageIDsArray
++ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageArray
                                            success:(void (^)(NSArray *updatedMessageIDsArray))success
-                                           failure:(void (^)(NSError *error))failure {
+                                           failure:(void (^)(NSError *error, NSArray *messageArray))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateMessageDeliveryStatus];
+    
+    NSMutableArray *messageIDsArray = [NSMutableArray array];
+    NSArray *tempMessageArray = [messageArray copy];
+    
+    for (TAPMessageModel *message in tempMessageArray) {
+        [messageIDsArray addObject:message.messageID];
+    }
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:messageIDsArray forKey:@"messageIDs"];
@@ -2976,7 +2999,7 @@
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:messageIDsArray success:success failure:failure];
                 } failure:^(NSError *error) {
-                    failure(error);
+                    failure(error, messageArray);
                 }];
                 return;
             }
@@ -2988,7 +3011,7 @@
             }
             
             NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
-            failure(error);
+            failure(error, messageArray);
             return;
         }
         
@@ -3014,19 +3037,26 @@
         
         NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
         
-        failure(newError);
+        failure(newError, messageIDsArray);
 #else
         NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
         
-        failure(localizedError);
+        failure(localizedError, messageIDsArray);
 #endif
     }];
 }
 
-+ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageIDsArray
++ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
                                         success:(void (^)(NSArray *updatedMessageIDsArray))success
-                                        failure:(void (^)(NSError *error))failure {
+                                        failure:(void (^)(NSError *error, NSArray *messageArray))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateMessageReadStatus];
+    
+    NSMutableArray *messageIDsArray = [NSMutableArray array];
+    NSArray *tempMessageArray = [messageArray copy];
+    
+    for (TAPMessageModel *message in tempMessageArray) {
+        [messageIDsArray addObject:message.messageID];
+    }
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:messageIDsArray forKey:@"messageIDs"];
@@ -3048,7 +3078,7 @@
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TAPDataManager callAPIUpdateMessageReadStatusWithArray:messageIDsArray success:success failure:failure];
                 } failure:^(NSError *error) {
-                    failure(error);
+                    failure(error, messageArray);
                 }];
                 return;
             }
@@ -3060,7 +3090,7 @@
             }
             
             NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
-            failure(error);
+            failure(error, messageArray);
             return;
         }
         
@@ -3086,11 +3116,11 @@
         
         NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
         
-        failure(newError);
+        failure(newError, messageIDsArray);
 #else
         NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
         
-        failure(localizedError);
+        failure(localizedError, messageIDsArray);
 #endif
     }];
 }

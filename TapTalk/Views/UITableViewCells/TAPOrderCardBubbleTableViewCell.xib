@@ -196,7 +196,7 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P27-5i-E3N">
                                         <rect key="frame" x="0.0" y="0.0" width="139.5" height="50"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gun-Gs-biL">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Due Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gun-Gs-biL">
                                                 <rect key="frame" x="8" y="5" width="123.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="18" id="rza-So-CMy"/>
@@ -236,7 +236,7 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ec6-M6-Hg5">
                                         <rect key="frame" x="140.5" y="0.0" width="139.5" height="50"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJ5-JM-8yU">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Due Time" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJ5-JM-8yU">
                                                 <rect key="frame" x="8" y="5" width="123.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="18" id="zP1-MX-ETp"/>
@@ -334,6 +334,7 @@
                                     <constraint firstAttribute="trailing" secondItem="wKm-gd-uR6" secondAttribute="trailing" constant="8" id="c00-X2-BVV"/>
                                     <constraint firstItem="fme-81-RLm" firstAttribute="leading" secondItem="5V4-7F-tHu" secondAttribute="leading" id="jiO-XJ-m9Q"/>
                                     <constraint firstItem="wKm-gd-uR6" firstAttribute="leading" secondItem="5V4-7F-tHu" secondAttribute="leading" constant="8" id="oi7-KU-rL8"/>
+                                    <constraint firstAttribute="height" constant="65.5" id="vM0-Lj-UQZ"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZJ0-nc-Nk2">
@@ -367,7 +368,7 @@
                                         <color key="textColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Abi-DO-2uM" customClass="RNImageView">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Abi-DO-2uM" customClass="RNImageView">
                                         <rect key="frame" x="186" y="23" width="86" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="24" id="6Xt-Ov-uru"/>
@@ -519,7 +520,7 @@
                                             <constraint firstAttribute="height" constant="18" id="0ku-dq-mgc"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="12"/>
-                                        <color key="textColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="textColor" red="0.92549019607843142" green="0.17254901960784313" blue="0.16862745098039217" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jl7-2w-Vjn">
@@ -622,7 +623,7 @@
                                 <rect key="frame" x="0.0" y="505.5" width="280" height="92"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s5B-QW-k7a">
-                                        <rect key="frame" x="20" y="8" width="240" height="76"/>
+                                        <rect key="frame" x="12" y="8" width="256" height="76"/>
                                         <attributedString key="attributedText">
                                             <fragment>
                                                 <string key="content">The Expert has marked this order as finish. 
@@ -667,8 +668,8 @@ If the status is not suitable, you can
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="s5B-QW-k7a" secondAttribute="bottom" constant="8" id="1ma-PO-2xv"/>
                                     <constraint firstItem="m7M-x8-ix6" firstAttribute="centerX" secondItem="dxN-f9-zpe" secondAttribute="centerX" id="DzQ-3K-ukv"/>
-                                    <constraint firstItem="s5B-QW-k7a" firstAttribute="leading" secondItem="dxN-f9-zpe" secondAttribute="leading" constant="20" id="EMH-Nv-K6a"/>
-                                    <constraint firstAttribute="trailing" secondItem="s5B-QW-k7a" secondAttribute="trailing" constant="20" id="Oi1-CE-ap1"/>
+                                    <constraint firstItem="s5B-QW-k7a" firstAttribute="leading" secondItem="dxN-f9-zpe" secondAttribute="leading" constant="12" id="EMH-Nv-K6a"/>
+                                    <constraint firstAttribute="trailing" secondItem="s5B-QW-k7a" secondAttribute="trailing" constant="12" id="Oi1-CE-ap1"/>
                                     <constraint firstItem="s5B-QW-k7a" firstAttribute="top" secondItem="dxN-f9-zpe" secondAttribute="top" constant="8" id="QWS-ps-yCZ"/>
                                     <constraint firstAttribute="height" constant="92" id="vkU-Du-VH6"/>
                                     <constraint firstAttribute="bottom" secondItem="m7M-x8-ix6" secondAttribute="bottom" constant="2" id="z5j-hf-ycD"/>
@@ -840,7 +841,7 @@ If the status is not suitable, you can
                                     <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DdE-Ld-WwJ">
                                         <rect key="frame" x="0.0" y="0.0" width="280" height="40"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mark as Finish" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ekL-2l-aGE">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mark as Finished" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ekL-2l-aGE">
                                                 <rect key="frame" x="0.0" y="0.0" width="280" height="40"/>
                                                 <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="14"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1012,6 +1013,7 @@ If the status is not suitable, you can
             <connections>
                 <outlet property="activeOrderLabel" destination="xQr-R1-2SN" id="Gal-2p-oXu"/>
                 <outlet property="activeOrderView" destination="0tS-1g-YGF" id="ArA-gH-TFy"/>
+                <outlet property="activeOrderViewHeightLayoutConstraint" destination="SXN-Hr-dKb" id="mqY-eD-WfW"/>
                 <outlet property="additionalCostDotView" destination="PNj-Wv-0S7" id="RGZ-T0-3ac"/>
                 <outlet property="additionalCostLabel" destination="fdC-W5-a8w" id="SRR-NR-W3O"/>
                 <outlet property="additionalCostPlaceholderLabel" destination="5aH-Sz-Txa" id="nuO-yg-8OX"/>
@@ -1042,6 +1044,7 @@ If the status is not suitable, you can
                 <outlet property="expertMarkFinishView" destination="dxN-f9-zpe" id="cv5-EV-60P"/>
                 <outlet property="headerButton" destination="O6i-F7-dbL" id="NMn-P4-Em5"/>
                 <outlet property="headerView" destination="BQ1-H4-XaB" id="Zyg-J8-H5N"/>
+                <outlet property="markFinishViewHeightLayoutConstraint" destination="vkU-Du-VH6" id="8El-Uf-1p7"/>
                 <outlet property="markFinishedActionButton" destination="2yL-wg-NN2" id="buW-hZ-QaV"/>
                 <outlet property="markFinishedActionLabel" destination="ekL-2l-aGE" id="ftA-Jo-uoT"/>
                 <outlet property="markFinishedActionView" destination="DdE-Ld-WwJ" id="Zau-gP-FCx"/>
@@ -1066,23 +1069,25 @@ If the status is not suitable, you can
                 <outlet property="recipientLabel" destination="wKm-gd-uR6" id="zhU-NM-kJN"/>
                 <outlet property="recipientPlaceholderLabel" destination="Zjp-qa-5AI" id="7TW-9a-evG"/>
                 <outlet property="recipientView" destination="5V4-7F-tHu" id="Jzh-Ha-twb"/>
+                <outlet property="recipientViewHeightLayoutConstraint" destination="vM0-Lj-UQZ" id="cDP-cq-Xl8"/>
                 <outlet property="reviewConfirmActionButton" destination="UQ8-oD-8r2" id="spu-z3-eZr"/>
                 <outlet property="reviewConfirmActionLabel" destination="2e0-3x-dmB" id="Wao-2c-yGh"/>
                 <outlet property="reviewConfirmActionView" destination="GfM-tU-uwk" id="CNV-JE-4KD"/>
                 <outlet property="reviewOrderActionButton" destination="f52-Nu-Nj4" id="yes-Sb-hCo"/>
                 <outlet property="reviewOrderActionLabel" destination="09y-ST-Yll" id="zG0-qd-Do4"/>
                 <outlet property="reviewOrderActionView" destination="Xsg-NY-El0" id="zWz-FY-w6q"/>
-                <outlet property="selectedBackgroundView" destination="0Ab-tf-2Ch" id="Ou2-xq-9xJ"/>
                 <outlet property="timeLabel" destination="XWo-Ab-sJC" id="AvE-bB-sti"/>
                 <outlet property="timePlaceholderLabel" destination="hJ5-JM-8yU" id="bT1-lG-CrY"/>
                 <outlet property="timeView" destination="ec6-M6-Hg5" id="K5G-Ot-sMc"/>
                 <outlet property="totalPriceLabel" destination="Rzs-Je-bLR" id="t2S-io-pgu"/>
                 <outlet property="totalPricePlaceholderLabel" destination="U4n-Ke-TRL" id="MhR-oo-kGE"/>
                 <outlet property="totalPriceView" destination="S4w-sN-xjF" id="QLr-o8-RzV"/>
+                <outlet property="totalPriceViewHeightLayoutConstraint" destination="cZQ-Ic-PWf" id="iTc-Nj-icz"/>
                 <outlet property="updateCostActionButton" destination="axH-mW-9Iy" id="gPJ-MZ-IZP"/>
                 <outlet property="updateCostActionLabel" destination="saq-xO-CdW" id="a7D-9n-aR8"/>
                 <outlet property="updateCostActionView" destination="tA7-zR-bm7" id="QcY-1N-xeG"/>
                 <outlet property="userActionView" destination="bkU-8h-Z7g" id="ojD-su-GPm"/>
+                <outlet property="userActionViewHeightLayoutConstraint" destination="WO5-xs-825" id="Zwo-9r-Q7m"/>
             </connections>
             <point key="canvasLocation" x="137.59999999999999" y="153.82308845577214"/>
         </tableViewCell>

@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "TapTalk"
-  s.version      = "0.1"
+  s.version      = "0.1.1"
   s.summary      = "Powerful Chat Engine"
 
   # This description is used to generate tags and improve search results.
@@ -77,7 +77,8 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :path => '.' }
+  # s.source       = { :path => '.' }
+  s.source         = { :git => 'https://git.moselo.com/taptalk/TapTalk-Engine-iOS.git', :tag => '0.1.1' }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -145,7 +146,7 @@ Pod::Spec.new do |s|
     
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents = '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "Configs.h"', '#import "TAPConnectionManager.h"', '#import "TAPChatManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPMessageStatusManager.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "RNImageView.h"', '#import "PodAsset.h"', '#import "RNGrowingTextView.h"', '#import "TAPSearchBarView.h"'
+    s.prefix_header_contents = '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "Configs.h"', '#import "TAPConnectionManager.h"', '#import "TAPChatManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPContactManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPMessageStatusManager.h"', '#import "TAPCustomBubbleManager.h"', '#import "TAPCustomKeyboardManager.h"', '#import "TAPMessageStatusManager.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "RNImageView.h"', '#import "PodAsset.h"', '#import "RNGrowingTextView.h"', '#import "TAPSearchBarView.h"'
     
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     

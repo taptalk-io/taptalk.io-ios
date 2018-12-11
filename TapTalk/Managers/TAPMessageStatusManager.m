@@ -14,23 +14,17 @@
 @property (strong, nonatomic) NSMutableArray *deliveryMessageQueueArray;
 @property (strong, nonatomic) NSMutableArray *filteredBulkDeliveryMessageArray;
 
-@property (strong, nonatomic) NSMutableDictionary *readMessageAPIRequestDictionary;
-@property (strong, nonatomic) NSMutableDictionary *deliveredMessageAPIRequestDictionary;
-@property (strong, nonatomic) NSMutableDictionary *filteredBulkDeliveryMessageAPIRequestDictionary;
+@property (strong, nonatomic) NSMutableDictionary *readCountDictionary;
 
-@property (strong, nonatomic) NSTimer *updateStatusTimer;
-
-@property (nonatomic) NSInteger deliveredRequestID;
-@property (nonatomic) NSInteger deliveredBulkRequestID;
-@property (nonatomic) NSInteger readRequestID;
+@property (nonatomic) NSInteger apiRequestCount;
 
 @property (nonatomic) BOOL isProcessingUpdateDeliveredStatus;
 @property (nonatomic) BOOL isProcessingUpdateReadStatus;
 
-- (void)updateMessageStatus;
-- (void)changingDeliveredStatusFlow;
-- (void)changingBulkFilteredDeliveredStatusFlow;
+- (void)changingDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish;
+- (void)changingBulkFilteredDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish;
 - (void)changingReadStatusFlow;
+- (void)increaseReadCountDictionaryWithRoomID:(NSString *)roomID;
 
 @end
 
@@ -53,12 +47,7 @@
         _readMessageQueueArray = [[NSMutableArray alloc] init];
         _deliveryMessageQueueArray = [[NSMutableArray alloc] init];
         _filteredBulkDeliveryMessageArray = [[NSMutableArray alloc] init];
-        _readMessageAPIRequestDictionary = [[NSMutableDictionary alloc] init];
-        _deliveredMessageAPIRequestDictionary = [[NSMutableDictionary alloc] init];
-        _filteredBulkDeliveryMessageAPIRequestDictionary = [[NSMutableDictionary alloc] init];
-        _readRequestID = 1;
-        _deliveredRequestID = 1;
-        _deliveredBulkRequestID = 1;
+        _readCountDictionary = [[NSMutableDictionary alloc] init];
         _isProcessingUpdateDeliveredStatus = NO;
         _isProcessingUpdateReadStatus = NO;
     }
@@ -67,43 +56,28 @@
 }
 
 #pragma mark - Custom Method
-- (void)triggerUpdateStatus {
-    //Check timer is already running or not
-    if ([self.updateStatusTimer isValid]) {
-        return;
-    }
-    
-    CGFloat timerInterval = 0.5f;
-    _updateStatusTimer = [NSTimer timerWithTimeInterval:timerInterval
-                                                   target:self
-                                                 selector:@selector(updateMessageStatus)
-                                                 userInfo:nil repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:self.updateStatusTimer forMode:NSRunLoopCommonModes];
-    //    [[NSRunLoop mainRunLoop] addTimer:repeatingTimer forMode:NSDefaultRunLoopMode];
-}
-
-- (void)stopTimerUpdateStatus {
-    [self.updateStatusTimer invalidate];
-    _updateStatusTimer = nil;
-}
-
 - (void)markMessageAsReadWithMessage:(TAPMessageModel *)message {
     [self.readMessageQueueArray addObject:message];
+    
+    //Add to read count dictionary
+    [self increaseReadCountDictionaryWithRoomID:message.room.roomID];
 }
 
 - (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message {
     [self.deliveryMessageQueueArray addObject:message];
 }
 
-- (void)updateMessageStatus {
+- (void)triggerUpdateMessageStatus {
+    //Do update sequentialy to prevent data misplaced from delivered back to read
+    
     //Call API to update delivery status
-    [self changingDeliveredStatusFlow];
-    
-    //Update leftover bulk delivery status that has not been called
-    [self changingBulkFilteredDeliveredStatusFlow];
-    
-    //Call API to update read status
-    [self changingReadStatusFlow];
+    [self changingDeliveredStatusFlowFinishUpdateDatabase:^{
+        //Update leftover bulk delivery status that has not been called
+        [self changingBulkFilteredDeliveredStatusFlowFinishUpdateDatabase:^{
+            //Call API to update read status
+            [self changingReadStatusFlow];
+        }];
+    }];
 }
 
 - (void)changingReadStatusFlow {
@@ -115,130 +89,104 @@
     _isProcessingUpdateReadStatus = YES;
     
     //Clear read message queue
-    NSMutableArray *parameterMessageIDsArray = [NSMutableArray array];
     NSArray *tempMessageArray = [self.readMessageQueueArray copy];
     
-    for (TAPMessageModel *message in tempMessageArray) {
-        [parameterMessageIDsArray addObject:message.messageID];
-        [self.readMessageQueueArray removeObject:message];
-    }
+    //Update to database
+    [TAPDataManager updateMessageReadStatusToDatabaseWithData:tempMessageArray success:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
     
     //Call API send read status
-    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:parameterMessageIDsArray success:^(NSArray *updatedMessageIDsArray) {
+    _apiRequestCount++;
+    
+    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:tempMessageArray success:^(NSArray *updatedMessageIDsArray) {
+        _isProcessingUpdateReadStatus = NO;
+        _apiRequestCount--;
+    } failure:^(NSError *error, NSArray *messageArray) {
+        _isProcessingUpdateReadStatus = NO;
+        _apiRequestCount--;
         
-        //Remove from dictionary
-        NSArray *obtainedMessageIDsArray = [self.readMessageAPIRequestDictionary objectForKey:[NSString stringWithFormat:@"%ld", (long)self.readRequestID]];
-        if ([obtainedMessageIDsArray count] != 0 && obtainedMessageIDsArray != nil) {
-            //Contain in dictionary, remove from dictionary
-            [self.readMessageAPIRequestDictionary removeObjectForKey:[NSString stringWithFormat:@"%ld", (long)self.readRequestID]];
-            _readRequestID++;
+        //Put back failed response to array
+        for(TAPMessageModel *message in messageArray) {
+            [self markMessageAsReadWithMessage:message];
         }
-        
-        _isProcessingUpdateReadStatus = NO;
-
-        //Update to database
-        [TAPDataManager updateMessageReadStatusToDatabaseWithData:tempMessageArray tableName:@"TAPMessageRealmModel" success:^{
-    
-        } failure:^(NSError *error) {
-    
-        }];
-    } failure:^(NSError *error) {
-        //Save failed request array to dictionary
-        [self.readMessageAPIRequestDictionary setObject:parameterMessageIDsArray forKey:[NSString stringWithFormat:@"%ld", (long)self.readRequestID]];
-        _readRequestID++;
-        _isProcessingUpdateReadStatus = NO;
     }];
+    
+    [self.readMessageQueueArray removeAllObjects];
 }
 
-- (void)changingDeliveredStatusFlow {
+- (void)changingDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish {
     //Get array of message
     if ([self.deliveryMessageQueueArray count] == 0 || self.isProcessingUpdateDeliveredStatus) {
+        finish();
         return;
     }
 
    _isProcessingUpdateDeliveredStatus = YES;
 
-    //Clear delivery message queue
-    NSMutableArray *parameterMessageIDsArray = [NSMutableArray array];
     NSArray *tempMessageArray = [self.deliveryMessageQueueArray copy];
-
-    for (TAPMessageModel *message in tempMessageArray) {
-        [parameterMessageIDsArray addObject:message.messageID];
-        [self.deliveryMessageQueueArray removeObject:message];
-    }
+    
+    //Update to database
+    [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:tempMessageArray success:^{
+        finish();
+    } failure:^(NSError *error) {
+        finish();
+    }];
 
     //Call API send delivery status
-    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:parameterMessageIDsArray success:^(NSArray *updatedMessageIDsArray) {
-    
-        //Remove from dictionary
-        NSArray *obtainedMessageIDsArray = [self.deliveredMessageAPIRequestDictionary objectForKey:[NSString stringWithFormat:@"%ld", (long)self.deliveredRequestID]];
-        if ([obtainedMessageIDsArray count] != 0 && obtainedMessageIDsArray != nil) {
-            //Contain in dictionary, remove from dictionary
-            [self.deliveredMessageAPIRequestDictionary removeObjectForKey:[NSString stringWithFormat:@"%ld", (long)self.deliveredRequestID]];
-            _deliveredRequestID++;
+    _apiRequestCount++;
+    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:tempMessageArray success:^(NSArray *updatedMessageIDsArray) {
+       _isProcessingUpdateDeliveredStatus = NO;
+        _apiRequestCount--;
+    } failure:^(NSError *error, NSArray *messageArray) {
+       _isProcessingUpdateDeliveredStatus = NO;
+        _apiRequestCount--;
+        
+        //Put back failed response to array
+        for(TAPMessageModel *message in messageArray) {
+            [self markMessageAsDeliveredWithMessage:message];
         }
-
-       _isProcessingUpdateDeliveredStatus = NO;
-        
-        //Update to database
-        [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:tempMessageArray tableName:@"TAPMessageRealmModel" success:^{
-
-        } failure:^(NSError *error) {
-
-        }];
-        
-    } failure:^(NSError *error) {
-        //Save failed request array to dictionary
-        [self.deliveredMessageAPIRequestDictionary setObject:parameterMessageIDsArray forKey:[NSString stringWithFormat:@"%ld", (long)self.deliveredRequestID]];
-        _deliveredRequestID++;
-       _isProcessingUpdateDeliveredStatus = NO;
     }];
+    
+    [self.deliveryMessageQueueArray removeAllObjects];
 }
 
-- (void)changingBulkFilteredDeliveredStatusFlow {
+- (void)changingBulkFilteredDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish {
     //Update to deliver from bulk of message where isSending = 0 && isDelivered == 0 && isRead == 0
     //Get array of message
     if ([self.filteredBulkDeliveryMessageArray count] == 0 || self.isProcessingUpdateDeliveredStatus) {
+        finish();
         return;
     }
     
     _isProcessingUpdateDeliveredStatus = YES;
     
     //Clear delivery message queue
-    NSMutableArray *parameterMessageIDsArray = [NSMutableArray array];
     NSArray *tempMessageArray = [self.filteredBulkDeliveryMessageArray copy];
     
-    for (TAPMessageModel *message in tempMessageArray) {
-        [parameterMessageIDsArray addObject:message.messageID];
-        [self.filteredBulkDeliveryMessageArray removeObject:message];
-    }
+    //Update to database
+    [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:tempMessageArray success:^{
+        finish();
+    } failure:^(NSError *error) {
+        finish();
+    }];
     
     //Call API send delivery status
-    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:parameterMessageIDsArray success:^(NSArray *updatedMessageIDsArray) {
-        
-        //Remove from dictionary
-        NSArray *obtainedMessageIDsArray = [self.filteredBulkDeliveryMessageAPIRequestDictionary objectForKey:[NSString stringWithFormat:@"%ld", (long)self.deliveredBulkRequestID]];
-        if ([obtainedMessageIDsArray count] != 0 && obtainedMessageIDsArray != nil) {
-            //Contain in dictionary, remove from dictionary
-            [self.filteredBulkDeliveryMessageAPIRequestDictionary removeObjectForKey:[NSString stringWithFormat:@"%ld", (long)self.deliveredBulkRequestID]];
-            _deliveredBulkRequestID++;
-        }
-        
+    _apiRequestCount++;
+    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:tempMessageArray success:^(NSArray *updatedMessageIDsArray) {
         _isProcessingUpdateDeliveredStatus = NO;
-        
-        //Update to database
-        [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:tempMessageArray tableName:@"TAPMessageRealmModel" success:^{
-            
-        } failure:^(NSError *error) {
-            
-        }];
-        
-    } failure:^(NSError *error) {
-        //Save failed request array to dictionary
-        [self.filteredBulkDeliveryMessageAPIRequestDictionary setObject:parameterMessageIDsArray forKey:[NSString stringWithFormat:@"%ld", (long)self.deliveredBulkRequestID]];
-        _deliveredBulkRequestID++;
+        _apiRequestCount--;
+    } failure:^(NSError *error, NSArray *messageArray) {
         _isProcessingUpdateDeliveredStatus = NO;
+        _apiRequestCount--;
+        
+        //Put back failed response to array
+        [self filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
     }];
+    
+    [self.filteredBulkDeliveryMessageArray removeAllObjects];
 }
 
 - (void)filterAndUpdateBulkMessageStatusToDeliveredWithArray:(NSArray *)messageArray {
@@ -262,30 +210,63 @@
 }
 
 - (void)markMessageAsDeliveredFromPushNotificationWithMessage:(TAPMessageModel *)message {
-    NSString *messageIDString = message.messageID;
-    NSArray *parameterMessageIDsArray = @[messageIDString];
+//    NSString *messageIDString = message.messageID;
+//    NSArray *parameterMessageIDsArray = @[messageIDString];
     
-    //Call API send delivery status
-    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:parameterMessageIDsArray success:^(NSArray *updatedMessageIDsArray) {
-        
-        //Update to database
-        [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:@[message] tableName:@"TAPMessageRealmModel" success:^{
-            
-        } failure:^(NSError *error) {
-            
-        }];
+    //Update to database
+    [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:@[message] success:^{
         
     } failure:^(NSError *error) {
+        
+    }];
+    
+    //Call API send delivery status
+    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:@[message] success:^(NSArray *updatedMessageIDsArray) {
+        
+    } failure:^(NSError *error, NSArray *messageIDArray) {
  
     }];
 }
 
 - (BOOL)hasPendingProcess {
-    if([self.readMessageQueueArray count] == 0 && [self.deliveryMessageQueueArray count] == 0 && [[self.readMessageAPIRequestDictionary allKeys] count] == 0 && [[self.deliveredMessageAPIRequestDictionary allKeys] count] == 0) {
+    if([self.readMessageQueueArray count] == 0 && [self.deliveryMessageQueueArray count] == 0 && self.apiRequestCount == 0) {
         return NO;
     }
     
     return YES;
+}
+
+- (void)increaseReadCountDictionaryWithRoomID:(NSString *)roomID {
+    NSNumber *currentCount = [self.readCountDictionary objectForKey:roomID];
+    
+    if(currentCount == nil) {
+        //Count is nil, create new object in dictionary
+        [self.readCountDictionary setObject:[NSNumber numberWithInt:1] forKey:roomID];
+        return;
+    }
+    
+    //Count not nil, increase count
+    NSInteger countInteger = [currentCount integerValue];
+    countInteger++;
+    
+    [self.readCountDictionary setObject:[NSNumber numberWithInt:countInteger] forKey:roomID];
+}
+
+- (NSInteger)getReadCountAndClearDictionaryForRoomID:(NSString *)roomID {
+    NSNumber *currentCount = [self.readCountDictionary objectForKey:roomID];
+    
+    if(currentCount == nil) {
+        return 0;
+    }
+    
+    NSInteger countInteger = [currentCount integerValue];
+    [self.readCountDictionary removeObjectForKey:roomID];
+    
+    return countInteger;
+}
+
+- (void)clearReadCountDictionary {
+    [self.readCountDictionary removeAllObjects];
 }
 
 @end

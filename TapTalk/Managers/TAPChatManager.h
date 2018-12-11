@@ -11,6 +11,8 @@
 #import "TAPMessageModel.h"
 #import "TAPUserModel.h"
 #import "TAPRoomModel.h"
+#import "TAPOnlineStatusModel.h"
+#import "TAPTypingModel.h"
 
 @protocol TAPChatManagerDelegate <NSObject>
 
@@ -23,13 +25,9 @@
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveDeleteMessageInActiveRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveDeleteMessageOnOtherRoom:(TAPMessageModel *)message;
-
-- (void)chatManagerShouldDecreaseUnreadBubbleForRoomID:(NSString *)roomID;
-
-//DV Temp
-- (void)chatManagerDidReceiveOnlineStatus:(TAPMessageModel *)message;
-- (void)chatManagerDidReceiveOfflineStatus:(TAPMessageModel *)message;
-//DV Temp
+- (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus;
+- (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing;
+- (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing;
 
 @end
 
@@ -38,6 +36,7 @@
 @property (strong, nonatomic) TAPUserModel *activeUser;
 @property (strong, nonatomic) TAPRoomModel *activeRoom;
 @property (strong, nonatomic) NSMutableDictionary *messageDraftDictionary;
+@property (nonatomic) BOOL isTyping;
 
 + (TAPChatManager *)sharedManager;
 
@@ -49,14 +48,14 @@
 - (void)disconnect;
 - (void)openRoom:(TAPRoomModel *)room;
 - (void)closeActiveRoom;
+- (void)startTyping;
+- (void)stopTyping;
 
 - (void)sendTextMessage:(NSString *)textMessage;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;
 
-- (void)startTyping;
-- (void)stopTyping;
 - (void)runEnterBackgroundSequenceWithApplication:(UIApplication *)application;
 - (void)removeAllBackgroundSequenceTaskWithApplication:(UIApplication *)application;
 - (void)updateSendingMessageToFailed;
@@ -66,6 +65,5 @@
 - (void)saveIncomingMessageAndDisconnect;
 - (void)saveUnsentMessageAndDisconnect;
 - (void)triggerSaveNewMessage;
-- (void)decreaseUnreadMessageForRoomID:(NSString *)roomID;
 
 @end

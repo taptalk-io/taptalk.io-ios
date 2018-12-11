@@ -10,7 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPAddNewContactViewControllerDelegate <NSObject>
+
+- (void)addNewContactViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user;
+
+@end
+
 @interface TAPAddNewContactViewController : TAPBaseViewController
+
+@property (weak, nonatomic) id<TAPAddNewContactViewControllerDelegate> delegate;
 
 @end
 

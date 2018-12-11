@@ -14,13 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPMessageStatusManager *)sharedManager;
 
-- (void)triggerUpdateStatus;
-- (void)stopTimerUpdateStatus;
+- (void)triggerUpdateMessageStatus;
 - (void)markMessageAsReadWithMessage:(TAPMessageModel *)message;
 - (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message;
 - (void)filterAndUpdateBulkMessageStatusToDeliveredWithArray:(NSArray *)messageArray;
 - (void)markMessageAsDeliveredFromPushNotificationWithMessage:(TAPMessageModel *)message;
 - (BOOL)hasPendingProcess;
+- (NSInteger)getReadCountAndClearDictionaryForRoomID:(NSString *)roomID;
+- (void)clearReadCountDictionary;
 
 @end
 

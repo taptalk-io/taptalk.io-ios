@@ -22,6 +22,8 @@
 - (void)receiveOnlineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary;
 - (void)receiveOfflineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary;
 - (void)receiveContactUpdatedFromSocketWithDataDictionary:(NSDictionary *)dataDictionary;
+- (void)receiveStartTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary;
+- (void)receiveStopTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary;
 - (void)stopTimerSaveNewMessage;
 - (void)runSendMessageSequenceWithMessage:(TAPMessageModel *)message;
 - (void)processMessageAsDelivered:(TAPMessageModel *)message;
@@ -65,7 +67,7 @@
         _checkPendingBackgroundTaskRetryAttempt = 0;
         _isEnterBackgroundSequenceActive = NO;
         
-        [TAPConnectionManager sharedManager].delegate = self;
+        [[TAPConnectionManager sharedManager] addDelegate:self];
     }
     
     return self;
@@ -73,7 +75,7 @@
 
 - (void)dealloc {
     //Remove Connection Manager delegate
-    [TAPConnectionManager sharedManager].delegate = nil;
+    [[TAPConnectionManager sharedManager] removeDelegate:self];
 }
 
 #pragma mark - Delegate
@@ -98,19 +100,16 @@
         
     }
     else if ([eventName isEqualToString:kTAPEventStartTyping]) {
-        
+        [self receiveStartTypingFromSocketWithDataDictionary:dataDictionary];
     }
     else if ([eventName isEqualToString:kTAPEventStopTyping]) {
-        
+        [self receiveStopTypingFromSocketWithDataDictionary:dataDictionary];
     }
     else if ([eventName isEqualToString:kTAPEventAuthentication]) {
         
     }
     else if ([eventName isEqualToString:kTAPEventUserOnline]) {
         [self receiveOnlineStatusFromSocketWithDataDictionary:dataDictionary];
-    }
-    else if ([eventName isEqualToString:kTAPEventUserOffline]) {
-        [self receiveOfflineStatusFromSocketWithDataDictionary:dataDictionary];
     }
     else if ([eventName isEqualToString:kTAPEventUserUpdated]) {
         [self receiveContactUpdatedFromSocketWithDataDictionary:dataDictionary];
@@ -137,6 +136,30 @@
 
 - (void)closeActiveRoom {
     _activeRoom = nil;
+}
+
+- (void)startTyping {
+    if(self.isTyping) {
+        return;
+    }
+    
+    _isTyping = YES;
+    
+    NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
+    NSDictionary *parameterDictionary = @{@"roomID" : roomID};
+    [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStartTyping parameters:parameterDictionary];
+}
+
+- (void)stopTyping {
+    if(!self.isTyping) {
+        return;
+    }
+    
+    _isTyping = NO;
+    
+    NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
+    NSDictionary *parameterDictionary = @{@"roomID" : roomID};
+    [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStopTyping parameters:parameterDictionary];
 }
 
 - (void)sendMessage:(TAPMessageModel *)message {
@@ -204,14 +227,6 @@
     }
 }
 
-- (void)startTyping {
-    
-}
-
-- (void)stopTyping {
-    
-}
-
 - (void)setActiveUser:(TAPUserModel *)activeUser {
     _activeUser = activeUser;
     
@@ -272,9 +287,6 @@
         //Stop timer save new message
         [self stopTimerSaveNewMessage];
 
-        //Stop timer update read and delivered message status
-        [[TAPMessageStatusManager sharedManager] stopTimerUpdateStatus];
-
         [TapTalk sharedInstance].instanceState = TapTalkInstanceStateInactive;
         
         //End background task
@@ -319,6 +331,9 @@
 
 - (void)receiveMessageFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {
     TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dataDictionary error:nil];
+    
+    //Add User to Contact Manager
+    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
     
     message.isSending = NO; //DV TEMP - Temporary set isSending to NO waiting for server
     
@@ -408,18 +423,34 @@
 }
 
 - (void)receiveOnlineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
-//    for (id delegate in self.delegatesArray) {
-//        if ([delegate respondsToSelector:@selector(chatManagerDidReceiveOnlineStatus:)]) {
-//            [delegate chatManagerDidReceiveOnlineStatus:[decryptedMessage copyMessageModel]];
-//        }
-//    }
+    TAPOnlineStatusModel *onlineStatus = [[TAPOnlineStatusModel alloc] initWithDictionary:dataDictionary error:nil];
+
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(chatManagerDidReceiveOnlineStatus:)]) {
+            [delegate chatManagerDidReceiveOnlineStatus:onlineStatus];
+        }
+    }
 }
-- (void)receiveOfflineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
-//    for (id delegate in self.delegatesArray) {
-//        if ([delegate respondsToSelector:@selector(chatManagerDidReceiveOfflineStatus:)]) {
-//            [delegate chatManagerDidReceiveOfflineStatus:[decryptedMessage copyMessageModel]];
-//        }
-//    }
+
+- (void)receiveStartTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
+    
+    TAPTypingModel *typing = [[TAPTypingModel alloc] initWithDictionary:dataDictionary error:nil];
+    
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(chatManagerDidReceiveStartTyping:)]) {
+            [delegate chatManagerDidReceiveStartTyping:typing];
+        }
+    }
+}
+
+- (void)receiveStopTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
+    TAPTypingModel *typing = [[TAPTypingModel alloc] initWithDictionary:dataDictionary error:nil];
+
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(chatManagerDidReceiveStopTyping:)]) {
+            [delegate chatManagerDidReceiveStopTyping:typing];
+        }
+    }
 }
 
 - (void)triggerSaveNewMessage {
@@ -445,12 +476,18 @@
 - (void)saveNewMessageToDatabase {
     if ([self.incomingMessageArray count] != 0) {
         //Insert to database
-        [TAPDataManager updateOrInsertDatabaseMessageWithData:self.incomingMessageArray tableName:@"TAPMessageRealmModel" success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageWithData:self.incomingMessageArray success:^{
             //Clear incoming message array
             [self.incomingMessageArray removeAllObjects];
+            
+            [[TAPMessageStatusManager sharedManager] triggerUpdateMessageStatus];
         } failure:^(NSError *error) {
             
         }];
+    }
+    else {
+        //Call to check if there are read message when there are no new incoming message
+        [[TAPMessageStatusManager sharedManager] triggerUpdateMessageStatus];
     }
 }
 
@@ -475,7 +512,7 @@
     }
     
     if ([groupedMessageArray count] != 0) {
-        [TAPDataManager updateOrInsertDatabaseMessageWithData:groupedMessageArray tableName:@"TAPMessageRealmModel" success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageWithData:groupedMessageArray success:^{
             
         } failure:^(NSError *error) {
             
@@ -508,7 +545,7 @@
     }
     
     if ([groupedMessageArray count] != 0) {
-        [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:groupedMessageArray tableName:@"TAPMessageRealmModel" success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:groupedMessageArray success:^{
             
         } failure:^(NSError *error) {
             
@@ -523,7 +560,7 @@
 - (void)saveIncomingMessageAndDisconnect {
     //Save new messages to database
     if ([self.incomingMessageArray count] != 0) {
-        [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:self.incomingMessageArray tableName:@"TAPMessageRealmModel" success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:self.incomingMessageArray success:^{
             
         } failure:^(NSError *error) {
             
@@ -563,14 +600,6 @@
     if (!isDelivered) {
         //Send delivered status to server
         [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
-    }
-}
-
-- (void)decreaseUnreadMessageForRoomID:(NSString *)roomID {
-    for (id delegate in self.delegatesArray) {
-        if ([delegate respondsToSelector:@selector(chatManagerShouldDecreaseUnreadBubbleForRoomID:)]) {
-            [delegate chatManagerShouldDecreaseUnreadBubbleForRoomID:roomID];
-        }
     }
 }
 

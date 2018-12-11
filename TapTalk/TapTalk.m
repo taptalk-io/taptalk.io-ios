@@ -155,6 +155,9 @@
     //Run update message sequence when enter background
     [[TAPChatManager sharedManager] runEnterBackgroundSequenceWithApplication:application];
     
+    //Send stop typing emit
+    [[TAPChatManager sharedManager] stopTyping];
+    
     //Clear all contact dictionary in ContactCacheManager
 //    [[TAPContactCacheManager sharedManager] clearContactDictionary];
 }
@@ -163,6 +166,9 @@
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:application];
+    
+    //Remove all read count on MessageStatusManager because the room list is reloaded from database
+    [[TAPMessageStatusManager sharedManager] clearReadCountDictionary];
     
     //Call to run room list view controller sequence
     self.roomListViewController.isShouldNotLoadFromAPI = NO;
@@ -203,9 +209,6 @@
 
     //Start trigger timer to save new message
     [[TAPChatManager sharedManager] triggerSaveNewMessage];
-    
-    //Start trigger timer to update read and delivered message status
-    [[TAPMessageStatusManager sharedManager] triggerUpdateStatus];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -257,17 +260,19 @@
     //Called when a notification is delivered to a foreground app.
     
     NSDictionary *userInfoDictionary = response.notification.request.content.userInfo;
-    [[TAPNotificationManager sharedManager] handleTappedNotificationWithUserInfo:userInfoDictionary];
-
+    NSDictionary *messageDictionary = [userInfoDictionary valueForKeyPath:@"data.message"];
+    TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
+    
+    [[TAPNotificationManager sharedManager] handleTappedNotificationWithUserInfo:messageDictionary];
+    
     //DV Temp
     //DV Note - Temporary open chat room when tapped notification - later will be handled in client's app delegate
-    TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:userInfoDictionary];
     TAPRoomModel *room = message.room;
-
+    
     UIViewController *currentActiveController = ((UINavigationController *)self.activeWindow.rootViewController).topViewController;
-
+    
     [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:currentActiveController.navigationController];
-
+    
     //END DV Temp
     
     completionHandler();
@@ -321,6 +326,7 @@
 }
 
 #pragma mark - Custom Method
+//General Set Up
 - (void)setEnvironment:(TapTalkEnvironment)environment {
     _environment = environment;
     NSLog(@"ENVIRONMENT TYPE = %ld", self.environment);
@@ -331,6 +337,17 @@
     _activeWindow = activeWindow;
 }
 
+- (UINavigationController *)getCurrentTapTalkActiveNavigationController {
+    UINavigationController *currentActiveNavigationController = (UINavigationController *)self.activeWindow.rootViewController;
+    return currentActiveNavigationController;
+}
+
+- (UIViewController *)getCurrentTapTalkActiveViewController {
+    UIViewController *currentActiveController = ((UINavigationController *)self.activeWindow.rootViewController).topViewController;
+    return currentActiveController;
+}
+
+//Chat
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser fromNavigationController:(UINavigationController *)navigationController {
     TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
     [[TAPChatManager sharedManager] openRoom:room];
@@ -338,8 +355,12 @@
     //Save all unsent message (in case user retrieve message on another room)
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
     
+    //Save user to ContactManager Dictionary
+    [[TAPContactManager sharedManager] addContactWithUserModel:otherUser saveToDatabase:NO];
+    
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.currentRoom = room;
+    chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
@@ -351,6 +372,7 @@
     
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.currentRoom = room;
+    chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
@@ -360,6 +382,28 @@
     if ([self.delegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
         [self.delegate tapTalkShouldResetAuthTicket];
     }
+}
+
+//Custom Keyboard
+- (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender recipient:(TAPUserModel *)recipient {
+    if([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardForSender:recipient:)]) {
+        return [self.delegate tapTalkCustomKeyboardForSender:sender recipient:recipient];
+    }
+    
+    return [NSArray array];
+}
+
+- (void)customKeyboardDidTappedWithSender:(TAPUserModel *)sender
+                                recipient:(TAPUserModel *)recipient
+                             keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
+    if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:keyboardItem:)]) {
+        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient keyboardItem:keyboardItem];
+    }
+}
+
+//Custom Bubble
+- (void)addCustomBubbleDataWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate {
+    [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate];
 }
 
 @end

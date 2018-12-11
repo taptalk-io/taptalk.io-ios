@@ -30,7 +30,7 @@ typedef NS_ENUM(NSInteger, LayoutType) {
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 //@property (strong, nonatomic) UITextField *searchBarTextField;
 
-- (void)isShowDefaultLabel:(BOOL)isShow;
+- (void)isShowDefaultLabel:(BOOL)isShow animated:(BOOL)animated;
 - (void)isShowExpertVerifiedLogo:(BOOL)isShow;
 - (void)setSearchViewLayoutWithType:(LayoutType)type;
 - (void)setSearchExpertButtonWithType:(ButtonType)type;

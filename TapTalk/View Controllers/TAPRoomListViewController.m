@@ -17,7 +17,7 @@
 #import <AFNetworking/AFNetworking.h>
 #import "TAPSearchViewController.h"
 
-@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate>
+@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
 @property (strong, nonatomic) TAPRoomListView *roomListView;
@@ -254,18 +254,12 @@
     [self processMessageFromSocket:message];
 }
 
-- (void)chatManagerShouldDecreaseUnreadBubbleForRoomID:(NSString *)roomID {
-    TAPRoomListModel *currentRoomList = [self.roomListDictionary objectForKey:roomID];
-    
-    currentRoomList.numberOfUnreadMessages--;
-    
-    if(currentRoomList.numberOfUnreadMessages < 0) {
-        currentRoomList.numberOfUnreadMessages = 0;
-    }
-    
-    NSInteger cellRow = [self.roomListArray indexOfObject:currentRoomList];
-    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
-    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+- (void)chatManagerDidReceiveStartTypingWithRoomID:(NSString *)roomID user:(TAPUserModel *)user {
+    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
+}
+
+- (void)chatManagerDidReceiveStopTypingWithRoomID:(NSString *)roomID user:(TAPUserModel *)user {
+    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
 }
 
 #pragma mark UITextField
@@ -322,6 +316,27 @@
     }];
 }
 
+#pragma mark TAPAddNewChatViewController
+- (void)addNewChatViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user {
+    [[TapTalk sharedInstance] openRoomWithOtherUser:user fromNavigationController:self.navigationController];
+}
+
+#pragma mark TAPChatViewController
+- (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID {
+    NSInteger readCount = [[TAPMessageStatusManager sharedManager] getReadCountAndClearDictionaryForRoomID:roomID];
+    
+    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+    roomList.numberOfUnreadMessages = roomList.numberOfUnreadMessages - readCount;
+    
+    if(roomList.numberOfUnreadMessages < 0) {
+        roomList.numberOfUnreadMessages = 0;
+    }
+    
+    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+}
+
 #pragma mark - Custom Method
 - (void)editButtonDidTapped {
     NSLog(@"Edit");
@@ -329,6 +344,7 @@
 
 - (void)addButtonDidTapped {
     TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
+    addNewChatViewController.delegate = self;
     UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
     [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
 }
@@ -460,7 +476,7 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         //Save messages to database
-        [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:messageArray tableName:@"TAPMessageRealmModel" success:^{
+        [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:messageArray success:^{
             //Get room list data from database and refresh UI
             [self reloadLocalDataAndUpdateUILogicAnimated:YES];
         } failure:^(NSError *error) {
@@ -603,6 +619,10 @@
                 TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomIDString];
                 roomList.numberOfUnreadMessages = numberOfUnreadMessages;
                 
+                if(roomList.numberOfUnreadMessages < 0) {
+                    roomList.numberOfUnreadMessages = 0;
+                }
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
                     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
@@ -674,7 +694,15 @@
         //Room is not on the list, create new room
         TAPRoomListModel *newRoomList = [TAPRoomListModel new];
         newRoomList.lastMessage = message;
-        newRoomList.numberOfUnreadMessages = 1;
+        
+        if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            //Message from other recipient, set unread as 1
+            newRoomList.numberOfUnreadMessages = 1;
+        }
+        else {
+            //Current user send new message, set unread to 0
+            newRoomList.numberOfUnreadMessages = 0;
+        }
         
         [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
         [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];

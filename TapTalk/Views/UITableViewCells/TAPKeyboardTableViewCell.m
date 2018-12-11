@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) IBOutlet UILabel *stringLabel;
 @property (strong, nonatomic) IBOutlet UILabel *emoticonLabel;
+@property (strong, nonatomic) IBOutlet RNImageView *iconImageView;
 
 @end
 
@@ -50,6 +51,18 @@
     
     self.stringLabel.text = titleString;
     self.emoticonLabel.text = emoticonString;
+}
+
+- (void)setKeyboardCellWithKeyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
+    
+    if(keyboardItem.iconImage != nil) {
+        self.iconImageView.image = keyboardItem.iconImage;
+    }
+    else {
+        [self.iconImageView setImageWithURLString:keyboardItem.iconURL];
+    }
+    
+    self.stringLabel.text = keyboardItem.itemName;
 }
 
 @end

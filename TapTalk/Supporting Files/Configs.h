@@ -91,8 +91,7 @@
 #define kTAPEventStartTyping @"chat/startTyping"
 #define kTAPEventStopTyping @"chat/stopTyping"
 #define kTAPEventAuthentication @"user/authentication"
-#define kTAPEventUserOnline @"user/online"
-#define kTAPEventUserOffline @"user/offline"
+#define kTAPEventUserOnline @"user/status"
 #define kTAPEventUserUpdated @"user/updated"
 
 typedef NS_ENUM(NSInteger, TAPChatMessageType) {
@@ -114,5 +113,3 @@ typedef NS_ENUM(NSInteger, TAPChatMessageType) {
     TAPChatMessageTypeOrderCard = 2003,
     TAPChatMessageTypePaymentConfirmation = 2004
 };
-
-

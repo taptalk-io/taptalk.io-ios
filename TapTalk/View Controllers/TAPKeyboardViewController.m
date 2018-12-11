@@ -38,7 +38,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 4; //WK Temp
+    return [self.customKeyboardArray count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -48,17 +48,21 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView registerNib:[TAPKeyboardTableViewCell cellNib] forCellReuseIdentifier:[TAPKeyboardTableViewCell description]];
     TAPKeyboardTableViewCell *cell = (TAPKeyboardTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPKeyboardTableViewCell description]];
-    if (indexPath.row == 0) {
-        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypePriceList];
-    }
-    else if (indexPath.row == 1) {
-        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypeExpertNotes];
-    }
-    else if (indexPath.row == 2) {
-        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypeSendService];
-    }
-    else if (indexPath.row == 3) {
-        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypeCreateOrderCard];
+//    if (indexPath.row == 0) {
+//        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypePriceList];
+//    }
+//    else if (indexPath.row == 1) {
+//        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypeExpertNotes];
+//    }
+//    else if (indexPath.row == 2) {
+//        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypeSendService];
+//    }
+//    else if (indexPath.row == 3) {
+//        [cell setKeyboardCellWithType:TAPKeyboardTableViewCellTypeCreateOrderCard];
+//    }
+    if([[self.customKeyboardArray objectAtIndex:indexPath.row] isKindOfClass:[TAPCustomKeyboardItemModel class]]) {
+        TAPCustomKeyboardItemModel *keyboardItem = [self.customKeyboardArray objectAtIndex:indexPath.row];
+        [cell setKeyboardCellWithKeyboardItem:keyboardItem];
     }
     
     return cell;
@@ -86,15 +90,24 @@
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    if ([self.delegate respondsToSelector:@selector(keyboardViewControllerDidSelectRowAtIndexPath:)]) {
-        [self.delegate keyboardViewControllerDidSelectRowAtIndexPath:indexPath];
-    }
+    
+    TAPCustomKeyboardItemModel *keyboardItem = [self.customKeyboardArray objectAtIndex:indexPath.row];
+    [[TAPCustomKeyboardManager sharedManager] customKeyboardTappedWithSender:self.sender recipient:self.recipient keyboardItem:keyboardItem];
 }
 
 #pragma mark - Custom Method
 - (void)setKeyboardHeight:(CGFloat)keyboardHeight {
     _keyboardHeight = keyboardHeight;
     self.customInputViewHeightConstraint.constant = self.keyboardHeight;
+}
+
+- (void)setCustomKeyboardArray:(NSArray *)customKeyboardArray
+                        sender:(TAPUserModel *)sender
+                     recipient:(TAPUserModel *)recipient {
+    _customKeyboardArray = customKeyboardArray;
+    _sender = sender;
+    _recipient = recipient;
+    [self.tableView reloadData];
 }
 
 @end

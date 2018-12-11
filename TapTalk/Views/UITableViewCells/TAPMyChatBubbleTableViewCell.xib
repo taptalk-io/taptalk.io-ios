@@ -26,7 +26,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="55.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xBZ-Oa-CNb">
+                    <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xBZ-Oa-CNb">
                         <rect key="frame" x="16" y="46" width="288" height="1.5"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -109,28 +109,17 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bDu-ha-egn">
-                                <rect key="frame" x="0.0" y="0.0" width="40" height="46"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <connections>
-                                    <action selector="chatBubbleButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="l64-HO-Gf0"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="HId-QA-OEm" secondAttribute="trailing" constant="12" id="21e-lQ-AaL"/>
                             <constraint firstAttribute="bottom" secondItem="HId-QA-OEm" secondAttribute="bottom" constant="12" id="D2k-aQ-9bO"/>
                             <constraint firstAttribute="trailing" secondItem="aYN-I4-Iq3" secondAttribute="trailing" constant="12" id="Inm-Yt-Rbi"/>
-                            <constraint firstItem="bDu-ha-egn" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" id="Ojx-r3-7Xv"/>
                             <constraint firstItem="aYN-I4-Iq3" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" constant="12" id="TeA-nh-uQU"/>
                             <constraint firstItem="HId-QA-OEm" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="12" id="XAP-a9-e2N"/>
-                            <constraint firstAttribute="height" relation="greaterThanOrEqual" priority="750" constant="42" id="emZ-JP-RK4"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="emZ-JP-RK4"/>
                             <constraint firstItem="HId-QA-OEm" firstAttribute="top" secondItem="aYN-I4-Iq3" secondAttribute="bottom" constant="3" id="hoW-H6-ZyD"/>
                             <constraint firstItem="aYN-I4-Iq3" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="12" id="sx8-nx-DwZ"/>
-                            <constraint firstAttribute="bottom" secondItem="bDu-ha-egn" secondAttribute="bottom" id="udv-vv-PYq"/>
-                            <constraint firstItem="bDu-ha-egn" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" id="v6o-xX-oWP"/>
-                            <constraint firstAttribute="trailing" secondItem="bDu-ha-egn" secondAttribute="trailing" id="wvT-X9-dRf"/>
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSendingChat" translatesAutoresizingMaskIntoConstraints="NO" id="iM8-gR-PXe">
@@ -181,7 +170,6 @@
             <connections>
                 <outlet property="bubbleLabel" destination="HId-QA-OEm" id="xCk-Rg-SwJ"/>
                 <outlet property="bubbleView" destination="GBq-4A-GJ7" id="mf1-eN-u3j"/>
-                <outlet property="chatBubbleButton" destination="bDu-ha-egn" id="Q69-UG-QIc"/>
                 <outlet property="chatBubbleRightConstraint" destination="mVW-oN-ID9" id="PFu-ZX-Hak"/>
                 <outlet property="replyButton" destination="Gjw-fa-TSr" id="JAk-y0-8Nd"/>
                 <outlet property="replyButtonRightConstraint" destination="6vT-dz-4yM" id="fOI-zP-8Aj"/>

@@ -272,7 +272,7 @@
         NSDate *date = [NSDate date];
         long createdDate = [date timeIntervalSince1970] * 1000.0f;
         selectedRecentSearch.created = [NSNumber numberWithLong:createdDate];
-        [TAPDataManager updateOrInsertDatabaseRecentSearchWithData:@[selectedRecentSearch] tableName:@"TAPRecentSearchRealmModel" success:^{
+        [TAPDataManager updateOrInsertDatabaseRecentSearchWithData:@[selectedRecentSearch] success:^{
             [self.recentSearchArray removeObjectAtIndex:indexPath.row];
             [self.recentSearchArray insertObject:selectedRecentSearch atIndex:0];
             [self.searchView.recentSearchTableView reloadData];
@@ -292,7 +292,7 @@
             long createdDate = [date timeIntervalSince1970] * 1000.0f;
             recentSearch.created = [NSNumber numberWithLong:createdDate];
             
-            [TAPDataManager updateOrInsertDatabaseRecentSearchWithData:@[recentSearch] tableName:@"TAPRecentSearchRealmModel" success:^{
+            [TAPDataManager updateOrInsertDatabaseRecentSearchWithData:@[recentSearch] success:^{
                 [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray) {
                     [self.recentSearchUnreadCountArray removeAllObjects];
                     for (TAPRecentSearchModel *recentSearch in recentSearchArray) {
@@ -450,7 +450,7 @@
 }
 
 - (void)clearHistoryButtonDidTapped {
-    [TAPDatabaseManager deleteAllDataFromTableName:@"TAPRecentSearchRealmModel" success:^{
+    [TAPDataManager deleteDatabaseAllRecentSearchSuccess:^{
         [self.recentSearchArray removeAllObjects];
         [self.searchView.recentSearchTableView reloadData];
     } failure:^(NSError *error) {

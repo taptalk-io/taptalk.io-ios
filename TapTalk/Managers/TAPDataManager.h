@@ -70,31 +70,24 @@
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure;
 + (void)updateOrInsertDatabaseMessageWithData:(NSArray *)dataArray
-                                    tableName:(NSString *)tableName
                                       success:(void (^)(void))success
                                       failure:(void (^)(NSError *error))failure;
 + (void)updateOrInsertDatabaseMessageInMainThreadWithData:(NSArray *)dataArray
-                                                tableName:(NSString *)tableName
                                                   success:(void (^)(void))success
                                                   failure:(void (^)(NSError *error))failure;
 + (void)updateOrInsertDatabaseRecentSearchWithData:(NSArray *)dataArray
-                                         tableName:(NSString *)tableName
                                            success:(void (^)(void))success
                                            failure:(void (^)(NSError *error))failure;
 + (void)updateOrInsertDatabaseContactWithData:(NSArray *)dataArray
-                                    tableName:(NSString *)tableName
                                       success:(void (^)(void))success
                                       failure:(void (^)(NSError *error))failure;
 + (void)updateMessageReadStatusToDatabaseWithData:(NSArray *)dataArray
-                                        tableName:(NSString *)tableName
                                           success:(void (^)(void))success
                                           failure:(void (^)(NSError *error))failure;
 + (void)updateMessageDeliveryStatusToDatabaseWithData:(NSArray *)dataArray
-                                            tableName:(NSString *)tableName
                                               success:(void (^)(void))success
                                               failure:(void (^)(NSError *error))failure;
 + (void)deleteDatabaseMessageWithData:(NSArray *)dataArray
-                            tableName:(NSString *)tableName
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure;
 + (void)deleteDatabaseMessageWithPredicateString:(NSString *)predicateString
@@ -103,6 +96,8 @@
 + (void)getDatabaseContactByUserID:(NSString *)userID
                            success:(void (^)(BOOL isContact))success
                            failure:(void (^)(NSError *error))failure;
++ (void)deleteDatabaseAllRecentSearchSuccess:(void (^)(void))success
+                                     failure:(void (^)(NSError *error))failure;
 
 //API Call
 + (void)callAPIGetAuthTicketWithUser:(TAPUserModel *)user
@@ -149,10 +144,10 @@
                                        isDebug:(BOOL)isDebug
                                        success:(void (^)(void))success
                                        failure:(void (^)(NSError *error))failure;
-+ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageIDsArray
++ (void)callAPIUpdateMessageDeliverStatusWithArray:(NSArray *)messageArray
                                         success:(void (^)(NSArray *updatedMessageIDsArray))success
-                                        failure:(void (^)(NSError *error))failure;
-+ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageIDsArray
+                                        failure:(void (^)(NSError *error, NSArray *messageArray))failure;
++ (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
                                        success:(void (^)(NSArray *updatedMessageIDsArray))success
-                                       failure:(void (^)(NSError *error))failure;
+                                       failure:(void (^)(NSError *error, NSArray *messageArray))failure;
 @end
