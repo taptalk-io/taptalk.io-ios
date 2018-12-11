@@ -19,7 +19,6 @@
     tapCustomKeyboardItemModel.iconImage = nil;
     tapCustomKeyboardItemModel.itemName = itemName;
     tapCustomKeyboardItemModel.itemID = itemID;
-    
     return tapCustomKeyboardItemModel;
 }
 
@@ -31,7 +30,6 @@
     tapCustomKeyboardItemModel.iconImage = image;
     tapCustomKeyboardItemModel.itemName = itemName;
     tapCustomKeyboardItemModel.itemID = itemID;
-    
     return tapCustomKeyboardItemModel;
 }
 
