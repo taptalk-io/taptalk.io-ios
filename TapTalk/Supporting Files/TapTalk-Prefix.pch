@@ -27,6 +27,7 @@
 #import "TAPMessageStatusManager.h"
 #import "TAPCustomBubbleManager.h"
 #import "TAPCustomKeyboardManager.h"
+#import "TAPContactManager.h"
 #import "AFNetworkActivityIndicatorManager.h"
 #import "NSUserDefaults+MPSecureUserDefaults.h"
 #import "RNImageView.h"

@@ -188,7 +188,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [UIView commitAnimations];
     
     self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, 0.0f);
-
+    
     self.view.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
     
     //TitleView
@@ -305,7 +305,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     if([[[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser] count] > 0) {
         //There's custom keyboard for this type
-       
+        
         NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser];
         
         [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:otherUser];
@@ -328,14 +328,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     self.inputMessageAccessoryView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     
-//    //Typing Animation
-//    _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
-//    self.fullTypingString = NSLocalizedString(@"typing...", @"");
-//    self.initialTypingString = NSLocalizedString(@"typing", @"");
-//    self.currentTypingString = self.initialTypingString;
-//    [self performSelector:@selector(animateTypingDot1) withObject:nil afterDelay:0.0f];
-//    [self performSelector:@selector(animateTypingDot2) withObject:nil afterDelay:0.2f];
-//    [self performSelector:@selector(animateTypingDot3) withObject:nil afterDelay:0.4f];
+    //    //Typing Animation
+    //    _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
+    //    self.fullTypingString = NSLocalizedString(@"typing...", @"");
+    //    self.initialTypingString = NSLocalizedString(@"typing", @"");
+    //    self.currentTypingString = self.initialTypingString;
+    //    [self performSelector:@selector(animateTypingDot1) withObject:nil afterDelay:0.0f];
+    //    [self performSelector:@selector(animateTypingDot2) withObject:nil afterDelay:0.2f];
+    //    [self performSelector:@selector(animateTypingDot3) withObject:nil afterDelay:0.4f];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -344,9 +344,9 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     _isViewWillAppeared = YES;
     
     self.connectionStatusViewController.view.frame = CGRectMake(CGRectGetMinX(self.connectionStatusViewController.view.frame), CGRectGetMinY(self.connectionStatusViewController.view.frame), CGRectGetWidth(self.connectionStatusViewController.view.frame), self.connectionStatusHeight);
-//    self.view.backgroundColor = [UIColor redColor];
+    //    self.view.backgroundColor = [UIColor redColor];
     [self.tableView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
-//    [self checkEmptyState];
+    //    [self checkEmptyState];
     
     //Check chat room contains mesage draft or not
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
@@ -423,8 +423,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     //DV Note - For product list height
-//    Collection view height (347.0f) + 16.0f gap
-//    return 363.0f;
+    //    Collection view height (347.0f) + 16.0f gap
+    //    return 363.0f;
     
     tableView.estimatedRowHeight = 70.0f;
     return UITableViewAutomaticDimension;
@@ -449,25 +449,25 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    
     if ([self.messageArray count] != 0) {
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
         
         //DV Note - For product list bubble
         //DV Temp
-//        [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
-//        TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
-//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        return cell;
+        //        [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
+        //        TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
+        //        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        //        return cell;
         //END DV Temp
         
         //CS Note - For order card bubble
         //CS Temp
         
-//        [tableView registerNib:[TAPOrderCardBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPOrderCardBubbleTableViewCell description]];
-//        TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
-//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        return cell;
+        //        [tableView registerNib:[TAPOrderCardBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPOrderCardBubbleTableViewCell description]];
+        //        TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
+        //        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        //        return cell;
         //END CS Temp
         
         if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
@@ -482,7 +482,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 cell.delegate = self;
                 
                 [cell setMessage:message];
-
+                
                 if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                     [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
                 }
@@ -542,30 +542,30 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         else {
             //Their Chat
             
-//            //DV Temp
-//            NSInteger type = 3001;
-//            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
-//            NSString *cellName = [cellDataDictionary objectForKey:@"name"];
-//            id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
-//
-//            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
-//            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
-//
-//            TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
-//            cell.delegate = userDelegate;
-//            return cell;
-//            //END DV Temp
-           
-//            //DV Temp
-//            NSInteger type = 3002;
-//            NSString *cellName = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
-//            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
-//            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
-//
-//            id cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
-//
-//            return cell;
-//            //END DV Temp
+            //            //DV Temp
+            //            NSInteger type = 3001;
+            //            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
+            //            NSString *cellName = [cellDataDictionary objectForKey:@"name"];
+            //            id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+            //
+            //            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+            //            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+            //
+            //            TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+            //            cell.delegate = userDelegate;
+            //            return cell;
+            //            //END DV Temp
+            
+            //            //DV Temp
+            //            NSInteger type = 3002;
+            //            NSString *cellName = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
+            //            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+            //            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+            //
+            //            id cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+            //
+            //            return cell;
+            //            //END DV Temp
             
             [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
             TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
@@ -574,19 +574,19 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-
+            
             [cell setMessage:message];
-
+            
             if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                 [cell showStatusLabel:YES animated:NO];
             }
             else {
                 [cell showStatusLabel:NO animated:NO];
             }
-
+            
             return cell;
         }
-
+        
     }
     
     [tableView registerNib:[TAPBaseXIBRotatedTableViewCell cellNib] forCellReuseIdentifier:[TAPBaseXIBRotatedTableViewCell description]];
@@ -697,7 +697,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     CGFloat keyboardMinYPositionInView = CGRectGetHeight([UIScreen mainScreen].bounds) - totalKeyboardHeight;
     
     CGFloat touchYPosition = positionInView.y + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO];
-
+    
     if (self.isKeyboardShowed && touchYPosition >= keyboardMinYPositionInView && self.keyboardHeight != keyboardAndAccessoryViewHeight && self.isScrollViewDragged) {
         CGFloat keyboardHeightDifference = touchYPosition - keyboardMinYPositionInView;
         
@@ -706,7 +706,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
         
         CGFloat chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + (totalKeyboardHeight - keyboardHeightDifference) - kInputMessageAccessoryViewHeight;
-    
+        
         if (chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint) {
             chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint;
         }
@@ -773,12 +773,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
-//    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
+    //    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
     [self setAsTyping:YES];
 }
 
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
-//    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
+    //    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
     [self setAsTyping:NO];
 }
 
@@ -905,37 +905,17 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 #pragma mark TAPYourChatBubbleTableViewCell
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
-    if (tappedMessage == self.selectedMessage) {
-        //select message that had been selected
-        self.selectedMessage = nil;
-        
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
-        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-        TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
-        
-        [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
-            //animation
-            [cell showStatusLabel:NO animated:YES];
-            [cell layoutIfNeeded];
-            [self.tableView beginUpdates];
-            [self.tableView endUpdates];
-        } completion:^(BOOL finished) {
-            //completion
-        }];
-    }
-    else {
-        //select message that had not been selected
-        if (self.selectedMessage == nil) {
-            //no messages had been selected
-            self.selectedMessage = tappedMessage;
+        if (tappedMessage == self.selectedMessage) {
+            //select message that had been selected
+            self.selectedMessage = nil;
+            
             NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            
             TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
             
             [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                 //animation
-                [cell showStatusLabel:YES animated:YES];
+                [cell showStatusLabel:NO animated:YES];
                 [cell layoutIfNeeded];
                 [self.tableView beginUpdates];
                 [self.tableView endUpdates];
@@ -944,45 +924,65 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             }];
         }
         else {
-            //a message had been selected
-            NSInteger previousMessageIndex = [self.messageArray indexOfObject:self.selectedMessage];
-            NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
-            
-            id previousCell;
-            BOOL isMyCell = NO;
-            if ([self.selectedMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                previousCell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:selectedPreviousMessageIndexPath];
-                isMyCell = YES;
+            //select message that had not been selected
+            if (self.selectedMessage == nil) {
+                //no messages had been selected
+                self.selectedMessage = tappedMessage;
+                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+                
+                TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+                
+                [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
+                    //animation
+                    [cell showStatusLabel:YES animated:YES];
+                    [cell layoutIfNeeded];
+                    [self.tableView beginUpdates];
+                    [self.tableView endUpdates];
+                } completion:^(BOOL finished) {
+                    //completion
+                }];
             }
             else {
-                previousCell = (TAPYourChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:selectedPreviousMessageIndexPath];
-            }
-            
-            self.selectedMessage = tappedMessage;
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
-            NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            
-            TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
-            
-            [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
-                //animation
-                if (isMyCell) {
-                    [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+                //a message had been selected
+                NSInteger previousMessageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+                NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
+                
+                id previousCell;
+                BOOL isMyCell = NO;
+                if ([self.selectedMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    previousCell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:selectedPreviousMessageIndexPath];
+                    isMyCell = YES;
                 }
                 else {
-                    [previousCell showStatusLabel:NO animated:YES];
+                    previousCell = (TAPYourChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:selectedPreviousMessageIndexPath];
                 }
-                [previousCell layoutIfNeeded];
                 
-                [cell showStatusLabel:YES animated:YES];
-                [cell layoutIfNeeded];
-                [self.tableView beginUpdates];
-                [self.tableView endUpdates];
-            } completion:^(BOOL finished) {
-                //completion
-            }];
+                self.selectedMessage = tappedMessage;
+                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+                
+                TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+                
+                [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
+                    //animation
+                    if (isMyCell) {
+                        [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+                    }
+                    else {
+                        [previousCell showStatusLabel:NO animated:YES];
+                    }
+                    [previousCell layoutIfNeeded];
+                    
+                    [cell showStatusLabel:YES animated:YES];
+                    [cell layoutIfNeeded];
+                    [self.tableView beginUpdates];
+                    [self.tableView endUpdates];
+                } completion:^(BOOL finished) {
+                    //completion
+                }];
+            }
         }
-    }
     }
 }
 
@@ -1178,8 +1178,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         else {
             [cell setMessage:message];
             
-//        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-//        [self.tableView reloadData];
+            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+            //        [self.tableView reloadData];
         }
     }
     else {
@@ -1263,7 +1263,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
         
         [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
-
+        
         [self.view layoutIfNeeded];
         
         if (!self.isKeyboardShowed) {
@@ -1291,7 +1291,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     if (self.isScrollViewDragged) {
         return;
     }
-
+    
     self.tableView.contentInset = UIEdgeInsetsMake(0.0f, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     
@@ -1453,12 +1453,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                                     }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                    actionWithTitle:@"Cancel"
-                                    style:UIAlertActionStyleCancel
-                                    handler:^(UIAlertAction * action) {
-                                        //Do some thing here
-                                        [self checkKeyboard];
-                                    }];
+                                   actionWithTitle:@"Cancel"
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       //Do some thing here
+                                       [self checkKeyboard];
+                                   }];
     
     [documentsAction setValue:[[UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [cameraAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
@@ -1505,7 +1505,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             //after animation
         }];
     }];
-   
+    
 }
 
 - (void)backButtonDidTapped {
@@ -1635,7 +1635,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             
             //Call API Get After Message
             [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated success:^(NSArray *messageArray) {
-
+                
                 //Update View
                 [self updateMessageDataAndUIWithMessages:messageArray toTop:YES];
                 
@@ -1643,19 +1643,19 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 if ([messageArray count] != 0) {
                     [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
                 }
-
+                
                 //Call API Before Message if count < 50
                 if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
                     [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:roomID maxCreated:minCreated];
                 }
-
+                
             } failure:^(NSError *error) {
                 //DV Temp
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
-
+                
                 UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 }];
-
+                
                 [alertController addAction:okAction];
                 [self presentViewController:alertController animated:YES completion:nil];
                 //END DV Temp
@@ -1798,7 +1798,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         //Update only when ui data is not read yet
         currentMessage.isRead = message.isRead;
     }
-       
+    
     currentMessage.isHidden = message.isHidden;
 }
 
@@ -1860,8 +1860,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         [self.scrolledPendingMessageArray removeAllObjects];
         [self.tableView reloadData];
         
-//        //Uncommand to scroll to top unread message (and command scroll to index 0 below) - have some glitch if scrolled pending message height is bigger than current y offset
-//        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:numberOfPendingArray - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        //        //Uncommand to scroll to top unread message (and command scroll to index 0 below) - have some glitch if scrolled pending message height is bigger than current y offset
+        //        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:numberOfPendingArray - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
@@ -2191,9 +2191,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             }
         }
     }
-    else {
-        return @"";
-    }
+    
+    return @"";
 }
 
 - (void)setAsTypingNoAfterDelay {
@@ -2203,3 +2202,4 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 @end
+
