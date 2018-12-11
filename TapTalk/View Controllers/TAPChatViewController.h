@@ -9,8 +9,17 @@
 #import "TAPBaseViewController.h"
 #import "TAPRoomModel.h"
 
+@protocol TAPChatViewControllerDelegate <NSObject>
+
+@optional
+
+- (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID;
+
+@end
+
 @interface TAPChatViewController : TAPBaseViewController
 
+@property (weak, nonatomic) id<TAPChatViewControllerDelegate> delegate;
 @property (strong, nonatomic) TAPRoomModel *currentRoom;
 
 @end

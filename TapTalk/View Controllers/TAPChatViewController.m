@@ -58,6 +58,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (strong, nonatomic) UIView *userStatusView;
 @property (strong, nonatomic) UILabel *userStatusLabel;
 @property (strong, nonatomic) NSTimer *lastSeenTimer;
+@property (strong, nonatomic) UIView *userTypingView;
 
 @property (strong, nonatomic) TAPConnectionStatusViewController *connectionStatusViewController;
 @property (strong, nonatomic) TAPKeyboardViewController *keyboardViewController;
@@ -65,6 +66,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (strong, nonatomic) NSMutableArray *messageArray;
 @property (strong, nonatomic) NSMutableDictionary *messageDictionary;
 @property (strong, nonatomic) TAPMessageModel *selectedMessage;
+@property (strong, nonatomic) TAPOnlineStatusModel *onlineStatus;
 
 @property (strong, nonatomic) NSNumber *minCreatedMessage;
 @property (strong, nonatomic) NSNumber *loadedMaxCreated;
@@ -74,8 +76,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic) CGFloat initialKeyboardHeight;
 
-@property (nonatomic) NSTimeInterval currentLastSeen;
-
 @property (nonatomic) long apiBeforeLastCreated;
 @property (nonatomic) BOOL isLastPage;
 @property (nonatomic) BOOL isViewWillAppeared;
@@ -84,6 +84,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (nonatomic) BOOL isKeyboardWasShowed;
 @property (nonatomic) BOOL isKeyboardShowed;
 @property (nonatomic) BOOL isScrollViewDragged;
+@property (nonatomic) BOOL isCustomKeyboardAvailable;
 
 @property (nonatomic) CGFloat connectionStatusHeight;
 
@@ -122,6 +123,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)updateLastSeenWithTimestamp:(NSTimeInterval)timestamp;
 - (void)processMessageAsRead:(TAPMessageModel *)message;
 - (void)processVisibleMessageAsRead;
+- (void)setAsTyping:(BOOL)typing;
+- (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
 
 @end
 
@@ -221,6 +224,31 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self.titleView addSubview:self.userDescriptionView];
     [self.navigationItem setTitleView:self.titleView];
     
+    _userTypingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), 100.0f, 16.0f)];
+    self.userTypingView.backgroundColor = [UIColor clearColor];
+    [self.titleView addSubview:self.userTypingView];
+    
+    UIImageView *typingAnimationImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 16.0f, 16.0f)];
+    typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    typingAnimationImageView.animationDuration = 0.6f;
+    typingAnimationImageView.animationRepeatCount = 0.0f;
+    [typingAnimationImageView startAnimating];
+    [self.userTypingView addSubview:typingAnimationImageView];
+    
+    UILabel *typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
+    typingLabel.text = NSLocalizedString(@"Typing", @"");
+    typingLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+    typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+    [typingLabel sizeToFit];
+    typingLabel.frame = CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(typingLabel.frame), 16.0f);
+    [self.userTypingView addSubview:typingLabel];
+    
+    self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
+    self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
+    
+    [self setAsTyping:NO];
+    [self isShowOnlineDotStatus:NO];
+    
     //RightBarButton
     UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
     RNImageView *rightBarImageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
@@ -267,23 +295,46 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self.view addSubview:self.connectionStatusViewController.view];
     _connectionStatusHeight = CGRectGetHeight(self.connectionStatusViewController.view.frame);
     
+    //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
     self.keyboardViewController.delegate = self;
+    
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:[self getOtherUserIDWithRoomID:self.currentRoom.roomID]];
+    
+    if([[[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser] count] > 0) {
+        //There's custom keyboard for this type
+       
+        NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser];
+        
+        [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:otherUser];
+        _isCustomKeyboardAvailable = YES;
+    }
+    else {
+        //There's no custom keyboard for this type
+        _isCustomKeyboardAvailable = NO;
+        self.keyboardOptionButton.alpha = 0.0f;
+        self.messageViewLeftConstraint.constant = -38.0f;
+    }
+    //END Custom Keyboard
     
     _isKeyboardWasShowed = NO;
     _isKeyboardShowed = NO;
     
-    _lastSeenTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(timerRefreshLastSeen) userInfo:nil repeats:YES];
+    _lastSeenTimer = [NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(timerRefreshLastSeen) userInfo:nil repeats:YES];
     
     [self firstLoadData];
     
     self.inputMessageAccessoryView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-
-    //DV Temp
-    double temp = 1541142092000.0f;
-    _currentLastSeen = (double)temp/1000.0f;
-    [self updateLastSeenWithTimestamp:self.currentLastSeen];
-    //END DV Temp
+    
+//    //Typing Animation
+//    _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
+//    self.fullTypingString = NSLocalizedString(@"typing...", @"");
+//    self.initialTypingString = NSLocalizedString(@"typing", @"");
+//    self.currentTypingString = self.initialTypingString;
+//    [self performSelector:@selector(animateTypingDot1) withObject:nil afterDelay:0.0f];
+//    [self performSelector:@selector(animateTypingDot2) withObject:nil afterDelay:0.2f];
+//    [self performSelector:@selector(animateTypingDot3) withObject:nil afterDelay:0.4f];
     
 }
 
@@ -332,6 +383,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [super viewWillDisappear:animated];
     
     _isViewWillAppeared = NO;
+    
+    if([self.delegate respondsToSelector:@selector(chatViewControllerShouldUpdateUnreadBubbleForRoomID:)]) {
+        [self.delegate chatViewControllerShouldUpdateUnreadBubbleForRoomID:self.currentRoom.roomID];
+    }
+    
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -340,6 +396,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     _isViewDidAppeared = NO;
     
     [self.navigationController.interactivePopGestureRecognizer removeTarget:self action:@selector(handleNavigationPopGesture:)];
+    
+    //stop typing animation sequence
 }
 
 - (void)didReceiveMemoryWarning {
@@ -447,6 +505,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 
                 return cell;
             }
+            else if (message.type == TAPChatMessageTypeOrderCard) {
+                [tableView registerNib:[TAPOrderCardBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPOrderCardBubbleTableViewCell description]];
+                TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                [cell setOrderCardWithType:13];//CS Temp
+                return cell;
+            }
             else {
                 //WK Temp - Where message.type is not 1001 or 1002, set empty chat message
                 [tableView registerNib:[TAPMyChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyChatBubbleTableViewCell description]];
@@ -476,6 +541,32 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
         else {
             //Their Chat
+            
+//            //DV Temp
+//            NSInteger type = 3001;
+//            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
+//            NSString *cellName = [cellDataDictionary objectForKey:@"name"];
+//            id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+//
+//            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+//            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+//
+//            TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+//            cell.delegate = userDelegate;
+//            return cell;
+//            //END DV Temp
+           
+//            //DV Temp
+//            NSInteger type = 3002;
+//            NSString *cellName = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
+//            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+//            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+//
+//            id cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+//
+//            return cell;
+//            //END DV Temp
+            
             [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
             TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -492,9 +583,10 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             else {
                 [cell showStatusLabel:NO animated:NO];
             }
-            
+
             return cell;
         }
+
     }
     
     [tableView registerNib:[TAPBaseXIBRotatedTableViewCell cellNib] forCellReuseIdentifier:[TAPBaseXIBRotatedTableViewCell description]];
@@ -674,12 +766,28 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self handleMessageFromSocket:message];
 }
 
+- (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus {
+    _onlineStatus = onlineStatus;
+    NSTimeInterval currentLastSeen = (double)self.onlineStatus.lastActive.doubleValue/1000.0f;
+    [self updateLastSeenWithTimestamp:currentLastSeen];
+}
+
+- (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
+//    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
+    [self setAsTyping:YES];
+}
+
+- (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
+//    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
+    [self setAsTyping:NO];
+}
+
 #pragma mark TAPMyChatBubbleTableViewCell
 - (void)myChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
         NSString *currentMessageString = tappedMessage.body;
-        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] tableName:@"TAPMessageRealmModel" success:^{
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
@@ -794,7 +902,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     }];
 }
 
-#pragma mark TAPYourChatBubbleTableViewCellDelegate
+#pragma mark TAPYourChatBubbleTableViewCell
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
     if (tappedMessage == self.selectedMessage) {
@@ -918,13 +1026,15 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     if (textView.text != nil) {
         if (![textView.text isEqualToString:@""]) {
-            [UIView animateWithDuration:0.2f animations:^{
-                self.keyboardOptionButton.alpha = 0.0f;
-                self.messageViewLeftConstraint.constant = -38.0f;
-                [self.messageTextView layoutIfNeeded];
-                [self.inputMessageAccessoryView layoutIfNeeded];
-                [self.view layoutIfNeeded];
-            }];
+            if(self.isCustomKeyboardAvailable) {
+                [UIView animateWithDuration:0.2f animations:^{
+                    self.keyboardOptionButton.alpha = 0.0f;
+                    self.messageViewLeftConstraint.constant = -38.0f;
+                    [self.messageTextView layoutIfNeeded];
+                    [self.inputMessageAccessoryView layoutIfNeeded];
+                    [self.view layoutIfNeeded];
+                }];
+            }
         }
     }
 }
@@ -932,26 +1042,29 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)growingTextViewDidStartTyping:(RNGrowingTextView *)textView {
     [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessageActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
     self.sendButton.userInteractionEnabled = YES;
-    [UIView animateWithDuration:0.2f animations:^{
-        self.keyboardOptionButton.alpha = 0.0f;
-        self.messageViewLeftConstraint.constant = -38.0f;
-        [self.messageTextView layoutIfNeeded];
-        [self.inputMessageAccessoryView layoutIfNeeded];
-    }];
+    if(self.isCustomKeyboardAvailable) {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.keyboardOptionButton.alpha = 0.0f;
+            self.messageViewLeftConstraint.constant = -38.0f;
+            [self.messageTextView layoutIfNeeded];
+            [self.inputMessageAccessoryView layoutIfNeeded];
+        }];
+    }
     [[TAPChatManager sharedManager] startTyping];
 }
 
 - (void)growingTextViewDidStopTyping:(RNGrowingTextView *)textView {
     [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
     self.sendButton.userInteractionEnabled = NO;
-    [UIView animateWithDuration:0.2f animations:^{
-        self.keyboardOptionButton.alpha = 1.0f;
-        self.messageViewLeftConstraint.constant = 4.0f;
-        [self.messageTextView layoutIfNeeded];
-        [self.inputMessageAccessoryView layoutIfNeeded];
-        [self.view layoutIfNeeded];
-    }];
-    
+    if(self.isCustomKeyboardAvailable) {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.keyboardOptionButton.alpha = 1.0f;
+            self.messageViewLeftConstraint.constant = 4.0f;
+            [self.messageTextView layoutIfNeeded];
+            [self.inputMessageAccessoryView layoutIfNeeded];
+            [self.view layoutIfNeeded];
+        }];
+    }
     [[TAPChatManager sharedManager] stopTyping];
 }
 
@@ -965,9 +1078,17 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     }];
 }
 
-#pragma mark TAPKeyboardViewControllerDelegate
+#pragma mark TAPKeyboardViewController
 - (void)keyboardViewControllerDidSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSLog(@"===> %ld", indexPath.row); //WK Temp
+    if(indexPath.row == 3) {
+        //Create Order Card
+        //CS Temp - Add Order Card Type Dummy Model
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeOrderCard];
+        [self.messageArray insertObject:message atIndex:0];
+        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+        //End Temp
+    }
 }
 
 #pragma mark UIImagePickerController
@@ -983,12 +1104,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
             }
             
+            //CS Temp - Add Image Type Dummy Model
             TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeImage];
             [RNImageView saveImageToCache:selectedImage withKey:message.localID];
             [self.messageArray insertObject:message atIndex:0];
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
             //End Temp
         }
+        [self checkKeyboard];
     }];
 }
 
@@ -1010,7 +1133,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         
         //Update message into array and dictionary
         //Need to take message before data updated to get current sending state
-        TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
         
         TAPUserModel *currentUser = [TAPDataManager getActiveUser];
         
@@ -1026,11 +1148,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
             }
             
-            if(!currentMessage.isDelivered && message.isDelivered) {
+            if(!currentMessage.isDelivered && message.isDelivered && !currentMessage.isRead && !message.isRead) {
                 setAsDelivered = YES;
             }
             
             if(!currentMessage.isRead && message.isRead) {
+                setAsDelivered = NO;
                 setAsRead = YES;
             }
         }
@@ -1044,13 +1167,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
         
         if (isSendingAnimation) {
-            [cell animateSendingIcon];
+            [cell receiveSentEvent];
         }
         else if (setAsDelivered) {
-            [cell setAsDelivered];
+            [cell receiveDeliveredEvent];
         }
         else if (setAsRead) {
-            [cell setAsRead];
+            [cell receiveReadEvent];
         }
         else {
             [cell setMessage:message];
@@ -1085,6 +1208,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
+    
     CGFloat accessoryViewAndSafeAreaHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
     
     //set initial keyboard height to prevent wrong keyboard height usage
@@ -1133,9 +1257,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         CGFloat newYContentOffset = self.tableView.contentOffset.y - keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
+        
         if (newYContentOffset < -tableViewYContentInset) {
             newYContentOffset = -tableViewYContentInset;
         }
+        
         [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
 
         [self.view layoutIfNeeded];
@@ -1165,13 +1291,15 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     if (self.isScrollViewDragged) {
         return;
     }
-    
+
     self.tableView.contentInset = UIEdgeInsetsMake(0.0f, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     
     [UIView animateWithDuration:0.2f animations:^{
-        self.keyboardOptionButton.alpha = 1.0f;
-        self.messageViewLeftConstraint.constant = 4.0f;
+        if(self.isCustomKeyboardAvailable) {
+            self.keyboardOptionButton.alpha = 1.0f;
+            self.messageViewLeftConstraint.constant = 4.0f;
+        }
         
         if (IS_IPHONE_X_FAMILY) {
             self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
@@ -1275,7 +1403,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (IBAction)attachmentButtonDidTapped:(id)sender {
-    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     //    NSMutableAttributedString *documentsAttributedString = [[NSMutableAttributedString alloc] initWithString:@"Documents"];
@@ -1363,19 +1490,22 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [alertController addAction:contactAction];
     [alertController addAction:cancelAction];
     
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
     [UIView animateWithDuration:0.2f animations:^{
-        if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
-            self.isKeyboardWasShowed = YES;
-        }
-        else {
-            self.isKeyboardWasShowed = NO;
-        }
-        [self.view endEditing:YES];
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
         }];
     }];
+   
 }
 
 - (void)backButtonDidTapped {
@@ -1406,6 +1536,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         
         TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
         NSString *roomName = room.name;
+        roomName = [TAPUtil nullToEmptyString:roomName];
         NSString *emptyTitleString = [NSString stringWithFormat:@"%@ is an expert\ndon’t forget to check out her services!", roomName];
         self.emptyTitleLabel.text = NSLocalizedString(emptyTitleString, @"");
         //set attributed string
@@ -1657,8 +1788,17 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     currentMessage.isDeleted = message.isDeleted;
     currentMessage.isSending = message.isSending;
     currentMessage.isFailedSend = message.isFailedSend;
-    currentMessage.isRead = message.isRead;
-    currentMessage.isDelivered = message.isDelivered;
+    
+    if(!currentMessage.isDelivered) {
+        //Update only when ui data is not delivered yet
+        currentMessage.isDelivered = message.isDelivered;
+    }
+    
+    if(!currentMessage.isRead) {
+        //Update only when ui data is not read yet
+        currentMessage.isRead = message.isRead;
+    }
+       
     currentMessage.isHidden = message.isHidden;
 }
 
@@ -1828,7 +1968,9 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     else if (status == AVAuthorizationStatusNotDetermined) {
         //request
         [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-            [self openCamera];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openCamera];
+            });
         }];
     }
     else {
@@ -1854,7 +1996,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)timerRefreshLastSeen {
-    [self updateLastSeenWithTimestamp:self.currentLastSeen];
+    NSTimeInterval currentLastSeen = (double)self.onlineStatus.lastActive.doubleValue/1000.0f;
+    [self updateLastSeenWithTimestamp:currentLastSeen];
 }
 
 - (void)updateLastSeenWithTimestamp:(NSTimeInterval)timestamp {
@@ -1876,7 +2019,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     [self isShowOnlineDotStatus:NO];
     
-    if (timestamp < 0) {
+    if (self.onlineStatus.isOnline) {
         lastSeenString = NSLocalizedString(@"Active Now", @"");
         [self isShowOnlineDotStatus:YES];
     }
@@ -1998,9 +2141,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     //Call Notification Manager remove local notification
     [[TAPNotificationManager sharedManager] removeReadLocalNotificationWithMessage:message];
-    
-    //Call chat manager to decrease unread bubble in room list
-    [[TAPChatManager sharedManager] decreaseUnreadMessageForRoomID:message.room.roomID];
 }
 
 - (void)processVisibleMessageAsRead {
@@ -2027,6 +2167,31 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     }
     else {
         _isNeedRefreshOnNetworkDown = YES;
+    }
+}
+
+- (void)setAsTyping:(BOOL)typing {
+    if(typing) {
+        self.userTypingView.alpha = 1.0f;
+        self.userDescriptionView.alpha = 0.0f;
+    }
+    else {
+        self.userTypingView.alpha = 0.0f;
+        self.userDescriptionView.alpha = 1.0f;
+    }
+}
+
+- (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID {
+    NSArray *roomIDArray = [roomID componentsSeparatedByString:@"-"];
+    if([roomIDArray count] > 0) {
+        for (NSString *userID in roomIDArray) {
+            if(![userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                return userID;
+            }
+        }
+    }
+    else {
+        return @"";
     }
 }
 

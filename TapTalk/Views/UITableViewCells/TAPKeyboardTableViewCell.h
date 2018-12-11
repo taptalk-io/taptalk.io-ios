@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, TAPKeyboardTableViewCellType) {
 @interface TAPKeyboardTableViewCell : TAPBaseXIBTableViewCell
 
 - (void)setKeyboardCellWithType:(TAPKeyboardTableViewCellType)type;
+- (void)setKeyboardCellWithKeyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
 
 @end
 

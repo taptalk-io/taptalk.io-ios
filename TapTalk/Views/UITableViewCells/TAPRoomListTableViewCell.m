@@ -313,6 +313,10 @@
     //Only update unread bubble when count unread from database
     if (updateUnreadBubble) {
         //Unread bubble
+        if(numberOfUnreadMessage < 0) {
+            numberOfUnreadMessage = 0;
+        }
+        
         if (numberOfUnreadMessage == 0) {
             self.bubbleUnreadView.alpha = 0.0f;
             self.bubbleUnreadView.frame = CGRectMake(CGRectGetMinX(self.messageStatusImageView.frame), CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.messageStatusImageView.frame), CGRectGetHeight(self.bubbleUnreadView.frame));

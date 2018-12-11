@@ -20,8 +20,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id<TAPKeyboardViewControllerDelegate> delegate;
 @property (nonatomic) CGFloat keyboardHeight;
+@property (strong, nonatomic) NSArray *customKeyboardArray;
+@property (strong, nonatomic) TAPUserModel *sender;
+@property (strong, nonatomic) TAPUserModel *recipient;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *customInputViewHeightConstraint;
+
+- (void)setCustomKeyboardArray:(NSArray *)customKeyboardArray
+                        sender:(TAPUserModel *)sender
+                     recipient:(TAPUserModel *)recipient;
 
 @end
 

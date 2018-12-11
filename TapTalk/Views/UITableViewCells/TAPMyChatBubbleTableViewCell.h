@@ -6,7 +6,7 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
-#import "TAPBaseXIBRotatedTableViewCell.h"
+#import "TAPBaseMyBubbleTableViewCell.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,15 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface TAPMyChatBubbleTableViewCell : TAPBaseXIBRotatedTableViewCell
+@interface TAPMyChatBubbleTableViewCell : TAPBaseMyBubbleTableViewCell
 
 @property (weak, nonatomic) id<TAPMyChatBubbleTableViewCellDelegate> delegate;
 @property (weak, nonatomic) TAPMessageModel *message;
 
 - (void)setMessage:(TAPMessageModel *)message;
-- (void)animateSendingIcon;
-- (void)setAsDelivered;
-- (void)setAsRead;
+- (void)receiveSentEvent;
+- (void)receiveDeliveredEvent;
+- (void)receiveReadEvent;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
 
 @end

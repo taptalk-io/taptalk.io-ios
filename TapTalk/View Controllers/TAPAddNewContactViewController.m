@@ -19,6 +19,7 @@
 @property (strong, nonatomic) NSString *updatedString;
 
 @property (nonatomic) BOOL wasFailedGetData;
+@property (nonatomic) BOOL isTappedAddContactOrChatNowButton;
 
 - (void)userChatNowButtonDidTapped;
 - (void)addUserToContactButtonDidTapped;
@@ -34,12 +35,6 @@
     _addNewContactView = [[TAPAddNewContactView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     self.addNewContactView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
     [self.view addSubview:self.addNewContactView];
-    
-//    - (void)isShowDefaultLabel:(BOOL)isShow;
-//    - (void)isShowExpertVerifiedLogo:(BOOL)isShow;
-//    - (void)setSearchViewLayoutWithType:(NSInteger)type;
-//    - (void)setSearchExpertButtonWithType:(NSInteger)type;
-//    - (void)setSearchUserButtonWithType:(NSInteger)type;
 }
 
 - (void)viewDidLoad {
@@ -57,6 +52,7 @@
     [self.addNewContactView.searchBarView.searchTextField becomeFirstResponder];
     
     _wasFailedGetData = NO;
+    _isTappedAddContactOrChatNowButton = NO;
     
     _addContactPopupView = [[TAPScanQRCodePopupView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.addContactPopupView.closePopupButton addTarget:self action:@selector(closePopupButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -96,6 +92,8 @@
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    [self.addNewContactView setSearchViewLayoutWithType:LayoutTypeDefault];
     
     if (![trimmedNewString isEqualToString:@""]) {
         self.updatedString = newString;
@@ -139,12 +137,19 @@
     [self.addContactPopupView setPopupViewToDefault];
     [self.addContactPopupView showPopupView:NO animated:NO];
     
-    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+    if([self.delegate respondsToSelector:@selector(addNewContactViewControllerShouldOpenNewRoomWithUser:)]) {
+        NSLog(@"SEARCHED USER: %@", [self.searchedUser description]);
+        
+        NSString *stringFromModel = [self.searchedUser toJSONString];
+        [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
+    }
     
-    //CS NOTE - Remove this VC in Navigation Stack to skip on pop
-    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
-    [navigationArray removeObject:self];
-    self.navigationController.viewControllers = navigationArray;
+//    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+//
+//    //CS NOTE - Remove this VC in Navigation Stack to skip on pop
+//    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
+//    [navigationArray removeObject:self];
+//    self.navigationController.viewControllers = navigationArray;
 }
 
 - (void)addUserToContactButtonDidTapped {
@@ -154,6 +159,10 @@
         [self.addContactPopupView showPopupView:YES animated:YES];
         [self.addContactPopupView animateExpandingView];
         [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
+        
+        //Add user to Contact Manager
+        self.searchedUser.isContact = YES;
+        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
         
         //Refresh Contact List From API
         [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
@@ -173,6 +182,11 @@
 
 - (void)addExpertToContactButtonDidTapped {
     [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+        
+        //Add user to Contact Manager
+        self.searchedUser.isContact = YES;
+        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
+        
         [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
         [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
         [self.addContactPopupView showPopupView:YES animated:YES];
@@ -186,6 +200,7 @@
 }
 
 - (void)reloadDataWithString {
+
     if ([self.updatedString isEqualToString:@""]) {
         _wasFailedGetData = NO;
         _searchedUser = nil;

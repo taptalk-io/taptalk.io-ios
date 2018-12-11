@@ -151,7 +151,7 @@
     }
     
     //Insert message to database
-    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[decryptedMessage] tableName:@"TAPMessageRealmModel" success:^{
+    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[decryptedMessage] success:^{
         //Update application badge
         [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
     } failure:^(NSError *error) {

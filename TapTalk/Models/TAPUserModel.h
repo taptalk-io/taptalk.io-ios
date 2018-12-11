@@ -29,5 +29,6 @@
 //Optional
 @property (nonatomic) BOOL isRequestPending;
 @property (nonatomic) BOOL isRequestAccepted;
+@property (nonatomic) BOOL isContact;
 
 @end

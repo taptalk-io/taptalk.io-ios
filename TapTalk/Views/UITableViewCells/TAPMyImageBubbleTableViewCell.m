@@ -92,7 +92,7 @@
             self.blurView.alpha = 0.0f;
         } completion:^(BOOL finished) {
             [self.blurView removeFromSuperview];
-            [self animateSendingIcon];
+            [self receiveSentEvent];
             _isDownloaded = YES;
         }];
     }];
@@ -121,49 +121,8 @@
 
 #pragma mark - Custom Method
 - (void)setMessage:(TAPMessageModel *)message {
-    _message = message;
-
-    if (message.isRead) {
-        //MESSAGE IS READ BY RECIPIENT
-        self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconReadChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.replyButton.alpha = 1.0f;
-        self.statusIconImageView.alpha = 1.0f;
-        
-        self.replyButtonRightConstraint.constant = 2.0f;
-        self.statusIconRightConstraint.constant = 2.0f;
-    }
-    else if (message.isDelivered) {
-        //MESSAGE IS DELIVERED TO RECIPIENT
-        self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDeliveredChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.replyButton.alpha = 1.0f;
-        self.statusIconImageView.alpha = 1.0f;
-        
-        self.replyButtonRightConstraint.constant = 2.0f;
-        self.statusIconRightConstraint.constant = 2.0f;
-    }
-    else if (message.isSending) {
-        //MESSAGE IS BEING SENT
-        self.chatBubbleRightConstraint.constant = 32.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.replyButton.alpha = 1.0f;
-        self.statusIconImageView.alpha = 1.0f;
-        self.sendingIconImageView.alpha = 1.0f;
-        
-        self.replyButtonRightConstraint.constant = -28.0f;
-        self.statusIconRightConstraint.constant = -17.0f;
-    }
-    else {
-        //MESSAGE IS SENT
-        self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.replyButton.alpha = 1.0f;
-        self.statusIconImageView.alpha = 1.0f;
-        
-        self.replyButtonRightConstraint.constant = 2.0f;
-        self.statusIconRightConstraint.constant = 2.0f;
-    }
+   
+    [super setMessage:message];
     
     UIImage *selectedImage = [RNImageView imageFromCacheWithKey:message.localID];
     selectedImage = [self compressImage:selectedImage];
@@ -179,85 +138,25 @@
     [self.bubbleImageView setImage:selectedImage];
 }
 
-- (void)animateSendingIcon {
-    self.chatBubbleRightConstraint.constant = 32.0f;
-    self.sendingIconLeftConstraint.constant = 4.0f;
-    self.sendingIconImageView.alpha = 1.0f;
-    self.sendingIconBottomConstraint.constant = -5.0f;
-    
-    //WK Temp
-    self.message.isSending = NO; //WK Temp
-    NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
-    
-    NSDate *currentDate = [NSDate date];
-    NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-    
-    NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
-    NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
-    [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
-    midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
-    NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
-    
-    NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
-    NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
-    
-    NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
-    
-    NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
-    NSString *lastMessageDateString = @"";
-    if (timeGap <= midnightTimeGap) {
-        //Today
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.dateFormat = @"HH:mm";
-        NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
-    }
-    else if (timeGap <= 86400.0f + midnightTimeGap) {
-        //Yesterday
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.dateFormat = @"HH:mm";
-        NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
-    }
-    else {
-        //Set date
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
-        
-        NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
-    }
-    
-    NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
-    //End Temp
-    
-    [UIView animateWithDuration:0.16f delay:0.2f options:UIViewAnimationOptionCurveLinear animations:^{
-        self.chatBubbleRightConstraint.constant = 16.0f;
-        
-        self.replyButtonRightConstraint.constant = 2.0f;
-        self.statusIconRightConstraint.constant = 2.0f;
-        [self.contentView layoutIfNeeded];
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.sendingIconLeftConstraint.constant = 20.0f;
-            [self.contentView layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            self.sendingIconLeftConstraint.constant = 4.0f;
-            self.sendingIconImageView.alpha = 0.0f;
-            self.statusLabel.text = statusString; //WK Temp
-            [self setMessage:self.message];
-        }];
-    }];
-    
-    [UIView animateWithDuration:0.36f delay:0.2f options:UIViewAnimationOptionCurveLinear animations:^{
-        self.sendingIconBottomConstraint.constant = -28.0f;
-        [self.contentView layoutIfNeeded];
-    } completion:^(BOOL finished) {
-        self.sendingIconBottomConstraint.constant = -5.0f;
-    }];
+- (void)receiveSentEvent {
+    [super receiveSentEvent];
+}
+
+- (void)receiveDeliveredEvent {
+    [super receiveDeliveredEvent];
+}
+
+- (void)receiveReadEvent {
+    [super receiveReadEvent];
+}
+
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
+    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon];
 }
 
 - (IBAction)replyButtonDidTapped:(id)sender {
+    [super replyButtonDidTapped:sender];
+    
     if ([self.delegate respondsToSelector:@selector(myImageReplyDidTapped)]) {
         [self.delegate myImageReplyDidTapped];
     }

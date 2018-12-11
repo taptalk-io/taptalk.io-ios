@@ -60,7 +60,9 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
         [reversedSubstringLocalID appendString:[substringLocalID substringWithRange:subStrRange]];
     }
     
-    NSString *password = [NSString stringWithFormat:@"%@%@", kKeyPasswordEncryptor, reversedSubstringLocalID];
+    //password is generated based on 16 first characters of kKeyPasswordEncryptor + reversedSubstringLocalID
+    NSString *substringKeyPassword = [kKeyPasswordEncryptor substringWithRange:NSMakeRange(0, 16)];
+    NSString *password = [NSString stringWithFormat:@"%@%@", substringKeyPassword, reversedSubstringLocalID];
     
     NSInteger messageLength = [message.body length];
     NSInteger localIDLength = [localID length];
@@ -100,7 +102,9 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
         [reversedSubstringLocalID appendString:[substringLocalID substringWithRange:subStrRange]];
     }
     
-    NSString *password = [NSString stringWithFormat:@"%@%@", kKeyPasswordEncryptor, reversedSubstringLocalID];
+    //password is generated based on 16 first characters of kKeyPasswordEncryptor + reversedSubstringLocalID
+    NSString *substringKeyPassword = [kKeyPasswordEncryptor substringWithRange:NSMakeRange(0, 16)];
+    NSString *password = [NSString stringWithFormat:@"%@%@", substringKeyPassword, reversedSubstringLocalID];
     
     NSString *encryptedMessageWithSalt = message.body;
     NSInteger encryptedMessageLength = [encryptedMessageWithSalt length] - 2; //-2 for removing random number and salt character

@@ -18,6 +18,7 @@
 
 #import "TAPUserModel.h"
 #import "TAPMessageModel.h"
+#import "TAPCustomKeyboardItemModel.h"
 
 //! Project version number for TapTalk.
 FOUNDATION_EXPORT double TapTalkVersionNumber;
@@ -40,6 +41,15 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 - (void)tapTalkShouldResetAuthTicket;
 - (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message;
+
+@optional
+//Custom Keyboard
+- (void)tapTalkCustomKeyboardDidTappedWithSender:(TAPUserModel *)sender
+                                       recipient:(TAPUserModel *)recipient
+                                    keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
+
+- (NSArray<TAPCustomKeyboardItemModel *> *)tapTalkCustomKeyboardForSender:(TAPUserModel *)sender
+                                                                recipient:(TAPUserModel *)recipient;
 
 @end
 
@@ -83,10 +93,25 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (void)handleException:(NSException *)exception;
 
 //Custom Method
+//General Set Up
 - (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow;
 - (void)setEnvironment:(TapTalkEnvironment)environment;
+- (UINavigationController *)getCurrentTapTalkActiveNavigationController;
+- (UIViewController *)getCurrentTapTalkActiveViewController;
+
+//Chat
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser fromNavigationController:(UINavigationController *)navigationController;
 - (void)openRoomWithRoom:(TAPRoomModel *)room fromNavigationController:(UINavigationController *)navigationController;
 - (void)shouldRefreshAuthTicket;
+
+//Custom Keyboard
+- (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender
+                              recipient:(TAPUserModel *)recipient;
+- (void)customKeyboardDidTappedWithSender:(TAPUserModel *)sender
+                                recipient:(TAPUserModel *)recipient
+                             keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
+
+//Custom Bubble
+- (void)addCustomBubbleDataWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate;
 
 @end

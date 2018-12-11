@@ -10,12 +10,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, OrderCardSenderType) {
-    OrderCardSenderTypeMy = 0,
-    OrderCardSenderTypeYour = 1
+typedef NS_ENUM(NSInteger, TAPOrderCardSenderType) {
+    TAPOrderCardSenderTypeMy = 0,
+    TAPOrderCardSenderTypeYour = 1
 };
 
-@protocol OrderCardBubbleTableViewCellDelegate <NSObject>
+@protocol TAPOrderCardBubbleTableViewCellDelegate <NSObject>
 
 - (void)orderCardBubbleDidTappedHeaderButtonDidTapped;
 - (void)orderCardBubbleDidTappedOrderStatusButtonDidTapped;
@@ -31,9 +31,11 @@ typedef NS_ENUM(NSInteger, OrderCardSenderType) {
 
 @interface TAPOrderCardBubbleTableViewCell : TAPBaseXIBRotatedTableViewCell
 
-@property (weak, nonatomic) id<OrderCardBubbleTableViewCellDelegate> delegate;
+@property (weak, nonatomic) id<TAPOrderCardBubbleTableViewCellDelegate> delegate;
 
-@property (nonatomic) OrderCardSenderType *orderCardSenderType;
+@property (nonatomic) TAPOrderCardSenderType *orderCardSenderType;
+
+- (void)setOrderCardWithType:(NSInteger)type; //CS TEMP - Dummy Set Data
 
 @end
 

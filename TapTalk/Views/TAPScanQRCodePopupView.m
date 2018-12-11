@@ -293,7 +293,11 @@
     [self.currentUserImageView setImageWithURLString:currentUserProfileImage];
     
     NSString *addedUserFullName = user.fullname;
+    addedUserFullName = [TAPUtil nullToEmptyString:addedUserFullName];
+    
     NSString *addedUserUsername = user.username;
+    addedUserUsername = [TAPUtil nullToEmptyString:addedUserUsername];
+    
     NSString *addedUserProfileImage = user.imageURL.thumbnail;
     addedUserProfileImage = [TAPUtil nullToEmptyString:addedUserProfileImage];
     

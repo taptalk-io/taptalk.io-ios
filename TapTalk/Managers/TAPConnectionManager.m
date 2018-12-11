@@ -27,6 +27,8 @@
 @property (nonatomic) NSInteger reconnectAttempt;
 @property (nonatomic) BOOL isShouldReconnect;
 
+@property (strong, nonatomic) NSMutableArray *delegatesArray;
+
 - (void)tryToReconnect;
 - (void)reconnect;
 
@@ -51,6 +53,8 @@
     if (self) {
         _tapConnectionStatus = TAPConnectionManagerStatusTypeNotConnected;
         _socketURL = [[NSString alloc] init];
+        
+        _delegatesArray = [[NSMutableArray alloc] init];
     }
     
     return self;
@@ -73,8 +77,10 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_CONNECTED object:nil];
     
-    if ([self.delegate respondsToSelector:@selector(connectionManagerDidConnected)]) {
-        [self.delegate connectionManagerDidConnected];
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(connectionManagerDidConnected)]) {
+            [delegate connectionManagerDidConnected];
+        }
     }
 }
 
@@ -95,8 +101,10 @@
         NSString *eventName = [messageDictionary objectForKey:@"eventName"];
         NSDictionary *dataDictionary = [messageDictionary objectForKey:@"data"];
         
-        if ([self.delegate respondsToSelector:@selector(connectionManagerDidReceiveNewEmit:parameter:)]) {
-            [self.delegate connectionManagerDidReceiveNewEmit:eventName parameter:dataDictionary];
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(connectionManagerDidReceiveNewEmit:parameter:)]) {
+                [delegate connectionManagerDidReceiveNewEmit:eventName parameter:dataDictionary];
+            }
         }
     }
 }
@@ -110,8 +118,10 @@
     
     _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
     
-    if ([self.delegate respondsToSelector:@selector(connectionManagerDidReceiveError:)]) {
-        [self.delegate connectionManagerDidReceiveError:error];
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(connectionManagerDidReceiveError:)]) {
+            [delegate connectionManagerDidReceiveError:error];
+        }
     }
     
     [self tryToReconnect];
@@ -126,12 +136,14 @@
     
     _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
     
-    if ([self.delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
-        if (reason == nil) {
-            reason = @"";
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
+            if (reason == nil) {
+                reason = @"";
+            }
+            
+            [delegate connectionManagerDidDisconnectedWithCode:code reason:reason cleanClose:wasClean];
         }
-        
-        [self.delegate connectionManagerDidDisconnectedWithCode:code reason:reason cleanClose:wasClean];
     }
     
     [self tryToReconnect];
@@ -152,8 +164,10 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_CONNECTING object:nil];
     
-    if ([self.delegate respondsToSelector:@selector(connectionManagerIsConnecting)]) {
-        [self.delegate connectionManagerIsConnecting];
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(connectionManagerIsConnecting)]) {
+            [delegate connectionManagerIsConnecting];
+        }
     }
     
     _webSocket.delegate = nil;
@@ -188,8 +202,10 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_RECONNECTING object:nil];
     
-    if ([self.delegate respondsToSelector:@selector(connectionManagerIsReconnecting)]) {
-        [self.delegate connectionManagerIsReconnecting];
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(connectionManagerIsReconnecting)]) {
+            [delegate connectionManagerIsReconnecting];
+        }
     }
     
     [self connect];
@@ -230,8 +246,10 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_DISCONNECTED object:nil];
     
-    if ([self.delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
-        [self.delegate connectionManagerDidDisconnectedWithCode:1 reason:@"User close connection" cleanClose:YES];
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
+            [delegate connectionManagerDidDisconnectedWithCode:1 reason:@"User close connection" cleanClose:YES];
+        }
     }
 }
 
@@ -280,6 +298,20 @@
     else {
         _socketURL = kSocketURLDevelopment;
     }
+}
+
+- (void)addDelegate:(id)delegate {
+    if ([self.delegatesArray containsObject:delegate]) {
+        return;
+    }
+    
+    NSLog(@"[WARNING] ConnectionManager - Do not forget to remove the delegate object, since an object can't weak retained in an array, also please remove this delegate before dealloc or the delegate will always retained");
+    
+    [self.delegatesArray addObject:delegate];
+}
+
+- (void)removeDelegate:(id)delegate {
+    [self.delegatesArray removeObject:delegate];
 }
 
 @end

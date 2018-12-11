@@ -24,7 +24,7 @@
 //WK Note - addNewChatView.searchResultTableView tableViewCell
 #import "TAPNewChatAddNewContactTableViewCell.h"
 
-@interface TAPAddNewChatViewController () <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface TAPAddNewChatViewController () <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, TAPAddNewContactViewControllerDelegate>
 
 @property (strong, nonatomic) TAPAddNewChatView *addNewChatView;
 
@@ -318,7 +318,7 @@
 }
 
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
-    if (tableView == self.addNewChatView.contactsTableView) {
+    if (tableView == self.addNewChatView.contactsTableView && [self.indexSectionDictionary count] >= 5) {
         NSArray *keysArray = [self.indexSectionDictionary allKeys];
         NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
         keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
@@ -357,6 +357,7 @@
             if (indexPath.row == 0) {
                 //New Contact
                 TAPAddNewContactViewController *addNewContactViewController = [[TAPAddNewContactViewController alloc] init];
+                addNewContactViewController.delegate = self;
                 [self.navigationController pushViewController:addNewContactViewController animated:YES];
             }
             else if (indexPath.row == 1) {
@@ -395,7 +396,12 @@
             }
             else {
                 TAPUserModel *selectedUser = [self.contactListDictionary objectForKey:selectedUsername];
-                [[TapTalk sharedInstance] openRoomWithOtherUser:selectedUser fromNavigationController:self.navigationController];
+                
+                [self dismissViewControllerAnimated:YES completion:^{
+                    if([self.delegate respondsToSelector:@selector(addNewChatViewControllerShouldOpenNewRoomWithUser:)]) {
+                        [self.delegate addNewChatViewControllerShouldOpenNewRoomWithUser:selectedUser];
+                    }
+                }];
             }
         }
         else if (indexPath.section == [tableView numberOfSections] - 1) {
@@ -407,6 +413,7 @@
     else if (tableView == self.addNewChatView.searchResultTableView) {
         if (indexPath.section == [tableView numberOfSections] - 1) {
             TAPAddNewContactViewController *addNewContactViewController = [[TAPAddNewContactViewController alloc] init];
+            addNewContactViewController.delegate = self;
             [self.navigationController pushViewController:addNewContactViewController animated:YES];
         }
         else {
@@ -427,7 +434,12 @@
             }
             else {
                 TAPUserModel *selectedUser = [self.contactListDictionary objectForKey:selectedUsername];
-                [[TapTalk sharedInstance] openRoomWithOtherUser:selectedUser fromNavigationController:self.navigationController];
+                
+                [self dismissViewControllerAnimated:YES completion:^{
+                    if([self.delegate respondsToSelector:@selector(addNewChatViewControllerShouldOpenNewRoomWithUser:)]) {
+                        [self.delegate addNewChatViewControllerShouldOpenNewRoomWithUser:selectedUser];
+                    }
+                }];
             }
         }
     }
@@ -511,6 +523,15 @@
     }
     
     return YES;
+}
+
+#pragma mark TAPAddNewContactViewController
+- (void)addNewContactViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user {
+    [self dismissViewControllerAnimated:YES completion:^{
+        if([self.delegate respondsToSelector:@selector(addNewChatViewControllerShouldOpenNewRoomWithUser:)]) {
+            [self.delegate addNewChatViewControllerShouldOpenNewRoomWithUser:user];
+        }
+    }];
 }
 
 #pragma mark - Custom Method

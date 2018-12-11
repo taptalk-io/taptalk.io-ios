@@ -67,7 +67,7 @@
 @property (strong, nonatomic) IBOutlet UIView *userActionView;
 
 @property (strong, nonatomic) IBOutlet UIView *orderStatusView;
-@property (strong, nonatomic) IBOutlet UIView *orderStatusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *orderStatusLabel;
 @property (strong, nonatomic) IBOutlet UIButton *orderStatusButton;
 
 @property (strong, nonatomic) IBOutlet UIView *reviewConfirmActionView;
@@ -102,6 +102,11 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *additionalCostViewHeightLayoutConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *discountViewHeightLayoutConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *orderCardViewLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *activeOrderViewHeightLayoutConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *markFinishViewHeightLayoutConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *userActionViewHeightLayoutConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *recipientViewHeightLayoutConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *totalPriceViewHeightLayoutConstraint;
 
 - (void)showMoreProductView:(BOOL)isShow;
 - (void)showCourierView:(BOOL)isShow;
@@ -110,6 +115,11 @@
 - (void)showDiscountView:(BOOL)isShow;
 - (void)showAdditionalCostDotView:(BOOL)isShow;
 - (void)showDiscountDotView:(BOOL)isShow;
+- (void)showActiveOrderView:(BOOL)isShow;
+- (void)showMarkFinishView:(BOOL)isShow;
+- (void)showUserActionView:(BOOL)isShow;
+- (void)showRecipientView:(BOOL)isShow;
+- (void)showTotalPriceView:(BOOL)isShow;
 - (void)showUserActionViewWithType:(NSInteger)type;
 
 - (IBAction)headerButtonDidTapped:(id)sender;
@@ -181,7 +191,7 @@
     self.timePlaceholderLabel.text = NSLocalizedString(@"Due Time", @"");
     
     //CS Temp
-    [self setOrderCardSenderType:OrderCardSenderTypeMy];
+    [self setTAPOrderCardSenderType:TAPOrderCardSenderTypeMy];
     //END CS Temp
 }
 
@@ -208,9 +218,11 @@
 
 - (void)showCourierView:(BOOL)isShow {
     if (isShow) {
+        self.courierView.alpha = 1.0f;
         self.courierViewHeightLayoutConstraint.constant = 48.0f;
     }
     else {
+        self.courierView.alpha = 0.0f;
         self.courierViewHeightLayoutConstraint.constant = 0.0f;
     }
 }
@@ -257,6 +269,56 @@
     }
     else {
         self.discountDotView.alpha = 0.0f;
+    }
+}
+
+- (void)showActiveOrderView:(BOOL)isShow {
+    if (isShow) {
+        self.activeOrderViewHeightLayoutConstraint.constant = 40.0f;
+    }
+    else {
+        self.activeOrderViewHeightLayoutConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showMarkFinishView:(BOOL)isShow {
+    if (isShow) {
+        self.markFinishViewHeightLayoutConstraint.constant = 92.0f;
+    }
+    else {
+        self.markFinishViewHeightLayoutConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showUserActionView:(BOOL)isShow {
+    if (isShow) {
+        self.userActionViewHeightLayoutConstraint.constant = 40.0f;
+    }
+    else {
+        self.userActionViewHeightLayoutConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showRecipientView:(BOOL)isShow {
+    if (isShow) {
+        self.recipientViewHeightLayoutConstraint.active = NO;
+        self.recipientView.alpha = 1.0f;
+    }
+    else {
+        self.recipientViewHeightLayoutConstraint.active = YES;
+        self.recipientViewHeightLayoutConstraint.constant = 0.0f;
+        self.recipientView.alpha = 0.0f;
+    }
+}
+
+- (void)showTotalPriceView:(BOOL)isShow {
+    if (isShow) {
+        self.totalPriceViewHeightLayoutConstraint.constant = 48.0f;
+        self.totalPriceView.alpha = 1.0f;
+    }
+    else {
+        self.totalPriceViewHeightLayoutConstraint.constant = 0.0f;
+        self.totalPriceView.alpha = 0.0f;
     }
 }
 
@@ -345,17 +407,451 @@
     }
 }
 
-- (void)setOrderCardSenderType:(OrderCardSenderType *)orderCardSenderType {
-    _orderCardSenderType = orderCardSenderType;
-    if (self.orderCardSenderType == OrderCardSenderTypeMy) {
+- (void)setTAPOrderCardSenderType:(TAPOrderCardSenderType *)tapOrderCardSenderType {
+    _orderCardSenderType = tapOrderCardSenderType;
+    if (self.orderCardSenderType == TAPOrderCardSenderTypeMy) {
         self.orderCardView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
         self.orderCardViewLeadingConstraint.constant = 16.0f;
 
     }
-    else if (self.orderCardSenderType == OrderCardSenderTypeYour){
+    else if (self.orderCardSenderType == TAPOrderCardSenderTypeYour){
         self.orderCardView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
         self.orderCardViewLeadingConstraint.constant = CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.orderCardView.frame) - 16.0f;
     }
 }
 
+- (void)setOrderCardWithType:(NSInteger)type { //CS TEMP - Dummy Set Data
+    //1 - Review and Confirm
+    //2 - Waiting Confirmation
+    //3 - Pay Now
+    //4 - Order Expired
+    //5 - Order Overpaid
+    //6 - Order Declined
+    //7 - Order Canceled
+    //8 - Order Reported
+    //9 - Write Review
+    //10 - Mark as Finish
+    //11 - Waiting User Confirmation
+    //12 - Active Order
+    //13 - Waiting Payment
+
+    self.orderIDLabel.text = @"MD-7WN5PAR1";
+    [self.productImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL];
+    self.productNameLabel.text = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit…";
+    self.productPriceLabel.text = @"Rp. 1.930.000";
+    
+    NSInteger qty = 3;
+    self.quantityLabel.text = [NSString stringWithFormat:@"%@ %ld", NSLocalizedString(@"Quantity:", @""), qty];
+    
+    NSInteger itemQty = 5;
+    if(itemQty > 1) {
+        [self showMoreProductView:YES];
+        self.moreProductLabel.text = [NSString stringWithFormat:@"And %ld more items", itemQty - 1];
+    }
+    else {
+        [self showMoreProductView:NO];
+        self.moreProductLabel.text = @"";
+    }
+    
+    self.recipientLabel.text = @"Bernama Badi Sabur\n081297304401\nJalan Kyai Maja No. 25C, Gunung, Kebayoran Baru, RT.12/RW.2, Gunung, Kby. Baru, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12120";
+    
+    self.courierTypeLabel.text = @"Instant Courier";
+    self.courierCostLabel.text = @"Rp 30.000";
+    [self.courierLogoImageView setImageWithURLString:@"https://www.keestore.com/wp-content/uploads/2018/05/go-send-by-go-jek-logo.png"];
+    
+    self.totalPriceLabel.text = @"Rp. 3.890.000";
+    
+    self.dateLabel.text = @"Fri 09 Nov 2018";
+    self.timeLabel.text = @"18:30";
+    
+    self.additionalCostLabel.text = @"Rp. 100.000";
+    self.discountLabel.text = @"(Rp. 100.000)";
+    
+    self.notesLabel.text = @"Mauris non tempor quam, et lacinia sapien. Mau…";
+    
+    BOOL isAdditional = YES;
+    BOOL isDiscount = YES;
+    BOOL isHasNotes = YES;
+    BOOL isHasCourier = YES;
+    
+    if (type == 1) {
+        //1 - Review and Confirm
+        if (isHasNotes) {
+            [self showNotesView:YES];
+        }
+        else {
+            [self showNotesView:NO];
+
+        }
+        
+        if (isAdditional) {
+            [self showAdditionalCostView:YES];
+        }
+        else {
+            [self showAdditionalCostView:NO];
+        }
+        
+        if (isDiscount) {
+            [self showDiscountView:YES];
+        }
+        else {
+            [self showDiscountView:NO];
+        }
+        
+        if (isHasCourier) {
+            [self showCourierView:YES];
+        }
+        else {
+            [self showCourierView:NO];
+        }
+        
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showRecipientView:YES];
+        [self showTotalPriceView:YES];
+        self.orderStatusView.alpha = 0.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 1.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+    }
+    else if (type == 2) {
+        //2 - Waiting Confirmation
+        if (isHasNotes) {
+            [self showNotesView:YES];
+        }
+        else {
+            [self showNotesView:NO];
+        }
+        
+        if (isAdditional) {
+            [self showAdditionalCostView:YES];
+        }
+        else {
+            [self showAdditionalCostView:NO];
+        }
+        
+        if (isDiscount) {
+            [self showDiscountView:YES];
+        }
+        else {
+            [self showDiscountView:NO];
+        }
+        
+        if (isHasCourier) {
+            [self showCourierView:YES];
+        }
+        else {
+            [self showCourierView:NO];
+        }
+        
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showRecipientView:YES];
+        [self showTotalPriceView:YES];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Waiting Confirmation", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"FF9049"];
+    }
+    else if (type == 3) {
+        //3 - Pay Now
+        if (isHasNotes) {
+            [self showNotesView:YES];
+        }
+        else {
+            [self showNotesView:NO];
+            
+        }
+        
+        if (isAdditional) {
+            [self showAdditionalCostView:YES];
+        }
+        else {
+            [self showAdditionalCostView:NO];
+        }
+        
+        if (isDiscount) {
+            [self showDiscountView:YES];
+        }
+        else {
+            [self showDiscountView:NO];
+        }
+        
+        if (isHasCourier) {
+            [self showCourierView:YES];
+        }
+        else {
+            [self showCourierView:NO];
+        }
+        
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showRecipientView:YES];
+        [self showTotalPriceView:YES];
+        self.orderStatusView.alpha = 0.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 1.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+    }
+    else if (type == 4) {
+        //4 - Order Expired
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Order Expired", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"EC2C2B"];
+    }
+    else if (type == 5) {
+        //5 - Order Overpaid
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Order Overpaid", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"EC2C2B"];
+    }
+    else if (type == 6) {
+        //6 - Order Declined
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Order Declined", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"EC2C2B"];
+    }
+    else if (type == 7) {
+        //7 - Order Canceled
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Order Canceled", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"EC2C2B"];
+    }
+    else if (type == 8) {
+        //8 - Order Reported
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Order Reported", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"EC2C2B"];
+    }
+    else if (type == 9) {
+        //9 - Write Review
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:YES];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 0.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 1.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+    }
+    else if (type == 10) {
+        //10 - Mark as Finish
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:YES];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 0.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 1.0f;
+    }
+    else if (type == 11) {
+        //11 - Waiting User Confirmation
+        if (isHasNotes) {
+            [self showNotesView:YES];
+        }
+        else {
+            [self showNotesView:NO];
+        }
+        
+        if (isAdditional) {
+            [self showAdditionalCostView:YES];
+        }
+        else {
+            [self showAdditionalCostView:NO];
+        }
+        
+        if (isDiscount) {
+            [self showDiscountView:YES];
+        }
+        else {
+            [self showDiscountView:NO];
+        }
+        
+        if (isHasCourier) {
+            [self showCourierView:YES];
+        }
+        else {
+            [self showCourierView:NO];
+        }
+        
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showRecipientView:YES];
+        [self showTotalPriceView:YES];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Waiting User Confirmation", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"FF9049"];
+    }
+    else if (type == 13) {
+        //13 - Waiting Payment
+        if (isHasNotes) {
+            [self showNotesView:YES];
+        }
+        else {
+            [self showNotesView:NO];
+        }
+        
+        if (isAdditional) {
+            [self showAdditionalCostView:YES];
+        }
+        else {
+            [self showAdditionalCostView:NO];
+        }
+        
+        if (isDiscount) {
+            [self showDiscountView:YES];
+        }
+        else {
+            [self showDiscountView:NO];
+        }
+        
+        if (isHasCourier) {
+            [self showCourierView:YES];
+        }
+        else {
+            [self showCourierView:NO];
+        }
+        
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showRecipientView:YES];
+        [self showTotalPriceView:YES];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Waiting Payment", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"FF9049"];
+    }
+    else if (type == 12) {
+        //12 - Active Order
+        [self showNotesView:NO];
+        [self showAdditionalCostView:NO];
+        [self showDiscountView:NO];
+        [self showMarkFinishView:NO];
+        [self showActiveOrderView:NO];
+        [self showNotesView:NO];
+        [self showCourierView:NO];
+        [self showRecipientView:NO];
+        [self showTotalPriceView:NO];
+        self.orderStatusView.alpha = 1.0f;
+        self.updateCostActionView.alpha = 0.0f;
+        self.confirmPaymentActionView.alpha = 0.0f;
+        self.reviewOrderActionView.alpha = 0.0f;
+        self.reviewConfirmActionView.alpha = 0.0f;
+        self.markFinishedActionView.alpha = 0.0f;
+        
+        self.orderStatusLabel.text = NSLocalizedString(@"Active Order", @"");
+        self.orderStatusLabel.textColor = [TAPUtil getColor:@"2ECCAD"];
+    }
+    
+}
 @end

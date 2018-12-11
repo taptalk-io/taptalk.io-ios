@@ -32,10 +32,13 @@ typedef NS_ENUM(NSInteger, TAPConnectionManagerStatusType) {
 
 @interface TAPConnectionManager : NSObject
 
-@property (weak, nonatomic) id<TAPConnectionManagerDelegate> delegate;
 @property (nonatomic) TAPConnectionManagerStatusType tapConnectionStatus;
 
 + (TAPConnectionManager *)sharedManager;
+
+#warning Do not forget to remove the delegate object, since an object can't weak retained in an array, also please remove this delegate before dealloc or the delegate will always retained
+- (void)addDelegate:(id <TAPConnectionManagerDelegate>)delegate;
+- (void)removeDelegate:(id <TAPConnectionManagerDelegate>)delegate;
 
 - (void)connect;
 - (void)sendEmit:(NSString *)eventName parameters:(NSDictionary *)parameterDictionary;

@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C3556F5121495F73D2A73AB668402911"
+               BlueprintIdentifier = "22205FE8E1A4CC5CABBF52F7B97B84C3"
                BlueprintName = "Pods-TapTalk"
                ReferencedContainer = "container:Pods.xcodeproj"
                BuildableName = "Pods-TapTalk.framework">

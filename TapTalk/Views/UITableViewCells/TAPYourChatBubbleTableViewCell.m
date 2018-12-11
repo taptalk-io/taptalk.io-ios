@@ -30,7 +30,7 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyMessageLabelLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyMessageLabelTrailingConstraint;
 
-- (void)showReplyView:(BOOL)show withMessasge:(TAPMessageModel *)message;
+- (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 
 @end
 
@@ -77,7 +77,7 @@
 //        isReply = NO;
 //    }
     
-    [self showReplyView:isReply withMessasge:message];
+    [self showReplyView:isReply withMessage:message];
     //End Temp
     
     self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
@@ -180,7 +180,7 @@
     }
 }
 
-- (void)showReplyView:(BOOL)show withMessasge:(TAPMessageModel *)message {
+- (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
         self.replyNameLabel.text = message.user.fullname;
         self.replyMessageLabel.text = message.body;
