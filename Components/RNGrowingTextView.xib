@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Lato-Regular.ttf">
+            <string>Lato-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RNGrowingTextView">
+            <connections>
+                <outlet property="placeholderLabel" destination="fi7-5S-4nc" id="rYP-U2-zEe"/>
+                <outlet property="textView" destination="0si-uy-XPq" id="wvV-3a-BMa"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="323" height="28"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textView multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="0si-uy-XPq">
+                    <rect key="frame" x="0.0" y="0.0" width="323" height="28"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
+                    <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="calibratedRGB"/>
+                    <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="15"/>
+                    <textInputTraits key="textInputTraits"/>
+                    <connections>
+                        <outlet property="delegate" destination="-1" id="jkD-HB-QV8"/>
+                    </connections>
+                </textView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Send a message…" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fi7-5S-4nc">
+                    <rect key="frame" x="0.0" y="4" width="323" height="24"/>
+                    <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="15"/>
+                    <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="fi7-5S-4nc" secondAttribute="trailing" id="5qS-Ci-geG"/>
+                <constraint firstAttribute="bottom" secondItem="fi7-5S-4nc" secondAttribute="bottom" id="Fza-as-f4x"/>
+                <constraint firstItem="fi7-5S-4nc" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Jf6-Ob-L69"/>
+                <constraint firstAttribute="bottom" secondItem="0si-uy-XPq" secondAttribute="bottom" id="Qes-qi-bza"/>
+                <constraint firstAttribute="trailing" secondItem="0si-uy-XPq" secondAttribute="trailing" id="Tq2-dY-rCg"/>
+                <constraint firstItem="fi7-5S-4nc" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="4" id="U7C-Le-hsh"/>
+                <constraint firstItem="0si-uy-XPq" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Y8n-zy-6tm"/>
+                <constraint firstItem="0si-uy-XPq" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="hqP-yF-jHS"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="32.799999999999997" y="120.53973013493254"/>
+        </view>
+    </objects>
+</document>
