@@ -65,5 +65,6 @@
 - (void)saveIncomingMessageAndDisconnect;
 - (void)saveUnsentMessageAndDisconnect;
 - (void)triggerSaveNewMessage;
+- (BOOL)checkIsTypingWithRoomID:(NSString *)roomID;
 
 @end

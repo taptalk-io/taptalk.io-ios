@@ -22,9 +22,17 @@
 @property (strong, nonatomic) UIImageView *messageStatusImageView;
 @property (strong, nonatomic) UIView *bubbleUnreadView;
 @property (strong, nonatomic) UILabel *numberOfUnreadMessageLabel;
+@property (strong, nonatomic) UILabel *typingLabel;
 @property (strong, nonatomic) UIView *separatorView;
 @property (nonatomic) TAPMessageStatusType messageStatusType;
 @property (nonatomic) BOOL *isShouldForceUpdateUnreadBubble;
+
+@property (strong, nonatomic) NSTimer *typingTimer;
+@property (strong, nonatomic) NSString *fullTypingString;
+@property (strong, nonatomic) NSString *initialTypingString;
+@property (strong, nonatomic) NSString *currentTypingString;
+
+- (void)animateTyping;
 
 @end
 
@@ -97,6 +105,19 @@
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
         self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
         [self.bgView addSubview:self.separatorView];
+        
+        //Typing Animation
+        _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
+        self.fullTypingString = NSLocalizedString(@"Typing...", @"");
+        self.initialTypingString = NSLocalizedString(@"Typing.", @"");
+        self.currentTypingString = self.initialTypingString;
+        
+        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
+        self.typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.typingLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.typingLabel.text = self.currentTypingString;
+        self.typingLabel.numberOfLines = 1;
+        [self.bgView addSubview:self.typingLabel];
     }
     
     return self;
@@ -416,6 +437,35 @@
     else {
         self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, newLastMessageLabelSize.height);
     }
+}
+
+- (void)setAsTyping:(BOOL)typing {
+    if (typing) {
+        self.typingLabel.alpha = 1.0f;
+        self.lastMessageLabel.alpha = 0.0f;
+        [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
+    }
+    else {
+        self.typingLabel.alpha = 0.0f;
+        self.lastMessageLabel.alpha = 1.0f;
+    }
+}
+
+- (void)animateTyping {
+    if([self.currentTypingString length] < [self.fullTypingString length]) {
+        self.currentTypingString = [self.fullTypingString substringWithRange:NSMakeRange(0, [self.currentTypingString length] + 1)];
+        self.typingLabel.text = self.currentTypingString;
+    }
+    else if([self.currentTypingString isEqualToString:self.fullTypingString]) {
+        self.currentTypingString = self.initialTypingString;
+        self.typingLabel.text = self.currentTypingString;
+    }
+}
+
+- (void)setAsTypingNoAfterDelay {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setAsTypingNoAfterDelay) object:nil];
+    self.typingLabel.alpha = 0.0f;
+    self.lastMessageLabel.alpha = 1.0f;
 }
 
 @end
