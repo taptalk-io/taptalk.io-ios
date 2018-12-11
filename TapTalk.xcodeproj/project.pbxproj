@@ -198,8 +198,6 @@
 		DF133C4E219C477500A0E6CC /* TAPChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF133C4B219C477400A0E6CC /* TAPChatViewController.m */; };
 		DF33AADF21B107BF004C2A49 /* TAPCustomKeyboardManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DF33AADD21B107BF004C2A49 /* TAPCustomKeyboardManager.h */; };
 		DF33AAE021B107BF004C2A49 /* TAPCustomKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DF33AADE21B107BF004C2A49 /* TAPCustomKeyboardManager.m */; };
-		DF33AAE321B10A39004C2A49 /* TAPCustomKeyboardGroupModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DF33AAE121B10A39004C2A49 /* TAPCustomKeyboardGroupModel.h */; };
-		DF33AAE421B10A39004C2A49 /* TAPCustomKeyboardGroupModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DF33AAE221B10A39004C2A49 /* TAPCustomKeyboardGroupModel.m */; };
 		DF45149721BA52FE00C1C539 /* TAPTypingModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DF45149521BA52FE00C1C539 /* TAPTypingModel.h */; };
 		DF45149821BA52FE00C1C539 /* TAPTypingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DF45149621BA52FE00C1C539 /* TAPTypingModel.m */; };
 		DFA598FF21B7B17D0082C5F3 /* TAPOnlineStatusModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */; };
@@ -469,8 +467,6 @@
 		DF133C4B219C477400A0E6CC /* TAPChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPChatViewController.m; sourceTree = "<group>"; };
 		DF33AADD21B107BF004C2A49 /* TAPCustomKeyboardManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCustomKeyboardManager.h; sourceTree = "<group>"; };
 		DF33AADE21B107BF004C2A49 /* TAPCustomKeyboardManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomKeyboardManager.m; sourceTree = "<group>"; };
-		DF33AAE121B10A39004C2A49 /* TAPCustomKeyboardGroupModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCustomKeyboardGroupModel.h; sourceTree = "<group>"; };
-		DF33AAE221B10A39004C2A49 /* TAPCustomKeyboardGroupModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomKeyboardGroupModel.m; sourceTree = "<group>"; };
 		DF45149521BA52FE00C1C539 /* TAPTypingModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPTypingModel.h; sourceTree = "<group>"; };
 		DF45149621BA52FE00C1C539 /* TAPTypingModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPTypingModel.m; sourceTree = "<group>"; };
 		DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPOnlineStatusModel.h; sourceTree = "<group>"; };
@@ -694,8 +690,6 @@
 				D74BA2AD2162066200DF494C /* TAPRoomListModel.m */,
 				DFEFE68B21AFC79100E486F8 /* TAPCustomKeyboardItemModel.h */,
 				DFEFE68C21AFC79100E486F8 /* TAPCustomKeyboardItemModel.m */,
-				DF33AAE121B10A39004C2A49 /* TAPCustomKeyboardGroupModel.h */,
-				DF33AAE221B10A39004C2A49 /* TAPCustomKeyboardGroupModel.m */,
 				DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */,
 				DFA598FE21B7B17D0082C5F3 /* TAPOnlineStatusModel.m */,
 				DF45149521BA52FE00C1C539 /* TAPTypingModel.h */,
@@ -1032,7 +1026,6 @@
 				D7FF4CE32176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.h in Headers */,
 				DFA598FF21B7B17D0082C5F3 /* TAPOnlineStatusModel.h in Headers */,
 				D77B5ECF2158BB6E00253BDC /* TAPMessageModel.h in Headers */,
-				DF33AAE321B10A39004C2A49 /* TAPCustomKeyboardGroupModel.h in Headers */,
 				D77B5F032158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.h in Headers */,
 				D77B5F752158BC7A00253BDC /* Configs.h in Headers */,
 				D780A08821AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.h in Headers */,
@@ -1285,7 +1278,6 @@
 				D77B5F572158BBEA00253BDC /* TAPAddNewChatViewController.m in Sources */,
 				D779658E215B3D4400756A38 /* RNGrowingTextView.m in Sources */,
 				D77B5EA02158BB4000253BDC /* TAPDataManager.m in Sources */,
-				DF33AAE421B10A39004C2A49 /* TAPCustomKeyboardGroupModel.m in Sources */,
 				F524EF1F217DE9970087D956 /* TAPSearchResultChatTableViewCell.m in Sources */,
 				D77B5EBA2158BB6300253BDC /* TAPMessageRealmModel.m in Sources */,
 				DFA5990421B7D3A30082C5F3 /* TAPContactManager.m in Sources */,
