@@ -12,7 +12,7 @@
 
 @property (strong, nonatomic) IBOutlet UIView *paddingView;
 @property (strong, nonatomic) IBOutlet UIView *backgroundContentView;
-@property (strong, nonatomic) IBOutlet RNImageView *productImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *productImageView;
 @property (strong, nonatomic) IBOutlet UILabel *productNameLabel;
 @property (strong, nonatomic) IBOutlet UIView *priceView;
 @property (strong, nonatomic) IBOutlet UILabel *pricePlaceholderLabel;

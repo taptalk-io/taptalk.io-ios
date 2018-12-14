@@ -29,7 +29,7 @@
             topPadding = [TAPUtil currentDeviceStatusBarHeight];
         }
         
-        _profileImageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), self.profileImageHeight)];
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), self.profileImageHeight)];
         [self addSubview:self.profileImageView];
         
         _gradientImageView = [[UIView alloc] initWithFrame:self.profileImageView.frame];

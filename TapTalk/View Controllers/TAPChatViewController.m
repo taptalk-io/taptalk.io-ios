@@ -33,7 +33,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     keyboardStateOptions = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, RNGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate>
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -43,14 +43,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (strong, nonatomic) IBOutlet UIButton *sendButton;
 @property (strong, nonatomic) IBOutlet UIButton *keyboardOptionButton;
 @property (strong, nonatomic) IBOutlet UIView *textViewBorderView;
-@property (strong, nonatomic) IBOutlet RNGrowingTextView *messageTextView;
+@property (strong, nonatomic) IBOutlet TAPGrowingTextView *messageTextView;
 @property (strong, nonatomic) IBOutlet UITextField *secondaryTextField;
 @property (strong, nonatomic) IBOutlet UIView *emptyView;
 @property (strong, nonatomic) IBOutlet TAPCustomAccessoryView *inputMessageAccessoryView;
 @property (strong, nonatomic) IBOutlet UILabel *emptyTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *emptyDescriptionLabel;
-@property (strong, nonatomic) IBOutlet RNImageView *senderImageView;
-@property (strong, nonatomic) IBOutlet RNImageView *recipientImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *recipientImageView;
 
 @property (strong, nonatomic) UIView *titleView;
 @property (strong, nonatomic) UILabel *nameLabel;
@@ -252,7 +252,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     //RightBarButton
     UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
-    RNImageView *rightBarImageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
+    TAPImageView *rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
     [rightBarImageView setImageWithURLString:room.imageURL.thumbnail];
     
     rightBarImageView.layer.cornerRadius = CGRectGetHeight(rightBarImageView.frame) / 2.0f;
@@ -1021,8 +1021,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     }];
 }
 
-#pragma mark RNGrowingTextView
-- (void)growingTextView:(RNGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
+#pragma mark TAPGrowingTextView
+- (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
     [UIView animateWithDuration:0.1f animations:^{
         self.messageTextViewHeight = height;
         self.messageTextViewHeightConstraint.constant = height;
@@ -1033,7 +1033,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     }];
 }
 
-- (void)growingTextViewDidBeginEditing:(RNGrowingTextView *)textView {
+- (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
     _keyboardState = keyboardStateDefault;
     
     [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
@@ -1053,7 +1053,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     }
 }
 
-- (void)growingTextViewDidStartTyping:(RNGrowingTextView *)textView {
+- (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView {
     [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessageActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
     self.sendButton.userInteractionEnabled = YES;
     if(self.isCustomKeyboardAvailable) {
@@ -1067,7 +1067,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [[TAPChatManager sharedManager] startTyping];
 }
 
-- (void)growingTextViewDidStopTyping:(RNGrowingTextView *)textView {
+- (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView {
     [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
     self.sendButton.userInteractionEnabled = NO;
     if(self.isCustomKeyboardAvailable) {
@@ -1120,7 +1120,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             
             //CS Temp - Add Image Type Dummy Model
             TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeImage];
-            [RNImageView saveImageToCache:selectedImage withKey:message.localID];
+            [TAPImageView saveImageToCache:selectedImage withKey:message.localID];
             [self.messageArray insertObject:message atIndex:0];
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
             //End Temp

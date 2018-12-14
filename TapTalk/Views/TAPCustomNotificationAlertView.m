@@ -43,13 +43,13 @@
         self.contentView.clipsToBounds = YES;
         [self.firstNotificationView addSubview:self.contentView];
         
-        _profilePictureImage = [[RNImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
+        _profilePictureImage = [[TAPImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.profilePictureImage.layer.cornerRadius = CGRectGetHeight(self.profilePictureImage.frame)/2.0f;
         self.profilePictureImage.clipsToBounds = YES;
         self.profilePictureImage.contentMode = UIViewContentModeScaleAspectFit;
         [self.contentView addSubview:self.profilePictureImage];
         
-        _contentImageView = [[RNImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.contentView.frame) - 52.0f - 8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
+        _contentImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.contentView.frame) - 52.0f - 8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.contentImageView.layer.cornerRadius = 6.0f;
         self.contentImageView.clipsToBounds = YES;
         self.contentImageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -95,13 +95,13 @@
         self.secondaryContentView.clipsToBounds = YES;
         [self.secondNotificationView addSubview:self.secondaryContentView];
         
-        _secondaryProfilePictureImage = [[RNImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
+        _secondaryProfilePictureImage = [[TAPImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.secondaryProfilePictureImage.layer.cornerRadius = CGRectGetHeight(self.profilePictureImage.frame)/2.0f;
         self.secondaryProfilePictureImage.clipsToBounds = YES;
         self.secondaryProfilePictureImage.contentMode = UIViewContentModeScaleAspectFit;
         [self.secondaryContentView addSubview:self.secondaryProfilePictureImage];
         
-        _secondaryContentImageView = [[RNImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.secondaryContentView.frame) - 52.0f - 8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
+        _secondaryContentImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.secondaryContentView.frame) - 52.0f - 8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.secondaryContentImageView.layer.cornerRadius = 6.0f;
         self.secondaryContentImageView.clipsToBounds = YES;
         self.secondaryContentImageView.contentMode = UIViewContentModeScaleAspectFit;

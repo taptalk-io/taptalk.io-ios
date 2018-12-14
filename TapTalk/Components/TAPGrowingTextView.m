@@ -1,14 +1,14 @@
 //
-//  RNGrowingTextView.m
+//  TAPGrowingTextView.m
 //  Moselo
 //
 //  Created by Ritchie Nathaniel on 3/10/17.
 //  Copyright © 2017 Moselo. All rights reserved.
 //
 
-#import "RNGrowingTextView.h"
+#import "TAPGrowingTextView.h"
 
-@interface RNGrowingTextView () <UITextViewDelegate>
+@interface TAPGrowingTextView () <UITextViewDelegate>
 
 //@property (strong, nonatomic) IBOutlet UITextView *textView;
 @property (strong, nonatomic) IBOutlet UILabel *placeholderLabel;
@@ -18,7 +18,7 @@
 
 @end
 
-@implementation RNGrowingTextView
+@implementation TAPGrowingTextView
 
 #pragma mark - Lifecycle
 - (id)init {

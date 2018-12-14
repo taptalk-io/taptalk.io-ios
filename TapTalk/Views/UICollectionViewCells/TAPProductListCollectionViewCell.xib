@@ -32,7 +32,7 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1ig-1W-vdJ">
                         <rect key="frame" x="0.0" y="0.0" width="230" height="347"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1ND-Xk-scR" customClass="RNImageView">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1ND-Xk-scR" customClass="TAPImageView">
                                 <rect key="frame" x="0.0" y="0.0" width="230" height="140"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="140" id="vbK-HQ-69q"/>

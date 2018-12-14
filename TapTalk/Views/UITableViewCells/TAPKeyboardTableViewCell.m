@@ -12,7 +12,7 @@
 
 @property (strong, nonatomic) IBOutlet UILabel *stringLabel;
 @property (strong, nonatomic) IBOutlet UILabel *emoticonLabel;
-@property (strong, nonatomic) IBOutlet RNImageView *iconImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *iconImageView;
 
 @end
 

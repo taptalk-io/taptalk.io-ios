@@ -14,7 +14,7 @@
 @property (strong, nonatomic) UIView *separatorView;
 @property (strong, nonatomic) UIView *bubbleUnreadView;
 @property (strong, nonatomic) UIView *onlineStatusView;
-@property (strong, nonatomic) RNImageView *profileImageView;
+@property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIImageView *expertIconImageView;
 @property (strong, nonatomic) UIImageView *muteImageView;
 @property (strong, nonatomic) UILabel *roomNameLabel;
@@ -35,7 +35,7 @@
         
         CGFloat leftPadding = 16.0f;
         CGFloat rightPadding = 16.0f;
-        _profileImageView = [[RNImageView alloc] initWithFrame:CGRectMake(leftPadding, 9.0f, 52.0f, 52.0f)];
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 9.0f, 52.0f, 52.0f)];
         self.profileImageView.backgroundColor = [UIColor clearColor];
         self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
         self.profileImageView.clipsToBounds = YES;

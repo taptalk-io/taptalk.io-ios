@@ -30,9 +30,9 @@
 #import "TAPContactManager.h"
 #import "AFNetworkActivityIndicatorManager.h"
 #import "NSUserDefaults+MPSecureUserDefaults.h"
-#import "RNImageView.h"
+#import "TAPImageView.h"
 #import "PodAsset.h"
-#import "RNGrowingTextView.h"
+#import "TAPGrowingTextView.h"
 #import "TAPSearchBarView.h"
 
 #endif /* TapTalk_Prefix_pch */

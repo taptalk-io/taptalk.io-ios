@@ -7,7 +7,7 @@
 //
 
 #import "TAPBaseView.h"
-#import "RNImageView.h"
+#import "TAPImageView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,8 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIView *firstNotificationView;
 @property (strong, nonatomic) UIView *shadowView;
 @property (strong, nonatomic) UIView *contentView;
-@property (strong, nonatomic) RNImageView *profilePictureImage;
-@property (strong, nonatomic) RNImageView *contentImageView;
+@property (strong, nonatomic) TAPImageView *profilePictureImage;
+@property (strong, nonatomic) TAPImageView *contentImageView;
 @property (strong, nonatomic) UILabel *nameLabel;
 @property (strong, nonatomic) UILabel *messageLabel;
 @property (strong, nonatomic) UIButton *notificationButton;
@@ -25,8 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIView *secondNotificationView;
 @property (strong, nonatomic) UIView *secondaryShadowView;
 @property (strong, nonatomic) UIView *secondaryContentView;
-@property (strong, nonatomic) RNImageView *secondaryProfilePictureImage;
-@property (strong, nonatomic) RNImageView *secondaryContentImageView;
+@property (strong, nonatomic) TAPImageView *secondaryProfilePictureImage;
+@property (strong, nonatomic) TAPImageView *secondaryContentImageView;
 @property (strong, nonatomic) UILabel *secondaryNameLabel;
 @property (strong, nonatomic) UILabel *secondaryMessageLabel;
 @property (strong, nonatomic) UIButton *secondaryNotificationButton;

@@ -16,13 +16,13 @@
 @property (strong, nonatomic) UIView *whiteBaseView;
 @property (strong, nonatomic) UIView *greenView;
 @property (strong, nonatomic) UIImageView *closePopupImageView;
-@property (strong, nonatomic) RNImageView *addedUserImageView;
+@property (strong, nonatomic) TAPImageView *addedUserImageView;
 @property (strong, nonatomic) UILabel *addedUserUsernameLabel;
 @property (strong, nonatomic) UILabel *addedUserFullnameLabel;
 @property (strong, nonatomic) UILabel *selfInformedLabel;
 
 //Success Add Contact
-@property (strong, nonatomic) RNImageView *currentUserImageView;
+@property (strong, nonatomic) TAPImageView *currentUserImageView;
 @property (strong, nonatomic) UIImageView *successAddContactImageView;
 @property (strong, nonatomic) UILabel *successAddContactLabel;
 
@@ -113,7 +113,7 @@
         _closePopupButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.closePopupImageView.frame) - 6.0f, CGRectGetMinY(self.closePopupImageView.frame) - 6.0f, 40.0f, 40.0f)];
         [self.whiteBaseView addSubview:self.closePopupButton];
         
-        _currentUserImageView = [[RNImageView alloc] initWithFrame:CGRectMake(-72.0f, self.profilePictureYPosition, 72.0f ,72.0f)];
+        _currentUserImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(-72.0f, self.profilePictureYPosition, 72.0f ,72.0f)];
         self.currentUserImageView.layer.cornerRadius = CGRectGetHeight(self.currentUserImageView.frame) / 2.0f;
         self.currentUserImageView.layer.borderColor = [UIColor whiteColor].CGColor;
         self.currentUserImageView.layer.borderWidth = 4.0f;
@@ -122,7 +122,7 @@
         self.currentUserImageView.alpha = 0.0f;
         [self.whiteBaseView addSubview:self.currentUserImageView];
         
-        _addedUserImageView = [[RNImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.whiteBaseView.frame) - 72.0f) / 2.0f, CGRectGetMinY(self.currentUserImageView.frame), CGRectGetWidth(self.currentUserImageView.frame), CGRectGetHeight(self.currentUserImageView.frame))];
+        _addedUserImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.whiteBaseView.frame) - 72.0f) / 2.0f, CGRectGetMinY(self.currentUserImageView.frame), CGRectGetWidth(self.currentUserImageView.frame), CGRectGetHeight(self.currentUserImageView.frame))];
         self.addedUserImageView.layer.cornerRadius = CGRectGetHeight(self.addedUserImageView.frame) / 2.0f;
         self.addedUserImageView.layer.borderColor = [UIColor whiteColor].CGColor;
         self.addedUserImageView.layer.borderWidth = 4.0f;

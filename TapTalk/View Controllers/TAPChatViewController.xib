@@ -109,7 +109,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="375" height="551"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KlL-O7-bwy">
-                            <rect key="frame" x="16" y="51" width="343" height="36"/>
+                            <rect key="frame" x="16" y="51" width="343" height="35"/>
                             <string key="text">Arsya Nafisa is an expert
 don’t forget to check out her services!</string>
                             <fontDescription key="fontDescription" name="NeueEinstellung-Bold" family="Neue Einstellung" pointSize="15"/>
@@ -117,9 +117,9 @@ don’t forget to check out her services!</string>
                             <nil key="highlightedColor"/>
                         </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eWX-ft-mhr">
-                            <rect key="frame" x="135" y="122" width="105" height="64"/>
+                            <rect key="frame" x="135" y="121" width="105" height="64"/>
                             <subviews>
-                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n5l-Jp-CPL" customClass="RNImageView">
+                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n5l-Jp-CPL" customClass="TAPImageView">
                                     <rect key="frame" x="0.0" y="0.0" width="64" height="64"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
@@ -127,7 +127,7 @@ don’t forget to check out her services!</string>
                                         <constraint firstAttribute="width" constant="64" id="c2c-f1-20N"/>
                                     </constraints>
                                 </view>
-                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QCj-Ox-vuf" customClass="RNImageView">
+                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QCj-Ox-vuf" customClass="TAPImageView">
                                     <rect key="frame" x="41" y="0.0" width="64" height="64"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
@@ -147,7 +147,7 @@ don’t forget to check out her services!</string>
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GmV-kq-wCX">
-                            <rect key="frame" x="16" y="208" width="343" height="54"/>
+                            <rect key="frame" x="16" y="207" width="343" height="52.5"/>
                             <string key="text">Hey there! If you are looking for handmade gifts
 to give to someone special, please check out
 my list of services and pricing below!</string>
@@ -236,7 +236,7 @@ my list of services and pricing below!</string>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bIM-9m-lUi">
                             <rect key="frame" x="60" y="8" width="255" height="36"/>
                             <subviews>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bob-7z-ZfQ" customClass="RNGrowingTextView">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bob-7z-ZfQ" customClass="TAPGrowingTextView">
                                     <rect key="frame" x="12" y="0.0" width="211" height="32"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>

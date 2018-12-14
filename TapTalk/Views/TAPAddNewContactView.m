@@ -13,9 +13,9 @@
 @property (strong, nonatomic) UILabel *defaultLabel;
 
 @property (strong, nonatomic) UIView *searchExpertView;
-@property (strong, nonatomic) RNImageView *coverImageView;
+@property (strong, nonatomic) TAPImageView *coverImageView;
 @property (strong, nonatomic) UIView *expertImageContainerView;
-@property (strong, nonatomic) RNImageView *expertImageView;
+@property (strong, nonatomic) TAPImageView *expertImageView;
 @property (strong, nonatomic) UIImageView *expertVerifiedImageView;
 @property (strong, nonatomic) UILabel *expertNameLabel;
 @property (strong, nonatomic) UILabel *expertCategoryLabel;
@@ -26,7 +26,7 @@
 @property (strong, nonatomic) UILabel *expertChatNowLabel;
 
 @property (strong, nonatomic) UIView *searchUserView;
-@property (strong, nonatomic) RNImageView *userImageView;
+@property (strong, nonatomic) TAPImageView *userImageView;
 @property (strong, nonatomic) UILabel *userFullNameLabel;
 @property (strong, nonatomic) UIView *addUserToContactButtonView;
 @property (strong, nonatomic) UILabel *addUserToContactLabel;
@@ -103,7 +103,7 @@
         self.searchExpertView.alpha = 0.0f;
         [self addSubview:self.searchExpertView];
         
-        _coverImageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.searchExpertView.frame), 93.0f)];
+        _coverImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.searchExpertView.frame), 93.0f)];
         UIBezierPath *maskPath = [UIBezierPath
                                   bezierPathWithRoundedRect:self.coverImageView.frame
                                   byRoundingCorners:(UIRectCornerTopLeft | UIRectCornerTopRight)
@@ -119,7 +119,7 @@
         self.coverImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.searchExpertView addSubview:self.coverImageView];
         
-        _expertImageView = [[RNImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchExpertView.frame) - 52.0f) / 2.0f, 66.0f, 52.0f, 52.0f)];
+        _expertImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchExpertView.frame) - 52.0f) / 2.0f, 66.0f, 52.0f, 52.0f)];
         self.expertImageView.clipsToBounds = YES;
         self.expertImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.expertImageView.layer.cornerRadius = CGRectGetHeight(self.expertImageView.frame) / 2.0f;
@@ -222,7 +222,7 @@
         self.searchUserView.alpha = 0.0f;
         [self addSubview:self.searchUserView];
 
-        _userImageView = [[RNImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 52.0f) / 2.0f, 8.0f, 52.0f, 52.0f)];
+        _userImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 52.0f) / 2.0f, 8.0f, 52.0f, 52.0f)];
         self.userImageView.clipsToBounds = YES;
         self.userImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.userImageView.layer.cornerRadius = CGRectGetHeight(self.userImageView.frame) / 2.0f;
