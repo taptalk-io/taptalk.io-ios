@@ -30,5 +30,6 @@
 @property (nonatomic) BOOL isRequestPending;
 @property (nonatomic) BOOL isRequestAccepted;
 @property (nonatomic) BOOL isContact;
+@property (nonatomic) BOOL isOnline;
 
 @end

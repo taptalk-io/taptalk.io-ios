@@ -203,7 +203,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     self.nameLabel.textAlignment = NSTextAlignmentCenter;
     [self.titleView addSubview:self.nameLabel];
     
-    _userStatusView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f, 7.0f, 7.0f)];
+    _userStatusView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f)];
     self.userStatusView.backgroundColor = [TAPUtil getColor:@"19C700"];
     self.userStatusView.layer.cornerRadius = CGRectGetHeight(self.userStatusView.frame) / 2.0f;
     self.userStatusView.alpha = 0.0f;
@@ -237,7 +237,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self.userTypingView addSubview:typingAnimationImageView];
     
     UILabel *typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
-    typingLabel.text = NSLocalizedString(@"Typing", @"");
+    typingLabel.text = NSLocalizedString(@"typing", @"");
     typingLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
     typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
     [typingLabel sizeToFit];
@@ -247,7 +247,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
     self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
     
-    [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID]];
+    [self setAsTyping:NO];
     [self isShowOnlineDotStatus:NO];
     
     //RightBarButton
@@ -328,14 +328,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     self.inputMessageAccessoryView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     
-    //    //Typing Animation
-    //    _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
-    //    self.fullTypingString = NSLocalizedString(@"typing...", @"");
-    //    self.initialTypingString = NSLocalizedString(@"typing", @"");
-    //    self.currentTypingString = self.initialTypingString;
-    //    [self performSelector:@selector(animateTypingDot1) withObject:nil afterDelay:0.0f];
-    //    [self performSelector:@selector(animateTypingDot2) withObject:nil afterDelay:0.2f];
-    //    [self performSelector:@selector(animateTypingDot3) withObject:nil afterDelay:0.4f];
+    [[TAPChatManager sharedManager] refreshShouldRefreshOnlineStatus];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -356,6 +349,27 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     draftMessage = [TAPUtil nullToEmptyString:draftMessage];
     
     [self.messageTextView setInitialText:draftMessage];
+    
+    if([[TAPChatManager sharedManager] checkShouldRefreshOnlineStatus]) {
+        [self setAsTyping:NO];
+        [TAPDataManager callAPIGetUserByUserID:[self getOtherUserIDWithRoomID:self.currentRoom.roomID] success:^(TAPUserModel *user) {
+            
+            BOOL isTyping = [[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID];
+            [self setAsTyping:isTyping];
+            
+            TAPOnlineStatusModel *onlineStatus = [TAPOnlineStatusModel new];
+            onlineStatus.isOnline = user.isOnline;
+            onlineStatus.lastActive = user.lastActivity;
+            
+            _onlineStatus = onlineStatus;
+            
+            NSTimeInterval currentLastSeen = (double)self.onlineStatus.lastActive.doubleValue/1000.0f;
+            [self updateLastSeenWithTimestamp:currentLastSeen];
+            
+        } failure:^(NSError *error) {
+            
+        }];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -2020,7 +2034,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self isShowOnlineDotStatus:NO];
     
     if (self.onlineStatus.isOnline) {
-        lastSeenString = NSLocalizedString(@"Active Now", @"");
+        lastSeenString = NSLocalizedString(@"active now", @"");
         [self isShowOnlineDotStatus:YES];
     }
     else if (timestamp == 0) {
@@ -2029,7 +2043,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     else if (timeGap <= midnightTimeGap) {
         if (timeGap < 60.0f) {
             //Set recently
-            lastSeenString = NSLocalizedString(@"Last seen recently", @"");
+            lastSeenString = NSLocalizedString(@"last seen recently", @"");
         }
         else if (timeGap < 3600.0f) {
             //Set minutes before
@@ -2041,7 +2055,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 minuteString = NSLocalizedString(@"minute", @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfMinutes, minuteString];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"last seen %li %@ ago", @""), (long)numberOfMinutes, minuteString];
         }
         else {
             //Set hour before
@@ -2053,7 +2067,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 hourString = NSLocalizedString(@"hour", @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfHours, hourString];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"last seen %li %@ ago", @""), (long)numberOfHours, hourString];
         }
     }
     else if (timeGap <= 86400.0f * 6 + midnightTimeGap) {
@@ -2067,15 +2081,15 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         
         NSString *dayString = NSLocalizedString(@"days", @"");
         
-        if (timeGap < 86400.0f) {
+        if (timeGap <= 86400.0f) {
             dayString = NSLocalizedString(@"day", @"");
         }
         
-        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfDays, dayString];
+        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"last seen %li %@ ago", @""), (long)numberOfDays, dayString];
     }
     else if (timeGap <= 86400.0f*7 + midnightTimeGap) {
         //Set a week ago
-        lastSeenString = @"Last seen a week ago";
+        lastSeenString = @"last seen a week ago";
     }
     else {
         //Set date
@@ -2085,7 +2099,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         dateFormatter.dateFormat = @"dd/MM/YY";
         NSString *formattedCreatedDate = [dateFormatter stringFromDate:lastLoginDate];
         
-        lastSeenString = [NSString stringWithFormat:@"Last seen %@", formattedCreatedDate];
+        lastSeenString = [NSString stringWithFormat:@"last seen %@", formattedCreatedDate];
     }
     
     self.userStatusLabel.text = lastSeenString;
@@ -2098,7 +2112,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)isShowOnlineDotStatus:(BOOL)isShow {
     if (isShow) {
-        self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f, 7.0f, 7.0f);
+        self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f);
         self.userStatusView.alpha = 1.0f;
         self.userStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 3.0f, 0.0f, 0.0f, 16.0f);
     }

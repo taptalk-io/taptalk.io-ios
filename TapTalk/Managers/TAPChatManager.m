@@ -38,6 +38,7 @@
 @property (strong, nonatomic) __block NSTimer *backgroundSequenceTimer;
 @property (nonatomic) NSInteger checkPendingBackgroundTaskRetryAttempt;
 @property (nonatomic) BOOL isEnterBackgroundSequenceActive;
+@property (nonatomic) BOOL isShouldRefreshOnlineStatus;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTask;
 
 @end
@@ -68,6 +69,7 @@
         _activeUser = [TAPDataManager getActiveUser];
         _checkPendingBackgroundTaskRetryAttempt = 0;
         _isEnterBackgroundSequenceActive = NO;
+        _isShouldRefreshOnlineStatus = YES;
         _typingDictionary = [[NSMutableDictionary alloc] init];
         [[TAPConnectionManager sharedManager] addDelegate:self];
     }
@@ -125,10 +127,12 @@
 
 - (void)connectionManagerDidReceiveError:(NSError *)error {
     _isTyping = NO;
+    _isShouldRefreshOnlineStatus = YES;
 }
 
 - (void)connectionManagerDidDisconnectedWithCode:(NSInteger)code reason:(NSString *)reason cleanClose:(BOOL)clean {
     _isTyping = NO;
+    _isShouldRefreshOnlineStatus = YES;
 }
 
 #pragma mark - Custom Method
@@ -434,6 +438,7 @@
 }
 
 - (void)receiveOnlineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
+    _isShouldRefreshOnlineStatus = NO;
     TAPOnlineStatusModel *onlineStatus = [[TAPOnlineStatusModel alloc] initWithDictionary:dataDictionary error:nil];
 
     for (id delegate in self.delegatesArray) {
@@ -625,6 +630,14 @@
 
 - (void)setIsTypingNo {
     _isTyping = NO;
+}
+
+- (BOOL)checkShouldRefreshOnlineStatus {
+    return self.isShouldRefreshOnlineStatus;
+}
+
+- (void)refreshShouldRefreshOnlineStatus {
+    _isShouldRefreshOnlineStatus = YES;
 }
 
 @end
