@@ -20,7 +20,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *productNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *productPriceLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quantityLabel;
-@property (strong, nonatomic) IBOutlet RNImageView *productImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *productImageView;
 
 @property (strong, nonatomic) IBOutlet UIView *moreProductView;
 @property (strong, nonatomic) IBOutlet UILabel *moreProductLabel;
@@ -41,7 +41,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *courierCostPlaceholderLabel;
 @property (strong, nonatomic) IBOutlet UILabel *courierTypeLabel;
 @property (strong, nonatomic) IBOutlet UILabel *courierCostLabel;
-@property (strong, nonatomic) IBOutlet RNImageView *courierLogoImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *courierLogoImageView;
 
 @property (strong, nonatomic) IBOutlet UIView *notesView;
 @property (strong, nonatomic) IBOutlet UILabel *notesPlaceholderLabel;

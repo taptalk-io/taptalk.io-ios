@@ -7,12 +7,12 @@
 //
 
 #import "TAPContactTableViewCell.h"
-#import "RNImageView.h"
+#import "TAPImageView.h"
 
 @interface TAPContactTableViewCell()
 @property (strong, nonatomic) UIView *bgView;
 
-@property (strong, nonatomic) RNImageView *contactImageView;
+@property (strong, nonatomic) TAPImageView *contactImageView;
 @property (strong, nonatomic) UIImageView *expertLogoImageView;
 @property (strong, nonatomic) UILabel *contactNameLabel;
 @property (strong, nonatomic) UIView *separatorView;
@@ -31,7 +31,7 @@
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
         
-        _contactImageView = [[RNImageView alloc] initWithFrame:CGRectMake(16.0f, 6.0f, 52.0f, 52.0f)];
+        _contactImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(16.0f, 6.0f, 52.0f, 52.0f)];
         self.contactImageView.backgroundColor = [UIColor clearColor];
         self.contactImageView.layer.cornerRadius = CGRectGetHeight(self.contactImageView.frame) / 2.0f;
         self.contactImageView.clipsToBounds = YES;

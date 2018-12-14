@@ -10,7 +10,7 @@
 
 @interface TAPImageCollectionViewCell ()
 
-@property (strong, nonatomic) RNImageView *imageView;
+@property (strong, nonatomic) TAPImageView *imageView;
 
 @end
 
@@ -21,7 +21,7 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _imageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
+        _imageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.imageView.clipsToBounds = YES;
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.contentView addSubview:self.imageView];

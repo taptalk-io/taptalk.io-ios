@@ -1,5 +1,5 @@
 //
-//  RNGrowingTextView.h
+//  TAPGrowingTextView.h
 //  Moselo
 //
 //  Created by Ritchie Nathaniel on 3/10/17.
@@ -9,22 +9,22 @@
 #import <UIKit/UIKit.h>
 #import "TAPCustomTextView.h"
 
-@class RNGrowingTextView;
+@class TAPGrowingTextView;
 
-@protocol RNGrowingTextViewDelegate <NSObject>
+@protocol TAPGrowingTextViewDelegate <NSObject>
 
 @optional
 
-- (void)growingTextView:(RNGrowingTextView *)textView shouldChangeHeight:(CGFloat)height;
-- (void)growingTextViewDidBeginEditing:(RNGrowingTextView *)textView;
-- (void)growingTextViewDidStartTyping:(RNGrowingTextView *)textView;
-- (void)growingTextViewDidStopTyping:(RNGrowingTextView *)textView;
+- (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height;
+- (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView;
+- (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView;
+- (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView;
 
 @end
 
-@interface RNGrowingTextView : UIView
+@interface TAPGrowingTextView : UIView
 
-@property (weak, nonatomic) id<RNGrowingTextViewDelegate> delegate;
+@property (weak, nonatomic) id<TAPGrowingTextViewDelegate> delegate;
 
 @property (strong, nonatomic) IBOutlet TAPCustomTextView *textView;
 

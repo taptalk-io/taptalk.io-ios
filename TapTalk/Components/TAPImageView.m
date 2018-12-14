@@ -1,20 +1,20 @@
 //
-//  RNImageView.m
+//  TAPImageView.m
 //
 //  Created by Ritchie Nathaniel on 11/23/15.
 //
 
-#import "RNImageView.h"
+#import "TAPImageView.h"
 #import "SDWebImageDownloader.h"
 #import "SDImageCache.h"
 
-@interface RNImageView ()
+@interface TAPImageView ()
 
 - (void)initialization;
 
 @end
 
-@implementation RNImageView
+@implementation TAPImageView
 
 #pragma mark - Lifecycle
 - (id)initWithFrame:(CGRect)frame {
@@ -93,8 +93,8 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.image = savedImage;
                 
-                if ([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
-                    [self.delegate RNImageViewDidFinishLoadImage:self];
+                if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+                    [self.delegate imageViewDidFinishLoadImage:self];
                 }
             });
         }
@@ -118,8 +118,8 @@
                         dispatch_async(dispatch_get_main_queue(), ^{
                             self.image = image;
                             
-                            if ([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
-                                [self.delegate RNImageViewDidFinishLoadImage:self];
+                            if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+                                [self.delegate imageViewDidFinishLoadImage:self];
                             }
                         });
                     }
@@ -130,8 +130,8 @@
 #endif
                     dispatch_async(dispatch_get_main_queue(), ^{
                         self.image = nil;
-                        if ([self.delegate respondsToSelector:@selector(RNImageViewDidFinishLoadImage:)]) {
-                            [self.delegate RNImageViewDidFinishLoadImage:self];
+                        if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+                            [self.delegate imageViewDidFinishLoadImage:self];
                         }
                     });
                 }

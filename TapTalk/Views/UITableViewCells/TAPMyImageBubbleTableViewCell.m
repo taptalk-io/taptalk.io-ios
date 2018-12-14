@@ -13,7 +13,7 @@
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *progressBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
-@property (strong, nonatomic) IBOutlet RNImageView *bubbleImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 //@property (strong, nonatomic) IBOutlet UIImageView *cancelImageView; //WK Temp - probably not required.
@@ -124,7 +124,7 @@
    
     [super setMessage:message];
     
-    UIImage *selectedImage = [RNImageView imageFromCacheWithKey:message.localID];
+    UIImage *selectedImage = [TAPImageView imageFromCacheWithKey:message.localID];
     selectedImage = [self compressImage:selectedImage];
     
     self.bubbleImageViewWidthConstraint.constant = self.cellWidth;

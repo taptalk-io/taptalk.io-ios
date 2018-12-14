@@ -11,7 +11,7 @@
 @interface TAPContactCollectionViewCell()
 @property (strong, nonatomic) UIView *bgView;
 
-@property (strong, nonatomic) RNImageView *contactImageView;
+@property (strong, nonatomic) TAPImageView *contactImageView;
 @property (strong, nonatomic) UIImageView *removeImageView;
 @property (strong, nonatomic) UILabel *contactNameLabel;
 @end
@@ -26,7 +26,7 @@
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
         
-        _contactImageView = [[RNImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 52.0f, 52.0f)];
+        _contactImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 52.0f, 52.0f)];
         self.contactImageView.layer.cornerRadius = CGRectGetHeight(self.contactImageView.frame) / 2.0;
         self.contactImageView.clipsToBounds = YES;
         [self.bgView addSubview:self.contactImageView];

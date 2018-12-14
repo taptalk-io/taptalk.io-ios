@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UIView *navigationBarView;
-@property (strong, nonatomic) RNImageView *profileImageView;
+@property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UILabel *nameLabel;
 @property (strong, nonatomic) UILabel *navigationNameLabel;
 @property (strong, nonatomic) UIButton *backButton;

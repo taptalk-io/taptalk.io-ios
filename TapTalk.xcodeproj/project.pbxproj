@@ -39,18 +39,16 @@
 		D76948BB21B10D2B00AE0BE6 /* TAPCustomBubbleManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D76948B921B10D2B00AE0BE6 /* TAPCustomBubbleManager.m */; };
 		D775E3972189D7660003A40C /* moselo-notification.caf in Resources */ = {isa = PBXBuildFile; fileRef = D775E3962189D7660003A40C /* moselo-notification.caf */; };
 		D779658D215B3D4400756A38 /* TAPCustomTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7796588215B3D4300756A38 /* TAPCustomTextView.h */; };
-		D779658E215B3D4400756A38 /* RNGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7796589215B3D4400756A38 /* RNGrowingTextView.m */; };
-		D779658F215B3D4400756A38 /* RNGrowingTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D779658A215B3D4400756A38 /* RNGrowingTextView.h */; };
+		D779658E215B3D4400756A38 /* TAPGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7796589215B3D4400756A38 /* TAPGrowingTextView.m */; };
+		D779658F215B3D4400756A38 /* TAPGrowingTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D779658A215B3D4400756A38 /* TAPGrowingTextView.h */; };
 		D7796591215B3D4400756A38 /* TAPCustomTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D779658C215B3D4400756A38 /* TAPCustomTextView.m */; };
 		D7796594215B3F1300756A38 /* TAPConnectionStatusView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7796592215B3F1300756A38 /* TAPConnectionStatusView.h */; };
 		D7796595215B3F1300756A38 /* TAPConnectionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7796593215B3F1300756A38 /* TAPConnectionStatusView.m */; };
 		D77B5E532158BA8C00253BDC /* TapTalk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D77B5E492158BA8C00253BDC /* TapTalk.framework */; };
 		D77B5E582158BA8C00253BDC /* TapTalkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5E572158BA8C00253BDC /* TapTalkTests.m */; };
-		D77B5E6E2158BABB00253BDC /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5E662158BABB00253BDC /* Base64.h */; };
-		D77B5E6F2158BABB00253BDC /* RNImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5E672158BABB00253BDC /* RNImageView.h */; };
+		D77B5E6F2158BABB00253BDC /* TAPImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5E672158BABB00253BDC /* TAPImageView.h */; };
 		D77B5E702158BABB00253BDC /* TAPUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5E682158BABB00253BDC /* TAPUtil.m */; };
-		D77B5E712158BABB00253BDC /* Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5E692158BABB00253BDC /* Base64.m */; };
-		D77B5E722158BABB00253BDC /* RNImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5E6A2158BABB00253BDC /* RNImageView.m */; };
+		D77B5E722158BABB00253BDC /* TAPImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5E6A2158BABB00253BDC /* TAPImageView.m */; };
 		D77B5E732158BABB00253BDC /* TAPUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5E6B2158BABB00253BDC /* TAPUtil.h */; };
 		D77B5E852158BB2900253BDC /* NSData+CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5E7D2158BB2800253BDC /* NSData+CommonCrypto.h */; };
 		D77B5E862158BB2900253BDC /* AESCrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5E7E2158BB2900253BDC /* AESCrypt.m */; };
@@ -176,7 +174,7 @@
 		D79A3E6D216C72C4004525CE /* TAPConnectionStatusViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D79A3E6B216C72C4004525CE /* TAPConnectionStatusViewController.h */; };
 		D7AB09902191882B00C18BEE /* TAPOldDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D7AB098E2191882B00C18BEE /* TAPOldDataManager.h */; };
 		D7AB09912191882B00C18BEE /* TAPOldDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D7AB098F2191882B00C18BEE /* TAPOldDataManager.m */; };
-		D7B4954C215B49F200F07BEC /* RNGrowingTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D779658B215B3D4400756A38 /* RNGrowingTextView.xib */; };
+		D7B4954C215B49F200F07BEC /* TAPGrowingTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D779658B215B3D4400756A38 /* TAPGrowingTextView.xib */; };
 		D7B4954F215B55B800F07BEC /* TAPUserRoleModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D7B4954D215B55B800F07BEC /* TAPUserRoleModel.h */; };
 		D7B49550215B55B800F07BEC /* TAPUserRoleModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D7B4954E215B55B800F07BEC /* TAPUserRoleModel.m */; };
 		D7D081182190255B0037FA57 /* TAPProductListCollectionViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D081152190255B0037FA57 /* TAPProductListCollectionViewCell.h */; };
@@ -286,9 +284,9 @@
 		D76948B921B10D2B00AE0BE6 /* TAPCustomBubbleManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomBubbleManager.m; sourceTree = "<group>"; };
 		D775E3962189D7660003A40C /* moselo-notification.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "moselo-notification.caf"; sourceTree = "<group>"; };
 		D7796588215B3D4300756A38 /* TAPCustomTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomTextView.h; sourceTree = "<group>"; };
-		D7796589215B3D4400756A38 /* RNGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNGrowingTextView.m; sourceTree = "<group>"; };
-		D779658A215B3D4400756A38 /* RNGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNGrowingTextView.h; sourceTree = "<group>"; };
-		D779658B215B3D4400756A38 /* RNGrowingTextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RNGrowingTextView.xib; sourceTree = "<group>"; };
+		D7796589215B3D4400756A38 /* TAPGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPGrowingTextView.m; sourceTree = "<group>"; };
+		D779658A215B3D4400756A38 /* TAPGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPGrowingTextView.h; sourceTree = "<group>"; };
+		D779658B215B3D4400756A38 /* TAPGrowingTextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPGrowingTextView.xib; sourceTree = "<group>"; };
 		D779658C215B3D4400756A38 /* TAPCustomTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomTextView.m; sourceTree = "<group>"; };
 		D7796592215B3F1300756A38 /* TAPConnectionStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPConnectionStatusView.h; sourceTree = "<group>"; };
 		D7796593215B3F1300756A38 /* TAPConnectionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPConnectionStatusView.m; sourceTree = "<group>"; };
@@ -297,11 +295,9 @@
 		D77B5E522158BA8C00253BDC /* TapTalkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapTalkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D77B5E572158BA8C00253BDC /* TapTalkTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapTalkTests.m; sourceTree = "<group>"; };
 		D77B5E592158BA8C00253BDC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D77B5E662158BABB00253BDC /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
-		D77B5E672158BABB00253BDC /* RNImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNImageView.h; sourceTree = "<group>"; };
+		D77B5E672158BABB00253BDC /* TAPImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPImageView.h; sourceTree = "<group>"; };
 		D77B5E682158BABB00253BDC /* TAPUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPUtil.m; sourceTree = "<group>"; };
-		D77B5E692158BABB00253BDC /* Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Base64.m; sourceTree = "<group>"; };
-		D77B5E6A2158BABB00253BDC /* RNImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNImageView.m; sourceTree = "<group>"; };
+		D77B5E6A2158BABB00253BDC /* TAPImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPImageView.m; sourceTree = "<group>"; };
 		D77B5E6B2158BABB00253BDC /* TAPUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPUtil.h; sourceTree = "<group>"; };
 		D77B5E7D2158BB2800253BDC /* NSData+CommonCrypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+CommonCrypto.h"; sourceTree = "<group>"; };
 		D77B5E7E2158BB2900253BDC /* AESCrypt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AESCrypt.m; sourceTree = "<group>"; };
@@ -608,19 +604,17 @@
 			children = (
 				D77B5F8F2158C4E900253BDC /* AESCrypt */,
 				D78364012158E3CD008AF7F5 /* Secure-NSUserDefaults */,
-				D77B5E662158BABB00253BDC /* Base64.h */,
-				D77B5E692158BABB00253BDC /* Base64.m */,
-				D77B5E672158BABB00253BDC /* RNImageView.h */,
-				D77B5E6A2158BABB00253BDC /* RNImageView.m */,
+				D77B5E672158BABB00253BDC /* TAPImageView.h */,
+				D77B5E6A2158BABB00253BDC /* TAPImageView.m */,
 				D77B5E6B2158BABB00253BDC /* TAPUtil.h */,
 				D77B5E682158BABB00253BDC /* TAPUtil.m */,
 				D7796588215B3D4300756A38 /* TAPCustomTextView.h */,
 				D779658C215B3D4400756A38 /* TAPCustomTextView.m */,
 				D7796592215B3F1300756A38 /* TAPConnectionStatusView.h */,
 				D7796593215B3F1300756A38 /* TAPConnectionStatusView.m */,
-				D779658A215B3D4400756A38 /* RNGrowingTextView.h */,
-				D7796589215B3D4400756A38 /* RNGrowingTextView.m */,
-				D779658B215B3D4400756A38 /* RNGrowingTextView.xib */,
+				D779658A215B3D4400756A38 /* TAPGrowingTextView.h */,
+				D7796589215B3D4400756A38 /* TAPGrowingTextView.m */,
+				D779658B215B3D4400756A38 /* TAPGrowingTextView.xib */,
 				D7111BA4215CC11C00D9225D /* TAPGradientView.h */,
 				D7111BA5215CC11C00D9225D /* TAPGradientView.m */,
 				D79A3E66216C72B2004525CE /* TAPSearchBarView.h */,
@@ -970,7 +964,6 @@
 				F5301EF6217A2209007227D2 /* TAPContactRealmModel.h in Headers */,
 				F53288102174A911004E7A25 /* TAPRecentSearchTableViewCell.h in Headers */,
 				D7AB09902191882B00C18BEE /* TAPOldDataManager.h in Headers */,
-				D77B5E6E2158BABB00253BDC /* Base64.h in Headers */,
 				D77B5F372158BB9500253BDC /* TAPAddNewChatView.h in Headers */,
 				D77B5F6D2158BBEA00253BDC /* TAPSearchViewController.h in Headers */,
 				D7111BA6215CC11C00D9225D /* TAPGradientView.h in Headers */,
@@ -991,7 +984,7 @@
 				D77B5EE52158BB7E00253BDC /* TAPContactCollectionViewCell.h in Headers */,
 				D71582FB217EFAEC00649C70 /* TAPCustomNotificationAlertView.h in Headers */,
 				F58EF7E22188244E00F50B24 /* TAPProfileView.h in Headers */,
-				D77B5E6F2158BABB00253BDC /* RNImageView.h in Headers */,
+				D77B5E6F2158BABB00253BDC /* TAPImageView.h in Headers */,
 				D77B5F312158BB9500253BDC /* TAPScanQRCodeView.h in Headers */,
 				D77B5EBC2158BB6300253BDC /* TAPRecentSearchRealmModel.h in Headers */,
 				D77B5F732158BC0B00253BDC /* TapTalk-Prefix.pch in Headers */,
@@ -1044,7 +1037,7 @@
 				D70EAA272163690200E6319E /* TAPBaseRealmModel.h in Headers */,
 				F524EF1E217DE9970087D956 /* TAPSearchResultChatTableViewCell.h in Headers */,
 				D7796594215B3F1300756A38 /* TAPConnectionStatusView.h in Headers */,
-				D779658F215B3D4400756A38 /* RNGrowingTextView.h in Headers */,
+				D779658F215B3D4400756A38 /* TAPGrowingTextView.h in Headers */,
 				DF133C4D219C477500A0E6CC /* TAPChatViewController.h in Headers */,
 				F58EF7DE2188243D00F50B24 /* TAPProfileViewController.h in Headers */,
 				D77B5EA82158BB4000253BDC /* TAPEncryptorManager.h in Headers */,
@@ -1145,7 +1138,7 @@
 				F56AAE5B2186EEFD00E0ECC3 /* TAPMyImageBubbleTableViewCell.xib in Resources */,
 				D7D0811A2190255B0037FA57 /* TAPProductListCollectionViewCell.xib in Resources */,
 				D7FF4CE52176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.xib in Resources */,
-				D7B4954C215B49F200F07BEC /* RNGrowingTextView.xib in Resources */,
+				D7B4954C215B49F200F07BEC /* TAPGrowingTextView.xib in Resources */,
 				D7D081202190459D0037FA57 /* TAPProductListBubbleTableViewCell.xib in Resources */,
 				D780A08521AE656E001D673D /* TAPBaseMyBubbleTableViewCell.xib in Resources */,
 				D7FF4CEB2176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.xib in Resources */,
@@ -1212,7 +1205,6 @@
 				D71582F3217EE99700649C70 /* TAPNotificationManager.m in Sources */,
 				D77B5F5A2158BBEA00253BDC /* TAPCreateGroupSubjectViewController.m in Sources */,
 				D780A08921AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.m in Sources */,
-				D77B5E712158BABB00253BDC /* Base64.m in Sources */,
 				D77B5F092158BB8700253BDC /* TAPBaseXIBRotatedTableViewCell.m in Sources */,
 				D76948BB21B10D2B00AE0BE6 /* TAPCustomBubbleManager.m in Sources */,
 				D77B5EA22158BB4000253BDC /* TAPEncryptorManager.m in Sources */,
@@ -1237,7 +1229,7 @@
 				F5CC1B88218997DC00F39F7D /* TAPImageCollectionViewCell.m in Sources */,
 				D77B5EAC2158BB4000253BDC /* TAPNetworkManager.m in Sources */,
 				D77B5F2D2158BB9500253BDC /* TAPBaseView.m in Sources */,
-				D77B5E722158BABB00253BDC /* RNImageView.m in Sources */,
+				D77B5E722158BABB00253BDC /* TAPImageView.m in Sources */,
 				F5E0B26E215B7BBB0040163B /* TAPMyChatBubbleTableViewCell.m in Sources */,
 				D77B5ED62158BB6E00253BDC /* TAPGroupModel.m in Sources */,
 				D7FF4CEA2176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.m in Sources */,
@@ -1276,7 +1268,7 @@
 				D77B5F632158BBEA00253BDC /* TAPAddNewContactViewController.m in Sources */,
 				D77B5F5E2158BBEA00253BDC /* TAPBaseViewController.m in Sources */,
 				D77B5F572158BBEA00253BDC /* TAPAddNewChatViewController.m in Sources */,
-				D779658E215B3D4400756A38 /* RNGrowingTextView.m in Sources */,
+				D779658E215B3D4400756A38 /* TAPGrowingTextView.m in Sources */,
 				D77B5EA02158BB4000253BDC /* TAPDataManager.m in Sources */,
 				F524EF1F217DE9970087D956 /* TAPSearchResultChatTableViewCell.m in Sources */,
 				D77B5EBA2158BB6300253BDC /* TAPMessageRealmModel.m in Sources */,

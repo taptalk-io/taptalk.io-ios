@@ -1,5 +1,5 @@
 //
-//  RNImageView.h
+//  TAPImageView.h
 //  Version 1.1
 //
 //  Created by Ritchie Nathaniel on 11/23/15.
@@ -7,26 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
-//#import "UIImage+WebP.h"
-
-//#define RNIMAGE_LOG
 
 static const NSInteger kMaxCacheAge = 60 * 60 * 24 * 7; // 1 Week in Seconds
 static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B
 
-@class RNImageView;
+@class TAPImageView;
 
-@protocol RNImageViewDelegate <NSObject>
+@protocol TAPImageViewDelegate <NSObject>
 
 @optional
 
-- (void)RNImageViewDidFinishLoadImage:(RNImageView *)imageView;
+- (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView;
 
 @end
 
-@interface RNImageView : UIImageView
+@interface TAPImageView : UIImageView
 
-@property (weak, nonatomic) id<RNImageViewDelegate> delegate;
+@property (weak, nonatomic) id<TAPImageViewDelegate> delegate;
 
 @property (strong, nonatomic) NSString *imageURLString;
 
