@@ -270,8 +270,17 @@
     TAPRoomModel *room = message.room;
     
     UIViewController *currentActiveController = ((UINavigationController *)self.activeWindow.rootViewController).topViewController;
+    UINavigationController *currentNavigationController = currentActiveController.navigationController;
     
-    [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:currentActiveController.navigationController];
+    if ([currentActiveController isKindOfClass:[TAPChatViewController class]]) {
+//        NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray:currentNavigationController.viewControllers];
+//        NSInteger viewControllerIndex = [navigationArray indexOfObject:currentActiveController];
+//        [navigationArray removeObjectAtIndex: viewControllerIndex];
+//        currentNavigationController.viewControllers = navigationArray;
+        [currentActiveController.navigationController popViewControllerAnimated:NO];
+    }
+    
+    [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:currentNavigationController animated:YES];
     
     //END DV Temp
     
@@ -367,7 +376,7 @@
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
-- (void)openRoomWithRoom:(TAPRoomModel *)room fromNavigationController:(UINavigationController *)navigationController {
+- (void)openRoomWithRoom:(TAPRoomModel *)room fromNavigationController:(UINavigationController *)navigationController animated:(BOOL)isAnimated {
     [[TAPChatManager sharedManager] openRoom:room];
     
     //Save all unsent message (in case user retrieve message on another room)
@@ -376,7 +385,40 @@
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
-    [navigationController pushViewController:chatViewController animated:YES];
+    [navigationController pushViewController:chatViewController animated:isAnimated];
+}
+
+- (void)sendTextMessage:(NSString *)message recipientXCUserID:(NSString *)recipientXCUserID success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+
+    TAPUserModel *recipientUser = [[TAPContactManager sharedManager] getUserWithUserID:recipientXCUserID];
+    
+    if(recipientUser == nil) {
+        //User not exist in database, call api
+        [TAPDataManager callAPIGetUserByXCUserID:recipientXCUserID success:^(TAPUserModel *user) {
+            
+            if(user == nil) {
+                //Failed to obtain user data
+                NSError *error; //DV Temp
+                failure(error);
+            }
+            
+            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+            [[TAPChatManager sharedManager] constructMessage:message user:[TAPChatManager sharedManager].activeUser room:room];
+            success();
+            
+        } failure:^(NSError *error) {
+            failure(error);
+        }];
+    }
+    else {
+        TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipientUser];
+        [[TAPChatManager sharedManager] constructMessage:message user:[TAPChatManager sharedManager].activeUser room:room];
+        success();
+    }
+}
+
+- (void)requestToSendProductListWithRecipientXCUserID:(NSString *)recipientXCUserID {
+    //Call API
 }
 
 - (void)shouldRefreshAuthTicket {

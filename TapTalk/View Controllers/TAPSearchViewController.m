@@ -267,7 +267,7 @@
     if (tableView == self.searchView.recentSearchTableView) {
         TAPRecentSearchModel *selectedRecentSearch = [self.recentSearchArray objectAtIndex:indexPath.row];
         TAPRoomModel *selectedRoom = selectedRecentSearch.room;
-        [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController];
+        [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController animated:YES];
         
         NSDate *date = [NSDate date];
         long createdDate = [date timeIntervalSince1970] * 1000.0f;
@@ -284,7 +284,7 @@
         if (indexPath.section == 0) {
             //CHATS AND CONTACTS
             TAPRoomModel *selectedRoom = [self.searchResultChatAndContactArray objectAtIndex:indexPath.row];
-            [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController];
+            [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController animated:YES];
             //Add to recent chat
             TAPRecentSearchModel *recentSearch = [TAPRecentSearchModel new];
             recentSearch.room = selectedRoom;
@@ -313,7 +313,7 @@
             //MESSAGES
             TAPMessageModel *selectedMessage = [self.searchResultMessageArray objectAtIndex:indexPath.row];
             TAPRoomModel *selectedRoom = selectedMessage.room;
-            [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController];
+            [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController animated:YES];
         }
     }
 }

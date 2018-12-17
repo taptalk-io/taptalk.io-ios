@@ -52,6 +52,7 @@
 - (void)stopTyping;
 
 - (void)sendTextMessage:(NSString *)textMessage;
+- (void)constructMessage:(NSString *)textMessage user:(TAPUserModel *)user room:(TAPRoomModel *)room;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;

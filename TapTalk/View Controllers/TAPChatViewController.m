@@ -305,7 +305,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     if([[[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser] count] > 0) {
         //There's custom keyboard for this type
-        
         NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser];
         
         [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:otherUser];
@@ -787,12 +786,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
-    //    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
+    NSLog(@"USER IS START TYPING"); //DV Temp
     [self setAsTyping:YES];
 }
 
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
-    //    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
+    NSLog(@"USER IS STOP TYPING"); //DV Temp
     [self setAsTyping:NO];
 }
 

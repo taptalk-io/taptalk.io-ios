@@ -71,8 +71,9 @@ static NSString * const kAPIVersionString = @"v1";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     else if (type == TAPAPIManagerTypeValidateAccessToken) {
+        NSString *formattedAPIBaseURL = [self.APIBaseURL stringByReplacingOccurrencesOfString:@"api" withString:@""];
         NSString *apiPath = @"pigeon?check=1";
-        return [NSString stringWithFormat:@"%@/%@", self.APIBaseURL, apiPath];
+        return [NSString stringWithFormat:@"%@%@", formattedAPIBaseURL, apiPath];
     }
     else if (type == TAPAPIManagerTypeGetMessageRoomListAndUnread) {
         NSString *apiPath = @"chat/message/room_list_and_unread";
