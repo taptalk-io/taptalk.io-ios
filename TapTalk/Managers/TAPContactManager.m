@@ -56,7 +56,7 @@
 
 #pragma mark - Custom Method
 - (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save {
-    TAPUserModel *savedUser = [self.contactUserDictionary objectForKey:user];
+    TAPUserModel *savedUser = [self.contactUserDictionary objectForKey:user.userID];
     if(savedUser != nil && savedUser.isContact) {
         user.isContact = YES;
     }
@@ -79,7 +79,7 @@
 }
 
 - (TAPUserModel *)getUserWithUserID:(NSString *)userID {
-    TAPUserModel *user = [self.contactUserDictionary objectForKey:user];
+    TAPUserModel *user = [self.contactUserDictionary objectForKey:userID];
     return user;
 }
 
@@ -94,7 +94,7 @@
 
 - (void)populateContactFromDatabase {
     [self.contactUserDictionary removeAllObjects];
-    [TAPDataManager getDatabaseAllContactSortBy:@"fullname" success:^(NSArray *resultArray) {
+    [TAPDataManager getDatabaseAllUserSortBy:@"fullname" success:^(NSArray *resultArray) {
         for (TAPUserModel *user in resultArray) {
             [self.contactUserDictionary setObject:user forKey:user.userID];
         }

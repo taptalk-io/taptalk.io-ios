@@ -58,6 +58,9 @@
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success
                                 failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseAllUserSortBy:(NSString *)columnName
+                         success:(void (^)(NSArray *resultArray))success
+                         failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllContactSortBy:(NSString *)columnName
                             success:(void (^)(NSArray *resultArray))success
                             failure:(void (^)(NSError *error))failure;
@@ -134,7 +137,7 @@
 + (void)callAPIGetUserByUserID:(NSString *)userID
                        success:(void (^)(TAPUserModel *user))success
                        failure:(void (^)(NSError *error))failure;
-+ (void)callAPIGetUserByXCUserID:(NSString *)XCuserID
++ (void)callAPIGetUserByXCUserID:(NSString *)XCUserID
                          success:(void (^)(TAPUserModel *user))success
                          failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetUserByUsername:(NSString *)username

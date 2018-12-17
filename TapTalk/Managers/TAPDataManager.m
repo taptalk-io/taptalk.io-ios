@@ -1245,6 +1245,27 @@
     }];
 }
 
++ (void)getDatabaseAllUserSortBy:(NSString *)columnName
+                         success:(void (^)(NSArray *resultArray))success
+                         failure:(void (^)(NSError *error))failure {
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact
+                             whereClauseQuery:@""
+                             sortByColumnName:columnName
+                                  isAscending:YES
+                                      success:^(NSArray *resultArray) {
+                                          NSMutableArray *modelArray = [NSMutableArray array];
+                                          for (NSInteger count = 0; count < [resultArray count]; count++) {
+                                              NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[resultArray objectAtIndex:count]];
+                                              
+                                              TAPUserModel *user = [TAPDataManager userModelFromDictionary:databaseDictionary];
+                                              [modelArray addObject:user];
+                                          }
+                                          success(modelArray);
+                                      } failure:^(NSError *error) {
+                                          failure(error);
+                                      }];
+}
+
 + (void)getDatabaseAllContactSortBy:(NSString *)columnName
                             success:(void (^)(NSArray *resultArray))success
                             failure:(void (^)(NSError *error))failure {
@@ -2744,13 +2765,13 @@
     }];
 }
 
-+ (void)callAPIGetUserByXCUserID:(NSString *)XCuserID
++ (void)callAPIGetUserByXCUserID:(NSString *)XCUserID
                          success:(void (^)(TAPUserModel *user))success
                          failure:(void (^)(NSError *error))failure; {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetUserByXCUserID];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:XCuserID forKey:@"xcUserID"];
+    [parameterDictionary setObject:XCUserID forKey:@"xcUserID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -2767,7 +2788,7 @@
             if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIGetUserByXCUserID:XCuserID success:success failure:failure];
+                    [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error);
                 }];

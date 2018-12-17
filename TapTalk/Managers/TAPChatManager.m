@@ -128,11 +128,13 @@
 - (void)connectionManagerDidReceiveError:(NSError *)error {
     _isTyping = NO;
     _isShouldRefreshOnlineStatus = YES;
+    _typingDictionary = [NSMutableDictionary dictionary];
 }
 
 - (void)connectionManagerDidDisconnectedWithCode:(NSInteger)code reason:(NSString *)reason cleanClose:(BOOL)clean {
     _isTyping = NO;
     _isShouldRefreshOnlineStatus = YES;
+    _typingDictionary = [NSMutableDictionary dictionary];
 }
 
 #pragma mark - Custom Method
@@ -216,6 +218,10 @@
 }
 
 - (void)sendTextMessage:(NSString *)textMessage {
+    [[TAPChatManager sharedManager] constructMessage:textMessage user:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom];
+}
+
+- (void)constructMessage:(NSString *)textMessage user:(TAPUserModel *)user room:(TAPRoomModel *)room {
     //Divide message if length more than character limit
     NSInteger characterLimit = kCharacterLimit;
     
@@ -230,13 +236,13 @@
             }
             
             NSString *substringMessage = [textMessage substringWithRange:NSMakeRange(startIndex, substringLength)];
-            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:substringMessage type:TAPChatMessageTypeText];
+            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:user room:room body:substringMessage type:TAPChatMessageTypeText];
             
             [self sendMessage:message];
         }
     }
     else {
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:textMessage type:TAPChatMessageTypeText];
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:user room:room body:textMessage type:TAPChatMessageTypeText];
         
         [self sendMessage:message];
     }

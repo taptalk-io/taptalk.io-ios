@@ -216,7 +216,7 @@
     TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
     TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
     TAPRoomModel *selectedRoom = selectedMessage.room;
-    [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController];
+    [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController animated:YES];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
