@@ -373,6 +373,7 @@
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
+    chatViewController.hidesBottomBarWhenPushed = YES;
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
@@ -385,6 +386,7 @@
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
+    chatViewController.hidesBottomBarWhenPushed = YES;
     [navigationController pushViewController:chatViewController animated:isAnimated];
 }
 
