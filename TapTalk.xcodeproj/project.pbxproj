@@ -183,6 +183,14 @@
 		D7D0811E2190459D0037FA57 /* TAPProductListBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D0811B2190459D0037FA57 /* TAPProductListBubbleTableViewCell.h */; };
 		D7D0811F2190459D0037FA57 /* TAPProductListBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D0811C2190459D0037FA57 /* TAPProductListBubbleTableViewCell.m */; };
 		D7D081202190459D0037FA57 /* TAPProductListBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7D0811D2190459D0037FA57 /* TAPProductListBubbleTableViewCell.xib */; };
+		D7FB9EDF21C8C7BC00E26FC7 /* TAPImagePreviewView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FB9EDD21C8C7BC00E26FC7 /* TAPImagePreviewView.h */; };
+		D7FB9EE021C8C7BC00E26FC7 /* TAPImagePreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7FB9EDE21C8C7BC00E26FC7 /* TAPImagePreviewView.m */; };
+		D7FB9EE321C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FB9EE121C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h */; };
+		D7FB9EE421C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7FB9EE221C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.m */; };
+		D7FB9EE721C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FB9EE521C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.h */; };
+		D7FB9EE821C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7FB9EE621C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.m */; };
+		D7FB9EEB21C8DDD400E26FC7 /* TAPImagePreviewViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FB9EE921C8DDD400E26FC7 /* TAPImagePreviewViewController.h */; };
+		D7FB9EEC21C8DDD400E26FC7 /* TAPImagePreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7FB9EEA21C8DDD400E26FC7 /* TAPImagePreviewViewController.m */; };
 		D7FF4CE32176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FF4CE02176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.h */; };
 		D7FF4CE42176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7FF4CE12176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.m */; };
 		D7FF4CE52176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7FF4CE22176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.xib */; };
@@ -450,6 +458,14 @@
 		D7D0811B2190459D0037FA57 /* TAPProductListBubbleTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPProductListBubbleTableViewCell.h; sourceTree = "<group>"; };
 		D7D0811C2190459D0037FA57 /* TAPProductListBubbleTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPProductListBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D7D0811D2190459D0037FA57 /* TAPProductListBubbleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TAPProductListBubbleTableViewCell.xib; sourceTree = "<group>"; };
+		D7FB9EDD21C8C7BC00E26FC7 /* TAPImagePreviewView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPImagePreviewView.h; sourceTree = "<group>"; };
+		D7FB9EDE21C8C7BC00E26FC7 /* TAPImagePreviewView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPImagePreviewView.m; sourceTree = "<group>"; };
+		D7FB9EE121C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPImagePreviewCollectionViewCell.h; sourceTree = "<group>"; };
+		D7FB9EE221C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPImagePreviewCollectionViewCell.m; sourceTree = "<group>"; };
+		D7FB9EE521C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapThumbnailImagePreviewCollectionViewCell.h; sourceTree = "<group>"; };
+		D7FB9EE621C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapThumbnailImagePreviewCollectionViewCell.m; sourceTree = "<group>"; };
+		D7FB9EE921C8DDD400E26FC7 /* TAPImagePreviewViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPImagePreviewViewController.h; sourceTree = "<group>"; };
+		D7FB9EEA21C8DDD400E26FC7 /* TAPImagePreviewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPImagePreviewViewController.m; sourceTree = "<group>"; };
 		D7FF4CE02176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPUnreadMessagesBubbleTableViewCell.h; sourceTree = "<group>"; };
 		D7FF4CE12176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPUnreadMessagesBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D7FF4CE22176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TAPUnreadMessagesBubbleTableViewCell.xib; sourceTree = "<group>"; };
@@ -742,6 +758,8 @@
 				F58EF7E12188244E00F50B24 /* TAPProfileView.m */,
 				DF133C46219C475200A0E6CC /* TAPCustomAccessoryView.h */,
 				DF133C45219C475200A0E6CC /* TAPCustomAccessoryView.m */,
+				D7FB9EDD21C8C7BC00E26FC7 /* TAPImagePreviewView.h */,
+				D7FB9EDE21C8C7BC00E26FC7 /* TAPImagePreviewView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -786,6 +804,8 @@
 				D71582FE217EFB0000649C70 /* TAPCustomNotificationAlertViewController.m */,
 				F58EF7DC2188243D00F50B24 /* TAPProfileViewController.h */,
 				F58EF7DD2188243D00F50B24 /* TAPProfileViewController.m */,
+				D7FB9EE921C8DDD400E26FC7 /* TAPImagePreviewViewController.h */,
+				D7FB9EEA21C8DDD400E26FC7 /* TAPImagePreviewViewController.m */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -804,6 +824,10 @@
 				D7D081152190255B0037FA57 /* TAPProductListCollectionViewCell.h */,
 				D7D081162190255B0037FA57 /* TAPProductListCollectionViewCell.m */,
 				D7D081172190255B0037FA57 /* TAPProductListCollectionViewCell.xib */,
+				D7FB9EE121C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h */,
+				D7FB9EE221C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.m */,
+				D7FB9EE521C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.h */,
+				D7FB9EE621C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.m */,
 			);
 			path = UICollectionViewCells;
 			sourceTree = "<group>";
@@ -967,6 +991,7 @@
 				D77B5F372158BB9500253BDC /* TAPAddNewChatView.h in Headers */,
 				D77B5F6D2158BBEA00253BDC /* TAPSearchViewController.h in Headers */,
 				D7111BA6215CC11C00D9225D /* TAPGradientView.h in Headers */,
+				D7FB9EE321C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h in Headers */,
 				D77B5EA12158BB4000253BDC /* TAPDatabaseManager.h in Headers */,
 				D77B5F6B2158BBEA00253BDC /* TAPBaseViewController.h in Headers */,
 				D76948BA21B10D2B00AE0BE6 /* TAPCustomBubbleManager.h in Headers */,
@@ -990,6 +1015,7 @@
 				D77B5F732158BC0B00253BDC /* TapTalk-Prefix.pch in Headers */,
 				D74769FE21638F9700B196E7 /* TAPAddNewContactView.h in Headers */,
 				D77B5EAA2158BB4000253BDC /* TAPFileManager.h in Headers */,
+				D7FB9EEB21C8DDD400E26FC7 /* TAPImagePreviewViewController.h in Headers */,
 				D77B5EB12158BB4000253BDC /* TAPConnectionManager.h in Headers */,
 				D78364052158E3DD008AF7F5 /* NSUserDefaults+MPSecureUserDefaults.h in Headers */,
 				D74BA2AE2162066200DF494C /* TAPRoomListModel.h in Headers */,
@@ -1002,6 +1028,7 @@
 				D77B5F062158BB8700253BDC /* TAPContactTableViewCell.h in Headers */,
 				D740A3B62192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.h in Headers */,
 				D77B5F0B2158BB8700253BDC /* TAPNewChatOptionTableViewCell.h in Headers */,
+				D7FB9EE721C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.h in Headers */,
 				DF33AADF21B107BF004C2A49 /* TAPCustomKeyboardManager.h in Headers */,
 				DF45149721BA52FE00C1C539 /* TAPTypingModel.h in Headers */,
 				DFA5990321B7D3A30082C5F3 /* TAPContactManager.h in Headers */,
@@ -1022,6 +1049,7 @@
 				D77B5F032158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.h in Headers */,
 				D77B5F752158BC7A00253BDC /* Configs.h in Headers */,
 				D780A08821AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.h in Headers */,
+				D7FB9EDF21C8C7BC00E26FC7 /* TAPImagePreviewView.h in Headers */,
 				D77B5F2C2158BB9500253BDC /* TAPCreateGroupSubjectView.h in Headers */,
 				D77B5EBD2158BB6300253BDC /* TAPMessageRealmModel.h in Headers */,
 				D77B5F612158BBEA00253BDC /* TAPScanQRCodeViewController.h in Headers */,
@@ -1248,6 +1276,7 @@
 				D79A3E69216C72B3004525CE /* TAPSearchBarView.m in Sources */,
 				D77B5F642158BBEA00253BDC /* TAPBlockedListViewController.m in Sources */,
 				D728D530217D813E00DACE7A /* TAPScanQRCodePopupView.m in Sources */,
+				D7FB9EE021C8C7BC00E26FC7 /* TAPImagePreviewView.m in Sources */,
 				D77B5ED02158BB6E00253BDC /* TAPRoomModel.m in Sources */,
 				F56AAE602186F4E000E0ECC3 /* TAPYourImageBubbleTableViewCell.m in Sources */,
 				F571763C216DC81300B50F3C /* TAPKeyboardViewController.m in Sources */,
@@ -1266,6 +1295,7 @@
 				F58EF7DF2188243D00F50B24 /* TAPProfileViewController.m in Sources */,
 				D77B5EA72158BB4000253BDC /* TAPConnectionManager.m in Sources */,
 				D77B5F632158BBEA00253BDC /* TAPAddNewContactViewController.m in Sources */,
+				D7FB9EE821C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.m in Sources */,
 				D77B5F5E2158BBEA00253BDC /* TAPBaseViewController.m in Sources */,
 				D77B5F572158BBEA00253BDC /* TAPAddNewChatViewController.m in Sources */,
 				D779658E215B3D4400756A38 /* TAPGrowingTextView.m in Sources */,
@@ -1286,9 +1316,11 @@
 				D7796591215B3D4400756A38 /* TAPCustomTextView.m in Sources */,
 				D79A3E6C216C72C4004525CE /* TAPConnectionStatusViewController.m in Sources */,
 				D77B5EDD2158BB6E00253BDC /* TAPMessageModel.m in Sources */,
+				D7FB9EEC21C8DDD400E26FC7 /* TAPImagePreviewViewController.m in Sources */,
 				D78364042158E3DD008AF7F5 /* NSUserDefaults+MPSecureUserDefaults.m in Sources */,
 				D780A08421AE656E001D673D /* TAPBaseMyBubbleTableViewCell.m in Sources */,
 				D77B5F342158BB9500253BDC /* TAPCreateGroupSubjectView.m in Sources */,
+				D7FB9EE421C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1315,6 +1347,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				BITCODE_GENERATION_MODE = bitcode;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1347,7 +1380,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1368,6 +1401,12 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-fembed-bitcode\n-fembed-bitcode",
+				);
+				OTHER_LDFLAGS = (
+					"-fembed-bitcode\n-fembed-bitcode",
+				);
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1378,6 +1417,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				BITCODE_GENERATION_MODE = bitcode;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1410,7 +1450,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1424,6 +1464,12 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = (
+					"-fembed-bitcode\n-fembed-bitcode",
+				);
+				OTHER_LDFLAGS = (
+					"-fembed-bitcode\n-fembed-bitcode",
+				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";

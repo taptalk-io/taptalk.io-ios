@@ -17,6 +17,11 @@
 #import <AFNetworking/AFNetworking.h>
 #import "TAPSearchViewController.h"
 
+
+#import "TAPImagePreviewViewController.h" //DV Temp
+
+
+
 @interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
@@ -348,6 +353,12 @@
 #pragma mark - Custom Method
 - (void)editButtonDidTapped {
     NSLog(@"Edit");
+    
+    //DV Temp
+//    TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+//    UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
+//    [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:nil];
+    //END DV Temp
 }
 
 - (void)addButtonDidTapped {
