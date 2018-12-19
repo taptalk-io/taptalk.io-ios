@@ -37,25 +37,30 @@
         [self addSubview:self.contentBackgroundView];
         
         CGFloat topMenuYPosition = 0.0f;
-        CGFloat imagePreviewCollectionViewHeight = CGRectGetHeight(self.frame);
+        CGFloat bottomMenuYPosition = CGRectGetHeight(self.frame) - 48.0f;
+        CGFloat topMenuViewHeight = 44.0f;
+        CGFloat bottomMenuViewHeight = 48.0f;
+        CGFloat imagePreviewCollectionViewHeight = CGRectGetHeight(self.frame) - topMenuViewHeight - bottomMenuViewHeight;
+        
         if (IS_IPHONE_X_FAMILY) {
             topMenuYPosition = [TAPUtil safeAreaTopPadding];
+            bottomMenuYPosition = bottomMenuYPosition - [TAPUtil safeAreaBottomPadding];
             imagePreviewCollectionViewHeight = imagePreviewCollectionViewHeight - topMenuYPosition - [TAPUtil safeAreaBottomPadding];
         }
         
+        //Top Menu View
+        _topMenuView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, topMenuYPosition, CGRectGetWidth(self.frame), topMenuViewHeight)];
+        self.topMenuView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
+        [self addSubview:self.topMenuView];
+        
         UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
         collectionLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        _imagePreviewCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, topMenuYPosition, CGRectGetWidth(self.frame), imagePreviewCollectionViewHeight) collectionViewLayout:collectionLayout];
+        _imagePreviewCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.topMenuView.frame), CGRectGetWidth(self.frame), imagePreviewCollectionViewHeight) collectionViewLayout:collectionLayout];
         self.imagePreviewCollectionView.backgroundColor = [UIColor clearColor];
         self.imagePreviewCollectionView.pagingEnabled = YES;
         self.imagePreviewCollectionView.showsVerticalScrollIndicator = NO;
         self.imagePreviewCollectionView.showsHorizontalScrollIndicator = NO;
         [self addSubview:self.imagePreviewCollectionView];
-        
-        //Top Menu View
-        _topMenuView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, topMenuYPosition, CGRectGetWidth(self.frame), 64.0f)];
-        self.topMenuView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
-        [self addSubview:self.topMenuView];
         
         _numberOfImageInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 32.0f - 50.0f, (CGRectGetHeight(self.topMenuView.frame) - 21.0f) / 2.0f, 50.0f, 21.0f)];
         self.numberOfImageInfoLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
@@ -79,12 +84,7 @@
         [self addSubview:self.thumbnailCollectionView];
         
         //Bottom Menu View
-        CGFloat bottomMenuYPosition = CGRectGetHeight(self.frame) - 48.0f;
-        if (IS_IPHONE_X_FAMILY) {
-            bottomMenuYPosition = bottomMenuYPosition - [TAPUtil safeAreaBottomPadding];
-        }
-        
-        _bottomMenuView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, bottomMenuYPosition, CGRectGetWidth(self.frame), 48.0f)];
+        _bottomMenuView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, bottomMenuYPosition, CGRectGetWidth(self.frame), bottomMenuViewHeight)];
         self.bottomMenuView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
         [self addSubview:self.bottomMenuView];
         

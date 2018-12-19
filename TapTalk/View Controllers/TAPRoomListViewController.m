@@ -57,7 +57,7 @@
     _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.roomListView];
     
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerLoadView)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerLoadView)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerLoadView];
     }
 }
@@ -113,7 +113,7 @@
     self.connectionStatusViewController.delegate = self;
     [self.roomListView addSubview:self.connectionStatusViewController.view];
     
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidLoad)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidLoad)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewDidLoad];
     }
     
@@ -125,7 +125,7 @@
     [super viewWillAppear:animated];
     _isViewAppear = YES;
     
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillAppear)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillAppear)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewWillAppear];
     }
 }
@@ -138,7 +138,7 @@
         [self.searchBarView.searchTextField resignFirstResponder];
     }
     
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillDisappear)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillDisappear)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewWillDisappear];
     }
 }
@@ -147,28 +147,28 @@
     [[TAPChatManager sharedManager] removeDelegate:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
     
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerDealloc)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerDealloc)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerDealloc];
     }
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerDidReceiveMemoryWarning)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerDidReceiveMemoryWarning)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerDidReceiveMemoryWarning];
     }
 }
     
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidAppear)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidAppear)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewDidAppear];
     }
 }
     
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    if (self.[lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidDisappear)]) {
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidDisappear)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewDidDisappear];
     }
 }
