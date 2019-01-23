@@ -118,7 +118,11 @@
 - (void)socketConnectedNotification:(NSNotification *)notification {
     [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeConnected];
     [self checkStatusHeight];
-    [TAPUtil tapticNotificationFeedbackGeneratorWithType:UINotificationFeedbackTypeSuccess];
+    
+    if ([[TapTalk sharedInstance] roomListViewController].isViewAppear || self.isChatViewControllerAppear) {
+        [TAPUtil tapticNotificationFeedbackGeneratorWithType:UINotificationFeedbackTypeSuccess];
+    }
+    
     [self performSelector:@selector(removeNetworkNotificationView) withObject:nil afterDelay:0.5f];
 }
 

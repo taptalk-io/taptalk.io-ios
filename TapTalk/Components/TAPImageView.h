@@ -28,9 +28,13 @@ static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B
 @property (strong, nonatomic) NSString *imageURLString;
 
 + (void)saveImageToCache:(UIImage *)image withKey:(NSString *)key;
-+ (UIImage *)imageFromCacheWithKey:(NSString *)key;
++ (void)imageFromCacheWithKey:(NSString *)key success:(void (^)(UIImage *savedImage))success; //Run in background thread, async
++ (UIImage *)imageFromCacheWithKey:(NSString *)key; //Run in main thread
 + (void)removeImageFromCacheWithKey:(NSString *)key;
 
 - (void)setImageWithURLString:(NSString *)urlString;
+
+//TapTalk
++ (void)imageFromCacheWithKey:(NSString *)key message:(TAPMessageModel *)receivedMessage success:(void (^)(UIImage *savedImage, TAPMessageModel *resultMessage))success;
 
 @end

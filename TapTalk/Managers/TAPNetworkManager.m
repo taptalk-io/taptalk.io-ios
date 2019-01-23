@@ -65,7 +65,11 @@ static const NSInteger kAPITimeOut = 300;
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
-    NSString *appKey = [NSString stringWithFormat:@"%@:%@", TAP_APP_KEY_ID, TAP_APP_KEY_SECRET];
+    NSString *appKeyID = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_ID valid:nil];
+    NSString *appKeySecret = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_SECRET valid:nil];
+    NSString *userAgent = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_USER_AGENT valid:nil];
+    
+    NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
     NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];
     NSString *encodedAppKey = [base64Data base64EncodedStringWithOptions:0];
     
@@ -75,7 +79,7 @@ static const NSInteger kAPITimeOut = 300;
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
     [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
-    [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"User-Agent"];
+    [manager.requestSerializer setValue:userAgent forHTTPHeaderField:@"User-Agent"];
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];
     
     if ([TAPDataManager getAccessToken] != nil && ![[TAPDataManager getAccessToken] isEqualToString:@""]) {
@@ -348,6 +352,114 @@ refreshToken:(NSString *)refreshToken
           failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
               failure(task, error);
           }];
+}
+
+- (void)upload:(NSString *)urlString
+      fileData:(NSData *)fileData
+      mimeType:(NSString *)mimeType
+    parameters:(NSDictionary *)parameters
+      progress:(void (^)(NSProgress *uploadProgress))progress
+       success:(void (^)(NSDictionary *responseObject))success
+       failure:(void (^)(NSError *error))failure {
+    
+    if(urlString == nil) {
+        urlString = @"";
+    }
+    
+    if(parameters == nil) {
+        parameters = [NSDictionary dictionary];
+    }
+#ifdef DEBUG
+    NSLog(@"POST URL: %@", urlString);
+#endif
+    
+    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        //No internet connection notification
+        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
+        
+        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
+        
+        failure (error);
+    }
+    
+    NSData *parameterData = [NSKeyedArchiver archivedDataWithRootObject:parameters];
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
+    
+    NSMutableURLRequest *request = [[self defaultManager].requestSerializer multipartFormRequestWithMethod:@"POST" URLString:urlString parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+
+        [formData appendPartWithFileData:fileData name:@"file" fileName:@"images.png" mimeType:mimeType];
+        
+        NSData *roomIDData = [[parameters objectForKey:@"roomID"] dataUsingEncoding:NSUTF8StringEncoding];
+        [formData appendPartWithFormData:roomIDData name:@"roomID"];
+
+        NSString *fileTypeString = [parameters objectForKey:@"fileType"];
+        fileTypeString = [TAPUtil nullToEmptyString:fileTypeString];
+        NSData *fileTypeData = [fileTypeString dataUsingEncoding:NSUTF8StringEncoding];
+        [formData appendPartWithFormData:fileTypeData name:@"fileType"];
+        
+        NSString *captionString = [parameters objectForKey:@"caption"];
+        captionString = [TAPUtil nullToEmptyString:captionString];
+        
+        if (![captionString isEqualToString:@""]) {
+            NSData *captionData = [captionString dataUsingEncoding:NSUTF8StringEncoding];
+            [formData appendPartWithFormData:captionData name:@"caption"];
+        }
+        
+    } error:nil];
+    
+    [request setTimeoutInterval:20000];
+
+    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+
+    NSURLSessionUploadTask *uploadTask;
+    uploadTask = [manager
+                  uploadTaskWithStreamedRequest:request
+                  progress:^(NSProgress * _Nonnull uploadProgress) {
+                      // This is not called back on the main queue.
+                      // You are responsible for dispatching to the main queue for UI updates
+                      dispatch_async(dispatch_get_main_queue(), ^{
+                          progress(uploadProgress);
+                      });
+                  }
+                  completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+                      if (error) {
+                          NSLog(@"Error: %@", error);
+                          failure(error);
+                      } else {
+                          NSLog(@"%@ %@", response, responseObject);
+                          success(responseObject);
+                      }
+                  }];
+
+    [uploadTask resume];
+    
+//    NSString *roomID = [parameters objectForKey:@"roomID"];
+//
+//    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+//
+//    [manager POST:urlString parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+//        [formData appendPartWithFileData:fileData
+//                                    name:@"file"
+//                                fileName:@"images" mimeType:@"image/png"];
+//
+////        [formData appendPartWithFormData:[roomID dataUsingEncoding:NSUTF8StringEncoding]
+////                                    name:@"roomID"];
+//
+////        [formData appendPartWithFormData:[key2 dataUsingEncoding:NSUTF8StringEncoding]
+////                                    name:@"key2"];
+//
+//    } progress:^(NSProgress * _Nonnull uploadProgress) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            progress(uploadProgress);
+//        });
+//    } success:^(NSURLSessionDataTask *task, id responseObject) {
+//        NSLog(@"Response: %@", responseObject);
+//        success(responseObject);
+//    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+//        NSLog(@"Error: %@", error);
+//        failure(error);
+//    }];
 }
 
 @end

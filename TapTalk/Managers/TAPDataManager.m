@@ -61,6 +61,7 @@
 //WK NOTE - USUALLY USED ON GETDATABASE METHODS
 + (TAPMessageModel *)messageModelFromDictionary:(NSDictionary *)dictionary {
     dictionary = [TAPUtil nullToEmptyDictionary:dictionary];
+    
     TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dictionary error:nil];
     
     TAPRoomModel *room = [TAPRoomModel new];
@@ -181,12 +182,69 @@
     user.updated = userUpdated;
     message.user = user;
     
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    NSString *title = [dictionary objectForKey:@"quoteTitle"];
+    title = [TAPUtil nullToEmptyString:title];
+    quote.title = title;
+    
+    NSString *content = [dictionary objectForKey:@"quoteContent"];
+    content = [TAPUtil nullToEmptyString:content];
+    quote.content = content;
+    
+    NSString *fileID = [dictionary objectForKey:@"quoteFileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    quote.fileID = fileID;
+    
+    NSString *imageURLString = [dictionary objectForKey:@"quoteImageURL"];
+    imageURLString = [TAPUtil nullToEmptyString:imageURLString];
+    quote.imageURL = imageURLString;
+    
+    message.quote = quote;
+    
+    TAPReplyToModel *replyTo = [TAPReplyToModel new];
+    NSString *replyToMessageID = [dictionary objectForKey:@"replyToMessageID"];
+    replyToMessageID = [TAPUtil nullToEmptyString:replyToMessageID];
+    replyTo.messageID = replyToMessageID;
+    
+    NSString *replyToLocalID = [dictionary objectForKey:@"replyToLocalID"];
+    replyToLocalID = [TAPUtil nullToEmptyString:replyToLocalID];
+    replyTo.localID = replyToLocalID;
+    
+    NSInteger replyMessageType = [[dictionary objectForKey:@"replyMessageType"] integerValue];
+    replyTo.messageType = replyMessageType;
+    message.replyTo = replyTo;
+    
+    TAPForwardFromModel *forwardFrom = [TAPForwardFromModel new];
+    NSString *forwardFromUserID = [dictionary objectForKey:@"forwardFromUserID"];
+    forwardFromUserID = [TAPUtil nullToEmptyString:forwardFromUserID];
+    forwardFrom.userID = forwardFromUserID;
+    
+    NSString *forwardFromXcUserID = [dictionary objectForKey:@"forwardFromXcUserID"];
+    forwardFromXcUserID = [TAPUtil nullToEmptyString:forwardFromXcUserID];
+    forwardFrom.xcUserID = forwardFromXcUserID;
+    
+    NSString *forwardFromFullname = [dictionary objectForKey:@"forwardFromFullname"];
+    forwardFromFullname = [TAPUtil nullToEmptyString:forwardFromFullname];
+    forwardFrom.fullname = forwardFromFullname;
+    
+    NSString *forwardFromMessageID = [dictionary objectForKey:@"forwardFromMessageID"];
+    forwardFromMessageID = [TAPUtil nullToEmptyString:forwardFromMessageID];
+    forwardFrom.messageID = forwardFromMessageID;
+    
+    NSString *forwardFromLocalID = [dictionary objectForKey:@"forwardFromLocalID"];
+    forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+    forwardFrom.localID = forwardFromLocalID;
+    message.forwardFrom = forwardFrom;
+    
     return message;
 }
 
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary {
     dictionary = [TAPUtil nullToEmptyDictionary:dictionary];
-    TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dictionary error:nil];
+    
+//    TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dictionary error:nil];
+    
+    TAPMessageModel *message = [TAPEncryptorManager decryptToMessageModelFromDictionary:dictionary];
     
     NSDictionary *roomDictionary = [dictionary objectForKey:@"room"];
     TAPRoomModel *room = [TAPRoomModel new];
@@ -294,6 +352,62 @@
     userUpdated = [TAPUtil nullToEmptyNumber:userUpdated];
     user.updated = userUpdated;
     message.user = user;
+    
+    NSDictionary *quoteDictionary = [dictionary objectForKey:@"quote"];
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    NSString *title = [quoteDictionary objectForKey:@"title"];
+    title = [TAPUtil nullToEmptyString:title];
+    quote.title = title;
+    
+    NSString *content = [quoteDictionary objectForKey:@"content"];
+    content = [TAPUtil nullToEmptyString:content];
+    quote.content = content;
+    
+    NSString *fileID = [quoteDictionary objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    quote.fileID = fileID;
+    
+    NSString *imageURL = [quoteDictionary objectForKey:@"imageURL"];
+    imageURL = [TAPUtil nullToEmptyString:imageURL];
+    quote.imageURL = imageURL;
+    message.quote = quote;
+    
+    NSDictionary *replyToDictionary = [dictionary objectForKey:@"replyTo"];
+    TAPReplyToModel *replyTo = [TAPReplyToModel new];
+    NSString *replyToMessageID = [replyToDictionary objectForKey:@"messageID"];
+    replyToMessageID = [TAPUtil nullToEmptyString:replyToMessageID];
+    replyTo.messageID = replyToMessageID;
+    
+    NSString *replyToLocalID = [replyToDictionary objectForKey:@"localID"];
+    replyToLocalID = [TAPUtil nullToEmptyString:replyToLocalID];
+    replyTo.localID = replyToLocalID;
+    
+    NSInteger replyMessageType = [[replyToDictionary objectForKey:@"messageType"] integerValue];
+    replyTo.messageType = replyMessageType;
+    message.replyTo = replyTo;
+    
+    NSDictionary *forwardFromDictionary = [dictionary objectForKey:@"forwardFrom"];
+    TAPForwardFromModel *forwardFrom = [TAPForwardFromModel new];
+    NSString *forwardFromUserID = [forwardFromDictionary objectForKey:@"userID"];
+    forwardFromUserID = [TAPUtil nullToEmptyString:forwardFromUserID];
+    forwardFrom.userID = forwardFromUserID;
+    
+    NSString *forwardFromXcUserID = [forwardFromDictionary objectForKey:@"xcUserID"];
+    forwardFromXcUserID = [TAPUtil nullToEmptyString:forwardFromXcUserID];
+    forwardFrom.xcUserID = forwardFromXcUserID;
+    
+    NSString *forwardFromFullname = [forwardFromDictionary objectForKey:@"fullname"];
+    forwardFromFullname = [TAPUtil nullToEmptyString:forwardFromFullname];
+    forwardFrom.fullname = forwardFromFullname;
+    
+    NSString *forwardFromMessageID = [forwardFromDictionary objectForKey:@"messageID"];
+    forwardFromMessageID = [TAPUtil nullToEmptyString:forwardFromMessageID];
+    forwardFrom.messageID = forwardFromMessageID;
+    
+    NSString *forwardFromLocalID = [forwardFromDictionary objectForKey:@"localID"];
+    forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+    forwardFrom.localID = forwardFromLocalID;
+    message.forwardFrom = forwardFrom;
     
     return message;
 }
@@ -503,6 +617,66 @@
     [messageMutableDictionary setValue:userUpdated forKey:@"userUpdated"];
     
     [messageMutableDictionary removeObjectForKey:@"user"];
+    
+    NSDictionary *quoteDictionary = [messageMutableDictionary objectForKey:@"quote"];
+    NSString *title = [quoteDictionary objectForKey:@"title"];
+    title = [TAPUtil nullToEmptyString:title];
+    [messageMutableDictionary setValue:title forKey:@"quoteTitle"];
+    
+    NSString *content = [quoteDictionary objectForKey:@"content"];
+    content = [TAPUtil nullToEmptyString:content];
+    [messageMutableDictionary setValue:content forKey:@"quoteContent"];
+    
+    NSString *fileID = [quoteDictionary objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    [messageMutableDictionary setValue:fileID forKey:@"quoteFileID"];
+    
+    NSString *imageURL = [quoteDictionary objectForKey:@"imageURL"];
+    imageURL = [TAPUtil nullToEmptyString:imageURL];
+    [messageMutableDictionary setValue:imageURL forKey:@"quoteImageURL"];
+    
+    [messageMutableDictionary removeObjectForKey:@"quote"];
+    
+    NSDictionary *replyToDictionary = [messageMutableDictionary objectForKey:@"replyTo"];
+    NSString *messageID = [replyToDictionary objectForKey:@"messageID"];
+    messageID = [TAPUtil nullToEmptyString:messageID];
+    [messageMutableDictionary setValue:messageID forKey:@"replyToMessageID"];
+    
+    NSString *localID = [replyToDictionary objectForKey:@"localID"];
+    localID = [TAPUtil nullToEmptyString:localID];
+    [messageMutableDictionary setValue:localID forKey:@"replyToLocalID"];
+    
+    NSNumber *messageType = [replyToDictionary objectForKey:@"messageType"];
+    messageType = [TAPUtil nullToEmptyNumber:messageType];
+    [messageMutableDictionary setValue:messageType forKey:@"replyMessageType"];
+    
+    [messageMutableDictionary removeObjectForKey:@"replyTo"];
+    
+    NSDictionary *forwardFromDictionary = [messageMutableDictionary objectForKey:@"forwardFrom"];
+    NSString *forwardFromUserID = [forwardFromDictionary objectForKey:@"userID"];
+    forwardFromUserID = [TAPUtil nullToEmptyString:forwardFromUserID];
+    [messageMutableDictionary setValue:forwardFromUserID forKey:@"forwardFromUserID"];
+   
+    NSString *forwardFromXcUserID = [forwardFromDictionary objectForKey:@"xcUserID"];
+    forwardFromXcUserID = [TAPUtil nullToEmptyString:forwardFromXcUserID];
+    [messageMutableDictionary setValue:forwardFromXcUserID forKey:@"forwardFromXcUserID"];
+    
+    NSString *forwardFromFullname = [forwardFromDictionary objectForKey:@"fullname"];
+    forwardFromFullname = [TAPUtil nullToEmptyString:forwardFromFullname];
+    [messageMutableDictionary setValue:forwardFromFullname forKey:@"forwardFromFullname"];
+    
+    NSString *forwardFromMessageID = [forwardFromDictionary objectForKey:@"messageID"];
+    forwardFromMessageID = [TAPUtil nullToEmptyString:forwardFromMessageID];
+    [messageMutableDictionary setValue:forwardFromMessageID forKey:@"forwardFromMessageID"];
+    
+    NSString *forwardFromLocalID = [forwardFromDictionary objectForKey:@"localID"];
+    forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+    [messageMutableDictionary setValue:forwardFromLocalID forKey:@"forwardFromLocalID"];
+    
+    [messageMutableDictionary removeObjectForKey:@"forwardFrom"];
+    
+    NSDictionary *dataDictionary = [messageMutableDictionary objectForKey:@"data"];
+    [messageMutableDictionary setValue:[TAPUtil jsonStringFromObject:dataDictionary] forKey:@"data"];
     
     return messageMutableDictionary;
 }
@@ -1663,10 +1837,11 @@
     
         NSMutableArray *messageResultArray = [NSMutableArray array];
         for (NSDictionary *messageDictionary in messageArray) {
-            TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
-    
+            
+//            TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
+            
             //Decrypt message
-            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDictionary];
     
             [messageResultArray addObject:decryptedMessage];
         }
@@ -1741,13 +1916,12 @@
         
         NSMutableArray *messageResultArray = [NSMutableArray array];
         for (NSDictionary *messageDictionary in messageArray) {
-            TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
-            
-            //Add User to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
             
             //Decrypt message
-            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDictionary];
+            
+            //Add User to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
             
             [messageResultArray addObject:decryptedMessage];
         }
@@ -1838,14 +2012,12 @@
         
         NSMutableArray *messageResultArray = [NSMutableArray array];
         for (NSDictionary *messageDictionary in messageArray) {
-            TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
-            
             //Decrypt message
-            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDictionary];
             [messageResultArray addObject:decryptedMessage];
             
-            if ([preferenceLastUpdated longLongValue] < [message.updated longLongValue]) {
-                preferenceLastUpdated = [NSNumber numberWithLongLong:[message.updated longLongValue]];
+            if ([preferenceLastUpdated longLongValue] < [decryptedMessage.updated longLongValue]) {
+                preferenceLastUpdated = [NSNumber numberWithLongLong:[decryptedMessage.updated longLongValue]];
             }
         }
         
@@ -1932,10 +2104,8 @@
 
         NSMutableArray *messageResultArray = [NSMutableArray array];
         for (NSDictionary *messageDictionary in messageArray) {
-            TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
-
             //Decrypt message
-            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDictionary];
             [messageResultArray addObject:decryptedMessage];
         }
         
@@ -3144,6 +3314,101 @@
         failure(localizedError, messageIDsArray);
 #endif
     }];
+}
+
++ (void)callAPIUploadFileWithFileData:(NSData *)fileData
+                               roomID:(NSString *)roomID
+                             fileType:(NSString *)fileType
+                             mimeType:(NSString *)mimeType
+                              caption:(NSString *)caption
+                      completionBlock:(void (^)(NSDictionary *responseObject))successBlock
+                        progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                         failureBlock:(void(^)(NSError *error))failureBlock {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUploadFile];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:fileType forKey:@"fileType"];
+    
+    if (caption != nil && ![caption isEqualToString:@""]) {
+        [parameterDictionary setObject:caption forKey:@"caption"];
+    }
+    
+    [[TAPNetworkManager sharedManager] upload:requestURL fileData:fileData mimeType:mimeType parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        CGFloat progress = uploadProgress.fractionCompleted;
+        progressBlock(progress, 1.0f);
+    } success:^(NSDictionary *responseObject) {
+        successBlock(responseObject);
+    } failure:^(NSError *error) {
+        failureBlock(error);
+    }];
+}
+
++ (void)callAPIDownloadFileWithFileID:(NSString *)fileID
+                               roomID:(NSString *)roomID
+                          isThumbnail:(BOOL)isThumbnail
+                      completionBlock:(void (^)(UIImage *downloadedImage))successBlock
+                        progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                         failureBlock:(void(^)(NSError *error))failureBlock {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDownloadFile];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:fileID forKey:@"fileID"];
+    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[NSNumber numberWithBool:isThumbnail] forKey:@"isThumbnail"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        CGFloat progress = uploadProgress.fractionCompleted;
+        progressBlock(progress, 1.0f);
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        
+        //DV Note
+        /*
+        This API is different from others in response format.
+        If other APIs return response in JSON format, this API returns response based on the download file's content type.
+        So success block in use to handle fail response and failure block is use to handle success response
+        Because AFNetworking check whether response is in json format or not, since failure response is in json format
+        so it will be handled in success block, and success response will return the data file,
+        hence it will be handled in failure block.
+        */
+        //END DV Note
+        
+        NSString *errorCode = [responseObject valueForKeyPath:@"error.code"];
+        NSString *errorMessage = [responseObject valueForKeyPath:@"error.message"];
+        NSString *errorStatus = [responseObject objectForKey:@"status"];
+    
+        NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
+        [errorDictionary setObject:errorCode forKey:@"errorCode"];
+        [errorDictionary setObject:errorMessage forKey:@"errorMessage"];
+        [errorDictionary setObject:errorStatus forKey:@"errorStatus"];
+        
+        NSError *error = [NSError errorWithDomain:@"Error" code:errorCode userInfo:errorDictionary];
+        failureBlock(error);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        //DV Note
+        /*
+         This API is different from others in response format.
+         If other APIs return response in JSON format, this API returns response based on the download file's content type.
+         So success block in use to handle fail response and failure block is use to handle success response
+         Because AFNetworking check whether response is in json format or not, since failure response is in json format
+         so it will be handled in success block, and success response will return the data file,
+         hence it will be handled in failure block.
+         */
+        //END DV Note
+        
+        //DV Temp
+#ifdef DEBUG
+        isThumbnail ? NSLog(@"THUMBNAIL") : NSLog(@"NO THUMBNAIL");
+#endif
+        //END DV Temp
+        
+        NSDictionary *responseObjectDictionary = error.userInfo;
+        NSData *imageData = [responseObjectDictionary objectForKey:@"com.alamofire.serialization.response.error.data"];
+        UIImage *downloadedImage = [UIImage imageWithData:imageData];
+        successBlock(downloadedImage);
+    }];
+
 }
 
 @end

@@ -47,7 +47,6 @@
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
 
-- (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)hideStatusLabelConstraintUpdateStatusIcon:(BOOL)updateStatusIcon;
 - (void)hideStatusLabelAlpha;
 - (void)setStatusIconUIWithStatus:(TAPBaseMyBubbleStatus)status;
@@ -120,16 +119,16 @@
     
     _message = message;
     
-    //WK Temp
-    BOOL isReply = NO;
-    //    if ([message.messageID integerValue] % 2 == 1) {
-    //        isReply = YES;
-    //    }
-    //    else {
-    //        isReply = NO;
-    //    }
-    [self showReplyView:isReply withMessage:message];
-    //End Temp
+//    //WK Temp
+//    BOOL isReply = YES;
+//    //    if ([message.messageID integerValue] % 2 == 1) {
+//    //        isReply = YES;
+//    //    }
+//    //    else {
+//    //        isReply = NO;
+//    //    }
+//    [self showReplyView:isReply withMessage:message];
+//    //End Temp
     
     if (!message.isFailedSend) {
         self.retryIconImageView.alpha = 0.0f;
@@ -340,31 +339,6 @@
     
     if (updateStatusIcon) {
         self.statusIconImageView.alpha = 1.0f;
-    }
-}
-
-- (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
-    if (show) {
-        self.replyNameLabel.text = message.user.fullname;
-        self.replyMessageLabel.text = message.body;
-        self.replyViewHeightContraint.constant = 60.0f;
-        self.replyViewBottomConstraint.constant = 3.0f;
-        self.replyViewInnerViewLeadingContraint.constant = 4.0f;
-        self.replyNameLabelLeadingConstraint.constant = 4.0f;
-        self.replyNameLabelTrailingConstraint.constant = 8.0f;
-        self.replyMessageLabelLeadingConstraint.constant = 4.0f;
-        self.replyMessageLabelTrailingConstraint.constant = 8.0f;
-    }
-    else {
-        self.replyNameLabel.text = @"";
-        self.replyMessageLabel.text = @"";
-        self.replyViewHeightContraint.constant = 0.0f;
-        self.replyViewBottomConstraint.constant = 0.0f;
-        self.replyViewInnerViewLeadingContraint.constant = 0.0f;
-        self.replyNameLabelLeadingConstraint.constant = 0.0f;
-        self.replyNameLabelTrailingConstraint.constant = 0.0f;
-        self.replyMessageLabelLeadingConstraint.constant = 0.0f;
-        self.replyMessageLabelTrailingConstraint.constant = 0.0f;
     }
 }
 

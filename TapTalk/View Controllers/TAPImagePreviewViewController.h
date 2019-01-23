@@ -10,7 +10,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPImagePreviewViewControllerDelegate <NSObject>
+
+- (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray;
+
+@end
+
 @interface TAPImagePreviewViewController : TAPBaseViewController
+
+@property (weak, nonatomic) id <TAPImagePreviewViewControllerDelegate> delegate;
+
+- (void)setImagePreviewData:(NSArray *)array;
+- (void)addMoreImagePreviewData:(NSArray *)array;
 
 @end
 

@@ -44,7 +44,7 @@
 //    imageCache.maxCacheSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheAge = kMaxCacheAge;
     
-    self.backgroundColor = [TAPUtil randomPastelColor];
+    self.backgroundColor = [TAPUtil getColor:@"E4E4E4"];
 }
 
 /*
@@ -57,21 +57,28 @@
 
 #pragma mark - Custom Method
 + (void)saveImageToCache:(UIImage *)image withKey:(NSString *)key {
-//    [[SDImageCache sharedImageCache] storeImage:image recalculateFromImage:NO imageData:nil forKey:key toDisk:YES];
     [[SDImageCache sharedImageCache] storeImage:image forKey:key
                                      completion:^{
                                          
                                      }];
 }
 
++ (void)imageFromCacheWithKey:(NSString *)key success:(void (^)(UIImage *savedImage))success {
+    //Run in background thread, async
+    [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            success(image);
+        });
+    }];
+}
+
 + (UIImage *)imageFromCacheWithKey:(NSString *)key {
+    //Run in main thread
     UIImage *savedImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:key];
-    
     return savedImage;
 }
 
 + (void)removeImageFromCacheWithKey:(NSString *)key {
-//    [[SDImageCache sharedImageCache] removeImageForKey:key];
     [[SDImageCache sharedImageCache] removeImageForKey:key withCompletion:^{
         
     }];
@@ -83,13 +90,11 @@
     }
     
     _imageURLString = urlString;
-    
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
     [imageCache diskImageExistsWithKey:urlString completion:^(BOOL isInCache) {
         if (isInCache) {
             //Image exist in disk, load from disk
             UIImage *savedImage = [imageCache imageFromDiskCacheForKey:urlString];
-            
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.image = savedImage;
                 
@@ -137,6 +142,16 @@
                 }
             }];
         }
+    }];
+}
+
+#pragma mark - TapTalk
++ (void)imageFromCacheWithKey:(NSString *)key message:(TAPMessageModel *)receivedMessage success:(void (^)(UIImage *savedImage, TAPMessageModel *resultMessage))success {
+    //Run in background thread, async
+    [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            success(image, receivedMessage);
+        });
     }];
 }
 

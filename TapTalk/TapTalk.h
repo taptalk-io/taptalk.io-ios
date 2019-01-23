@@ -51,6 +51,8 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (NSArray<TAPCustomKeyboardItemModel *> *)tapTalkCustomKeyboardForSender:(TAPUserModel *)sender
                                                                 recipient:(TAPUserModel *)recipient;
 
+- (void)tapTalkQuoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
+
 @end
 
 @interface TapTalk : NSObject
@@ -98,12 +100,31 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (void)setEnvironment:(TapTalkEnvironment)environment;
 - (UINavigationController *)getCurrentTapTalkActiveNavigationController;
 - (UIViewController *)getCurrentTapTalkActiveViewController;
+- (void)setUserAgent:(NSString *)userAgent;
+- (void)setAppKeySecret:(NSString *)appKeySecret;
+- (void)setAppKeyID:(NSString *)appKeyID;
 
 //Chat
-- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser fromNavigationController:(UINavigationController *)navigationController;
-- (void)openRoomWithRoom:(TAPRoomModel *)room fromNavigationController:(UINavigationController *)navigationController animated:(BOOL)isAnimated;
+- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
+     fromNavigationController:(UINavigationController *)navigationController;
+- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
+               withQuoteTitle:(NSString *)quoteTitle
+                 quoteContent:(NSString *)quoteContent
+          quoteImageURLString:(NSString *)quoteImageURL
+                     userInfo:(NSDictionary *)userInfo
+     fromNavigationController:(UINavigationController *)navigationController;
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated;
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+          withQuoteTitle:(NSString *)quoteTitle
+            quoteContent:(NSString *)quoteContent
+     quoteImageURLString:(NSString *)quoteImageURL
+                userInfo:(NSDictionary *)userInfo
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated;
 - (void)shouldRefreshAuthTicket;
-- (void)sendTextMessage:(NSString *)message recipientXCUserID:(NSString *)recipientXCUserID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
+- (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)requestToSendProductListWithRecipientXCUserID:(NSString *)recipientXCUserID;
 
 //Custom Keyboard
@@ -115,5 +136,8 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 //Custom Bubble
 - (void)addCustomBubbleDataWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate;
+
+//Custom Quote
+- (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
 
 @end

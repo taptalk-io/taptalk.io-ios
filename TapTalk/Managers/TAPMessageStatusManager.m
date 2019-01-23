@@ -93,7 +93,7 @@
     
     //Update to database
     [TAPDataManager updateMessageReadStatusToDatabaseWithData:tempMessageArray success:^{
-        
+        [self.readMessageQueueArray removeAllObjects];
     } failure:^(NSError *error) {
         
     }];
@@ -113,8 +113,6 @@
             [self markMessageAsReadWithMessage:message];
         }
     }];
-    
-    [self.readMessageQueueArray removeAllObjects];
 }
 
 - (void)changingDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish {
@@ -130,6 +128,7 @@
     
     //Update to database
     [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:tempMessageArray success:^{
+        [self.deliveryMessageQueueArray removeAllObjects];
         finish();
     } failure:^(NSError *error) {
         finish();
@@ -149,8 +148,6 @@
             [self markMessageAsDeliveredWithMessage:message];
         }
     }];
-    
-    [self.deliveryMessageQueueArray removeAllObjects];
 }
 
 - (void)changingBulkFilteredDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish {

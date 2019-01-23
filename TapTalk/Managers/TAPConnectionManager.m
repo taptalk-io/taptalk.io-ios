@@ -174,10 +174,13 @@
     _webSocket = nil;
     
     [self validateToken];
+    
+    NSString *appKeyID = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_ID valid:nil];
+    NSString *appKeySecret = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_SECRET valid:nil];
         
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
-    NSString *appKey = [NSString stringWithFormat:@"%@:%@", TAP_APP_KEY_ID, TAP_APP_KEY_SECRET];
+    NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
     NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];
     NSString *encodedAppKey = [base64Data base64EncodedStringWithOptions:0];
     

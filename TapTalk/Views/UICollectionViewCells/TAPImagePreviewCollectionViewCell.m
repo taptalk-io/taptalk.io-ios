@@ -22,7 +22,7 @@
     
     if (self) {
         _selectedPictureImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
-        self.selectedPictureImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.selectedPictureImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.selectedPictureImageView.clipsToBounds = YES;
         [self.contentView addSubview:self.selectedPictureImageView];
     }

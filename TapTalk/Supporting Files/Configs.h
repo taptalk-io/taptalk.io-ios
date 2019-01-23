@@ -5,8 +5,6 @@
 //#define SHORTENED_APP_STORE_URL @"http://bit.ly/MoseloiOS"
 //#define APP_STORE_ID @"1257677004"
 #define TAP_SECURE_KEY_NSUSERDEFAULTS @"h0m1ngp1g30n-m0s3l0-81191E@c"
-#define TAP_APP_KEY_ID @"d886f0e518fb8d80k2"
-#define TAP_APP_KEY_SECRET @"NDM4XzEuMl/9hcHBfa2V5X2lkX2lvcz/oxNTM2OTk3ODc3MjI0MTky"
 #define TAP_NUMBER_OF_ITEMS_CHAT 50
 
 #define TAP_DUMMY_IMAGE_URL @"https://instagram.fcgk6-1.fna.fbcdn.net/vp/a957263ad8322a1661f604e2942f1acc/5C5B8666/t51.2885-15/e35/41659851_331857600921431_1280889939227049984_n.jpg"//DV Temp
@@ -31,6 +29,11 @@
 #define TAP_PREFS_OTHER_USER_ID @"Prefs.otherUserID"
 #define TAP_PREFS_INCOMING_PUSH_NOTIFICATION @"Prefs.incomingPushNotification"
 //END DV Temp
+
+//User Customized Prefs
+#define TAP_PREFS_USER_AGENT @"Prefs.userAgent"
+#define TAP_PREFS_APP_KEY_ID @"Prefs.appKeyID"
+#define TAP_PREFS_APP_KEY_SECRET @"Prefs.appKeySecret"
 
 //Color
 #define TAP_COLOR_MOSELO_GREEN @"2ECCAD"
@@ -80,6 +83,10 @@
 #define TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND @"Notification.applicationWillEnterForeground"
 #define TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE @"Notification.applicationDidBecomeActive"
 #define TAP_NOTIFICATION_APPLICATION_WILL_TERMINATE @"Notification.applicationWillTerminate"
+#define TAP_NOTIFICATION_UPLOAD_FILE_START @"Notification.uploadFileStart"
+#define TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS @"Notification.uploadFileProgress"
+#define TAP_NOTIFICATION_UPLOAD_FILE_FINISH @"Notification.uploadFileFinish"
+#define TAP_NOTIFICATION_UPLOAD_FILE_FAILURE @"Notification.uploadFileFailure"
 
 //Typedef
 #define kTAPEventOpenRoom @"chat/openRoom"

@@ -22,11 +22,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id<TAPMyImageBubbleTableViewCellDelegate> delegate;
 @property (weak, nonatomic) TAPMessageModel *message;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewHeightConstraint;
+
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
+
+- (void)showProgressUploadView:(BOOL)show;
+- (void)animateFailedUploadingImage;
+- (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)setInitialAnimateUploadingImageWithCancelButton:(BOOL)withCancelButton;
+- (void)animateFinishedUploadingImage;
+- (void)setFullImage:(UIImage *)image;
+- (void)setThumbnailImage:(UIImage *)thumbnailImage;
 
 @end
 

@@ -359,8 +359,23 @@
     return currentActiveController;
 }
 
+- (void)setUserAgent:(NSString *)userAgent {
+    [[NSUserDefaults standardUserDefaults] setSecureObject:userAgent forKey:TAP_PREFS_USER_AGENT];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setAppKeySecret:(NSString *)appKeySecret {
+    [[NSUserDefaults standardUserDefaults] setSecureObject:appKeySecret forKey:TAP_PREFS_APP_KEY_SECRET];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+- (void)setAppKeyID:(NSString *)appKeyID {
+    [[NSUserDefaults standardUserDefaults] setSecureObject:appKeyID forKey:TAP_PREFS_APP_KEY_ID];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 //Chat
-- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser fromNavigationController:(UINavigationController *)navigationController {
+- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
+     fromNavigationController:(UINavigationController *)navigationController {
     TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
     [[TAPChatManager sharedManager] openRoom:room];
     
@@ -377,7 +392,29 @@
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
-- (void)openRoomWithRoom:(TAPRoomModel *)room fromNavigationController:(UINavigationController *)navigationController animated:(BOOL)isAnimated {
+- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
+               withQuoteTitle:(NSString *)quoteTitle
+                 quoteContent:(NSString *)quoteContent
+          quoteImageURLString:(NSString *)quoteImageURL
+                     userInfo:(NSDictionary *)userInfo
+     fromNavigationController:(UINavigationController *)navigationController {
+    
+    //Create quote model and set quote to chat
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    quote.title = quoteTitle;
+    quote.content = quoteContent;
+    quote.imageURL = quoteImageURL;
+    
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+    
+    //Open room
+    [self openRoomWithOtherUser:otherUser fromNavigationController:navigationController];
+}
+
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated {
     [[TAPChatManager sharedManager] openRoom:room];
     
     //Save all unsent message (in case user retrieve message on another room)
@@ -390,33 +427,30 @@
     [navigationController pushViewController:chatViewController animated:isAnimated];
 }
 
-- (void)sendTextMessage:(NSString *)message recipientXCUserID:(NSString *)recipientXCUserID success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
-
-    TAPUserModel *recipientUser = [[TAPContactManager sharedManager] getUserWithUserID:recipientXCUserID];
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+          withQuoteTitle:(NSString *)quoteTitle
+            quoteContent:(NSString *)quoteContent
+     quoteImageURLString:(NSString *)quoteImageURL
+                userInfo:(NSDictionary *)userInfo
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated {
     
-    if(recipientUser == nil) {
-        //User not exist in database, call api
-        [TAPDataManager callAPIGetUserByXCUserID:recipientXCUserID success:^(TAPUserModel *user) {
-            
-            if(user == nil) {
-                //Failed to obtain user data
-                NSError *error; //DV Temp
-                failure(error);
-            }
-            
-            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
-            [[TAPChatManager sharedManager] constructMessage:message user:[TAPChatManager sharedManager].activeUser room:room];
-            success();
-            
-        } failure:^(NSError *error) {
-            failure(error);
-        }];
-    }
-    else {
-        TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipientUser];
-        [[TAPChatManager sharedManager] constructMessage:message user:[TAPChatManager sharedManager].activeUser room:room];
-        success();
-    }
+    //Create quote model and set quote to chat
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    quote.title = quoteTitle;
+    quote.content = quoteContent;
+    quote.imageURL = quoteImageURL;
+    
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+    
+    //Open room
+    [self openRoomWithRoom:room fromNavigationController:navigationController animated:isAnimated];
+}
+
+- (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];    
+    [[TAPChatManager sharedManager] sendTextMessage:message room:room];
+    success();
 }
 
 - (void)requestToSendProductListWithRecipientXCUserID:(NSString *)recipientXCUserID {
@@ -451,6 +485,13 @@
 //Custom Bubble
 - (void)addCustomBubbleDataWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate {
     [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate];
+}
+
+//Custom Quote
+- (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo {
+    if ([self.delegate respondsToSelector:@selector(tapTalkQuoteDidTappedWithUserInfo:)]) {
+        [self.delegate tapTalkQuoteDidTappedWithUserInfo:userInfo];
+    }
 }
 
 @end

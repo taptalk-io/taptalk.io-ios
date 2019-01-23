@@ -17,11 +17,6 @@
 #import <AFNetworking/AFNetworking.h>
 #import "TAPSearchViewController.h"
 
-
-#import "TAPImagePreviewViewController.h" //DV Temp
-
-
-
 @interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
@@ -45,7 +40,7 @@
 - (void)reloadLocalDataAndUpdateUILogicAnimated:(BOOL)animated;
 - (void)refreshViewAndQueryUnreadLogicWithMessageArray:(NSArray *)messageArray animateReloadData:(BOOL)animateReloadData;
 - (void)queryNumberOfUnreadMessageInRoomListArrayInBackgroundAndUpdateUIAndReloadTableView:(BOOL)reloadTableView;
-- (void)processMessageFromSocket:(TAPMessageModel *)message;
+- (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage;
 - (void)updateCellDataAtIndexPath:(NSIndexPath *)indexPath updateUnreadBubble:(BOOL)updateUnreadBubble;
 
 @end
@@ -269,31 +264,31 @@
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:YES];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:NO];
 }
 
 - (void)chatManagerDidReceiveDeleteMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:NO];
 }
 
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:YES];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:NO];
 }
 
 - (void)chatManagerDidReceiveDeleteMessageInActiveRoom:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:NO];
 }
 
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
-    [self processMessageFromSocket:message];
+    [self processMessageFromSocket:message isNewMessage:YES];
 }
 
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
@@ -389,13 +384,9 @@
 
 #pragma mark - Custom Method
 - (void)editButtonDidTapped {
+#ifdef DEBUG
     NSLog(@"Edit");
-    
-    //DV Temp
-//    TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
-//    UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
-//    [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:nil];
-    //END DV Temp
+#endif
 }
 
 - (void)addButtonDidTapped {
@@ -700,7 +691,7 @@
     });
 }
 
-- (void)processMessageFromSocket:(TAPMessageModel *)message {
+- (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage {
     NSString *messageRoomID = message.room.roomID;
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:messageRoomID];
@@ -737,7 +728,7 @@
 
             [self updateCellDataAtIndexPath:currentIndexPath updateUnreadBubble:YES];
 
-            if (currentIndexPath != 0) {
+            if (currentIndexPath != 0 && isNewMessage) {
                 //Move cell to top
                 [self.roomListArray removeObject:roomList];
                 [self.roomListArray insertObject:roomList atIndex:0];

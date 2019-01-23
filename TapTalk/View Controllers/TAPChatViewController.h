@@ -8,6 +8,7 @@
 
 #import "TAPBaseViewController.h"
 #import "TAPRoomModel.h"
+#import "TAPImagePreviewModel.h"
 
 @protocol TAPChatViewControllerDelegate <NSObject>
 

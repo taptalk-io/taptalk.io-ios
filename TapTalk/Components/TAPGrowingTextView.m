@@ -170,7 +170,6 @@ shouldChangeTextInRange:(NSRange)range
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
     
     _text = newString;
-    
     if ([newString isEqualToString:@""]) {
         self.placeholderLabel.alpha = 1.0f;
         

@@ -453,7 +453,8 @@
 //        if (errorCode != 999) {
 //            [self showFailAPIWithMessageString:error.domain show:YES];
 //        }
-        
+#ifdef DEBUG
+        //Note - this alert only shown at debug
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -461,11 +462,8 @@
         
         [alertController addAction:okAction];
         [self presentViewController:alertController animated:YES completion:nil];
-        
-        //END DV Temp
     }];
-
-    //END DV Temp
+#endif
 }
 
 - (void)presentRegisterViewControllerIfNeededFromViewController:(UIViewController *)viewController force:(BOOL)force {
