@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "TAPUserModel.h"
 #import "TAPRecentSearchModel.h"
-#import "AFHTTPSessionManager.h"
+@import AFNetworking;
 
 @interface TAPDataManager : NSObject
 

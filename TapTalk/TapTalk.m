@@ -7,7 +7,7 @@
 //
 
 #import "TapTalk.h"
-#import "AFHTTPSessionManager.h"
+@import AFNetworking;
 
 @interface TapTalk () <TAPNotificationManagerDelegate>
 

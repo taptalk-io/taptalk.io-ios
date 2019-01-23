@@ -9,7 +9,7 @@
 #import "TAPFileUploadManager.h"
 #import "TAPDataImageModel.h"
 #import <TapTalk/Base64.h>
-#import "AFHTTPSessionManager.h"
+@import AFNetworking;
 
 #define kMaxImageSize 2000.0f
 #define kMaxThumbnailImageSize 20.0f
