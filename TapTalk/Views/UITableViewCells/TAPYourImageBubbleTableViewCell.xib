@@ -69,12 +69,21 @@
                                             <constraint firstAttribute="height" constant="34" id="qEG-Jh-w2o"/>
                                         </constraints>
                                     </view>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownloadImage" translatesAutoresizingMaskIntoConstraints="NO" id="615-F2-3pn">
+                                        <rect key="frame" x="17" y="17" width="14" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="14" id="qQk-US-4X2"/>
+                                            <constraint firstAttribute="height" constant="14" id="xFl-wQ-l8Q"/>
+                                        </constraints>
+                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" red="0.015686274510000001" green="0.015686274510000001" blue="0.058823529409999999" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
+                                    <constraint firstItem="615-F2-3pn" firstAttribute="centerY" secondItem="dle-zC-gDE" secondAttribute="centerY" id="3yz-PE-LnG"/>
                                     <constraint firstAttribute="height" constant="48" id="8oF-As-Ejb"/>
                                     <constraint firstItem="dH4-Pp-KVE" firstAttribute="centerX" secondItem="dle-zC-gDE" secondAttribute="centerX" id="9tA-qA-SZB"/>
                                     <constraint firstItem="dH4-Pp-KVE" firstAttribute="centerY" secondItem="dle-zC-gDE" secondAttribute="centerY" id="UgX-Ln-yhF"/>
+                                    <constraint firstItem="615-F2-3pn" firstAttribute="centerX" secondItem="dle-zC-gDE" secondAttribute="centerX" id="ePc-5v-pMJ"/>
                                     <constraint firstAttribute="width" constant="48" id="tzJ-WF-vI7"/>
                                 </constraints>
                             </view>
@@ -152,6 +161,7 @@
                 <outlet property="captionLabel" destination="cG1-Kg-Lav" id="e9O-gF-Sck"/>
                 <outlet property="captionLabelBottomConstraint" destination="KDi-jN-xZ0" id="JcY-W2-W6J"/>
                 <outlet property="captionLabelTopConstraint" destination="HBf-QT-Xl8" id="qI4-7k-ICd"/>
+                <outlet property="downloadImageView" destination="615-F2-3pn" id="G4X-I8-hyV"/>
                 <outlet property="progressBackgroundView" destination="dle-zC-gDE" id="yeh-fT-Htk"/>
                 <outlet property="progressBarView" destination="dH4-Pp-KVE" id="vVD-Dg-zzU"/>
                 <outlet property="replyButton" destination="pAP-ue-Z6c" id="KEP-DZ-cxC"/>
@@ -165,6 +175,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="TAPIconDownloadImage" width="12" height="16"/>
         <image name="TAPIconReplyChat" width="28" height="28"/>
     </resources>
 </document>

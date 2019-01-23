@@ -16,6 +16,7 @@
 @property (strong, nonatomic) IBOutlet TAPImageView *thumbnailBubbleImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *cancelImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *downloadImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
@@ -178,8 +179,8 @@
 }
 
 - (IBAction)cancelButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(myImageCancelDidTappedWithLocalID:tag:)]) {
-        [self.delegate myImageCancelDidTappedWithLocalID:self.message.localID tag:self.tag];
+    if ([self.delegate respondsToSelector:@selector(myImageCancelDidTappedWithMessage:)]) {
+        [self.delegate myImageCancelDidTappedWithMessage:self.message];
     }
 }
 
@@ -399,10 +400,12 @@
     
     if (withCancelButton) {
         self.cancelImageView.alpha = 1.0f;
+        self.downloadImageView.alpha = 0.0f;
         self.cancelButton.alpha = 1.0f;
         self.cancelButton.userInteractionEnabled = YES;
     }
     else {
+        self.downloadImageView.alpha = 1.0f;
         self.cancelImageView.alpha = 0.0f;
         self.cancelButton.alpha = 0.0f;
         self.cancelButton.userInteractionEnabled = NO;

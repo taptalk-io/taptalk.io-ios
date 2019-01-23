@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)obtainImageUploadStatusWithMessage:(TAPMessageModel *)message;
 - (void)sendFileWithData:(TAPMessageModel *)message;
 - (NSDictionary *)getUploadProgressWithLocalID:(NSString *)localID;
+- (void)cancelUploadingImageWithMessage:(TAPMessageModel *)message;
 
 @end
 
