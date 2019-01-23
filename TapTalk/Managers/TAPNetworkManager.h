@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AFHTTPSessionManager.h"
 
 #define NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY @"Prefs.NetworkManagerNoConnectionNotificationKey"
 
@@ -50,12 +51,12 @@ refreshToken:(NSString *)refreshToken
      success:(void (^)(NSURLSessionDataTask *dataTask, NSDictionary *responseObject))success
      failure:(void (^)(NSURLSessionDataTask *dataTask, NSError *error))failure;
 
-- (void)upload:(NSString *)urlString
-      fileData:(NSData *)fileData
-      mimeType:(NSString *)mimeType
-    parameters:(NSDictionary *)parameters
-      progress:(void (^)(NSProgress *uploadProgress))progress
-       success:(void (^)(NSDictionary *responseObject))success
-       failure:(void (^)(NSError *error))failure;
+- (NSURLSessionUploadTask *)upload:(NSString *)urlString
+                          fileData:(NSData *)fileData
+                          mimeType:(NSString *)mimeType
+                        parameters:(NSDictionary *)parameters
+                          progress:(void (^)(NSProgress *uploadProgress))progress
+                           success:(void (^)(NSDictionary *responseObject))success
+                           failure:(void (^)(NSError *error))failure;
 
 @end

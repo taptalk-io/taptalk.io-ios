@@ -7,7 +7,7 @@
 //
 
 #import "TAPFileDownloadManager.h"
-#import "Base64.h"
+#import <TapTalk/Base64.h>
 
 @interface TAPFileDownloadManager ()
 
@@ -110,9 +110,7 @@
                 [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
                 [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
                 
-                NSMutableDictionary *downloadProgressRoomDictionary = [NSMutableDictionary dictionary];
-                [downloadProgressRoomDictionary setObject:objectDictionary forKey:currentDownloadMessage.localID];
-                [self.downloadProgressDictionary setObject:downloadProgressRoomDictionary forKey:currentDownloadMessage.localID];
+                [self.downloadProgressDictionary setObject:objectDictionary forKey:currentDownloadMessage.localID];
                 
                 progressBlock(progress, total, resultMessage);
             } success:^(UIImage *fullImage, TAPMessageModel *currentDownloadMessage) {

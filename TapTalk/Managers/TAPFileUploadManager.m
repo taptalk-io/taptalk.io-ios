@@ -8,7 +8,8 @@
 
 #import "TAPFileUploadManager.h"
 #import "TAPDataImageModel.h"
-#import "Base64.h"
+#import <TapTalk/Base64.h>
+#import "AFHTTPSessionManager.h"
 
 #define kMaxImageSize 2000.0f
 #define kMaxThumbnailImageSize 20.0f
@@ -108,7 +109,7 @@
         [objectDictionary setObject:currentMessage forKey:@"message"];
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_START object:objectDictionary];
         
-        [TAPDataManager callAPIUploadFileWithFileData:imageData roomID:currentMessage.room.roomID fileType:@"image" mimeType:@"image/jpeg" caption:captionString completionBlock:^(NSDictionary *responseObject) {
+        NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:imageData roomID:currentMessage.room.roomID fileType:@"image" mimeType:@"image/jpeg" caption:captionString completionBlock:^(NSDictionary *responseObject) {
             
             //resize to 20x20 for thumbnail
             [self resizeImage:dataImage.dummyImage maxImageSize:kMaxThumbnailImageSize success:^(UIImage *resizedImage) {
@@ -191,13 +192,12 @@
         } progressBlock:^(CGFloat progress, CGFloat total) {
             
             NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+            [objectDictionary setObject:uploadTask forKey:@"uploadTask"];
             [objectDictionary setObject:currentMessage forKey:@"message"];
             [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
             [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
             
-            NSMutableDictionary *uploadProgressRoomDictionary = [NSMutableDictionary dictionary];
-            [uploadProgressRoomDictionary setObject:objectDictionary forKey:currentMessage.localID];
-            [self.uploadProgressDictionary setObject:uploadProgressRoomDictionary forKey:currentMessage.localID];
+            [self.uploadProgressDictionary setObject:objectDictionary forKey:currentMessage.localID];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:objectDictionary];
         

@@ -14,27 +14,27 @@
 //#define DB_NAME @"moselo.sqlite"
 
 //Prefs Key
-#define TAP_PREFS_ACTIVE_USER @"Prefs.activeUser"
-#define TAP_PREFS_PUSH_TOKEN @"Prefs.pushToken"
-#define TAP_PREFS_ACCESS_TOKEN @"Prefs.accessToken"
-#define TAP_PREFS_REFRESH_TOKEN @"Prefs.refreshToken"
-#define TAP_PREFS_REFRESH_TOKEN_EXPIRED_TIME @"Prefs.refreshTokenExpiredTime"
-#define TAP_PREFS_ACCESS_TOKEN_EXPIRED_TIME @"Prefs.accessTokenExpiredTime"
-#define TAP_PREFS_IS_DONE_FIRST_SETUP @"Prefs.isDoneFirstSetup"
-#define TAP_PREFS_IS_DONE_FIRST_SETUP @"Prefs.isDoneFirstSetup"
-#define TAP_PREFS_LAST_UPDATED_CHAT_ROOM @"Prefs.lastUpdatedChatRoom"
-#define TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP @"Prefs.lastDeletedOldMessageTimestamp"
+#define TAP_PREFS_ACTIVE_USER @"Prefs.TapTalkActiveUser"
+#define TAP_PREFS_PUSH_TOKEN @"Prefs.TapTalkPushToken"
+#define TAP_PREFS_ACCESS_TOKEN @"Prefs.TapTalkAccessToken"
+#define TAP_PREFS_REFRESH_TOKEN @"Prefs.TapTalkRefreshToken"
+#define TAP_PREFS_REFRESH_TOKEN_EXPIRED_TIME @"Prefs.TapTalkRefreshTokenExpiredTime"
+#define TAP_PREFS_ACCESS_TOKEN_EXPIRED_TIME @"Prefs.TapTalkAccessTokenExpiredTime"
+#define TAP_PREFS_IS_DONE_FIRST_SETUP @"Prefs.TapTalkIsDoneFirstSetup"
+#define TAP_PREFS_IS_DONE_FIRST_SETUP @"Prefs.TapTalkIsDoneFirstSetup"
+#define TAP_PREFS_LAST_UPDATED_CHAT_ROOM @"Prefs.TapTalkLastUpdatedChatRoom"
+#define TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP @"Prefs.TapTalkLastDeletedOldMessageTimestamp"
 
 //DV Temp
 //DV Note - 14 Sept Temporary added for checking 1 on 1 chat
-#define TAP_PREFS_OTHER_USER_ID @"Prefs.otherUserID"
-#define TAP_PREFS_INCOMING_PUSH_NOTIFICATION @"Prefs.incomingPushNotification"
+#define TAP_PREFS_OTHER_USER_ID @"Prefs.TapTalkOtherUserID"
+#define TAP_PREFS_INCOMING_PUSH_NOTIFICATION @"Prefs.TapTalkIncomingPushNotification"
 //END DV Temp
 
 //User Customized Prefs
-#define TAP_PREFS_USER_AGENT @"Prefs.userAgent"
-#define TAP_PREFS_APP_KEY_ID @"Prefs.appKeyID"
-#define TAP_PREFS_APP_KEY_SECRET @"Prefs.appKeySecret"
+#define TAP_PREFS_USER_AGENT @"Prefs.TapTalkUserAgent"
+#define TAP_PREFS_APP_KEY_ID @"Prefs.TapTalkAppKeyID"
+#define TAP_PREFS_APP_KEY_SECRET @"Prefs.TapTalkAppKeySecret"
 
 //Color
 #define TAP_COLOR_MOSELO_GREEN @"2ECCAD"
@@ -72,22 +72,22 @@
 #define TAP_FONT_LATO_BLACK_ITALIC @"Lato-BlackItalic"
 
 //Notification
-#define TAP_NOTIFICATION_SOCKET_CONNECTING @"Notification.isConnecting"
-#define TAP_NOTIFICATION_SOCKET_CONNECTED @"Notification.isConnected"
-#define TAP_NOTIFICATION_SOCKET_RECEIVE_ERROR @"Notification.isReceiveError"
-#define TAP_NOTIFICATION_SOCKET_RECONNECTING @"Notification.isReconnecting"
-#define TAP_NOTIFICATION_SOCKET_DISCONNECTED @"Notification.isDisonnected"
-#define TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED @"Notification.reachabilityStatusChanged"
-#define TAP_NOTIFICATION_APPLICATION_DID_FINISH_LAUNCHING @"Notification.applicationDidFinishLaunching"
-#define TAP_NOTIFICATION_APPLICATION_WILL_RESIGN_ACTIVE @"Notification.applicationWillResignActive"
-#define TAP_NOTIFICATION_APPLICATION_DID_ENTER_BACKGROUND @"Notification.applicationDidEnterBackground"
-#define TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND @"Notification.applicationWillEnterForeground"
-#define TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE @"Notification.applicationDidBecomeActive"
-#define TAP_NOTIFICATION_APPLICATION_WILL_TERMINATE @"Notification.applicationWillTerminate"
-#define TAP_NOTIFICATION_UPLOAD_FILE_START @"Notification.uploadFileStart"
-#define TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS @"Notification.uploadFileProgress"
-#define TAP_NOTIFICATION_UPLOAD_FILE_FINISH @"Notification.uploadFileFinish"
-#define TAP_NOTIFICATION_UPLOAD_FILE_FAILURE @"Notification.uploadFileFailure"
+#define TAP_NOTIFICATION_SOCKET_CONNECTING @"Notification.TapTalkIsConnecting"
+#define TAP_NOTIFICATION_SOCKET_CONNECTED @"Notification.TapTalkIsConnected"
+#define TAP_NOTIFICATION_SOCKET_RECEIVE_ERROR @"Notification.TapTalkIsReceiveError"
+#define TAP_NOTIFICATION_SOCKET_RECONNECTING @"Notification.TapTalkIsReconnecting"
+#define TAP_NOTIFICATION_SOCKET_DISCONNECTED @"Notification.TapTalkIsDisonnected"
+#define TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED @"Notification.TapTalkReachabilityStatusChanged"
+#define TAP_NOTIFICATION_APPLICATION_DID_FINISH_LAUNCHING @"Notification.TapTalkApplicationDidFinishLaunching"
+#define TAP_NOTIFICATION_APPLICATION_WILL_RESIGN_ACTIVE @"Notification.TapTalkApplicationWillResignActive"
+#define TAP_NOTIFICATION_APPLICATION_DID_ENTER_BACKGROUND @"Notification.TapTalkApplicationDidEnterBackground"
+#define TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND @"Notification.TapTalkApplicationWillEnterForeground"
+#define TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE @"Notification.TapTalkApplicationDidBecomeActive"
+#define TAP_NOTIFICATION_APPLICATION_WILL_TERMINATE @"Notification.TapTalkApplicationWillTerminate"
+#define TAP_NOTIFICATION_UPLOAD_FILE_START @"Notification.TapTalkUploadFileStart"
+#define TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS @"Notification.TapTalkUploadFileProgress"
+#define TAP_NOTIFICATION_UPLOAD_FILE_FINISH @"Notification.TapTalkUploadFileFinish"
+#define TAP_NOTIFICATION_UPLOAD_FILE_FAILURE @"Notification.TapTalkUploadFileFailure"
 
 //Typedef
 #define kTAPEventOpenRoom @"chat/openRoom"

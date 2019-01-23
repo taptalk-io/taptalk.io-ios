@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPMyImageBubbleTableViewCellDelegate <NSObject>
 
-- (void)myImageCancelDidTapped;
+- (void)myImageCancelDidTappedWithLocalID:(NSString *)localID tag:(NSInteger)tag;
 - (void)myImageReplyDidTapped;
 
 @end
@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id<TAPMyImageBubbleTableViewCellDelegate> delegate;
 @property (weak, nonatomic) TAPMessageModel *message;
+@property (strong, nonatomic) NSIndexPath *currentIndexPath;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewHeightConstraint;
