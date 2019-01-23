@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "TapTalk"
-  s.version      = "0.1.5"
+  s.version      = "0.1.6"
   s.summary      = "Powerful Chat Engine"
 
   # This description is used to generate tags and improve search results.
@@ -146,7 +146,7 @@ Pod::Spec.new do |s|
     
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents = '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "Configs.h"', '#import "TAPConnectionManager.h"', '#import "TAPChatManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPContactManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPMessageStatusManager.h"', '#import "TAPCustomBubbleManager.h"', '#import "TAPCustomKeyboardManager.h"', '#import "TAPContactManager.h"', '#import "TAPMessageStatusManager.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "TAPImageView.h"', '#import "PodAsset.h"', '#import "TAPGrowingTextView.h"', '#import "TAPSearchBarView.h"'
+    s.prefix_header_contents ='#import "Configs.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "PodAsset.h"', '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "TAPChatManager.h"', '#import "TAPConnectionManager.h"', '#import "TAPContactManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPCustomBubbleManager.h"', '#import "TAPCustomKeyboardManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPFileDownloadManager.h"', '#import "TAPFileUploadManager.h"', '#import "TAPMessageStatusManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPGrowingTextView.h"', '#import "TAPImageView.h"', '#import "TAPSearchBarView.h"'
     
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     

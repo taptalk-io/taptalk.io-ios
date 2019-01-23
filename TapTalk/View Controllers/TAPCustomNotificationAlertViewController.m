@@ -200,7 +200,7 @@
 //    NSString *profilePictureURL = TAP_DUMMY_IMAGE_URL; //DV Temp
     NSString *nameString = message.user.fullname;
     NSString *messageString = message.body;
-    NSString *contentImageURL = TAP_DUMMY_IMAGE_URL; //DV Temp
+    NSString *contentImageURL = @""; //DV Temp
     
     BOOL isShowProfilePicture = NO;
     BOOL isShowContentImage = NO; //DV Temp

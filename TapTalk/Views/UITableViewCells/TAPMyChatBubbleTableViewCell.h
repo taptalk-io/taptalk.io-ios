@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPMyChatBubbleTableViewCellDelegate <NSObject>
 
 - (void)myChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myChatReplyDidTapped;
 
 @end

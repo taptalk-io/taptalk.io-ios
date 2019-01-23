@@ -12,11 +12,14 @@
 #import <Photos/Photos.h>
 
 #import "TAPMyChatBubbleTableViewCell.h"
-#import "TAPMyImageBubbleTableViewCell.h"
 #import "TAPYourChatBubbleTableViewCell.h"
+#import "TAPMyImageBubbleTableViewCell.h"
+#import "TAPYourImageBubbleTableViewCell.h"
 #import "TAPConnectionStatusViewController.h"
 #import "TAPKeyboardViewController.h"
 #import "TAPProfileViewController.h"
+#import "TAPImagePreviewViewController.h"
+#import "TAPPhotoAlbumListViewController.h"
 
 #import "TAPGradientView.h"
 #import "TAPCustomAccessoryView.h"
@@ -24,16 +27,24 @@
 #import "TAPProductListBubbleTableViewCell.h" //DV Temp
 #import "TAPOrderCardBubbleTableViewCell.h" //CS Temp
 
+#import "TAPQuoteModel.h"
+
 static const NSInteger kShowChatAnchorOffset = 70.0f;
 static const NSInteger kChatAnchorDefaultBottomConstraint = 63.0f;
 static const NSInteger kInputMessageAccessoryViewHeight = 52.0f;
+static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
 typedef NS_ENUM(NSInteger, KeyboardState) {
     keyboardStateDefault = 0,
     keyboardStateOptions = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate>
+typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
+    inputAccessoryExtensionTypeQuote = 0,
+    inputAccessoryExtensionTypeReplyMessage = 1,
+};
+
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -78,13 +89,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 @property (nonatomic) long apiBeforeLastCreated;
 @property (nonatomic) BOOL isLastPage;
-@property (nonatomic) BOOL isViewWillAppeared;
-@property (nonatomic) BOOL isViewDidAppeared;
 @property (nonatomic) KeyboardState keyboardState;
 @property (nonatomic) BOOL isKeyboardWasShowed;
 @property (nonatomic) BOOL isKeyboardShowed;
 @property (nonatomic) BOOL isScrollViewDragged;
 @property (nonatomic) BOOL isCustomKeyboardAvailable;
+@property (nonatomic) BOOL isViewWillAppeared;
+@property (nonatomic) BOOL isViewDidAppeared;
+@property (nonatomic) BOOL isKeyboardOptionTapped;
 
 @property (nonatomic) CGFloat connectionStatusHeight;
 
@@ -93,15 +105,29 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 @property (strong, nonatomic) IBOutlet UILabel *chatAnchorBadgeLabel;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatAnchorButtonBottomConstrait;
 
+//Input Accessory Extension
+@property (strong, nonatomic) IBOutlet UIView *quoteView;
+@property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
+@property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
+@property (strong, nonatomic) IBOutlet UIView *replyMessageView;
+@property (strong, nonatomic) IBOutlet UIView *replyMessageInnerContainerView;
+@property (strong, nonatomic) IBOutlet UILabel *replyMessageNameLabel;
+@property (strong, nonatomic) IBOutlet UILabel *replyMessageMessageLabel;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *inputAccessoryExtensionHeightConstraint;
+@property (nonatomic) InputAccessoryExtensionType inputAccessoryExtensionType;
+
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
+    
 
 - (IBAction)sendButtonDidTapped:(id)sender;
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
 - (IBAction)chatAnchorButtonDidTapped:(id)sender;
+- (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender;
 
 - (void)backButtonDidTapped;
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index;
@@ -126,6 +152,16 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)setAsTyping:(BOOL)typing;
 - (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
 - (void)setAsTypingNoAfterDelay;
+- (void)showInputAccessoryExtensionView:(BOOL)show;
+- (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType;
+- (void)setReplyMessageWithMessage:(TAPMessageModel *)message;
+- (void)setQuoteWithQuote:(TAPQuoteModel *)quote;
+- (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image;
+- (void)fileUploadManagerProgressNotification:(NSNotification *)notification;
+- (void)fileUploadManagerStartNotification:(NSNotification *)notification;
+- (void)fileUploadManagerFinishNotification:(NSNotification *)notification;
+- (void)fileUploadManagerFailureNotification:(NSNotification *)notification;
+- (void)fetchImageDataWithMessage:(TAPMessageModel *)message;
 
 @end
 
@@ -135,12 +171,18 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)loadView {
     [super loadView];
     
+    id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+    CGFloat extensionHeight = 0.0f;
+    if(quotedMessage) {
+        extensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
+    }
+    
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.0];
     [UIView setAnimationDelay:0.0];
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
     [UIView performWithoutAnimation:^{
-        self.tableView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - kInputMessageAccessoryViewHeight - [TAPUtil safeAreaBottomPadding]);
+        self.tableView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - kInputMessageAccessoryViewHeight - extensionHeight - [TAPUtil safeAreaBottomPadding]);
     }];
     [UIView commitAnimations];
     
@@ -150,6 +192,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityStatusChange:) name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerProgressNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerStartNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_START object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerFinishNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerFailureNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:nil];
     
     self.navigationController.delegate = self;
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
@@ -209,14 +256,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     self.userStatusView.alpha = 0.0f;
     self.userStatusView.clipsToBounds = YES;
     
-    _userStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 3.0f, 0.0f, 0.0f, 16.0f)];
+    _userStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 4.0f, 0.0f, 0.0f, 16.0f)];
     self.userStatusLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
     self.userStatusLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
     self.userStatusLabel.textAlignment = NSTextAlignmentCenter;
     [self.userStatusLabel sizeToFit];
     self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
     
-    CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 3.0f;
+    CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;
     
     _userDescriptionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), userStatusViewWidth, 16.0f)];
     self.userDescriptionView.center = CGPointMake(self.nameLabel.center.x, self.userDescriptionView.center.y);
@@ -259,9 +306,9 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     rightBarImageView.clipsToBounds = YES;
     [rightBarView addSubview:rightBarImageView];
     
-    UIImageView *expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(rightBarImageView.frame) - 13.0f, CGRectGetMaxY(rightBarImageView.frame) - 13.0f, 13.0f, 13.0f)];
-    expertIconImageView.image = [UIImage imageNamed:@"TAPIconExpertSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    [rightBarView addSubview:expertIconImageView];
+//    UIImageView *expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(rightBarImageView.frame) - 13.0f, CGRectGetMaxY(rightBarImageView.frame) - 13.0f, 13.0f, 13.0f)];
+//    expertIconImageView.image = [UIImage imageNamed:@"TAPIconExpertSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+//    [rightBarView addSubview:expertIconImageView];
     
     UIButton *rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(rightBarView.frame), CGRectGetHeight(rightBarView.frame))];
     [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -325,15 +372,56 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     [self firstLoadData];
     
+    //Input Accessory Extension View
     self.inputMessageAccessoryView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     
     [[TAPChatManager sharedManager] refreshShouldRefreshOnlineStatus];
+    
+    self.replyMessageInnerContainerView.layer.cornerRadius = 4.0f;
+    
+    id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+    if (quotedMessage) {
+        [self showInputAccessoryExtensionView:YES];
+        if ([quotedMessage isKindOfClass:[TAPMessageModel class]]) {
+            TAPMessageModel *quoteMessageModel = (TAPMessageModel *)quotedMessage;
+            [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+            [self setReplyMessageWithMessage:quoteMessageModel];
+        }
+        else if ([quotedMessage isKindOfClass:[TAPQuoteModel class]]) {
+            TAPQuoteModel *quoteModel = (TAPQuoteModel *)quotedMessage;
+            [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+            [self setQuoteWithQuote:quoteModel];
+        }
+    }
+    else {
+        [self showInputAccessoryExtensionView:NO];
+    }
+    
+//    //CS TEMP - Test Reply Message View
+//    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+//    TAPMessageModel *testMessage = [TAPMessageModel new];
+//    testMessage.user = [[TAPContactManager sharedManager] getUserWithUserID:[self getOtherUserIDWithRoomID:self.currentRoom.roomID]];
+//    testMessage.body = @"This is sample message body for reply view, this is just a temporary message. Remember to remove this later";
+//    [self setReplyMessageWithMessage:testMessage];
+//    //END CS TEMP
+    
+    //CS TEMP - Test Custom Quote View
+//    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+//    TAPQuoteModel *quote = [TAPQuoteModel new];
+//    quote.title = @"Custom Title";
+//    quote.content = @"Rp 50000";
+//    quote.imageURL = TAP_DUMMY_IMAGE_URL;
+//    [self setQuoteWithQuote:quote];
+    //END CS TEMP
+    
+    //END Input Accessory Extension View
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     _isViewWillAppeared = YES;
+    self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
     
     self.connectionStatusViewController.view.frame = CGRectMake(CGRectGetMinX(self.connectionStatusViewController.view.frame), CGRectGetMinY(self.connectionStatusViewController.view.frame), CGRectGetWidth(self.connectionStatusViewController.view.frame), self.connectionStatusHeight);
     //    self.view.backgroundColor = [UIColor redColor];
@@ -348,6 +436,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     draftMessage = [TAPUtil nullToEmptyString:draftMessage];
     
     [self.messageTextView setInitialText:draftMessage];
+    if (![self.messageTextView.text isEqualToString:@""]) {
+        [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessageActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+        self.sendButton.userInteractionEnabled = YES;
+        if(self.isCustomKeyboardAvailable) {
+            self.keyboardOptionButton.alpha = 0.0f;
+            self.messageViewLeftConstraint.constant = -38.0f;          
+        }
+    }
     
     if([[TAPChatManager sharedManager] checkShouldRefreshOnlineStatus]) {
         [self setAsTyping:NO];
@@ -389,6 +485,10 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }];
     }
     
+    //CS NOTE - Add show input accessory extension validation here because it should be shown after initial keyboard height is obtained
+    
+//    [self showInputAccessoryExtensionView:YES];
+    
     [self processVisibleMessageAsRead];
 }
 
@@ -396,11 +496,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [super viewWillDisappear:animated];
     
     _isViewWillAppeared = NO;
+    self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
     
     if([self.delegate respondsToSelector:@selector(chatViewControllerShouldUpdateUnreadBubbleForRoomID:)]) {
         [self.delegate chatViewControllerShouldUpdateUnreadBubbleForRoomID:self.currentRoom.roomID];
     }
-    
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -418,9 +518,14 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     // Dispose of any resources that can be recreated.
 }
 
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_UPLOAD_FILE_START object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:nil];
 }
 
 #pragma mark - Data Source
@@ -516,6 +621,27 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 
                 [cell setMessage:message];
                 
+                NSInteger status = [[TAPFileUploadManager sharedManager] obtainImageUploadStatusWithMessage:message];
+                // 0 is not found
+                // 1 is uploading
+                // 2 is waiting for upload
+                if (status != 0) {
+                    [cell showProgressUploadView:YES];
+                    
+                    //Set current progress
+                    NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                    if (uploadProgressDictionary == nil) {
+                        CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
+                        CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
+                        [cell setInitialAnimateUploadingImageWithCancelButton:YES];
+                        [cell animateProgressUploadingImageWithProgress:progress total:total];
+                    }
+                }
+                else {
+                    // Fetch image data, get from cache or download if needed
+                    [self fetchImageDataWithMessage:message];
+                }
+                
                 return cell;
             }
             else if (message.type == TAPChatMessageTypeOrderCard) {
@@ -580,24 +706,50 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             //            return cell;
             //            //END DV Temp
             
-            [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
-            TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            cell.tag = indexPath.row;
-            cell.userInteractionEnabled = YES;
-            cell.contentView.userInteractionEnabled = YES;
-            cell.delegate = self;
-            
-            [cell setMessage:message];
-            
-            if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
-                [cell showStatusLabel:YES animated:NO];
+            if (message.type == TAPChatMessageTypeText) {
+                [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
+                TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.tag = indexPath.row;
+                cell.userInteractionEnabled = YES;
+                cell.contentView.userInteractionEnabled = YES;
+                cell.delegate = self;
+                
+                [cell setMessage:message];
+                
+                if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
+                    [cell showStatusLabel:YES animated:NO];
+                }
+                else {
+                    [cell showStatusLabel:NO animated:NO];
+                }
+                
+                return cell;
             }
-            else {
-                [cell showStatusLabel:NO animated:NO];
+            else if (message.type == TAPChatMessageTypeImage) {
+                [tableView registerNib:[TAPYourImageBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourImageBubbleTableViewCell description]];
+                TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourImageBubbleTableViewCell description] forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.tag = indexPath.row;
+                cell.userInteractionEnabled = YES;
+                cell.contentView.userInteractionEnabled = YES;
+                
+                [cell setMessage:message];
+                
+                NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                if (progressDictionary != nil) {
+                    CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
+                    CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
+                    [cell setInitialAnimateDownloadingImage];
+                    [cell animateProgressDownloadingImageWithProgress:progress total:total];
+                }
+                else {
+                    //Fetch image data, get from cache or download if needed
+                    [self fetchImageDataWithMessage:message];
+                }
+                
+                return cell;
             }
-            
-            return cell;
         }
         
     }
@@ -705,7 +857,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     //CS NOTE - move chat anchor button as the keyboard move interactively
     CGPoint positionInView = [scrollView.panGestureRecognizer locationInView:self.view];
-    CGFloat keyboardAndAccessoryViewHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
+    CGFloat keyboardAndAccessoryViewHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.inputAccessoryExtensionHeightConstraint.constant;
     CGFloat totalKeyboardHeight = self.keyboardHeight; //include inputView height
     CGFloat keyboardMinYPositionInView = CGRectGetHeight([UIScreen mainScreen].bounds) - totalKeyboardHeight;
     
@@ -718,10 +870,10 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             keyboardHeightDifference = 0.0f;
         }
         
-        CGFloat chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + (totalKeyboardHeight - keyboardHeightDifference) - kInputMessageAccessoryViewHeight;
+        CGFloat chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + (totalKeyboardHeight - keyboardHeightDifference) - kInputMessageAccessoryViewHeight - self.inputAccessoryExtensionHeightConstraint.constant;
         
-        if (chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint) {
-            chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint;
+        if (chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint + self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding) {
+            chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding;
         }
         self.chatAnchorButtonBottomConstrait.constant = chatAnchorBottomConstraint;
     }
@@ -757,7 +909,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         //If message don't have the same room id, reject message
         return;
     }
-    
     [self handleMessageFromSocket:message];
 }
 
@@ -899,6 +1050,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     //WK Note : Do reply here later.
+    [self showInputAccessoryExtensionView:YES];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+    [self setReplyMessageWithMessage:self.selectedMessage];
+    
+    [[TAPChatManager sharedManager] saveToQuotedMessage:self.selectedMessage userInfo:nil roomID:self.currentRoom.roomID];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -913,6 +1069,28 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     } completion:^(BOOL finished) {
         //completion
     }];
+}
+
+- (void)myChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
+        //reply to exists
+ 
+    }
+    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
+        //quote exists
+        if(tappedMessage.data) {
+            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:tappedMessage.data];
+        }
+    }
+}
+
+#pragma mark TAPMyImageBubbleTableViewCell
+- (void)myImageCancelDidTapped {
+    
+}
+
+- (void)myImageReplyDidTapped {
+    
 }
 
 #pragma mark TAPYourChatBubbleTableViewCell
@@ -1004,7 +1182,12 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     //WK Note : Do reply here later.
+    [self showInputAccessoryExtensionView:YES];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+    [self setReplyMessageWithMessage:self.selectedMessage];
     
+    [[TAPChatManager sharedManager] saveToQuotedMessage:self.selectedMessage userInfo:nil roomID:self.currentRoom.roomID];
+
     //remove selectedMessage
     self.selectedMessage = nil;
     
@@ -1018,6 +1201,19 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     } completion:^(BOOL finished) {
         //completion
     }];
+}
+
+- (void)yourChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
+        //reply to exists
+        
+    }
+    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
+        //quote exists
+        if(tappedMessage.data) {
+            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:tappedMessage.data];
+        }
+    }
 }
 
 #pragma mark TAPGrowingTextView
@@ -1098,9 +1294,22 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         //Create Order Card
         //CS Temp - Add Order Card Type Dummy Model
         TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeOrderCard];
-        [self.messageArray insertObject:message atIndex:0];
+        
+        [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
+        
         [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         //End Temp
+    }
+}
+
+#pragma mark TAPImagePreviewViewController
+- (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray {
+    for (TAPImagePreviewModel *imagePreview in dataArray) {
+        UIImage *selectedImage = imagePreview.image;
+        NSString *caption = imagePreview.caption;
+        caption = [TAPUtil nullToEmptyString:caption];
+        
+        [[TAPChatManager sharedManager] sendImageMessage:selectedImage caption:caption];
     }
 }
 
@@ -1117,19 +1326,39 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
             }
             
+            [self performSelector:@selector(showImagePreviewControllerWithSelectedImage:) withObject:selectedImage afterDelay:0.3f];
+            
             //CS Temp - Add Image Type Dummy Model
-            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeImage];
-            [TAPImageView saveImageToCache:selectedImage withKey:message.localID];
-            [self.messageArray insertObject:message atIndex:0];
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+//            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeImage];
+//            //        [TAPImageView saveImageToCache:selectedImage withKey:message.localID];
+//            message.imageMessage = selectedImage;
+//            [self.messageArray insertObject:message atIndex:0];
+//            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
             //End Temp
         }
         [self checkKeyboard];
     }];
 }
 
+#pragma mark TAPPhotoAlbumListViewController
+- (void)photoAlbumListViewControllerSelectImageWithDataArray:(NSArray *)dataArray {
+    
+}
+
+- (void)photoAlbumListViewControllerDidFinishAndSendImageWithDataArray:(NSArray *)dataArray {
+    //Handle send image from gallery
+    for (TAPImagePreviewModel *imagePreview in dataArray) {
+        UIImage *selectedImage = imagePreview.image;
+        NSString *caption = imagePreview.caption;
+        caption = [TAPUtil nullToEmptyString:caption];
+        
+        [[TAPChatManager sharedManager] sendImageMessage:selectedImage caption:caption];
+    }
+}
+
 #pragma mark - Custom Method
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index {
+    
     //Add message to message pointer dictionary
     [self.messageDictionary setObject:message forKey:message.localID];
     
@@ -1140,7 +1369,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 - (void)handleMessageFromSocket:(TAPMessageModel *)message {
     //Check if message exist in Message Pointer Dictionary
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
-    
     if(currentMessage != nil) {
         //Message exist in dictionary
         
@@ -1222,11 +1450,15 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     
-    CGFloat accessoryViewAndSafeAreaHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
+    if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
+        return;
+    }
+    
+    CGFloat accessoryViewAndSafeAreaHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.inputAccessoryExtensionHeightConstraint.constant;
     
     //set initial keyboard height to prevent wrong keyboard height usage
-    if (self.initialKeyboardHeight == 0.0f && keyboardHeight != accessoryViewAndSafeAreaHeight) {
-        self.initialKeyboardHeight = keyboardHeight;
+    if (self.initialKeyboardHeight == 0.0f && keyboardHeight !=  accessoryViewAndSafeAreaHeight) {
+        self.initialKeyboardHeight = keyboardHeight - self.inputAccessoryExtensionHeightConstraint.constant;
     }
     
     if (self.keyboardHeight == 0.0f) {
@@ -1269,7 +1501,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+        
         CGFloat newYContentOffset = self.tableView.contentOffset.y - keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
+        if(self.initialKeyboardHeight > 0.0f) {
+            newYContentOffset = self.tableView.contentOffset.y - keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.inputAccessoryExtensionHeightConstraint.constant;
+        }
         
         if (newYContentOffset < -tableViewYContentInset) {
             newYContentOffset = -tableViewYContentInset;
@@ -1297,16 +1533,20 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
     
+    if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
+        return;
+    }
+    
     //set default keyboard height including accessory view height
-    _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding;
+    _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.inputAccessoryExtensionHeightConstraint.constant;
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
         return;
     }
     
-    self.tableView.contentInset = UIEdgeInsetsMake(0.0f, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
-    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
+    self.tableView.contentInset = UIEdgeInsetsMake(self.inputAccessoryExtensionHeightConstraint.constant, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
+    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(self.inputAccessoryExtensionHeightConstraint.constant, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     
     [UIView animateWithDuration:0.2f animations:^{
         if(self.isCustomKeyboardAvailable) {
@@ -1315,10 +1555,10 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         }
         
         if (IS_IPHONE_X_FAMILY) {
-            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
+            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding + self.inputAccessoryExtensionHeightConstraint.constant;
         }
         else {
-            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint;
+            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.inputAccessoryExtensionHeightConstraint.constant;
         }
         
         [self.view layoutIfNeeded];
@@ -1363,15 +1603,22 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         self.messageTextView.text = @"";
     }
     
-    if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
-        //Only scroll if table view is at bottom
+    if(self.inputAccessoryExtensionHeightConstraint.constant > 0.0f) {
+        [self showInputAccessoryExtensionView:NO];
+    }
+    else if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
+//        Only scroll if table view is at bottom
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
     
     [self checkEmptyState];
+    [[TAPChatManager sharedManager] stopTyping];
 }
 
 - (IBAction)keyboardOptionButtonDidTapped:(id)sender {
+    
+    _isKeyboardOptionTapped = YES;
+    
     if (self.keyboardState == keyboardStateDefault) {
         _keyboardState = keyboardStateOptions;
         
@@ -1413,6 +1660,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             [self.messageTextView becameFirstResponder];
         }
     }
+    _isKeyboardOptionTapped = NO;
 }
 
 - (IBAction)attachmentButtonDidTapped:(id)sender {
@@ -1663,7 +1911,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 }
                 
             } failure:^(NSError *error) {
-                //DV Temp
+#ifdef DEBUG
+                //Note - this alert only shown at debug
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
                 
                 UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -1671,7 +1920,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 
                 [alertController addAction:okAction];
                 [self presentViewController:alertController animated:YES completion:nil];
-                //END DV Temp
+#endif
             }];
         }
     } failure:^(NSError *error) {
@@ -1720,7 +1969,8 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 [self updateMessageDataAndUIWithMessages:messageArray toTop:NO];
             }
         } failure:^(NSError *error) {
-            //DV Temp
+#ifdef DEBUG
+            //Note - this alert only shown at debug
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -1728,7 +1978,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             
             [alertController addAction:okAction];
             [self presentViewController:alertController animated:YES completion:nil];
-            //END DV Temp
+#endif
         }];
     }
 }
@@ -1789,7 +2039,6 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 
 - (void)updateMessageModelValueWithMessage:(TAPMessageModel *)message {
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
-    
     currentMessage.messageID = message.messageID;
     currentMessage.localID = message.localID;
     currentMessage.type = message.type;
@@ -1925,22 +2174,31 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
 }
 
 - (void)openGallery {
+    
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
-        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-        imagePicker.allowsEditing = NO;
-        imagePicker.delegate = self;
-        imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-        
-        [self presentViewController:imagePicker animated:YES completion:^{
-            //completion
-        }];
+//        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+//        imagePicker.allowsEditing = NO;
+//        imagePicker.delegate = self;
+//        imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+//
+//        [self presentViewController:imagePicker animated:YES completion:^{
+//            //completion
+//        }];
+        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
+//        photoAlbumListViewController.currentTotalImageData = [self.imageDataArray count];
+        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
+        photoAlbumListViewController.delegate = self;
+        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
         //request
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            [self openGallery];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openGallery];
+            });
         }];
     }
     else {
@@ -2033,7 +2291,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     [self isShowOnlineDotStatus:NO];
     
     if (self.onlineStatus.isOnline) {
-        lastSeenString = NSLocalizedString(@"active now", @"");
+        lastSeenString = NSLocalizedString(@"Active now", @"");
         [self isShowOnlineDotStatus:YES];
     }
     else if (timestamp == 0) {
@@ -2042,7 +2300,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     else if (timeGap <= midnightTimeGap) {
         if (timeGap < 60.0f) {
             //Set recently
-            lastSeenString = NSLocalizedString(@"last seen recently", @"");
+            lastSeenString = NSLocalizedString(@"Last seen recently", @"");
         }
         else if (timeGap < 3600.0f) {
             //Set minutes before
@@ -2054,7 +2312,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 minuteString = NSLocalizedString(@"minute", @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"last seen %li %@ ago", @""), (long)numberOfMinutes, minuteString];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfMinutes, minuteString];
         }
         else {
             //Set hour before
@@ -2066,7 +2324,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
                 hourString = NSLocalizedString(@"hour", @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"last seen %li %@ ago", @""), (long)numberOfHours, hourString];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfHours, hourString];
         }
     }
     else if (timeGap <= 86400.0f * 6 + midnightTimeGap) {
@@ -2084,11 +2342,11 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
             dayString = NSLocalizedString(@"day", @"");
         }
         
-        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"last seen %li %@ ago", @""), (long)numberOfDays, dayString];
+        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfDays, dayString];
     }
     else if (timeGap <= 86400.0f*7 + midnightTimeGap) {
         //Set a week ago
-        lastSeenString = @"last seen a week ago";
+        lastSeenString = @"Last seen a week ago";
     }
     else {
         //Set date
@@ -2098,13 +2356,13 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
         dateFormatter.dateFormat = @"dd/MM/YY";
         NSString *formattedCreatedDate = [dateFormatter stringFromDate:lastLoginDate];
         
-        lastSeenString = [NSString stringWithFormat:@"last seen %@", formattedCreatedDate];
+        lastSeenString = [NSString stringWithFormat:@"Last seen %@", formattedCreatedDate];
     }
     
     self.userStatusLabel.text = lastSeenString;
     [self.userStatusLabel sizeToFit];
     self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
-    CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 3.0f;
+    CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;
     self.userDescriptionView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), userStatusViewWidth, 16.0f);
     self.userDescriptionView.center = CGPointMake(self.nameLabel.center.x, self.userDescriptionView.center.y);
 }
@@ -2113,7 +2371,7 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     if (isShow) {
         self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f);
         self.userStatusView.alpha = 1.0f;
-        self.userStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 3.0f, 0.0f, 0.0f, 16.0f);
+        self.userStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 4.0f, 0.0f, 0.0f, 16.0f);
     }
     else {
         self.userStatusView.frame = CGRectZero;
@@ -2213,6 +2471,521 @@ typedef NS_ENUM(NSInteger, KeyboardState) {
     self.userTypingView.alpha = 0.0f;
     self.userDescriptionView.alpha = 1.0f;
 }
+    
+- (void)showInputAccessoryExtensionView:(BOOL)show {
+    if (self.isKeyboardShowed) {
+        _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + kInputMessageAccessoryExtensionViewDefaultHeight + self.initialKeyboardHeight;
+    }
+    else {
+        _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding;
+    }
+    
+    if (show) {
+        self.inputAccessoryExtensionHeightConstraint.constant = kInputMessageAccessoryExtensionViewDefaultHeight;
+    }
+    else {
+        self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+    }
+}
+    
+- (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType {
+    _inputAccessoryExtensionType = inputAccessoryExtensionType;
+    if (inputAccessoryExtensionType == inputAccessoryExtensionTypeQuote) {
+        self.quoteView.alpha = 1.0f;
+        self.replyMessageView.alpha = 0.0f;
+    }
+    else if (inputAccessoryExtensionType == inputAccessoryExtensionTypeReplyMessage) {
+        self.quoteView.alpha = 0.0f;
+        self.replyMessageView.alpha = 1.0f;
+    }
+}
+
+- (void)setReplyMessageWithMessage:(TAPMessageModel *)message {
+    self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];;
+    self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
+}
+
+- (void)setQuoteWithQuote:(TAPQuoteModel *)quote {
+    self.quoteTitleLabel.text = quote.title;
+    self.quoteSubtitleLabel.text = quote.content;
+    if (![quote.imageURL isEqualToString:@""]) {
+        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    }
+}
+
+- (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender {
+    [self showInputAccessoryExtensionView:NO];
+}
+
+- (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image {
+    TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+    imagePreviewViewController.delegate = self;
+    
+    TAPImagePreviewModel *imagePreview = [TAPImagePreviewModel new];
+    imagePreview.image = image;
+    
+    [imagePreviewViewController setImagePreviewData:@[imagePreview]];
+    UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
+    [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:nil];
+}
+
+- (void)fileUploadManagerProgressNotification:(NSNotification *)notification {
+    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+ 
+    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+    
+    NSString *roomID = obtainedMessage.room.roomID;
+    roomID = [TAPUtil nullToEmptyString:roomID];
+    
+    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+    NSString *currentActiveRoomID = currentRoom.roomID;
+    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+    
+    if (![roomID isEqualToString:currentActiveRoomID]) {
+        return;
+    }
+    
+    NSString *localID = obtainedMessage.localID;
+    localID = [TAPUtil nullToEmptyString:localID];
+    
+    NSString *progressString = [notificationParameterDictionary objectForKey:@"progress"];
+    CGFloat progress = [progressString floatValue];
+    
+    NSString *totalString = [notificationParameterDictionary objectForKey:@"total"];
+    CGFloat total = [totalString floatValue];
+    
+    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    
+    TAPChatMessageType type = currentMessage.type;
+    if (type == TAPChatMessageTypeImage) {
+        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+        [cell animateProgressUploadingImageWithProgress:progress total:total];
+    }
+}
+
+- (void)fileUploadManagerStartNotification:(NSNotification *)notification {
+    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+    
+    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+    
+    NSString *roomID = obtainedMessage.room.roomID;
+    roomID = [TAPUtil nullToEmptyString:roomID];
+    
+    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+    NSString *currentActiveRoomID = currentRoom.roomID;
+    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+    
+    if (![roomID isEqualToString:currentActiveRoomID]) {
+        return;
+    }
+    
+    NSString *localID = obtainedMessage.localID;
+    localID = [TAPUtil nullToEmptyString:localID];
+    
+    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    
+    TAPChatMessageType type = currentMessage.type;
+    if (type == TAPChatMessageTypeImage) {
+        
+        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+        [cell setInitialAnimateUploadingImageWithCancelButton:YES];
+    }
+}
+
+- (void)fileUploadManagerFinishNotification:(NSNotification *)notification {
+    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+    
+    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+    
+    NSString *roomID = obtainedMessage.room.roomID;
+    roomID = [TAPUtil nullToEmptyString:roomID];
+    
+    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+    NSString *currentActiveRoomID = currentRoom.roomID;
+    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+    
+    if (![roomID isEqualToString:currentActiveRoomID]) {
+        return;
+    }
+    
+    NSString *localID = obtainedMessage.localID;
+    localID = [TAPUtil nullToEmptyString:localID];
+    
+    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    
+    TAPChatMessageType type = currentMessage.type;
+    if (type == TAPChatMessageTypeImage) {
+        
+        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+        [cell animateFinishedUploadingImage];
+    }
+}
+
+- (void)fileUploadManagerFailureNotification:(NSNotification *)notification {
+    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+    
+    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+    
+    NSString *roomID = obtainedMessage.room.roomID;
+    roomID = [TAPUtil nullToEmptyString:roomID];
+    
+    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+    NSString *currentActiveRoomID = currentRoom.roomID;
+    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+    
+    if (![roomID isEqualToString:currentActiveRoomID]) {
+        return;
+    }
+    
+    NSString *localID = obtainedMessage.localID;
+    localID = [TAPUtil nullToEmptyString:localID];
+    
+    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    
+    TAPChatMessageType type = currentMessage.type;
+    if (type == TAPChatMessageTypeImage) {
+        
+        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+        [cell animateFailedUploadingImage];
+    }
+}
+
+- (void)fetchImageDataWithMessage:(TAPMessageModel *)message {
+    [[TAPFileDownloadManager sharedManager] receiveImageFileWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    //My Chat
+                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell setInitialAnimateUploadingImageWithCancelButton:NO];
+                }
+                else {
+                    //Their Chat
+                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell setInitialAnimateDownloadingImage];
+                }
+            }
+        });
+    } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    //My Chat
+                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell animateProgressUploadingImageWithProgress:progress total:total];
+                }
+                else {
+                    //Their Chat
+                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell animateProgressDownloadingImageWithProgress:progress total:total];
+                }
+            }
+        });
+    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    //My Chat
+                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    if (fullImage != nil) {
+                        [cell setFullImage:fullImage];
+                    }
+                    [cell animateFinishedUploadingImage];
+                }
+                else {
+                    //Their Chat
+                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    if (fullImage != nil) {
+                        [cell setFullImage:fullImage];
+                    }
+                    [cell animateFinishedDownloadingImage];
+                }
+            }
+        });
+    } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    //My Chat
+                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell animateFailedUploadingImage];
+                }
+                else {
+                    //Their Chat
+                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell animateFailedDownloadingImage];
+                }
+            }
+        });
+    }];
+}
+    
+//DV NOTE - Uncomment this to use API download thumbnail image
+//- (void)fetchImageDataWithMessage:(TAPMessageModel *)message {
+//
+//    [[TAPFileDownloadManager sharedManager] receiveImageFileWithMessage:message progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+//            NSString *currentActiveRoomID = currentRoom.roomID;
+//            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+//
+//            NSString *roomID = receivedMessage.room.roomID;
+//            roomID = [TAPUtil nullToEmptyString:roomID];
+//
+//            NSString *localID = receivedMessage.localID;
+//            localID = [TAPUtil nullToEmptyString:localID];
+//
+//            if (![roomID isEqualToString:currentActiveRoomID]) {
+//                return;
+//            }
+//
+//            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//
+//            TAPChatMessageType type = currentMessage.type;
+//            if (type == TAPChatMessageTypeImage) {
+//
+//                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+//                    //My Chat
+//                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    [cell animateProgressUploadingImageWithProgress:progress total:total];
+//                }
+//                else {
+//                    //Their Chat
+//                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    [cell animateProgressDownloadingImageWithProgress:progress total:total];
+//                }
+//            }
+//        });
+//    } successThumbnailImage:^(UIImage * _Nonnull thumbnailImage, TAPMessageModel * _Nonnull receivedMessage) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+//            NSString *currentActiveRoomID = currentRoom.roomID;
+//            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+//
+//            NSString *roomID = receivedMessage.room.roomID;
+//            roomID = [TAPUtil nullToEmptyString:roomID];
+//
+//            NSString *localID = receivedMessage.localID;
+//            localID = [TAPUtil nullToEmptyString:localID];
+//
+//            if (![roomID isEqualToString:currentActiveRoomID]) {
+//                return;
+//            }
+//
+//            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//
+//            TAPChatMessageType type = currentMessage.type;
+//            if (type == TAPChatMessageTypeImage) {
+//                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+//                    //My Chat
+//                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    if (thumbnailImage != nil) {
+//                        [cell setThumbnailImage:thumbnailImage];
+//                    }
+//                    [cell animateFinishedUploadingImage];
+//                }
+//                else {
+//                    //Their Chat
+//                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    if (thumbnailImage != nil) {
+//                        [cell setThumbnailImage:thumbnailImage];
+//                    }
+//                    [cell animateFinishedDownloadingImage];
+//                }
+//            }
+//        });
+//    } successFullImage:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+//            NSString *currentActiveRoomID = currentRoom.roomID;
+//            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+//
+//            NSString *roomID = receivedMessage.room.roomID;
+//            roomID = [TAPUtil nullToEmptyString:roomID];
+//
+//            NSString *localID = receivedMessage.localID;
+//            localID = [TAPUtil nullToEmptyString:localID];
+//
+//            if (![roomID isEqualToString:currentActiveRoomID]) {
+//                return;
+//            }
+//
+//            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//
+//            TAPChatMessageType type = currentMessage.type;
+//            if (type == TAPChatMessageTypeImage) {
+//                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+//                    //My Chat
+//                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    if (fullImage != nil) {
+//                        [cell setFullImage:fullImage];
+//                    }
+//                    [cell animateFinishedUploadingImage];
+//                }
+//                else {
+//                    //Their Chat
+//                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    if (fullImage != nil) {
+//                        [cell setFullImage:fullImage];
+//                    }
+//                    [cell animateFinishedDownloadingImage];
+//                }
+//            }
+//        });
+//    } failureThumbnailImage:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+//            NSString *currentActiveRoomID = currentRoom.roomID;
+//            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+//
+//            NSString *roomID = receivedMessage.room.roomID;
+//            roomID = [TAPUtil nullToEmptyString:roomID];
+//
+//            NSString *localID = receivedMessage.localID;
+//            localID = [TAPUtil nullToEmptyString:localID];
+//
+//            if (![roomID isEqualToString:currentActiveRoomID]) {
+//                return;
+//            }
+//
+//            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//
+//            TAPChatMessageType type = currentMessage.type;
+//            if (type == TAPChatMessageTypeImage) {
+//
+//                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+//                    //My Chat
+//                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    [cell animateFailedUploadingImage];
+//                }
+//                else {
+//                    //Their Chat
+//                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    [cell animateFailedDownloadingImage];
+//                }
+//            }
+//        });
+//    } failureFullImage:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+//            NSString *currentActiveRoomID = currentRoom.roomID;
+//            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+//
+//            NSString *roomID = receivedMessage.room.roomID;
+//            roomID = [TAPUtil nullToEmptyString:roomID];
+//
+//            NSString *localID = receivedMessage.localID;
+//            localID = [TAPUtil nullToEmptyString:localID];
+//
+//            if (![roomID isEqualToString:currentActiveRoomID]) {
+//                return;
+//            }
+//
+//            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//
+//            TAPChatMessageType type = currentMessage.type;
+//            if (type == TAPChatMessageTypeImage) {
+//
+//                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+//                    //My Chat
+//                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    [cell animateFailedUploadingImage];
+//                }
+//                else {
+//                    //Their Chat
+//                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//                    [cell animateFailedDownloadingImage];
+//                }
+//            }
+//        });
+//    }];
+//}
+//END DV NOTE
 
 @end
 

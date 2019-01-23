@@ -83,6 +83,10 @@
     newModel.created = self.created;
     newModel.updated = self.updated;
     newModel.user = self.user;
+    newModel.quote = self.quote;
+    newModel.replyTo = self.replyTo;
+    newModel.forwardFrom = self.forwardFrom;
+    newModel.data = self.data;
     newModel.isDeleted = self.isDeleted;
     newModel.isSending = self.isSending;
     newModel.isFailedSend = self.isFailedSend;
@@ -93,4 +97,18 @@
     return newModel;
 }
 
+- (instancetype)initWithDictionary:(NSDictionary *)dict error:(NSError *__autoreleasing *)err {
+    if([[dict objectForKey:@"data"] isKindOfClass:[NSString class]]) {
+        //convert data from JSONString to NSDictionary
+        NSDictionary *data = [TAPUtil jsonObjectFromString:[dict objectForKey:@"data"]];
+        data = [TAPUtil nullToEmptyDictionary:data];
+        
+        NSMutableDictionary *mutableDictionary = [dict mutableCopy];
+        [mutableDictionary setObject:data forKey:@"data"];
+        
+        TAPMessageModel *message = [super initWithDictionary:mutableDictionary error:err];
+        return message;
+    }
+    return [super initWithDictionary:dict error:err];
+}
 @end

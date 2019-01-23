@@ -47,4 +47,25 @@
 @property (strong, nonatomic) NSNumber<RLMDouble> *userCreated;
 @property (strong, nonatomic) NSNumber<RLMDouble> *userUpdated;
 
+//Data
+@property (nonatomic, strong) NSString *data; //contains JSONString converted from NSDictionary
+
+//Quote
+@property (nonatomic, strong) NSString *quoteTitle;
+@property (nonatomic, strong) NSString *quoteContent;
+@property (nonatomic, strong) NSString *quoteFileID; //Image from TapTalk
+@property (nonatomic, strong) NSString *quoteImageURL; //Image from Client
+
+//ReplyTo
+@property (nonatomic, strong) NSString *replyToMessageID;
+@property (nonatomic, strong) NSString *replyToLocalID;
+@property (nonatomic) TAPChatMessageType replyMessageType;
+
+//ForwardFrom
+@property (nonatomic, strong) NSString *forwardFromUserID;
+@property (nonatomic, strong) NSString *forwardFromXcUserID;
+@property (nonatomic, strong) NSString *forwardFromFullname;
+@property (nonatomic, strong) NSString *forwardFromMessageID;
+@property (nonatomic, strong) NSString *forwardFromLocalID;
+
 @end

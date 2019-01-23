@@ -127,7 +127,14 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/feedback/read";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-
+    else if (type == TAPAPIManagerTypeUploadFile) {
+        NSString *apiPath = @"chat/file/upload";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDownloadFile) {
+        NSString *apiPath = @"chat/file/download";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }

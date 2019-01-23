@@ -15,7 +15,7 @@
 
 @interface TAPChatManager () <TAPConnectionManagerDelegate>
 
-- (void)sendMessage:(TAPMessageModel *)message;
+- (void)sendMessage:(TAPMessageModel *)message notifyDelegate:(BOOL)notifyDelegate;
 - (void)checkAndSendPendingMessage;
 - (void)checkPendingBackgroundTask;
 - (void)receiveMessageFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary;
@@ -27,12 +27,13 @@
 - (void)stopTimerSaveNewMessage;
 - (void)runSendMessageSequenceWithMessage:(TAPMessageModel *)message;
 - (void)processMessageAsDelivered:(TAPMessageModel *)message;
-- (void)setIsTypingNo;
+- (void)setIsWaitingTypingNo;
 
 @property (strong, nonatomic) NSMutableArray *delegatesArray;
 @property (strong, nonatomic) NSMutableArray *pendingMessageArray;
 @property (strong, nonatomic) NSMutableArray *incomingMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *waitingResponseDictionary;
+@property (strong, nonatomic) NSMutableDictionary *waitingUploadDictionary;
 @property (strong, nonatomic) NSMutableDictionary *typingDictionary;
 @property (strong, nonatomic) NSTimer *saveNewMessageTimer;
 @property (strong, nonatomic) __block NSTimer *backgroundSequenceTimer;
@@ -40,6 +41,7 @@
 @property (nonatomic) BOOL isEnterBackgroundSequenceActive;
 @property (nonatomic) BOOL isShouldRefreshOnlineStatus;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTask;
+@property (nonatomic) BOOL isWaitingSendTyping;
 
 @end
 
@@ -65,7 +67,10 @@
         _pendingMessageArray = [[NSMutableArray alloc] init];
         _incomingMessageArray = [[NSMutableArray alloc] init];
         _waitingResponseDictionary = [[NSMutableDictionary alloc] init];
+        _waitingUploadDictionary = [[NSMutableDictionary alloc] init];
         _messageDraftDictionary = [[NSMutableDictionary alloc] init];
+        _quotedMessageDictionary = [[NSMutableDictionary alloc] init];
+        _userInfoDictionary = [[NSMutableDictionary alloc] init];
         _activeUser = [TAPDataManager getActiveUser];
         _checkPendingBackgroundTaskRetryAttempt = 0;
         _isEnterBackgroundSequenceActive = NO;
@@ -127,12 +132,14 @@
 
 - (void)connectionManagerDidReceiveError:(NSError *)error {
     _isTyping = NO;
+    _isWaitingSendTyping = NO;
     _isShouldRefreshOnlineStatus = YES;
     _typingDictionary = [NSMutableDictionary dictionary];
 }
 
 - (void)connectionManagerDidDisconnectedWithCode:(NSInteger)code reason:(NSString *)reason cleanClose:(BOOL)clean {
     _isTyping = NO;
+    _isWaitingSendTyping = NO;
     _isShouldRefreshOnlineStatus = YES;
     _typingDictionary = [NSMutableDictionary dictionary];
 }
@@ -155,7 +162,12 @@
 }
 
 - (void)startTyping {
-    if(self.isTyping) {
+    
+    if (!self.isWaitingSendTyping) {
+        _isTyping = NO;
+    }
+    
+    if (self.isTyping || self.isWaitingSendTyping) {
         return;
     }
     
@@ -164,7 +176,8 @@
     NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
     NSDictionary *parameterDictionary = @{@"roomID" : roomID};
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStartTyping parameters:parameterDictionary];
-    [self performSelector:@selector(setIsTypingNo) withObject:nil afterDelay:10.0f];
+    _isWaitingSendTyping = YES;
+    [self performSelector:@selector(setIsWaitingTypingNo) withObject:nil afterDelay:10.0f];
 }
 
 - (void)stopTyping {
@@ -173,25 +186,32 @@
     }
     
     _isTyping = NO;
+    _isWaitingSendTyping = NO;
     
     NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
     NSDictionary *parameterDictionary = @{@"roomID" : roomID};
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStopTyping parameters:parameterDictionary];
 }
 
-- (void)sendMessage:(TAPMessageModel *)message {
+- (void)sendMessage:(TAPMessageModel *)message notifyDelegate:(BOOL)notifyDelegate {
 //    Check if socket is connected
 //    ConnectionManagerStatusTypeDisconnected = 0
 //    ConnectionManagerStatusTypeConnecting = 1
 //    ConnectionManagerStatusTypeConnected = 2
     
+    if (notifyDelegate) {
+        [self notifySendMessageToDelegate:message];
+    }
+    
+    [self runSendMessageSequenceWithMessage:message];
+}
+
+- (void)notifySendMessageToDelegate:(TAPMessageModel *)message {
     for (id delegate in self.delegatesArray) {
         if ([delegate respondsToSelector:@selector(chatManagerDidSendNewMessage:)]) {
             [delegate chatManagerDidSendNewMessage:[message copyMessageModel]];
         }
     }
-    
-    [self runSendMessageSequenceWithMessage:message];
 }
 
 - (void)runSendMessageSequenceWithMessage:(TAPMessageModel *)message {
@@ -207,21 +227,34 @@
         //Add message to waiting response array
         [self.waitingResponseDictionary setObject:message forKey:message.localID];
         
-        //Encrypt message
-        TAPMessageModel *encryptedMessage = [TAPEncryptorManager encryptMessage:message];
+//        //Encrypt message
+//        message.body = [TAPEncryptorManager encryptString:message.body key:message.localID];
+//        message.quote.content = [TAPEncryptorManager encryptString:message.quote.content key:message.localID];
+//
+//        NSMutableDictionary *parametersDictionary = [NSMutableDictionary dictionary];
+//        parametersDictionary = [[message toDictionary] mutableCopy];
+//
+//        NSDictionary *dataDictionary = [parametersDictionary objectForKey:@"data"];
+//        NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
+//        NSString *encryptedDataJSONString = [TAPEncryptorManager encryptString:dataJSONString key:message.localID];
         
-        NSMutableDictionary *parametersDictionary = [NSMutableDictionary dictionary];
-        parametersDictionary = [[encryptedMessage toDictionary] mutableCopy];
+//        [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
         
-        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:parametersDictionary];
+        NSDictionary *encryptedParametersDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModel:message];
+        
+        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:encryptedParametersDictionary];
     }
 }
 
-- (void)sendTextMessage:(NSString *)textMessage {
-    [[TAPChatManager sharedManager] constructMessage:textMessage user:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom];
+- (void)sendFileMessage:(TAPMessageModel *)message {
+    [self sendMessage:message notifyDelegate:NO];
 }
 
-- (void)constructMessage:(NSString *)textMessage user:(TAPUserModel *)user room:(TAPRoomModel *)room {
+- (void)sendTextMessage:(NSString *)textMessage {
+    [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom];
+}
+
+- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room {
     //Divide message if length more than character limit
     NSInteger characterLimit = kCharacterLimit;
     
@@ -236,16 +269,112 @@
             }
             
             NSString *substringMessage = [textMessage substringWithRange:NSMakeRange(startIndex, substringLength)];
-            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:user room:room body:substringMessage type:TAPChatMessageTypeText];
+            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:substringMessage type:TAPChatMessageTypeText];
             
-            [self sendMessage:message];
+            //Check if quote message available
+            id quotedMessageObject = [[TAPChatManager sharedManager].quotedMessageDictionary objectForKey:room.roomID];
+            if (quotedMessageObject != nil) {
+                if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+                    //if message quoted from message model then should construct quote and reply to model
+                    TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+                    
+                    TAPQuoteModel *quote = [TAPQuoteModel new];
+                    quote.title = quotedMessage.user.fullname;
+                    quote.content = quotedMessage.body;
+                    message.quote = [quote copy];
+                    
+                    TAPReplyToModel *replyTo = [TAPReplyToModel new];
+                    replyTo.messageID = quotedMessage.messageID;
+                    replyTo.localID = quotedMessage.localID;
+                    replyTo.messageType = quotedMessage.type;
+                    message.replyTo = [replyTo copy];
+                }
+                else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+                     //if message quoted from quote model then should just construct quote model
+                    TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
+                    message.quote = [quotedMessage copy];
+                }
+            }
+            
+            //check if userInfo is available, if available add to data in message model
+            //userInfo custom user information from client, used for custom quote click action
+            id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
+            if (userInfo != nil) {
+                message.data = userInfo;
+            }
+            
+            [self sendMessage:message notifyDelegate:YES];
+            
+            [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
         }
     }
     else {
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:user room:room body:textMessage type:TAPChatMessageTypeText];
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:textMessage type:TAPChatMessageTypeText];
         
-        [self sendMessage:message];
+        //Check if quote message available
+        id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
+        if (quotedMessageObject != nil) {
+            if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+                //if message quoted from message model then should construct quote and reply to model
+                TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+                
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = quotedMessage.user.fullname;
+                quote.content = quotedMessage.body;
+                message.quote = quote;
+                
+                TAPReplyToModel *replyTo = [TAPReplyToModel new];
+                replyTo.messageID = quotedMessage.messageID;
+                replyTo.localID = quotedMessage.localID;
+                replyTo.messageType = quotedMessage.type;
+                message.replyTo = replyTo;
+            }
+            else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+                //if message quoted from quote model then should just construct quote model
+                TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
+                message.quote = quotedMessage;
+            }
+        }
+        
+        //check if userInfo is available, if available add to data in message model
+        //userInfo custom user information from client, used for custom quote click action
+        id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
+        if (userInfo != nil) {
+            message.data = userInfo;
+        }
+        
+        [self sendMessage:message notifyDelegate:YES];
+        
+        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
     }
+}
+
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedString(@"🖼 Photo", @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
+    }
+    
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:messageBodyCaption type:TAPChatMessageTypeImage];
+    
+    NSMutableDictionary *dataDictionary = message.data;
+    if (dataDictionary == nil) {
+        dataDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
+    [dataDictionary setObject:image forKey:@"dummyImage"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    message.data = [dataDictionary copy];
+    
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
 
 - (void)setActiveUser:(TAPUserModel *)activeUser {
@@ -351,15 +480,14 @@
 }
 
 - (void)receiveMessageFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {
-    TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dataDictionary error:nil];
-    
-    //Add User to Contact Manager
-    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
-    
-    message.isSending = NO; //DV TEMP - Temporary set isSending to NO waiting for server
     
     //Decrypt message
-    TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptMessage:message];
+    TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:dataDictionary];
+    
+    //Add User to Contact Manager
+    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+    
+    decryptedMessage.isSending = NO; //DV TEMP - Temporary set isSending to NO waiting for server
     
 #ifdef DEBUG
     NSLog(@"Receive Message: %@", decryptedMessage.body);
@@ -619,6 +747,28 @@
     return draftMessage;
 }
 
+- (void)saveToQuotedMessage:(id)quotedMessageObject userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID { //Object could be TAPMessageModel or TAPQuoteModel
+    if(quotedMessageObject != nil) {
+        [[TAPChatManager sharedManager].quotedMessageDictionary setObject:quotedMessageObject forKey:roomID];
+    }
+    
+    if(userInfo != nil) {
+        [[TAPChatManager sharedManager].userInfoDictionary setObject:userInfo forKey:roomID];
+    }
+}
+
+- (id)getQuotedMessageObjectWithRoomID:(NSString *)roomID { //Object could be TAPMessageModel or TAPQuoteModel
+     roomID = [TAPUtil nullToEmptyString:roomID];
+    id object =  [[TAPChatManager sharedManager].quotedMessageDictionary objectForKey:roomID];
+    return object;
+}
+
+- (void)removeQuotedMessageObjectWithRoomID:(NSString *)roomID {
+    roomID = [TAPUtil nullToEmptyString:roomID];
+    [[TAPChatManager sharedManager].quotedMessageDictionary removeObjectForKey:roomID];
+    [[TAPChatManager sharedManager].userInfoDictionary removeObjectForKey:roomID];
+}
+
 - (void)processMessageAsDelivered:(TAPMessageModel *)message {
     BOOL isDelivered = message.isDelivered;
     if (!isDelivered) {
@@ -634,8 +784,8 @@
     return NO;
 }
 
-- (void)setIsTypingNo {
-    _isTyping = NO;
+- (void)setIsWaitingTypingNo {
+    _isWaitingSendTyping = NO;
 }
 
 - (BOOL)checkShouldRefreshOnlineStatus {

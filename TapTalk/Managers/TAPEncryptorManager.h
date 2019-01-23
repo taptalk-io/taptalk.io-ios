@@ -13,7 +13,7 @@
 
 + (TAPEncryptorManager *)sharedManager;
 
-+ (TAPMessageModel *)encryptMessage:(TAPMessageModel *)message;
-+ (TAPMessageModel *)decryptMessage:(TAPMessageModel *)message;
++ (TAPMessageModel *)decryptToMessageModelFromDictionary:(NSDictionary *)dictionary;
++ (NSDictionary *)encryptToDictionaryFromMessageModel:(TAPMessageModel *)message;
 
 @end

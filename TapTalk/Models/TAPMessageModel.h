@@ -9,6 +9,9 @@
 #import "TAPBaseModel.h"
 #import "TAPUserModel.h"
 #import "TAPRoomModel.h"
+#import "TAPQuoteModel.h"
+#import "TAPReplyToModel.h"
+#import "TAPForwardFromModel.h"
 #import "Configs.h"
 
 @interface TAPMessageModel : TAPBaseModel
@@ -24,6 +27,10 @@
 @property (nonatomic, strong) NSNumber *updated;
 @property (nonatomic, strong) NSNumber *deleted;
 @property (nonatomic, strong) TAPUserModel *user;
+@property (nonatomic, strong) TAPQuoteModel *quote;
+@property (nonatomic, strong) TAPReplyToModel *replyTo;
+@property (nonatomic, strong) TAPForwardFromModel *forwardFrom;
+@property (nonatomic, strong) NSDictionary *data;
 @property (nonatomic) BOOL isDeleted;
 @property (nonatomic) BOOL isSending;
 @property (nonatomic) BOOL isFailedSend;

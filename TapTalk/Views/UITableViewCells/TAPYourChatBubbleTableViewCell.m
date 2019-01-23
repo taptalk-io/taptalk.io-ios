@@ -7,15 +7,20 @@
 //
 
 #import "TAPYourChatBubbleTableViewCell.h"
+#import "TAPQuoteModel.h"
 
 @interface TAPYourChatBubbleTableViewCell()
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
+@property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
+@property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
+@property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 
@@ -29,8 +34,17 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyNameLabelTrailingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyMessageLabelLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyMessageLabelTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyButtonLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyButtonTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewBottomConstraint;
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
+- (void)showQuoteView:(BOOL)show;
+
+- (IBAction)quoteButtonDidTapped:(id)sender;
 
 @end
 
@@ -49,6 +63,12 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
     
     self.replyView.layer. cornerRadius = 4.0f;
+    
+    self.quoteImageView.layer.cornerRadius = 8.0f;
+    self.quoteView.layer.cornerRadius = 8.0f;
+    
+    [self.quoteImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //CS TEMP
+    [self showQuoteView:NO]; //CS TEMP
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -68,17 +88,21 @@
 - (void)setMessage:(TAPMessageModel *)message {
     _message = message;
     
-    //WK Temp
-    BOOL isReply;
-//    if ([message.messageID integerValue] % 2 == 1) {
-//        isReply = YES;
-//    }
-//    else {
-//        isReply = NO;
-//    }
-    
-    [self showReplyView:isReply withMessage:message];
-    //End Temp
+    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""]  && message.replyTo != nil && message.quote != nil) {
+        //reply to exists
+        [self showReplyView:YES withMessage:message];
+        [self showQuoteView:NO];
+    }
+    else if (![message.quote.title isEqualToString:@""] && message != nil) {
+        //quote exists
+        [self showReplyView:NO withMessage:nil];
+        [self setQuote:message.quote];
+        [self showQuoteView:YES];
+    }
+    else {
+        [self showReplyView:NO withMessage:nil];
+        [self showQuoteView:NO];
+    }
     
     self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
 }
@@ -180,29 +204,65 @@
     }
 }
 
+- (IBAction)quoteButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourChatQuoteViewDidTapped:)]) {
+        [self.delegate yourChatQuoteViewDidTapped:self.message];
+    }
+}
+
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
-        self.replyNameLabel.text = message.user.fullname;
-        self.replyMessageLabel.text = message.body;
+        self.replyNameLabel.text = message.quote.title;
+        self.replyMessageLabel.text = message.quote.content;
         self.replyViewHeightContraint.constant = 60.0f;
+        self.replyViewBottomConstraint.active = YES;
         self.replyViewBottomConstraint.constant = 3.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
         self.replyNameLabelLeadingConstraint.constant = 4.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
         self.replyMessageLabelLeadingConstraint.constant = 4.0f;
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
+        self.replyButtonLeadingConstraint.active = YES;
+        self.replyButtonTrailingConstraint.active = YES;
     }
     else {
         self.replyNameLabel.text = @"";
         self.replyMessageLabel.text = @"";
         self.replyViewHeightContraint.constant = 0.0f;
+        self.replyViewBottomConstraint.active = YES;
         self.replyViewBottomConstraint.constant = 0.0f;
         self.replyViewInnerViewLeadingContraint.constant = 0.0f;
         self.replyNameLabelLeadingConstraint.constant = 0.0f;
         self.replyNameLabelTrailingConstraint.constant = 0.0f;
         self.replyMessageLabelLeadingConstraint.constant = 0.0f;
         self.replyMessageLabelTrailingConstraint.constant = 0.0f;
+        self.replyButtonLeadingConstraint.active = NO;
+        self.replyButtonTrailingConstraint.active = NO;
     }
 }
 
+- (void)showQuoteView:(BOOL)show {
+    if (show) {
+        self.quoteViewLeadingConstraint.active = YES;
+        self.quoteViewTrailingConstraint.active = YES;
+        self.quoteViewTopConstraint.active = YES;
+        self.quoteViewBottomConstraint.active = YES;
+        self.quoteView.alpha = 1.0f;
+        self.replyViewBottomConstraint.active = NO;
+    }
+    else {
+        self.quoteViewLeadingConstraint.active = NO;
+        self.quoteViewTrailingConstraint.active = NO;
+        self.quoteViewTopConstraint.active = NO;
+        self.quoteViewBottomConstraint.active = NO;
+        self.quoteView.alpha = 0.0f;
+        self.replyViewBottomConstraint.active = YES;
+    }
+}
+
+- (void)setQuote:(TAPQuoteModel *)quote {
+    [self.quoteImageView setImageWithURLString:[TAPUtil nullToEmptyString:quote.imageURL]];
+    self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
+    self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
+}
 @end

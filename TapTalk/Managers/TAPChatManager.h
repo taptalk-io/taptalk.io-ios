@@ -13,6 +13,7 @@
 #import "TAPRoomModel.h"
 #import "TAPOnlineStatusModel.h"
 #import "TAPTypingModel.h"
+#import "TAPQuoteModel.h"
 
 @protocol TAPChatManagerDelegate <NSObject>
 
@@ -36,6 +37,8 @@
 @property (strong, nonatomic) TAPUserModel *activeUser;
 @property (strong, nonatomic) TAPRoomModel *activeRoom;
 @property (strong, nonatomic) NSMutableDictionary *messageDraftDictionary;
+@property (strong, nonatomic) NSMutableDictionary *quotedMessageDictionary;
+@property (strong, nonatomic) NSMutableDictionary *userInfoDictionary; //contains user info from custom quote
 @property (nonatomic) BOOL isTyping;
 
 + (TAPChatManager *)sharedManager;
@@ -51,11 +54,19 @@
 - (void)startTyping;
 - (void)stopTyping;
 
+- (void)notifySendMessageToDelegate:(TAPMessageModel *)message;
+
 - (void)sendTextMessage:(NSString *)textMessage;
-- (void)constructMessage:(NSString *)textMessage user:(TAPUserModel *)user room:(TAPRoomModel *)room;
+- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room;
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
+- (void)sendFileMessage:(TAPMessageModel *)message;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;
+
+- (void)saveToQuotedMessage:(id)quotedMessageObject userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID; //Object could be TAPMessageModel or TAPQuoteModel
+- (id)getQuotedMessageObjectWithRoomID:(NSString *)roomID; //Object could be TAPMessageModel or TAPQuoteModel
+- (void)removeQuotedMessageObjectWithRoomID:(NSString *)roomID;
 
 - (void)runEnterBackgroundSequenceWithApplication:(UIApplication *)application;
 - (void)removeAllBackgroundSequenceTaskWithApplication:(UIApplication *)application;

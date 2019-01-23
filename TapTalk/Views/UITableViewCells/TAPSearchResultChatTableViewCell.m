@@ -182,13 +182,13 @@
         if (isOnline) {
             self.onlineStatusView.alpha = 1.0f;
             self.onlineStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.onlineStatusView.frame) + 3.0f, CGRectGetMinY(self.onlineStatusLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.onlineStatusView.frame) + 3.0f), CGRectGetHeight(self.onlineStatusLabel.frame));
-            self.onlineStatusLabel.text = @"active now";
+            self.onlineStatusLabel.text = @"Active now";
         }
         else {
             self.onlineStatusView.alpha = 0.0f;
             self.onlineStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.profileImageView.frame) + 8.0f), 20.0f);
             
-            self.onlineStatusLabel.text = @"active 6 minutes ago";
+            self.onlineStatusLabel.text = @"Active 6 minutes ago";
         }
     }
     

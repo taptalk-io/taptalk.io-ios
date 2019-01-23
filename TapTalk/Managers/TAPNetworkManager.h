@@ -50,4 +50,12 @@ refreshToken:(NSString *)refreshToken
      success:(void (^)(NSURLSessionDataTask *dataTask, NSDictionary *responseObject))success
      failure:(void (^)(NSURLSessionDataTask *dataTask, NSError *error))failure;
 
+- (void)upload:(NSString *)urlString
+      fileData:(NSData *)fileData
+      mimeType:(NSString *)mimeType
+    parameters:(NSDictionary *)parameters
+      progress:(void (^)(NSProgress *uploadProgress))progress
+       success:(void (^)(NSDictionary *responseObject))success
+       failure:(void (^)(NSError *error))failure;
+
 @end

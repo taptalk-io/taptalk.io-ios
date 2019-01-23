@@ -108,8 +108,8 @@
         
         //Typing Animation
         _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
-        self.fullTypingString = NSLocalizedString(@"typing...", @"");
-        self.initialTypingString = NSLocalizedString(@"typing.", @"");
+        self.fullTypingString = NSLocalizedString(@"Typing...", @"");
+        self.initialTypingString = NSLocalizedString(@"Typing.", @"");
         self.currentTypingString = self.initialTypingString;
         
         _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];

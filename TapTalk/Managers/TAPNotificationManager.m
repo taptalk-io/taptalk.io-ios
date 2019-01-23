@@ -47,15 +47,15 @@
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self handleIncomingMessage:message shouldNotShowNotification:NO isNeedDecrypted:NO]; //DV Temp
+    [self handleIncomingMessage:message shouldNotShowNotification:NO]; //DV Temp
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self handleIncomingMessage:message shouldNotShowNotification:NO isNeedDecrypted:NO]; //DV Temp
+    [self handleIncomingMessage:message shouldNotShowNotification:NO]; //DV Temp
 }
 
 - (void)chatManagerDidReceiveDeleteMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self handleIncomingMessage:message shouldNotShowNotification:NO isNeedDecrypted:NO]; //DV Temp
+    [self handleIncomingMessage:message shouldNotShowNotification:NO]; //DV Temp
 }
 
 #pragma mark - TAPCustomNotificationAlertViewController
@@ -133,27 +133,18 @@
     
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
     
-    [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldNotShowNotification:YES isNeedDecrypted:YES];
+    [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldNotShowNotification:YES];
 }
 
-- (void)handleIncomingMessage:(TAPMessageModel *)message shouldNotShowNotification:(BOOL)shouldNotShowNotification isNeedDecrypted:(BOOL)isNeedDecrypted {
+- (void)handleIncomingMessage:(TAPMessageModel *)message shouldNotShowNotification:(BOOL)shouldNotShowNotification {
     if (message == nil) {
         return;
     }
     
-    TAPMessageModel *decryptedMessage = [TAPMessageModel new];
-    if (isNeedDecrypted) {
-        //Decrypt message
-        decryptedMessage = [TAPEncryptorManager decryptMessage:message];
-    }
-    else {
-        decryptedMessage = message;
-    }
-    
     //Insert message to database
-    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[decryptedMessage] success:^{
+    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[message] success:^{
         //Update application badge
-        [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+//        [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
     } failure:^(NSError *error) {
         
     }];
@@ -162,18 +153,18 @@
         //Handling local push notification
         if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
             UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-            content.title = decryptedMessage.user.fullname;
-            NSString *messageText = decryptedMessage.body;
+            content.title = message.user.fullname;
+            NSString *messageText = message.body;
             content.body = messageText;
             content.sound = [UNNotificationSound soundNamed:NOTIFICATION_SOUND_NAME];
-            content.userInfo = decryptedMessage.toDictionary;
-            content.threadIdentifier = decryptedMessage.room.roomID;
-            content.summaryArgument = decryptedMessage.user.fullname;
+            content.userInfo = message.toDictionary;
+            content.threadIdentifier = message.room.roomID;
+            content.summaryArgument = message.user.fullname;
 
             // Deliver the notification after x second
             UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger
                                                           triggerWithTimeInterval:1.0f repeats:NO];
-            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:decryptedMessage.localID
+            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:message.localID
                                                                                   content:content
                                                                                   trigger:trigger];
 
@@ -191,20 +182,20 @@
             currentTimeInterval += 1.0f; //Fire message with delay to avoid miss date
             NSDate *updatedDate = [NSDate dateWithTimeIntervalSince1970:currentTimeInterval];
             localNotification.fireDate = updatedDate;
-            localNotification.alertTitle = decryptedMessage.user.fullname;
-            NSString *messageText = decryptedMessage.body;
+            localNotification.alertTitle = message.user.fullname;
+            NSString *messageText = message.body;
             localNotification.alertBody = messageText;
             localNotification.soundName = NOTIFICATION_SOUND_NAME;
-            localNotification.userInfo = [decryptedMessage toDictionary];
+            localNotification.userInfo = [message toDictionary];
 
             [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
         }
         
         //Update message delivery status to API
-        [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredFromPushNotificationWithMessage:decryptedMessage];
+        [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredFromPushNotificationWithMessage:message];
     }
     else if (![message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID]) {
-        [self showInAppNotificationWithMessage:decryptedMessage];
+        [self showInAppNotificationWithMessage:message];
     }
 }
 
