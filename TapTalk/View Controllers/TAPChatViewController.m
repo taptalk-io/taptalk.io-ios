@@ -1085,8 +1085,38 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 #pragma mark TAPMyImageBubbleTableViewCell
-- (void)myImageCancelDidTapped {
-    
+- (void)myImageCancelDidTappedWithLocalID:(NSString *)localID tag:(NSInteger)tag {
+//    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+//    NSString *currentActiveRoomID = currentRoom.roomID;
+//    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+//    
+//    NSString *roomID = receivedMessage.room.roomID;
+//    roomID = [TAPUtil nullToEmptyString:roomID];
+//    
+//    NSString *localID = receivedMessage.localID;
+//    localID = [TAPUtil nullToEmptyString:localID];
+//    
+//    if (![roomID isEqualToString:currentActiveRoomID]) {
+//        return;
+//    }
+//    
+//    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+//    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//    
+//    TAPChatMessageType type = currentMessage.type;
+//    if (type == TAPChatMessageTypeImage) {
+//        
+//        if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+//            //My Chat
+//            TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//            [cell setInitialAnimateUploadingImageWithCancelButton:NO];
+//        }
+//        else {
+//            //Their Chat
+//            TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//            [cell setInitialAnimateDownloadingImage];
+//        }
+//    }
 }
 
 - (void)myImageReplyDidTapped {

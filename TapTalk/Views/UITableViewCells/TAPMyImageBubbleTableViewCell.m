@@ -178,8 +178,8 @@
 }
 
 - (IBAction)cancelButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(myImageCancelDidTapped)]) {
-        [self.delegate myImageCancelDidTapped];
+    if ([self.delegate respondsToSelector:@selector(myImageCancelDidTappedWithLocalID:tag:)]) {
+        [self.delegate myImageCancelDidTappedWithLocalID:self.message.localID tag:self.tag];
     }
 }
 

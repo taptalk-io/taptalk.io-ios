@@ -7,7 +7,6 @@
 //
 
 #import "TAPYourImageBubbleTableViewCell.h"
-//#import "Base64.h"
 
 @interface TAPYourImageBubbleTableViewCell ()
 

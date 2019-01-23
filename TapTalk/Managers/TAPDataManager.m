@@ -3316,7 +3316,7 @@
     }];
 }
 
-+ (void)callAPIUploadFileWithFileData:(NSData *)fileData
++ (NSURLSessionUploadTask *)callAPIUploadFileWithFileData:(NSData *)fileData
                                roomID:(NSString *)roomID
                              fileType:(NSString *)fileType
                              mimeType:(NSString *)mimeType
@@ -3334,7 +3334,7 @@
         [parameterDictionary setObject:caption forKey:@"caption"];
     }
     
-    [[TAPNetworkManager sharedManager] upload:requestURL fileData:fileData mimeType:mimeType parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+    NSURLSessionUploadTask *uploadTask = [[TAPNetworkManager sharedManager] upload:requestURL fileData:fileData mimeType:mimeType parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         CGFloat progress = uploadProgress.fractionCompleted;
         progressBlock(progress, 1.0f);
     } success:^(NSDictionary *responseObject) {
@@ -3342,6 +3342,8 @@
     } failure:^(NSError *error) {
         failureBlock(error);
     }];
+    
+    return uploadTask;
 }
 
 + (void)callAPIDownloadFileWithFileID:(NSString *)fileID

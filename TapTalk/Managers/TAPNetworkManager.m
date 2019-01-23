@@ -7,7 +7,6 @@
 //
 
 #import "TAPNetworkManager.h"
-#import "AFHTTPSessionManager.h"
 
 static const NSInteger kAPITimeOut = 300;
 
@@ -354,13 +353,13 @@ refreshToken:(NSString *)refreshToken
           }];
 }
 
-- (void)upload:(NSString *)urlString
-      fileData:(NSData *)fileData
-      mimeType:(NSString *)mimeType
-    parameters:(NSDictionary *)parameters
-      progress:(void (^)(NSProgress *uploadProgress))progress
-       success:(void (^)(NSDictionary *responseObject))success
-       failure:(void (^)(NSError *error))failure {
+- (NSURLSessionUploadTask *)upload:(NSString *)urlString
+                          fileData:(NSData *)fileData
+                          mimeType:(NSString *)mimeType
+                        parameters:(NSDictionary *)parameters
+                          progress:(void (^)(NSProgress *uploadProgress))progress
+                           success:(void (^)(NSDictionary *responseObject))success
+                           failure:(void (^)(NSError *error))failure {
     
     if(urlString == nil) {
         urlString = @"";
@@ -433,33 +432,8 @@ refreshToken:(NSString *)refreshToken
                   }];
 
     [uploadTask resume];
-    
-//    NSString *roomID = [parameters objectForKey:@"roomID"];
-//
-//    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-//
-//    [manager POST:urlString parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-//        [formData appendPartWithFileData:fileData
-//                                    name:@"file"
-//                                fileName:@"images" mimeType:@"image/png"];
-//
-////        [formData appendPartWithFormData:[roomID dataUsingEncoding:NSUTF8StringEncoding]
-////                                    name:@"roomID"];
-//
-////        [formData appendPartWithFormData:[key2 dataUsingEncoding:NSUTF8StringEncoding]
-////                                    name:@"key2"];
-//
-//    } progress:^(NSProgress * _Nonnull uploadProgress) {
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            progress(uploadProgress);
-//        });
-//    } success:^(NSURLSessionDataTask *task, id responseObject) {
-//        NSLog(@"Response: %@", responseObject);
-//        success(responseObject);
-//    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-//        NSLog(@"Error: %@", error);
-//        failure(error);
-//    }];
+
+    return uploadTask;
 }
 
 @end

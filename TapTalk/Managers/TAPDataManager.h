@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "TAPUserModel.h"
 #import "TAPRecentSearchModel.h"
+#import "AFHTTPSessionManager.h"
 
 @interface TAPDataManager : NSObject
 
@@ -153,14 +154,14 @@
 + (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
                                        success:(void (^)(NSArray *updatedMessageIDsArray))success
                                        failure:(void (^)(NSError *error, NSArray *messageArray))failure;
-+ (void)callAPIUploadFileWithFileData:(NSData *)fileData
-                               roomID:(NSString *)roomID
-                             fileType:(NSString *)fileType
-                             mimeType:(NSString *)mimeType
-                              caption:(NSString *)caption
-                      completionBlock:(void (^)(NSDictionary *responseObject))successBlock
-                        progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
-                         failureBlock:(void(^)(NSError *error))failureBlock;
++ (NSURLSessionUploadTask *)callAPIUploadFileWithFileData:(NSData *)fileData
+                                                   roomID:(NSString *)roomID
+                                                 fileType:(NSString *)fileType
+                                                 mimeType:(NSString *)mimeType
+                                                  caption:(NSString *)caption
+                                          completionBlock:(void (^)(NSDictionary *responseObject))successBlock
+                                            progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                                             failureBlock:(void(^)(NSError *error))failureBlock;
 + (void)callAPIDownloadFileWithFileID:(NSString *)fileID
                                roomID:(NSString *)roomID
                           isThumbnail:(BOOL)isThumbnail
