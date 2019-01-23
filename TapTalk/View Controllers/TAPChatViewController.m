@@ -131,6 +131,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 - (void)backButtonDidTapped;
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index;
+- (void)removeMessageFromArrayAndDictionaryWithLocalID:(NSString *)localID;
 - (void)handleMessageFromSocket:(TAPMessageModel *)message;
 - (void)destroySequence;
 - (void)firstLoadData;
@@ -1085,7 +1086,21 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 #pragma mark TAPMyImageBubbleTableViewCell
-- (void)myImageCancelDidTappedWithLocalID:(NSString *)localID tag:(NSInteger)tag {
+- (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message {
+    
+    //Cancel uploading task
+    [[TAPFileUploadManager sharedManager] cancelUploadingImageWithMessage:message];
+    
+    //Remove message from array and dictionary
+    TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
+    NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
+    [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
+    
+    NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
+    [self.tableView beginUpdates];
+    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+    [self.tableView endUpdates];
+    
 //    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
 //    NSString *currentActiveRoomID = currentRoom.roomID;
 //    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
@@ -1394,6 +1409,12 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     //Add message to data array
     [self.messageArray insertObject:message atIndex:index];
+}
+
+- (void)removeMessageFromArrayAndDictionaryWithLocalID:(NSString *)localID {
+    TAPMessageModel *currentRemovedMessage = [self.messageDictionary objectForKey:localID];
+    [self.messageDictionary removeObjectForKey:localID];
+    [self.messageArray removeObject:currentRemovedMessage];
 }
 
 - (void)handleMessageFromSocket:(TAPMessageModel *)message {

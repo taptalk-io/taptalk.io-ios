@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPMyImageBubbleTableViewCellDelegate <NSObject>
 
-- (void)myImageCancelDidTappedWithLocalID:(NSString *)localID tag:(NSInteger)tag;
+- (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageReplyDidTapped;
 
 @end

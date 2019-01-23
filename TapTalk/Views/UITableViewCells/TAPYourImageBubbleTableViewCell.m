@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) IBOutlet UIView *progressBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
+@property (strong, nonatomic) IBOutlet UIImageView *downloadImageView;
 
 @property (strong, nonatomic) IBOutlet TAPImageView *thumbnailBubbleImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;

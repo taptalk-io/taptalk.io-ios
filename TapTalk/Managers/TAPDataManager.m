@@ -3188,7 +3188,7 @@
             if(errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:messageIDsArray success:success failure:failure];
+                    [TAPDataManager callAPIUpdateMessageDeliverStatusWithArray:tempMessageArray success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error, messageArray);
                 }];
@@ -3267,7 +3267,7 @@
             if(errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:messageIDsArray success:success failure:failure];
+                    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:tempMessageArray success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error, messageArray);
                 }];

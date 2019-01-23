@@ -19,7 +19,7 @@
 @property (strong, nonatomic) NSMutableDictionary *uploadQueueDictionary;
 @property (strong, nonatomic) NSMutableDictionary *uploadProgressDictionary;
 
-- (void)runUploadImageWithData:(TAPMessageModel *)message;
+- (void)runUploadImageWithRoomID:(NSString *)roomID;
 - (TAPDataImageModel *)convertDictionaryToDataImageModel:(NSDictionary *)dictionary;
 - (NSDictionary *)convertDataImageModelToDictionary:(TAPDataImageModel *)dataImage;
 - (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success;
@@ -74,13 +74,13 @@
     else {
         [uploadQueueRoomArray addObject:message];
         [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
-        [self runUploadImageWithData:message];
+        [self runUploadImageWithRoomID:message.room.roomID];
     }
 }
 
-- (void)runUploadImageWithData:(TAPMessageModel *)message {
+- (void)runUploadImageWithRoomID:(NSString *)roomID {
     
-    NSMutableArray *uploadQueueRoomArray = [self.uploadQueueDictionary objectForKey:message.room.roomID];
+    NSMutableArray *uploadQueueRoomArray = [self.uploadQueueDictionary objectForKey:roomID];
     if ([uploadQueueRoomArray count] == 0 || uploadQueueRoomArray == nil) {
         return;
     }
@@ -177,6 +177,8 @@
                 CGFloat total = 1.0f;
                 NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
                 [objectDictionary setObject:currentMessage forKey:@"message"];
+                [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
                 
                 [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
                 
@@ -185,21 +187,20 @@
                 // Check if queue array is exist, run upload again
                 if ([uploadQueueRoomArray count] > 0) {
                     TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-                    [self runUploadImageWithData:nextUploadMessage];
+                    NSString *nextRoomID = nextUploadMessage.room.roomID;
+                    [self runUploadImageWithRoomID:nextRoomID];
                 }
             }];
             
         } progressBlock:^(CGFloat progress, CGFloat total) {
+            NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+            [obtainedDictionary setObject:currentMessage forKey:@"message"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
             
-            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-            [objectDictionary setObject:uploadTask forKey:@"uploadTask"];
-            [objectDictionary setObject:currentMessage forKey:@"message"];
-            [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-            [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
             
-            [self.uploadProgressDictionary setObject:objectDictionary forKey:currentMessage.localID];
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:objectDictionary];
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
         
         } failureBlock:^(NSError *error) {
             
@@ -207,7 +208,17 @@
             [objectDictionary setObject:currentMessage forKey:@"message"];
             [objectDictionary setObject:error forKey:@"error"];
             [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+            
+            [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
         }];
+        
+        NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+        if (obtainedDictionary == nil) {
+            obtainedDictionary = [NSMutableDictionary dictionary];
+        }
+        [obtainedDictionary setObject:uploadTask forKey:@"uploadTask"];
+        [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+        
     }];
 }
 
@@ -349,6 +360,37 @@
 - (NSDictionary *)getUploadProgressWithLocalID:(NSString *)localID {
     NSDictionary *progressDictionary = [self.uploadProgressDictionary objectForKey:localID];
     return progressDictionary;
+}
+
+- (void)cancelUploadingImageWithMessage:(TAPMessageModel *)message {
+    NSString *currentRoomID = message.room.roomID;
+    NSString *currentLocalID = message.localID;
+    NSInteger currentUploadedIndex = 0;
+    
+    //Obtain current uploading message index
+    NSMutableArray *uploadQueueRoomArray = [self.uploadQueueDictionary objectForKey:currentRoomID];
+    for (NSInteger counter = 0; counter < [uploadQueueRoomArray count]; counter++) {
+        TAPMessageModel *loopedMessage = [uploadQueueRoomArray objectAtIndex:counter];
+        if ([currentLocalID isEqualToString:loopedMessage.localID]) {
+            currentUploadedIndex = counter;
+            break;
+        }
+        
+    }
+    
+    //Cancel current task
+    NSMutableDictionary *progressDictionary = [self.uploadProgressDictionary objectForKey:message.localID];
+    NSURLSessionUploadTask *currentUploadTask = [progressDictionary objectForKey:@"uploadTask"];
+    [currentUploadTask cancel];
+    
+    //Remove from queue array
+    [uploadQueueRoomArray removeObjectAtIndex:currentUploadedIndex];
+    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentRoomID];
+    
+    if (currentUploadedIndex == 0) {
+        //Run next upload image when deleted image is still uploading
+        [self runUploadImageWithRoomID:currentRoomID];
+    }
 }
 
 @end

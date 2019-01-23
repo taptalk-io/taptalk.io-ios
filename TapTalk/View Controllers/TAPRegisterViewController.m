@@ -462,8 +462,8 @@
         
         [alertController addAction:okAction];
         [self presentViewController:alertController animated:YES completion:nil];
-    }];
 #endif
+    }];
 }
 
 - (void)presentRegisterViewControllerIfNeededFromViewController:(UIViewController *)viewController force:(BOOL)force {
