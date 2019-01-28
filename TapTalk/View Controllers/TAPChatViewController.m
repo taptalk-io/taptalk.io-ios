@@ -386,14 +386,25 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [[TAPChatManager sharedManager] refreshShouldRefreshOnlineStatus];
     
     self.replyMessageInnerContainerView.layer.cornerRadius = 4.0f;
+    self.quoteImageView.layer.cornerRadius = 4.0f;
+    self.quoteImageView.clipsToBounds = YES;
     
     id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     if (quotedMessage) {
         [self showInputAccessoryExtensionView:YES];
         if ([quotedMessage isKindOfClass:[TAPMessageModel class]]) {
             TAPMessageModel *quoteMessageModel = (TAPMessageModel *)quotedMessage;
-            [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
-            [self setReplyMessageWithMessage:quoteMessageModel];
+            
+            //if reply exists check if image in quote exists
+            //if image exists  change view to Quote View
+            if((quoteMessageModel.quote.fileID && ![quoteMessageModel.quote.fileID isEqualToString:@""]) || (quoteMessageModel.quote.imageURL && ![quoteMessageModel.quote.imageURL isEqualToString:@""])) {
+                [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+                [self setQuoteWithQuote:quoteMessageModel.quote];
+            }
+            else {
+                [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+                [self setReplyMessageWithMessage:quoteMessageModel];
+            }
         }
         else if ([quotedMessage isKindOfClass:[TAPQuoteModel class]]) {
             TAPQuoteModel *quoteModel = (TAPQuoteModel *)quotedMessage;
@@ -753,6 +764,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
+                cell.delegate = self;
                 [cell setMessage:message];
                 [cell showStatusLabel:YES animated:NO];
                 
@@ -1099,7 +1111,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:tappedMessage.data];
+            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
         }
     }
 }
@@ -1132,6 +1144,53 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [self.tableView endUpdates];
 }
 
+- (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
+    NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+    NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+    
+    //WK Note : Do reply here later.
+    [self showInputAccessoryExtensionView:YES];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+    
+    //convert to quote model
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    quote.fileID = [TAPUtil nullToEmptyString:[message.data objectForKey:@"fileID"]];
+    quote.title = message.user.fullname;
+    quote.content = message.body;
+    [self setQuoteWithQuote:quote];
+    
+    message.quote = quote;
+
+    [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+    
+    //remove selectedMessage
+    self.selectedMessage = nil;
+    
+    TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
+        //animation
+        [cell showStatusLabel:NO animated:YES];
+        [cell layoutIfNeeded];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+    } completion:^(BOOL finished) {
+        //completion
+    }];
+}
+
+- (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
+    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
+        //reply to exists
+        
+    }
+    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
+        //quote exists
+        if(message.data) {
+            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]]];
+        }
+    }
+}
+
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
     NSInteger messageIndex = [self.messageArray indexOfObject:message];
 
@@ -1154,10 +1213,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     } failure:^(NSError *error) {
         
     }];
-}
-
-- (void)myImageReplyDidTapped {
-    
 }
 
 #pragma mark TAPYourChatBubbleTableViewCell
@@ -1278,7 +1333,55 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:tappedMessage.data];
+            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+        }
+    }
+}
+
+#pragma mark TAPYourImageBubbleTableViewCell
+- (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
+    NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+    NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+    
+    //WK Note : Do reply here later.
+    [self showInputAccessoryExtensionView:YES];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+    
+    //convert to quote model
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    quote.fileID = [TAPUtil nullToEmptyString:[message.data objectForKey:@"fileID"]];
+    quote.title = message.user.fullname;
+    quote.content = message.body;
+    [self setQuoteWithQuote:quote];
+    
+    message.quote = quote;
+    
+    [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+    
+    //remove selectedMessage
+    self.selectedMessage = nil;
+    
+    TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
+        //animation
+        [cell showStatusLabel:NO animated:YES];
+        [cell layoutIfNeeded];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+    } completion:^(BOOL finished) {
+        //completion
+    }];
+}
+
+- (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
+    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
+        //reply to exists
+        
+    }
+    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
+        //quote exists
+        if(message.data) {
+            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]]];
         }
     }
 }
@@ -1422,6 +1525,10 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 - (void)photoAlbumListViewControllerDidFinishAndSendImageWithDataArray:(NSArray *)dataArray {
     //Handle send image from gallery
+    
+    if(self.inputAccessoryExtensionHeightConstraint.constant > 0.0f) {
+        [self showInputAccessoryExtensionView:NO];
+    }
     
     //hide empty chat
     [UIView animateWithDuration:0.2f animations:^{
@@ -2599,8 +2706,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)setQuoteWithQuote:(TAPQuoteModel *)quote {
     self.quoteTitleLabel.text = quote.title;
     self.quoteSubtitleLabel.text = quote.content;
-    if (![quote.imageURL isEqualToString:@""]) {
+    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
         [self.quoteImageView setImageWithURLString:quote.imageURL];
+    }
+    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+        [self.quoteImageView setImageWithURLString:quote.fileID];
     }
 }
 

@@ -248,6 +248,7 @@
 
 - (void)sendFileMessage:(TAPMessageModel *)message {
     [self sendMessage:message notifyDelegate:NO];
+    [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:message.room.roomID];
 }
 
 - (void)sendTextMessage:(NSString *)textMessage {
@@ -278,10 +279,16 @@
                     //if message quoted from message model then should construct quote and reply to model
                     TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
                     
-                    TAPQuoteModel *quote = [TAPQuoteModel new];
-                    quote.title = quotedMessage.user.fullname;
-                    quote.content = quotedMessage.body;
-                    message.quote = [quote copy];
+                    if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+
+                        message.quote = [quotedMessage.quote copy];
+                    }
+                    else {
+                        TAPQuoteModel *quote = [TAPQuoteModel new];
+                        quote.title = quotedMessage.user.fullname;
+                        quote.content = quotedMessage.body;
+                        message.quote = [quote copy];
+                    }
                     
                     TAPReplyToModel *replyTo = [TAPReplyToModel new];
                     replyTo.messageID = quotedMessage.messageID;
@@ -300,7 +307,13 @@
             //userInfo custom user information from client, used for custom quote click action
             id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
             if (userInfo != nil) {
-                message.data = userInfo;
+                NSMutableDictionary *dataDictionary = message.data;
+                if (dataDictionary == nil) {
+                    dataDictionary = [[NSMutableDictionary alloc] init];
+                }
+                
+                [dataDictionary setObject:userInfo forKey:@"userInfo"];
+                message.data = dataDictionary;
             }
             
             [self sendMessage:message notifyDelegate:YES];
@@ -318,10 +331,15 @@
                 //if message quoted from message model then should construct quote and reply to model
                 TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
                 
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quotedMessage.user.fullname;
-                quote.content = quotedMessage.body;
-                message.quote = quote;
+                if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                    message.quote = [quotedMessage.quote copy];
+                }
+                else {
+                    TAPQuoteModel *quote = [TAPQuoteModel new];
+                    quote.title = quotedMessage.user.fullname;
+                    quote.content = quotedMessage.body;
+                    message.quote = [quote copy];
+                }
                 
                 TAPReplyToModel *replyTo = [TAPReplyToModel new];
                 replyTo.messageID = quotedMessage.messageID;
@@ -340,7 +358,13 @@
         //userInfo custom user information from client, used for custom quote click action
         id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
         if (userInfo != nil) {
-            message.data = userInfo;
+            NSMutableDictionary *dataDictionary = message.data;
+            if (dataDictionary == nil) {
+                dataDictionary = [[NSMutableDictionary alloc] init];
+            }
+            
+            [dataDictionary setObject:userInfo forKey:@"userInfo"];
+            message.data = dataDictionary;
         }
         
         [self sendMessage:message notifyDelegate:YES];
@@ -350,6 +374,8 @@
 }
 
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+    
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
 
     caption = [TAPUtil nullToEmptyString:caption];
     
@@ -362,7 +388,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:messageBodyCaption type:TAPChatMessageTypeImage];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage];
     
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
@@ -379,7 +405,45 @@
     [dataDictionary setObject:imageHeight forKey:@"height"];
     [dataDictionary setObject:imageWidth forKey:@"width"];
     [dataDictionary setObject:caption forKey:@"caption"];
+    
+    //check if userInfo is available, if available add to data in message model
+    //userInfo custom user information from client, used for custom quote click action
+    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
+    if (userInfo != nil) {
+        [dataDictionary setObject:userInfo forKey:@"userInfo"];
+    }
+    
     message.data = [dataDictionary copy];
+    
+    //Check if quote message available
+    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
+    if (quotedMessageObject != nil) {
+        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+            //if message quoted from message model then should construct quote and reply to model
+            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+            
+            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                message.quote = [quotedMessage.quote copy];
+            }
+            else {
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = quotedMessage.user.fullname;
+                quote.content = quotedMessage.body;
+                message.quote = [quote copy];
+            }
+            
+            TAPReplyToModel *replyTo = [TAPReplyToModel new];
+            replyTo.messageID = quotedMessage.messageID;
+            replyTo.localID = quotedMessage.localID;
+            replyTo.messageType = quotedMessage.type;
+            message.replyTo = replyTo;
+        }
+        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+            //if message quoted from quote model then should just construct quote model
+            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
+            message.quote = quotedMessage;
+        }
+    }
     
     //Save image to cache with localID key
     [TAPImageView saveImageToCache:image withKey:message.localID];
@@ -837,6 +901,19 @@
 - (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID {
    TAPMessageModel *message = [self.waitingResponseDictionary objectForKey:localID];
     return message;
+}
+
+- (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID {
+    NSArray *roomIDArray = [roomID componentsSeparatedByString:@"-"];
+    if([roomIDArray count] > 0) {
+        for (NSString *userID in roomIDArray) {
+            if(![userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                return userID;
+            }
+        }
+    }
+    
+    return @"";
 }
 
 @end

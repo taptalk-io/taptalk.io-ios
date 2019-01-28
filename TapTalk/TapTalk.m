@@ -489,6 +489,7 @@ fromNavigationController:(UINavigationController *)navigationController
 
 //Custom Quote
 - (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo {
+    NSLog(@"QUOTE TAPPED -- %@", userInfo);
     if ([self.delegate respondsToSelector:@selector(tapTalkQuoteDidTappedWithUserInfo:)]) {
         [self.delegate tapTalkQuoteDidTappedWithUserInfo:userInfo];
     }

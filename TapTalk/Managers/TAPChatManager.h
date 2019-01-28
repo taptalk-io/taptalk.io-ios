@@ -83,5 +83,6 @@
 - (void)addToWaitingUploadFileMessage:(TAPMessageModel *)message;
 - (void)removeFromWaitingUploadFileMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID;
+- (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
 
 @end

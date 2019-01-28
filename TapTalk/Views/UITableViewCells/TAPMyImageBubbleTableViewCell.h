@@ -20,7 +20,8 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 
 - (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message;
-- (void)myImageReplyDidTapped;
+- (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
 
 @end
 
