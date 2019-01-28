@@ -301,7 +301,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     //RightBarButton
     UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
     TAPImageView *rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
-    [rightBarImageView setImageWithURLString:room.imageURL.thumbnail];
+    
+    NSString *profileImageURL = room.imageURL.thumbnail;
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        rightBarImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+         [rightBarImageView setImageWithURLString:profileImageURL];
+    }
     
     rightBarImageView.layer.cornerRadius = CGRectGetHeight(rightBarImageView.frame) / 2.0f;
     rightBarImageView.clipsToBounds = YES;
@@ -621,26 +628,38 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.delegate = self;
                 
                 [cell setMessage:message];
+                [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
                 
-                NSInteger status = [[TAPFileUploadManager sharedManager] obtainImageUploadStatusWithMessage:message];
-                // 0 is not found
-                // 1 is uploading
-                // 2 is waiting for upload
-                if (status != 0) {
-                    [cell showProgressUploadView:YES];
+                if (message.isFailedSend) {
+                    //Update view to failed send
                     
-                    //Set current progress
-                    NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
-                    if (uploadProgressDictionary == nil) {
-                        CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
-                        CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
-                        [cell setInitialAnimateUploadingImageWithCancelButton:YES];
-                        [cell animateProgressUploadingImageWithProgress:progress total:total];
-                    }
-                }
-                else {
                     // Fetch image data, get from cache or download if needed
                     [self fetchImageDataWithMessage:message];
+                    [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeFailed];
+                }
+                else {
+                    NSInteger status = [[TAPFileUploadManager sharedManager] obtainImageUploadStatusWithMessage:message];
+                    // 0 is not found
+                    // 1 is uploading
+                    // 2 is waiting for upload
+                    if (status != 0) {
+                        [cell showProgressUploadView:YES];
+                        
+                        //Set current progress
+                        NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                        if (uploadProgressDictionary == nil) {
+                            CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
+                            CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
+                            
+                            [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
+        
+                            [cell animateProgressUploadingImageWithProgress:progress total:total];
+                        }
+                    }
+                    else {
+                        // Fetch image data, get from cache or download if needed
+                        [self fetchImageDataWithMessage:message];
+                    }
                 }
                 
                 return cell;
@@ -734,8 +753,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
-                
                 [cell setMessage:message];
+                [cell showStatusLabel:YES animated:NO];
                 
                 NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
                 if (progressDictionary != nil) {
@@ -1091,47 +1110,50 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     //Cancel uploading task
     [[TAPFileUploadManager sharedManager] cancelUploadingImageWithMessage:message];
     
-    //Remove message from array and dictionary
+    //Remove message from array and dictionary in ChatViewController
     TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
     NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
     [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
     
+    //Remove from WaitingUploadDictionary in ChatManager
+    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
+    
+    //Remove message from database
+    [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
+
+    } failure:^(NSError *error) {
+        
+    }];
+    
+    //Update chat room UI
     NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
     [self.tableView beginUpdates];
     [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
     [self.tableView endUpdates];
-    
-//    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-//    NSString *currentActiveRoomID = currentRoom.roomID;
-//    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-//    
-//    NSString *roomID = receivedMessage.room.roomID;
-//    roomID = [TAPUtil nullToEmptyString:roomID];
-//    
-//    NSString *localID = receivedMessage.localID;
-//    localID = [TAPUtil nullToEmptyString:localID];
-//    
-//    if (![roomID isEqualToString:currentActiveRoomID]) {
-//        return;
-//    }
-//    
-//    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-//    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
-//    
-//    TAPChatMessageType type = currentMessage.type;
-//    if (type == TAPChatMessageTypeImage) {
-//        
-//        if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-//            //My Chat
-//            TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//            [cell setInitialAnimateUploadingImageWithCancelButton:NO];
-//        }
-//        else {
-//            //Their Chat
-//            TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//            [cell setInitialAnimateDownloadingImage];
-//        }
-//    }
+}
+
+- (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
+    NSInteger messageIndex = [self.messageArray indexOfObject:message];
+
+    [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
+        [self.messageArray removeObjectAtIndex:messageIndex];
+        [self.messageDictionary removeObjectForKey:message.localID];
+        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        [self.tableView beginUpdates];
+        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+        [self.tableView endUpdates];
+        
+     [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+         
+         NSDictionary *dataDictionary = resultMessage.data;
+         NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
+         currentCaption = [TAPUtil nullToEmptyString:currentCaption];
+         
+         [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
+     }];
+    } failure:^(NSError *error) {
+        
+    }];
 }
 
 - (void)myImageReplyDidTapped {
@@ -1349,6 +1371,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 #pragma mark TAPImagePreviewViewController
 - (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray {
+    
+    //hide empty chat
+    [UIView animateWithDuration:0.2f animations:^{
+        if (self.emptyView.alpha != 0.0f) {
+            self.emptyView.alpha = 0.0f;
+        }
+    }];
+    
     for (TAPImagePreviewModel *imagePreview in dataArray) {
         UIImage *selectedImage = imagePreview.image;
         NSString *caption = imagePreview.caption;
@@ -1392,6 +1422,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 - (void)photoAlbumListViewControllerDidFinishAndSendImageWithDataArray:(NSArray *)dataArray {
     //Handle send image from gallery
+    
+    //hide empty chat
+    [UIView animateWithDuration:0.2f animations:^{
+        if (self.emptyView.alpha != 0.0f) {
+            self.emptyView.alpha = 0.0f;
+        }
+    }];
+    
     for (TAPImagePreviewModel *imagePreview in dataArray) {
         UIImage *selectedImage = imagePreview.image;
         NSString *caption = imagePreview.caption;
@@ -2101,6 +2139,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     currentMessage.isDeleted = message.isDeleted;
     currentMessage.isSending = message.isSending;
     currentMessage.isFailedSend = message.isFailedSend;
+    currentMessage.data = message.data;
     
     if(!currentMessage.isDelivered) {
         //Update only when ui data is not delivered yet
@@ -2642,7 +2681,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if (type == TAPChatMessageTypeImage) {
         
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell setInitialAnimateUploadingImageWithCancelButton:YES];
+        
+        [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
     }
 }
 
@@ -2698,12 +2738,17 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
     NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
     
+    //Update message status to array and dictionary
+    currentMessage.isFailedSend = YES;
+    currentMessage.isSending = NO;
+    
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
         
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         [cell animateFailedUploadingImage];
     }
+
 }
 
 - (void)fetchImageDataWithMessage:(TAPMessageModel *)message {
@@ -2732,7 +2777,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell setInitialAnimateUploadingImageWithCancelButton:NO];
+                    
+                    if (message.isFailedSend) {
+                        [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeFailed];
+                    }
+                    else {
+                        [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeDownloading];
+                    }
                 }
                 else {
                     //Their Chat

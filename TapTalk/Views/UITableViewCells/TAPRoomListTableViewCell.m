@@ -217,8 +217,13 @@
     
     self.messageStatusType = statusType;
     
-    [self.profileImageView setImageWithURLString:profileImageURL];
-
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+    }
+    else {
+        [self.profileImageView setImageWithURLString:profileImageURL];
+    }
+    
     //TIME LABEL
     self.timeLabel.text = timeString;
     //resize timelabel

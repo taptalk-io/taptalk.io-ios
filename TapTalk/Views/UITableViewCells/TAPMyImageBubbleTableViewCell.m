@@ -19,10 +19,12 @@
 @property (strong, nonatomic) IBOutlet UIImageView *downloadImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *retryImageView;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *captionLabel;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *cancelButton;
+@property (strong, nonatomic) IBOutlet UIButton *retryButton;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconLeftConstraint;
@@ -71,6 +73,8 @@
     _pathWidth = 4.0f;
     _newProgress = 0.0f;
     _updateInterval = 1;
+    _cellWidth = 0.0f;
+    _cellHeight = 0.0f;
     
     _maxWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) * 2.0f / 3.0f) - 16.0f; //two third of screen, and 16.0f is right padding.
     _maxHeight = self.maxWidth / 234.0f * 300.0f; //234.0f and 300.0f are width and height constraint on design
@@ -97,6 +101,10 @@
     self.blurView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bubbleImageView.bounds), CGRectGetHeight(self.bubbleImageView.bounds));
 
     self.progressBackgroundView.alpha = 0.0f;
+    self.retryButton.alpha = 0.0f;
+    self.retryButton.userInteractionEnabled = NO;
+    self.retryImageView.alpha = 0.0f;
+    self.downloadImageView.alpha = 0.0f;
     
     self.bubbleImageView.backgroundColor = [UIColor clearColor];
 }
@@ -122,15 +130,41 @@
     
     [self setImageCaptionWithString:captionString];
     
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     UIImage *selectedImage = nil;
+    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     if (fileID == nil || [fileID isEqualToString:@""]) {
-        selectedImage = [dataDictionary objectForKey:@"dummyImage"];
-        [self getImageSizeFromImage:selectedImage];
+//        selectedImage = [dataDictionary objectForKey:@"dummyImage"];
         
-        self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-        self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-        [self.bubbleImageView setImage:selectedImage];
+        CGFloat imageTempHeight = [[dataDictionary objectForKey:@"height"] floatValue];
+        CGFloat imageTempWidth = [[dataDictionary objectForKey:@"width"] floatValue];
+        
+        if (imageTempWidth == 0.0f && imageTempHeight == 0.0f) {
+            self.bubbleImageViewWidthConstraint.constant = 0.0f;
+            self.bubbleImageViewHeightConstraint.constant = 0.0f;
+        }
+        else {
+            [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
+            self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+            self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+        }
+        
+#ifdef DEBUG
+        NSLog(@"CELL WIDTH %f CELL HEIGHT %f", self.cellWidth, self.cellHeight);
+#endif
+        
+        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            if (savedImage != nil) {
+//                [self getImageSizeFromImage:savedImage];
+//                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+//                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+                [self.bubbleImageView setImage:savedImage];
+            }
+            else {
+                self.bubbleImageViewWidthConstraint.constant = 0.0f;
+                self.bubbleImageViewHeightConstraint.constant = 0.0f;
+            }
+        }];
+
     }
     else {        
         //already called fetchImageDataWithMessage function in view controller for fetch image
@@ -142,10 +176,6 @@
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-    
-//        [TAPImageView imageFromCacheWithKey:fileID success:^(UIImage *savedImage) {
-//            self.bubbleImageView.image = savedImage;
-//        }];
     }
     
 //    if (!self.isDownloaded) {
@@ -181,6 +211,12 @@
 - (IBAction)cancelButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myImageCancelDidTappedWithMessage:)]) {
         [self.delegate myImageCancelDidTappedWithMessage:self.message];
+    }
+}
+
+- (IBAction)retryButtonDidTapped:(id)sender  {
+    if ([self.delegate respondsToSelector:@selector(myImageRetryDidTappedWithMessage:)]) {
+        [self.delegate myImageRetryDidTappedWithMessage:self.message];
     }
 }
 
@@ -351,6 +387,8 @@
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
     _syncProgressSubView = nil;
+    
+    [self setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeFailed];
 }
 
 - (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total {
@@ -396,19 +434,52 @@
     }
 }
 
-- (void)setInitialAnimateUploadingImageWithCancelButton:(BOOL)withCancelButton {
+- (void)setInitialAnimateUploadingImageWithType:(TAPMyImageBubbleTableViewCellStateType)type {
     
-    if (withCancelButton) {
-        self.cancelImageView.alpha = 1.0f;
-        self.downloadImageView.alpha = 0.0f;
-        self.cancelButton.alpha = 1.0f;
-        self.cancelButton.userInteractionEnabled = YES;
-    }
-    else {
-        self.downloadImageView.alpha = 1.0f;
-        self.cancelImageView.alpha = 0.0f;
-        self.cancelButton.alpha = 0.0f;
-        self.cancelButton.userInteractionEnabled = NO;
+    switch (type) {
+        case TAPMyImageBubbleTableViewCellStateTypeUploading:
+        {
+            self.cancelImageView.alpha = 1.0f;
+            self.cancelButton.alpha = 1.0f;
+            self.cancelButton.userInteractionEnabled = YES;
+            
+            self.downloadImageView.alpha = 0.0f;
+            
+            self.retryImageView.alpha = 0.0f;
+            self.retryButton.alpha = 0.0f;
+            self.retryButton.userInteractionEnabled = NO;
+            break;
+        }
+        case TAPMyImageBubbleTableViewCellStateTypeDownloading:
+        {
+            self.cancelImageView.alpha = 0.0f;
+            self.cancelButton.alpha = 0.0f;
+            self.cancelButton.userInteractionEnabled = NO;
+            
+            self.downloadImageView.alpha = 1.0f;
+            
+            self.retryImageView.alpha = 0.0f;
+            self.retryButton.alpha = 0.0f;
+            self.retryButton.userInteractionEnabled = NO;
+            break;
+        }
+        case TAPMyImageBubbleTableViewCellStateTypeFailed:
+        {
+            self.cancelImageView.alpha = 0.0f;
+            self.cancelButton.alpha = 0.0f;
+            self.cancelButton.userInteractionEnabled = NO;
+            
+            self.downloadImageView.alpha = 0.0f;
+            
+            self.retryImageView.alpha = 1.0f;
+            self.retryButton.alpha = 1.0f;
+            self.retryButton.userInteractionEnabled = YES;
+            break;
+        }
+        default:
+        {
+            break;
+        }
     }
     
     self.progressBackgroundView.alpha = 1.0f;
@@ -433,87 +504,6 @@
     _lastProgress = 0.0f;
     
 }
-
-//- (void)animateLoadingWithImageData:(NSData *)imageData roomID:(NSString *)roomID {
-//    // borderWidth is a float representing a value used as a margin (outer border).
-//    // pathwidth is the width of the progress path (inner).
-//    CGFloat startAngle = M_PI * 1.5;
-//    CGFloat endAngle = startAngle + (M_PI * 2);
-//    CGFloat borderWidth = 0.0f;
-//    CGFloat pathWidth = 4.0f;
-//
-//    // progress is a float storing current progress
-//    // newProgress is a float storing updated progress
-//    // updateInterval is a float specifying the duration of the animation.
-//    CGFloat newProgress = 0.0f;
-//    NSInteger updateInterval = 1;
-//
-//    // set initial
-//    _syncProgressSubView = [[UIView alloc] initWithFrame:self.progressBarView.bounds];
-//    [self.progressBarView addSubview:self.syncProgressSubView];
-//    _progressLayer = [CAShapeLayer layer];
-//    self.lastProgress = 0.0f;
-//
-//    __block CGFloat blockNewProgress = 0.0f;
-//
-//    //CALL API UPLOAD
-//    [TAPDataManager callAPIUploadFileWithFileData:imageData roomID:roomID caption:@"" completionBlock:^{
-//        self.lastProgress = 0.0f;
-//        self.progressLayer.strokeEnd = 0.0f;
-//        self.progressLayer.strokeStart = 0.0f;
-//        [self.progressLayer removeAllAnimations];
-//        [self.syncProgressSubView removeFromSuperview];
-//        _progressLayer = nil;
-//        _syncProgressSubView = nil;
-//
-//        [UIView animateWithDuration:0.2f animations:^{
-//            self.blurView.alpha = 0.0f;
-//            self.progressBackgroundView.alpha = 0.0f;
-//        }];
-//    } progressBlock:^(CGFloat progress, CGFloat total) {
-//        CGFloat lastProgress = self.lastProgress;
-//        blockNewProgress = progress/total;
-//
-//        NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-//        NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
-//
-//        //Circular Progress Bar using CAShapeLayer and UIBezierPath
-//        _progressLayer = [CAShapeLayer layer];
-//        [self.progressLayer setFrame:self.progressBarView.bounds];
-//        UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - borderWidth - pathWidth) / 2 startAngle:startAngle endAngle:endAngle clockwise:YES];
-//
-//        self.progressLayer.lineCap = kCALineCapRound;
-//        self.progressLayer.strokeColor = [UIColor whiteColor].CGColor;
-//        self.progressLayer.lineWidth = 3.0f;
-//        self.progressLayer.path = progressPath.CGPath;
-//        self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);
-//        self.progressLayer.fillColor = [UIColor clearColor].CGColor;
-//        self.progressLayer.position = CGPointMake(self.progressBarView.layer.frame.size.width / 2 - borderWidth / 2, self.progressBarView.layer.frame.size.height / 2 - borderWidth / 2);
-//        [self.progressLayer setStrokeEnd:0.0f];
-//        [self.syncProgressSubView.layer addSublayer:self.progressLayer];
-//
-//        [self.progressLayer setStrokeEnd:newProgress];
-//        CABasicAnimation *strokeEndAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
-//        strokeEndAnimation.duration = updateInterval;
-//        [strokeEndAnimation setFillMode:kCAFillModeForwards];
-//        strokeEndAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-//        strokeEndAnimation.removedOnCompletion = NO;
-//        strokeEndAnimation.fromValue = [NSNumber numberWithFloat:lastProgress];
-//        strokeEndAnimation.toValue = [NSNumber numberWithFloat:blockNewProgress];
-//        _lastProgress = blockNewProgress;
-//        [self.progressLayer addAnimation:strokeEndAnimation forKey:@"progressStatus"];
-//    } failureBlock:^(NSError *error) {
-//        self.lastProgress = 0.0f;
-//        self.progressLayer.strokeEnd = 0.0f;
-//        self.progressLayer.strokeStart = 0.0f;
-//        [self.progressLayer removeAllAnimations];
-//        [self.syncProgressSubView removeFromSuperview];
-//        _progressLayer = nil;
-//        _syncProgressSubView = nil;
-//    }];
-//
-//    newProgress = blockNewProgress;
-//}
 
 - (void)showImageCaption:(BOOL)show {
     if (show) {
@@ -542,6 +532,10 @@
 
 - (void)setThumbnailImage:(UIImage *)thumbnailImage {
     self.thumbnailBubbleImageView.image = thumbnailImage;
+}
+
+- (void)setMyImageBubbleTableViewCellStateType:(TAPMyImageBubbleTableViewCellStateType)myImageBubbleTableViewCellStateType {
+    _myImageBubbleTableViewCellStateType = myImageBubbleTableViewCellStateType;
 }
 
 @end

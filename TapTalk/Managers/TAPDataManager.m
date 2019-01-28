@@ -884,6 +884,10 @@
     [[TAPDatabaseManager sharedManager] updateMessageToFailedWhenClosed];
 }
 
++ (void)updateMessageToFailedWithLocalID:(NSString *)localID {
+    [[TAPDatabaseManager sharedManager] updateMessageToFailedWithColumnName:@"localID" value:localID];
+}
+
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated {
     NSDictionary *preferenceLastUpdatedDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_LAST_UPDATED_CHAT_ROOM valid:nil];
     preferenceLastUpdatedDictionary = [TAPUtil nullToEmptyDictionary:preferenceLastUpdatedDictionary];

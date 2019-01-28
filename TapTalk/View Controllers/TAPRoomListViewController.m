@@ -457,7 +457,7 @@
 - (void)runFullRefreshSequence {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        //Save pending messages, new messages, and waiting response messages to database
+        //Save pending messages, new messages, waiting response messages, and waiting upload file messages to database
         [[TAPChatManager sharedManager] saveAllUnsentMessageInMainThread];
         
         [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {

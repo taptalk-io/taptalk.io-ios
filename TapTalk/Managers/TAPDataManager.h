@@ -22,6 +22,7 @@
 + (void)setRefreshToken:(NSString *)refreshToken expiryDate:(NSTimeInterval)expiryDate;
 + (NSString *)getRefreshToken;
 + (void)updateMessageToFailedWhenClosedInDatabase;
++ (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
 + (NSNumber *)getMessageLastUpdatedWithRoomID:(NSString *)roomID;
 
