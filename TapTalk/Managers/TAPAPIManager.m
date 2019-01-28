@@ -135,6 +135,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/file/download";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeGetBulkUserByID) {
+        NSString *apiPath = @"client/user/get_by_xcuserid";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }

@@ -10,7 +10,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPYourImageBubbleTableViewCellDelegate <NSObject>
+
+- (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
+
+@end
+
 @interface TAPYourImageBubbleTableViewCell : TAPBaseXIBRotatedTableViewCell
+
+@property (weak, nonatomic) id<TAPYourImageBubbleTableViewCellDelegate> delegate;
 
 @property (weak, nonatomic) TAPMessageModel *message;
 

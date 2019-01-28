@@ -169,5 +169,8 @@
                       completionBlock:(void (^)(UIImage *downloadedImage))successBlock
                         progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
                          failureBlock:(void(^)(NSError *error))failureBlock;
++ (void)callAPIGetBulkUserByUserID:(NSArray *)userIDArray
+                       success:(void (^)(NSArray *userIDArray))success
+                           failure:(void (^)(NSError *error))failure;
 
 @end

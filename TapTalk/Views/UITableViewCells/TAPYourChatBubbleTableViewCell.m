@@ -90,8 +90,17 @@
     
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""]  && message.replyTo != nil && message.quote != nil) {
         //reply to exists
-        [self showReplyView:YES withMessage:message];
-        [self showQuoteView:NO];
+        //if reply exists check if image in quote exists
+        //if image exists  change view to Quote View
+        if(message.quote.fileID || message.quote.imageURL) {
+            [self showReplyView:NO withMessage:nil];
+            [self showQuoteView:YES];
+            [self setQuote:message.quote];
+        }
+        else {
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
     }
     else if (![message.quote.title isEqualToString:@""] && message != nil) {
         //quote exists
@@ -261,7 +270,12 @@
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    [self.quoteImageView setImageWithURLString:[TAPUtil nullToEmptyString:quote.imageURL]];
+    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    }
+    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+        [self.quoteImageView setImageWithURLString:quote.fileID];
+    }
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }
