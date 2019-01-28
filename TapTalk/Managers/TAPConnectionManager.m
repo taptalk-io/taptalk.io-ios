@@ -282,6 +282,12 @@
 }
 
 - (void)validateToken {
+    NSString *accessToken = [TAPDataManager getAccessToken];
+
+    if (accessToken == nil || [accessToken isEqualToString:@""]) {
+        return;
+    }
+    
     [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:^{
 #ifdef DEBUG
         NSLog(@"Token Validated");

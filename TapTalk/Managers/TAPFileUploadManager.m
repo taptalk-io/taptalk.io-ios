@@ -22,8 +22,7 @@
 - (void)runUploadImageWithRoomID:(NSString *)roomID;
 - (TAPDataImageModel *)convertDictionaryToDataImageModel:(NSDictionary *)dictionary;
 - (NSDictionary *)convertDataImageModelToDictionary:(TAPDataImageModel *)dataImage;
-- (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success;
-
+- (void)resizeImage:(UIImage *)image message:(TAPMessageModel *)message maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage, TAPMessageModel *resultMessage))success;
 @end
 
 @implementation TAPFileUploadManager
@@ -97,128 +96,155 @@
     TAPDataImageModel *dataImage = [TAPDataImageModel new];
     dataImage = [self convertDictionaryToDataImageModel:dataDictionary];
     
-    //Resize image
-    [self resizeImage:dataImage.dummyImage maxImageSize:kMaxImageSize success:^(UIImage *resizedImage) {
-        dataImage.dummyImage = resizedImage;
+    //Get dummy image from cache
+    [TAPImageView imageFromCacheWithKey:currentMessage.localID message:currentMessage success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
         
-        //Convert dummy image to image data
-        NSData *imageData = UIImageJPEGRepresentation(resizedImage, 0.6f);
-        
-        //Call API Upload File
-        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-        [objectDictionary setObject:currentMessage forKey:@"message"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_START object:objectDictionary];
-        
-        NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:imageData roomID:currentMessage.room.roomID fileType:@"image" mimeType:@"image/jpeg" caption:captionString completionBlock:^(NSDictionary *responseObject) {
+        //Resize image
+        [self resizeImage:savedImage message:resultMessage maxImageSize:kMaxImageSize success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
+                
+//            dataImage.dummyImage = resizedImage;
             
-            //resize to 20x20 for thumbnail
-            [self resizeImage:dataImage.dummyImage maxImageSize:kMaxThumbnailImageSize success:^(UIImage *resizedImage) {
-                
-                NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
-                NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
-                
-                NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
-                
-                NSMutableDictionary *resultDataDictionary = [NSMutableDictionary dictionary];
-                
-                NSString *mediaType = [responseDataDictionary objectForKey:@"mediaType"];
-                mediaType = [TAPUtil nullToEmptyString:mediaType];
-                
-                NSString *fileID = [responseDataDictionary objectForKey:@"id"];
-                fileID = [TAPUtil nullToEmptyString:fileID];
-                
-                if ([mediaType hasPrefix:@"image"]) {
-                    NSString *caption = [responseDataDictionary objectForKey:@"caption"];
-                    caption = [TAPUtil nullToEmptyString:caption];
-                    
-                    NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
-                    sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
-                    NSString *sizeString = [NSString stringWithFormat:@"%f", [sizeRaw floatValue]];
-                    NSNumber *sizeNumber = [NSNumber numberWithFloat:[sizeString floatValue]];
-                    
-                    NSString *heightRaw = [responseDataDictionary objectForKey:@"height"];
-                    heightRaw = [TAPUtil nullToEmptyString:heightRaw];
-                    NSString *heightString = [NSString stringWithFormat:@"%f", [heightRaw floatValue]];
-                    NSNumber *heightNumber = [NSNumber numberWithFloat:[heightString floatValue]];
-                    
-                    NSString *widthRaw = [responseDataDictionary objectForKey:@"width"];
-                    widthRaw = [TAPUtil nullToEmptyString:widthRaw];
-                    NSString *widthString = [NSString stringWithFormat:@"%f", [widthRaw floatValue]];
-                    NSNumber *widthNumber = [NSNumber numberWithFloat:[widthString floatValue]];
-                    
-                    [resultDataDictionary setObject:caption forKey:@"caption"];
-                    [resultDataDictionary setObject:sizeNumber forKey:@"size"];
-                    [resultDataDictionary setObject:heightNumber forKey:@"height"];
-                    [resultDataDictionary setObject:widthNumber forKey:@"width"];
-                }
-                
-                [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
-                [resultDataDictionary setObject:fileID forKey:@"fileID"];
-                [resultDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
-                currentMessage.data = resultDataDictionary;
-                
-                //Send emit
-                [[TAPChatManager sharedManager] sendFileMessage:currentMessage];
-                
-                //Save image to cache
-                [TAPImageView saveImageToCache:dataImage.dummyImage withKey:fileID];
-                
-                //Remove first object
-                [uploadQueueRoomArray removeObjectAtIndex:0];
-                
-                if ([uploadQueueRoomArray count] == 0) {
-                    [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
-                }
-                else {
-                    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
-                }
-                
-                CGFloat progress = 1.0f;
-                CGFloat total = 1.0f;
-                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                [objectDictionary setObject:currentMessage forKey:@"message"];
-                [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-                [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-                
-                [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
-                
-                // Check if queue array is exist, run upload again
-                if ([uploadQueueRoomArray count] > 0) {
-                    TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-                    NSString *nextRoomID = nextUploadMessage.room.roomID;
-                    [self runUploadImageWithRoomID:nextRoomID];
-                }
-            }];
+            __block UIImage *resultImage = resizedImage;
             
-        } progressBlock:^(CGFloat progress, CGFloat total) {
-            NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
-            [obtainedDictionary setObject:currentMessage forKey:@"message"];
-            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            //Save resized dummy image to localID cache
+            [TAPImageView saveImageToCache:resizedImage withKey:resultMessage.localID];
             
-            [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+            //Convert dummy image to image data
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 0.6f);
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
-        
-        } failureBlock:^(NSError *error) {
-            
+            //Call API Upload File
             NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
             [objectDictionary setObject:currentMessage forKey:@"message"];
-            [objectDictionary setObject:error forKey:@"error"];
-            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_START object:objectDictionary];
             
-            [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+            NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:imageData roomID:currentMessage.room.roomID fileType:@"image" mimeType:@"image/jpeg" caption:captionString completionBlock:^(NSDictionary *responseObject) {
+                
+                //resize to 20x20 for thumbnail
+                [self resizeImage:savedImage message:resultMessage maxImageSize:kMaxThumbnailImageSize success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
+                        
+                    NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+                    NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+                    
+                    NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
+                    
+                    NSMutableDictionary *resultDataDictionary = [NSMutableDictionary dictionary];
+                    
+                    NSString *mediaType = [responseDataDictionary objectForKey:@"mediaType"];
+                    mediaType = [TAPUtil nullToEmptyString:mediaType];
+                    
+                    NSString *fileID = [responseDataDictionary objectForKey:@"id"];
+                    fileID = [TAPUtil nullToEmptyString:fileID];
+                    
+                    if ([mediaType hasPrefix:@"image"]) {
+                        NSString *caption = [responseDataDictionary objectForKey:@"caption"];
+                        caption = [TAPUtil nullToEmptyString:caption];
+                        
+                        NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
+                        sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
+                        NSString *sizeString = [NSString stringWithFormat:@"%f", [sizeRaw floatValue]];
+                        NSNumber *sizeNumber = [NSNumber numberWithFloat:[sizeString floatValue]];
+                        
+                        NSString *heightRaw = [responseDataDictionary objectForKey:@"height"];
+                        heightRaw = [TAPUtil nullToEmptyString:heightRaw];
+                        NSString *heightString = [NSString stringWithFormat:@"%f", [heightRaw floatValue]];
+                        NSNumber *heightNumber = [NSNumber numberWithFloat:[heightString floatValue]];
+                        
+                        NSString *widthRaw = [responseDataDictionary objectForKey:@"width"];
+                        widthRaw = [TAPUtil nullToEmptyString:widthRaw];
+                        NSString *widthString = [NSString stringWithFormat:@"%f", [widthRaw floatValue]];
+                        NSNumber *widthNumber = [NSNumber numberWithFloat:[widthString floatValue]];
+                        
+                        [resultDataDictionary setObject:caption forKey:@"caption"];
+                        [resultDataDictionary setObject:sizeNumber forKey:@"size"];
+                        [resultDataDictionary setObject:heightNumber forKey:@"height"];
+                        [resultDataDictionary setObject:widthNumber forKey:@"width"];
+                    }
+                    
+                    [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
+                    [resultDataDictionary setObject:fileID forKey:@"fileID"];
+                    [resultDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
+                    resultMessage.data = resultDataDictionary;
+                    
+                    //Remove from waiting upload dictionary in ChatManager
+                    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
+                    
+                    //Save image to cache
+                    [TAPImageView saveImageToCache:resultImage withKey:fileID];
+                    
+                    //Remove dummy image with localID key from cache
+                    [TAPImageView removeImageFromCacheWithKey:resultMessage.localID];
+                    
+                    //Send emit
+                    [[TAPChatManager sharedManager] sendFileMessage:resultMessage];
+                    
+                    //Remove first object
+                    [uploadQueueRoomArray removeObjectAtIndex:0];
+                    
+                    if ([uploadQueueRoomArray count] == 0) {
+                        [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
+                    }
+                    else {
+                        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
+                    }
+                    
+                    CGFloat progress = 1.0f;
+                    CGFloat total = 1.0f;
+                    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                    [objectDictionary setObject:resultMessage forKey:@"message"];
+                    [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                    [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+                    
+                    [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
+                    
+                    // Check if queue array is exist, run upload again
+                    if ([uploadQueueRoomArray count] > 0) {
+                        TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
+                        NSString *nextRoomID = nextUploadMessage.room.roomID;
+                        [self runUploadImageWithRoomID:nextRoomID];
+                    }
+                }];
+                
+            } progressBlock:^(CGFloat progress, CGFloat total) {
+                NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+                [obtainedDictionary setObject:currentMessage forKey:@"message"];
+                [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+                
+                [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
+                
+            } failureBlock:^(NSError *error) {
+                
+                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                [objectDictionary setObject:currentMessage forKey:@"message"];
+                [objectDictionary setObject:error forKey:@"error"];
+                
+                TAPMessageModel *obtainedMesage = [[TAPChatManager sharedManager] getMessageFromWaitingUploadDictionaryWithKey:currentMessage.localID];
+                if (obtainedMesage != nil) {
+                    
+                    //Update isFailedSend to 1 and isSending to 0
+                    [TAPDataManager updateMessageToFailedWithLocalID:currentMessage.localID];
+                    
+                    //Remove from waiting upload dictionary
+                    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
+                }
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+                
+                [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+            }];
+            
+            NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+            if (obtainedDictionary == nil) {
+                obtainedDictionary = [NSMutableDictionary dictionary];
+            }
+            [obtainedDictionary setObject:uploadTask forKey:@"uploadTask"];
+            [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+            
         }];
-        
-        NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
-        if (obtainedDictionary == nil) {
-            obtainedDictionary = [NSMutableDictionary dictionary];
-        }
-        [obtainedDictionary setObject:uploadTask forKey:@"uploadTask"];
-        [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
-        
     }];
 }
 
@@ -234,7 +260,7 @@
     NSString *caption = [dictionary objectForKey:@"caption"];
     caption = [TAPUtil nullToEmptyString:caption];
     
-    UIImage *dummyImage = [dictionary objectForKey:@"dummyImage"];
+//    UIImage *dummyImage = [dictionary objectForKey:@"dummyImage"];
     
     NSNumber *imageHeightRaw = [dictionary objectForKey:@"imageHeight"];
     CGFloat imageHeight = [imageHeightRaw floatValue];
@@ -246,7 +272,7 @@
     CGFloat size = [sizeRaw floatValue];
     
     dataImage.fileID = fileID;
-    dataImage.dummyImage = dummyImage;
+//    dataImage.dummyImage = dummyImage;
     dataImage.imageWidth = imageWidth;
     dataImage.imageHeight = imageHeight;
     dataImage.size = size;
@@ -268,7 +294,7 @@
     NSString *caption = dataImage.caption;
     caption = [TAPUtil nullToEmptyString:caption];
     
-    UIImage *dummyImage = dataImage.dummyImage;
+//    UIImage *dummyImage = dataImage.dummyImage;
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:dataImage.imageHeight];
     
@@ -279,7 +305,7 @@
     [dataDictionary setObject:fileID forKey:@"fileID"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:caption forKey:@"caption"];
-    [dataDictionary setObject:dummyImage forKey:@"dummyImage"];
+//    [dataDictionary setObject:dummyImage forKey:@"dummyImage"];
     [dataDictionary setObject:imageHeight forKey:@"imageHeight"];
     [dataDictionary setObject:imageWidth forKey:@"imageWidth"];
     [dataDictionary setObject:size forKey:@"size"];
@@ -287,7 +313,7 @@
     return dataDictionary;
 }
 
-- (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success {
+- (void)resizeImage:(UIImage *)image message:(TAPMessageModel *)message maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage, TAPMessageModel *resultMessage))success {
     __block UIImage *resizedImage;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         CGFloat imageWidth = image.size.width;
@@ -317,7 +343,7 @@
         resizedImage = [TAPUtil resizedImage:image frame:CGRectMake(0.0f, 0.0f, roundf(imageWidth), roundf(imageHeight))];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            success(resizedImage);
+            success(resizedImage, message);
         });
         
     });

@@ -664,4 +664,21 @@
     }
 }
 
+- (void)updateMessageToFailedWithColumnName:(NSString *)columnName value:(NSString *)value {
+    RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+    
+    NSString *whereClause = [NSString stringWithFormat:@"isSending == true AND %@ LIKE '%@'",columnName, value];
+    
+    RLMResults *results = [TAPMessageRealmModel objectsInRealm:realm where:whereClause];
+    
+    if ([results count] != 0) {
+        [realm beginWriteTransaction];
+        for (TAPMessageRealmModel *messageRealmModel in results) {
+            messageRealmModel.isSending = [NSNumber numberWithBool:NO];
+            messageRealmModel.isFailedSend = [NSNumber numberWithBool:YES];
+        }
+        [realm commitWriteTransaction];
+    }
+}
+
 @end

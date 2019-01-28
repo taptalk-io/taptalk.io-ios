@@ -80,5 +80,8 @@
 - (BOOL)checkIsTypingWithRoomID:(NSString *)roomID;
 - (BOOL)checkShouldRefreshOnlineStatus;
 - (void)refreshShouldRefreshOnlineStatus;
+- (void)addToWaitingUploadFileMessage:(TAPMessageModel *)message;
+- (void)removeFromWaitingUploadFileMessage:(TAPMessageModel *)message;
+- (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID;
 
 @end

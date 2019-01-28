@@ -368,10 +368,24 @@
     if (dataDictionary == nil) {
         dataDictionary = [[NSMutableDictionary alloc] init];
     }
+#ifdef DEBUG
+    NSLog(@"IMAGE BEFORE CACHE SIZE HEIGHT: %f, WIDTH: %f", image.size.height, image.size.width);
+#endif
     
-    [dataDictionary setObject:image forKey:@"dummyImage"];
+    NSNumber *imageHeight = [NSNumber numberWithFloat:image.size.height];
+    NSNumber *imageWidth = [NSNumber numberWithFloat:image.size.width];
+    
+//    [dataDictionary setObject:image forKey:@"dummyImage"];
+    [dataDictionary setObject:imageHeight forKey:@"height"];
+    [dataDictionary setObject:imageWidth forKey:@"width"];
     [dataDictionary setObject:caption forKey:@"caption"];
     message.data = [dataDictionary copy];
+    
+    //Save image to cache with localID key
+    [TAPImageView saveImageToCache:image withKey:message.localID];
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     
     [[TAPFileUploadManager sharedManager] sendFileWithData:message];
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
@@ -631,10 +645,10 @@
         [TAPDataManager updateOrInsertDatabaseMessageWithData:self.incomingMessageArray success:^{
             //Clear incoming message array
             [self.incomingMessageArray removeAllObjects];
-            
+
             [[TAPMessageStatusManager sharedManager] triggerUpdateMessageStatus];
         } failure:^(NSError *error) {
-            
+
         }];
     }
     else {
@@ -663,6 +677,13 @@
         [groupedMessageArray addObjectsFromArray:waitingResponseArray];
     }
     
+    //Save waiting upload file messages to database
+    NSArray *waitingUploadArray = [NSArray array];
+    waitingUploadArray = [self.waitingUploadDictionary allValues];
+    if ([waitingUploadArray count] != 0) {
+        [groupedMessageArray addObjectsFromArray:waitingUploadArray];
+    }
+    
     if ([groupedMessageArray count] != 0) {
         [TAPDataManager updateOrInsertDatabaseMessageWithData:groupedMessageArray success:^{
             
@@ -674,6 +695,7 @@
     //Clear array incoming and waiting response dictionary
     [self.incomingMessageArray removeAllObjects];
     [self.waitingResponseDictionary removeAllObjects];
+    [self.waitingUploadDictionary removeAllObjects];
 }
 
 - (void)saveAllUnsentMessageInMainThread {
@@ -689,11 +711,18 @@
         [groupedMessageArray addObjectsFromArray:self.pendingMessageArray];
     }
     
-    //Save waitingResponse messages to database
+    //Save waiting response messages to database
     NSArray *waitingResponseArray = [NSArray array];
     waitingResponseArray = [self.waitingResponseDictionary allValues];
     if ([waitingResponseArray count] != 0) {
         [groupedMessageArray addObjectsFromArray:waitingResponseArray];
+    }
+    
+    //Save waiting upload file messages to database
+    NSArray *waitingUploadArray = [NSArray array];
+    waitingUploadArray = [self.waitingUploadDictionary allValues];
+    if ([waitingUploadArray count] != 0) {
+        [groupedMessageArray addObjectsFromArray:waitingUploadArray];
     }
     
     if ([groupedMessageArray count] != 0) {
@@ -707,6 +736,7 @@
     //Clear array incoming and waiting response dictionary
     [self.incomingMessageArray removeAllObjects];
     [self.waitingResponseDictionary removeAllObjects];
+    [self.waitingUploadDictionary removeAllObjects];
 }
 
 - (void)saveIncomingMessageAndDisconnect {
@@ -794,6 +824,19 @@
 
 - (void)refreshShouldRefreshOnlineStatus {
     _isShouldRefreshOnlineStatus = YES;
+}
+
+- (void)addToWaitingUploadFileMessage:(TAPMessageModel *)message {
+    [self.waitingUploadDictionary setObject:message forKey:message.localID];
+}
+
+- (void)removeFromWaitingUploadFileMessage:(TAPMessageModel *)message {
+    [self.waitingUploadDictionary removeObjectForKey:message.localID];
+}
+
+- (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID {
+   TAPMessageModel *message = [self.waitingResponseDictionary objectForKey:localID];
+    return message;
 }
 
 @end

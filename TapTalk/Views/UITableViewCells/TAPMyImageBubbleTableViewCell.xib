@@ -68,18 +68,31 @@
                                             <constraint firstAttribute="width" constant="34" id="rNT-a3-aJf"/>
                                         </constraints>
                                     </view>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconCancelUpload" translatesAutoresizingMaskIntoConstraints="NO" id="UdT-T0-sjf">
-                                        <rect key="frame" x="17" y="17" width="14" height="14"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="14" id="IYg-PN-6qk"/>
-                                            <constraint firstAttribute="height" constant="14" id="bB3-TY-AK3"/>
-                                        </constraints>
-                                    </imageView>
                                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownloadImage" translatesAutoresizingMaskIntoConstraints="NO" id="Qqn-aE-vYh">
                                         <rect key="frame" x="17" y="17" width="14" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="14" id="1wI-oP-LOi"/>
                                             <constraint firstAttribute="width" constant="14" id="izp-Lr-RB2"/>
+                                        </constraints>
+                                    </imageView>
+                                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryUploadImage" translatesAutoresizingMaskIntoConstraints="NO" id="Fbh-2v-PuS">
+                                        <rect key="frame" x="17" y="17" width="14" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="hoU-qZ-S4R"/>
+                                            <constraint firstAttribute="width" constant="14" id="re9-8j-FgT"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Aft-bv-3pe">
+                                        <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
+                                        <connections>
+                                            <action selector="retryButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="u57-Gt-gGx"/>
+                                        </connections>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconCancelUpload" translatesAutoresizingMaskIntoConstraints="NO" id="UdT-T0-sjf">
+                                        <rect key="frame" x="17" y="17" width="14" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="14" id="IYg-PN-6qk"/>
+                                            <constraint firstAttribute="height" constant="14" id="bB3-TY-AK3"/>
                                         </constraints>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Suw-Ve-E7u">
@@ -95,13 +108,21 @@
                                     <constraint firstItem="Qqn-aE-vYh" firstAttribute="trailing" secondItem="UdT-T0-sjf" secondAttribute="trailing" id="7ee-mF-MYh"/>
                                     <constraint firstItem="tfO-kO-gDQ" firstAttribute="centerX" secondItem="ZeB-2B-m5c" secondAttribute="centerX" id="9xG-ey-9qv"/>
                                     <constraint firstAttribute="bottom" secondItem="Suw-Ve-E7u" secondAttribute="bottom" id="BaK-Fh-YXT"/>
+                                    <constraint firstItem="UdT-T0-sjf" firstAttribute="trailing" secondItem="Fbh-2v-PuS" secondAttribute="trailing" id="Cd2-yN-3FR"/>
                                     <constraint firstItem="UdT-T0-sjf" firstAttribute="centerY" secondItem="ZeB-2B-m5c" secondAttribute="centerY" id="DzQ-av-rV6"/>
                                     <constraint firstAttribute="height" constant="48" id="EAk-KO-RkZ"/>
                                     <constraint firstItem="tfO-kO-gDQ" firstAttribute="centerY" secondItem="ZeB-2B-m5c" secondAttribute="centerY" id="EK8-Sf-BVx"/>
+                                    <constraint firstItem="UdT-T0-sjf" firstAttribute="top" secondItem="Fbh-2v-PuS" secondAttribute="top" id="KGs-JC-pr5"/>
+                                    <constraint firstItem="Suw-Ve-E7u" firstAttribute="bottom" secondItem="Aft-bv-3pe" secondAttribute="bottom" id="OcA-1f-3xt"/>
                                     <constraint firstItem="Suw-Ve-E7u" firstAttribute="leading" secondItem="ZeB-2B-m5c" secondAttribute="leading" id="RMQ-GA-Eaj"/>
+                                    <constraint firstItem="UdT-T0-sjf" firstAttribute="leading" secondItem="Fbh-2v-PuS" secondAttribute="leading" id="TmG-34-20J"/>
                                     <constraint firstItem="Qqn-aE-vYh" firstAttribute="leading" secondItem="UdT-T0-sjf" secondAttribute="leading" id="Xkl-A4-h9s"/>
                                     <constraint firstItem="Suw-Ve-E7u" firstAttribute="top" secondItem="ZeB-2B-m5c" secondAttribute="top" id="aqx-8p-QeC"/>
+                                    <constraint firstItem="UdT-T0-sjf" firstAttribute="bottom" secondItem="Fbh-2v-PuS" secondAttribute="bottom" id="hHx-ev-BLe"/>
                                     <constraint firstItem="Qqn-aE-vYh" firstAttribute="bottom" secondItem="UdT-T0-sjf" secondAttribute="bottom" id="kG2-Wz-sJl"/>
+                                    <constraint firstItem="Suw-Ve-E7u" firstAttribute="trailing" secondItem="Aft-bv-3pe" secondAttribute="trailing" id="q6k-vJ-gb4"/>
+                                    <constraint firstItem="Suw-Ve-E7u" firstAttribute="top" secondItem="Aft-bv-3pe" secondAttribute="top" id="qQs-zE-Avl"/>
+                                    <constraint firstItem="Suw-Ve-E7u" firstAttribute="leading" secondItem="Aft-bv-3pe" secondAttribute="leading" id="rr9-lL-Mya"/>
                                     <constraint firstItem="Qqn-aE-vYh" firstAttribute="top" secondItem="UdT-T0-sjf" secondAttribute="top" id="ujM-zO-AKr"/>
                                     <constraint firstAttribute="width" constant="48" id="xvj-2q-8Pd"/>
                                     <constraint firstItem="UdT-T0-sjf" firstAttribute="centerX" secondItem="ZeB-2B-m5c" secondAttribute="centerX" id="ySN-rf-Jj9"/>
@@ -184,6 +205,8 @@
                 <outlet property="progressBarView" destination="tfO-kO-gDQ" id="Y8v-U5-6J5"/>
                 <outlet property="replyButton" destination="mOj-ZL-6Kr" id="vqZ-rl-aDF"/>
                 <outlet property="replyButtonRightConstraint" destination="Clz-FG-6Ce" id="RJn-0Z-cvo"/>
+                <outlet property="retryButton" destination="Aft-bv-3pe" id="Qc7-ox-VYS"/>
+                <outlet property="retryImageView" destination="Fbh-2v-PuS" id="IXb-zz-PJl"/>
                 <outlet property="sendingIconBottomConstraint" destination="1Jo-CR-KeW" id="S7x-fx-Jdp"/>
                 <outlet property="sendingIconImageView" destination="vpz-Pu-2L3" id="igo-HT-YGc"/>
                 <outlet property="sendingIconLeftConstraint" destination="2yM-iX-kfC" id="OHl-gx-oo9"/>
@@ -199,6 +222,7 @@
         <image name="TAPIconCancelUpload" width="14" height="14"/>
         <image name="TAPIconDownloadImage" width="12" height="16"/>
         <image name="TAPIconReplyChat" width="28" height="28"/>
+        <image name="TAPIconRetryUploadImage" width="14" height="16"/>
         <image name="TAPIconSendingChat" width="10" height="11"/>
     </resources>
 </document>

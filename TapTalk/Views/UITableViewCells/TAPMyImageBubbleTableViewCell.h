@@ -10,9 +10,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
+    TAPMyImageBubbleTableViewCellStateTypeUploading = 0,
+    TAPMyImageBubbleTableViewCellStateTypeDownloading = 1,
+    TAPMyImageBubbleTableViewCellStateTypeFailed = 2
+};
+
 @protocol TAPMyImageBubbleTableViewCellDelegate <NSObject>
 
 - (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageReplyDidTapped;
 
 @end
@@ -21,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id<TAPMyImageBubbleTableViewCellDelegate> delegate;
 @property (weak, nonatomic) TAPMessageModel *message;
+@property (nonatomic) TAPMyImageBubbleTableViewCellStateType myImageBubbleTableViewCellStateType;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;
@@ -35,10 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showProgressUploadView:(BOOL)show;
 - (void)animateFailedUploadingImage;
 - (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
-- (void)setInitialAnimateUploadingImageWithCancelButton:(BOOL)withCancelButton;
+- (void)setInitialAnimateUploadingImageWithType:(TAPMyImageBubbleTableViewCellStateType)type;
 - (void)animateFinishedUploadingImage;
 - (void)setFullImage:(UIImage *)image;
 - (void)setThumbnailImage:(UIImage *)thumbnailImage;
+- (void)setMyImageBubbleTableViewCellStateType:(TAPMyImageBubbleTableViewCellStateType)myImageBubbleTableViewCellStateType;
 
 @end
 

@@ -78,4 +78,6 @@
                                         failure:(void (^)(NSError *error))failure;
 - (void)updateMessageToFailedWhenClosed;
 
+- (void)updateMessageToFailedWithColumnName:(NSString *)columnName value:(NSString *)value;
+
 @end

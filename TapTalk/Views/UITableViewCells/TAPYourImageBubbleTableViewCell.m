@@ -141,12 +141,39 @@
 
     UIImage *selectedImage = nil;
     if (fileID == nil || [fileID isEqualToString:@""]) {
-        selectedImage = [dataDictionary objectForKey:@"dummyImage"];
-        [self getImageSizeFromImage:selectedImage];
-        
-        self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-        self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-        [self.bubbleImageView setImage:selectedImage];
+        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            if (savedImage != nil) {
+                [self getImageSizeFromImage:savedImage];
+                
+                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+                [self.bubbleImageView setImage:savedImage];
+            }
+            else {
+                self.bubbleImageViewWidthConstraint.constant = 0.0f;
+                self.bubbleImageViewHeightConstraint.constant = 0.0f;
+            }
+        }];
+
+//        selectedImage = [dataDictionary objectForKey:@"dummyImage"];
+//        [self getImageSizeFromImage:selectedImage];
+//
+//        self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+//        self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+//        [self.bubbleImageView setImage:selectedImage];
+//        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+//            if (savedImage != nil) {
+//                [self getImageSizeFromImage:savedImage];
+//                
+//                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+//                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+//                [self.bubbleImageView setImage:savedImage];
+//            }
+//            else {
+//                self.bubbleImageViewWidthConstraint.constant = 0.0f;
+//                self.bubbleImageViewHeightConstraint.constant = 0.0f;
+//            }
+//        }];
     }
     else {
         //already called fetchImageDataWithMessage function in view controller for fetch image
