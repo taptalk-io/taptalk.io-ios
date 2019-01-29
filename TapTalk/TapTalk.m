@@ -374,6 +374,59 @@
 }
 
 //Chat
+- (void)openRoomWithXCUserID:(NSString *)XCUserID
+                  quoteTitle:(nullable NSString *)quoteTitle
+                quoteContent:(nullable NSString *)quoteContent
+         quoteImageURLString:(nullable NSString *)quoteImageURL
+                    userInfo:(nullable NSDictionary *)userInfo
+    fromNavigationController:(UINavigationController *)navigationController
+                     success:(void (^)(void))success
+                     failure:(void (^)(NSError *error))failure {
+    //Check is user exist in TapTalk database
+    [TAPDataManager getDatabaseContactByXCUserID:XCUserID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+        if (isContact) {
+            //User is in contact
+            //Create quote model and set quote to chat
+            if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = quoteTitle;
+                quote.content = quoteContent;
+                quote.imageURL = quoteImageURL;
+                
+                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
+                [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+            }
+            
+            //Open room
+            [self openRoomWithOtherUser:obtainedUser fromNavigationController:navigationController];
+            success();
+        }
+        else {
+            //User not in contact, call API to obtain user data
+            [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:^(TAPUserModel *user) {
+                //Create quote model and set quote to chat
+                if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
+                    TAPQuoteModel *quote = [TAPQuoteModel new];
+                    quote.title = quoteTitle;
+                    quote.content = quoteContent;
+                    quote.imageURL = quoteImageURL;
+                    
+                    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+                    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+                }
+                
+                //Open room
+                [self openRoomWithOtherUser:user fromNavigationController:navigationController];
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
+        }
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
      fromNavigationController:(UINavigationController *)navigationController {
     TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];

@@ -481,7 +481,7 @@
         [self.userImageView setImageWithURLString:imageURLString];
         
         [self setSearchViewLayoutWithType:LayoutTypeUser];
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact) {
+        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
             if (isContact) {
                 [self setSearchUserButtonWithType:ButtonTypeChat];
             }
@@ -501,7 +501,7 @@
         [self.expertImageView setImageWithURLString:@"https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
         
         [self setSearchViewLayoutWithType:LayoutTypeExpert];
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact) {
+        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
             if (isContact) {
                 [self setSearchUserButtonWithType:ButtonTypeChat];
             }

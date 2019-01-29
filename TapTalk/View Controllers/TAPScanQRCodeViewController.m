@@ -102,7 +102,7 @@
         
         //DV Temp
         //Note - Temporary query for friend data from db, if found means isContact = 1 until API response showing isContact
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact) {
+        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
             _isProcessingQRCode = NO;
             [self.scanQRCodePopupView setIsLoading:NO animated:YES];
             [self.scanQRCodePopupView setPopupInfoWithUserData:user isContact:isContact];
