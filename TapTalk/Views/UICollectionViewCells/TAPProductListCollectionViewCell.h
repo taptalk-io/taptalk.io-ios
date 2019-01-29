@@ -12,8 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPProductListCollectionViewCell : TAPBaseCollectionViewCell
 
-@property (strong, nonatomic) IBOutlet UIButton *detailButton;
-@property (strong, nonatomic) IBOutlet UIButton *orderNowButton;
+@property (strong, nonatomic) IBOutlet UIButton *leftOptionButton;
+@property (strong, nonatomic) IBOutlet UIButton *rightOptionButton;
 
 - (void)setProductCellWithData:(NSDictionary *)product;
 
