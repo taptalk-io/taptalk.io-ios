@@ -595,14 +595,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if ([self.messageArray count] != 0) {
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
         
-        //DV Note - For product list bubble
-        //DV Temp
-        //        [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
-        //        TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
-        //        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        //        return cell;
-        //END DV Temp
-        
         //CS Note - For order card bubble
         //CS Temp
         
@@ -685,6 +677,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 [cell setOrderCardWithType:13];//CS Temp
+                return cell;
+            }
+            else if (message.type == TAPChatMessageTypeProduct) {
+                [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
+                TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
+                NSArray *productListArray = [message.data objectForKey:@"items"];
+                [cell setProductListBubbleCellWithData:productListArray];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 return cell;
             }
             else {
@@ -785,6 +785,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                     [self fetchImageDataWithMessage:message];
                 }
                 
+                return cell;
+            }
+            else if (message.type == TAPChatMessageTypeProduct) {
+                [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
+                TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
+                NSArray *productListArray = [message.data objectForKey:@"items"];
+                [cell setProductListBubbleCellWithData:productListArray];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 return cell;
             }
         }

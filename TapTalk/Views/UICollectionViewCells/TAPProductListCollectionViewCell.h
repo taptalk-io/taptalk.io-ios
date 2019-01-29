@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) IBOutlet UIButton *detailButton;
 @property (strong, nonatomic) IBOutlet UIButton *orderNowButton;
 
-- (void)setProductListWithData; //DV Temp
+- (void)setProductCellWithData:(NSDictionary *)product;
 
 @end
 
