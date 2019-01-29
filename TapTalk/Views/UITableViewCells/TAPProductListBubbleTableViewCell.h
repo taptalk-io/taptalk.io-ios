@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPProductListBubbleTableViewCell : TAPBaseXIBRotatedTableViewCell
 
+- (void)setProductListBubbleCellWithData:(NSArray *)productDataArray;
+
 @end
 
 NS_ASSUME_NONNULL_END

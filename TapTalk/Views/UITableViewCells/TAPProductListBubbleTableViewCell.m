@@ -12,6 +12,7 @@
 @interface TAPProductListBubbleTableViewCell () <UICollectionViewDelegate, UICollectionViewDataSource>
 
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (strong, nonatomic) NSMutableArray *productDataArray;
 
 @end
 
@@ -20,6 +21,7 @@
 #pragma mark - Lifecycle
 - (void)awakeFromNib {
     [super awakeFromNib];
+    _productDataArray = [[NSMutableArray alloc] init];
     
 }
 
@@ -72,7 +74,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-    return 6; //DV Temp
+    return [self.productDataArray count];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -83,7 +85,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     TAPProductListCollectionViewCell *cell = (TAPProductListCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifier forIndexPath:indexPath];
     
-    [cell setProductListWithData];
+    if ([self.productDataArray count] != 0) {
+        NSDictionary *productData = [self.productDataArray objectAtIndex:indexPath.row];
+        [cell setProductCellWithData:productData];
+    }
     
     return cell;
 }
@@ -101,5 +106,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Custom Method
+- (void)setProductListBubbleCellWithData:(NSArray *)productDataArray {
+    _productDataArray = productDataArray;
+    [self.collectionView reloadData];
+}
 
 @end

@@ -22,10 +22,10 @@
 @property (strong, nonatomic) IBOutlet UILabel *ratingPlaceholderLabel;
 @property (strong, nonatomic) IBOutlet UILabel *ratingLabel;
 @property (strong, nonatomic) IBOutlet UILabel *productDescriptionLabel;
-@property (strong, nonatomic) IBOutlet UIView *detailView;
-@property (strong, nonatomic) IBOutlet UIView *orderNowView;
-@property (strong, nonatomic) IBOutlet UILabel *detailLabel;
-@property (strong, nonatomic) IBOutlet UILabel *orderNowLabel;
+@property (strong, nonatomic) IBOutlet UIView *leftOptionView;
+@property (strong, nonatomic) IBOutlet UIView *rightOptionView;
+@property (strong, nonatomic) IBOutlet UILabel *leftOptionLabel;
+@property (strong, nonatomic) IBOutlet UILabel *rightOptionLabel;
 
 @end
 
@@ -41,12 +41,12 @@
     self.backgroundContentView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner | kCALayerMinXMaxYCorner;
     
     if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
-        self.orderNowLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
-        self.detailLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
+        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
+        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
     }
     else {
-        self.orderNowLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
-        self.detailLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
+        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
+        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
     }
 }
 
@@ -57,18 +57,52 @@
     self.priceLabel.text = @"";
     self.ratingLabel.text = @"";
     self.productDescriptionLabel.text = @"";
+    self.leftOptionLabel.text = @"";
+    self.rightOptionLabel.text = @"";
 }
 
 #pragma mark - Custom Method
-//DV Temp
-- (void)setProductListWithData {
-    [self.productImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL];
+- (void)setProductCellWithData:(NSDictionary *)product {
+
+    NSString *productNameString = [product objectForKey:@"name"];
+    productNameString = [TAPUtil nullToEmptyString:productNameString];
     
-    self.productNameLabel.text = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit Aliquam aliquet urna eget ante consectetur quis elementum arcu fringilla Etiam ornare metus vitae risus dictum id pulvinar tellus eleifend";
-    self.priceLabel.text = [TAPUtil formattedCurrencyWithCurrencySign:@"Rp " value:999999999];
-    self.ratingLabel.text = @"4.9";
-    self.productDescriptionLabel.text = @"Suspendisse potenti. Ut arcu nulla, sodales quis hendrerit id, mattis a tellus. Morbi vel ligula quam. Ut volutpat in orci tincidunt cursus. Ut laoreet felis et risus sollicitudin pulvinar. In molestie feugiat mi, ac sodales metus volutpat at. Aenean tempus nisl ut nulla faucibus fermentum. Nunc maximus blandit luctus. Phasellus felis ex, hendrerit dapibus erat nec, aliquam suscipit arcu. Ut fermentum ornare magna, at bibendum orci posuere in. Morbi sagittis ornare mattis. Quisque consectetur sem id diam ultricies euismod.";
+    NSString *currencyString = [product objectForKey:@"currency"];
+    currencyString = [TAPUtil nullToEmptyString:currencyString];
+    
+    NSString *priceString = [product objectForKey:@"price"];
+    productNameString = [TAPUtil nullToEmptyString:productNameString];
+    
+    NSString *ratingString = [product objectForKey:@"rating"];
+    ratingString = [TAPUtil nullToEmptyString:ratingString];
+    
+    NSString *productDescriptionString = [product objectForKey:@"description"];
+    productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
+    
+    NSString *productImageURLString = [product objectForKey:@"imageURL"];
+    productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
+    
+    NSString *leftOptionTextString = [product objectForKey:@"buttonOption1Text"];
+    leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
+    
+    NSString *rightOptionTextString = [product objectForKey:@"buttonOption1Text"];
+    rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
+    
+    NSString *leftOptionColorString = [product objectForKey:@"buttonOption1Color"];
+    leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
+    
+    NSString *rightOptionColorString = [product objectForKey:@"buttonOption2Color"];
+    rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
+    
+    self.productNameLabel.text = productNameString;
+    self.priceLabel.text = [TAPUtil formattedCurrencyWithCurrencySign:currencyString value:[priceString floatValue]];
+    [self.productImageView setImageWithURLString:productImageURLString];
+    self.ratingLabel.text = ratingString;
+    self.productDescriptionLabel.text = productDescriptionString;
+    self.leftOptionLabel.text = leftOptionTextString;
+    self.leftOptionLabel.textColor = [TAPUtil getColor:leftOptionColorString];
+    self.rightOptionLabel.text = rightOptionTextString;
+    self.rightOptionLabel.textColor = [TAPUtil getColor:rightOptionColorString];
 }
-//END DV Temp
 
 @end

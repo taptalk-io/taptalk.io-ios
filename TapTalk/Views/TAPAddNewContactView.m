@@ -473,47 +473,67 @@
     TAPUserRoleModel *userRole = user.userRole;
     NSString *fullName = user.fullname;
     
-    if ([userRole.userRoleCode isEqualToString:@"user"]) { //WK Temp - Temporary @"0"
-        TAPImageURLModel *imageURL = user.imageURL;
-        NSString *imageURLString = imageURL.thumbnail;
-        
-        self.userFullNameLabel.text = fullName;
-        [self.userImageView setImageWithURLString:imageURLString];
-        
-        [self setSearchViewLayoutWithType:LayoutTypeUser];
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
-            if (isContact) {
-                [self setSearchUserButtonWithType:ButtonTypeChat];
-            }
-            else {
-                [self setSearchUserButtonWithType:ButtonTypeAdd];
-            }
-        } failure:^(NSError *error) {
+    TAPImageURLModel *imageURL = user.imageURL;
+    NSString *imageURLString = imageURL.thumbnail;
+    
+    self.userFullNameLabel.text = fullName;
+    [self.userImageView setImageWithURLString:imageURLString];
+    
+    [self setSearchViewLayoutWithType:LayoutTypeUser];
+    [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+        if (isContact) {
+            [self setSearchUserButtonWithType:ButtonTypeChat];
+        }
+        else {
+            [self setSearchUserButtonWithType:ButtonTypeAdd];
+        }
+    } failure:^(NSError *error) {
 #ifdef DEBUG
-            NSLog(@"%@", error);
+        NSLog(@"%@", error);
 #endif
-        }];
-    }
-    else {
-        self.expertNameLabel.text = fullName;
-        self.expertCategoryLabel.text = @"Makeup Artist";
-        [self.coverImageView setImageWithURLString:@"https://images.pexels.com/photos/1115128/pexels-photo-1115128.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
-        [self.expertImageView setImageWithURLString:@"https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
-        
-        [self setSearchViewLayoutWithType:LayoutTypeExpert];
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
-            if (isContact) {
-                [self setSearchUserButtonWithType:ButtonTypeChat];
-            }
-            else {
-                [self setSearchUserButtonWithType:ButtonTypeAdd];
-            }
-        } failure:^(NSError *error) {
-#ifdef DEBUG
-            NSLog(@"%@", error);
-#endif
-        }];
-    }
+    }];
+    
+//    if ([userRole.userRoleCode isEqualToString:@"user"]) { //WK Temp - Temporary @"0"
+//        TAPImageURLModel *imageURL = user.imageURL;
+//        NSString *imageURLString = imageURL.thumbnail;
+//
+//        self.userFullNameLabel.text = fullName;
+//        [self.userImageView setImageWithURLString:imageURLString];
+//
+//        [self setSearchViewLayoutWithType:LayoutTypeUser];
+//        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+//            if (isContact) {
+//                [self setSearchUserButtonWithType:ButtonTypeChat];
+//            }
+//            else {
+//                [self setSearchUserButtonWithType:ButtonTypeAdd];
+//            }
+//        } failure:^(NSError *error) {
+//#ifdef DEBUG
+//            NSLog(@"%@", error);
+//#endif
+//        }];
+//    }
+//    else {
+//        self.expertNameLabel.text = fullName;
+//        self.expertCategoryLabel.text = @"Makeup Artist";
+//        [self.coverImageView setImageWithURLString:@"https://images.pexels.com/photos/1115128/pexels-photo-1115128.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
+//        [self.expertImageView setImageWithURLString:@"https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
+//
+//        [self setSearchViewLayoutWithType:LayoutTypeExpert];
+//        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+//            if (isContact) {
+//                [self setSearchUserButtonWithType:ButtonTypeChat];
+//            }
+//            else {
+//                [self setSearchUserButtonWithType:ButtonTypeAdd];
+//            }
+//        } failure:^(NSError *error) {
+//#ifdef DEBUG
+//            NSLog(@"%@", error);
+//#endif
+//        }];
+//    }
 }
 
 - (void)showLoading:(BOOL)isLoading {
