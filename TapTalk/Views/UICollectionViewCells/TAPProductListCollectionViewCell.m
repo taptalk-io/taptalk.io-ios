@@ -64,6 +64,9 @@
 #pragma mark - Custom Method
 - (void)setProductCellWithData:(NSDictionary *)product {
 
+    NSString *productIDString = [product objectForKey:@"id"];
+    productIDString = [TAPUtil nullToEmptyString:productIDString];
+    
     NSString *productNameString = [product objectForKey:@"name"];
     productNameString = [TAPUtil nullToEmptyString:productNameString];
     
