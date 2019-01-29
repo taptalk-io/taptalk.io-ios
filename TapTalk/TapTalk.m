@@ -565,7 +565,7 @@ fromNavigationController:(UINavigationController *)navigationController
     NSMutableArray *convertedProductArray = [[NSMutableArray alloc] init];
     
     for (TAPProductModel *product in productModelArray) {
-        NSString *productID = product.productID;
+        NSString *productID = product.productDataID;
         NSString *productNameString = product.productName;
         NSString *currencyString = product.productCurrency;
         NSString *priceString = product.productPrice;

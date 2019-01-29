@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPProductModel : TAPBaseModel
 
-@property (strong, nonatomic) NSString *productID;
+@property (strong, nonatomic) NSString *productDataID;
 @property (strong, nonatomic) NSString *productName;
 @property (strong, nonatomic) NSString *productCurrency;
 @property (strong, nonatomic) NSString *productPrice;
