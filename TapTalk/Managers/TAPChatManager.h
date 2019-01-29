@@ -60,6 +60,7 @@
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
 - (void)sendFileMessage:(TAPMessageModel *)message;
+- (void)sendProductMessage:(TAPMessageModel *)message;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;

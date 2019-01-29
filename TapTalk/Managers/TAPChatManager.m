@@ -255,6 +255,10 @@
     [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom];
 }
 
+- (void)sendProductMessage:(TAPMessageModel *)message {
+    [self sendMessage:message notifyDelegate:YES];
+}
+
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room {
     //Divide message if length more than character limit
     NSInteger characterLimit = kCharacterLimit;
