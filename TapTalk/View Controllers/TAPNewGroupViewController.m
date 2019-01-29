@@ -66,6 +66,7 @@
     firstUser.username = @"ritchie";
     firstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ritchie_1542363733889f.jpg";
     firstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ritchie_1542363733889t.jpg";
+    firstUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *secondUser = [TAPUserModel new];
     secondUser.userID = @"2";
@@ -76,6 +77,7 @@
     secondUser.username = @"dominic";
     secondUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dominic_1542363733889f.jpg";
     secondUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dominic_1542363733889t.jpg";
+    secondUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirdUser = [TAPUserModel new];
     thirdUser.userID = @"3";
@@ -86,6 +88,7 @@
     thirdUser.username = @"rionaldo";
     thirdUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rionaldo_1542363733889f.jpg";
     thirdUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rionaldo_1542363733889t.jpg";
+    thirdUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *fourthUser = [TAPUserModel new];
     fourthUser.userID = @"4";
@@ -96,6 +99,7 @@
     fourthUser.username = @"kevin";
     fourthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevin_1542363733889f.jpg";
     fourthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevin_1542363733889t.jpg";
+    fourthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *fifthUser = [TAPUserModel new];
     fifthUser.userID = @"5";
@@ -104,8 +108,9 @@
     fifthUser.email = @"welly@moselo.com";
     fifthUser.phone = @"08979809026";
     fifthUser.username = @"welly";
-    firstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/welly_1542363733889f.jpg";
-    firstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/welly_1542363733889t.jpg";
+    fifthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/welly_1542363733889f.jpg";
+    fifthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/welly_1542363733889t.jpg";
+    fifthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *sixthUser = [TAPUserModel new];
     sixthUser.userID = @"6";
@@ -116,6 +121,7 @@
     sixthUser.username = @"jony";
     sixthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jony_1542363733889f.jpg";
     sixthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jony_1542363733889t.jpg";
+    sixthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *seventhUser = [TAPUserModel new];
     seventhUser.userID = @"7";
@@ -126,6 +132,7 @@
     seventhUser.username = @"michael";
     seventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/michael_1542363733889f.jpg";
     seventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/michael_1542363733889t.jpg";
+    seventhUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *eighthUser = [TAPUserModel new];
     eighthUser.userID = @"8";
@@ -136,6 +143,7 @@
     eighthUser.username = @"richard";
     eighthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/richard_1542363733889f.jpg";
     eighthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/richard_1542363733889t.jpg";
+    eighthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *ninthUser = [TAPUserModel new];
     ninthUser.userID = @"9";
@@ -146,6 +154,7 @@
     ninthUser.username = @"erwin";
     ninthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/erwin_1542363733889f.jpg";
     ninthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/erwin_1542363733889t.jpg";
+    ninthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *tenthUser = [TAPUserModel new];
     tenthUser.userID = @"10";
@@ -156,6 +165,7 @@
     tenthUser.username = @"jefry";
     tenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jefry_1542363733889f.jpg";
     tenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jefry_1542363733889t.jpg";
+    tenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *eleventhUser = [TAPUserModel new];
     eleventhUser.userID = @"11";
@@ -166,6 +176,7 @@
     eleventhUser.username = @"cundy";
     eleventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/cundy_1542363733889f.jpg";
     eleventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/cundy_1542363733889t.jpg";
+    eleventhUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twelfthUser = [TAPUserModel new];
     twelfthUser.userID = @"12";
@@ -176,6 +187,7 @@
     twelfthUser.username = @"rizka";
     twelfthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rizka_1542363733889f.jpg";
     twelfthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rizka_1542363733889t.jpg";
+    twelfthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirteenthUser = [TAPUserModel new];
     thirteenthUser.userID = @"13";
@@ -186,6 +198,7 @@
     thirteenthUser.username = @"test1";
     thirteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test1_1542363733889f.jpg";
     thirteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test1_1542363733889t.jpg";
+    thirteenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *fourteenthUser = [TAPUserModel new];
     fourteenthUser.userID = @"14";
@@ -196,6 +209,7 @@
     fourteenthUser.username = @"test2";
     fourteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test2_1542363733889f.jpg";
     fourteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test2_1542363733889t.jpg";
+    fourteenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *fifteenthUser = [TAPUserModel new];
     fifteenthUser.userID = @"15";
@@ -206,6 +220,7 @@
     fifteenthUser.username = @"test3";
     fifteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test3_1542363733889f.jpg";
     fifteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test3_1542363733889t.jpg";
+    fifteenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *sixteenthUser = [TAPUserModel new];
     sixteenthUser.userID = @"17";
@@ -216,6 +231,7 @@
     sixteenthUser.username = @"santo";
     sixteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/santo_1542363733889f.jpg";
     sixteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/santo_1542363733889t.jpg";
+    sixteenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *seventeenthUser = [TAPUserModel new];
     seventeenthUser.userID = @"18";
@@ -228,6 +244,7 @@
     seventeenthUser.isRequestAccepted = YES;
     seventeenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/veronica_1542363733889f.jpg";
     seventeenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/veronica_1542363733889t.jpg";
+    seventeenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *eighteenthUser = [TAPUserModel new];
     eighteenthUser.userID = @"19";
@@ -240,6 +257,7 @@
     eighteenthUser.isRequestAccepted = YES;
     eighteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/poppy_1542363733889f.jpg";
     eighteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/poppy_1542363733889t.jpg";
+    eighteenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *nineteenthUser = [TAPUserModel new];
     nineteenthUser.userID = @"20";
@@ -252,6 +270,7 @@
     nineteenthUser.isRequestAccepted = YES;
     nineteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/axel_1542363733889f.jpg";
     nineteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/axel_1542363733889t.jpg";
+    nineteenthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentiethUser = [TAPUserModel new];
     twentiethUser.userID = @"21";
@@ -264,6 +283,7 @@
     twentiethUser.isRequestAccepted = YES;
     twentiethUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ovita_1542363733889f.jpg";
     twentiethUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ovita_1542363733889t.jpg";
+    twentiethUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentyFirstUser = [TAPUserModel new];
     twentyFirstUser.userID = @"22";
@@ -276,6 +296,7 @@
     twentyFirstUser.isRequestAccepted = YES;
     twentyFirstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/putri_1542363733889f.jpg";
     twentyFirstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/putri_1542363733889t.jpg";
+    twentyFirstUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentySecondUser = [TAPUserModel new];
     twentySecondUser.userID = @"23";
@@ -288,6 +309,7 @@
     twentySecondUser.isRequestAccepted = YES;
     twentySecondUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/amalia_1542363733889f.jpg";
     twentySecondUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/amalia_1542363733889t.jpg";
+    twentySecondUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentyThirdUser = [TAPUserModel new];
     twentyThirdUser.userID = @"24";
@@ -300,6 +322,7 @@
     twentyThirdUser.isRequestAccepted = YES;
     twentyThirdUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ronal_1542363733889f.jpg";
     twentyThirdUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ronal_1542363733889t.jpg";
+    twentyThirdUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentyFourthUser = [TAPUserModel new];
     twentyFourthUser.userID = @"25";
@@ -312,6 +335,7 @@
     twentyFourthUser.isRequestAccepted = YES;
     twentyFourthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ardanti_1542363733889f.jpg";
     twentyFourthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ardanti_1542363733889t.jpg";
+    twentyFourthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentyFifthUser = [TAPUserModel new];
     twentyFifthUser.userID = @"26";
@@ -324,6 +348,7 @@
     twentyFifthUser.isRequestAccepted = YES;
     twentyFifthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/anita_1542363733889f.jpg";
     twentyFifthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/anita_1542363733889t.jpg";
+    twentyFifthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentySixthUser = [TAPUserModel new];
     twentySixthUser.userID = @"27";
@@ -336,6 +361,7 @@
     twentySixthUser.isRequestAccepted = YES;
     twentySixthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevinfianto_1542363733889f.jpg";
     twentySixthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevinfianto_1542363733889t.jpg";
+    twentySixthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentySeventhUser = [TAPUserModel new];
     twentySeventhUser.userID = @"28";
@@ -348,6 +374,7 @@
     twentySeventhUser.isRequestAccepted = YES;
     twentySeventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dessy_1542363733889f.jpg";
     twentySeventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dessy_1542363733889t.jpg";
+    twentySecondUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentyEightUser = [TAPUserModel new];
     twentyEightUser.userID = @"29";
@@ -360,6 +387,7 @@
     twentyEightUser.isRequestAccepted = YES;
     twentyEightUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/neni_1542363733889f.jpg";
     twentyEightUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/neni_1542363733889t.jpg";
+    twentyEightUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *twentyNinthUser = [TAPUserModel new];
     twentyNinthUser.userID = @"30";
@@ -372,6 +400,7 @@
     twentyNinthUser.isRequestAccepted = YES;
     twentyNinthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/bernama_1542363733889f.jpg";
     twentyNinthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/bernama_1542363733889t.jpg";
+    twentyNinthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtiethUser = [TAPUserModel new];
     thirtiethUser.userID = @"31";
@@ -384,6 +413,7 @@
     thirtiethUser.isRequestAccepted = YES;
     thirtiethUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/william_1542363733889f.jpg";
     thirtiethUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/william_1542363733889t.jpg";
+    thirtiethUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtyFirstUser = [TAPUserModel new];
     thirtyFirstUser.userID = @"32";
@@ -396,6 +426,7 @@
     thirtyFirstUser.isRequestAccepted = YES;
     thirtyFirstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sarah_1542363733889f.jpg";
     thirtyFirstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sarah_1542363733889t.jpg";
+    thirtyFirstUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtySecondUser = [TAPUserModel new];
     thirtySecondUser.userID = @"33";
@@ -408,6 +439,7 @@
     thirtySecondUser.isRequestAccepted = YES;
     thirtySecondUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/retyan_1542363733889f.jpg";
     thirtySecondUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/retyan_1542363733889t.jpg";
+    thirtySecondUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtyThirdUser = [TAPUserModel new];
     thirtyThirdUser.userID = @"34";
@@ -420,6 +452,7 @@
     thirtyThirdUser.isRequestAccepted = YES;
     thirtyThirdUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sekar_1542363733889f.jpg";
     thirtyThirdUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sekar_1542363733889t.jpg";
+    thirtyThirdUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtyFourthUser = [TAPUserModel new];
     thirtyFourthUser.userID = @"35";
@@ -432,6 +465,7 @@
     thirtyFourthUser.isRequestAccepted = YES;
     thirtyFourthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/mei_1542363733889f.jpg";
     thirtyFourthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/mei_1542363733889t.jpg";
+    thirtyFourthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtyFifthUser = [TAPUserModel new];
     thirtyFifthUser.userID = @"36";
@@ -444,6 +478,7 @@
     thirtyFifthUser.isRequestAccepted = YES;
     thirtyFifthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/yuendry_1542363733889f.jpg";
     thirtyFifthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/yuendry_1542363733889t.jpg";
+    thirtyFifthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtySixthUser = [TAPUserModel new];
     thirtySixthUser.userID = @"37";
@@ -456,6 +491,7 @@
     thirtySixthUser.isRequestAccepted = YES;
     thirtySixthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ervin_1542363733889f.jpg";
     thirtySixthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ervin_1542363733889t.jpg";
+    thirtySixthUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtySeventhUser = [TAPUserModel new];
     thirtySeventhUser.userID = @"38";
@@ -468,6 +504,7 @@
     thirtySeventhUser.isRequestAccepted = YES;
     thirtySeventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/fauzi_1542363733889f.jpg";
     thirtySeventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/fauzi_1542363733889t.jpg";
+    thirtySeventhUser.userRole.userRoleCode = @"user";
     
     TAPUserModel *thirtyEighthUser = [TAPUserModel new];
     thirtyEighthUser.userID = @"39";
@@ -480,6 +517,7 @@
     thirtyEighthUser.isRequestAccepted = YES;
     thirtyEighthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/lucas_1542363733889f.jpg";
     thirtyEighthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/lucas_1542363733889t.jpg";
+    thirtyEighthUser.userRole.userRoleCode = @"user";
     
     _contactListDictionary = @{@"ritchie" : firstUser, @"dominic" : secondUser, @"rionaldo" : thirdUser, @"kevin" : fourthUser, @"welly" : fifthUser, @"jony" : sixthUser, @"michael" : seventhUser, @"richard" : eighthUser, @"erwin" : ninthUser, @"jefry" : tenthUser, @"cundy" : eleventhUser, @"rizka" : twelfthUser, @"test1" : thirteenthUser, @"test2" : fourteenthUser, @"test3" : fifteenthUser, @"santo" : sixteenthUser, @"veronica" : seventeenthUser, @"poppy" : eighteenthUser, @"axel" : nineteenthUser, @"ovita" : twentiethUser, @"putri" : twentyFirstUser, @"amalia" : twentySecondUser, @"ronal" : twentyThirdUser, @"ardanti" : twentyFourthUser, @"anita" : twentyFifthUser, @"kevinfianto" : twentySixthUser, @"dessy" : twentySeventhUser, @"neni" : twentyEightUser, @"bernama" : twentyNinthUser, @"william" : thirtiethUser, @"sarah" : thirtyFirstUser, @"retyan" : thirtySecondUser, @"sekar" : thirtyThirdUser, @"mei" : thirtyFourthUser, @"yuendry" : thirtyFifthUser, @"ervin" : thirtySixthUser, @"fauzi" : thirtySeventhUser,  @"lucas" : thirtyEighthUser};
     //END DV Temp
