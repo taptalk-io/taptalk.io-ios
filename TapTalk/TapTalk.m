@@ -566,16 +566,37 @@ fromNavigationController:(UINavigationController *)navigationController
     
     for (TAPProductModel *product in productModelArray) {
         NSString *productID = product.productDataID;
+        productID = [TAPUtil nullToEmptyString:productID];
+        
         NSString *productNameString = product.productName;
+        productNameString = [TAPUtil nullToEmptyString:productNameString];
+        
         NSString *currencyString = product.productCurrency;
+        currencyString = [TAPUtil nullToEmptyString:currencyString];
+        
         NSString *priceString = product.productPrice;
+        priceString = [TAPUtil nullToEmptyString:priceString];
+        
         NSString *ratingString = product.productRating;
+        ratingString = [TAPUtil nullToEmptyString:ratingString];
+        
         NSString *productDescriptionString = product.productDescription;
+        productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
+        
         NSString *productImageURLString = product.productImageURL;
+        productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
+        
         NSString *leftOptionTextString = product.buttonOption1Text;
+        leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
+        
         NSString *rightOptionTextString = product.buttonOption2Text;
+        rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
+        
         NSString *leftOptionColorString = product.buttonOption1Color;
+        leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
+        
         NSString *rightOptionColorString = product.buttonOption2Color;
+        rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
         
         NSMutableDictionary *productDictionary = [[NSMutableDictionary alloc] init];
         [productDictionary setObject:productID forKey:@"id"];
