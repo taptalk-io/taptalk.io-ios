@@ -17,6 +17,8 @@
 @property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
+- (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
+
 @end
 
 @implementation TapTalk
@@ -506,6 +508,19 @@ fromNavigationController:(UINavigationController *)navigationController
     success();
 }
 
+- (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+    
+    NSArray *convertedProductArray = [self convertProductModelToDictionaryWithData:productArray];
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:recipient room:room body:@"Product List" type:TAPChatMessageTypeProduct];
+
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+    [dataDictionary setObject:convertedProductArray forKey:@"items"];
+
+    [[TAPChatManager sharedManager] sendTextMessage:message room:room];
+    success();
+}
+
 - (void)shouldRefreshAuthTicket {
     [[TAPChatManager sharedManager] disconnect];
     
@@ -542,6 +557,40 @@ fromNavigationController:(UINavigationController *)navigationController
     if ([self.delegate respondsToSelector:@selector(tapTalkQuoteDidTappedWithUserInfo:)]) {
         [self.delegate tapTalkQuoteDidTappedWithUserInfo:userInfo];
     }
+}
+
+- (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray {
+    NSMutableArray *convertedProductArray = [[NSMutableArray alloc] init];
+    
+    for (TAPProductModel *product in productModelArray) {
+        NSString *productNameString = product.productName;
+        NSString *currencyString = product.productCurrency;
+        NSString *priceString = product.productPrice;
+        NSString *ratingString = product.productRating;
+        NSString *productDescriptionString = product.productDescription;
+        NSString *productImageURLString = product.productImageURL;
+        NSString *leftOptionTextString = product.buttonOption1Text
+        NSString *rightOptionTextString = product.buttonOption2Text;
+        NSString *leftOptionColorString = product.buttonOption1Color;
+        NSString *rightOptionColorString = product.buttonOption2Color;
+        
+        NSMutableDictionary *productDictionary = [[NSMutableDictionary alloc] init];
+        [productDictionary setObject:productNameString forKey:@"name"];
+        [productDictionary setObject:currencyString forKey:@"currency"];
+        [productDictionary setObject:priceString forKey:@"price"];
+        [productDictionary setObject:ratingString forKey:@"rating"];
+        [productDictionary setObject:productDescriptionString forKey:@"description"];
+        [productDictionary setObject:productImageURLString forKey:@"imageURL"];
+        [productDictionary setObject:leftOptionTextString forKey:@"buttonOption1Text"];
+        [productDictionary setObject:rightOptionTextString forKey:@"buttonOption2Text"];
+        [productDictionary setObject:leftOptionColorString forKey:@"buttonOption1Color"];
+        [productDictionary setObject:rightOptionColorString forKey:@"buttonOption2Color"];
+        
+        [convertedProductArray addObject:productDictionary];
+    }
+    
+    return convertedProductArray;
+    
 }
 
 @end

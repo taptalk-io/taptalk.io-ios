@@ -42,6 +42,8 @@
 		D728D530217D813E00DACE7A /* TAPScanQRCodePopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = D728D52E217D813E00DACE7A /* TAPScanQRCodePopupView.m */; };
 		D729550421899E5100B2AC56 /* TAPContactCacheManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D729550221899E5100B2AC56 /* TAPContactCacheManager.h */; };
 		D729550521899E5100B2AC56 /* TAPContactCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D729550321899E5100B2AC56 /* TAPContactCacheManager.m */; };
+		D73E2E8D220088550083E997 /* TAPProductModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D73E2E8B220088550083E997 /* TAPProductModel.h */; };
+		D73E2E8E220088550083E997 /* TAPProductModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D73E2E8C220088550083E997 /* TAPProductModel.m */; };
 		D740A3B62192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D740A3B32192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.h */; };
 		D740A3B72192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D740A3B42192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.m */; };
 		D740A3B82192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D740A3B52192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.xib */; };
@@ -322,6 +324,8 @@
 		D728D52E217D813E00DACE7A /* TAPScanQRCodePopupView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPScanQRCodePopupView.m; sourceTree = "<group>"; };
 		D729550221899E5100B2AC56 /* TAPContactCacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPContactCacheManager.h; sourceTree = "<group>"; };
 		D729550321899E5100B2AC56 /* TAPContactCacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPContactCacheManager.m; sourceTree = "<group>"; };
+		D73E2E8B220088550083E997 /* TAPProductModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPProductModel.h; sourceTree = "<group>"; };
+		D73E2E8C220088550083E997 /* TAPProductModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPProductModel.m; sourceTree = "<group>"; };
 		D740A3B32192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPOrderCardBubbleTableViewCell.h; sourceTree = "<group>"; };
 		D740A3B42192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPOrderCardBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D740A3B52192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TAPOrderCardBubbleTableViewCell.xib; sourceTree = "<group>"; };
@@ -782,6 +786,8 @@
 				DF2513CA21E61BCB000D165A /* TAPReplyToModel.m */,
 				DF2513CD21E61BE3000D165A /* TAPForwardFromModel.h */,
 				DF2513CE21E61BE3000D165A /* TAPForwardFromModel.m */,
+				D73E2E8B220088550083E997 /* TAPProductModel.h */,
+				D73E2E8C220088550083E997 /* TAPProductModel.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1133,6 +1139,7 @@
 				F571763B216DC81300B50F3C /* TAPKeyboardViewController.h in Headers */,
 				D7D0811E2190459D0037FA57 /* TAPProductListBubbleTableViewCell.h in Headers */,
 				D77B5F2F2158BB9500253BDC /* TAPRoomListView.h in Headers */,
+				D73E2E8D220088550083E997 /* TAPProductModel.h in Headers */,
 				D77B5F082158BB8700253BDC /* TAPRoomListTableViewCell.h in Headers */,
 				D77B5E852158BB2900253BDC /* NSData+CommonCrypto.h in Headers */,
 				D77B5E8A2158BB2900253BDC /* NSString+Base64.h in Headers */,
@@ -1335,6 +1342,7 @@
 				D77B5EB92158BB6300253BDC /* TAPRecentSearchRealmModel.m in Sources */,
 				D77B5F362158BB9500253BDC /* TAPSearchView.m in Sources */,
 				F53288112174A911004E7A25 /* TAPRecentSearchTableViewCell.m in Sources */,
+				D73E2E8E220088550083E997 /* TAPProductModel.m in Sources */,
 				D71582F3217EE99700649C70 /* TAPNotificationManager.m in Sources */,
 				D77B5F5A2158BBEA00253BDC /* TAPCreateGroupSubjectViewController.m in Sources */,
 				D780A08921AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.m in Sources */,

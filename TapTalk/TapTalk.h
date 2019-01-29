@@ -19,6 +19,7 @@
 #import "TAPUserModel.h"
 #import "TAPMessageModel.h"
 #import "TAPCustomKeyboardItemModel.h"
+#import "TAPProductModel.h"
 
 //! Project version number for TapTalk.
 FOUNDATION_EXPORT double TapTalkVersionNumber;
@@ -135,6 +136,9 @@ fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated;
 - (void)shouldRefreshAuthTicket;
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
+- (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
+
+//TODO: Send Image Message
 
 //Custom Keyboard
 - (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender
