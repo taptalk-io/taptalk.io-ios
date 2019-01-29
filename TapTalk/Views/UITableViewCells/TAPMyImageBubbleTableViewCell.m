@@ -150,6 +150,9 @@
     self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
+    
+    [self showReplyView:NO withMessage:nil];
+    [self showQuoteView:NO];
 }
 
 #pragma mark - Custom Method
@@ -633,6 +636,7 @@
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
+        self.replyView.alpha = 1.0f;
     }
     else {
         self.replyNameLabel.text = @"";
@@ -647,6 +651,7 @@
         self.replyMessageLabelTrailingConstraint.constant = 0.0f;
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
+        self.replyView.alpha = 0.0f;
     }
 }
 

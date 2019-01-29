@@ -138,6 +138,9 @@
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
     
+    [self showQuoteView:NO];
+    [self showReplyView:NO withMessage:nil];
+    
 }
 
 - (void)prepareForReuse {
@@ -147,6 +150,9 @@
     self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
+    
+    [self showQuoteView:NO];
+    [self showReplyView:NO withMessage:nil];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -648,6 +654,7 @@
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
+        self.replyView.alpha = 1.0f;
     }
     else {
         self.replyNameLabel.text = @"";
@@ -662,6 +669,7 @@
         self.replyMessageLabelTrailingConstraint.constant = 0.0f;
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
+        self.replyView.alpha = 0.0f;
     }
 }
 
