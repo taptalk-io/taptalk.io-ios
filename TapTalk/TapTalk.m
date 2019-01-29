@@ -516,6 +516,8 @@ fromNavigationController:(UINavigationController *)navigationController
 
     NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
     [dataDictionary setObject:convertedProductArray forKey:@"items"];
+    
+    message.data = dataDictionary;
 
     [[TAPChatManager sharedManager] sendTextMessage:message room:room];
     success();
@@ -569,7 +571,7 @@ fromNavigationController:(UINavigationController *)navigationController
         NSString *ratingString = product.productRating;
         NSString *productDescriptionString = product.productDescription;
         NSString *productImageURLString = product.productImageURL;
-        NSString *leftOptionTextString = product.buttonOption1Text
+        NSString *leftOptionTextString = product.buttonOption1Text;
         NSString *rightOptionTextString = product.buttonOption2Text;
         NSString *leftOptionColorString = product.buttonOption1Color;
         NSString *rightOptionColorString = product.buttonOption2Color;
