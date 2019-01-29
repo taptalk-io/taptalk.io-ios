@@ -519,7 +519,7 @@ fromNavigationController:(UINavigationController *)navigationController
     
     message.data = dataDictionary;
 
-    [[TAPChatManager sharedManager] sendTextMessage:message room:room];
+    [[TAPChatManager sharedManager] sendProductMessage:message];
     success();
 }
 
