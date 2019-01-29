@@ -136,7 +136,7 @@ static NSString * const kAPIVersionString = @"v1";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     else if (type == TAPAPIManagerTypeGetBulkUserByID) {
-        NSString *apiPath = @"client/user/get_by_xcuserid";
+        NSString *apiPath = @"client/user/get_all_by_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     

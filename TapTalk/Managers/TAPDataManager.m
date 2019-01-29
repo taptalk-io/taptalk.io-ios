@@ -145,15 +145,15 @@
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
     NSString *userRoleString = [dictionary objectForKey:@"userRole"];
     if ([userRoleString isEqualToString:@""] || userRoleString == nil) {
-        userRole.userRoleID = @"";
+        userRole.userRoleCode = @"";
         userRole.name = @"";
         userRole.iconURL = @"";
     }
     else {
         NSDictionary *userRoleJSONDictionary = [TAPUtil jsonObjectFromString:userRoleString];
-        NSString *userRoleID = [userRoleJSONDictionary objectForKey:@"userRoleID"];
-        userRoleID = [TAPUtil nullToEmptyString:userRoleID];
-        userRole.userRoleID = userRoleID;
+        NSString *userRoleCode = [userRoleJSONDictionary objectForKey:@"userRoleCode"];
+        userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+        userRole.userRoleCode = userRoleCode;
         
         NSString *name = [userRoleJSONDictionary objectForKey:@"name"];
         name = [TAPUtil nullToEmptyString:name];
@@ -322,9 +322,9 @@
     userRoleDictionary = [TAPUtil nullToEmptyDictionary:userRoleDictionary];
     
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
-    NSString *userRoleID = [userRoleDictionary objectForKey:@"userRoleID"];
-    userRoleID = [TAPUtil nullToEmptyString:userRoleID];
-    userRole.userRoleID = userRoleID;
+    NSString *userRoleCode = [userRoleDictionary objectForKey:@"userRoleCode"];
+    userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+    userRole.userRoleCode = userRoleCode;
     
     NSString *name = [userRoleDictionary objectForKey:@"name"];
     name = [TAPUtil nullToEmptyString:name];
@@ -459,9 +459,9 @@
     user.imageURL = imageURL;
     
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
-    NSString *userRoleID = [dictionary objectForKey:@"userRoleID"];
-    userRoleID = [TAPUtil nullToEmptyString:userRoleID];
-    userRole.userRoleID = userRoleID;
+    NSString *userRoleCode = [dictionary objectForKey:@"userRoleCode"];
+    userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+    userRole.userRoleCode = userRoleCode;
     
     NSString *userRoleName = [dictionary objectForKey:@"userRoleName"];
     userRoleName = [TAPUtil nullToEmptyString:userRoleName];
@@ -718,9 +718,9 @@
     
     NSDictionary *userRole = [userDictionary objectForKey:@"userRole"];
     userRole = [TAPUtil nullToEmptyDictionary:userRole];
-    NSString *userRoleID = [userRole objectForKey:@"userRoleID"];
-    userRoleID = [TAPUtil nullToEmptyString:userRoleID];
-    [userMutableDictionary setValue:userRoleID forKey:@"userRoleID"];
+    NSString *userRoleCode = [userRole objectForKey:@"userRoleCode"];
+    userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+    [userMutableDictionary setValue:userRoleCode forKey:@"userRoleCode"];
     
     NSString *userRoleName = [userRole objectForKey:@"name"];
     userRoleName = [TAPUtil nullToEmptyString:userRoleName];
@@ -1864,7 +1864,9 @@
         
         if([tempRecipientIDArray count] > 0) {
             //call get multiple user API to populate contact
-            [TAPDataManager callAPIGetBulkUserByUserID:tempRecipientIDArray success:nil failure:nil];
+            [TAPDataManager callAPIGetBulkUserByUserID:tempRecipientIDArray success:^(NSArray *userModelArray) {
+            } failure:^(NSError *error) {
+            }];
         }
         
         success(messageResultArray);
@@ -1982,9 +1984,18 @@
     //Obtain Last Updated Value
     NSNumber *lastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
 
+    NSInteger formattedMinCreated = [minCreated integerValue];
+    NSNumber *formattedMinCreatedNum;
+    if (formattedMinCreated < 0) {
+        formattedMinCreatedNum = [NSNumber numberWithInteger:0];
+    }
+    else {
+        formattedMinCreatedNum = minCreated;
+    }
+    
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:minCreated forKey:@"minCreated"];
+    [parameterDictionary setObject:formattedMinCreatedNum forKey:@"minCreated"];
     [parameterDictionary setObject:lastUpdated forKey:@"lastUpdated"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -2254,9 +2265,9 @@
             
             NSDictionary *userRoleDictionary = [obtainedUserDictionary objectForKey:@"userRole"];
             TAPUserRoleModel *userRole = [TAPUserRoleModel new];
-            NSString *userRoleID = [userRoleDictionary objectForKey:@"userRoleID"];
-            userRoleID = [TAPUtil nullToEmptyString:userRoleID];
-            userRole.userRoleID = userRoleID;
+            NSString *userRoleCode = [userRoleDictionary objectForKey:@"userRoleCode"];
+            userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+            userRole.userRoleCode = userRoleCode;
          
             NSString *name = [userRoleDictionary objectForKey:@"name"];
             name = [TAPUtil nullToEmptyString:name];
@@ -2297,419 +2308,6 @@
             
             [userResultArray addObject:user];
         }
-        //WK NOTE - UNCOMMENT THIS CODE TO REMOVE TEMPORARY ADD CONTACTS TO DATABASE
-        
-        //WK Temp - add contacts to database
-
-//        TAPUserModel *firstUser = [TAPUserModel new];
-//        firstUser.userID = @"1";
-//        firstUser.xcUserID = @"1";
-//        firstUser.fullname = @"Ritchie Nathaniel";
-//        firstUser.email = @"ritchie@moselo.com";
-//        firstUser.phone = @"08979809026";
-//        firstUser.username = @"ritchie";
-//        firstUser.isRequestPending = NO;
-//        firstUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *secondUser = [TAPUserModel new];
-//        secondUser.userID = @"2";
-//        secondUser.xcUserID = @"2";
-//        secondUser.fullname = @"Dominic Vedericho";
-//        secondUser.email = @"dominic@moselo.com";
-//        secondUser.phone = @"08979809026";
-//        secondUser.username = @"dominic";
-//        secondUser.isRequestPending = NO;
-//        secondUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirdUser = [TAPUserModel new];
-//        thirdUser.userID = @"3";
-//        thirdUser.xcUserID = @"3";
-//        thirdUser.fullname = @"Rionaldo Linggautama";
-//        thirdUser.email = @"rionaldo@moselo.com";
-//        thirdUser.phone = @"08979809026";
-//        thirdUser.username = @"rionaldo";
-//        thirdUser.isRequestPending = NO;
-//        thirdUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *fourthUser = [TAPUserModel new];
-//        fourthUser.userID = @"4";
-//        fourthUser.xcUserID = @"4";
-//        fourthUser.fullname = @"Kevin Reynaldo";
-//        fourthUser.email = @"kevin@moselo.com";
-//        fourthUser.phone = @"08979809026";
-//        fourthUser.username = @"kevin";
-//        fourthUser.isRequestPending = NO;
-//        fourthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *fifthUser = [TAPUserModel new];
-//        fifthUser.userID = @"5";
-//        fifthUser.xcUserID = @"5";
-//        fifthUser.fullname = @"Welly Kencana";
-//        fifthUser.email = @"welly@moselo.com";
-//        fifthUser.phone = @"08979809026";
-//        fifthUser.username = @"welly";
-//        fifthUser.isRequestPending = NO;
-//        fifthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *sixthUser = [TAPUserModel new];
-//        sixthUser.userID = @"6";
-//        sixthUser.xcUserID = @"6";
-//        sixthUser.fullname = @"Jony Lim";
-//        sixthUser.email = @"jony@moselo.com";
-//        sixthUser.phone = @"08979809026";
-//        sixthUser.username = @"jony";
-//        sixthUser.isRequestPending = NO;
-//        sixthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *seventhUser = [TAPUserModel new];
-//        seventhUser.userID = @"7";
-//        seventhUser.xcUserID = @"7";
-//        seventhUser.fullname = @"Michael Tansy";
-//        seventhUser.email = @"michael@moselo.com";
-//        seventhUser.phone = @"08979809026";
-//        seventhUser.username = @"michael";
-//        seventhUser.isRequestPending = NO;
-//        seventhUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *eighthUser = [TAPUserModel new];
-//        eighthUser.userID = @"8";
-//        eighthUser.xcUserID = @"8";
-//        eighthUser.fullname = @"Richard Fang";
-//        eighthUser.email = @"richard@moselo.com";
-//        eighthUser.phone = @"08979809026";
-//        eighthUser.username = @"richard";
-//        eighthUser.isRequestPending = NO;
-//        eighthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *ninthUser = [TAPUserModel new];
-//        ninthUser.userID = @"9";
-//        ninthUser.xcUserID = @"9";
-//        ninthUser.fullname = @"Erwin Andreas";
-//        ninthUser.email = @"erwin@moselo.com";
-//        ninthUser.phone = @"08979809026";
-//        ninthUser.username = @"erwin";
-//        ninthUser.isRequestPending = NO;
-//        ninthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *tenthUser = [TAPUserModel new];
-//        tenthUser.userID = @"10";
-//        tenthUser.xcUserID = @"10";
-//        tenthUser.fullname = @"Jefry Lorentono";
-//        tenthUser.email = @"jefry@moselo.com";
-//        tenthUser.phone = @"08979809026";
-//        tenthUser.username = @"jefry";
-//        tenthUser.isRequestPending = NO;
-//        tenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *eleventhUser = [TAPUserModel new];
-//        eleventhUser.userID = @"11";
-//        eleventhUser.xcUserID = @"11";
-//        eleventhUser.fullname = @"Cundy Sunardy";
-//        eleventhUser.email = @"cundy@moselo.com";
-//        eleventhUser.phone = @"08979809026";
-//        eleventhUser.username = @"cundy";
-//        eleventhUser.isRequestPending = NO;
-//        eleventhUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twelfthUser = [TAPUserModel new];
-//        twelfthUser.userID = @"12";
-//        twelfthUser.xcUserID = @"12";
-//        twelfthUser.fullname = @"Rizka Fatmawati";
-//        twelfthUser.email = @"rizka@moselo.com";
-//        twelfthUser.phone = @"08979809026";
-//        twelfthUser.username = @"rizka";
-//        twelfthUser.isRequestPending = NO;
-//        twelfthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirteenthUser = [TAPUserModel new];
-//        thirteenthUser.userID = @"13";
-//        thirteenthUser.xcUserID = @"13";
-//        thirteenthUser.fullname = @"Test 1";
-//        thirteenthUser.email = @"test1@moselo.com";
-//        thirteenthUser.phone = @"08979809026";
-//        thirteenthUser.username = @"test1";
-//        thirteenthUser.isRequestPending = NO;
-//        thirteenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *fourteenthUser = [TAPUserModel new];
-//        fourteenthUser.userID = @"14";
-//        fourteenthUser.xcUserID = @"14";
-//        fourteenthUser.fullname = @"Test 2";
-//        fourteenthUser.email = @"test2@moselo.com";
-//        fourteenthUser.phone = @"08979809026";
-//        fourteenthUser.username = @"test2";
-//        fourteenthUser.isRequestPending = NO;
-//        fourteenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *fifteenthUser = [TAPUserModel new];
-//        fifteenthUser.userID = @"15";
-//        fifteenthUser.xcUserID = @"15";
-//        fifteenthUser.fullname = @"Test 3";
-//        fifteenthUser.email = @"test3@moselo.com";
-//        fifteenthUser.phone = @"08979809026";
-//        fifteenthUser.username = @"test3";
-//        fifteenthUser.isRequestPending = NO;
-//        fifteenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *sixteenthUser = [TAPUserModel new];
-//        sixteenthUser.userID = @"17";
-//        sixteenthUser.xcUserID = @"16";
-//        sixteenthUser.fullname = @"Santo";
-//        sixteenthUser.email = @"santo@moselo.com";
-//        sixteenthUser.phone = @"08979809026";
-//        sixteenthUser.username = @"santo";
-//        sixteenthUser.isRequestPending = NO;
-//        sixteenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *seventeenthUser = [TAPUserModel new];
-//        seventeenthUser.userID = @"18";
-//        seventeenthUser.xcUserID = @"17";
-//        seventeenthUser.fullname = @"Veronica Dian";
-//        seventeenthUser.email = @"veronica@moselo.com";
-//        seventeenthUser.phone = @"08979809026";
-//        seventeenthUser.username = @"veronica";
-//        seventeenthUser.isRequestPending = NO;
-//        seventeenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *eighteenthUser = [TAPUserModel new];
-//        eighteenthUser.userID = @"19";
-//        eighteenthUser.xcUserID = @"18";
-//        eighteenthUser.fullname = @"Poppy Sibarani";
-//        eighteenthUser.email = @"poppy@moselo.com";
-//        eighteenthUser.phone = @"08979809026";
-//        eighteenthUser.username = @"poppy";
-//        eighteenthUser.isRequestPending = NO;
-//        eighteenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *nineteenthUser = [TAPUserModel new];
-//        nineteenthUser.userID = @"20";
-//        nineteenthUser.xcUserID = @"19";
-//        nineteenthUser.fullname = @"Axel Soedarsono";
-//        nineteenthUser.email = @"axel@moselo.com";
-//        nineteenthUser.phone = @"08979809026";
-//        nineteenthUser.username = @"axel";
-//        nineteenthUser.isRequestPending = NO;
-//        nineteenthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentiethUser = [TAPUserModel new];
-//        twentiethUser.userID = @"21";
-//        twentiethUser.xcUserID = @"20";
-//        twentiethUser.fullname = @"Ovita";
-//        twentiethUser.email = @"ovita@moselo.com";
-//        twentiethUser.phone = @"08979809026";
-//        twentiethUser.username = @"ovita";
-//        twentiethUser.isRequestPending = NO;
-//        twentiethUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentyFirstUser = [TAPUserModel new];
-//        twentyFirstUser.userID = @"22";
-//        twentyFirstUser.xcUserID = @"21";
-//        twentyFirstUser.fullname = @"Putri Prima";
-//        twentyFirstUser.email = @"putri@moselo.com";
-//        twentyFirstUser.phone = @"08979809026";
-//        twentyFirstUser.username = @"putri";
-//        twentyFirstUser.isRequestPending = NO;
-//        twentyFirstUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentySecondUser = [TAPUserModel new];
-//        twentySecondUser.userID = @"23";
-//        twentySecondUser.xcUserID = @"22";
-//        twentySecondUser.fullname = @"Amalia Nanda";
-//        twentySecondUser.email = @"amalia@moselo.com";
-//        twentySecondUser.phone = @"08979809026";
-//        twentySecondUser.username = @"amalia";
-//        twentySecondUser.isRequestPending = NO;
-//        twentySecondUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentyThirdUser = [TAPUserModel new];
-//        twentyThirdUser.userID = @"24";
-//        twentyThirdUser.xcUserID = @"23";
-//        twentyThirdUser.fullname = @"Ronal Gorba";
-//        twentyThirdUser.email = @"ronal@moselo.com";
-//        twentyThirdUser.phone = @"08979809026";
-//        twentyThirdUser.username = @"ronal";
-//        twentyThirdUser.isRequestPending = NO;
-//        twentyThirdUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentyFourthUser = [TAPUserModel new];
-//        twentyFourthUser.userID = @"25";
-//        twentyFourthUser.xcUserID = @"24";
-//        twentyFourthUser.fullname = @"Ardanti Wulandari";
-//        twentyFourthUser.email = @"ardanti@moselo.com";
-//        twentyFourthUser.phone = @"08979809026";
-//        twentyFourthUser.username = @"ardanti";
-//        twentyFourthUser.isRequestPending = NO;
-//        twentyFourthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentyFifthUser = [TAPUserModel new];
-//        twentyFifthUser.userID = @"26";
-//        twentyFifthUser.xcUserID = @"25";
-//        twentyFifthUser.fullname = @"Anita";
-//        twentyFifthUser.email = @"anita@moselo.com";
-//        twentyFifthUser.phone = @"08979809026";
-//        twentyFifthUser.username = @"anita";
-//        twentyFifthUser.isRequestPending = NO;
-//        twentyFifthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentySixthUser = [TAPUserModel new];
-//        twentySixthUser.userID = @"27";
-//        twentySixthUser.xcUserID = @"26";
-//        twentySixthUser.fullname = @"Kevin Fianto";
-//        twentySixthUser.email = @"kevin.fianto@moselo.com";
-//        twentySixthUser.phone = @"08979809026";
-//        twentySixthUser.username = @"kevinfianto";
-//        twentySixthUser.isRequestPending = NO;
-//        twentySixthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentySeventhUser = [TAPUserModel new];
-//        twentySeventhUser.userID = @"28";
-//        twentySeventhUser.xcUserID = @"27";
-//        twentySeventhUser.fullname = @"Dessy Silitonga";
-//        twentySeventhUser.email = @"dessy@moselo.com";
-//        twentySeventhUser.phone = @"08979809026";
-//        twentySeventhUser.username = @"dessy";
-//        twentySeventhUser.isRequestPending = NO;
-//        twentySeventhUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentyEightUser = [TAPUserModel new];
-//        twentyEightUser.userID = @"29";
-//        twentyEightUser.xcUserID = @"28";
-//        twentyEightUser.fullname = @"Neni Nurhasanah";
-//        twentyEightUser.email = @"neni@moselo.com";
-//        twentyEightUser.phone = @"08979809026";
-//        twentyEightUser.username = @"neni";
-//        twentyEightUser.isRequestPending = NO;
-//        twentyEightUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *twentyNinthUser = [TAPUserModel new];
-//        twentyNinthUser.userID = @"30";
-//        twentyNinthUser.xcUserID = @"29";
-//        twentyNinthUser.fullname = @"Bernama Sabur";
-//        twentyNinthUser.email = @"bernama@moselo.com";
-//        twentyNinthUser.phone = @"08979809026";
-//        twentyNinthUser.username = @"bernama";
-//        twentyNinthUser.isRequestPending = NO;
-//        twentyNinthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtiethUser = [TAPUserModel new];
-//        thirtiethUser.userID = @"31";
-//        thirtiethUser.xcUserID = @"30";
-//        thirtiethUser.fullname = @"William Raymond";
-//        thirtiethUser.email = @"william@moselo.com";
-//        thirtiethUser.phone = @"08979809026";
-//        thirtiethUser.username = @"william";
-//        thirtiethUser.isRequestPending = NO;
-//        thirtiethUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtyFirstUser = [TAPUserModel new];
-//        thirtyFirstUser.userID = @"32";
-//        thirtyFirstUser.xcUserID = @"31";
-//        thirtyFirstUser.fullname = @"Sarah Febrina";
-//        thirtyFirstUser.email = @"sarah@moselo.com";
-//        thirtyFirstUser.phone = @"08979809026";
-//        thirtyFirstUser.username = @"sarah";
-//        thirtyFirstUser.isRequestPending = NO;
-//        thirtyFirstUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtySecondUser = [TAPUserModel new];
-//        thirtySecondUser.userID = @"33";
-//        thirtySecondUser.xcUserID = @"32";
-//        thirtySecondUser.fullname = @"Retyan Arthasani";
-//        thirtySecondUser.email = @"retyan@moselo.com";
-//        thirtySecondUser.phone = @"08979809026";
-//        thirtySecondUser.username = @"retyan";
-//        thirtySecondUser.isRequestPending = NO;
-//        thirtySecondUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtyThirdUser = [TAPUserModel new];
-//        thirtyThirdUser.userID = @"34";
-//        thirtyThirdUser.xcUserID = @"33";
-//        thirtyThirdUser.fullname = @"Sekar Sari";
-//        thirtyThirdUser.email = @"sekar@moselo.com";
-//        thirtyThirdUser.phone = @"08979809026";
-//        thirtyThirdUser.username = @"sekar";
-//        thirtyThirdUser.isRequestPending = NO;
-//        thirtyThirdUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtyFourthUser = [TAPUserModel new];
-//        thirtyFourthUser.userID = @"35";
-//        thirtyFourthUser.xcUserID = @"34";
-//        thirtyFourthUser.fullname = @"Meilika";
-//        thirtyFourthUser.email = @"mei@moselo.com";
-//        thirtyFourthUser.phone = @"08979809026";
-//        thirtyFourthUser.username = @"mei";
-//        thirtyFourthUser.isRequestPending = NO;
-//        thirtyFourthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtyFifthUser = [TAPUserModel new];
-//        thirtyFifthUser.userID = @"36";
-//        thirtyFifthUser.xcUserID = @"35";
-//        thirtyFifthUser.fullname = @"Yuendry";
-//        thirtyFifthUser.email = @"yuen@moselo.com";
-//        thirtyFifthUser.phone = @"08979809026";
-//        thirtyFifthUser.username = @"yuendry";
-//        thirtyFifthUser.isRequestPending = NO;
-//        thirtyFifthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtySixthUser = [TAPUserModel new];
-//        thirtySixthUser.userID = @"37";
-//        thirtySixthUser.xcUserID = @"36";
-//        thirtySixthUser.fullname = @"Ervin";
-//        thirtySixthUser.email = @"ervin@moselo.com";
-//        thirtySixthUser.phone = @"08979809026";
-//        thirtySixthUser.username = @"ervin";
-//        thirtySixthUser.isRequestPending = NO;
-//        thirtySixthUser.isRequestAccepted = YES;
-//
-//        TAPUserModel *thirtySeventhUser = [TAPUserModel new];
-//        thirtySeventhUser.userID = @"38";
-//        thirtySeventhUser.xcUserID = @"37";
-//        thirtySeventhUser.fullname = @"Fauzi";
-//        thirtySeventhUser.email = @"fauzi@moselo.com";
-//        thirtySeventhUser.phone = @"08979809026";
-//        thirtySeventhUser.username = @"fauzi";
-//        thirtySeventhUser.isRequestPending = NO;
-//        thirtySeventhUser.isRequestAccepted = YES;
-//
-//        [userResultArray addObject:firstUser];
-//        [userResultArray addObject:secondUser];
-//        [userResultArray addObject:thirdUser];
-//        [userResultArray addObject:fourthUser];
-//        [userResultArray addObject:fifthUser];
-//        [userResultArray addObject:sixthUser];
-//        [userResultArray addObject:seventhUser];
-//        [userResultArray addObject:eighthUser];
-//        [userResultArray addObject:ninthUser];
-//        [userResultArray addObject:tenthUser];
-//        [userResultArray addObject:eleventhUser];
-//        [userResultArray addObject:twelfthUser];
-//        [userResultArray addObject:thirteenthUser];
-//        [userResultArray addObject:fourteenthUser];
-//        [userResultArray addObject:fifteenthUser];
-//        [userResultArray addObject:sixteenthUser];
-//        [userResultArray addObject:seventeenthUser];
-//        [userResultArray addObject:eighteenthUser];
-//        [userResultArray addObject:nineteenthUser];
-//        [userResultArray addObject:twentiethUser];
-//        [userResultArray addObject:twentyFirstUser];
-//        [userResultArray addObject:twentySecondUser];
-//        [userResultArray addObject:twentyThirdUser];
-//        [userResultArray addObject:twentyFourthUser];
-//        [userResultArray addObject:twentyFifthUser];
-//        [userResultArray addObject:twentySixthUser];
-//        [userResultArray addObject:twentySeventhUser];
-//        [userResultArray addObject:twentyEightUser];
-//        [userResultArray addObject:twentyNinthUser];
-//        [userResultArray addObject:thirtiethUser];
-//        [userResultArray addObject:thirtyFirstUser];
-//        [userResultArray addObject:thirtySecondUser];
-//        [userResultArray addObject:thirtyThirdUser];
-//        [userResultArray addObject:thirtyFourthUser];
-//        [userResultArray addObject:thirtyFifthUser];
-//        [userResultArray addObject:thirtySixthUser];
-//        [userResultArray addObject:thirtySeventhUser];
-        
-        //End Temp
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseContactWithData:userResultArray success:^{
@@ -3435,12 +3033,12 @@
 }
 
 + (void)callAPIGetBulkUserByUserID:(NSArray *)userIDArray
-                           success:(void (^)(NSArray *userIDArray))success
+                           success:(void (^)(NSArray *userModelArray))success
                            failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetBulkUserByID];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userIDArray forKey:@"id"];
+    [parameterDictionary setObject:userIDArray forKey:@"ids"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         

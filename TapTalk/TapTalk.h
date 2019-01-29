@@ -105,6 +105,14 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (void)setAppKeyID:(NSString *)appKeyID;
 
 //Chat
+
+- (void)openRoomWithUserID:(NSString *)userID
+                quoteTitle:(nullable NSString *)quoteTitle
+              quoteContent:(nullable NSString *)quoteContent
+       quoteImageURLString:(nullable NSString *)quoteImageURL
+                  userInfo:(nullable NSDictionary *)userInfo
+  fromNavigationController:(UINavigationController *)navigationController;
+
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
      fromNavigationController:(UINavigationController *)navigationController;
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
@@ -125,7 +133,6 @@ fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated;
 - (void)shouldRefreshAuthTicket;
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
-- (void)requestToSendProductListWithRecipientXCUserID:(NSString *)recipientXCUserID;
 
 //Custom Keyboard
 - (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender

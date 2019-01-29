@@ -473,7 +473,7 @@
     TAPUserRoleModel *userRole = user.userRole;
     NSString *fullName = user.fullname;
     
-    if ([userRole.userRoleID isEqualToString:@"0"]) { //WK Temp - Temporary @"0"
+    if ([userRole.userRoleCode isEqualToString:@"user"]) { //WK Temp - Temporary @"0"
         TAPImageURLModel *imageURL = user.imageURL;
         NSString *imageURLString = imageURL.thumbnail;
         

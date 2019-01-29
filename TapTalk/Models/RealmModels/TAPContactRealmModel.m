@@ -16,7 +16,7 @@
 }
 
 + (NSArray<NSString *> *)indexedProperties {
-    NSArray *indexedPropertiesArray = [NSArray arrayWithObjects:@"userRoleID", nil];
+    NSArray *indexedPropertiesArray = [NSArray arrayWithObjects:@"userRoleCode", nil];
     return indexedPropertiesArray;
 }
 
