@@ -177,6 +177,8 @@
             self.statusLabelHeightConstraint.constant = 13.0f;
             self.replyButton.alpha = 1.0f;
             self.replyButtonLeftConstraint.constant = 2.0f;
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
         } completion:^(BOOL finished) {
             self.chatBubbleButton.userInteractionEnabled = YES;
         }];
@@ -194,6 +196,8 @@
             self.statusLabelHeightConstraint.constant = 0.0f;
             self.replyButton.alpha = 0.0f;
             self.replyButtonLeftConstraint.constant = -28.0f;
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
         } completion:^(BOOL finished) {
             self.chatBubbleButton.userInteractionEnabled = YES;
             self.statusLabel.alpha = 0.0f;

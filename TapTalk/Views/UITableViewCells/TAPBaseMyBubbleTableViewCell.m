@@ -180,10 +180,12 @@
         self.chatBubbleRightConstraint.constant = 16.0f;
         self.statusIconRightConstraint.constant = 2.0f;
         [self.contentView layoutIfNeeded];
+        [self layoutIfNeeded];
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.2f animations:^{
             self.sendingIconLeftConstraint.constant = 20.0f;
             [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
         } completion:^(BOOL finished) {
             self.sendingIconLeftConstraint.constant = 4.0f;
             self.sendingIconImageView.alpha = 0.0f;
@@ -194,6 +196,7 @@
     [UIView animateWithDuration:0.36f delay:0.2f options:UIViewAnimationOptionCurveLinear animations:^{
         self.sendingIconBottomConstraint.constant = -28.0f;
         [self.contentView layoutIfNeeded];
+        [self layoutIfNeeded];
     } completion:^(BOOL finished) {
         self.sendingIconBottomConstraint.constant = -5.0f;
         
@@ -297,6 +300,8 @@
             self.replyButtonRightConstraint.constant = 2.0f;
             self.statusIconBottomConstraint.constant = -17.0f;
             self.statusIconImageView.alpha = 0.0f;
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
         } completion:^(BOOL finished) {
         }];
     }
@@ -323,6 +328,8 @@
                 [UIView animateWithDuration:0.2f animations:^{
                     [self hideStatusLabelAlpha];
                     [self hideStatusLabelConstraintUpdateStatusIcon:updateStatusIcon];
+                    [self.contentView layoutIfNeeded];
+                    [self layoutIfNeeded];
                 } completion:^(BOOL finished) {
                 }];
             }

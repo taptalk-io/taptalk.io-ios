@@ -86,6 +86,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 @property (nonatomic) CGFloat safeAreaBottomPadding;
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic) CGFloat initialKeyboardHeight;
+@property (nonatomic) CGFloat currentInputAccessoryExtensionHeight;
 
 @property (nonatomic) long apiBeforeLastCreated;
 @property (nonatomic) BOOL isLastPage;
@@ -97,6 +98,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 @property (nonatomic) BOOL isViewWillAppeared;
 @property (nonatomic) BOOL isViewDidAppeared;
 @property (nonatomic) BOOL isKeyboardOptionTapped;
+@property (nonatomic) BOOL isKeyboardShowedForFirstTime;
 
 @property (nonatomic) CGFloat connectionStatusHeight;
 
@@ -494,7 +496,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [self.navigationController.interactivePopGestureRecognizer addTarget:self
                                                                   action:@selector(handleNavigationPopGesture:)];
     
-    if (self.keyboardHeight == 0.0f) {
+    if (self.initialKeyboardHeight == 0.0f) {
         [UIView performWithoutAnimation:^{
             [self.messageTextView becameFirstResponder];
         }];
@@ -502,6 +504,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         [UIView performWithoutAnimation:^{
             [self.messageTextView resignFirstResponder];
         }];
+        _isKeyboardShowed = NO;
     }
     
     [self processVisibleMessageAsRead];
@@ -850,6 +853,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
         
@@ -903,7 +907,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     //CS NOTE - move chat anchor button as the keyboard move interactively
     CGPoint positionInView = [scrollView.panGestureRecognizer locationInView:self.view];
-    CGFloat keyboardAndAccessoryViewHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.inputAccessoryExtensionHeightConstraint.constant;
+    CGFloat keyboardAndAccessoryViewHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.currentInputAccessoryExtensionHeight;
     CGFloat totalKeyboardHeight = self.keyboardHeight; //include inputView height
     CGFloat keyboardMinYPositionInView = CGRectGetHeight([UIScreen mainScreen].bounds) - totalKeyboardHeight;
     
@@ -916,10 +920,10 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             keyboardHeightDifference = 0.0f;
         }
         
-        CGFloat chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + (totalKeyboardHeight - keyboardHeightDifference) - kInputMessageAccessoryViewHeight - self.inputAccessoryExtensionHeightConstraint.constant;
+        CGFloat chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + (totalKeyboardHeight - keyboardHeightDifference) - kInputMessageAccessoryViewHeight - self.currentInputAccessoryExtensionHeight;
         
-        if (chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint + self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding) {
-            chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding;
+        if (chatAnchorBottomConstraint < kChatAnchorDefaultBottomConstraint + self.currentInputAccessoryExtensionHeight + self.safeAreaBottomPadding) {
+            chatAnchorBottomConstraint = kChatAnchorDefaultBottomConstraint + self.currentInputAccessoryExtensionHeight + self.safeAreaBottomPadding;
         }
         self.chatAnchorButtonBottomConstrait.constant = chatAnchorBottomConstraint;
     }
@@ -1520,13 +1524,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             
             [self performSelector:@selector(showImagePreviewControllerWithSelectedImage:) withObject:selectedImage afterDelay:0.3f];
             
-            //CS Temp - Add Image Type Dummy Model
-//            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeImage];
-//            //        [TAPImageView saveImageToCache:selectedImage withKey:message.localID];
-//            message.imageMessage = selectedImage;
-//            [self.messageArray insertObject:message atIndex:0];
-//            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
-            //End Temp
         }
         [self checkKeyboard];
     }];
@@ -1540,7 +1537,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)photoAlbumListViewControllerDidFinishAndSendImageWithDataArray:(NSArray *)dataArray {
     //Handle send image from gallery
     
-    if(self.inputAccessoryExtensionHeightConstraint.constant > 0.0f) {
+    if(self.currentInputAccessoryExtensionHeight > 0.0f) {
         [self showInputAccessoryExtensionView:NO];
     }
     
@@ -1660,15 +1657,19 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     
+    if(!self.isKeyboardShowedForFirstTime) {
+        _isKeyboardShowedForFirstTime = YES;
+    }
+
     if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
         return;
     }
     
-    CGFloat accessoryViewAndSafeAreaHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.inputAccessoryExtensionHeightConstraint.constant;
+    CGFloat accessoryViewAndSafeAreaHeight = self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.currentInputAccessoryExtensionHeight;
     
     //set initial keyboard height to prevent wrong keyboard height usage
-    if (self.initialKeyboardHeight == 0.0f && keyboardHeight !=  accessoryViewAndSafeAreaHeight) {
-        self.initialKeyboardHeight = keyboardHeight - self.inputAccessoryExtensionHeightConstraint.constant;
+    if (self.initialKeyboardHeight == 0.0f && keyboardHeight !=  accessoryViewAndSafeAreaHeight && keyboardHeight != kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding && keyboardHeight != kInputMessageAccessoryViewHeight) {
+        _initialKeyboardHeight = keyboardHeight;
     }
     
     if (self.keyboardHeight == 0.0f) {
@@ -1692,7 +1693,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
     
     //set keyboard height to initial height
-    if (keyboardHeight == self.initialKeyboardHeight) {
+    if (keyboardHeight == self.initialKeyboardHeight && self.isKeyboardShowed) {
         _keyboardHeight = self.initialKeyboardHeight;
     }
     
@@ -1705,24 +1706,34 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         return;
     }
     
-    CGFloat tableViewYContentInset = keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+    CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+
+    CGFloat lastTableViewYContentInset = self.tableView.contentInset.top;
+    
     self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
-    
+    NSLog(@"--KEYBOARDHEIGHT %f", keyboardHeight);
+    NSLog(@"--CONTENTINSETTT %f", lastTableViewYContentInset);
+    NSLog(@"--CONTENTINSENEW %f", tableViewYContentInset);
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         
-        CGFloat newYContentOffset = self.tableView.contentOffset.y - keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
-        if(self.initialKeyboardHeight > 0.0f) {
-            newYContentOffset = self.tableView.contentOffset.y - keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.inputAccessoryExtensionHeightConstraint.constant;
+        CGFloat newYContentOffset = self.tableView.contentOffset.y - self.keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.currentInputAccessoryExtensionHeight;
+        
+        
+        if (fabs(tableViewYContentInset - lastTableViewYContentInset) == kInputMessageAccessoryExtensionViewDefaultHeight) {
+            newYContentOffset = self.tableView.contentOffset.y + lastTableViewYContentInset - tableViewYContentInset;
         }
         
-        if (newYContentOffset < -tableViewYContentInset) {
+        if(self.tableView.contentOffset.y == 0.0f) {
+            newYContentOffset = 0.0f;
+        }
+        
+        if (newYContentOffset < tableViewYContentInset) {
             newYContentOffset = -tableViewYContentInset;
         }
         
         [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
-        
         [self.view layoutIfNeeded];
         
         if (!self.isKeyboardShowed) {
@@ -1736,7 +1747,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
     }];
     
-    if (keyboardHeight != accessoryViewAndSafeAreaHeight) {
+    if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight != kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding && keyboardHeight != kInputMessageAccessoryViewHeight) {
         _isKeyboardShowed = YES;
     }
 }
@@ -1748,7 +1759,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
     
     //set default keyboard height including accessory view height
-    _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.inputAccessoryExtensionHeightConstraint.constant;
+    _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
@@ -1756,8 +1767,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         return;
     }
     
-    self.tableView.contentInset = UIEdgeInsetsMake(self.inputAccessoryExtensionHeightConstraint.constant, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
-    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(self.inputAccessoryExtensionHeightConstraint.constant, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
+    self.tableView.contentInset = UIEdgeInsetsMake(self.currentInputAccessoryExtensionHeight, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
+    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(self.currentInputAccessoryExtensionHeight, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     
     [UIView animateWithDuration:0.2f animations:^{
         if(self.isCustomKeyboardAvailable) {
@@ -1766,10 +1777,10 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
         
         if (IS_IPHONE_X_FAMILY) {
-            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding + self.inputAccessoryExtensionHeightConstraint.constant;
+            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
         }
         else {
-            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.inputAccessoryExtensionHeightConstraint.constant;
+            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.currentInputAccessoryExtensionHeight;
         }
         
         [self.view layoutIfNeeded];
@@ -1814,7 +1825,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         self.messageTextView.text = @"";
     }
     
-    if(self.inputAccessoryExtensionHeightConstraint.constant > 0.0f) {
+    if(self.currentInputAccessoryExtensionHeight > 0.0f) {
         [self showInputAccessoryExtensionView:NO];
     }
     else if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
@@ -2685,21 +2696,49 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
     
 - (void)showInputAccessoryExtensionView:(BOOL)show {
-    if (self.isKeyboardShowed) {
-        _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + kInputMessageAccessoryExtensionViewDefaultHeight + self.initialKeyboardHeight;
-    }
     
     if (show) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.inputAccessoryExtensionHeightConstraint.constant = kInputMessageAccessoryExtensionViewDefaultHeight;
-            [self.inputAccessoryView layoutIfNeeded];
-        }];
+        _currentInputAccessoryExtensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
+        
+        if (self.isKeyboardShowed) {
+            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
+        }
+        else {
+            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+        }
+        
+        if (self.isKeyboardShowedForFirstTime) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.inputAccessoryExtensionHeightConstraint.constant = self.currentInputAccessoryExtensionHeight;
+                [self.inputAccessoryView layoutIfNeeded];
+                [[[self.inputAccessoryView superview] superview] layoutIfNeeded];
+            }];
+        }
+        else {
+            self.inputAccessoryExtensionHeightConstraint.constant = self.currentInputAccessoryExtensionHeight;
+        }
     }
     else {
-        [UIView animateWithDuration:0.2f animations:^{
+        _currentInputAccessoryExtensionHeight = 0.0f;
+
+        if (self.isKeyboardShowed) {
+            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
+        }
+        else {
+            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+        }
+        
+        if (self.isKeyboardShowedForFirstTime) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+                [self.inputAccessoryView layoutIfNeeded];
+                [[[self.inputAccessoryView superview] superview] layoutIfNeeded];
+            }];
+        }
+        else {
             self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
-            [self.inputAccessoryView layoutIfNeeded];
-        }];
+        }
+    
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     }
 }
