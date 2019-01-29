@@ -85,7 +85,7 @@
     NSString *leftOptionTextString = [product objectForKey:@"buttonOption1Text"];
     leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
     
-    NSString *rightOptionTextString = [product objectForKey:@"buttonOption1Text"];
+    NSString *rightOptionTextString = [product objectForKey:@"buttonOption2Text"];
     rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
     
     NSString *leftOptionColorString = [product objectForKey:@"buttonOption1Color"];
