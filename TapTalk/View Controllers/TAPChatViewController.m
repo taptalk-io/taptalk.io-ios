@@ -504,10 +504,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }];
     }
     
-    //CS NOTE - Add show input accessory extension validation here because it should be shown after initial keyboard height is obtained
-    
-//    [self showInputAccessoryExtensionView:YES];
-    
     [self processVisibleMessageAsRead];
 }
 
@@ -562,6 +558,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     //DV Note - For product list height
     //    Collection view height (347.0f) + 16.0f gap
     //    return 363.0f;
+    
+    TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
+    if (currentMessage != nil) {
+        BOOL isHidden = currentMessage.isHidden;
+        if (isHidden) {
+            //Set height = 0 for hidden message
+            return 0.0f;
+        }
+    }
     
     tableView.estimatedRowHeight = 70.0f;
     return UITableViewAutomaticDimension;
@@ -786,10 +791,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
     }
     
-    [tableView registerNib:[TAPBaseXIBRotatedTableViewCell cellNib] forCellReuseIdentifier:[TAPBaseXIBRotatedTableViewCell description]];
-    TAPBaseXIBRotatedTableViewCell *cell = (TAPBaseXIBRotatedTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPBaseXIBRotatedTableViewCell description] forIndexPath:indexPath];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//    [tableView registerNib:[TAPBaseXIBRotatedTableViewCell cellNib] forCellReuseIdentifier:[TAPBaseXIBRotatedTableViewCell description]];
+//    TAPBaseXIBRotatedTableViewCell *cell = (TAPBaseXIBRotatedTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPBaseXIBRotatedTableViewCell description] forIndexPath:indexPath];
+//    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
+    UITableViewCell *cell = [[UITableViewCell alloc] init];
     return cell;
 }
 
@@ -1738,6 +1744,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
+        _isKeyboardShowed = NO;
         return;
     }
     
@@ -2673,15 +2680,18 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if (self.isKeyboardShowed) {
         _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + kInputMessageAccessoryExtensionViewDefaultHeight + self.initialKeyboardHeight;
     }
-    else {
-        _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding;
-    }
     
     if (show) {
-        self.inputAccessoryExtensionHeightConstraint.constant = kInputMessageAccessoryExtensionViewDefaultHeight;
+        [UIView animateWithDuration:0.2f animations:^{
+            self.inputAccessoryExtensionHeightConstraint.constant = kInputMessageAccessoryExtensionViewDefaultHeight;
+            [self.inputAccessoryView layoutIfNeeded];
+        }];
     }
     else {
-        self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+        [UIView animateWithDuration:0.2f animations:^{
+            self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+            [self.inputAccessoryView layoutIfNeeded];
+        }];
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     }
 }

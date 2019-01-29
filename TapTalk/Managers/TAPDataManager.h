@@ -170,7 +170,7 @@
                         progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
                          failureBlock:(void(^)(NSError *error))failureBlock;
 + (void)callAPIGetBulkUserByUserID:(NSArray *)userIDArray
-                       success:(void (^)(NSArray *userIDArray))success
+                       success:(void (^)(NSArray *userModelArray))success
                            failure:(void (^)(NSError *error))failure;
 
 @end

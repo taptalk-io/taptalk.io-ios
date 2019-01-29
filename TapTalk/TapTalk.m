@@ -453,10 +453,6 @@ fromNavigationController:(UINavigationController *)navigationController
     success();
 }
 
-- (void)requestToSendProductListWithRecipientXCUserID:(NSString *)recipientXCUserID {
-    //Call API
-}
-
 - (void)shouldRefreshAuthTicket {
     [[TAPChatManager sharedManager] disconnect];
     

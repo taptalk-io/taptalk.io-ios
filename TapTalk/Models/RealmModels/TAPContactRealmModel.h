@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *username;
 @property (nonatomic, strong) NSString *imageURL;
 //User Role
-@property (strong, nonatomic) NSString *userRoleID;
+@property (strong, nonatomic) NSString *userRoleCode;
 @property (strong, nonatomic) NSString *userRoleName;
 @property (strong, nonatomic) NSString *userRoleIconURL;
 
