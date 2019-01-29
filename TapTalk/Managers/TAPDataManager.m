@@ -322,7 +322,7 @@
     userRoleDictionary = [TAPUtil nullToEmptyDictionary:userRoleDictionary];
     
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
-    NSString *userRoleCode = [userRoleDictionary objectForKey:@"userRoleCode"];
+    NSString *userRoleCode = [userRoleDictionary objectForKey:@"code"];
     userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
     userRole.userRoleCode = userRoleCode;
     
@@ -718,7 +718,7 @@
     
     NSDictionary *userRole = [userDictionary objectForKey:@"userRole"];
     userRole = [TAPUtil nullToEmptyDictionary:userRole];
-    NSString *userRoleCode = [userRole objectForKey:@"userRoleCode"];
+    NSString *userRoleCode = [userRole objectForKey:@"code"];
     userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
     [userMutableDictionary setValue:userRoleCode forKey:@"userRoleCode"];
     
@@ -2256,7 +2256,7 @@
             
             NSDictionary *userRoleDictionary = [obtainedUserDictionary objectForKey:@"userRole"];
             TAPUserRoleModel *userRole = [TAPUserRoleModel new];
-            NSString *userRoleCode = [userRoleDictionary objectForKey:@"userRoleCode"];
+            NSString *userRoleCode = [userRoleDictionary objectForKey:@"code"];
             userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
             userRole.userRoleCode = userRoleCode;
          
