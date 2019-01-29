@@ -565,6 +565,7 @@ fromNavigationController:(UINavigationController *)navigationController
     NSMutableArray *convertedProductArray = [[NSMutableArray alloc] init];
     
     for (TAPProductModel *product in productModelArray) {
+        NSString *productID = product.productID;
         NSString *productNameString = product.productName;
         NSString *currencyString = product.productCurrency;
         NSString *priceString = product.productPrice;
@@ -577,6 +578,7 @@ fromNavigationController:(UINavigationController *)navigationController
         NSString *rightOptionColorString = product.buttonOption2Color;
         
         NSMutableDictionary *productDictionary = [[NSMutableDictionary alloc] init];
+        [productDictionary setObject:productID forKey:@"id"];
         [productDictionary setObject:productNameString forKey:@"name"];
         [productDictionary setObject:currencyString forKey:@"currency"];
         [productDictionary setObject:priceString forKey:@"price"];
