@@ -571,8 +571,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
     }
     
-    tableView.estimatedRowHeight = 70.0f;
-    return UITableViewAutomaticDimension;
+    if (currentMessage.type == TAPChatMessageTypeProduct) {
+        //DV Note - For product list height
+        //    Collection view height (347.0f) + 16.0f gap
+        return 363.0f;
+    }
+    else {
+        tableView.estimatedRowHeight = 70.0f;
+        return UITableViewAutomaticDimension;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
