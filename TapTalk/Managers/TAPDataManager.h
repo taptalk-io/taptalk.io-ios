@@ -99,7 +99,10 @@
                                          success:(void (^)(void))success
                                          failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseContactByUserID:(NSString *)userID
-                           success:(void (^)(BOOL isContact))success
+                           success:(void (^)(BOOL isContact, TAPUserModel *obtainedUser))success
+                           failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseContactByXCUserID:(NSString *)XCUserID
+                           success:(void (^)(BOOL isContact, TAPUserModel *obtainedUser))success
                            failure:(void (^)(NSError *error))failure;
 + (void)deleteDatabaseAllRecentSearchSuccess:(void (^)(void))success
                                      failure:(void (^)(NSError *error))failure;

@@ -1466,7 +1466,7 @@
 }
 
 + (void)getDatabaseContactByUserID:(NSString *)userID
-                           success:(void (^)(BOOL isContact))success
+                           success:(void (^)(BOOL isContact, TAPUserModel *obtainedUser))success
                            failure:(void (^)(NSError *error))failure {
     userID = [TAPUtil nullToEmptyString:userID];
     NSString *queryClause = [NSString stringWithFormat:@"userID == \'%@\'", userID];
@@ -1476,14 +1476,39 @@
                                  isAscending:NO
                                      success:^(NSArray *resultArray) {
                                          if ([resultArray count] > 0) {
-                                             success(YES);
+                                             TAPUserModel *obtainedUser = [resultArray firstObject];
+                                             success(YES, obtainedUser);
                                          }
                                          else {
-                                             success(NO);
+                                             TAPUserModel *obtainedUser = nil;
+                                             success(NO, obtainedUser);
                                          }
                                      } failure:^(NSError *error) {
                                          failure(error);
                                      }];
+}
+
++ (void)getDatabaseContactByXCUserID:(NSString *)XCUserID
+                             success:(void (^)(BOOL isContact, TAPUserModel *obtainedUser))success
+                             failure:(void (^)(NSError *error))failure {
+    XCUserID = [TAPUtil nullToEmptyString:XCUserID];
+    NSString *queryClause = [NSString stringWithFormat:@"xcUserID == \'%@\'", XCUserID];
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact
+                             whereClauseQuery:queryClause
+                             sortByColumnName:@""
+                                  isAscending:NO
+                                      success:^(NSArray *resultArray) {
+                                          if ([resultArray count] > 0) {
+                                              TAPUserModel *obtainedUser = [resultArray firstObject];
+                                              success(YES, obtainedUser);
+                                          }
+                                          else {
+                                              TAPUserModel *obtainedUser = nil;
+                                              success(NO, obtainedUser);
+                                          }
+                                      } failure:^(NSError *error) {
+                                          failure(error);
+                                      }];
 }
 
 #pragma mark - API Call

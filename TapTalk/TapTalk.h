@@ -106,12 +106,14 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 //Chat
 
-- (void)openRoomWithUserID:(NSString *)userID
-                quoteTitle:(nullable NSString *)quoteTitle
-              quoteContent:(nullable NSString *)quoteContent
-       quoteImageURLString:(nullable NSString *)quoteImageURL
-                  userInfo:(nullable NSDictionary *)userInfo
-  fromNavigationController:(UINavigationController *)navigationController;
+- (void)openRoomWithXCUserID:(NSString *)XCUserID
+                  quoteTitle:(nullable NSString *)quoteTitle
+                quoteContent:(nullable NSString *)quoteContent
+         quoteImageURLString:(nullable NSString *)quoteImageURL
+                    userInfo:(nullable NSDictionary *)userInfo
+    fromNavigationController:(UINavigationController *)navigationController
+                     success:(void (^)(void))success
+                     failure:(void (^)(NSError *error))failure;
 
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
      fromNavigationController:(UINavigationController *)navigationController;
