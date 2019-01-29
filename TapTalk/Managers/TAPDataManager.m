@@ -1983,19 +1983,10 @@
     
     //Obtain Last Updated Value
     NSNumber *lastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
-
-    NSInteger formattedMinCreated = [minCreated integerValue];
-    NSNumber *formattedMinCreatedNum;
-    if (formattedMinCreated < 0) {
-        formattedMinCreatedNum = [NSNumber numberWithInteger:0];
-    }
-    else {
-        formattedMinCreatedNum = minCreated;
-    }
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:formattedMinCreatedNum forKey:@"minCreated"];
+    [parameterDictionary setObject:minCreated forKey:@"minCreated"];
     [parameterDictionary setObject:lastUpdated forKey:@"lastUpdated"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
