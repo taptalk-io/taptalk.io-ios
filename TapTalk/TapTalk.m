@@ -56,6 +56,18 @@
 - (void)setAuthTicket:(NSString *)authTicket
               success:(void (^)(void))success
               failure:(void (^)(NSError *error))failure {
+    
+    if (authTicket == nil || [authTicket isEqualToString:@""]) {
+        NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
+        [errorDictionary setObject:@"Invalid Auth Ticket" forKey:@"message"];
+        [errorDictionary setObject:@"401" forKey:@"code"];
+        NSError *error = [NSError errorWithDomain:@"Invalid Auth Ticket" code:401 userInfo:errorDictionary];
+        failure(error);
+    }
+    
+    //Initialize Contact Manager To Populate Contact Data
+    [TAPContactManager sharedManager];
+    
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
         //Send Push Token to server
         NSString *pushToken = [[TAPNotificationManager sharedManager] pushToken];
