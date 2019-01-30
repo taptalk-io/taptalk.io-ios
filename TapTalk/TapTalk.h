@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 //Custom Keyboard
 - (void)tapTalkCustomKeyboardDidTappedWithSender:(TAPUserModel *)sender
                                        recipient:(TAPUserModel *)recipient
+                                          roomID:(NSString *)roomID
                                     keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
 
 - (NSArray<TAPCustomKeyboardItemModel *> *)tapTalkCustomKeyboardForSender:(TAPUserModel *)sender

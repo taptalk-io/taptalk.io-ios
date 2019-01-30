@@ -26,6 +26,11 @@
 @property (strong, nonatomic) IBOutlet UIView *rightOptionView;
 @property (strong, nonatomic) IBOutlet UILabel *leftOptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *rightOptionLabel;
+@property (strong, nonatomic) IBOutlet UIView *singleOptionView;
+
+- (IBAction)leftOptionButtonDidTapped:(id)sender;
+- (IBAction)rightOptionButtonDidTapped:(id)sender;
+- (IBAction)singleOptionButtonDidTapped:(id)sender;
 
 @end
 
@@ -34,6 +39,18 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    self.singleOptionView.alpha = 0.0f;
+    self.singleOptionButton.alpha = 0.0f;
+    self.singleOptionButton.userInteractionEnabled = NO;
+    
+    self.leftOptionView.alpha = 1.0f;
+    self.leftOptionButton.alpha = 1.0f;
+    self.leftOptionButton.userInteractionEnabled = YES;
+    
+    self.rightOptionView.alpha = 1.0f;
+    self.rightOptionButton.alpha = 1.0f;
+    self.rightOptionButton.userInteractionEnabled = YES;
+    
     self.backgroundContentView.clipsToBounds = YES;
     self.backgroundContentView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_ED].CGColor;
     self.backgroundContentView.layer.borderWidth = 1.0f;
@@ -106,6 +123,55 @@
     self.leftOptionLabel.textColor = [TAPUtil getColor:leftOptionColorString];
     self.rightOptionLabel.text = rightOptionTextString;
     self.rightOptionLabel.textColor = [TAPUtil getColor:rightOptionColorString];
+}
+
+- (void)setAsSingleButtonView:(BOOL)isSetAsSingleButtonView {
+    _isSetAsSingleButtonView = isSetAsSingleButtonView;
+    
+    if (isSetAsSingleButtonView) {
+        self.singleOptionView.alpha = 1.0f;
+        self.singleOptionButton.alpha = 1.0f;
+        self.singleOptionButton.userInteractionEnabled = YES;
+
+        self.leftOptionView.alpha = 0.0f;
+        self.leftOptionButton.alpha = 0.0f;
+        self.leftOptionButton.userInteractionEnabled = NO;
+
+        self.rightOptionView.alpha = 0.0f;
+        self.rightOptionButton.alpha = 0.0f;
+        self.rightOptionButton.userInteractionEnabled = NO;
+    }
+    else {
+        self.singleOptionView.alpha = 0.0f;
+        self.singleOptionButton.alpha = 0.0f;
+        self.singleOptionButton.userInteractionEnabled = NO;
+        
+        self.leftOptionView.alpha = 1.0f;
+        self.leftOptionButton.alpha = 1.0f;
+        self.leftOptionButton.userInteractionEnabled = YES;
+        
+        self.rightOptionView.alpha = 1.0f;
+        self.rightOptionButton.alpha = 1.0f;
+        self.rightOptionButton.userInteractionEnabled = YES;
+    }
+}
+
+- (IBAction)leftOptionButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:)]) {
+        [self.delegate leftOrSingleOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
+    }
+}
+
+- (IBAction)rightOptionButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(rightOptionButtonDidTappedWithIndexPath:)]) {
+        [self.delegate rightOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
+    }
+}
+
+- (IBAction)singleOptionButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:)]) {
+        [self.delegate leftOrSingleOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
+    }
 }
 
 @end

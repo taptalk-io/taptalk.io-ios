@@ -543,6 +543,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 
+- (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
+    //Override present view controller method to resign keyboard before presenting view controller from Chat Room to avoid keyboard accessory missing after VC presented from Chat Room
+    [self.secondaryTextField resignFirstResponder];
+    [self.messageTextView resignFirstResponder];
+    [super presentViewController:viewControllerToPresent animated:flag completion:completion];
+}
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
