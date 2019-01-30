@@ -1518,7 +1518,8 @@
                                   isAscending:NO
                                       success:^(NSArray *resultArray) {
                                           if ([resultArray count] > 0) {
-                                              TAPUserModel *obtainedUser = [resultArray firstObject];
+                                              NSDictionary *dataDictionary = [resultArray firstObject];
+                                              TAPUserModel *obtainedUser = [self userModelFromDictionary:dataDictionary];
                                               success(YES, obtainedUser);
                                           }
                                           else {

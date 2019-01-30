@@ -575,12 +575,11 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)customKeyboardDidTappedWithSender:(TAPUserModel *)sender
                                 recipient:(TAPUserModel *)recipient
                              keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
-    if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:roomID:keyboardItem:)]) {
+    if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:room:keyboardItem:)]) {
         
-        NSString *roomID = [TAPChatManager sharedManager].activeRoom.roomID;
-        roomID = [TAPUtil nullToEmptyString:roomID];
+        TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
         
-        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient roomID:roomID keyboardItem:keyboardItem];
+        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient room:room keyboardItem:keyboardItem];
     }
 }
 
