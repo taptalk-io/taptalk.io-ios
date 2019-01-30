@@ -10,7 +10,7 @@ def tapTalk_pods
     pod 'Realm'
     pod 'ZBarSDK', '~> 1.3'
     pod 'PodAsset'
-    pod 'SDWebImage', '~> 4.0'
+    pod 'SDWebImage', '4.4.2'
 end
 
 target "TapTalk" do
