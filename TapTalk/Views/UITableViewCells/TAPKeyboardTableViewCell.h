@@ -10,16 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, TAPKeyboardTableViewCellType) {
-    TAPKeyboardTableViewCellTypePriceList = 1,
-    TAPKeyboardTableViewCellTypeExpertNotes = 2,
-    TAPKeyboardTableViewCellTypeSendService = 3,
-    TAPKeyboardTableViewCellTypeCreateOrderCard = 4,
-};
-
 @interface TAPKeyboardTableViewCell : TAPBaseXIBTableViewCell
 
-- (void)setKeyboardCellWithType:(TAPKeyboardTableViewCellType)type;
 - (void)setKeyboardCellWithKeyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
 
 @end

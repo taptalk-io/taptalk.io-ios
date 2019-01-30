@@ -158,7 +158,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)processMessageAsRead:(TAPMessageModel *)message;
 - (void)processVisibleMessageAsRead;
 - (void)setAsTyping:(BOOL)typing;
-- (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
 - (void)setAsTypingNoAfterDelay;
 - (void)showInputAccessoryExtensionView:(BOOL)show;
 - (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType;
@@ -363,7 +362,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     self.keyboardViewController.delegate = self;
     
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:[self getOtherUserIDWithRoomID:self.currentRoom.roomID]];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     
     if([[[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser] count] > 0) {
         //There's custom keyboard for this type
@@ -474,7 +474,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     if([[TAPChatManager sharedManager] checkShouldRefreshOnlineStatus]) {
         [self setAsTyping:NO];
-        [TAPDataManager callAPIGetUserByUserID:[self getOtherUserIDWithRoomID:self.currentRoom.roomID] success:^(TAPUserModel *user) {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+        [TAPDataManager callAPIGetUserByUserID:otherUserID success:^(TAPUserModel *user) {
             
             BOOL isTyping = [[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID];
             [self setAsTyping:isTyping];
@@ -2510,9 +2511,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)profileImageDidTapped {
-    TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
-    profileViewController.room = [TAPChatManager sharedManager].activeRoom;
-    [self.navigationController pushViewController:profileViewController animated:YES];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    [[TapTalk sharedInstance] profileButtonDidTapped:self otherUser:otherUser];
 }
 
 - (void)openGallery {
@@ -2799,19 +2800,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         self.userTypingView.alpha = 0.0f;
         self.userDescriptionView.alpha = 1.0f;
     }
-}
-
-- (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID {
-    NSArray *roomIDArray = [roomID componentsSeparatedByString:@"-"];
-    if([roomIDArray count] > 0) {
-        for (NSString *userID in roomIDArray) {
-            if(![userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                return userID;
-            }
-        }
-    }
-    
-    return @"";
 }
 
 - (void)setAsTypingNoAfterDelay {
