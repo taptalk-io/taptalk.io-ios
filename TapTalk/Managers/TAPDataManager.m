@@ -145,15 +145,15 @@
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
     NSString *userRoleString = [dictionary objectForKey:@"userRole"];
     if ([userRoleString isEqualToString:@""] || userRoleString == nil) {
-        userRole.userRoleCode = @"";
+        userRole.code = @"";
         userRole.name = @"";
         userRole.iconURL = @"";
     }
     else {
         NSDictionary *userRoleJSONDictionary = [TAPUtil jsonObjectFromString:userRoleString];
-        NSString *userRoleCode = [userRoleJSONDictionary objectForKey:@"userRoleCode"];
+        NSString *userRoleCode = [userRoleJSONDictionary objectForKey:@"code"];
         userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
-        userRole.userRoleCode = userRoleCode;
+        userRole.code = userRoleCode;
         
         NSString *name = [userRoleJSONDictionary objectForKey:@"name"];
         name = [TAPUtil nullToEmptyString:name];
@@ -324,7 +324,7 @@
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
     NSString *userRoleCode = [userRoleDictionary objectForKey:@"code"];
     userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
-    userRole.userRoleCode = userRoleCode;
+    userRole.code = userRoleCode;
     
     NSString *name = [userRoleDictionary objectForKey:@"name"];
     name = [TAPUtil nullToEmptyString:name];
@@ -461,7 +461,7 @@
     TAPUserRoleModel *userRole = [TAPUserRoleModel new];
     NSString *userRoleCode = [dictionary objectForKey:@"userRoleCode"];
     userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
-    userRole.userRoleCode = userRoleCode;
+    userRole.code = userRoleCode;
     
     NSString *userRoleName = [dictionary objectForKey:@"userRoleName"];
     userRoleName = [TAPUtil nullToEmptyString:userRoleName];
@@ -1008,11 +1008,23 @@
     [TAPDatabaseManager loadRoomListSuccess:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         NSMutableArray *modelArray = [NSMutableArray array];
+        NSMutableArray *tempRecipientIDArray = [NSMutableArray array];
+        
+        
         for (NSInteger count = 0; count < [messageArray count]; count++) {
             NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray objectAtIndex:count]];
             
             TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
             [modelArray addObject:messageModel];
+            
+            if([messageModel.user.userID isEqualToString:[self getActiveUser].userID]) {
+                NSString *currentOtherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:messageModel.room.roomID];
+                [tempRecipientIDArray addObject:currentOtherUserID];
+            }
+            else {
+                //Add User to Contact Manager
+                [[TAPContactManager sharedManager] addContactWithUserModel:messageModel.user saveToDatabase:NO];
+            }
             
             NSError *error;
             
@@ -1020,6 +1032,13 @@
                 failure(error);
                 return;
             }
+        }
+        
+        if([tempRecipientIDArray count] > 0) {
+            //call get multiple user API to populate contact
+            [TAPDataManager callAPIGetBulkUserByUserID:tempRecipientIDArray success:^(NSArray *userModelArray) {
+            } failure:^(NSError *error) {
+            }];
         }
         
         success(modelArray);
@@ -2297,7 +2316,7 @@
             TAPUserRoleModel *userRole = [TAPUserRoleModel new];
             NSString *userRoleCode = [userRoleDictionary objectForKey:@"code"];
             userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
-            userRole.userRoleCode = userRoleCode;
+            userRole.code = userRoleCode;
          
             NSString *name = [userRoleDictionary objectForKey:@"name"];
             name = [TAPUtil nullToEmptyString:name];

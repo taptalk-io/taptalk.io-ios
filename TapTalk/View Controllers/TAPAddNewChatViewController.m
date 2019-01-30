@@ -89,11 +89,16 @@
 #pragma mark TableView
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (tableView == self.addNewChatView.contactsTableView) {
-        return [self.indexSectionDictionary count] + 2;
-        /*
-         1 section is options (Add New Contact, Create Group, Scan QR Code)
-         1 section is blocked contacts (in the bottom)
-         */
+        //DV Note
+        //Temporary Hidden For V1 (30 Jan 2019)
+        //Hide Blocked Contacts
+//        return [self.indexSectionDictionary count] + 2;
+//        /*
+//         1 section is options (Add New Contact, Create Group, Scan QR Code)
+//         1 section is blocked contacts (in the bottom)
+//         */
+        //END DV Note
+        return 1;
     }
     else if (tableView == self.addNewChatView.searchResultTableView) {
         return 2; //1 section is add new contact
@@ -105,7 +110,13 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView == self.addNewChatView.contactsTableView) {
         if (section == 0) {
-            return 3; //options (Add New Contact, Create Group, Scan QR Code)
+            //DV Note
+            //Temporary Hidden For V1 (30 Jan 2019)
+            //Hide Create Group
+//            return 3; //options (Add New Contact, Create Group, Scan QR Code)
+            //END DV Note
+            
+            return 2; //options (Add New Contact, Scan QR Code)
         }
         else if (section <= [[self.indexSectionDictionary allKeys] count]) {
             
@@ -117,9 +128,13 @@
             NSArray *contactArray = [self.indexSectionDictionary objectForKey:key];
             return [contactArray count];
         }
-        else if (section == [tableView numberOfSections] - 1) {
-            return 1; //blocked contacts
-        }
+        //DV Note
+        //Temporary Hidden For V1 (30 Jan 2019)
+        //Hide Blocked Contacts
+//        else if (section == [tableView numberOfSections] - 1) {
+//            return 1; //blocked contacts
+//        }
+        //END DV Note
     }
     else if (tableView == self.addNewChatView.searchResultTableView) {
         if (section == 0) {
@@ -142,9 +157,13 @@
         else if (indexPath.section <= [self.indexSectionDictionary count]) {
             return 64.0f;
         }
-        else if (indexPath.section == [self.indexSectionDictionary count] + 1) {
-            return 98.0f;
-        }
+        //DV Note
+        //Temporary Hidden For V1 (30 Jan 2019)
+        //Hide Blocked Contact
+//        else if (indexPath.section == [self.indexSectionDictionary count] + 1) {
+//            return 98.0f;
+//        }
+        //END DV Note
     }
     else if (tableView == self.addNewChatView.searchResultTableView) {
         if (indexPath.section == 0) {
@@ -173,9 +192,13 @@
             else if (indexPath.row == 1) {
                 [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeScanQRCode];
             }
-            else if (indexPath.row == 2) {
-                [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewGroup];
-            }
+            //DV Note
+            //Temporary Hidden For V1 (30 Jan 2019)
+            //Hide Create Group
+//            else if (indexPath.row == 2) {
+//                [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewGroup];
+//            }
+            //END DV Note
             
             return cell;
         }
@@ -206,14 +229,17 @@
             
             return cell;
         }
-        
-        else if (indexPath.section == [tableView numberOfSections] - 1) {
-            static NSString *cellID = @"TAPNewChatBlockedContactsTableViewCell";
-            TAPNewChatBlockedContactsTableViewCell *cell = [[TAPNewChatBlockedContactsTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            return cell;
-        }
+        //DV Note
+        //Temporary Hidden For V1 (30 Jan 2019)
+        //Hide Blocked Contact
+//        else if (indexPath.section == [tableView numberOfSections] - 1) {
+//            static NSString *cellID = @"TAPNewChatBlockedContactsTableViewCell";
+//            TAPNewChatBlockedContactsTableViewCell *cell = [[TAPNewChatBlockedContactsTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
+//            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//
+//            return cell;
+//        }
+        //END DV Note
     }
     else if (tableView == self.addNewChatView.searchResultTableView) {
         if (indexPath.section == 0) {
@@ -364,11 +390,15 @@
                 //Scan QR Code
                 [self openScanQRCode];
             }
-            else if (indexPath.row == 2) {
-                //New Group
-                TAPNewGroupViewController *createGroupViewController = [[TAPNewGroupViewController alloc] init]; //newGroupViewController
-                [self.navigationController pushViewController:createGroupViewController animated:YES];
-            }
+            //DV Note
+            //Temporary Hidden For V1 (30 Jan 2019)
+            //Hide Create Group
+//            else if (indexPath.row == 2) {
+//                //New Group
+//                TAPNewGroupViewController *createGroupViewController = [[TAPNewGroupViewController alloc] init]; //newGroupViewController
+//                [self.navigationController pushViewController:createGroupViewController animated:YES];
+//            }
+            //END DV Note
         }
         else if (indexPath.section <= [[self.indexSectionDictionary allKeys] count]) {
             //Contacts
@@ -404,11 +434,15 @@
                 }];
             }
         }
-        else if (indexPath.section == [tableView numberOfSections] - 1) {
-            //Blocked Contacts
-            TAPBlockedListViewController *blockedListViewController = [[TAPBlockedListViewController alloc] init];
-            [self.navigationController pushViewController:blockedListViewController animated:YES];
-        }
+        //DV Note
+        //Temporary Hidden For V1 (30 Jan 2019)
+        //Hide Blocked Contact
+//        else if (indexPath.section == [tableView numberOfSections] - 1) {
+//            //Blocked Contacts
+//            TAPBlockedListViewController *blockedListViewController = [[TAPBlockedListViewController alloc] init];
+//            [self.navigationController pushViewController:blockedListViewController animated:YES];
+//        }
+        //END DV Note
     }
     else if (tableView == self.addNewChatView.searchResultTableView) {
         if (indexPath.section == [tableView numberOfSections] - 1) {

@@ -2010,17 +2010,89 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (IBAction)attachmentButtonDidTapped:(id)sender {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    //    NSMutableAttributedString *documentsAttributedString = [[NSMutableAttributedString alloc] initWithString:@"Documents"];
-    //    [documentsAttributedString addAttribute:NSFontAttributeName
-    //                                      value:[UIFont fontWithName:TAP_FONT_LATO_REGULAR size:18.0f]
-    //                                      range:NSMakeRange(0, documentsAttributedString.length)];
-    
-    UIAlertAction *documentsAction = [UIAlertAction
-                                      actionWithTitle:@"Documents"
-                                      style:UIAlertActionStyleDefault
-                                      handler:^(UIAlertAction * action) {
-                                          //Do some thing here
-                                      }];
+    //DV Note
+    //Temporary Hidden For V1 (30 Jan 2019)
+    //Hide Other Attachment
+//    UIAlertAction *documentsAction = [UIAlertAction
+//                                      actionWithTitle:@"Documents"
+//                                      style:UIAlertActionStyleDefault
+//                                      handler:^(UIAlertAction * action) {
+//                                          //Do some thing here
+//                                      }];
+//
+//    UIAlertAction *cameraAction = [UIAlertAction
+//                                   actionWithTitle:@"Camera"
+//                                   style:UIAlertActionStyleDefault
+//                                   handler:^(UIAlertAction * action) {
+//                                       [self performSelector:@selector(openCamera) withObject:nil];
+//                                   }];
+//
+//    UIAlertAction *galleryAction = [UIAlertAction
+//                                    actionWithTitle:@"Gallery"
+//                                    style:UIAlertActionStyleDefault
+//                                    handler:^(UIAlertAction * action) {
+//                                        [self performSelector:@selector(openGallery) withObject:nil];
+//                                    }];
+//
+//    UIAlertAction *audioAction = [UIAlertAction
+//                                  actionWithTitle:@"Audio"
+//                                  style:UIAlertActionStyleDefault
+//                                  handler:^(UIAlertAction * action) {
+//                                      //Do some thing here
+//                                  }];
+//
+//    UIAlertAction *locationAction = [UIAlertAction
+//                                     actionWithTitle:@"Location"
+//                                     style:UIAlertActionStyleDefault
+//                                     handler:^(UIAlertAction * action) {
+//                                         //Do some thing here
+//                                     }];
+//
+//    UIAlertAction *contactAction = [UIAlertAction
+//                                    actionWithTitle:@"Contact"
+//                                    style:UIAlertActionStyleDefault
+//                                    handler:^(UIAlertAction * action) {
+//                                        //Do some thing here
+//                                    }];
+//
+//    UIAlertAction *cancelAction = [UIAlertAction
+//                                   actionWithTitle:@"Cancel"
+//                                   style:UIAlertActionStyleCancel
+//                                   handler:^(UIAlertAction * action) {
+//                                       //Do some thing here
+//                                       [self checkKeyboard];
+//                                   }];
+//
+//    [documentsAction setValue:[[UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+//    [cameraAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+//    [galleryAction setValue:[[UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+//    [audioAction setValue:[[UIImage imageNamed:@"TAPIconVoice" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+//    [locationAction setValue:[[UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+//    [contactAction setValue:[[UIImage imageNamed:@"TAPIconContact" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+//
+//    [documentsAction setValue:@0 forKey:@"titleTextAlignment"];
+//    [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
+//    [galleryAction setValue:@0 forKey:@"titleTextAlignment"];
+//    [audioAction setValue:@0 forKey:@"titleTextAlignment"];
+//    [locationAction setValue:@0 forKey:@"titleTextAlignment"];
+//    [contactAction setValue:@0 forKey:@"titleTextAlignment"];
+//
+//    [documentsAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+//    [cameraAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+//    [galleryAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+//    [audioAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+//    [locationAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+//    [contactAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+//    [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
+//
+//    [alertController addAction:documentsAction];
+//    [alertController addAction:cameraAction];
+//    [alertController addAction:galleryAction];
+//    [alertController addAction:audioAction];
+//    [alertController addAction:locationAction];
+//    [alertController addAction:contactAction];
+//    [alertController addAction:cancelAction];
+    //END DV NOTE
     
     UIAlertAction *cameraAction = [UIAlertAction
                                    actionWithTitle:@"Camera"
@@ -2036,27 +2108,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                                         [self performSelector:@selector(openGallery) withObject:nil];
                                     }];
     
-    UIAlertAction *audioAction = [UIAlertAction
-                                  actionWithTitle:@"Audio"
-                                  style:UIAlertActionStyleDefault
-                                  handler:^(UIAlertAction * action) {
-                                      //Do some thing here
-                                  }];
-    
-    UIAlertAction *locationAction = [UIAlertAction
-                                     actionWithTitle:@"Location"
-                                     style:UIAlertActionStyleDefault
-                                     handler:^(UIAlertAction * action) {
-                                         //Do some thing here
-                                     }];
-    
-    UIAlertAction *contactAction = [UIAlertAction
-                                    actionWithTitle:@"Contact"
-                                    style:UIAlertActionStyleDefault
-                                    handler:^(UIAlertAction * action) {
-                                        //Do some thing here
-                                    }];
-    
     UIAlertAction *cancelAction = [UIAlertAction
                                    actionWithTitle:@"Cancel"
                                    style:UIAlertActionStyleCancel
@@ -2065,34 +2116,19 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                                        [self checkKeyboard];
                                    }];
     
-    [documentsAction setValue:[[UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [cameraAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [galleryAction setValue:[[UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
-    [audioAction setValue:[[UIImage imageNamed:@"TAPIconVoice" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
-    [locationAction setValue:[[UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
-    [contactAction setValue:[[UIImage imageNamed:@"TAPIconContact" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
-    [documentsAction setValue:@0 forKey:@"titleTextAlignment"];
+
     [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
     [galleryAction setValue:@0 forKey:@"titleTextAlignment"];
-    [audioAction setValue:@0 forKey:@"titleTextAlignment"];
-    [locationAction setValue:@0 forKey:@"titleTextAlignment"];
-    [contactAction setValue:@0 forKey:@"titleTextAlignment"];
     
-    [documentsAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [cameraAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [galleryAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
-    [audioAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
-    [locationAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
-    [contactAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
     
-    [alertController addAction:documentsAction];
     [alertController addAction:cameraAction];
     [alertController addAction:galleryAction];
-    [alertController addAction:audioAction];
-    [alertController addAction:locationAction];
-    [alertController addAction:contactAction];
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
