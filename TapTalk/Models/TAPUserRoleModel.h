@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPUserRoleModel : TAPBaseModel
-@property (strong, nonatomic) NSString *userRoleCode;
+@property (strong, nonatomic) NSString *code;
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSString *iconURL;
 @end
