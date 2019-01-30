@@ -140,7 +140,7 @@ Pod::Spec.new do |s|
     s.dependency "SocketRocket"
     s.dependency "JSONModel", "~> 1.1"
     s.dependency "Realm"
-    s.dependency "SDWebImage", "~> 4.4.2"
+    s.dependency "SDWebImage", "4.4.2"
     s.dependency "ZBarSDK", "~> 1.3"
     s.dependency "PodAsset"
     
