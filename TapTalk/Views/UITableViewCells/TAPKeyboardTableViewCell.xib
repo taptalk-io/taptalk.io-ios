@@ -27,7 +27,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="53.5"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x8m-l6-0eE">
-                                <rect key="frame" x="56" y="18" width="248" height="18"/>
+                                <rect key="frame" x="48" y="18" width="256" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="khr-HW-RaK"/>
                                 </constraints>
@@ -36,11 +36,11 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Tui-AG-gbL" customClass="TAPImageView">
-                                <rect key="frame" x="16" y="11" width="32" height="32"/>
+                                <rect key="frame" x="16" y="15" width="24" height="24"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="tU2-ri-UvN"/>
-                                    <constraint firstAttribute="width" constant="32" id="wo7-Gd-0lA"/>
+                                    <constraint firstAttribute="height" constant="24" id="tU2-ri-UvN"/>
+                                    <constraint firstAttribute="width" constant="24" id="wo7-Gd-0lA"/>
                                 </constraints>
                             </imageView>
                         </subviews>
