@@ -409,6 +409,7 @@
 
 //Chat
 - (void)openRoomWithXCUserID:(NSString *)XCUserID
+               prefilledText:(NSString *)prefilledText
                   quoteTitle:(nullable NSString *)quoteTitle
                 quoteContent:(nullable NSString *)quoteContent
          quoteImageURLString:(nullable NSString *)quoteImageURL
@@ -421,14 +422,21 @@
         if (isContact) {
             //User is in contact
             //Create quote model and set quote to chat
+            
+            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
+            
             if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
                 TAPQuoteModel *quote = [TAPQuoteModel new];
                 quote.title = quoteTitle;
                 quote.content = quoteContent;
                 quote.imageURL = quoteImageURL;
                 
-                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
                 [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+            }
+            
+            NSString *draftMessage = [TAPUtil nullToEmptyString:prefilledText];
+            if (![draftMessage isEqualToString:@""]) {
+                 [[TAPChatManager sharedManager] saveMessageToDraftWithMessage:draftMessage roomID:room.roomID];
             }
             
             //Open room
@@ -439,14 +447,20 @@
             //User not in contact, call API to obtain user data
             [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:^(TAPUserModel *user) {
                 //Create quote model and set quote to chat
+                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
+                
                 if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
                     TAPQuoteModel *quote = [TAPQuoteModel new];
                     quote.title = quoteTitle;
                     quote.content = quoteContent;
                     quote.imageURL = quoteImageURL;
                     
-                    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
                     [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+                }
+                
+                NSString *draftMessage = [TAPUtil nullToEmptyString:prefilledText];
+                if (![draftMessage isEqualToString:@""]) {
+                    [[TAPChatManager sharedManager] saveMessageToDraftWithMessage:draftMessage roomID:room.roomID];
                 }
                 
                 //Open room

@@ -118,6 +118,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 //Chat
 - (void)openRoomWithXCUserID:(NSString *)XCUserID
+               prefilledText:(NSString *)prefilledText
                   quoteTitle:(nullable NSString *)quoteTitle
                 quoteContent:(nullable NSString *)quoteContent
          quoteImageURLString:(nullable NSString *)quoteImageURL
