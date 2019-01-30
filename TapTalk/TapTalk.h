@@ -58,9 +58,9 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
                                                                 recipient:(TAPUserModel *)recipient;
 
 //Product List
-- (void)productListBubbleLeftOrSingleOptionDidTappedProduct:(TAPProductModel *)product isSingleOption:(BOOL)isSingleOption;
+- (void)productListBubbleLeftOrSingleOptionDidTappedProduct:(TAPProductModel *)product room:(TAPRoomModel *)room isSingleOption:(BOOL)isSingleOption;
 
-- (void)productListBubbleRightOptionDidTappedWithProduct:(TAPProductModel *)product isSingleOption:(BOOL)isSingleOption;
+- (void)productListBubbleRightOptionDidTappedWithProduct:(TAPProductModel *)product room:(TAPRoomModel *)room isSingleOption:(BOOL)isSingleOption;
 
 //Quote
 - (void)tapTalkQuoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
