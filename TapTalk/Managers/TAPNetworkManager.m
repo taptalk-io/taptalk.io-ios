@@ -79,6 +79,8 @@ static const NSInteger kAPITimeOut = 300;
     [manager.requestSerializer setValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
     [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
     [manager.requestSerializer setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+    [manager.requestSerializer setValue:@"MTlkYzhjMjc0YmNjOGM0NjQ2MmI2ODM4NTpNR1kyT0Raa01ETmlZVFJqTlRFdU1TNHgvWkRka05tTTBNelkvWm1JNE5UUTRaV1E0WmpJNS9Oems0TVdaa1pUZGhaVGsw" forHTTPHeaderField:@"Server-Key"]; //DV Temp - Temporary set server key, needs to be deleted when integrated to Moselo
+    
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];
     
     if ([TAPDataManager getAccessToken] != nil && ![[TAPDataManager getAccessToken] isEqualToString:@""]) {
