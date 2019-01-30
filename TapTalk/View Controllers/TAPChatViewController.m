@@ -447,6 +447,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
     _isViewWillAppeared = YES;
     self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
     
