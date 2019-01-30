@@ -721,8 +721,8 @@ fromNavigationController:(UINavigationController *)navigationController
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
     TAPProductModel *product = [convertedProductArray firstObject];
     
-    if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:isSingleOption:)]) {
-        [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product isSingleOption:isSingleOption];
+    if ([self.delegate respondsToSelector:@selector(productListBubbleRightOptionDidTappedWithProduct:isSingleOption:)]) {
+        [self.delegate productListBubbleRightOptionDidTappedWithProduct:product isSingleOption:isSingleOption];
     }
 }
 
