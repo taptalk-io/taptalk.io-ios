@@ -73,6 +73,7 @@
     
     //DV Note
     //Temporary Hidden For V1 (30 Jan 2019)
+    //Hide Edit Button
     //LeftBarButton
 //    _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
 //    [self.leftBarButton setTitle:@"Edit" forState:UIControlStateNormal];

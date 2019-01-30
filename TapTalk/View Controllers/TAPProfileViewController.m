@@ -115,7 +115,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return 4;
     }
     else if (section == 1) {
-        return 40; //WK Temp
+        return 9; //WK Temp
     }
     
     return 0;
@@ -155,7 +155,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSLog(@"===>");
         }
         
-        [cell setImageCollectionViewCellWithURL:TAP_DUMMY_IMAGE_URL]; //WK Temp - Dummy image URL
+        //DV Note
+        //Temporary Hidden For V1 (30 Jan 2019)
+        //Hide Shared Media
+//        [cell setImageCollectionViewCellWithURL:TAP_DUMMY_IMAGE_URL]; //WK Temp - Dummy image URL
+        //END DV Note
         
         return cell;
     }
