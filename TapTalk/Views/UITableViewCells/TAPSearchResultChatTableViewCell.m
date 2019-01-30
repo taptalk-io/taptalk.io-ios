@@ -110,7 +110,7 @@
     BOOL isGroup = NO;
     BOOL isMuted = NO;
     BOOL isOnline = NO;
-    NSString *profileImageURL = room.imageURL.thumbnail;
+    NSString *profileImageURL = room.imageURL.fullsize;
     //END DV Temp
     
     NSInteger numberOfUnreadMessage = [unreadMessageCount integerValue];
@@ -120,7 +120,12 @@
     NSString *roomName = currentRoom.name;
     roomName = [TAPUtil nullToEmptyString:roomName];
     
-    [self.profileImageView setImageWithURLString:profileImageURL];
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        [self.profileImageView setImageWithURLString:profileImageURL];
+    }
     
     if (numberOfUnreadMessage == 0) {
         self.bubbleUnreadView.alpha = 0.0f;

@@ -80,8 +80,15 @@
 - (void)setContactTableViewCellWithUser:(TAPUserModel *)user {
     if (user.userID != nil) {
         NSString *contactName = user.fullname;
-        NSString *imageURL = user.imageURL.thumbnail;
-        [self.contactImageView setImageWithURLString:imageURL];
+        NSString *imageURL = user.imageURL.fullsize;
+        
+        if (imageURL == nil || [imageURL isEqualToString:@""]) {
+            self.contactImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.contactImageView setImageWithURLString:imageURL];
+        }
+        
         NSMutableDictionary *contactNameAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat contactNameLetterSpacing = -0.2f;
         [contactNameAttributesDictionary setObject:@(contactNameLetterSpacing) forKey:NSKernAttributeName];

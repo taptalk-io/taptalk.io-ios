@@ -98,7 +98,7 @@
 //         1 section is blocked contacts (in the bottom)
 //         */
         //END DV Note
-        return 1;
+        return [self.indexSectionDictionary count] + 1;
     }
     else if (tableView == self.addNewChatView.searchResultTableView) {
         return 2; //1 section is add new contact
