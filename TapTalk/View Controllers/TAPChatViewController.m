@@ -688,13 +688,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 
                 return cell;
             }
-            else if (message.type == TAPChatMessageTypeOrderCard) {
-                [tableView registerNib:[TAPOrderCardBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPOrderCardBubbleTableViewCell description]];
-                TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
-                cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                [cell setOrderCardWithType:13];//CS Temp
-                return cell;
-            }
             else if (message.type == TAPChatMessageTypeProduct) {
                 [tableView registerNib:[TAPProductListBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPProductListBubbleTableViewCell description]];
                 TAPProductListBubbleTableViewCell *cell = (TAPProductListBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPProductListBubbleTableViewCell description] forIndexPath:indexPath];
@@ -704,30 +697,23 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 return cell;
             }
             else {
-                //WK Temp - Where message.type is not 1001 or 1002, set empty chat message
-                [tableView registerNib:[TAPMyChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyChatBubbleTableViewCell description]];
-                TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatBubbleTableViewCell description] forIndexPath:indexPath];
-                cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                cell.tag = indexPath.row;
-                cell.userInteractionEnabled = YES;
-                cell.contentView.userInteractionEnabled = YES;
-                cell.delegate = self;
+            
+                //check if custom bubble available
+                NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
                 
-                //WK Temp
-                TAPMessageModel *editedMessage = message;
-                editedMessage.body = @"";
-                
-                [cell setMessage:editedMessage];
-                //End Temp
-                
-                if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
-                    [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
+                if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                    //if custom bubble from client available
+                    NSString *cellName = [cellDataDictionary objectForKey:@"name"];
+                    id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+        
+                    UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+                    [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+        
+                    TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+                    cell.delegate = userDelegate;
+                    [cell setMessage:message];
+                    return cell;
                 }
-                else {
-                    [cell showStatusLabel:NO animated:NO updateStatusIcon:NO];
-                }
-                
-                return cell;
             }
         }
         else {
@@ -811,8 +797,24 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 return cell;
             }
+            
+            //check if custom bubble available
+            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
+            
+            if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                //if custom bubble from client available
+                NSString *cellName = [cellDataDictionary objectForKey:@"name"];
+                id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+                
+                UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+                [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+                
+                TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+                cell.delegate = userDelegate;
+                [cell setMessage:message];
+                return cell;
+            }
         }
-        
     }
     
 //    [tableView registerNib:[TAPBaseXIBRotatedTableViewCell cellNib] forCellReuseIdentifier:[TAPBaseXIBRotatedTableViewCell description]];

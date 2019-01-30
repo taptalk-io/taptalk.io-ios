@@ -65,8 +65,12 @@
         failure(error);
     }
     
-    //Initialize Contact Manager To Populate Contact Data
-    [[TAPContactManager sharedManager] populateContactFromDatabase];
+    //Refresh Contact List
+    [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
+        
+    } failure:^(NSError *error) {
+        //        NSLog(@"%@", error);
+    }];
     
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
         //Send Push Token to server
