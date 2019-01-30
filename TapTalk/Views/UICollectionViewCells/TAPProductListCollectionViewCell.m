@@ -114,6 +114,10 @@
     NSString *rightOptionColorString = [product objectForKey:@"buttonOption2Color"];
     rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
     
+    if ([productDescriptionString isEqualToString:@""]) {
+        productDescriptionString = @"No description";
+    }
+    
     self.productNameLabel.text = productNameString;
     self.priceLabel.text = [TAPUtil formattedCurrencyWithCurrencySign:currencyString value:[priceString floatValue]];
     [self.productImageView setImageWithURLString:productImageURLString];
