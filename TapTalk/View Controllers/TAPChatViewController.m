@@ -834,6 +834,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 //    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     UITableViewCell *cell = [[UITableViewCell alloc] init];
+    cell.backgroundColor = [TAPUtil getColor:@"F3F3F3"];
     return cell;
 }
 

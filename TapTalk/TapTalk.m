@@ -576,7 +576,11 @@ fromNavigationController:(UINavigationController *)navigationController
                                 recipient:(TAPUserModel *)recipient
                              keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
     if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:roomID:keyboardItem:)]) {
-        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient roomID:[TAPChatManager sharedManager].activeRoom keyboardItem:keyboardItem];
+        
+        NSString *roomID = [TAPChatManager sharedManager].activeRoom.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
+        
+        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient roomID:roomID keyboardItem:keyboardItem];
     }
 }
 
@@ -710,9 +714,10 @@ fromNavigationController:(UINavigationController *)navigationController
     
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
     TAPProductModel *product = [convertedProductArray firstObject];
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:isSingleOption:)]) {
-        [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product isSingleOption:isSingleOption];
+    if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:room:isSingleOption:)]) {
+        [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product room:room isSingleOption:isSingleOption];
     }
 }
 
@@ -720,9 +725,10 @@ fromNavigationController:(UINavigationController *)navigationController
     
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
     TAPProductModel *product = [convertedProductArray firstObject];
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    if ([self.delegate respondsToSelector:@selector(productListBubbleRightOptionDidTappedWithProduct:isSingleOption:)]) {
-        [self.delegate productListBubbleRightOptionDidTappedWithProduct:product isSingleOption:isSingleOption];
+    if ([self.delegate respondsToSelector:@selector(productListBubbleRightOptionDidTappedWithProduct:room:isSingleOption:)]) {
+        [self.delegate productListBubbleRightOptionDidTappedWithProduct:product room:room isSingleOption:isSingleOption];
     }
 }
 
