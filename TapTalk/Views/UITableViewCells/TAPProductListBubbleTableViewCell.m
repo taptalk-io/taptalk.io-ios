@@ -9,7 +9,7 @@
 #import "TAPProductListBubbleTableViewCell.h"
 #import "TAPProductListCollectionViewCell.h"
 
-@interface TAPProductListBubbleTableViewCell () <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface TAPProductListBubbleTableViewCell () <UICollectionViewDelegate, UICollectionViewDataSource, TAPProductListCollectionViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic) NSMutableArray *productDataArray;
@@ -85,6 +85,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     TAPProductListCollectionViewCell *cell = (TAPProductListCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifier forIndexPath:indexPath];
     
+    cell.delegate = self;
+    cell.selectedIndexPath = indexPath;
+    
+    BOOL isSingleOption = NO;
+    if (self.productListBubbleTableViewCellType == TAPProductListBubbleTableViewCellTypeSingleOption) {
+        isSingleOption = YES;
+    }
+    
+    [cell setAsSingleButtonView:isSingleOption];
+    
     if ([self.productDataArray count] != 0) {
         NSDictionary *productData = [self.productDataArray objectAtIndex:indexPath.row];
         [cell setProductCellWithData:productData];
@@ -105,10 +115,26 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
 }
 
+#pragma mark - TAPProductListCollectionViewCell
+- (void)leftOrSingleOptionButtonDidTappedWithIndexPath:(NSIndexPath *)indexPath isSingleOptionView:(BOOL)isSingleOption {
+    
+//    if ([self.delegate respondsToSelector:@selector(productListBubbleDidTappedLeftOrSingleOptionWithData:isSingleOptionView:)]) {
+//        [self.delegate productListBubbleDidTappedLeftOrSingleOptionWithData:<#(nonnull TAPMessageModel *)#> isSingleOptionView:isSingleOption];
+//    }
+}
+
+- (void)rightOptionButtonDidTappedWithIndexPath:(NSIndexPath *)indexPath isSingleOptionView:(BOOL)isSingleOption {
+    
+}
+
 #pragma mark - Custom Method
 - (void)setProductListBubbleCellWithData:(NSArray *)productDataArray {
     _productDataArray = productDataArray;
     [self.collectionView reloadData];
+}
+
+- (void)setProductListBubbleTableViewCellType:(TAPProductListBubbleTableViewCellType)productListBubbleTableViewCellType {
+    _productListBubbleTableViewCellType = productListBubbleTableViewCellType;
 }
 
 @end

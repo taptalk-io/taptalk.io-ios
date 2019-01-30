@@ -18,6 +18,7 @@
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 - (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
+- (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController;
 
 @end
 
@@ -368,13 +369,26 @@
 }
 
 - (UINavigationController *)getCurrentTapTalkActiveNavigationController {
-    UINavigationController *currentActiveNavigationController = (UINavigationController *)self.activeWindow.rootViewController;
-    return currentActiveNavigationController;
+    return [self getCurrentTapTalkActiveNavigationController].navigationController;
 }
 
 - (UIViewController *)getCurrentTapTalkActiveViewController {
-    UIViewController *currentActiveController = ((UINavigationController *)self.activeWindow.rootViewController).topViewController;
-    return currentActiveController;
+    return [self topViewControllerWithRootViewController:self.activeWindow.rootViewController];
+}
+
+- (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController {
+    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController* tabBarController = (UITabBarController*)rootViewController;
+        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+    } else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController* navigationController = (UINavigationController*)rootViewController;
+        return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
+    } else if (rootViewController.presentedViewController) {
+        UIViewController* presentedViewController = rootViewController.presentedViewController;
+        return [self topViewControllerWithRootViewController:presentedViewController];
+    } else {
+        return rootViewController;
+    }
 }
 
 - (void)setUserAgent:(NSString *)userAgent {
@@ -559,8 +573,8 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)customKeyboardDidTappedWithSender:(TAPUserModel *)sender
                                 recipient:(TAPUserModel *)recipient
                              keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
-    if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:keyboardItem:)]) {
-        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient keyboardItem:keyboardItem];
+    if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:roomID:keyboardItem:)]) {
+        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient roomID:[TAPChatManager sharedManager].activeRoom keyboardItem:keyboardItem];
     }
 }
 

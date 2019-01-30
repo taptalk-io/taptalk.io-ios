@@ -184,6 +184,9 @@
                                 <state key="normal" title="Button">
                                     <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <action selector="leftOptionButtonDidTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="Lcs-Lq-p2r"/>
+                                </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Chk-nX-c8c" userLabel="Separator View">
                                 <rect key="frame" x="114.5" y="307" width="1" height="40"/>
@@ -217,6 +220,39 @@
                                 <state key="normal">
                                     <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <action selector="rightOptionButtonDidTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="gVp-H1-zLr"/>
+                                </connections>
+                            </button>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tjq-gV-MWY">
+                                <rect key="frame" x="0.0" y="307" width="230" height="40"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Details" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rn7-IW-JsW">
+                                        <rect key="frame" x="0.0" y="0.0" width="230" height="40"/>
+                                        <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="12"/>
+                                        <color key="textColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="rn7-IW-JsW" secondAttribute="bottom" id="1QH-SU-enl"/>
+                                    <constraint firstItem="rn7-IW-JsW" firstAttribute="top" secondItem="tjq-gV-MWY" secondAttribute="top" id="6rU-Ge-5ee"/>
+                                    <constraint firstItem="rn7-IW-JsW" firstAttribute="leading" secondItem="tjq-gV-MWY" secondAttribute="leading" id="K2p-5p-vQH"/>
+                                    <constraint firstAttribute="height" constant="40" id="h3g-gp-btE"/>
+                                    <constraint firstAttribute="trailing" secondItem="rn7-IW-JsW" secondAttribute="trailing" id="hgx-dM-oXu"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aV9-DX-k7u">
+                                <rect key="frame" x="57" y="153" width="114.5" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal">
+                                    <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="singleOptionButtonDidTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="JUQ-iT-pE2"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -236,6 +272,7 @@
                             <constraint firstItem="1rl-9s-5h2" firstAttribute="trailing" secondItem="Up4-I8-Xo4" secondAttribute="trailing" constant="8" id="Bt5-c0-jv3"/>
                             <constraint firstItem="xOe-yr-Zy7" firstAttribute="width" secondItem="xrf-mm-Eyl" secondAttribute="width" id="DRc-XH-yMt"/>
                             <constraint firstItem="xOe-yr-Zy7" firstAttribute="leading" secondItem="AMf-UK-CW8" secondAttribute="trailing" id="E4k-4E-msS"/>
+                            <constraint firstItem="tjq-gV-MWY" firstAttribute="bottom" secondItem="1rl-9s-5h2" secondAttribute="bottom" id="Ef6-FE-jBy"/>
                             <constraint firstItem="1ND-Xk-scR" firstAttribute="top" secondItem="1rl-9s-5h2" secondAttribute="top" id="Frn-gY-7tk"/>
                             <constraint firstItem="6JA-9P-eKb" firstAttribute="leading" secondItem="Chk-nX-c8c" secondAttribute="trailing" id="HNk-rq-Pp4"/>
                             <constraint firstItem="AMf-UK-CW8" firstAttribute="leading" secondItem="xrf-mm-Eyl" secondAttribute="trailing" id="IHb-fe-bT3"/>
@@ -244,9 +281,11 @@
                             <constraint firstItem="1rl-9s-5h2" firstAttribute="trailing" secondItem="bQJ-QM-45R" secondAttribute="trailing" constant="8" id="L6X-i7-E0S"/>
                             <constraint firstItem="r6D-L1-1Jb" firstAttribute="leading" secondItem="1ig-1W-vdJ" secondAttribute="leading" id="LyC-wi-RD7"/>
                             <constraint firstItem="Chk-nX-c8c" firstAttribute="leading" secondItem="r6D-L1-1Jb" secondAttribute="trailing" id="NNU-3P-isf"/>
+                            <constraint firstItem="1rl-9s-5h2" firstAttribute="trailing" secondItem="tjq-gV-MWY" secondAttribute="trailing" id="O8l-iZ-kih"/>
                             <constraint firstItem="1ND-Xk-scR" firstAttribute="leading" secondItem="1ig-1W-vdJ" secondAttribute="leading" id="Rai-Oy-lrR"/>
                             <constraint firstItem="6JA-9P-eKb" firstAttribute="top" secondItem="4LO-pl-Jk8" secondAttribute="top" id="SqT-hz-Uev"/>
                             <constraint firstItem="xrf-mm-Eyl" firstAttribute="leading" secondItem="1rl-9s-5h2" secondAttribute="leading" id="SzZ-YZ-asM"/>
+                            <constraint firstItem="tjq-gV-MWY" firstAttribute="leading" secondItem="1rl-9s-5h2" secondAttribute="leading" id="TCh-Xz-PBM"/>
                             <constraint firstItem="pu1-GG-8j1" firstAttribute="top" secondItem="Up4-I8-Xo4" secondAttribute="bottom" constant="8" id="Uuc-x4-DDU"/>
                             <constraint firstItem="r6D-L1-1Jb" firstAttribute="top" secondItem="eZq-bf-RTn" secondAttribute="bottom" id="VWx-Q0-zfR"/>
                             <constraint firstItem="eXd-0T-5Yt" firstAttribute="leading" secondItem="1ig-1W-vdJ" secondAttribute="leading" id="aDR-AG-3tb"/>
@@ -297,6 +336,8 @@
                 <outlet property="rightOptionButton" destination="4LO-pl-Jk8" id="P8C-qL-vNA"/>
                 <outlet property="rightOptionLabel" destination="W5N-rD-eJn" id="uUO-2q-eeS"/>
                 <outlet property="rightOptionView" destination="6JA-9P-eKb" id="ZoS-Gt-zb6"/>
+                <outlet property="singleOptionButton" destination="aV9-DX-k7u" id="WHT-yT-Mgw"/>
+                <outlet property="singleOptionView" destination="tjq-gV-MWY" id="kdI-DV-dcs"/>
                 <outlet property="starRatingImageView" destination="Gae-K1-59p" id="OPa-rk-a4f"/>
             </connections>
             <point key="canvasLocation" x="52.799999999999997" y="48.575712143928037"/>
