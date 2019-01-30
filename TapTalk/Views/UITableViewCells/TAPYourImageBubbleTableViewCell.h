@@ -8,12 +8,15 @@
 
 #import "TAPBaseXIBRotatedTableViewCell.h"
 
+@class TAPYourImageBubbleTableViewCell;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPYourImageBubbleTableViewCellDelegate <NSObject>
 
 - (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell;
 
 @end
 
@@ -23,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) TAPMessageModel *message;
 
+@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewHeightConstraint;
 
