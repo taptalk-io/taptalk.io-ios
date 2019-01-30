@@ -702,6 +702,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 NSArray *productListArray = [message.data objectForKey:@"items"];
                 [cell setProductListBubbleCellWithData:productListArray];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
                 cell.delegate = self;
                 return cell;
             }
@@ -805,6 +806,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [cell setProductListBubbleCellWithData:productListArray];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.delegate = self;
+                [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
                 return cell;
             }
             
