@@ -47,7 +47,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     inputAccessoryExtensionTypeReplyMessage = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate>
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -701,6 +701,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 NSArray *productListArray = [message.data objectForKey:@"items"];
                 [cell setProductListBubbleCellWithData:productListArray];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.delegate = self;
                 return cell;
             }
             else {
@@ -802,6 +803,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 NSArray *productListArray = [message.data objectForKey:@"items"];
                 [cell setProductListBubbleCellWithData:productListArray];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.delegate = self;
                 return cell;
             }
             
@@ -1503,6 +1505,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
         [imageDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
     }
+}
+
+#pragma mark TAPProductListBubbleTableViewCell
+- (void)productListBubbleDidTappedLeftOrSingleOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption {
+    [[TapTalk sharedInstance] processingProductListLeftOrSingleOptionButtonTappedWithData:@[productDictionary] isSingleOption:isSingleOption];
+}
+
+- (void)productListBubbleDidTappedRightOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption {
+    [[TapTalk sharedInstance] processingProductListRightOptionButtonTappedWithData:@[productDictionary] isSingleOption:isSingleOption];
 }
 
 #pragma mark TAPGrowingTextView
