@@ -17,8 +17,9 @@ typedef NS_ENUM(NSInteger, TAPProductListBubbleTableViewCellType) {
 
 @protocol TAPProductListBubbleTableViewCellDelegate <NSObject>
 
-- (void)productListBubbleDidTappedLeftOrSingleOptionWithData:(TAPMessageModel *)message isSingleOptionView:(BOOL)isSingleOption;
-- (void)productListBubbleDidTappedRightOptionWithData:(TAPMessageModel *)message isSingleOptionView:(BOOL)isSingleOption;
+- (void)productListBubbleDidTappedLeftOrSingleOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption;
+- (void)productListBubbleDidTappedRightOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption;
+
 @end
 
 @interface TAPProductListBubbleTableViewCell : TAPBaseXIBRotatedTableViewCell

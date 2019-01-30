@@ -18,6 +18,7 @@
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 - (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
+- (NSArray *)convertDictionaryToProductModelWithData:(NSArray *)productDictionaryArray;
 - (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController;
 
 @end
@@ -645,7 +646,82 @@ fromNavigationController:(UINavigationController *)navigationController
     }
     
     return convertedProductArray;
+}
+
+- (NSArray *)convertDictionaryToProductModelWithData:(NSArray *)productDictionaryArray {
+    NSMutableArray *convertedProductArray = [[NSMutableArray alloc] init];
     
+    for (NSDictionary *productDictionary in productDictionaryArray) {
+        NSString *productID = [productDictionary objectForKey:@"id"];
+        productID = [TAPUtil nullToEmptyString:productID];
+        
+        NSString *productNameString = [productDictionary objectForKey:@"name"];
+        productNameString = [TAPUtil nullToEmptyString:productNameString];
+        
+        NSString *currencyString = [productDictionary objectForKey:@"currency"];
+        currencyString = [TAPUtil nullToEmptyString:currencyString];
+        
+        NSString *priceString = [productDictionary objectForKey:@"price"];
+        priceString = [TAPUtil nullToEmptyString:priceString];
+        
+        NSString *ratingString = [productDictionary objectForKey:@"rating"];
+        ratingString = [TAPUtil nullToEmptyString:ratingString];
+        
+        NSString *productDescriptionString = [productDictionary objectForKey:@"description"];
+        productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
+        
+        NSString *productImageURLString = [productDictionary objectForKey:@"imageURL"];
+        productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
+        
+        NSString *leftOptionTextString = [productDictionary objectForKey:@"buttonOption1Text"];
+        leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
+        
+        NSString *rightOptionTextString = [productDictionary objectForKey:@"buttonOption2Text"];
+        rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
+        
+        NSString *leftOptionColorString = [productDictionary objectForKey:@"buttonOption1Color"];
+        leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
+        
+        NSString *rightOptionColorString = [productDictionary objectForKey:@"buttonOption2Color"];
+        rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
+        
+        TAPProductModel *product = [TAPProductModel new];
+        product.productDataID = productID;
+        product.productName = productNameString;
+        product.productCurrency = currencyString;
+        product.productPrice = priceString;
+        product.productRating = ratingString;
+        product.productDescription = productDescriptionString;
+        product.productImageURL = productImageURLString;
+        product.buttonOption1Text = leftOptionTextString;
+        product.buttonOption2Text = rightOptionTextString;
+        product.buttonOption1Color = leftOptionColorString;
+        product.buttonOption2Color = rightOptionColorString;
+        
+        [convertedProductArray addObject:product];
+    }
+    
+    return convertedProductArray;
+}
+
+- (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
+    
+    NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
+    TAPProductModel *product = [convertedProductArray firstObject];
+    
+    if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:isSingleOption:)]) {
+        [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product isSingleOption:isSingleOption];
+    }
+}
+
+- (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
+    
+    NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
+    TAPProductModel *product = [convertedProductArray firstObject];
+    
+    if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:isSingleOption:)]) {
+        [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product isSingleOption:isSingleOption];
+    }
 }
 
 @end

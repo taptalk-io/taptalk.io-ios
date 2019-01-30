@@ -117,14 +117,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark - TAPProductListCollectionViewCell
 - (void)leftOrSingleOptionButtonDidTappedWithIndexPath:(NSIndexPath *)indexPath isSingleOptionView:(BOOL)isSingleOption {
+    NSDictionary *productData = [self.productDataArray objectAtIndex:indexPath.row];
     
-//    if ([self.delegate respondsToSelector:@selector(productListBubbleDidTappedLeftOrSingleOptionWithData:isSingleOptionView:)]) {
-//        [self.delegate productListBubbleDidTappedLeftOrSingleOptionWithData:<#(nonnull TAPMessageModel *)#> isSingleOptionView:isSingleOption];
-//    }
+    if ([self.delegate respondsToSelector:@selector(productListBubbleDidTappedLeftOrSingleOptionWithData:isSingleOptionView:)]) {
+        [self.delegate productListBubbleDidTappedLeftOrSingleOptionWithData:productData isSingleOptionView:isSingleOption];
+    }
 }
 
 - (void)rightOptionButtonDidTappedWithIndexPath:(NSIndexPath *)indexPath isSingleOptionView:(BOOL)isSingleOption {
+    NSDictionary *productData = [self.productDataArray objectAtIndex:indexPath.row];
     
+    if ([self.delegate respondsToSelector:@selector(productListBubbleDidTappedRightOptionWithData:isSingleOptionView:)]) {
+        [self.delegate productListBubbleDidTappedRightOptionWithData:productData isSingleOptionView:isSingleOption];
+    }
 }
 
 #pragma mark - Custom Method

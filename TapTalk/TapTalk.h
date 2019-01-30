@@ -53,6 +53,9 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (NSArray<TAPCustomKeyboardItemModel *> *)tapTalkCustomKeyboardForSender:(TAPUserModel *)sender
                                                                 recipient:(TAPUserModel *)recipient;
 
+- (void)productListBubbleLeftOrSingleOptionDidTappedProduct:(TAPProductModel *)product isSingleOption:(BOOL)isSingleOption;
+- (void)productListBubbleRightOptionDidTappedWithProduct:(TAPProductModel *)product isSingleOption:(BOOL)isSingleOption;
+
 - (void)tapTalkQuoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
 
 @end
@@ -153,5 +156,9 @@ fromNavigationController:(UINavigationController *)navigationController
 
 //Custom Quote
 - (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
+
+//TapTalk Internal Usage Method
+- (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
+- (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
 
 @end
