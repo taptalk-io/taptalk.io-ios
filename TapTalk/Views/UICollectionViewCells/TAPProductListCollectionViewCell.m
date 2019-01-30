@@ -161,19 +161,19 @@
 }
 
 - (IBAction)leftOptionButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:)]) {
+    if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:isSingleOptionView:)]) {
         [self.delegate leftOrSingleOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
     }
 }
 
 - (IBAction)rightOptionButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(rightOptionButtonDidTappedWithIndexPath:)]) {
+    if ([self.delegate respondsToSelector:@selector(rightOptionButtonDidTappedWithIndexPath:isSingleOptionView:)]) {
         [self.delegate rightOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
     }
 }
 
 - (IBAction)singleOptionButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:)]) {
+    if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:isSingleOptionView:)]) {
         [self.delegate leftOrSingleOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
     }
 }
