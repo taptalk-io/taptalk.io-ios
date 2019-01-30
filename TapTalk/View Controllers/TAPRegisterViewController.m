@@ -535,12 +535,6 @@
     [TAPDataManager callAPIGetAuthTicketWithUser:selectedUser success:^(NSString *authTicket) {
         [[TapTalk sharedInstance] setAuthTicket:authTicket success:^{
             
-            //Refresh Contact List From API
-            [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-            } failure:^(NSError *error) {
-                //        NSLog(@"%@", error);
-            }];
-            
             [self dismissViewControllerAnimated:YES completion:nil];
         } failure:^(NSError *error) {
             
