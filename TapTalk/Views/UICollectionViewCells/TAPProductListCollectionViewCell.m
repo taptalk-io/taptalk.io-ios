@@ -21,6 +21,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *starRatingImageView;
 @property (strong, nonatomic) IBOutlet UILabel *ratingPlaceholderLabel;
 @property (strong, nonatomic) IBOutlet UILabel *ratingLabel;
+@property (strong, nonatomic) IBOutlet UILabel *noRatingLabel;
 @property (strong, nonatomic) IBOutlet UILabel *productDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UIView *leftOptionView;
 @property (strong, nonatomic) IBOutlet UIView *rightOptionView;
@@ -39,6 +40,9 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    
+    self.noRatingLabel.alpha = 0.0f;
+    
     self.singleOptionView.alpha = 0.0f;
     self.singleOptionButton.alpha = 0.0f;
     self.singleOptionButton.userInteractionEnabled = NO;
@@ -69,6 +73,9 @@
 
 - (void)prepareForReuse {
     [super prepareForReuse];
+    self.starRatingImageView.alpha = 1.0f;
+    self.ratingLabel.alpha = 1.0f;
+    self.noRatingLabel.alpha = 0.0f;
     self.productImageView.image = nil;
     self.productNameLabel.text = @"";
     self.priceLabel.text = @"";
@@ -116,6 +123,17 @@
     
     if ([productDescriptionString isEqualToString:@""]) {
         productDescriptionString = @"No description";
+    }
+    
+    if ([ratingString isEqualToString:@""] || [ratingString isEqualToString:@"0.0"] || [ratingString isEqualToString:@"0"]) {
+        self.starRatingImageView.alpha = 0.0f;
+        self.ratingLabel.alpha = 0.0f;
+        self.noRatingLabel.alpha = 1.0f;
+    }
+    else {
+        self.starRatingImageView.alpha = 1.0f;
+        self.ratingLabel.alpha = 1.0f;
+        self.noRatingLabel.alpha = 0.0f;
     }
     
     self.productNameLabel.text = productNameString;
