@@ -1865,11 +1865,9 @@
         messageArray = [TAPUtil nullToEmptyArray:messageArray];
         
         NSMutableArray *tempRecipientIDArray = [NSMutableArray array];
-    
         NSMutableArray *messageResultArray = [NSMutableArray array];
+        
         for (NSDictionary *messageDictionary in messageArray) {
-            
-//            TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:messageDictionary error:nil];
             
             //Decrypt message
             TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDictionary];
@@ -1962,16 +1960,32 @@
         NSArray *messageArray = [responseObject valueForKeyPath:@"data.messages"];
         messageArray = [TAPUtil nullToEmptyArray:messageArray];
         
+        NSMutableArray *tempRecipientIDArray = [NSMutableArray array];
         NSMutableArray *messageResultArray = [NSMutableArray array];
+        
         for (NSDictionary *messageDictionary in messageArray) {
             
             //Decrypt message
             TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDictionary];
             
-            //Add User to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+            if([decryptedMessage.user.userID isEqualToString:[self getActiveUser].userID]) {
+                NSString *currentOtherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:decryptedMessage.room.roomID];
+                [tempRecipientIDArray addObject:currentOtherUserID];
+            }
+            else {
+                //Add User to Contact Manager
+                [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+            }
             
             [messageResultArray addObject:decryptedMessage];
+            
+        }
+        
+        if([tempRecipientIDArray count] > 0) {
+            //call get multiple user API to populate contact
+            [TAPDataManager callAPIGetBulkUserByUserID:tempRecipientIDArray success:^(NSArray *userModelArray) {
+            } failure:^(NSError *error) {
+            }];
         }
         
         success(messageResultArray);
