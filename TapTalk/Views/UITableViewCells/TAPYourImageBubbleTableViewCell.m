@@ -15,7 +15,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *downloadImageView;
 
 @property (strong, nonatomic) IBOutlet TAPImageView *thumbnailBubbleImageView;
-@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
+//@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
@@ -23,6 +23,7 @@
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
+@property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *captionLabel;
@@ -150,6 +151,7 @@
     self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
+    self.openImageButton.alpha = 0.0f;
     
     [self showQuoteView:NO];
     [self showReplyView:NO withMessage:nil];
@@ -165,6 +167,12 @@
 - (IBAction)replyButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourImageReplyDidTappedWithMessage:)]) {
         [self.delegate yourImageReplyDidTappedWithMessage:self.message];
+    }
+}
+
+- (IBAction)openImageButtonDidTapped:(id)sender  {
+    if ([self.delegate respondsToSelector:@selector(yourImageDidTapped:)]) {
+        [self.delegate yourImageDidTapped:self];
     }
 }
 
@@ -552,6 +560,7 @@
     [UIView animateWithDuration:0.2f animations:^{
         self.blurView.alpha = 0.0f;
         self.progressBackgroundView.alpha = 0.0f;
+        self.openImageButton.alpha = 1.0f;
     }];
 }
 

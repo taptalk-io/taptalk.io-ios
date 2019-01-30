@@ -16,7 +16,7 @@
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet TAPImageView *thumbnailBubbleImageView;
-@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
+//@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *cancelImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *downloadImageView;
@@ -32,6 +32,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *cancelButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
+@property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconLeftConstraint;
@@ -150,6 +151,7 @@
     self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
+    self.openImageButton.alpha = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -286,6 +288,12 @@
 - (IBAction)retryButtonDidTapped:(id)sender  {
     if ([self.delegate respondsToSelector:@selector(myImageRetryDidTappedWithMessage:)]) {
         [self.delegate myImageRetryDidTappedWithMessage:self.message];
+    }
+}
+
+- (IBAction)openImageButtonDidTapped:(id)sender  {
+    if ([self.delegate respondsToSelector:@selector(myImageDidTapped:)]) {
+        [self.delegate myImageDidTapped:self];
     }
 }
 
@@ -460,6 +468,7 @@
     [UIView animateWithDuration:0.2f animations:^{
         self.blurView.alpha = 0.0f;
         self.progressBackgroundView.alpha = 0.0f;
+        self.openImageButton.alpha = 1.0f;
     }];
 }
 

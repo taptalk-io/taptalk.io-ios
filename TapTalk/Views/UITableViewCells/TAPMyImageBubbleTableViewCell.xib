@@ -165,6 +165,12 @@
                                     <constraint firstAttribute="height" priority="999" constant="300" id="xOq-yb-L9x"/>
                                 </constraints>
                             </imageView>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eKC-XJ-Soe">
+                                <rect key="frame" x="0.0" y="68" width="234" height="300"/>
+                                <connections>
+                                    <action selector="openImageButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="4cj-MN-cSJ"/>
+                                </connections>
+                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZeB-2B-m5c">
                                 <rect key="frame" x="93" y="194" width="48" height="48"/>
                                 <subviews>
@@ -250,13 +256,17 @@
                         <constraints>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="trailing" secondItem="IUO-Bd-7lc" secondAttribute="trailing" id="16a-qr-tfw"/>
                             <constraint firstItem="ZeB-2B-m5c" firstAttribute="centerX" secondItem="f4S-1d-CLr" secondAttribute="centerX" id="2Xs-YG-9mo"/>
+                            <constraint firstItem="eKC-XJ-Soe" firstAttribute="bottom" secondItem="f4S-1d-CLr" secondAttribute="bottom" id="4ve-Oo-BzG"/>
                             <constraint firstAttribute="trailing" secondItem="QyT-DU-suG" secondAttribute="trailing" constant="10" id="6ie-9m-Seq"/>
                             <constraint firstItem="AXj-gR-pkg" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="Bn2-ax-esJ"/>
+                            <constraint firstItem="eKC-XJ-Soe" firstAttribute="top" secondItem="f4S-1d-CLr" secondAttribute="top" id="G9O-2d-ReH"/>
                             <constraint firstItem="QyT-DU-suG" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="HAS-wo-E40"/>
                             <constraint firstAttribute="bottom" secondItem="aBL-bd-0Oe" secondAttribute="bottom" constant="10" id="HIM-hI-nJv"/>
+                            <constraint firstItem="eKC-XJ-Soe" firstAttribute="leading" secondItem="f4S-1d-CLr" secondAttribute="leading" id="I1P-EX-2Jm"/>
                             <constraint firstItem="ZeB-2B-m5c" firstAttribute="centerY" secondItem="f4S-1d-CLr" secondAttribute="centerY" id="PcG-cF-Vrf"/>
                             <constraint firstAttribute="trailing" secondItem="AXj-gR-pkg" secondAttribute="trailing" constant="10" id="WiS-F0-2sN"/>
                             <constraint firstItem="aBL-bd-0Oe" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="XD1-c4-XZ4"/>
+                            <constraint firstItem="eKC-XJ-Soe" firstAttribute="trailing" secondItem="f4S-1d-CLr" secondAttribute="trailing" id="aBu-oE-Kwn"/>
                             <constraint firstItem="aBL-bd-0Oe" firstAttribute="top" secondItem="f4S-1d-CLr" secondAttribute="bottom" constant="10" id="bst-x2-Nvl"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="bottom" secondItem="IUO-Bd-7lc" secondAttribute="bottom" id="cMb-YC-29K"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="leading" secondItem="IUO-Bd-7lc" secondAttribute="leading" id="fxY-KS-h7z"/>
@@ -316,6 +326,7 @@
                 <outlet property="captionLabelTopConstraint" destination="bst-x2-Nvl" id="SfY-Yf-nNa"/>
                 <outlet property="chatBubbleRightConstraint" destination="Sfa-UL-VDP" id="uV2-kq-AKu"/>
                 <outlet property="downloadImageView" destination="Qqn-aE-vYh" id="FXe-x9-v2m"/>
+                <outlet property="openImageButton" destination="eKC-XJ-Soe" id="B57-ts-xrp"/>
                 <outlet property="progressBackgroundView" destination="ZeB-2B-m5c" id="xqO-IT-RS7"/>
                 <outlet property="progressBarView" destination="tfO-kO-gDQ" id="Y8v-U5-6J5"/>
                 <outlet property="quoteImageView" destination="aQc-pt-QmK" id="kyu-xR-Iay"/>

@@ -8,6 +8,8 @@
 
 #import "TAPBaseMyBubbleTableViewCell.h"
 
+@class TAPMyImageBubbleTableViewCell;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
@@ -22,6 +24,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell;
 
 @end
 
@@ -32,6 +35,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 @property (nonatomic) TAPMyImageBubbleTableViewCellStateType myImageBubbleTableViewCellStateType;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
 
+@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewHeightConstraint;
 
