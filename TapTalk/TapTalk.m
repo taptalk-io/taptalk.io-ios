@@ -66,7 +66,7 @@
     }
     
     //Initialize Contact Manager To Populate Contact Data
-    [TAPContactManager sharedManager];
+    [[TAPContactManager sharedManager] populateContactFromDatabase];
     
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
         //Send Push Token to server

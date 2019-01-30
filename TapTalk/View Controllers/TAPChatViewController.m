@@ -27,6 +27,9 @@
 #import "TAPProductListBubbleTableViewCell.h" //DV Temp
 #import "TAPOrderCardBubbleTableViewCell.h" //CS Temp
 
+//WK Temp
+#import "TAPImageDetailViewController.h"
+
 #import "TAPQuoteModel.h"
 
 static const NSInteger kShowChatAnchorOffset = 70.0f;
@@ -44,7 +47,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     inputAccessoryExtensionTypeReplyMessage = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate>
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -124,6 +127,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
+
+@property (nonatomic) BOOL isShowAccessoryView;
     
 
 - (IBAction)sendButtonDidTapped:(id)sender;
@@ -377,6 +382,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     _isKeyboardWasShowed = NO;
     _isKeyboardShowed = NO;
+    _isShowAccessoryView = YES;
     
     _lastSeenTimer = [NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(timerRefreshLastSeen) userInfo:nil repeats:YES];
     
@@ -1240,6 +1246,45 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }];
 }
 
+- (void)myImageReplyDidTapped {
+    
+}
+
+- (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
+    [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
+    
+    _isShowAccessoryView = NO;
+    [self reloadInputViews];
+    
+    TAPImageDetailViewController *imageDetailViewController = [[TAPImageDetailViewController alloc] init];
+    imageDetailViewController.delegate = self;
+    
+    UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
+    NSArray *imageSliderImage = [NSArray array];
+    if(cellImage != nil) {
+        imageSliderImage = @[cellImage];
+        TAPMessageModel *currentMessage = myImageBubbleCell.message;
+        NSString *cellImageURLString = [TAPUtil nullToEmptyString:[myImageBubbleCell.message.data objectForKey:@"fileID"]];
+
+        NSString *fileID = [myImageBubbleCell.message.data objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        [imageDetailViewController setThumbnailImageArray:imageSliderImage];
+        [imageDetailViewController setImageArray:@[cellImage]];
+        
+        [imageDetailViewController setActiveIndex:0];
+    
+        NSInteger selectedRow = [self.messageArray indexOfObject:myImageBubbleCell.message];
+        NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
+        CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
+        CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
+        CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + 6.0f + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        
+        [imageDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+    }
+}
+
 #pragma mark TAPYourChatBubbleTableViewCell
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -1411,6 +1456,46 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+#pragma mark TAPYourImageBubbleTableViewCell
+- (void)yourImageReplyDidTapped {
+    
+}
+
+- (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
+    [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
+    
+    _isShowAccessoryView = NO;
+    [self reloadInputViews];
+    
+    TAPImageDetailViewController *imageDetailViewController = [[TAPImageDetailViewController alloc] init];
+    imageDetailViewController.delegate = self;
+    
+    UIImage *cellImage = yourImageBubbleCell.bubbleImageView.image;
+    NSArray *imageSliderImage = [NSArray array];
+    if(cellImage != nil) {
+        imageSliderImage = @[cellImage];
+        TAPMessageModel *currentMessage = yourImageBubbleCell.message;
+        NSString *cellImageURLString = [TAPUtil nullToEmptyString:[yourImageBubbleCell.message.data objectForKey:@"fileID"]];
+        
+        NSString *fileID = [yourImageBubbleCell.message.data objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        [imageDetailViewController setThumbnailImageArray:imageSliderImage];
+        [imageDetailViewController setImageArray:@[cellImage]];
+        
+        [imageDetailViewController setActiveIndex:0];
+        
+        NSInteger selectedRow = [self.messageArray indexOfObject:yourImageBubbleCell.message];
+        NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
+        CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
+        CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
+        CGRect imageRectInView = CGRectMake(16.0f, CGRectGetMinY(cellRectInView) + 6.0f + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], yourImageBubbleCell.bubbleImageViewWidthConstraint.constant, yourImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        
+        [imageDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+    }
+}
+
 #pragma mark TAPGrowingTextView
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
     [UIView animateWithDuration:0.1f animations:^{
@@ -1562,6 +1647,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
         [[TAPChatManager sharedManager] sendImageMessage:selectedImage caption:caption];
     }
+}
+
+#pragma mark TAPImageDetailViewController
+- (void)imageDetailViewControllerWillStartClosingAnimation {
+    _isShowAccessoryView = YES;
+    
+    [self reloadInputViews];
 }
 
 #pragma mark - Custom Method
@@ -2612,7 +2704,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
-    return self.inputMessageAccessoryView;
+    if (self.isShowAccessoryView) {
+        return self.inputMessageAccessoryView;
+    }
+    else {
+        return nil;
+    }
+    
 }
 
 - (BOOL)canBecomeFirstResponder {

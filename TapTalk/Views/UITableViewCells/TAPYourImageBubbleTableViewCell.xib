@@ -61,6 +61,12 @@
                                     <constraint firstAttribute="width" constant="234" id="nzm-pk-N5C"/>
                                 </constraints>
                             </imageView>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jPa-2d-Pxc">
+                                <rect key="frame" x="0.0" y="68" width="234" height="300"/>
+                                <connections>
+                                    <action selector="openImageButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="DDh-1d-vaQ"/>
+                                </connections>
+                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dle-zC-gDE">
                                 <rect key="frame" x="93" y="194" width="48" height="48"/>
                                 <subviews>
@@ -214,6 +220,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
+                            <constraint firstItem="jPa-2d-Pxc" firstAttribute="bottom" secondItem="pVW-ZN-0k9" secondAttribute="bottom" id="0r6-gf-OI9"/>
                             <constraint firstItem="jFV-u9-bL6" firstAttribute="top" secondItem="pVW-ZN-0k9" secondAttribute="top" id="34G-Ph-h5o"/>
                             <constraint firstItem="KOu-lI-oLh" firstAttribute="bottom" secondItem="pVW-ZN-0k9" secondAttribute="bottom" id="4uG-xf-cXn"/>
                             <constraint firstItem="dle-zC-gDE" firstAttribute="centerY" secondItem="pVW-ZN-0k9" secondAttribute="centerY" id="989-ac-mnW"/>
@@ -231,9 +238,12 @@
                             <constraint firstItem="mBC-Z6-fF5" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="leading" constant="10" id="QSN-bt-oef"/>
                             <constraint firstItem="jFV-u9-bL6" firstAttribute="trailing" secondItem="pVW-ZN-0k9" secondAttribute="trailing" id="S2a-Yu-bdL"/>
                             <constraint firstItem="jFV-u9-bL6" firstAttribute="leading" secondItem="pVW-ZN-0k9" secondAttribute="leading" id="X9G-2D-MWi"/>
+                            <constraint firstItem="jPa-2d-Pxc" firstAttribute="leading" secondItem="pVW-ZN-0k9" secondAttribute="leading" id="ZNE-xN-0Il"/>
                             <constraint firstItem="mBC-Z6-fF5" firstAttribute="top" secondItem="Pdc-VM-5SJ" secondAttribute="top" constant="10" id="Ztd-lV-6Pd"/>
                             <constraint firstItem="KOu-lI-oLh" firstAttribute="trailing" secondItem="pVW-ZN-0k9" secondAttribute="trailing" id="clz-dd-aok"/>
                             <constraint firstItem="KOu-lI-oLh" firstAttribute="leading" secondItem="pVW-ZN-0k9" secondAttribute="leading" id="eJI-Mz-cUj"/>
+                            <constraint firstItem="jPa-2d-Pxc" firstAttribute="top" secondItem="pVW-ZN-0k9" secondAttribute="top" id="evZ-tR-8m9"/>
+                            <constraint firstItem="jPa-2d-Pxc" firstAttribute="trailing" secondItem="pVW-ZN-0k9" secondAttribute="trailing" id="gl1-NG-snk"/>
                             <constraint firstAttribute="trailing" secondItem="cG1-Kg-Lav" secondAttribute="trailing" constant="10" id="l5U-Ah-ytM"/>
                             <constraint firstItem="ngr-f7-6gy" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="leading" constant="10" id="pZ6-iX-qQF"/>
                             <constraint firstItem="jFV-u9-bL6" firstAttribute="bottom" secondItem="pVW-ZN-0k9" secondAttribute="bottom" id="qHd-TP-m4Y"/>
@@ -283,6 +293,7 @@
                 <outlet property="captionLabelBottomConstraint" destination="KDi-jN-xZ0" id="JcY-W2-W6J"/>
                 <outlet property="captionLabelTopConstraint" destination="HBf-QT-Xl8" id="qI4-7k-ICd"/>
                 <outlet property="downloadImageView" destination="615-F2-3pn" id="G4X-I8-hyV"/>
+                <outlet property="openImageButton" destination="jPa-2d-Pxc" id="NgY-9y-tI4"/>
                 <outlet property="progressBackgroundView" destination="dle-zC-gDE" id="yeh-fT-Htk"/>
                 <outlet property="progressBarView" destination="dH4-Pp-KVE" id="vVD-Dg-zzU"/>
                 <outlet property="quoteImageView" destination="Uvf-pJ-5d1" id="hdQ-W9-qZs"/>
