@@ -44,6 +44,10 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message;
 
 @optional
+//User Profile
+- (void)tapTalkProfileButtonDidTapped:(UIViewController *)viewController
+                            otherUser:(TAPUserModel *)otherUser;
+
 //Custom Keyboard
 - (void)tapTalkCustomKeyboardDidTappedWithSender:(TAPUserModel *)sender
                                        recipient:(TAPUserModel *)recipient
@@ -53,9 +57,12 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (NSArray<TAPCustomKeyboardItemModel *> *)tapTalkCustomKeyboardForSender:(TAPUserModel *)sender
                                                                 recipient:(TAPUserModel *)recipient;
 
+//Product List
 - (void)productListBubbleLeftOrSingleOptionDidTappedProduct:(TAPProductModel *)product isSingleOption:(BOOL)isSingleOption;
+
 - (void)productListBubbleRightOptionDidTappedWithProduct:(TAPProductModel *)product isSingleOption:(BOOL)isSingleOption;
 
+//Quote
 - (void)tapTalkQuoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
 
 @end
@@ -110,7 +117,6 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (void)setAppKeyID:(NSString *)appKeyID;
 
 //Chat
-
 - (void)openRoomWithXCUserID:(NSString *)XCUserID
                   quoteTitle:(nullable NSString *)quoteTitle
                 quoteContent:(nullable NSString *)quoteContent
@@ -160,5 +166,6 @@ fromNavigationController:(UINavigationController *)navigationController
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
 - (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
+- (void)profileButtonDidTapped:(UIViewController *)activeViewController otherUser:(TAPUserModel *)otherUser;
 
 @end

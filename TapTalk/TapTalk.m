@@ -7,6 +7,7 @@
 //
 
 #import "TapTalk.h"
+#import "TAPProfileViewController.h"
 @import AFNetworking;
 
 @interface TapTalk () <TAPNotificationManagerDelegate>
@@ -704,6 +705,7 @@ fromNavigationController:(UINavigationController *)navigationController
     return convertedProductArray;
 }
 
+//TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
@@ -721,6 +723,17 @@ fromNavigationController:(UINavigationController *)navigationController
     
     if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:isSingleOption:)]) {
         [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product isSingleOption:isSingleOption];
+    }
+}
+
+- (void)profileButtonDidTapped:(UIViewController *)activeViewController otherUser:(TAPUserModel *)otherUser {
+    if ([self.delegate respondsToSelector:@selector(tapTalkProfileButtonDidTapped:otherUser:)]) {
+        [self.delegate tapTalkProfileButtonDidTapped:activeViewController otherUser:otherUser];
+    }
+    else {
+        TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+        profileViewController.room = [TAPChatManager sharedManager].activeRoom;
+        [activeViewController.navigationController pushViewController:profileViewController animated:YES];
     }
 }
 
