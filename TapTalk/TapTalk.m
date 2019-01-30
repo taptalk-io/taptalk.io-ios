@@ -215,8 +215,8 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:application];
     
     //RN Temp
-    TAPRegisterViewController *registerViewController = [[TapTalk sharedInstance] registerViewController];
-    [registerViewController presentRegisterViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:NO];
+//    TAPRegisterViewController *registerViewController = [[TapTalk sharedInstance] registerViewController];
+//    [registerViewController presentRegisterViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:NO];
     //END RN Temp
     
     _instanceState = TapTalkInstanceStateActive;
