@@ -1737,22 +1737,55 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         //Update view
         NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
         NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
-        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
         
-        if (isSendingAnimation) {
-            [cell receiveSentEvent];
-        }
-        else if (setAsDelivered) {
-            [cell receiveDeliveredEvent];
-        }
-        else if (setAsRead) {
-            [cell receiveReadEvent];
-        }
-        else {
-            [cell setMessage:message];
+        if (currentMessage.type == TAPChatMessageTypeText) {
+            TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
             
-            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-            //        [self.tableView reloadData];
+            if (isSendingAnimation) {
+                [cell receiveSentEvent];
+            }
+            else if (setAsDelivered) {
+                [cell receiveDeliveredEvent];
+            }
+            else if (setAsRead) {
+                [cell receiveReadEvent];
+            }
+            else {
+                [cell setMessage:message];
+                
+                //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                //        [self.tableView reloadData];
+            }
+        }
+        else if (currentMessage.type == TAPChatMessageTypeImage) {
+            TAPMyImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+            
+            if (isSendingAnimation) {
+                [cell receiveSentEvent];
+            }
+            else if (setAsDelivered) {
+                [cell receiveDeliveredEvent];
+            }
+            else if (setAsRead) {
+                [cell receiveReadEvent];
+            }
+            else {
+                [cell setMessage:message];
+                
+                //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                //        [self.tableView reloadData];
+            }
+        }
+        else if (currentMessage.type == TAPChatMessageTypeProduct) {
+            TAPProductListBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+            NSArray *productListArray = [currentMessage.data objectForKey:@"items"];
+            [cell setProductListBubbleCellWithData:productListArray];
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
+            }
+            else {
+                [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
+            }
         }
     }
     else {
