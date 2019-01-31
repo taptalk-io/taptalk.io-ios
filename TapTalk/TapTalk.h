@@ -41,7 +41,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 @protocol TapTalkDelegate <NSObject>
 
 - (void)tapTalkShouldResetAuthTicket;
-- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message;
+- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message fromActiveController:(UIViewController *)currentActiveController;
 
 @optional
 //User Profile
@@ -126,23 +126,16 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
     fromNavigationController:(UINavigationController *)navigationController
                      success:(void (^)(void))success
                      failure:(void (^)(NSError *error))failure;
-
-- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
-     fromNavigationController:(UINavigationController *)navigationController;
-- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
-               withQuoteTitle:(NSString *)quoteTitle
-                 quoteContent:(NSString *)quoteContent
-          quoteImageURLString:(NSString *)quoteImageURL
-                     userInfo:(NSDictionary *)userInfo
-     fromNavigationController:(UINavigationController *)navigationController;
 - (void)openRoomWithRoom:(TAPRoomModel *)room
+              quoteTitle:(nullable NSString *)quoteTitle
+            quoteContent:(nullable NSString *)quoteContent
+     quoteImageURLString:(nullable NSString *)quoteImageURL
+                userInfo:(nullable NSDictionary *)userInfo
 fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated;
+- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
+     fromNavigationController:(UINavigationController *)navigationController;
 - (void)openRoomWithRoom:(TAPRoomModel *)room
-          withQuoteTitle:(NSString *)quoteTitle
-            quoteContent:(NSString *)quoteContent
-     quoteImageURLString:(NSString *)quoteImageURL
-                userInfo:(NSDictionary *)userInfo
 fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated;
 - (void)shouldRefreshAuthTicket;
