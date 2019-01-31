@@ -335,7 +335,7 @@
 }
 
 - (UINavigationController *)getCurrentTapTalkActiveNavigationController {
-    return [self getCurrentTapTalkActiveNavigationController].navigationController;
+    return [self getCurrentTapTalkActiveViewController].navigationController;
 }
 
 - (UIViewController *)getCurrentTapTalkActiveViewController {
