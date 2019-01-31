@@ -672,9 +672,9 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
     TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-
+    
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
     TAPProductModel *product = [convertedProductArray firstObject];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
@@ -687,7 +687,7 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
     TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
