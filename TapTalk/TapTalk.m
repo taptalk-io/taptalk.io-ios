@@ -671,23 +671,31 @@ fromNavigationController:(UINavigationController *)navigationController
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
     TAPProductModel *product = [convertedProductArray firstObject];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    if ([self.delegate respondsToSelector:@selector(productListBubbleLeftOrSingleOptionDidTappedProduct:room:isSingleOption:)]) {
-        [self.delegate productListBubbleLeftOrSingleOptionDidTappedProduct:product room:room isSingleOption:isSingleOption];
+    if ([self.delegate respondsToSelector:@selector(tapTalkProductListBubbleLeftOrSingleOptionDidTappedProduct:room:recipient:isSingleOption:)]) {
+        [self.delegate tapTalkProductListBubbleLeftOrSingleOptionDidTappedProduct:product room:room recipient:otherUser isSingleOption:isSingleOption];
     }
 }
 
 - (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    
     NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
     TAPProductModel *product = [convertedProductArray firstObject];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    if ([self.delegate respondsToSelector:@selector(productListBubbleRightOptionDidTappedWithProduct:room:isSingleOption:)]) {
-        [self.delegate productListBubbleRightOptionDidTappedWithProduct:product room:room isSingleOption:isSingleOption];
+    if ([self.delegate respondsToSelector:@selector(tapTalkProductListBubbleRightOptionDidTappedWithProduct:room:recipient:isSingleOption:)]) {
+        [self.delegate tapTalkProductListBubbleRightOptionDidTappedWithProduct:product room:room recipient:otherUser isSingleOption:isSingleOption];
     }
 }
 
