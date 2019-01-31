@@ -68,13 +68,6 @@
         failure(error);
     }
     
-    //Refresh Contact List
-    [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-        
-    } failure:^(NSError *error) {
-        //        NSLog(@"%@", error);
-    }];
-    
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
         //Send Push Token to server
         NSString *pushToken = [[TAPNotificationManager sharedManager] pushToken];
@@ -97,6 +90,13 @@
         }
         
         [[TAPChatManager sharedManager] connect];
+        
+        //Refresh Contact List
+        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
+            
+        } failure:^(NSError *error) {
+            //        NSLog(@"%@", error);
+        }];
         
         //First chat initialization on login
         self.roomListViewController.isShouldNotLoadFromAPI = NO;
@@ -194,30 +194,12 @@
     //Call to run room list view controller sequence
     self.roomListViewController.isShouldNotLoadFromAPI = NO;
     [self.roomListViewController viewLoadedSequence];
-    
-    
-    //DV Temp
-    //Temporary show log notification prefs
-//    NSMutableArray *pushNotificationArray = [[NSMutableArray alloc] init];
-//    pushNotificationArray = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_INCOMING_PUSH_NOTIFICATION valid:nil];
-//    
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Log Push Notification"
-//                                                    message:[NSString stringWithFormat:@"COUNT DICT NOTIFICATION: %ld", (long)[pushNotificationArray count]]
-//                                                   delegate:self
-//                                          cancelButtonTitle:@"OK"
-//                                          otherButtonTitles:nil];
-//    [alert show];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:application];
-    
-    //RN Temp
-//    TAPRegisterViewController *registerViewController = [[TapTalk sharedInstance] registerViewController];
-//    [registerViewController presentRegisterViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:NO];
-    //END RN Temp
     
     _instanceState = TapTalkInstanceStateActive;
 
@@ -286,25 +268,6 @@
     
     [[TAPNotificationManager sharedManager] handleTappedNotificationWithUserInfo:messageDictionary];
     
-    //DV Temp
-    //DV Note - Temporary open chat room when tapped notification - later will be handled in client's app delegate
-    TAPRoomModel *room = message.room;
-    
-    UIViewController *currentActiveController = ((UINavigationController *)self.activeWindow.rootViewController).topViewController;
-    UINavigationController *currentNavigationController = currentActiveController.navigationController;
-    
-    if ([currentActiveController isKindOfClass:[TAPChatViewController class]]) {
-//        NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray:currentNavigationController.viewControllers];
-//        NSInteger viewControllerIndex = [navigationArray indexOfObject:currentActiveController];
-//        [navigationArray removeObjectAtIndex: viewControllerIndex];
-//        currentNavigationController.viewControllers = navigationArray;
-        [currentActiveController.navigationController popViewControllerAnimated:NO];
-    }
-    
-    [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:currentNavigationController animated:YES];
-    
-    //END DV Temp
-    
     completionHandler();
 }
 
@@ -353,8 +316,9 @@
 #pragma mark - Delegate
 #pragma mark TAPNotificationManager
 - (void)notificationManagerDidHandleTappedNotificationWithMessage:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:)]) {
-        [self.delegate tapTalkDidTappedNotificationWithMessage:message];
+    UIViewController *currentActiveController = [[TapTalk sharedInstance] getCurrentTapTalkActiveViewController];
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:fromActiveController:)]) {
+        [self.delegate tapTalkDidTappedNotificationWithMessage:message fromActiveController:currentActiveController];
     }
 }
 
@@ -493,24 +457,24 @@
     [navigationController pushViewController:chatViewController animated:YES];
 }
 
-- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
-               withQuoteTitle:(NSString *)quoteTitle
-                 quoteContent:(NSString *)quoteContent
-          quoteImageURLString:(NSString *)quoteImageURL
-                     userInfo:(NSDictionary *)userInfo
-     fromNavigationController:(UINavigationController *)navigationController {
-    
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+              quoteTitle:(nullable NSString *)quoteTitle
+            quoteContent:(nullable NSString *)quoteContent
+     quoteImageURLString:(nullable NSString *)quoteImageURL
+                userInfo:(nullable NSDictionary *)userInfo
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated {
+
     //Create quote model and set quote to chat
     TAPQuoteModel *quote = [TAPQuoteModel new];
     quote.title = quoteTitle;
     quote.content = quoteContent;
     quote.imageURL = quoteImageURL;
-    
-    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
+
     [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
-    
+
     //Open room
-    [self openRoomWithOtherUser:otherUser fromNavigationController:navigationController];
+    [self openRoomWithRoom:room fromNavigationController:navigationController animated:isAnimated];
 }
 
 - (void)openRoomWithRoom:(TAPRoomModel *)room
@@ -526,26 +490,6 @@ fromNavigationController:(UINavigationController *)navigationController
     chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
     chatViewController.hidesBottomBarWhenPushed = YES;
     [navigationController pushViewController:chatViewController animated:isAnimated];
-}
-
-- (void)openRoomWithRoom:(TAPRoomModel *)room
-          withQuoteTitle:(NSString *)quoteTitle
-            quoteContent:(NSString *)quoteContent
-     quoteImageURLString:(NSString *)quoteImageURL
-                userInfo:(NSDictionary *)userInfo
-fromNavigationController:(UINavigationController *)navigationController
-                animated:(BOOL)isAnimated {
-    
-    //Create quote model and set quote to chat
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.title = quoteTitle;
-    quote.content = quoteContent;
-    quote.imageURL = quoteImageURL;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
-    
-    //Open room
-    [self openRoomWithRoom:room fromNavigationController:navigationController animated:isAnimated];
 }
 
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
