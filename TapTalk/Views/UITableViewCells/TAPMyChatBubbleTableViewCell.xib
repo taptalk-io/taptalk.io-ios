@@ -175,22 +175,33 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5YI-Ih-9ho">
+                                <rect key="frame" x="0.0" y="0.0" width="88" height="75"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="chatBubbleButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Q2y-sL-YBX"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.78823529410000004" green="0.42352941179999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="HId-QA-OEm" secondAttribute="trailing" constant="12" id="21e-lQ-AaL"/>
+                            <constraint firstAttribute="trailing" secondItem="5YI-Ih-9ho" secondAttribute="trailing" id="3En-3e-7Uz"/>
                             <constraint firstAttribute="bottom" secondItem="HId-QA-OEm" secondAttribute="bottom" constant="12" id="D2k-aQ-9bO"/>
                             <constraint firstAttribute="trailing" secondItem="aYN-I4-Iq3" secondAttribute="trailing" constant="12" id="Inm-Yt-Rbi"/>
                             <constraint firstItem="FpM-fx-qIk" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="12" id="JfB-33-PJ5"/>
                             <constraint firstItem="aYN-I4-Iq3" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" constant="12" id="TeA-nh-uQU"/>
                             <constraint firstAttribute="trailing" secondItem="FpM-fx-qIk" secondAttribute="trailing" constant="12" id="URw-C8-8Yo"/>
+                            <constraint firstItem="5YI-Ih-9ho" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" id="VHj-dp-dEh"/>
                             <constraint firstItem="HId-QA-OEm" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="12" id="XAP-a9-e2N"/>
+                            <constraint firstAttribute="bottom" secondItem="5YI-Ih-9ho" secondAttribute="bottom" id="Xvh-hq-Zo9"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="emZ-JP-RK4"/>
                             <constraint firstItem="HId-QA-OEm" firstAttribute="top" secondItem="aYN-I4-Iq3" secondAttribute="bottom" constant="3" id="hoW-H6-ZyD"/>
                             <constraint firstItem="HId-QA-OEm" firstAttribute="top" secondItem="FpM-fx-qIk" secondAttribute="bottom" constant="3" id="oBz-7z-5Lm"/>
                             <constraint firstItem="aYN-I4-Iq3" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="12" id="sx8-nx-DwZ"/>
                             <constraint firstItem="FpM-fx-qIk" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" constant="12" id="yoR-Dv-Phl"/>
+                            <constraint firstItem="5YI-Ih-9ho" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" id="zeL-On-k6I"/>
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSendingChat" translatesAutoresizingMaskIntoConstraints="NO" id="iM8-gR-PXe">
@@ -241,6 +252,7 @@
             <connections>
                 <outlet property="bubbleLabel" destination="HId-QA-OEm" id="xCk-Rg-SwJ"/>
                 <outlet property="bubbleView" destination="GBq-4A-GJ7" id="mf1-eN-u3j"/>
+                <outlet property="chatBubbleButton" destination="5YI-Ih-9ho" id="vPe-52-Uml"/>
                 <outlet property="chatBubbleRightConstraint" destination="mVW-oN-ID9" id="PFu-ZX-Hak"/>
                 <outlet property="quoteImageView" destination="pzV-EX-DL1" id="yln-1f-Qfm"/>
                 <outlet property="quoteSubtitleLabel" destination="C0g-rZ-3f4" id="WYp-lt-bDS"/>
