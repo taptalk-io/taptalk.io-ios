@@ -236,7 +236,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     [self.tableView setTransform:CGAffineTransformMakeRotation(-M_PI)];
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 10.0f);
-    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.rowHeight = 0.0f;
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     
     [UIView commitAnimations];
