@@ -466,12 +466,14 @@ fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated {
 
     //Create quote model and set quote to chat
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.title = quoteTitle;
-    quote.content = quoteContent;
-    quote.imageURL = quoteImageURL;
-
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+    if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
+        TAPQuoteModel *quote = [TAPQuoteModel new];
+        quote.title = quoteTitle;
+        quote.content = quoteContent;
+        quote.imageURL = quoteImageURL;
+        
+        [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+    }
 
     //Open room
     [self openRoomWithRoom:room fromNavigationController:navigationController animated:isAnimated];

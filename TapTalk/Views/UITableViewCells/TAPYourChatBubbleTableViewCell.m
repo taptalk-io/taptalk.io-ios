@@ -67,8 +67,7 @@
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
     
-    [self.quoteImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //CS TEMP
-    [self showQuoteView:NO]; //CS TEMP
+    [self showQuoteView:NO];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -92,7 +91,7 @@
         //reply to exists
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
-        if(message.quote.fileID || message.quote.imageURL) {
+        if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote];
