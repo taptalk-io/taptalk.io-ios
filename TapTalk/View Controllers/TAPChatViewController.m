@@ -365,10 +365,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
     TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     
-    if([[[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser] count] > 0) {
+    NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:otherUser];
+    if([keyboardArray count] > 0) {
         //There's custom keyboard for this type
-        NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:currentUser];
-        
         [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:otherUser];
         _isCustomKeyboardAvailable = YES;
     }
