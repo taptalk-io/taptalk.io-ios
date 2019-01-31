@@ -41,6 +41,8 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewBottomConstraint;
 
+@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
+
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
 
@@ -66,6 +68,10 @@
     
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
+    
+    _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewTap:)];
+    [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
     
     [self showQuoteView:NO];
 }
@@ -169,6 +175,8 @@
             animationDuration = 0.0f;
         }
         
+        self.chatBubbleButton.alpha = 1.0f;
+        
         [UIView animateWithDuration:animationDuration animations:^{
             self.statusLabel.alpha = 1.0f;
             self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
@@ -198,9 +206,16 @@
             [self.contentView layoutIfNeeded];
             [self layoutIfNeeded];
         } completion:^(BOOL finished) {
+            self.chatBubbleButton.alpha = 0.0f;
             self.chatBubbleButton.userInteractionEnabled = YES;
             self.statusLabel.alpha = 0.0f;
         }];
+    }
+}
+
+- (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
+    if ([self.delegate respondsToSelector:@selector(yourChatBubbleViewDidTapped:)]) {
+        [self.delegate yourChatBubbleViewDidTapped:self.message];
     }
 }
 

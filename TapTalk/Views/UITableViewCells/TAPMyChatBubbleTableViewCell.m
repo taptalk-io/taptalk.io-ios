@@ -31,6 +31,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *retryIconImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
+@property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
 
@@ -105,7 +106,7 @@
     self.quoteView.layer.cornerRadius = 8.0f;
     
     _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                            action:@selector(handleBubbleViewTap:)];
+                                                                              action:@selector(handleBubbleViewTap:)];
     [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
     
     [self showQuoteView:NO];
@@ -176,6 +177,38 @@
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
     [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon];
+    
+    self.chatBubbleButton.userInteractionEnabled = NO;
+    
+    if (isShowed) {
+        CGFloat animationDuration = 0.2f;
+        
+        if (!animated) {
+            animationDuration = 0.0f;
+        }
+        
+        self.chatBubbleButton.alpha = 1.0f;
+        
+        [UIView animateWithDuration:animationDuration animations:^{
+            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
+        } completion:^(BOOL finished) {
+            self.chatBubbleButton.userInteractionEnabled = YES;
+        }];
+    }
+    else {
+        CGFloat animationDuration = 0.2f;
+        
+        if (!animated) {
+            animationDuration = 0.0f;
+        }
+        
+        [UIView animateWithDuration:animationDuration animations:^{
+            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+        } completion:^(BOOL finished) {
+            self.chatBubbleButton.alpha = 0.0f;
+            self.chatBubbleButton.userInteractionEnabled = YES;
+        }];
+    }
 }
 
 - (IBAction)replyButtonDidTapped:(id)sender {
@@ -197,6 +230,12 @@
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
     [super handleBubbleViewTap:recognizer];
     
+    if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
+        [self.delegate myChatBubbleViewDidTapped:self.message];
+    }
+}
+
+- (IBAction)chatBubbleButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
         [self.delegate myChatBubbleViewDidTapped:self.message];
     }
