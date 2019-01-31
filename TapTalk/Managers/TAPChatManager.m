@@ -282,10 +282,12 @@
                 if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
                     //if message quoted from message model then should construct quote and reply to model
                     TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-                    
-                    if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                    quotedMessage = [quotedMessage copy];
 
+                    if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
                         message.quote = [quotedMessage.quote copy];
+                        message.quote.title = quotedMessage.user.fullname;
+                        message.quote.content = quotedMessage.body;
                     }
                     else {
                         TAPQuoteModel *quote = [TAPQuoteModel new];
@@ -334,8 +336,12 @@
             if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
                 //if message quoted from message model then should construct quote and reply to model
                 TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+                quotedMessage = [quotedMessage copy];
                 
-                if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                NSString *quoteImageUrl = [TAPUtil nullToEmptyString:quotedMessage.quote.imageURL];
+                NSString *quoteFileID = [TAPUtil nullToEmptyString:quotedMessage.quote.fileID];
+                
+                if (![quoteImageUrl isEqualToString:@""] || ![quoteFileID isEqualToString:@""]) {
                     message.quote = [quotedMessage.quote copy];
                 }
                 else {
@@ -354,7 +360,7 @@
             else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
                 //if message quoted from quote model then should just construct quote model
                 TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-                message.quote = quotedMessage;
+                message.quote = [quotedMessage copy];
             }
         }
         
@@ -425,9 +431,11 @@
         if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-            
+            quotedMessage = [quotedMessage copy];
             if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
                 message.quote = [quotedMessage.quote copy];
+                message.quote.title = quotedMessage.user.fullname;
+                message.quote.content = quotedMessage.body;
             }
             else {
                 TAPQuoteModel *quote = [TAPQuoteModel new];
@@ -445,7 +453,7 @@
         else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
             //if message quoted from quote model then should just construct quote model
             TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-            message.quote = quotedMessage;
+            message.quote = [quotedMessage copy];
         }
     }
     
@@ -847,6 +855,7 @@
 
 - (void)saveToQuotedMessage:(id)quotedMessageObject userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID { //Object could be TAPMessageModel or TAPQuoteModel
     if(quotedMessageObject != nil) {
+        
         [[TAPChatManager sharedManager].quotedMessageDictionary setObject:quotedMessageObject forKey:roomID];
     }
     

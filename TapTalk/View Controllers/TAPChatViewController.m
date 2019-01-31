@@ -1133,6 +1133,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
     [self setReplyMessageWithMessage:self.selectedMessage];
     
+    TAPMessageModel *quotedMessageModel = [self.selectedMessage copy];
     [[TAPChatManager sharedManager] saveToQuotedMessage:self.selectedMessage userInfo:nil roomID:self.currentRoom.roomID];
     
     //remove selectedMessage
@@ -1195,20 +1196,22 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     
+    TAPMessageModel *quotedMessageModel = [message copy];
+    
     //WK Note : Do reply here later.
     [self showInputAccessoryExtensionView:YES];
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     
     //convert to quote model
     TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[message.data objectForKey:@"fileID"]];
-    quote.title = message.user.fullname;
-    quote.content = message.body;
+    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+    quote.title = quotedMessageModel.user.fullname;
+    quote.content = quotedMessageModel.body;
     [self setQuoteWithQuote:quote];
     
-    message.quote = quote;
+    quotedMessageModel.quote = quote;
 
-    [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -1394,7 +1397,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
     [self setReplyMessageWithMessage:self.selectedMessage];
     
-    [[TAPChatManager sharedManager] saveToQuotedMessage:self.selectedMessage userInfo:nil roomID:self.currentRoom.roomID];
+    TAPMessageModel *quotedMessageModel = [self.selectedMessage copy];
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
 
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -1429,20 +1433,22 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     
+    TAPMessageModel *quotedMessageModel = [message copy];
+    
     //WK Note : Do reply here later.
     [self showInputAccessoryExtensionView:YES];
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     
     //convert to quote model
     TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[message.data objectForKey:@"fileID"]];
-    quote.title = message.user.fullname;
-    quote.content = message.body;
+    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+    quote.title = quotedMessageModel.user.fullname;
+    quote.content = quotedMessageModel.body;
     [self setQuoteWithQuote:quote];
     
-    message.quote = quote;
+    quotedMessageModel.quote = quote;
     
-    [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
     
     //remove selectedMessage
     self.selectedMessage = nil;
