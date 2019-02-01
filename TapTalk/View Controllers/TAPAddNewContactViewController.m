@@ -177,26 +177,59 @@
 }
 
 - (void)expertChatNowButtonDidTapped {
-    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+    [self.addContactPopupView setPopupViewToDefault];
+    [self.addContactPopupView showPopupView:NO animated:NO];
+    
+    if([self.delegate respondsToSelector:@selector(addNewContactViewControllerShouldOpenNewRoomWithUser:)]) {
+        NSLog(@"SEARCHED USER: %@", [self.searchedUser description]);
+        
+        NSString *stringFromModel = [self.searchedUser toJSONString];
+        [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
+    }
+    
+//    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
 }
 
 - (void)addExpertToContactButtonDidTapped {
+    
     [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
-        
-        //Add user to Contact Manager
-        self.searchedUser.isContact = YES;
-        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
-        
         [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
         [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
         [self.addContactPopupView showPopupView:YES animated:YES];
         [self.addContactPopupView animateExpandingView];
         [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
+        
+        //Add user to Contact Manager
+        self.searchedUser.isContact = YES;
+        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
+        
+        //Refresh Contact List From API
+        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
+        } failure:^(NSError *error) {
+        }];
+        
     } failure:^(NSError *error) {
 #ifdef DEBUG
         NSLog(@"%@", error);
 #endif
     }];
+    
+//    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+//
+//        //Add user to Contact Manager
+//        self.searchedUser.isContact = YES;
+//        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
+//
+//        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
+//        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
+//        [self.addContactPopupView showPopupView:YES animated:YES];
+//        [self.addContactPopupView animateExpandingView];
+//        [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
+//    } failure:^(NSError *error) {
+//#ifdef DEBUG
+//        NSLog(@"%@", error);
+//#endif
+//    }];
 }
 
 - (void)reloadDataWithString {
