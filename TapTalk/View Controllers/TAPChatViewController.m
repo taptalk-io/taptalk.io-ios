@@ -722,6 +722,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
                     TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
                     cell.delegate = userDelegate;
+                    cell.clipsToBounds = YES;
                     [cell setMessage:message];
                     return cell;
                 }
@@ -824,6 +825,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 
                 TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
                 cell.delegate = userDelegate;
+                cell.clipsToBounds = YES;
                 [cell setMessage:message];
                 return cell;
             }
@@ -1801,6 +1803,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 
                 TAPBaseGeneralBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                 [cell setMessage:message];
+                [self.tableView beginUpdates];
+                [self.tableView endUpdates];
             }
         }
         
@@ -2480,6 +2484,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     currentMessage.recipientID = message.recipientID;
     currentMessage.created = message.created;
     currentMessage.user = message.user;
+    currentMessage.isHidden = message.isHidden;
     currentMessage.isDeleted = message.isDeleted;
     currentMessage.isSending = message.isSending;
     currentMessage.isFailedSend = message.isFailedSend;
@@ -2495,7 +2500,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         currentMessage.isRead = message.isRead;
     }
     
-    currentMessage.isHidden = message.isHidden;
 }
 
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer {
