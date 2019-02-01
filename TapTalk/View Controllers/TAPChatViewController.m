@@ -127,9 +127,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
-
 @property (nonatomic) BOOL isShowAccessoryView;
-    
+
+@property (strong, nonatomic) TAPUserModel *otherUser;
 
 - (IBAction)sendButtonDidTapped:(id)sender;
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
@@ -225,6 +225,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     _messageDictionary = [[NSMutableDictionary alloc] init];
     _anchorUnreadMessageArray = [[NSMutableArray alloc] init];
     _scrolledPendingMessageArray = [[NSMutableArray alloc] init];
+    _otherUser = nil;
     
     [[TAPChatManager sharedManager] addDelegate:self];
     
@@ -363,12 +364,12 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
-    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    _otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     
-    NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:otherUser];
+    NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:self.otherUser];
     if([keyboardArray count] > 0) {
         //There's custom keyboard for this type
-        [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:otherUser];
+        [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:self.otherUser];
         _isCustomKeyboardAvailable = YES;
     }
     else {
@@ -2228,15 +2229,28 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             return;
         }
         
-        //show empty chat
-        //WK Temp
+        //Show empty chat welcome message
         TAPUserModel *activeUser = [TAPDataManager getActiveUser];
         
         TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
         NSString *roomName = room.name;
         roomName = [TAPUtil nullToEmptyString:roomName];
-        NSString *emptyTitleString = [NSString stringWithFormat:@"%@ is an expert\ndon’t forget to check out her services!", roomName];
-        self.emptyTitleLabel.text = NSLocalizedString(emptyTitleString, @"");
+
+        NSString *otherUserRoleCode = self.otherUser.userRole.code;
+        otherUserRoleCode = [TAPUtil nullToEmptyString:otherUserRoleCode];
+        
+        NSString *emptyTitleString = @"";
+        NSString *emptyDescriptionString = @"";
+        if ([otherUserRoleCode isEqualToString:@"expert"]) {
+            emptyTitleString = [NSString stringWithFormat:@"%@ is an Expert.", roomName];
+            emptyDescriptionString = @"Hi, there! If you are looking for creative gifts for someone special, please check his/her services!";
+        }
+        else {
+            emptyTitleString = @"Are you looking for creative gifts?";
+            emptyDescriptionString = @"Discuss with your friend and discover more about the creative gift in our lists.";
+        }
+        
+        self.emptyTitleLabel.text = emptyTitleString
         //set attributed string
         NSMutableDictionary *emptyTitleAttributesDictionary = [NSMutableDictionary dictionary];
         [emptyTitleAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f] forKey:NSFontAttributeName];
@@ -2249,9 +2263,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                                                 range:roomNameRange];
             self.emptyTitleLabel.attributedText = emptyTitleAttributedString;
         }
-        //End Temp
         
-        self.emptyDescriptionLabel.text = @"Hey there! If you are looking for handmade gifts\nto give to someone special, please check out\nmy list of services and pricing below!";
+        self.emptyDescriptionLabel.text = emptyDescriptionString;
         
         self.senderImageView.layer.borderWidth = 4.0f;
         self.senderImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
