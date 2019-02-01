@@ -2250,7 +2250,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             emptyDescriptionString = @"Discuss with your friend and discover more about the creative gift in our lists.";
         }
         
-        self.emptyTitleLabel.text = emptyTitleString
+        self.emptyTitleLabel.text = emptyTitleString;
         //set attributed string
         NSMutableDictionary *emptyTitleAttributesDictionary = [NSMutableDictionary dictionary];
         [emptyTitleAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f] forKey:NSFontAttributeName];
