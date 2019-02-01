@@ -495,6 +495,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             
         }];
     }
+    
+    [self setKeyboardStateDefault];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -893,8 +895,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
         if (tableViewYContentInset <= self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight) {
             //set keyboard state to default
-            _keyboardState = keyboardStateDefault;
-            [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+            [self setKeyboardStateDefault];
         }
     }];
 }
@@ -1543,9 +1544,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
-    _keyboardState = keyboardStateDefault;
-    
-    [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+    [self setKeyboardStateDefault];
     
     if (textView.text != nil) {
         if (![textView.text isEqualToString:@""]) {
@@ -2022,9 +2021,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     _isKeyboardOptionTapped = YES;
     
     if (self.keyboardState == keyboardStateDefault) {
-        _keyboardState = keyboardStateOptions;
+        [self setKeyboardStateOption];
         
-        [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
         [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
         
         self.secondaryTextField.inputView = self.keyboardViewController.inputView;
@@ -2044,9 +2042,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
     }
     else {
-        _keyboardState = keyboardStateDefault;
+        [self setKeyboardStateDefault];
         
-        [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
         if (IS_IPHONE_X_FAMILY) {
             if (self.isKeyboardShowed) {
                 [UIView performWithoutAnimation:^{
@@ -2537,8 +2534,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }];
     
     //set keyboard state to default
-    _keyboardState = keyboardStateDefault;
-    [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+    [self setKeyboardStateDefault];
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
@@ -2637,6 +2633,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
     TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     [[TapTalk sharedInstance] profileButtonDidTapped:self otherUser:otherUser];
+    
+    [self setKeyboardStateDefault];
 }
 
 - (void)openGallery {
@@ -3303,6 +3301,18 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }
         });
     }];
+}
+
+- (void)setKeyboardStateDefault {
+    _keyboardState = keyboardStateDefault;
+    
+    [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+}
+
+- (void)setKeyboardStateOption {
+    _keyboardState = keyboardStateOptions;
+    
+    [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
 }
     
 //DV NOTE - Uncomment this to use API download thumbnail image
