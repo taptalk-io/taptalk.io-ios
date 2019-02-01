@@ -227,26 +227,29 @@
     return footer;
 }
 
-- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewRowAction *readRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        NSLog(@"Read Did Tapped");
-    }];
-    readRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
-    
-    UITableViewRowAction *muteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        NSLog(@"Mute Did Tapped");
-    }];
-    muteRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
-    
-    UITableViewRowAction *deleteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        NSLog(@"Delete Did Tapped");
-    }];
-    deleteRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionDelete" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
-    
-    NSArray<UITableViewRowAction *> *rowActionArray = [NSArray arrayWithObjects:deleteRowAction, muteRowAction, readRowAction, nil];
-    return rowActionArray;
-}
-
+//DV Note
+//Temporary Hidden For V1 (30 Jan 2019)
+//Hide Blocked Contacts
+//- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    UITableViewRowAction *readRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+//        NSLog(@"Read Did Tapped");
+//    }];
+//    readRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+//
+//    UITableViewRowAction *muteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+//        NSLog(@"Mute Did Tapped");
+//    }];
+//    muteRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+//
+//    UITableViewRowAction *deleteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+//        NSLog(@"Delete Did Tapped");
+//    }];
+//    deleteRowAction.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"TAPIconSlideActionDelete" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+//
+//    NSArray<UITableViewRowAction *> *rowActionArray = [NSArray arrayWithObjects:deleteRowAction, muteRowAction, readRowAction, nil];
+//    return rowActionArray;
+//}
+//END DV NOTE
 
 #pragma mark - Delegate
 #pragma mark TableView
