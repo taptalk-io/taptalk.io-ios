@@ -87,15 +87,26 @@
     
     //RightBarButton
     UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    //DV Note
+    //Temporary Hidden For V1 (1 Feb 2019)
+    //extend rightBarButton
+//    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+//    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
+    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 20.0f, 0.0f, 0.0f);
+    //END DV Note
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     [self.rightBarButton addTarget:self action:@selector(addButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     
     //TitleView
-    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, 30.0f)];
+    //DV Note
+    //Temporary Hidden For V1 (1 Feb 2019)
+    //Extend titleView
+//    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, 30.0f)];
+    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(-55.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, 30.0f)];
+    //END DV Note
     self.searchBarView.searchTextField.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
@@ -317,12 +328,25 @@
 #pragma mark UITextField
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
     self.navigationItem.leftBarButtonItem = nil;
-    self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+    //DV Note
+    //Temporary Hidden For V1 (1 Feb 2019)
+    //UNCOMMENT
+//    self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+    //END DV Note
     
     [UIView animateWithDuration:0.2f animations:^{
-        self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+        //DV Note
+        //Temporary Hidden For V1 (1 Feb 2019)
+        //UNCOMMENT
+//        self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+        //END DV Note
         
-        _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+        //DV Note
+        //Temporary Hidden For V1 (1 Feb 2019)
+        //extend rightBarButton
+//        _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+        _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
+        //END DV Note
         [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
         [self.rightBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forState:UIControlStateNormal];
         self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
@@ -336,7 +360,12 @@
         searchNavigationController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
         [self presentViewController:searchNavigationController animated:NO completion:^{
             UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-            _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+            //DV Note
+            //Temporary Hidden For V1 (1 Feb 2019)
+            //extend rightBarButton
+//            _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+            _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
+            //END DV Note
             [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
             self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
             [self.rightBarButton addTarget:self action:@selector(addButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -345,9 +374,13 @@
             
             UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
             [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-            self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+            //DV Note
+            //Temporary Hidden For V1 (1 Feb 2019)
+            //UNCOMMENT
+//            self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
             
-            self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+//            self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+            //END DV Note
         }];
     }];
     
