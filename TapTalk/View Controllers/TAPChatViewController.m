@@ -1792,6 +1792,18 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
             }
         }
+        else {
+            //check if custom bubble available
+            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
+            
+            if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                //if custom bubble from client available
+                
+                TAPBaseGeneralBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                [cell setMessage:message];
+            }
+        }
+        
     }
     else {
         //Message not exist in dictionary
