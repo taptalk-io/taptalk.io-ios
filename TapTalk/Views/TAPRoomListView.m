@@ -23,7 +23,11 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
+        UITabBarController *tabBarController = [[[TapTalk sharedInstance] getCurrentTapTalkActiveViewController] tabBarController];
+        UITabBar *tabBar = tabBarController.tabBar;
+        CGFloat tabbarHeight = CGRectGetHeight(tabBar.frame); //this will return 0 when tabBarController is nil.
+        
+        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - tabbarHeight)];
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self addSubview:self.bgView];
         
