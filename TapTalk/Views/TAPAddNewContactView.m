@@ -16,7 +16,7 @@
 @property (strong, nonatomic) TAPImageView *coverImageView;
 @property (strong, nonatomic) UIView *expertImageContainerView;
 @property (strong, nonatomic) TAPImageView *expertImageView;
-@property (strong, nonatomic) UIImageView *expertVerifiedImageView;
+@property (strong, nonatomic) TAPImageView *expertVerifiedImageView;
 @property (strong, nonatomic) UILabel *expertNameLabel;
 @property (strong, nonatomic) UILabel *expertCategoryLabel;
 @property (strong, nonatomic) UIView *addExpertToContactButtonView;
@@ -128,7 +128,6 @@
         [self.searchExpertView addSubview:self.expertImageView];
         
         _expertVerifiedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.expertImageView.frame) - 22.0f, CGRectGetMaxY(self.expertImageView.frame) - 22.0f, 22.0f, 22.0f)];
-        self.expertVerifiedImageView.image = [UIImage imageNamed:@"TAPIconExpert" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
         self.expertVerifiedImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.searchExpertView addSubview:self.expertVerifiedImageView];
         
@@ -470,70 +469,85 @@
 }
 
 - (void)setContactWithUser:(TAPUserModel *)user {
+    
     TAPUserRoleModel *userRole = user.userRole;
+    
     NSString *fullName = user.fullname;
+    fullName = [TAPUtil nullToEmptyString:fullName];
+    
+    NSString *userRoleCode = userRole.code;
+    userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+    
+    NSString *userRoleName = userRole.name;
+    userRoleName = [TAPUtil nullToEmptyString:userRoleName];
+    
+    NSString *userRoleIcon = userRole.iconURL;
+    userRoleIcon = [TAPUtil nullToEmptyString:userRoleIcon];
     
     TAPImageURLModel *imageURL = user.imageURL;
     NSString *imageURLString = imageURL.thumbnail;
     
-    self.userFullNameLabel.text = fullName;
-    [self.userImageView setImageWithURLString:imageURLString];
-    
-    [self setSearchViewLayoutWithType:LayoutTypeUser];
-    [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
-        if (isContact) {
-            [self setSearchUserButtonWithType:ButtonTypeChat];
+    if ([userRole.code isEqualToString:@"expert"]) {
+        self.expertNameLabel.text = fullName;
+        
+        if (imageURLString == nil || [imageURLString isEqualToString:@""]) {
+            self.expertImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
-            [self setSearchUserButtonWithType:ButtonTypeAdd];
+            [self.expertImageView setImageWithURLString:imageURLString];
         }
-    } failure:^(NSError *error) {
+        
+        if ([userRoleIcon isEqualToString:@""]) {
+            self.expertVerifiedImageView.alpha = 0.0f;
+        }
+        else {
+            self.expertVerifiedImageView.alpha = 1.0f;
+            [self.expertVerifiedImageView setImageURLString:userRoleIcon];
+        }
+        
+        self.expertCategoryLabel.text = userRole.name; //DV Temp
+        self.coverImageView.image = [UIImage imageNamed:@"TAPIconDefaultCover" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]; //DV Temp
+        
+        [self setSearchViewLayoutWithType:LayoutTypeExpert];
+        
+        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+            if (isContact) {
+                [self setSearchExpertButtonWithType:ButtonTypeChat];
+            }
+            else {
+                [self setSearchExpertButtonWithType:ButtonTypeAdd];
+            }
+        } failure:^(NSError *error) {
 #ifdef DEBUG
-        NSLog(@"%@", error);
+            NSLog(@"%@", error);
 #endif
-    }];
-    
-//    if ([userRole.userRoleCode isEqualToString:@"user"]) { //WK Temp - Temporary @"0"
-//        TAPImageURLModel *imageURL = user.imageURL;
-//        NSString *imageURLString = imageURL.thumbnail;
-//
-//        self.userFullNameLabel.text = fullName;
-//        [self.userImageView setImageWithURLString:imageURLString];
-//
-//        [self setSearchViewLayoutWithType:LayoutTypeUser];
-//        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
-//            if (isContact) {
-//                [self setSearchUserButtonWithType:ButtonTypeChat];
-//            }
-//            else {
-//                [self setSearchUserButtonWithType:ButtonTypeAdd];
-//            }
-//        } failure:^(NSError *error) {
-//#ifdef DEBUG
-//            NSLog(@"%@", error);
-//#endif
-//        }];
-//    }
-//    else {
-//        self.expertNameLabel.text = fullName;
-//        self.expertCategoryLabel.text = @"Makeup Artist";
-//        [self.coverImageView setImageWithURLString:@"https://images.pexels.com/photos/1115128/pexels-photo-1115128.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
-//        [self.expertImageView setImageWithURLString:@"https://images.pexels.com/photos/943084/pexels-photo-943084.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"]; //DV Temp
-//
-//        [self setSearchViewLayoutWithType:LayoutTypeExpert];
-//        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
-//            if (isContact) {
-//                [self setSearchUserButtonWithType:ButtonTypeChat];
-//            }
-//            else {
-//                [self setSearchUserButtonWithType:ButtonTypeAdd];
-//            }
-//        } failure:^(NSError *error) {
-//#ifdef DEBUG
-//            NSLog(@"%@", error);
-//#endif
-//        }];
-//    }
+        }];
+    }
+    else {
+        self.userFullNameLabel.text = fullName;
+
+        if (imageURLString == nil || [imageURLString isEqualToString:@""]) {
+            self.userImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.userImageView setImageWithURLString:imageURLString];
+        }
+        
+        [self setSearchViewLayoutWithType:LayoutTypeUser];
+        
+        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+            if (isContact) {
+                [self setSearchUserButtonWithType:ButtonTypeChat];
+            }
+            else {
+                [self setSearchUserButtonWithType:ButtonTypeAdd];
+            }
+        } failure:^(NSError *error) {
+#ifdef DEBUG
+            NSLog(@"%@", error);
+#endif
+        }];
+    }
 }
 
 - (void)showLoading:(BOOL)isLoading {

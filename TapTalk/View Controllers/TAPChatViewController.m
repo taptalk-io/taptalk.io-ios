@@ -2266,16 +2266,31 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
         self.emptyDescriptionLabel.text = emptyDescriptionString;
         
+        
+        NSString *senderImageURL = activeUser.imageURL.thumbnail;
+        NSString *recipientImageURL = room.imageURL.thumbnail;
+        if (senderImageURL == nil || [senderImageURL isEqualToString:@""]) {
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.senderImageView setImageWithURLString:senderImageURL];
+        }
+        
+        if (recipientImageURL == nil || [recipientImageURL isEqualToString:@""]) {
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.senderImageView setImageWithURLString:recipientImageURL];
+        }
+        
         self.senderImageView.layer.borderWidth = 4.0f;
         self.senderImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
         self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame) / 2.0f;
-        [self.senderImageView setImageWithURLString:activeUser.imageURL.thumbnail];
         self.senderImageView.backgroundColor = [UIColor clearColor];
         
         self.recipientImageView.layer.borderWidth = 4.0f;
         self.recipientImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
         self.recipientImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame) / 2.0f;
-        [self.recipientImageView setImageWithURLString:room.imageURL.thumbnail];
         self.recipientImageView.backgroundColor = [UIColor clearColor];
         
         [UIView animateWithDuration:0.0f animations:^{
