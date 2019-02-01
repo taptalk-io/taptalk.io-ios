@@ -2273,10 +2273,10 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
         
         if (recipientImageURL == nil || [recipientImageURL isEqualToString:@""]) {
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.recipientImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
-            [self.senderImageView setImageWithURLString:recipientImageURL];
+            [self.recipientImageView setImageWithURLString:recipientImageURL];
         }
         
         self.senderImageView.layer.borderWidth = 4.0f;
