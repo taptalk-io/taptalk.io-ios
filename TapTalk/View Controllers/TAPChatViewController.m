@@ -622,16 +622,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     if ([self.messageArray count] != 0) {
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
-        
-        //CS Note - For order card bubble
-        //CS Temp
-        
-        //        [tableView registerNib:[TAPOrderCardBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPOrderCardBubbleTableViewCell description]];
-        //        TAPOrderCardBubbleTableViewCell *cell = (TAPOrderCardBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPOrderCardBubbleTableViewCell description] forIndexPath:indexPath];
-        //        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        //        return cell;
-        //END CS Temp
-        
+    
         if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
             //My Chat
             if (message.type == TAPChatMessageTypeText) {
@@ -643,7 +634,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
                 
-                [cell setMessage:message];
+                if (!message.isHidden) {
+                    [cell setMessage:message];
+                }
                 
                 if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                     [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
@@ -663,7 +656,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
                 
-                [cell setMessage:message];
+                if (!message.isHidden) {
+                    [cell setMessage:message];
+                }
                 [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
                 
                 if (message.isFailedSend) {
@@ -726,7 +721,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                     TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
                     cell.delegate = userDelegate;
                     cell.clipsToBounds = YES;
-                    [cell setMessage:message];
+                    if (!message.isHidden) {
+                        [cell setMessage:message];
+                    }
                     return cell;
                 }
             }
@@ -768,7 +765,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
                 
-                [cell setMessage:message];
+                if (!message.isHidden) {
+                    [cell setMessage:message];
+                }
                 
                 if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
                     [cell showStatusLabel:YES animated:NO];
@@ -787,7 +786,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
-                [cell setMessage:message];
+                if (!message.isHidden) {
+                    [cell setMessage:message];
+                }
                 [cell showStatusLabel:YES animated:NO];
                 
                 NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
@@ -829,7 +830,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
                 cell.delegate = userDelegate;
                 cell.clipsToBounds = YES;
-                [cell setMessage:message];
+                if (!message.isHidden) {
+                    [cell setMessage:message];
+                }
                 return cell;
             }
         }
@@ -1891,14 +1894,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
-    NSLog(@"--KEYBOARDHEIGHT %f", keyboardHeight);
-    NSLog(@"--CONTENTINSETTT %f", lastTableViewYContentInset);
-    NSLog(@"--CONTENTINSENEW %f", tableViewYContentInset);
+    
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         
         CGFloat newYContentOffset = self.tableView.contentOffset.y - self.keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.currentInputAccessoryExtensionHeight;
-        
         
         if (fabs(tableViewYContentInset - lastTableViewYContentInset) == kInputMessageAccessoryExtensionViewDefaultHeight) {
             newYContentOffset = self.tableView.contentOffset.y + lastTableViewYContentInset - tableViewYContentInset;
