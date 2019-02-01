@@ -25,7 +25,6 @@
 #import "TAPCustomAccessoryView.h"
 
 #import "TAPProductListBubbleTableViewCell.h" //DV Temp
-#import "TAPOrderCardBubbleTableViewCell.h" //CS Temp
 
 //WK Temp
 #import "TAPImageDetailViewController.h"
