@@ -328,6 +328,8 @@
     _environment = environment;
     NSLog(@"ENVIRONMENT TYPE = %ld", self.environment);
     
+    //Set Socket URL Environment
+    [[TAPConnectionManager sharedManager] setSocketURLWithTapTalkEnvironment:self.environment];
 }
 
 - (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow {
