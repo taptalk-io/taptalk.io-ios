@@ -1424,7 +1424,7 @@
     NSString *alphaNumericSearchString = [[keyword componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
     //End Note
     
-    NSString *queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\'", alphaNumericSearchString];
+    NSString *queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\' AND isContact = true", alphaNumericSearchString];
     
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact whereClauseQuery:queryClause sortByColumnName:columnName isAscending:YES success:^(NSArray *resultArray) {
         
@@ -1488,7 +1488,7 @@
                            success:(void (^)(BOOL isContact, TAPUserModel *obtainedUser))success
                            failure:(void (^)(NSError *error))failure {
     userID = [TAPUtil nullToEmptyString:userID];
-    NSString *queryClause = [NSString stringWithFormat:@"userID == \'%@\'", userID];
+    NSString *queryClause = [NSString stringWithFormat:@"userID == \'%@\' AND isContact = true", userID];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact
                              whereClauseQuery:queryClause
                              sortByColumnName:@""
@@ -1511,7 +1511,7 @@
                              success:(void (^)(BOOL isContact, TAPUserModel *obtainedUser))success
                              failure:(void (^)(NSError *error))failure {
     XCUserID = [TAPUtil nullToEmptyString:XCUserID];
-    NSString *queryClause = [NSString stringWithFormat:@"xcUserID == \'%@\'", XCUserID];
+    NSString *queryClause = [NSString stringWithFormat:@"xcUserID == \'%@\' AND isContact = true", XCUserID];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact
                              whereClauseQuery:queryClause
                              sortByColumnName:@""
