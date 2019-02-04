@@ -536,6 +536,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
     
     _keyboardHeight = self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
+    
+    //Save existing message to draft
+    [self saveMessageDraft];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -2220,7 +2223,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)destroySequence {
-    [self saveMessageDraft];
     [[TAPChatManager sharedManager] closeActiveRoom];
     
     //Remove ChatManager Delegate
