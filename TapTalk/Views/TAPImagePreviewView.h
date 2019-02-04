@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) UIView *captionView;
 @property (strong, nonatomic) UIView *captionSeparatorView;
-@property (strong, nonatomic) UILabel *wordLeftLabel;
+@property (strong, nonatomic) UILabel *wordCountLabel;
 @property (strong, nonatomic) UIView *bottomMenuView;
 
 @property (strong, nonatomic) UIButton *cancelButton;
@@ -27,8 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIButton *sendButton;
 
 - (void)setItemNumberWithCurrentNumber:(NSInteger)current ofTotalNumber:(NSInteger)total;
-- (void)setCurrentWordLeftWithCurrentCharCount:(NSInteger)charCount;
-- (void)isShowCounterCharLeft:(BOOL)isShow;
+- (void)setCurrentWordCountWithCurrentCharCount:(NSInteger)charCount;
+- (void)isShowCounterCharCount:(BOOL)isShow;
 - (void)isShowAsSingleImagePreview:(BOOL)isShow animated:(BOOL)animated;
 
 @end

@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) UIFont *font;
 @property (strong, nonatomic) NSString *text;
+@property (nonatomic) NSInteger characterCountLimit;
 
 @property (nonatomic) CGFloat minimumHeight;
 @property (nonatomic) CGFloat maximumHeight;
@@ -52,6 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setInputView:(UIView *)inputView;
 
+//Note - Set limit to 0 if don't want to limit the text
+- (void)setCharCountLimit:(NSInteger)limit;
 
 @end
 

@@ -60,11 +60,15 @@
 
 #pragma mark - TAPCustomNotificationAlertViewController
 - (void)customNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:(TAPMessageModel *)message {
-
+    if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+        [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
+    }
 }
 
 - (void)secondaryCustomNotificationAlertViewControllerNotificationButtonDidTappedWithMessage:(TAPMessageModel *)message {
-
+    if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+        [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
+    }
 }
 
 #pragma mark - Custom Method

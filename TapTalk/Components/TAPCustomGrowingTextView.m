@@ -105,6 +105,8 @@
     if (self.maximumHeight == 0.0f) {
         self.maximumHeight = 60.0f;
     }
+    
+    self.characterCountLimit = 0;
 }
 
 #pragma mark - Delegate
@@ -112,6 +114,10 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
 
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
+    
+    if (self.characterCountLimit != 0 && [newString length] > self.characterCountLimit) {
+        return NO;
+    }
     
     _text = newString;
     
@@ -267,6 +273,10 @@
 
 - (void)setPlaceholderText:(NSString *)text {
     self.placeholderLabel.text = text;
+}
+
+- (void)setCharCountLimit:(NSInteger)limit {
+    _characterCountLimit = limit;
 }
 
 @end

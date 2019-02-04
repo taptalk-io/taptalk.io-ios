@@ -114,21 +114,22 @@
         self.captionView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
         [self addSubview:self.captionView];
         
-        CGFloat wordLeftLabelWidth = 50.0f;
-        CGFloat captionTextViewWidth = CGRectGetWidth(self.captionView.frame) - 16.0f - 16.0f - 8.0f - wordLeftLabelWidth;
+        CGFloat wordCountLabelWidth = 50.0f;
+        CGFloat captionTextViewWidth = CGRectGetWidth(self.captionView.frame) - 16.0f - 16.0f - 8.0f - wordCountLabelWidth;
         _captionTextView = [[TAPCustomGrowingTextView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, captionTextViewWidth, 22.0f)];
+        [self.captionTextView setCharacterCountLimit:TAP_LIMIT_OF_CAPTION_CHARACTER];
         [self.captionView addSubview:self.captionTextView];
         
         _captionSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.captionTextView.frame) + 12.0f, CGRectGetWidth(self.frame) - 32.0f, 1.0f)];
         self.captionSeparatorView.backgroundColor = [UIColor whiteColor];
         [self.captionView addSubview:self.captionSeparatorView];
         
-        _wordLeftLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - wordLeftLabelWidth - 16.0f, CGRectGetMinY(self.captionSeparatorView.frame) - 15.0f - 13.0f, wordLeftLabelWidth, 13.0f)];
-        self.wordLeftLabel.textAlignment = NSTextAlignmentRight;
-        self.wordLeftLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
-        self.wordLeftLabel.textColor = [UIColor whiteColor];
+        _wordCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - wordCountLabelWidth - 16.0f, CGRectGetMinY(self.captionSeparatorView.frame) - 15.0f - 13.0f, wordCountLabelWidth, 13.0f)];
+        self.wordCountLabel.textAlignment = NSTextAlignmentRight;
+        self.wordCountLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.wordCountLabel.textColor = [UIColor whiteColor];
         
-        [self.captionView addSubview:self.wordLeftLabel];
+        [self.captionView addSubview:self.wordCountLabel];
     }
     
     return self;
@@ -144,17 +145,17 @@
     self.numberOfImageInfoLabel.frame = CGRectMake(CGRectGetWidth(self.frame) - 32.0f - contentSize.width, CGRectGetMinY(self.numberOfImageInfoLabel.frame), contentSize.width, CGRectGetHeight(self.numberOfImageInfoLabel.frame));
 }
 
-- (void)setCurrentWordLeftWithCurrentCharCount:(NSInteger)charCount {
-    NSString *wordLeft = [NSString stringWithFormat:@"%ld/100", charCount];
-    self.wordLeftLabel.text = wordLeft;
+- (void)setCurrentWordCountWithCurrentCharCount:(NSInteger)charCount {
+    NSString *wordCountString = [NSString stringWithFormat:@"%ld/100", charCount];
+    self.wordCountLabel.text = wordCountString;
 }
 
-- (void)isShowCounterCharLeft:(BOOL)isShow {
+- (void)isShowCounterCharCount:(BOOL)isShow {
     if (isShow) {
-        self.wordLeftLabel.alpha = 1.0f;
+        self.wordCountLabel.alpha = 1.0f;
     }
     else {
-        self.wordLeftLabel.alpha = 0.0f;
+        self.wordCountLabel.alpha = 0.0f;
     }
 }
 
