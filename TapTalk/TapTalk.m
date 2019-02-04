@@ -389,7 +389,7 @@
             //User is in contact
             //Create quote model and set quote to chat
             
-            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
             
             if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
                 TAPQuoteModel *quote = [TAPQuoteModel new];
