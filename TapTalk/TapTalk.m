@@ -389,7 +389,7 @@
             //User is in contact
             //Create quote model and set quote to chat
             
-            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
+            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
             
             if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
                 TAPQuoteModel *quote = [TAPQuoteModel new];
@@ -413,7 +413,7 @@
             //User not in contact, call API to obtain user data
             [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:^(TAPUserModel *user) {
                 //Create quote model and set quote to chat
-                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
+                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
                 
                 if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
                     TAPQuoteModel *quote = [TAPQuoteModel new];
