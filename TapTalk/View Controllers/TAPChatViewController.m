@@ -1542,14 +1542,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 #pragma mark TAPGrowingTextView
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
-    [UIView animateWithDuration:0.1f animations:^{
-        self.messageTextViewHeight = height;
-        self.messageTextViewHeightConstraint.constant = height;
-        self.messageViewHeightConstraint.constant = self.messageTextViewHeight + 16.0f + 4.0f;
-        [self.messageTextView layoutIfNeeded];
-        [self.inputMessageAccessoryView layoutIfNeeded];
-        [self.view layoutIfNeeded];
-    }];
+    //CS TEMP - temporary disable inputmessage change height, because the keyboard heoght and tableView inset & offset still return false value
+//    [UIView animateWithDuration:0.1f animations:^{
+//        self.messageTextViewHeight = height;
+//        self.messageTextViewHeightConstraint.constant = height;
+//        self.messageViewHeightConstraint.constant = self.messageTextViewHeight + 16.0f + 4.0f;
+//        [self.messageTextView layoutIfNeeded];
+//        [self.inputMessageAccessoryView layoutIfNeeded];
+//        [self.view layoutIfNeeded];
+//    }];
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
