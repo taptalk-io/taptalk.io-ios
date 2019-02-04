@@ -2223,6 +2223,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)destroySequence {
+    [self saveMessageDraft];
     [[TAPChatManager sharedManager] closeActiveRoom];
     
     //Remove ChatManager Delegate
