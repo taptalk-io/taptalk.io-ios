@@ -18,8 +18,6 @@
 
 #import "TAPImagePreviewModel.h"
 
-#define kLimitOfCaptionCharacters 100
-
 @interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate>
 
 @property (strong, nonatomic) TAPImagePreviewView *imagePreviewView;
@@ -85,8 +83,8 @@
     [self.imagePreviewView.captionTextView setPlaceholderColor:[UIColor whiteColor]];
     [self.imagePreviewView.captionTextView setPlaceholderText:NSLocalizedString(@"Add a caption", @"")];
     
-    self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters, kLimitOfCaptionCharacters];
-    [self.imagePreviewView isShowCounterCharLeft:NO];
+    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
+    [self.imagePreviewView isShowCounterCharCount:NO];
     
     if ([self.imageDataArray count] != 0 && [self.imageDataArray count] > 1) {
         [self.imagePreviewView isShowAsSingleImagePreview:NO animated:NO];
@@ -244,13 +242,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //contain previous saved caption
                 [self.imagePreviewView.captionTextView setInitialText:@""];
                 [self.imagePreviewView.captionTextView setInitialText:savedCaptionString];
-                self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters - [savedCaptionString length], kLimitOfCaptionCharacters];
-                [self.imagePreviewView isShowCounterCharLeft:YES];
+                self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [savedCaptionString length], TAP_LIMIT_OF_CAPTION_CHARACTER];
+                [self.imagePreviewView isShowCounterCharCount:YES];
             }
             else {
                 [self.imagePreviewView.captionTextView setInitialText:@""];
-                self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters, kLimitOfCaptionCharacters];
-                [self.imagePreviewView isShowCounterCharLeft:NO];
+                self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
+                [self.imagePreviewView isShowCounterCharCount:NO];
             }
         }
     }
@@ -262,8 +260,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //Remove image
             
             [self.imagePreviewView.captionTextView setInitialText:@""];
-            [self.imagePreviewView isShowCounterCharLeft:NO];
-            self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters, kLimitOfCaptionCharacters];
+            [self.imagePreviewView isShowCounterCharCount:NO];
+            self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
 
             //Remove from data array
             NSLog(@"indexpath item: %ld", indexPath.item);
@@ -303,13 +301,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //contain previous saved caption
                 [self.imagePreviewView.captionTextView setInitialText:@""];
                 [self.imagePreviewView.captionTextView setInitialText:savedCaptionString];
-                self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters - [savedCaptionString length], kLimitOfCaptionCharacters];
-                [self.imagePreviewView isShowCounterCharLeft:YES];
+                self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [savedCaptionString length], TAP_LIMIT_OF_CAPTION_CHARACTER];
+                [self.imagePreviewView isShowCounterCharCount:YES];
             }
             else {
                 [self.imagePreviewView.captionTextView setInitialText:@""];
-                self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters, kLimitOfCaptionCharacters];
-                [self.imagePreviewView isShowCounterCharLeft:NO];
+                self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
+                [self.imagePreviewView isShowCounterCharCount:NO];
             }
         }
     }
@@ -383,29 +381,30 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //contain previous saved caption
             [self.imagePreviewView.captionTextView setInitialText:@""];
             [self.imagePreviewView.captionTextView setInitialText:savedCaptionString];
-            self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters - [savedCaptionString length], kLimitOfCaptionCharacters];
-            [self.imagePreviewView isShowCounterCharLeft:YES];
+            self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [savedCaptionString length], TAP_LIMIT_OF_CAPTION_CHARACTER];
+            
+            NSLog(@"length: %ld", [savedCaptionString length]);
+            
+            [self.imagePreviewView isShowCounterCharCount:YES];
         }
         else {
             [self.imagePreviewView.captionTextView setInitialText:@""];
-            self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters, kLimitOfCaptionCharacters];
-            [self.imagePreviewView isShowCounterCharLeft:NO];
+            self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
+            [self.imagePreviewView isShowCounterCharCount:NO];
         }
     }
 }
 
 #pragma mark TAPCustomGrowingTextView
 - (BOOL)customGrowingTextView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
     NSInteger textLength = [newString length];
     
-    if (textLength > kLimitOfCaptionCharacters) {
+    [self.imagePreviewView setCurrentWordCountWithCurrentCharCount:textLength];
+    
+    if (textLength > TAP_LIMIT_OF_CAPTION_CHARACTER) {
         return NO;
     }
-    
-    NSInteger charCountLeft = kLimitOfCaptionCharacters - textLength;
-    [self.imagePreviewView setCurrentWordLeftWithCurrentCharCount:charCountLeft];
     
     return YES;
 }
@@ -415,12 +414,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         self.captionTextViewHeight = height;
         
-        CGFloat captionTextViewWidth = CGRectGetWidth(self.imagePreviewView.captionView.frame) - 16.0f - 16.0f - 8.0f - CGRectGetWidth(self.imagePreviewView.wordLeftLabel.frame);
+        CGFloat captionTextViewWidth = CGRectGetWidth(self.imagePreviewView.captionView.frame) - 16.0f - 16.0f - 8.0f - CGRectGetWidth(self.imagePreviewView.wordCountLabel.frame);
         self.imagePreviewView.captionTextView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionTextView.frame), CGRectGetMinY(self.imagePreviewView.captionTextView.frame), captionTextViewWidth, self.captionTextViewHeight);
         
         self.imagePreviewView.captionSeparatorView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionSeparatorView.frame), CGRectGetMaxY(self.imagePreviewView.captionTextView.frame) + 12.0f, CGRectGetWidth(self.imagePreviewView.captionSeparatorView.frame), CGRectGetHeight(self.imagePreviewView.captionSeparatorView.frame));
         
-        self.imagePreviewView.wordLeftLabel.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.wordLeftLabel.frame), CGRectGetMinY(self.imagePreviewView.captionSeparatorView.frame) - 15.0f - 13.0f, CGRectGetWidth(self.imagePreviewView.wordLeftLabel.frame), CGRectGetHeight(self.imagePreviewView.wordLeftLabel.frame));
+        self.imagePreviewView.wordCountLabel.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.wordCountLabel.frame), CGRectGetMinY(self.imagePreviewView.captionSeparatorView.frame) - 15.0f - 13.0f, CGRectGetWidth(self.imagePreviewView.wordCountLabel.frame), CGRectGetHeight(self.imagePreviewView.wordCountLabel.frame));
         
         CGFloat captionViewHeight = CGRectGetMaxY(self.imagePreviewView.captionSeparatorView.frame) + 10.0f;
         self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - captionViewHeight, CGRectGetWidth(self.imagePreviewView.captionView.frame), captionViewHeight);
@@ -428,7 +427,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)customGrowingTextViewDidBeginEditing:(UITextView *)textView {
-    [self.imagePreviewView isShowCounterCharLeft:YES];
+    [self.imagePreviewView isShowCounterCharCount:YES];
 }
 
 - (void)customGrowingTextViewDidEndEditing:(UITextView *)textView {
@@ -450,8 +449,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #pragma mark TAPPhotoAlbumListViewController
 - (void)photoAlbumListViewControllerSelectImageWithDataArray:(NSArray *)dataArray {
     [self addMoreImagePreviewData:dataArray];
-    self.imagePreviewView.wordLeftLabel.text = [NSString stringWithFormat:@"%ld/%ld", kLimitOfCaptionCharacters, kLimitOfCaptionCharacters];
-    [self.imagePreviewView isShowCounterCharLeft:NO];
+    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", TAP_LIMIT_OF_CAPTION_CHARACTER, TAP_LIMIT_OF_CAPTION_CHARACTER];
+    [self.imagePreviewView isShowCounterCharCount:NO];
     
     if ([self.imageDataArray count] != 0 && [self.imageDataArray count] > 1) {
         [self.imagePreviewView isShowAsSingleImagePreview:NO animated:NO];

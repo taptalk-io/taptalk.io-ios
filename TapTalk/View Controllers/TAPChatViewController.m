@@ -468,8 +468,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessageActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
         self.sendButton.userInteractionEnabled = YES;
         if(self.isCustomKeyboardAvailable) {
-            self.keyboardOptionButton.alpha = 0.0f;
-            self.messageViewLeftConstraint.constant = -38.0f;          
+            [UIView animateWithDuration:0.2f animations:^{
+                self.keyboardOptionButton.alpha = 1.0f;
+                self.messageViewLeftConstraint.constant = 4.0f;
+                [self.view layoutIfNeeded];
+            } completion:^(BOOL finished) {
+                //Do something after animation completed.
+            }];
         }
     }
     
@@ -529,6 +534,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if([self.delegate respondsToSelector:@selector(chatViewControllerShouldUpdateUnreadBubbleForRoomID:)]) {
         [self.delegate chatViewControllerShouldUpdateUnreadBubbleForRoomID:self.currentRoom.roomID];
     }
+    
+    _keyboardHeight = self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {

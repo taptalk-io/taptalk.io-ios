@@ -235,6 +235,7 @@
         self.customNotificationAlertView.secondaryMessageLabel.text = messageString;
         [self showSecondaryAnimationWithProfileImage:isShowProfilePicture contentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
     }
+    
 }
 
 - (void)showFirstAnimationWithProfileImage:(BOOL)hasProfileImage contentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
@@ -382,6 +383,7 @@
     }
     _isTappedFirstNotificationButton = NO;
     
+    [self hideAfterDelay];
 }
 
 - (void)secondaryNotificationButtonDidTapped {
@@ -395,6 +397,7 @@
     }
     _isTappedSecondNotificationButton = NO;
     
+    [self hideAfterDelay];
 }
 
 @end

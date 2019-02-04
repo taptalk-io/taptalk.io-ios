@@ -330,7 +330,7 @@
     
     //Set Socket URL Environment
     [[TAPConnectionManager sharedManager] setSocketURLWithTapTalkEnvironment:self.environment];
-}
+}  
 
 - (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow {
     _activeWindow = activeWindow;
