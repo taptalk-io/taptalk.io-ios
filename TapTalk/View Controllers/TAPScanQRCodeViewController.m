@@ -174,6 +174,28 @@
 
 - (void)addContactButtonDidTapped {
     [self.scanQRCodePopupView animateExpandingView];
+    
+    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+//        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
+//        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
+//        [self.addContactPopupView showPopupView:YES animated:YES];
+//        [self.addContactPopupView animateExpandingView];
+//        [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
+        
+        //Add user to Contact Manager
+        self.searchedUser.isContact = YES;
+        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
+        
+        //Refresh Contact List From API
+        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
+        } failure:^(NSError *error) {
+        }];
+        
+    } failure:^(NSError *error) {
+#ifdef DEBUG
+        NSLog(@"%@", error);
+#endif
+    }];
 }
 
 - (void)chatNowButtonDidTapped {
