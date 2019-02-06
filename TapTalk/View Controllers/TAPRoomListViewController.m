@@ -480,6 +480,7 @@
     }
     
     if ([TAPChatManager sharedManager].activeUser == nil) {
+        
         return; //User not logged in
     }
     

@@ -95,6 +95,9 @@
     [self.scanQRCodePopupView setIsLoading:YES animated:YES];
     [TAPDataManager callAPIGetUserByUserID:code success:^(TAPUserModel *user) {
         
+        //Upsert User to Contact Manager
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+        
         _searchedUser = user;
 //        _isProcessingQRCode = NO;
 //        [self.scanQRCodePopupView setIsLoading:NO animated:YES];
