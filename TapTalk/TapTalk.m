@@ -375,6 +375,11 @@
 
 - (void)refreshActiveUser {
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    
+    if (currentUser == nil) {
+        return;
+    }
+    
     NSString *userID = currentUser.userID;
     [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
         if (user != nil) {
