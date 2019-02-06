@@ -483,6 +483,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
         [TAPDataManager callAPIGetUserByUserID:otherUserID success:^(TAPUserModel *user) {
             
+            //Upsert User to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+            
             BOOL isTyping = [[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID];
             [self setAsTyping:isTyping];
             

@@ -373,6 +373,24 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (void)refreshActiveUser {
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSString *userID = currentUser.userID;
+    [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
+        if (user! = nil) {
+            //Save to prefs
+            [TAPDataManager setActiveUser:user];
+        }
+    } failure:^(NSError *error) {
+        
+    }];
+
+    
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    _otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+}
+
 //Chat
 - (void)openRoomWithXCUserID:(NSString *)XCUserID
                prefilledText:(NSString *)prefilledText

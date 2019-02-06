@@ -480,6 +480,10 @@
     }
     
     if ([TAPChatManager sharedManager].activeUser == nil) {
+        
+        //Refresh auth ticket
+        [[TapTalk sharedInstance] shouldRefreshAuthTicket];
+        
         return; //User not logged in
     }
     
