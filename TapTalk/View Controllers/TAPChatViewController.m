@@ -130,6 +130,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 @property (strong, nonatomic) TAPUserModel *otherUser;
 
+@property (weak, nonatomic) id openedBubbleCell;
+
 - (IBAction)sendButtonDidTapped:(id)sender;
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
 - (IBAction)chatAnchorButtonDidTapped:(id)sender;
@@ -1320,6 +1322,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + 6.0f + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
         
         [imageDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+        myImageBubbleCell.bubbleImageView.alpha = 0.0f;
+        _openedBubbleCell = myImageBubbleCell;
     }
 }
 
@@ -1534,6 +1538,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         CGRect imageRectInView = CGRectMake(16.0f, CGRectGetMinY(cellRectInView) + 6.0f + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], yourImageBubbleCell.bubbleImageViewWidthConstraint.constant, yourImageBubbleCell.bubbleImageViewHeightConstraint.constant);
         
         [imageDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+        yourImageBubbleCell.bubbleImageView.alpha = 0.0f;
+        _openedBubbleCell = yourImageBubbleCell;
     }
 }
 
@@ -1703,6 +1709,17 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     _isShowAccessoryView = YES;
     
     [self reloadInputViews];
+}
+
+- (void)imageDetailViewControllerDidFinishClosingAnimation {
+    if ([self.openedBubbleCell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)self.openedBubbleCell;
+        cell.bubbleImageView.alpha = 1.0f;
+    }
+    else if ([self.openedBubbleCell isKindOfClass:[TAPYourImageBubbleTableViewCell class]]) {
+        TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)self.openedBubbleCell;
+        cell.bubbleImageView.alpha = 1.0f;
+    }
 }
 
 #pragma mark - Custom Method

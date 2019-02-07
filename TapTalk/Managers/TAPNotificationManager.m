@@ -292,7 +292,9 @@
             unreadRoomCount = 0;
         }
         
-        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:unreadRoomCount];
+        //Send delegate to be used to client side
+        [[TapTalk sharedInstance] setBadgeWithNumberOfUnreadRooms:unreadRoomCount];
+        
     } failure:^(NSError *error) {
         
     }];

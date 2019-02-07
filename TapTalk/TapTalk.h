@@ -65,6 +65,9 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 //Quote
 - (void)tapTalkQuoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
 
+//Badge
+- (void)tapTalkSetBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms;
+
 @end
 
 @interface TapTalk : NSObject
@@ -162,5 +165,6 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
 - (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
 - (void)profileButtonDidTapped:(UIViewController *)activeViewController otherUser:(TAPUserModel *)otherUser;
+- (void)setBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms;
 
 @end

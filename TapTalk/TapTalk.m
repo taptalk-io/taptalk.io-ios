@@ -730,4 +730,10 @@ fromNavigationController:(UINavigationController *)navigationController
     }
 }
 
+- (void)setBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms {
+    if ([self.delegate respondsToSelector:@selector(tapTalkShouldRefreshBadgeWithUnreadRooms:)]) {
+        [self.delegate tapTalkShouldRefreshBadgeWithUnreadRooms:numberOfUnreadRooms];
+    }
+}
+
 @end
