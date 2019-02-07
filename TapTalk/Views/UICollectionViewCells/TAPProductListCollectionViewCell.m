@@ -98,7 +98,7 @@
     currencyString = [TAPUtil nullToEmptyString:currencyString];
     
     NSString *priceString = [product objectForKey:@"price"];
-    productNameString = [TAPUtil nullToEmptyString:productNameString];
+    priceString = [TAPUtil nullToEmptyString:priceString];
     
     NSString *ratingString = [product objectForKey:@"rating"];
     ratingString = [TAPUtil nullToEmptyString:ratingString];
@@ -137,7 +137,7 @@
     }
     
     self.productNameLabel.text = productNameString;
-    self.priceLabel.text = [TAPUtil formattedCurrencyWithCurrencySign:currencyString value:[priceString floatValue]];
+    self.priceLabel.text = [TAPUtil formattedCurrencyWithCurrencySign:currencyString value:[priceString doubleValue]];
     [self.productImageView setImageWithURLString:productImageURLString];
     self.ratingLabel.text = ratingString;
     self.productDescriptionLabel.text = productDescriptionString;
