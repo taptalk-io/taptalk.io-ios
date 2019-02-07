@@ -201,6 +201,10 @@
     else if (![message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID]) {
         [self showInAppNotificationWithMessage:message];
     }
+    
+    //Update application badge
+    [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+
 }
 
 - (void)showInAppNotificationWithMessage:(TAPMessageModel *)message {

@@ -169,6 +169,32 @@
     
     [self setImageCaptionWithString:captionString];
     
+    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
+        //reply to exists
+        
+        //if reply exists check if image in quote exists
+        //if image exists  change view to Quote View
+        if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+            [self showReplyView:NO withMessage:nil];
+            [self showQuoteView:YES];
+            [self setQuote:message.quote];
+        }
+        else {
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+    }
+    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
+        //quote exists
+        [self showReplyView:NO withMessage:nil];
+        [self setQuote:message.quote];
+        [self showQuoteView:YES];
+    }
+    else {
+        [self showReplyView:NO withMessage:nil];
+        [self showQuoteView:NO];
+    }
+    
     UIImage *selectedImage = nil;
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     if (fileID == nil || [fileID isEqualToString:@""]) {
@@ -221,32 +247,6 @@
 //        self.blurView.frame = CGRectMake(CGRectGetMinX(self.blurView.frame), CGRectGetMinY(self.blurView.frame), self.bubbleImageViewWidthConstraint.constant, self.bubbleImageViewHeightConstraint.constant);
 //        [self.bubbleImageView insertSubview:self.blurView atIndex:0];
 //    }
-    
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-        //if reply exists check if image in quote exists
-        //if image exists  change view to Quote View
-        if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
-            [self showReplyView:NO withMessage:nil];
-            [self showQuoteView:YES];
-            [self setQuote:message.quote];
-        }
-        else {
-            [self showReplyView:YES withMessage:message];
-            [self showQuoteView:NO];
-        }
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        [self showReplyView:NO withMessage:nil];
-        [self setQuote:message.quote];
-        [self showQuoteView:YES];
-    }
-    else {
-        [self showReplyView:NO withMessage:nil];
-        [self showQuoteView:NO];
-    }
 }
 
 - (void)receiveSentEvent {

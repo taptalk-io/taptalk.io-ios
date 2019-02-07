@@ -141,7 +141,7 @@
                                 <color key="backgroundColor" red="0.78823529410000004" green="0.42352941179999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" identifier="ReplyView"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" relation="lessThanOrEqual" priority="999" constant="60" id="28q-gq-Tze"/>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" priority="999" constant="48" id="28q-gq-Tze"/>
                                     <constraint firstAttribute="bottom" secondItem="jKg-pf-pPY" secondAttribute="bottom" id="5B0-Am-7Pa"/>
                                     <constraint firstItem="WbW-Z2-1cA" firstAttribute="leading" secondItem="QyT-DU-suG" secondAttribute="leading" constant="4" id="EML-qQ-WsF"/>
                                     <constraint firstAttribute="trailing" secondItem="jKg-pf-pPY" secondAttribute="trailing" id="EpY-cc-hYd"/>
