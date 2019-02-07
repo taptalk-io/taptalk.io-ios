@@ -119,6 +119,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 - (void)setAppKeySecret:(NSString *)appKeySecret;
 - (void)setAppKeyID:(NSString *)appKeyID;
 - (void)refreshActiveUser;
+- (void)updateUnreadBadgeCount;
 
 //Chat
 - (void)openRoomWithXCUserID:(NSString *)XCUserID

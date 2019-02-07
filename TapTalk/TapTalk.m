@@ -391,6 +391,10 @@
     }];
 }
 
+- (void)updateUnreadBadgeCount {
+    [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+}
+
 //Chat
 - (void)openRoomWithXCUserID:(NSString *)XCUserID
                prefilledText:(NSString *)prefilledText
