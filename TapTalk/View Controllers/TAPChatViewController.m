@@ -2243,7 +2243,12 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)destroySequence {
+    //Save to draft
     [self saveMessageDraft];
+    
+    //Update badge count
+    [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+    
     [[TAPChatManager sharedManager] closeActiveRoom];
     
     //Remove ChatManager Delegate
