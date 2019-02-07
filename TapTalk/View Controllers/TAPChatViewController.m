@@ -720,7 +720,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 return cell;
             }
             else {
-            
                 //check if custom bubble available
                 NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
                 
@@ -2008,11 +2007,18 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     //Remove highlighted message.
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-    TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    id cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
     
     [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
         //animation
-        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+        if ([cell isKindOfClass:[TAPMyChatBubbleTableViewCell class]]) {
+            TAPMyChatBubbleTableViewCell *myChatCell = cell;
+            [myChatCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+        }
+        else if ([cell isKindOfClass:[TAPYourChatBubbleTableViewCell class]]) {
+            TAPYourChatBubbleTableViewCell *yourChatCell = cell;
+            [yourChatCell showStatusLabel:NO animated:YES];
+        }
         [cell layoutIfNeeded];
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
