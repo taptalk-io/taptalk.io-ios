@@ -121,7 +121,7 @@
         
         _expertImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchExpertView.frame) - 52.0f) / 2.0f, 66.0f, 52.0f, 52.0f)];
         self.expertImageView.clipsToBounds = YES;
-        self.expertImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.expertImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.expertImageView.layer.cornerRadius = CGRectGetHeight(self.expertImageView.frame) / 2.0f;
         self.expertImageView.layer.borderColor = [UIColor whiteColor].CGColor;
         self.expertImageView.layer.borderWidth = 4.0f;
@@ -223,7 +223,7 @@
 
         _userImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 52.0f) / 2.0f, 8.0f, 52.0f, 52.0f)];
         self.userImageView.clipsToBounds = YES;
-        self.userImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.userImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.userImageView.layer.cornerRadius = CGRectGetHeight(self.userImageView.frame) / 2.0f;
         [self.searchUserView addSubview:self.userImageView];
         

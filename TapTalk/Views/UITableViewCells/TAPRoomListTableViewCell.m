@@ -51,6 +51,7 @@
         CGFloat leftPadding = 16.0f;
         CGFloat rightPadding = 16.0f;
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 9.0f, 52.0f, 52.0f)];
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.profileImageView.backgroundColor = [UIColor clearColor];
         self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
         self.profileImageView.clipsToBounds = YES;
