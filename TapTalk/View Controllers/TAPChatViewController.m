@@ -320,6 +320,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     rightBarImageView.layer.cornerRadius = CGRectGetHeight(rightBarImageView.frame) / 2.0f;
     rightBarImageView.clipsToBounds = YES;
+    rightBarImageView.contentMode = UIViewContentModeScaleAspectFill;
     [rightBarView addSubview:rightBarImageView];
     
 //    UIImageView *expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(rightBarImageView.frame) - 13.0f, CGRectGetMaxY(rightBarImageView.frame) - 13.0f, 13.0f, 13.0f)];
@@ -1873,6 +1874,43 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 
     if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
+        _keyboardHeight = keyboardHeight;
+        CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+            
+            self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
+            self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
+            
+//            CGFloat newYContentOffset = self.tableView.contentOffset.y - self.keyboardHeight + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight + self.currentInputAccessoryExtensionHeight;
+//
+//            if (fabs(tableViewYContentInset - lastTableViewYContentInset) == kInputMessageAccessoryExtensionViewDefaultHeight) {
+//                newYContentOffset = self.tableView.contentOffset.y + lastTableViewYContentInset - tableViewYContentInset;
+//            }
+//
+//            if(self.tableView.contentOffset.y == 0.0f) {
+//                newYContentOffset = 0.0f;
+//            }
+//
+//            if (newYContentOffset < tableViewYContentInset) {
+//                newYContentOffset = -tableViewYContentInset;
+//            }
+//
+//            [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
+//            [self.view layoutIfNeeded];
+//
+//            if (!self.isKeyboardShowed) {
+//                [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+//            }
+        } completion:^(BOOL finished) {
+            //Do something after animation completed.
+            //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
+//            if (tempHeight != 0.0f && tempHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
+//                _keyboardHeight = tempHeight;
+//            }
+        }];
+        
         return;
     }
     
@@ -2325,11 +2363,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         self.senderImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
         self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame) / 2.0f;
         self.senderImageView.backgroundColor = [UIColor clearColor];
+        self.senderImageView.contentMode = UIViewContentModeScaleAspectFill;
         
         self.recipientImageView.layer.borderWidth = 4.0f;
         self.recipientImageView.layer.borderColor = [TAPUtil getColor:@"F8F8F8"].CGColor;
         self.recipientImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame) / 2.0f;
         self.recipientImageView.backgroundColor = [UIColor clearColor];
+        self.recipientImageView.contentMode = UIViewContentModeScaleAspectFill;
         
         [UIView animateWithDuration:0.0f animations:^{
             self.emptyView.alpha = 1.0f;

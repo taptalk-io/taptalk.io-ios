@@ -35,6 +35,7 @@
         self.contactImageView.backgroundColor = [UIColor clearColor];
         self.contactImageView.layer.cornerRadius = CGRectGetHeight(self.contactImageView.frame) / 2.0f;
         self.contactImageView.clipsToBounds = YES;
+        self.contactImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.bgView addSubview:self.contactImageView];
         
         _expertLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contactImageView.frame) - 22.0f, CGRectGetMaxY(self.contactImageView.frame) - 22.0f, 22.0f, 22.0f)];
