@@ -8,12 +8,15 @@
 
 #import "TAPAPIManager.h"
 
-static NSString * const kBaseURLProduction = @"https://hp.moselo.com:8080";
-static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com:8080";
-static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com:8080";
+//DV NOTE - Old url
+//static NSString * const kBaseURLProduction = @"https://hp.moselo.com:8080";
+//static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com:8080";
+//static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com:8080";
 
-//static NSString * const kBaseURL = @"https://hp-staging.moselo.com:8080";
-//static NSString * const kBaseURL = @"https://dev.taptalk.io:8080";
+static NSString * const kBaseURLProduction = @"https://engine.taptalk.io:8080";
+static NSString * const kBaseURLStaging = @"https://engine-staging.taptalk.io:8080";
+static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io:8080";
+
 static NSString * const kAPIVersionString = @"v1";
 
 @interface TAPAPIManager ()
