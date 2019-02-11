@@ -45,7 +45,7 @@
         self.tableView.separatorInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
         self.tableView.separatorColor = [UIColor clearColor];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        if (@available(iOS 11.0, *)) {
+        if (IS_IOS_11_OR_ABOVE) {
             [self.tableView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
         }
         [self addSubview:self.tableView];

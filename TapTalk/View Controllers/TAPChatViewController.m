@@ -460,7 +460,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     self.connectionStatusViewController.view.frame = CGRectMake(CGRectGetMinX(self.connectionStatusViewController.view.frame), CGRectGetMinY(self.connectionStatusViewController.view.frame), CGRectGetWidth(self.connectionStatusViewController.view.frame), self.connectionStatusHeight);
     //    self.view.backgroundColor = [UIColor redColor];
-    [self.tableView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
+    if (IS_IOS_11_OR_ABOVE) {
+        [self.tableView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
+    }
     //    [self checkEmptyState];
     
     //Check chat room contains mesage draft or not
