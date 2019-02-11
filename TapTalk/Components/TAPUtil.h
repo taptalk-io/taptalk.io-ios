@@ -32,6 +32,7 @@
 #define IS_IOS_8_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
 #define IS_BELOW_IOS_9 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 9)?YES:NO
 #define IS_IOS_10_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0"))
+#define IS_IOS_11_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0"))
 
 #define SYSTEM_VERSION ([[UIDevice currentDevice] systemVersion])
 #define SYSTEM_VERSION_EQUAL_TO(version) ([[[UIDevice currentDevice] systemVersion] compare:version options:NSNumericSearch] == NSOrderedSame)
