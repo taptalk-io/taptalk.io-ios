@@ -1122,7 +1122,7 @@
 + (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
                                            success:(void (^)(NSInteger))success
                                            failure:(void (^)(NSError *))failure {
-    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && !(userID LIKE '%@')", activeUserID];
+    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && !(userID LIKE '%@')", activeUserID];
     
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"" isAscending:NO distinctBy:@"roomID" success:^(NSArray *resultArray) {
         
