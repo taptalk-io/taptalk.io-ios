@@ -1705,6 +1705,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     if(self.currentInputAccessoryExtensionHeight > 0.0f) {
         [self showInputAccessoryExtensionView:NO];
+        self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+        CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        
+        self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
+        self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     }
     
     //hide empty chat
@@ -2666,7 +2671,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification {
-    [self callAPIAfterAndUpdateUIAndScrollToTop:YES];
+    if ([self.messageArray count] > 0) {
+        [self callAPIAfterAndUpdateUIAndScrollToTop:YES];
+    }
 }
 
 - (IBAction)chatAnchorButtonDidTapped:(id)sender {
@@ -3068,7 +3075,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
         }
     
-        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     }
 }
     
@@ -3102,6 +3108,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 - (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender {
     [self showInputAccessoryExtensionView:NO];
+    [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
 }
 
 - (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image {
@@ -3142,7 +3149,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     CGFloat total = [totalString floatValue];
     
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    NSArray *messageArray = [self.messageArray copy];
+    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
     
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
@@ -3171,7 +3179,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     localID = [TAPUtil nullToEmptyString:localID];
     
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    NSArray *messageArray = [self.messageArray copy];
+    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
     
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
@@ -3202,7 +3211,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     localID = [TAPUtil nullToEmptyString:localID];
     
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    NSArray *messageArray = [self.messageArray copy];
+    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
     
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
@@ -3232,7 +3242,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     localID = [TAPUtil nullToEmptyString:localID];
     
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-    NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+    NSArray *messageArray = [self.messageArray copy];
+    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
     
     //Update message status to array and dictionary
     currentMessage.isFailedSend = YES;
@@ -3265,7 +3276,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }
             
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            NSArray *messageArray = [self.messageArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
             
             TAPChatMessageType type = currentMessage.type;
             if (type == TAPChatMessageTypeImage) {
@@ -3305,7 +3317,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }
             
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            NSArray *messageArray = [self.messageArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
             
             TAPChatMessageType type = currentMessage.type;
             if (type == TAPChatMessageTypeImage) {
@@ -3339,7 +3352,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }
             
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            NSArray *messageArray = [self.messageArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
             
             TAPChatMessageType type = currentMessage.type;
             if (type == TAPChatMessageTypeImage) {
@@ -3378,7 +3392,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }
             
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+            NSArray *messageArray = [self.messageArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
             
             TAPChatMessageType type = currentMessage.type;
             if (type == TAPChatMessageTypeImage) {
@@ -3430,8 +3445,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 //            }
 //
 //            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
-//
+//NSArray *messageArray = [self.messageArray copy];
+//NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];//
 //            TAPChatMessageType type = currentMessage.type;
 //            if (type == TAPChatMessageTypeImage) {
 //
@@ -3464,8 +3479,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 //            }
 //
 //            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
-//
+//NSArray *messageArray = [self.messageArray copy];
+//NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];//
 //            TAPChatMessageType type = currentMessage.type;
 //            if (type == TAPChatMessageTypeImage) {
 //                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
@@ -3503,8 +3518,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 //            }
 //
 //            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
-//
+//NSArray *messageArray = [self.messageArray copy];
+//NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];//
 //            TAPChatMessageType type = currentMessage.type;
 //            if (type == TAPChatMessageTypeImage) {
 //                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {

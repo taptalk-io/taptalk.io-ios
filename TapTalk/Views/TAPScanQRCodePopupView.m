@@ -118,7 +118,7 @@
         self.currentUserImageView.layer.borderColor = [UIColor whiteColor].CGColor;
         self.currentUserImageView.layer.borderWidth = 4.0f;
         self.currentUserImageView.clipsToBounds = YES;
-        self.currentUserImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.currentUserImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.currentUserImageView.alpha = 0.0f;
         [self.whiteBaseView addSubview:self.currentUserImageView];
         
@@ -127,7 +127,7 @@
         self.addedUserImageView.layer.borderColor = [UIColor whiteColor].CGColor;
         self.addedUserImageView.layer.borderWidth = 4.0f;
         self.addedUserImageView.clipsToBounds = YES;
-        self.addedUserImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.addedUserImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.whiteBaseView addSubview:self.addedUserImageView];
         
         _addedUserUsernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserImageView.frame) + self.profilePictureBottomGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 22.0f)];
