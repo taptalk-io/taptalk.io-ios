@@ -359,12 +359,10 @@
     if (![trimmedNewString isEqualToString:@""]) {
         self.updatedString = newString;
         
-        self.updatedString = newString;
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [TAPDataManager searchMessageWithString:trimmedString sortBy:@"created" success:^(NSArray *resultArray) {
-            self.searchResultMessageArray = [resultArray mutableCopy];
-            
             [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray) {
+                self.searchResultMessageArray = [resultArray mutableCopy];
                 self.searchResultChatAndContactArray = [roomArray mutableCopy];
                 self.searchResultUnreadCountArray = [unreadCountArray mutableCopy];
                 

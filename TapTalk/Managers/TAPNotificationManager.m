@@ -155,45 +155,45 @@
     
     if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         //Handling local push notification
-        if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
-            UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-            content.title = message.user.fullname;
-            NSString *messageText = message.body;
-            content.body = messageText;
-            content.sound = [UNNotificationSound soundNamed:NOTIFICATION_SOUND_NAME];
-            content.userInfo = message.toDictionary;
-            content.threadIdentifier = message.room.roomID;
-            content.summaryArgument = message.user.fullname;
-
-            // Deliver the notification after x second
-            UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger
-                                                          triggerWithTimeInterval:1.0f repeats:NO];
-            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:message.localID
-                                                                                  content:content
-                                                                                  trigger:trigger];
-
-            // Schedule the notification.
-            UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-            [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
-
-            }];
-        }
-        else {
-            //UserNotifcation.framework is not available below iOS 10
-            UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-            NSDate *currentDate = [NSDate date];
-            NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-            currentTimeInterval += 1.0f; //Fire message with delay to avoid miss date
-            NSDate *updatedDate = [NSDate dateWithTimeIntervalSince1970:currentTimeInterval];
-            localNotification.fireDate = updatedDate;
-            localNotification.alertTitle = message.user.fullname;
-            NSString *messageText = message.body;
-            localNotification.alertBody = messageText;
-            localNotification.soundName = NOTIFICATION_SOUND_NAME;
-            localNotification.userInfo = [message toDictionary];
-
-            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-        }
+//        if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
+//            UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+//            content.title = message.user.fullname;
+//            NSString *messageText = message.body;
+//            content.body = messageText;
+//            content.sound = [UNNotificationSound soundNamed:NOTIFICATION_SOUND_NAME];
+//            content.userInfo = message.toDictionary;
+//            content.threadIdentifier = message.room.roomID;
+//            content.summaryArgument = message.user.fullname;
+//
+//            // Deliver the notification after x second
+//            UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger
+//                                                          triggerWithTimeInterval:1.0f repeats:NO];
+//            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:message.localID
+//                                                                                  content:content
+//                                                                                  trigger:trigger];
+//
+//            // Schedule the notification.
+//            UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+//            [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+//
+//            }];
+//        }
+//        else {
+//            //UserNotifcation.framework is not available below iOS 10
+//            UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+//            NSDate *currentDate = [NSDate date];
+//            NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+//            currentTimeInterval += 1.0f; //Fire message with delay to avoid miss date
+//            NSDate *updatedDate = [NSDate dateWithTimeIntervalSince1970:currentTimeInterval];
+//            localNotification.fireDate = updatedDate;
+//            localNotification.alertTitle = message.user.fullname;
+//            NSString *messageText = message.body;
+//            localNotification.alertBody = messageText;
+//            localNotification.soundName = NOTIFICATION_SOUND_NAME;
+//            localNotification.userInfo = [message toDictionary];
+//
+//            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+//        }
         
         //Update message delivery status to API
         [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredFromPushNotificationWithMessage:message];
@@ -248,46 +248,46 @@
 
 - (void)removeReadLocalNotificationWithMessage:(TAPMessageModel *)message {
     //Handling local push notification
-    if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
-        [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
-            
-            for (NSInteger counter = 0; counter < [notifications count]; counter++) {
-                UNNotification *notification = [notifications objectAtIndex:counter];
-                NSString *identifier = notification.request.identifier;
-                NSDictionary *userInfoDictionary = notification.request.content.userInfo;
-                NSString *notificationRoomID = [userInfoDictionary valueForKeyPath:@"room.roomID"];
-                
-                NSString *obtainedLocalID = message.localID;
-                NSString *obtainedRoomID = message.room.roomID;
-                
-                if ([identifier isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
-                    //Cancelling local notification
-                    [[UNUserNotificationCenter currentNotificationCenter]
-                     removeDeliveredNotificationsWithIdentifiers:@[identifier]];
-                    break;
-                }
-            }
-        }];
-    }
-    else {
-        //UserNotifcation.framework is not available below iOS 10
-        NSArray *localNotificationArray = [[UIApplication sharedApplication] scheduledLocalNotifications];
-        for (NSInteger counter = 0; counter < [localNotificationArray count]; counter++) {
-            UILocalNotification *selectedLocalNotification = [localNotificationArray objectAtIndex:counter];
-            NSDictionary *currentUserInfo = selectedLocalNotification.userInfo;
-            NSString *notificationLocalID = [currentUserInfo objectForKey:@"localID"];
-            NSString *notificationRoomID = [currentUserInfo valueForKeyPath:@"room.roomID"];
-
-            NSString *obtainedLocalID = message.localID;
-            NSString *obtainedRoomID = message.room.roomID;
-            
-            if ([notificationLocalID isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
-                    //Cancelling local notification
-                    [[UIApplication sharedApplication] cancelLocalNotification:selectedLocalNotification];
-                    break;
-            }
-        }
-    }
+//    if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
+//        [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
+//            
+//            for (NSInteger counter = 0; counter < [notifications count]; counter++) {
+//                UNNotification *notification = [notifications objectAtIndex:counter];
+//                NSString *identifier = notification.request.identifier;
+//                NSDictionary *userInfoDictionary = notification.request.content.userInfo;
+//                NSString *notificationRoomID = [userInfoDictionary valueForKeyPath:@"room.roomID"];
+//                
+//                NSString *obtainedLocalID = message.localID;
+//                NSString *obtainedRoomID = message.room.roomID;
+//                
+//                if ([identifier isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
+//                    //Cancelling local notification
+//                    [[UNUserNotificationCenter currentNotificationCenter]
+//                     removeDeliveredNotificationsWithIdentifiers:@[identifier]];
+//                    break;
+//                }
+//            }
+//        }];
+//    }
+//    else {
+//        //UserNotifcation.framework is not available below iOS 10
+//        NSArray *localNotificationArray = [[UIApplication sharedApplication] scheduledLocalNotifications];
+//        for (NSInteger counter = 0; counter < [localNotificationArray count]; counter++) {
+//            UILocalNotification *selectedLocalNotification = [localNotificationArray objectAtIndex:counter];
+//            NSDictionary *currentUserInfo = selectedLocalNotification.userInfo;
+//            NSString *notificationLocalID = [currentUserInfo objectForKey:@"localID"];
+//            NSString *notificationRoomID = [currentUserInfo valueForKeyPath:@"room.roomID"];
+//
+//            NSString *obtainedLocalID = message.localID;
+//            NSString *obtainedRoomID = message.room.roomID;
+//            
+//            if ([notificationLocalID isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
+//                    //Cancelling local notification
+//                    [[UIApplication sharedApplication] cancelLocalNotification:selectedLocalNotification];
+//                    break;
+//            }
+//        }
+//    }
 }
 
 - (void)updateApplicationBadgeCount {

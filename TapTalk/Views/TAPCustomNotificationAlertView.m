@@ -46,13 +46,13 @@
         _profilePictureImage = [[TAPImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.profilePictureImage.layer.cornerRadius = CGRectGetHeight(self.profilePictureImage.frame)/2.0f;
         self.profilePictureImage.clipsToBounds = YES;
-        self.profilePictureImage.contentMode = UIViewContentModeScaleAspectFit;
+        self.profilePictureImage.contentMode = UIViewContentModeScaleAspectFill;
         [self.contentView addSubview:self.profilePictureImage];
         
         _contentImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.contentView.frame) - 52.0f - 8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.contentImageView.layer.cornerRadius = 6.0f;
         self.contentImageView.clipsToBounds = YES;
-        self.contentImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.contentImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.contentView addSubview:self.contentImageView];
         
         CGFloat profilePictureImageRightGap = 8.0f;
@@ -98,13 +98,13 @@
         _secondaryProfilePictureImage = [[TAPImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.secondaryProfilePictureImage.layer.cornerRadius = CGRectGetHeight(self.profilePictureImage.frame)/2.0f;
         self.secondaryProfilePictureImage.clipsToBounds = YES;
-        self.secondaryProfilePictureImage.contentMode = UIViewContentModeScaleAspectFit;
+        self.secondaryProfilePictureImage.contentMode = UIViewContentModeScaleAspectFill;
         [self.secondaryContentView addSubview:self.secondaryProfilePictureImage];
         
         _secondaryContentImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.secondaryContentView.frame) - 52.0f - 8.0f, (CGRectGetHeight(self.contentView.frame) - 52.0f) / 2.0f, 52.0f, 52.0f)];
         self.secondaryContentImageView.layer.cornerRadius = 6.0f;
         self.secondaryContentImageView.clipsToBounds = YES;
-        self.secondaryContentImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.secondaryContentImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.secondaryContentView addSubview:self.secondaryContentImageView];
         
         _secondaryNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.secondaryProfilePictureImage.frame) + profilePictureImageRightGap, 15.0f, nameLabelWidth, 18.0f)];
