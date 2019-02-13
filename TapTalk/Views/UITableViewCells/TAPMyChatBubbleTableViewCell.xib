@@ -244,7 +244,7 @@
                     <constraint firstItem="xBZ-Oa-CNb" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="ik2-FB-Kmz"/>
                     <constraint firstAttribute="trailing" secondItem="GBq-4A-GJ7" secondAttribute="trailing" constant="16" id="mVW-oN-ID9"/>
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="trailing" secondItem="xBZ-Oa-CNb" secondAttribute="trailing" id="wau-Hp-47l"/>
-                    <constraint firstItem="xBZ-Oa-CNb" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="bottom" id="xZ3-Cj-mZU"/>
+                    <constraint firstItem="xBZ-Oa-CNb" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="bottom" priority="999" id="xZ3-Cj-mZU"/>
                     <constraint firstItem="fpH-0H-kQw" firstAttribute="top" secondItem="vWG-OV-8Uo" secondAttribute="top" id="yGx-By-qJ4"/>
                 </constraints>
             </tableViewCellContentView>

@@ -197,7 +197,7 @@
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="bottom" secondItem="3Nk-OP-Hbp" secondAttribute="bottom" constant="2" id="8NO-ia-hLZ"/>
-                    <constraint firstItem="sLI-nG-1KB" firstAttribute="top" secondItem="dnm-L1-3kp" secondAttribute="bottom" id="CZT-LY-VJW"/>
+                    <constraint firstItem="sLI-nG-1KB" firstAttribute="top" secondItem="dnm-L1-3kp" secondAttribute="bottom" priority="999" id="CZT-LY-VJW"/>
                     <constraint firstItem="3Nk-OP-Hbp" firstAttribute="leading" secondItem="dnm-L1-3kp" secondAttribute="trailing" constant="-28" id="LHg-Wf-xga"/>
                     <constraint firstAttribute="bottom" secondItem="sLI-nG-1KB" secondAttribute="bottom" constant="8" id="ThV-y7-ZtU"/>
                     <constraint firstAttribute="trailing" secondItem="sLI-nG-1KB" secondAttribute="trailing" constant="16" id="YCy-sF-t1s"/>

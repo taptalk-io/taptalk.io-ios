@@ -93,7 +93,6 @@
 }
 
 - (void)populateContactFromDatabase {
-    [self.contactUserDictionary removeAllObjects];
     [TAPDataManager getDatabaseAllUserSortBy:@"fullname" success:^(NSArray *resultArray) {
         for (TAPUserModel *user in resultArray) {
             [self.contactUserDictionary setObject:user forKey:user.userID];

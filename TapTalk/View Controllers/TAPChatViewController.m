@@ -1060,13 +1060,27 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
-    NSLog(@"USER IS START TYPING"); //DV Temp
-    [self setAsTyping:YES];
+    NSString *currentRoomID = [TAPChatManager sharedManager].activeRoom.roomID;
+    currentRoomID = [TAPUtil nullToEmptyString:currentRoomID];
+    
+    NSString *typingRoomID = typing.roomID;
+    typingRoomID = [TAPUtil nullToEmptyString:typingRoomID];
+    
+    if ([typingRoomID isEqualToString:currentRoomID]) {
+        [self setAsTyping:YES];
+    }
 }
 
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
-    NSLog(@"USER IS STOP TYPING"); //DV Temp
-    [self setAsTyping:NO];
+    NSString *currentRoomID = [TAPChatManager sharedManager].activeRoom.roomID;
+    currentRoomID = [TAPUtil nullToEmptyString:currentRoomID];
+    
+    NSString *typingRoomID = typing.roomID;
+    typingRoomID = [TAPUtil nullToEmptyString:typingRoomID];
+    
+    if ([typingRoomID isEqualToString:currentRoomID]) {
+        [self setAsTyping:NO];
+    }
 }
 
 #pragma mark TAPMyChatBubbleTableViewCell
@@ -2866,7 +2880,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     else if (timeGap <= midnightTimeGap) {
         if (timeGap < 60.0f) {
             //Set recently
-            lastSeenString = NSLocalizedString(@"Last seen recently", @"");
+            lastSeenString = NSLocalizedString(@"Active recently", @"");
         }
         else if (timeGap < 3600.0f) {
             //Set minutes before
@@ -2878,7 +2892,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 minuteString = NSLocalizedString(@"minute", @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfMinutes, minuteString];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfMinutes, minuteString];
         }
         else {
             //Set hour before
@@ -2890,7 +2904,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 hourString = NSLocalizedString(@"hour", @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfHours, hourString];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfHours, hourString];
         }
     }
     else if (timeGap <= 86400.0f * 6 + midnightTimeGap) {
@@ -2908,21 +2922,21 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             dayString = NSLocalizedString(@"day", @"");
         }
         
-        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Last seen %li %@ ago", @""), (long)numberOfDays, dayString];
+        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfDays, dayString];
     }
     else if (timeGap <= 86400.0f*7 + midnightTimeGap) {
         //Set a week ago
-        lastSeenString = @"Last seen a week ago";
+        lastSeenString = @"Active a week ago";
     }
     else {
         //Set date
         NSDate *lastLoginDate = [NSDate dateWithTimeIntervalSince1970:timestamp];
         
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.dateFormat = @"dd/MM/YY";
+        dateFormatter.dateFormat = @"dd MMM YYYY";
         NSString *formattedCreatedDate = [dateFormatter stringFromDate:lastLoginDate];
         
-        lastSeenString = [NSString stringWithFormat:@"Last seen %@", formattedCreatedDate];
+        lastSeenString = [NSString stringWithFormat:@"Last active %@", formattedCreatedDate];
     }
     
     self.userStatusLabel.text = lastSeenString;

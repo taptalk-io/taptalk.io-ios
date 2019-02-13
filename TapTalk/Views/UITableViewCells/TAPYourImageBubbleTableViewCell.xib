@@ -279,7 +279,7 @@
                     <constraint firstItem="pAP-ue-Z6c" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="trailing" constant="2" id="f6H-82-JWi"/>
                     <constraint firstAttribute="bottom" secondItem="Ruq-Mt-UE7" secondAttribute="bottom" constant="8" id="iL8-xh-A4E"/>
                     <constraint firstItem="Pdc-VM-5SJ" firstAttribute="bottom" secondItem="pAP-ue-Z6c" secondAttribute="bottom" constant="2" id="pQ0-hG-Y9R"/>
-                    <constraint firstItem="Ruq-Mt-UE7" firstAttribute="top" secondItem="Pdc-VM-5SJ" secondAttribute="bottom" constant="2" id="uue-BM-rEx"/>
+                    <constraint firstItem="Ruq-Mt-UE7" firstAttribute="top" secondItem="Pdc-VM-5SJ" secondAttribute="bottom" priority="999" constant="2" id="uue-BM-rEx"/>
                     <constraint firstItem="Ruq-Mt-UE7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="ywE-pq-FJ1"/>
                     <constraint firstItem="Pdc-VM-5SJ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="zpC-ZE-s9O"/>
                 </constraints>
