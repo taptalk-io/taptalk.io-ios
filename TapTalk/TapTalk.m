@@ -316,6 +316,10 @@
 #pragma mark - Delegate
 #pragma mark TAPNotificationManager
 - (void)notificationManagerDidHandleTappedNotificationWithMessage:(TAPMessageModel *)message {
+    
+    //Save user to ContactManager Dictionary
+    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
+    
     UIViewController *currentActiveController = [[TapTalk sharedInstance] getCurrentTapTalkActiveViewController];
     if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:fromActiveController:)]) {
         [self.delegate tapTalkDidTappedNotificationWithMessage:message fromActiveController:currentActiveController];
@@ -436,6 +440,9 @@
             [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:^(TAPUserModel *user) {
                 //Create quote model and set quote to chat
                 TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+                
+                //Save user to ContactManager Dictionary
+                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
                 
                 if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
                     TAPQuoteModel *quote = [TAPQuoteModel new];
