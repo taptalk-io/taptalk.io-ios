@@ -34,6 +34,7 @@
         self.profileImageView.backgroundColor = [UIColor clearColor];
         self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
         self.profileImageView.clipsToBounds = YES;
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self addSubview:self.profileImageView];
         
         _expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 22.0f, CGRectGetMaxY(self.profileImageView.frame) - 22.0f, 22.0f, 22.0f)];

@@ -39,6 +39,7 @@
         self.profileImageView.backgroundColor = [UIColor clearColor];
         self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
         self.profileImageView.clipsToBounds = YES;
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.bgView addSubview:self.profileImageView];
         
         _expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 22.0f, CGRectGetMaxY(self.profileImageView.frame) - 22.0f, 22.0f, 22.0f)];
@@ -211,15 +212,17 @@
     NSMutableAttributedString *roomNameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.roomNameLabel.text];
     [roomNameAttributedString addAttributes:roomNameAttributesDictionary
                                       range:NSMakeRange(0, [self.roomNameLabel.text length])];
-    //WK Note - Create nonAlphaNumericCharacters
-    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
-    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
     
-    NSString *alphaNumericSearchedString = [[lowercaseSeachedString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
-    //End Note
+    //CS NOTE - uncomment to use trimmed string
+//    //WK Note - Create nonAlphaNumericCharacters
+//    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
+//    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+//    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+//
+//    NSString *alphaNumericSearchedString = [[lowercaseSeachedString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
+//    //End Note
     
-    NSRange searchedRange = [lowercaseRoomName rangeOfString:alphaNumericSearchedString];
+    NSRange searchedRange = [lowercaseRoomName rangeOfString:lowercaseSeachedString];
     [roomNameAttributedString addAttribute:NSForegroundColorAttributeName
                                      value:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]
                                      range:searchedRange];

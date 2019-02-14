@@ -288,15 +288,16 @@
     NSString *lowercaseLastMessage = [self.lastMessageLabel.text lowercaseString];
     NSString *lowercaseSeachedString = [searchedString lowercaseString];
     
-    //WK Note - Create nonAlphaNumericCharacters
-    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
-    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+    //CS NOTE - uncomment to use trimmed string
+//    //WK Note - Create nonAlphaNumericCharacters
+//    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
+//    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+//    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+//
+//    NSString *alphaNumericSearchedString = [[lowercaseSeachedString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
+//    //End Note
     
-    NSString *alphaNumericSearchedString = [[lowercaseSeachedString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
-    //End Note
-    
-    NSRange searchedRange = [lowercaseLastMessage rangeOfString:alphaNumericSearchedString];
+    NSRange searchedRange = [lowercaseLastMessage rangeOfString:lowercaseSeachedString];
     [lastMessageAttributedString addAttribute:NSForegroundColorAttributeName
                                         value:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]
                                         range:searchedRange];

@@ -119,7 +119,13 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     NSInteger saltCharIndexPosition = (((encryptedStringLength + randomNumber) * randomNumber) % encryptedStringLength);
     
     NSString *encryptedStringModified = [encryptedStringWithSalt stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
-    encryptedStringModified = [encryptedStringModified stringByReplacingCharactersInRange:NSMakeRange(saltCharIndexPosition, 1) withString:@""];
+    //CS NOTE - check if index position exist in range to  prevent crash
+    if (saltCharIndexPosition < [encryptedStringModified length]) {
+        encryptedStringModified = [encryptedStringModified stringByReplacingCharactersInRange:NSMakeRange(saltCharIndexPosition, 1) withString:@""];
+    }
+    else {
+        return nil;
+    }
     
     NSString *decryptedString = [AESCrypt decrypt:encryptedStringModified password:password];
     

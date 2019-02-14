@@ -64,6 +64,8 @@
     
     TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dictionary error:nil];
     
+    message.body = [TAPDataManager normalizedDatabaseStringFromString:message.body];
+    
     TAPRoomModel *room = [TAPRoomModel new];
     NSString *roomID = [dictionary objectForKey:@"roomID"];
     roomID = [TAPUtil nullToEmptyString:roomID];
@@ -71,6 +73,7 @@
     
     NSString *roomName = [dictionary objectForKey:@"roomName"];
     roomName = [TAPUtil nullToEmptyString:roomName];
+    roomName = [TAPDataManager normalizedDatabaseStringFromString:roomName];
     room.name = roomName;
     
     NSString *roomColor = [dictionary objectForKey:@"roomColor"];
@@ -426,6 +429,7 @@
     
     NSString *fullname = [dictionary objectForKey:@"fullname"];
     fullname = [TAPUtil nullToEmptyString:fullname];
+    fullname = [TAPDataManager normalizedDatabaseStringFromString:fullname];
     user.fullname = fullname;
     
     NSString *email = [dictionary objectForKey:@"email"];
@@ -512,7 +516,7 @@
     room.color = color;
     
     TAPImageURLModel *imageURL = [TAPImageURLModel new];
-    NSString *imageURLString = [dictionary objectForKey:@"imageURL"];
+    NSString *imageURLString = [dictionary objectForKey:@"roomImage"];
     if ([imageURLString isEqualToString:@""] || imageURLString == nil) {
         imageURL.thumbnail = @"";
         imageURL.fullsize = @"";
@@ -539,11 +543,16 @@
 #pragma mark From Model
 //WK NOTE - USUALLY USED ON UPDATE AND INSERTION METHODS
 + (NSDictionary *)dictionaryFromMessageModel:(TAPMessageModel *)message {
+    
     NSDictionary *messageDictionary = [message toDictionary];
     messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
     
     NSMutableDictionary *messageMutableDictionary = [messageDictionary mutableCopy];
     
+    NSString *body = [messageMutableDictionary objectForKey:@"body"];
+    body = [TAPDataManager escapedDatabaseStringFromString:message.body];
+    [messageMutableDictionary setValue:body forKey:@"body"];
+
     NSMutableDictionary *roomDicitonary = [messageMutableDictionary objectForKey:@"room"];
     NSString *roomID = [roomDicitonary objectForKey:@"roomID"];
     roomID = [TAPUtil nullToEmptyString:roomID];
@@ -551,6 +560,7 @@
     
     NSString *roomName = [roomDicitonary objectForKey:@"name"];
     roomName = [TAPUtil nullToEmptyString:roomName];
+    roomName = [TAPDataManager escapedDatabaseStringFromString:roomName];
     [messageMutableDictionary setValue:roomName forKey:@"roomName"];
     
     NSString *roomColor = [roomDicitonary objectForKey:@"color"];
@@ -696,6 +706,7 @@
     
     NSString *fullname = [userDictionary objectForKey:@"fullname"];
     fullname = [TAPUtil nullToEmptyString:fullname];
+    fullname = [TAPDataManager escapedDatabaseStringFromString:fullname];
     [userMutableDictionary setValue:fullname forKey:@"fullname"];
     
     NSString *email = [userDictionary objectForKey:@"email"];
@@ -905,20 +916,59 @@
     return lastUpdated;
 }
 
++ (NSString *)escapedDatabaseStringFromString:(NSString *)string {
+    //Use to handle escaped character in database when running query
+    if(string == nil) {
+        return @"";
+    }
+    
+    NSString *newString = string;
+    
+    newString = [newString stringByReplacingOccurrencesOfString:@"'" withString:@"[--0001--]"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"\\" withString:@"[--0002--]"];
+    newString = [newString stringByReplacingOccurrencesOfString:@";" withString:@"[--0003--]"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"‘" withString:@"[--0004--]"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"’" withString:@"[--0005--]"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"“" withString:@"[--0006--]"];
+    
+    return newString;
+}
+
++ (NSString *)normalizedDatabaseStringFromString:(NSString *)string {
+//Use to handle escaped character in database when running query
+    if(string == nil) {
+        return @"";
+    }
+    
+    NSString *newString = string;
+    
+    newString = [newString stringByReplacingOccurrencesOfString:@"[--0001--]" withString:@"'"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"[--0002--]" withString:@"\\"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"[--0003--]" withString:@";"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"[--0004--]" withString:@"‘"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"[--0005--]" withString:@"’"];
+    newString = [newString stringByReplacingOccurrencesOfString:@"[--0006--]" withString:@"“"];
+    
+    return newString;
+}
+
 #pragma mark - Database Call
 + (void)searchMessageWithString:(NSString *)searchString
                          sortBy:(NSString *)columnName
                         success:(void (^)(NSArray *resultArray))success
                         failure:(void (^)(NSError *error))failure {
-    //WK Note - Create nonAlphaNumericCharacters
-    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
-    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+    //CS NOTE - uncomment to use trimmed string
+//    //WK Note - Create nonAlphaNumericCharacters
+//    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
+//    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+//    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+//
+//    NSString *alphaNumericSearchString = [[searchString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
+//    //End Note
     
-    NSString *alphaNumericSearchString = [[searchString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
-    //End Note
+    searchString = [TAPDataManager escapedDatabaseStringFromString:searchString];
     
-    NSString *queryClause = [NSString stringWithFormat:@"body CONTAINS[c] \'%@\'", alphaNumericSearchString];
+    NSString *queryClause = [NSString stringWithFormat:@"body CONTAINS[c] \'%@\'", searchString];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryClause sortByColumnName:columnName isAscending:NO success:^(NSArray *resultArray) {
         NSMutableArray *modelArray = [NSMutableArray array];
         for (NSInteger count = 0; count < [resultArray count]; count++) {
@@ -1139,15 +1189,18 @@
                                 SortBy:(NSString *)columnName
                                success:(void (^)(NSArray *roomArray, NSArray *unreadCountArray))success
                                failure:(void (^)(NSError *error))failure {
-    //WK Note - Create nonAlphaNumericCharacters
-    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
-    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+    //CS NOTE - uncomment to use trimmed string
+//    //WK Note - Create nonAlphaNumericCharacters
+//    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
+//    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+//    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+//
+//    NSString *alphaNumericSearchString = [[searchString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
+//    //End Note
     
-    NSString *alphaNumericSearchString = [[searchString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
-    //End Note
+    searchString = [TAPDataManager escapedDatabaseStringFromString:searchString];
     
-    NSString __block *queryClause = [NSString stringWithFormat:@"roomName CONTAINS[c] \'%@\'", alphaNumericSearchString];
+    NSString __block *queryClause = [NSString stringWithFormat:@"roomName CONTAINS[c] \'%@\'", searchString];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryClause sortByColumnName:@"" isAscending:YES distinctBy:@"roomID" success:^(NSArray *resultArray) {
         
         NSArray *databaseArray = [NSArray array];
@@ -1162,7 +1215,7 @@
             [modelDictionary setObject:room forKey:room.roomID];
         }
         
-        queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\'", alphaNumericSearchString];
+        queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\'", searchString];
         [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact whereClauseQuery:queryClause sortByColumnName:@"fullname" isAscending:YES success:^(NSArray *resultArray) {
             for (NSInteger count = 0; count < [resultArray count]; count++) {
                 NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[resultArray objectAtIndex:count]];
@@ -1416,15 +1469,18 @@
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success
                                 failure:(void (^)(NSError *error))failure {
-    //WK Note - Create nonAlphaNumericCharacters
-    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
-    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+    //CS NOTE - uncomment to use trimmed string
+//  //  WK Note - Create nonAlphaNumericCharacters
+//    NSMutableCharacterSet *nonAlphaNumericCharacters = [[NSMutableCharacterSet alloc] init];
+//    [nonAlphaNumericCharacters formUnionWithCharacterSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+//    [nonAlphaNumericCharacters removeCharactersInString:@" "]; //Remove space from nonAlphaNumericCharacters
+//
+//    NSString *alphaNumericSearchString = [[keyword componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
+//    //End Note
     
-    NSString *alphaNumericSearchString = [[keyword componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
-    //End Note
+    keyword = [TAPDataManager escapedDatabaseStringFromString:keyword];
     
-    NSString *queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\' AND isContact = true", alphaNumericSearchString];
+    NSString *queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\' AND isContact = true", keyword];
     
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact whereClauseQuery:queryClause sortByColumnName:columnName isAscending:YES success:^(NSArray *resultArray) {
         
