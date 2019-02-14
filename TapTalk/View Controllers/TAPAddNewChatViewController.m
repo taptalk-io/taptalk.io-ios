@@ -523,6 +523,7 @@
     
     if (![trimmedNewString isEqualToString:@""]) {
         self.updatedString = newString;
+        
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         
         [TAPDataManager getDatabaseContactSearchKeyword:trimmedString sortBy:@"fullname" success:^(NSArray *resultArray) {

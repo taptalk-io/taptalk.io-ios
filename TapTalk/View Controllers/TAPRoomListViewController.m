@@ -698,6 +698,11 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         NSArray *roomListLocalArray = [NSArray arrayWithArray:self.roomListArray];
+        
+        if ([roomListLocalArray count] == 0) {
+            return;
+        }
+        
         for (TAPRoomListModel *roomList in roomListLocalArray) {
             TAPMessageModel *messageData = roomList.lastMessage;
             TAPRoomModel *roomData = messageData.room;

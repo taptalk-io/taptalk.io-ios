@@ -28,6 +28,9 @@
 
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
 
++ (NSString *)escapedDatabaseStringFromString:(NSString *)string;
++ (NSString *)normalizedDatabaseStringFromString:(NSString *)string;
+
 //Database Call
 + (void)searchMessageWithString:(NSString *)searchString
                          sortBy:(NSString *)columnName

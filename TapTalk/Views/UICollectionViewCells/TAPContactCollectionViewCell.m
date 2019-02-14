@@ -29,6 +29,7 @@
         _contactImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 52.0f, 52.0f)];
         self.contactImageView.layer.cornerRadius = CGRectGetHeight(self.contactImageView.frame) / 2.0;
         self.contactImageView.clipsToBounds = YES;
+        self.contactImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.bgView addSubview:self.contactImageView];
         
         _removeImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contactImageView.frame) - 22.0f, CGRectGetMaxY(self.contactImageView.frame) - 22.0f, 22.0f, 22.0f)];

@@ -485,6 +485,9 @@
     CGFloat imageWidth = width;
     CGFloat imageHeight = height;
     
+    _cellWidth = imageWidth;
+    _cellHeight = imageHeight;
+    
     if (imageWidth > imageHeight) {
         if (imageWidth > self.maxWidth) {
             imageWidth = self.maxWidth;

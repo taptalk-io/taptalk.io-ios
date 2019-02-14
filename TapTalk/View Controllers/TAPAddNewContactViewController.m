@@ -259,7 +259,7 @@
             NSLog(@"%@", error);
 #endif
             NSInteger errorCode = error.code;
-            if (errorCode == 40002) {
+            if (errorCode == 40401) {
                 //USER NOT FOUND
                 [self.addNewContactView setSearchViewLayoutWithType:LayoutTypeDefault];
                 [self.addNewContactView showNoInternetView:NO];

@@ -103,6 +103,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 @property (nonatomic) BOOL isViewDidAppeared;
 @property (nonatomic) BOOL isKeyboardOptionTapped;
 @property (nonatomic) BOOL isKeyboardShowedForFirstTime;
+@property (nonatomic) BOOL isInputAccessoryExtensionShowedFirstTimeOpen;
 
 @property (nonatomic) CGFloat connectionStatusHeight;
 
@@ -185,6 +186,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     CGFloat extensionHeight = 0.0f;
     if(quotedMessage) {
         extensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
+        _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
     }
     
     [UIView beginAnimations:nil context:nil];
@@ -241,7 +243,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     [self.tableView setTransform:CGAffineTransformMakeRotation(-M_PI)];
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 10.0f);
-    self.tableView.rowHeight = 0.0f;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     
     [UIView commitAnimations];
@@ -407,6 +409,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if (quotedMessage) {
         [self showInputAccessoryExtensionView:YES];
         if ([quotedMessage isKindOfClass:[TAPMessageModel class]]) {
+            _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
             TAPMessageModel *quoteMessageModel = (TAPMessageModel *)quotedMessage;
             
             //if reply exists check if image in quote exists
@@ -1687,6 +1690,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
         [[TAPChatManager sharedManager] sendImageMessage:selectedImage caption:caption];
     }
+    
+    //check if keyboard was showed
+    //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
+    [self performSelector:@selector(checkKeyboard) withObject:nil afterDelay:0.05f];
+
 }
 
 #pragma mark UIImagePickerController
@@ -1705,7 +1713,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             [self performSelector:@selector(showImagePreviewControllerWithSelectedImage:) withObject:selectedImage afterDelay:0.3f];
             
         }
-        [self checkKeyboard];
     }];
 }
 
@@ -1740,6 +1747,10 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         
         [[TAPChatManager sharedManager] sendImageMessage:selectedImage caption:caption];
     }
+    
+    //check if keyboard was showed
+    //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
+    [self performSelector:@selector(checkKeyboard) withObject:nil afterDelay:0.05f];
 }
 
 #pragma mark TAPImageDetailViewController
@@ -3088,7 +3099,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         else {
             self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
         }
-    
+        
+        if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
+            _initialKeyboardHeight = 0.0f;
+            _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
+        }
     }
 }
     
