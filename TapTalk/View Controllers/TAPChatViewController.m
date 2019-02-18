@@ -625,7 +625,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    //
+    TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
+    if (currentMessage != nil) {
+        BOOL isHidden = currentMessage.isHidden;
+        if (isHidden) {
+            //Set height = 0 for hidden message
+            return 0.0f;
+        }
+    }
+    
     NSNumber *height = [self.cellHeightsDictionary objectForKey:indexPath];
     if (height) {
         return [height doubleValue];
