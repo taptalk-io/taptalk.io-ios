@@ -634,7 +634,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
     }
     
-    NSNumber *height = [self.cellHeightsDictionary objectForKey:indexPath];
+    NSNumber *height = [self.cellHeightsDictionary objectForKey:currentMessage.localID];
     if (height) {
         return [height doubleValue];
     }
@@ -911,8 +911,18 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
     
     //save cell height to prevent jumpy effects
-    [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:indexPath];
-
+    TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
+    if (currentMessage != nil) {
+        BOOL isHidden = currentMessage.isHidden;
+        if (isHidden) {
+            //Set height = 0 for hidden message
+            [self.cellHeightsDictionary setObject:@(0.0f) forKey:currentMessage.localID];
+        }
+        else {
+            //save cell height to prevent jumpy effects
+            [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:currentMessage.localID];
+        }
+    }
 }
 
 #pragma mark - Delegate
