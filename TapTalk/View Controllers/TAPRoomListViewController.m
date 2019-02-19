@@ -17,7 +17,7 @@
 #import <AFNetworking/AFNetworking.h>
 #import "TAPSearchViewController.h"
 
-@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate>
+@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
 @property (strong, nonatomic) TAPRoomListView *roomListView;
@@ -129,6 +129,11 @@
     
     //View appear sequence
     [self viewLoadedSequence];
+    
+    //Check for 3D Touch availability
+    if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+        [self registerForPreviewingWithDelegate:self sourceView:self.roomListView.roomListTableView];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -263,6 +268,38 @@
 //END DV NOTE
 
 #pragma mark - Delegate
+#pragma mark UIViewControllerPreviewing
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    NSIndexPath *indexPath = [self.roomListView.roomListTableView indexPathForRowAtPoint:location];
+    
+    TAPRoomListTableViewCell *cell = [self.roomListView.roomListTableView cellForRowAtIndexPath:indexPath];
+    
+    TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
+    TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
+    TAPRoomModel *room = selectedMessage.room;
+    
+    CGRect convertedRect = [cell convertRect:cell.bounds toView:self.roomListView.roomListTableView];
+    previewingContext.sourceRect = convertedRect;
+    
+    //DV Note - Open Room with Room method (duplicate from TapTalk Instance)
+    [[TAPChatManager sharedManager] openRoom:room];
+    [[TAPChatManager sharedManager] saveAllUnsentMessage];
+    
+    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.currentRoom = room;
+    chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
+    [chatViewController setChatViewControllerType:TAPChatViewControllerTypePeek];
+    //END DV Note
+    
+    return chatViewController;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    TAPChatViewController *chatViewController = (TAPChatViewController *)viewControllerToCommit;
+    [chatViewController setChatViewControllerType:TAPChatViewControllerTypeDefault];
+    [self.navigationController showViewController:chatViewController sender:nil];
+}
+
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
