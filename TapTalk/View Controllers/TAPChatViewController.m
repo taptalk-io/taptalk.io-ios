@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 @property (strong, nonatomic) IBOutlet TAPImageView *recipientImageView;
 @property (strong, nonatomic) IBOutlet TAPCustomAccessoryView *inputMessageAccessoryView;
 
-@property (strong, nonatomic) IBOutlet UIVisualEffectView *dummyNavigationBarVisualEffectView;
+@property (strong, nonatomic) IBOutlet UIView *dummyNavigationBarView;
 @property (strong, nonatomic) IBOutlet UILabel *dummyNavigationBarTitleLabel;
 
 @property (strong, nonatomic) UIView *titleView;
@@ -456,7 +456,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if (self.chatViewControllerType == TAPChatViewControllerTypePeek) {
         //Hide accessory view when peek 3D touch
         self.inputMessageAccessoryView.alpha = 0.0f;
-        self.dummyNavigationBarVisualEffectView.alpha = 1.0f;
+        self.dummyNavigationBarView.alpha = 1.0f;
         self.dummyNavigationBarTitleLabel.alpha = 1.0f;
         self.dummyNavigationBarTitleLabel.text = room.name;
     }
@@ -1790,12 +1790,12 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     if (self.chatViewControllerType == TAPChatViewControllerTypePeek) {
         //Hide accessory view when peek 3D touch
         self.inputMessageAccessoryView.alpha = 0.0f;
-        self.dummyNavigationBarVisualEffectView.alpha = 0.0f;
-        self.dummyNavigationBarTitleLabel.alpha = 0.0f;
+        self.dummyNavigationBarView.alpha = 1.0f;
+        self.dummyNavigationBarTitleLabel.alpha = 1.0f;
     }
     else {
         self.inputMessageAccessoryView.alpha = 1.0f;
-        self.dummyNavigationBarVisualEffectView.alpha = 0.0f;
+        self.dummyNavigationBarView.alpha = 0.0f;
         self.dummyNavigationBarTitleLabel.alpha = 0.0f;
     }
 }
