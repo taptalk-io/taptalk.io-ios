@@ -21,8 +21,8 @@
 #import "TAPImagePreviewViewController.h"
 #import "TAPPhotoAlbumListViewController.h"
 
-#import "TAPGradientView.h"
 #import "TAPCustomAccessoryView.h"
+#import "TAPGradientView.h"
 
 #import "TAPProductListBubbleTableViewCell.h" //DV Temp
 
@@ -59,11 +59,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 @property (strong, nonatomic) IBOutlet TAPGrowingTextView *messageTextView;
 @property (strong, nonatomic) IBOutlet UITextField *secondaryTextField;
 @property (strong, nonatomic) IBOutlet UIView *emptyView;
-@property (strong, nonatomic) IBOutlet TAPCustomAccessoryView *inputMessageAccessoryView;
 @property (strong, nonatomic) IBOutlet UILabel *emptyTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *emptyDescriptionLabel;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *recipientImageView;
+@property (strong, nonatomic) IBOutlet TAPCustomAccessoryView *inputMessageAccessoryView;
+
+@property (strong, nonatomic) IBOutlet UIVisualEffectView *dummyNavigationBarVisualEffectView;
+@property (strong, nonatomic) IBOutlet UILabel *dummyNavigationBarTitleLabel;
 
 @property (strong, nonatomic) UIView *titleView;
 @property (strong, nonatomic) UILabel *nameLabel;
@@ -197,7 +200,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         self.tableView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - kInputMessageAccessoryViewHeight - extensionHeight - [TAPUtil safeAreaBottomPadding]);
     }];
     [UIView commitAnimations];
-    
 }
 
 - (void)viewDidLoad {
@@ -450,6 +452,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     //END CS TEMP
     
     //END Input Accessory Extension View
+    
+    if (self.chatViewControllerType == TAPChatViewControllerTypePeek) {
+        //Hide accessory view when peek 3D touch
+        self.inputMessageAccessoryView.alpha = 0.0f;
+        self.dummyNavigationBarVisualEffectView.alpha = 1.0f;
+        self.dummyNavigationBarTitleLabel.alpha = 1.0f;
+        self.dummyNavigationBarTitleLabel.text = room.name;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -1774,6 +1784,22 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 #pragma mark - Custom Method
+- (void)setChatViewControllerType:(TAPChatViewControllerType)chatViewControllerType {
+    _chatViewControllerType = chatViewControllerType;
+    
+    if (self.chatViewControllerType == TAPChatViewControllerTypePeek) {
+        //Hide accessory view when peek 3D touch
+        self.inputMessageAccessoryView.alpha = 0.0f;
+        self.dummyNavigationBarVisualEffectView.alpha = 0.0f;
+        self.dummyNavigationBarTitleLabel.alpha = 0.0f;
+    }
+    else {
+        self.inputMessageAccessoryView.alpha = 1.0f;
+        self.dummyNavigationBarVisualEffectView.alpha = 0.0f;
+        self.dummyNavigationBarTitleLabel.alpha = 0.0f;
+    }
+}
+
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index {
     
     //Add message to message pointer dictionary
