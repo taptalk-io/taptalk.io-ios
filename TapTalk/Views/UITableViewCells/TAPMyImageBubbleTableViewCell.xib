@@ -161,7 +161,7 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <accessibility key="accessibilityConfiguration" identifier="BubbleImageView"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="234" id="dy0-rG-qIq"/>
+                                    <constraint firstAttribute="width" priority="999" constant="234" id="dy0-rG-qIq"/>
                                     <constraint firstAttribute="height" priority="999" constant="300" id="xOq-yb-L9x"/>
                                 </constraints>
                             </imageView>
