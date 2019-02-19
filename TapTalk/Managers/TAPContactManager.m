@@ -62,7 +62,7 @@
     }
     
     TAPUserModel *activeUser = [TAPDataManager getActiveUser];
-    if(user.userID != activeUser.userID) {
+    if(user.userID != activeUser.userID && user.userID != nil) {
         //if user != self set to Dictionary
         [self.contactUserDictionary setObject:user forKey:user.userID];
         

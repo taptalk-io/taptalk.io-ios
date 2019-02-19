@@ -10,15 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol TAPKeyboardViewControllerDelegate <NSObject>
-
-- (void)keyboardViewControllerDidSelectRowAtIndexPath:(NSIndexPath *)indexPath;
-
-@end
-
 @interface TAPKeyboardViewController : UIInputViewController
 
-@property (weak, nonatomic) id<TAPKeyboardViewControllerDelegate> delegate;
 @property (nonatomic) CGFloat keyboardHeight;
 @property (strong, nonatomic) NSArray *customKeyboardArray;
 @property (strong, nonatomic) TAPUserModel *sender;

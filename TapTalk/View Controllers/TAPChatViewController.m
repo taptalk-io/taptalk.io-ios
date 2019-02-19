@@ -46,7 +46,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     inputAccessoryExtensionTypeReplyMessage = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, TAPKeyboardViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate>
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -368,7 +368,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
-    self.keyboardViewController.delegate = self;
     
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
@@ -639,6 +638,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         return [height doubleValue];
     }
     return UITableViewAutomaticDimension;
+    
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -1675,22 +1675,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         [self.view layoutIfNeeded];
     }];
 }
-
-#pragma mark TAPKeyboardViewController
-- (void)keyboardViewControllerDidSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"===> %ld", indexPath.row); //WK Temp
-    if(indexPath.row == 3) {
-        //Create Order Card
-        //CS Temp - Add Order Card Type Dummy Model
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:[TAPChatManager sharedManager].activeRoom body:@"" type:TAPChatMessageTypeOrderCard];
-        
-        [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
-        
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
-        //End Temp
-    }
-}
-
 #pragma mark TAPImagePreviewViewController
 - (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray {
     
@@ -2714,7 +2698,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification {
-    if ([self.messageArray count] > 0) {
+    if ([self.messageArray count] > 0 && self.minCreatedMessage != nil && [self.minCreatedMessage integerValue] != 0) {
         [self callAPIAfterAndUpdateUIAndScrollToTop:YES];
     }
 }
