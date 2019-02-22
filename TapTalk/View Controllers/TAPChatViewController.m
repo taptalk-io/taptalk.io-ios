@@ -645,7 +645,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     NSNumber *height = [self.cellHeightsDictionary objectForKey:currentMessage.localID];
     if (height) {
-        return [height doubleValue];
+        CGFloat heightFloat = [height doubleValue];
+        if (heightFloat < 0.0f) {
+            heightFloat = 0.0f;
+        }
+        return heightFloat;
     }
     return UITableViewAutomaticDimension;
     
@@ -930,7 +934,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
         else {
             //save cell height to prevent jumpy effects
-            [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:currentMessage.localID];
+            if (cell.frame.size.height >= 0.0f) {
+                [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:currentMessage.localID];
+            }
         }
     }
 }
@@ -1306,17 +1312,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     //remove selectedMessage
     self.selectedMessage = nil;
-    
-    TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
-    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
-        //animation
-        [cell showStatusLabel:NO animated:YES];
-        [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
-    } completion:^(BOOL finished) {
-        //completion
-    }];
 }
 
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
@@ -1547,17 +1542,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     //remove selectedMessage
     self.selectedMessage = nil;
-    
-    TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
-    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
-        //animation
-        [cell showStatusLabel:NO animated:YES];
-        [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
-    } completion:^(BOOL finished) {
-        //completion
-    }];
 }
 
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
