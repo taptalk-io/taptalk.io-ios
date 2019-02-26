@@ -347,7 +347,6 @@
 }
 
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
-    //    NSLog(@"USER %@ IS START TYPING", user.fullname); //DV Temp
     TAPRoomModel *room = [self.roomListDictionary objectForKey:typing.roomID];
     NSInteger index = [self.roomListArray indexOfObject:room];
     TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.roomListView.roomListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
@@ -355,7 +354,6 @@
 }
 
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
-    //    NSLog(@"USER %@ IS STOP TYPING", user.fullname); //DV Temp
     TAPRoomModel *room = [self.roomListDictionary objectForKey:typing.roomID];
     NSInteger index = [self.roomListArray indexOfObject:room];
     TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.roomListView.roomListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
