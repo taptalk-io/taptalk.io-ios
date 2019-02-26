@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) UIViewContentMode contentMode;
 
 @property (strong, nonatomic) TAPImageDetailView *imageDetailView;
+@property (strong, nonatomic) TAPMessageModel *message;
 
 @property (strong, nonatomic) NSArray *imageLocalNameArray;
 @property (strong, nonatomic) NSArray *imageArray;

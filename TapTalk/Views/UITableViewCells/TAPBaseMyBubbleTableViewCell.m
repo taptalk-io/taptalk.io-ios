@@ -156,7 +156,7 @@
         self.retryButton.alpha = 1.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
         
-        NSString *statusString = NSLocalizedString(@"Failed to send tap to retry", @"");
+        NSString *statusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
         self.statusLabel.text = statusString;
         self.statusLabel.alpha = 1.0f;
         self.statusLabelTopConstraint.constant = 2.0f;
@@ -240,9 +240,9 @@
     [self setStatusIconUIWithStatus:TAPBaseMyBubbleStatusRead];
 }
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
     if (isShowed) {
-        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
+        NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
 
         NSDate *currentDate = [NSDate date];
         NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
@@ -306,12 +306,12 @@
         }];
     }
     else {
-        if (self.message.isFailedSend) {
+        if (message.isFailedSend) {
             self.retryIconImageView.alpha = 1.0f;
             self.retryButton.alpha = 1.0f;
             self.chatBubbleRightConstraint.constant = 16.0f;
 
-            NSString *statusString = NSLocalizedString(@"Failed to send tap to retry", @"");
+            NSString *statusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
             self.statusLabel.text = statusString;
             self.statusLabel.alpha = 1.0f;
             self.statusLabelTopConstraint.constant = 2.0f;

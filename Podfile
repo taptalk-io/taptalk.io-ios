@@ -11,6 +11,9 @@ def tapTalk_pods
     pod 'ZBarSDK', '~> 1.3'
     pod 'PodAsset'
     pod 'SDWebImage', '4.4.2'
+    pod 'GooglePlaces'
+    pod 'GooglePlacePicker'
+    pod 'GoogleMaps'
 end
 
 target "TapTalk" do

@@ -29,6 +29,7 @@
 #import "TAPEncryptorManager.h"
 #import "TAPFileDownloadManager.h"
 #import "TAPFileUploadManager.h"
+#import "TAPLocationManager.h"'
 #import "TAPMessageStatusManager.h"
 #import "TAPNetworkManager.h"
 #import "TAPNotificationManager.h"

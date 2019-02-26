@@ -175,8 +175,8 @@
     [super receiveReadEvent];
 }
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
-    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon];
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
+    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon message:message];
     
     self.chatBubbleButton.userInteractionEnabled = NO;
     

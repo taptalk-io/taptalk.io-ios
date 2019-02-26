@@ -61,6 +61,7 @@
     [self.imageDetailPreviewView.activityIndicator startAnimating];
     [self.imageDetailPreviewView.zoomScrollView removeGestureRecognizer:self.doubleTapGestureRecognizer];
     [self.imageDetailPreviewView setImage:self.image];
+    [self.imageDetailPreviewView.zoomScrollView addGestureRecognizer:self.doubleTapGestureRecognizer];
 //    [self.imageDetailPreviewView setImageURL:self.imageURL imageLocalName:self.imageLocalName];
 }
 
@@ -126,16 +127,21 @@
 }
 
 - (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer {
-    if(self.imageDetailPreviewView.zoomScrollView.zoomScale > self.imageDetailPreviewView.zoomScrollView.minimumZoomScale) {
-        return;
+    if([self.delegate respondsToSelector:@selector(imageDetailPreviewViewControllerDidHandleSingleTap)]) {
+        [self.delegate imageDetailPreviewViewControllerDidHandleSingleTap];
     }
     
-    if([self.delegate respondsToSelector:@selector(imageDetailPreviewViewControllerDidTapped)]) {
-        [self.delegate imageDetailPreviewViewControllerDidTapped];
+    if(self.imageDetailPreviewView.zoomScrollView.zoomScale > self.imageDetailPreviewView.zoomScrollView.minimumZoomScale) {
+        return;
     }
 }
 
 - (void)handleDoubleTap:(UITapGestureRecognizer *)gestureRecognizer {
+    
+    if([self.delegate respondsToSelector:@selector(imageDetailPreviewViewControllerDidHandleDoubleTap)]) {
+        [self.delegate imageDetailPreviewViewControllerDidHandleDoubleTap];
+    }
+    
     if(self.imageDetailPreviewView.zoomScrollView.zoomScale >= self.imageDetailPreviewView.zoomScrollView.maximumZoomScale) {
         [self.imageDetailPreviewView.zoomScrollView setZoomScale:self.imageDetailPreviewView.zoomScrollView.minimumZoomScale animated:YES];
         

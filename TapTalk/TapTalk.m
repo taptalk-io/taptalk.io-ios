@@ -8,7 +8,10 @@
 
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
+
 @import AFNetworking;
+@import GooglePlaces;
+@import GoogleMaps;
 
 @interface TapTalk () <TAPNotificationManagerDelegate>
 
@@ -306,6 +309,10 @@
     //Other initialization
     [TAPNetworkManager sharedManager];
     [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    
+    //Google API Key
+    [GMSPlacesClient provideAPIKey:@"AIzaSyC6PNBIZsFfQZ5OQm4MFElW98hk8JIjaYk"];
+    [GMSServices provideAPIKey:@"AIzaSyC6PNBIZsFfQZ5OQm4MFElW98hk8JIjaYk"];
 }
 
 - (void)resetPersistent {

@@ -467,6 +467,69 @@
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
 
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address {
+
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+
+    NSString *messageBodyString = NSLocalizedString(@"📍Location", @"");
+    
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeLocation];
+    
+    NSMutableDictionary *dataDictionary = message.data;
+    if (dataDictionary == nil) {
+        dataDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
+    [dataDictionary setObject:[NSNumber numberWithFloat:latitude] forKey:@"latitude"];
+    [dataDictionary setObject:[NSNumber numberWithFloat:longitude] forKey:@"longitude"];
+    [dataDictionary setObject:address forKey:@"address"];
+    
+    //check if userInfo is available, if available add to data in message model
+    //userInfo custom user information from client, used for custom quote click action
+    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
+    if (userInfo != nil) {
+        [dataDictionary setObject:userInfo forKey:@"userInfo"];
+    }
+    
+    message.data = [dataDictionary copy];
+    
+    //Check if quote message available
+    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
+    if (quotedMessageObject != nil) {
+        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+            //if message quoted from message model then should construct quote and reply to model
+            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+            quotedMessage = [quotedMessage copy];
+            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                message.quote = [quotedMessage.quote copy];
+                message.quote.title = quotedMessage.user.fullname;
+                message.quote.content = quotedMessage.body;
+            }
+            else {
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = quotedMessage.user.fullname;
+                quote.content = quotedMessage.body;
+                message.quote = [quote copy];
+            }
+            
+            TAPReplyToModel *replyTo = [TAPReplyToModel new];
+            replyTo.messageID = quotedMessage.messageID;
+            replyTo.localID = quotedMessage.localID;
+            replyTo.messageType = quotedMessage.type;
+            message.replyTo = replyTo;
+        }
+        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+            //if message quoted from quote model then should just construct quote model
+            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
+            message.quote = [quotedMessage copy];
+        }
+    }
+    
+    [self sendMessage:message notifyDelegate:YES];
+    
+    [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
+}
+
 - (void)setActiveUser:(TAPUserModel *)activeUser {
     _activeUser = activeUser;
     

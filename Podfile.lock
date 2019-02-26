@@ -14,11 +14,21 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
+  - GoogleMaps (3.0.2):
+    - GoogleMaps/Maps (= 3.0.2)
+  - GoogleMaps/Base (3.0.2)
+  - GoogleMaps/Maps (3.0.2):
+    - GoogleMaps/Base
+  - GooglePlacePicker (3.0.2):
+    - GoogleMaps (= 3.0.2)
+    - GooglePlaces (= 3.0.2)
+  - GooglePlaces (3.0.2):
+    - GoogleMaps/Base (= 3.0.2)
   - JSONModel (1.8.0)
-  - PodAsset (0.22.0)
-  - Realm (3.13.0):
-    - Realm/Headers (= 3.13.0)
-  - Realm/Headers (3.13.0)
+  - PodAsset (1.0.0)
+  - Realm (3.13.1):
+    - Realm/Headers (= 3.13.1)
+  - Realm/Headers (3.13.1)
   - SDWebImage (4.4.2):
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
@@ -27,6 +37,9 @@ PODS:
 
 DEPENDENCIES:
   - AFNetworking (~> 3.1.0)
+  - GoogleMaps
+  - GooglePlacePicker
+  - GooglePlaces
   - JSONModel (~> 1.1)
   - PodAsset
   - Realm
@@ -37,6 +50,9 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - AFNetworking
+    - GoogleMaps
+    - GooglePlacePicker
+    - GooglePlaces
     - JSONModel
     - PodAsset
     - Realm
@@ -46,13 +62,16 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
+  GoogleMaps: 941cd655e009b4d8e42df19a3d749bc3fccec973
+  GooglePlacePicker: 00a74c32477edc8e01a99cf49a6bd4e64767a2b1
+  GooglePlaces: c086e0055dc5f0177d7c9d65fc77a1734f9a4825
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
-  PodAsset: d9d35b6a86ceaeaead63692a1bce27b4aea243b3
-  Realm: 5edd2ee65406aef591a4f9895de5a3440e51b3d8
+  PodAsset: c2c2b20013c1edf698fea2bacba6e75a638537a2
+  Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   ZBarSDK: 4c1b5daeb7d6cc67dc9355e690af0230a661f6ec
 
-PODFILE CHECKSUM: 048bdf7df46aea4c399e701fe1c189972e4138ec
+PODFILE CHECKSUM: 57aa9fd27022c0bc92c9c474e36eb17422ca2040
 
-COCOAPODS: 1.6.0.beta.2
+COCOAPODS: 1.6.0

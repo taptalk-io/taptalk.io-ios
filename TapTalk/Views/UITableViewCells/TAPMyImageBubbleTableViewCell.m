@@ -34,6 +34,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
+
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconLeftConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconBottomConstraint;
@@ -261,8 +262,8 @@
     [super receiveReadEvent];
 }
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
-    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon];
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
+    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon message:message];
     if (!self.message.isFailedSend) {
         self.statusIconImageView.alpha = 1.0f;
     }

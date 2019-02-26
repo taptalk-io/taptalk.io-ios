@@ -21,7 +21,7 @@
 @property (nonatomic) CGFloat lastXGap;
 @property (nonatomic) CGFloat lastYGap;
 
-@property (nonatomic) BOOL isBottomBarInitallyHidden;
+@property (nonatomic) BOOL isHeaderFooterViewShown;
 @property (nonatomic) BOOL isActiveIndexSet;
 @property (nonatomic) BOOL isWillTransitionCalled;
 @property (nonatomic) NSInteger currentActiveIndex;
@@ -30,7 +30,12 @@
 
 @property (weak, nonatomic) TAPImageDetailPreviewViewController *currentViewController;
 
+- (void)handlePan:(UIPanGestureRecognizer *)panGestureRecognizer;
+- (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
+- (void)handleDoubleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (void)dismissSelf;
+- (void)showFinishSavingImageState;
+- (void)removeSaveImageLoadingView;
 
 @end
 
@@ -95,6 +100,16 @@
                                                          animated:NO
                                                        completion:nil];
     }
+    
+    //Remove swipe to back gesture
+    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+        self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+    }
+    
+    //Show header footer info view
+    _isHeaderFooterViewShown = YES;
+    [self.imageDetailView showHeaderAndCaptionView:self.isHeaderFooterViewShown animated:NO];
+    [self.imageDetailView setImageDetailInfoWithMessage:self.message];
     
 }
 
@@ -196,9 +211,26 @@
     }
 }
 
-#pragma mark ImageDetailPreviewViewController
-- (void)imageDetailPreviewViewControllerDidTapped {
+- (void)imageDetailViewDidTappedSaveButton {
+    [self.imageDetailView setSaveLoadingAsFinishedState:NO];
+    [self.imageDetailView showSaveLoadingView:YES];
+    UIImage *currentImage = [self.imageArray firstObject];
+    UIImageWriteToSavedPhotosAlbum(currentImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+}
+
+- (void)imageDetailViewDidTappedBackButton {
+    [self.imageDetailView showHeaderAndCaptionView:NO animated:YES];
     [self dismissSelf];
+}
+
+#pragma mark ImageDetailPreviewViewController
+- (void)imageDetailPreviewViewControllerDidHandleSingleTap {
+    _isHeaderFooterViewShown = !self.isHeaderFooterViewShown;
+    [self.imageDetailView showHeaderAndCaptionView:_isHeaderFooterViewShown animated:YES];
+}
+
+- (void)imageDetailPreviewViewControllerDidHandleDoubleTap {
+    
 }
 
 #pragma mark UIScrollView
@@ -267,11 +299,16 @@
 }
 
 - (void)handlePan:(UIPanGestureRecognizer *)panGestureRecognizer {
+    
     CGPoint location = [panGestureRecognizer locationInView:self.view];
     
     CGFloat minimumGapToAction = 50.0f;
     
     if(panGestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        
+        //Hide header and footer view
+        [self.imageDetailView showHeaderAndCaptionView:NO animated:NO];
+        
         _startPanPoint = location;
         _lastPanPoint = location;
     }
@@ -326,6 +363,11 @@
                                      self.imageDetailView.movementView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.imageDetailView.movementView.frame), CGRectGetHeight(self.imageDetailView.movementView.frame));
                                      self.imageDetailView.backgroundView.alpha = 1.0f;
                                  } completion:nil];
+             
+                //Show header and footer view
+                if (self.isHeaderFooterViewShown) {
+                    [self.imageDetailView showHeaderAndCaptionView:YES animated:YES];
+                }
                 
                 return;
             }
@@ -345,6 +387,11 @@
                                      self.imageDetailView.movementView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.imageDetailView.movementView.frame), CGRectGetHeight(self.imageDetailView.movementView.frame));
                                      self.imageDetailView.backgroundView.alpha = 1.0f;
                                  } completion:nil];
+                
+                //Show header and footer view
+                if (self.isHeaderFooterViewShown) {
+                    [self.imageDetailView showHeaderAndCaptionView:YES animated:YES];
+                }
                 
                 return;
             }
@@ -397,6 +444,20 @@
                                                          animated:YES
                                                        completion:nil];
     }
+}
+
+//Override completionSelector method of save image to gallery
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [self showFinishSavingImageState];
+}
+
+- (void)showFinishSavingImageState {
+    [self.imageDetailView setSaveLoadingAsFinishedState:YES];
+    [self performSelector:@selector(removeSaveImageLoadingView) withObject:nil afterDelay:1.0f];
+}
+
+- (void)removeSaveImageLoadingView {
+    [self.imageDetailView showSaveLoadingView:NO];
 }
 
 @end

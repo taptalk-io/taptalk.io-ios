@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
 
 @end
 

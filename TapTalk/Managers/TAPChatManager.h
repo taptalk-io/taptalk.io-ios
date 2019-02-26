@@ -61,6 +61,7 @@
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
 - (void)sendFileMessage:(TAPMessageModel *)message;
 - (void)sendProductMessage:(TAPMessageModel *)message;
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;

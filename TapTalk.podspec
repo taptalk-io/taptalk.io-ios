@@ -122,7 +122,9 @@ Pod::Spec.new do |s|
   # s.library   = "iconv"
   # s.libraries = "iconv", "xml2"
   
-# s.vendored_frameworks = 'WebP.framework'
+#   s.vendored_frameworks = 'GooglePlacePicker.framework', 'GooglePlaces.framework', 'GoogleMaps.framework', 'GoogleMapsCore.framework'
+
+   s.static_framework = true
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -143,10 +145,13 @@ Pod::Spec.new do |s|
     s.dependency "SDWebImage", "4.4.2"
     s.dependency "ZBarSDK", "~> 1.3"
     s.dependency "PodAsset"
+    s.dependency "GooglePlaces"
+    s.dependency "GooglePlacePicker"
+    s.dependency "GoogleMaps"
     
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents ='#import "Configs.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "PodAsset.h"', '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "TAPChatManager.h"', '#import "TAPConnectionManager.h"', '#import "TAPContactManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPCustomBubbleManager.h"', '#import "TAPCustomKeyboardManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPFileDownloadManager.h"', '#import "TAPFileUploadManager.h"', '#import "TAPMessageStatusManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPGrowingTextView.h"', '#import "TAPImageView.h"', '#import "TAPSearchBarView.h"'
+    s.prefix_header_contents ='#import "Configs.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "PodAsset.h"', '#import "TapTalk.h"', '#import "TAPUtil.h"', '#import "TAPChatManager.h"', '#import "TAPConnectionManager.h"', '#import "TAPContactManager.h"', '#import "TAPContactCacheManager.h"', '#import "TAPCustomBubbleManager.h"', '#import "TAPCustomKeyboardManager.h"', '#import "TAPDataManager.h"', '#import "TAPDatabaseManager.h"', '#import "TAPEncryptorManager.h"', '#import "TAPFileDownloadManager.h"', '#import "TAPFileUploadManager.h"', '#import "TAPLocationManager.h"', '#import "TAPMessageStatusManager.h"', '#import "TAPNetworkManager.h"', '#import "TAPNotificationManager.h"', '#import "TAPOldDataManager.h"', '#import "TAPGrowingTextView.h"', '#import "TAPImageView.h"', '#import "TAPSearchBarView.h"'
     
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     

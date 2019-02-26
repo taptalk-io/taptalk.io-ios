@@ -11,7 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPImageDetailPreviewViewControllerDelegate <NSObject>
 
-- (void)imageDetailPreviewViewControllerDidTapped;
+- (void)imageDetailPreviewViewControllerDidHandleSingleTap;
+- (void)imageDetailPreviewViewControllerDidHandleDoubleTap;
 
 @end
 

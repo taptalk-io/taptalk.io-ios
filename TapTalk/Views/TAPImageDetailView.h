@@ -11,9 +11,10 @@
 
 - (void)imageDetailViewWillStartOpeningAnimation;
 - (void)imageDetailViewWillStartClosingAnimation;
-
 - (void)imageDetailViewDidFinishOpeningAnimation;
 - (void)imageDetailViewDidFinishClosingAnimation;
+- (void)imageDetailViewDidTappedBackButton;
+- (void)imageDetailViewDidTappedSaveButton;
 
 @end
 
@@ -30,6 +31,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)animateOpeningWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage;
 - (void)animateClosingWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage;
+- (void)showHeaderAndCaptionView:(BOOL)isShow animated:(BOOL)animated;
+- (void)setSaveLoadingAsFinishedState:(BOOL)isFinished;
+- (void)showSaveLoadingView:(BOOL)isShow;
+- (void)setImageDetailInfoWithMessage:(TAPMessageModel *)message;
 
 @end
 

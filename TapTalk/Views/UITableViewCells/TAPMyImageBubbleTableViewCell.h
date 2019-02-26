@@ -43,7 +43,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
 
 - (void)showProgressUploadView:(BOOL)show;
 - (void)animateFailedUploadingImage;

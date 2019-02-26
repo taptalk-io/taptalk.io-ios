@@ -15,11 +15,14 @@
 #import "TAPYourChatBubbleTableViewCell.h"
 #import "TAPMyImageBubbleTableViewCell.h"
 #import "TAPYourImageBubbleTableViewCell.h"
+#import "TAPMyLocationBubbleTableViewCell.h"
+#import "TAPYourLocationBubbleTableViewCell.h"
 #import "TAPConnectionStatusViewController.h"
 #import "TAPKeyboardViewController.h"
 #import "TAPProfileViewController.h"
 #import "TAPImagePreviewViewController.h"
 #import "TAPPhotoAlbumListViewController.h"
+#import "TAPPickLocationViewController.h"
 
 #import "TAPCustomAccessoryView.h"
 #import "TAPGradientView.h"
@@ -46,7 +49,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     inputAccessoryExtensionTypeReplyMessage = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate>
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPPickLocationViewControllerDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -138,6 +141,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 @property (weak, nonatomic) id openedBubbleCell;
 
+//Custom Method
 - (IBAction)sendButtonDidTapped:(id)sender;
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
 - (IBAction)chatAnchorButtonDidTapped:(id)sender;
@@ -176,6 +180,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)fileUploadManagerFinishNotification:(NSNotification *)notification;
 - (void)fileUploadManagerFailureNotification:(NSNotification *)notification;
 - (void)fetchImageDataWithMessage:(TAPMessageModel *)message;
+
+//Attachment
+- (void)openCamera;
+- (void)openGallery;
+- (void)pickLocation;
+
+//Location
+- (void)openLocationInGoogleMaps:(NSDictionary *)dataDictionary;
+- (void)openLocationInAppleMaps:(NSDictionary *)dataDictionary;
 
 @end
 
@@ -652,7 +665,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         return heightFloat;
     }
     return UITableViewAutomaticDimension;
-    
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -694,10 +706,10 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 }
                 
                 if (self.selectedMessage != nil && [self.selectedMessage.localID isEqualToString:message.localID]) {
-                    [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
+                    [cell showStatusLabel:YES animated:NO updateStatusIcon:NO message:message];
                 }
                 else {
-                    [cell showStatusLabel:NO animated:NO updateStatusIcon:NO];
+                    [cell showStatusLabel:NO animated:NO updateStatusIcon:NO message:message];
                 }
                 
                 return cell;
@@ -714,7 +726,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 if (!message.isHidden) {
                     [cell setMessage:message];
                 }
-                [cell showStatusLabel:YES animated:NO updateStatusIcon:NO];
+                
+                [cell showStatusLabel:YES animated:NO updateStatusIcon:NO message:message];
                 
                 if (message.isFailedSend) {
                     //Update view to failed send
@@ -760,6 +773,25 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 cell.delegate = self;
                 return cell;
             }
+            else if (message.type == TAPChatMessageTypeLocation) {
+                [tableView registerNib:[TAPMyLocationBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyLocationBubbleTableViewCell description]];
+                TAPMyLocationBubbleTableViewCell *cell = (TAPMyLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyLocationBubbleTableViewCell description] forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.delegate = self;
+                
+                if (!message.isHidden) {
+                    [cell setMessage:message];
+                }
+                
+                if (message.isFailedSend) {
+                    [cell showStatusLabel:NO animated:NO updateStatusIcon:NO message:message];
+                }
+                else {
+                    [cell showStatusLabel:YES animated:NO updateStatusIcon:NO message:message];
+                }
+            
+                return cell;
+            }
             else {
                 //check if custom bubble available
                 NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
@@ -784,32 +816,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
         else {
             //Their Chat
-            
-            //            //DV Temp
-            //            NSInteger type = 3001;
-            //            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
-            //            NSString *cellName = [cellDataDictionary objectForKey:@"name"];
-            //            id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
-            //
-            //            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
-            //            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
-            //
-            //            TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
-            //            cell.delegate = userDelegate;
-            //            return cell;
-            //            //END DV Temp
-            
-            //            //DV Temp
-            //            NSInteger type = 3002;
-            //            NSString *cellName = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:type];
-            //            UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
-            //            [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
-            //
-            //            id cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
-            //
-            //            return cell;
-            //            //END DV Temp
-            
             if (message.type == TAPChatMessageTypeText) {
                 [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
                 TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
@@ -869,25 +875,40 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
                 return cell;
             }
-            
-            //check if custom bubble available
-            NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
-            
-            if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
-                //if custom bubble from client available
-                NSString *cellName = [cellDataDictionary objectForKey:@"name"];
-                id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+            else if (message.type == TAPChatMessageTypeLocation) {
+                [tableView registerNib:[TAPYourLocationBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourLocationBubbleTableViewCell description]];
+                TAPYourLocationBubbleTableViewCell *cell = (TAPYourLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourLocationBubbleTableViewCell description] forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.delegate = self;
                 
-                UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
-                [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
-                
-                TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
-                cell.delegate = userDelegate;
-                cell.clipsToBounds = YES;
                 if (!message.isHidden) {
                     [cell setMessage:message];
                 }
+                
+                [cell showStatusLabel:YES animated:NO];
+                
                 return cell;
+            }
+            else {
+                //check if custom bubble available
+                NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
+                
+                if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                    //if custom bubble from client available
+                    NSString *cellName = [cellDataDictionary objectForKey:@"name"];
+                    id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+                    
+                    UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+                    [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
+                    
+                    TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
+                    cell.delegate = userDelegate;
+                    cell.clipsToBounds = YES;
+                    if (!message.isHidden) {
+                        [cell setMessage:message];
+                    }
+                    return cell;
+                }
             }
         }
     }
@@ -1149,7 +1170,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                 //animation
                 [self.tableView beginUpdates];
-                [cell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+                [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
                 [cell layoutIfNeeded];
                 [self.tableView endUpdates];
             } completion:^(BOOL finished) {
@@ -1169,7 +1190,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                     //animation
                     [self.tableView beginUpdates];
-                    [cell showStatusLabel:YES animated:YES updateStatusIcon:YES];
+                    [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
                     [cell layoutIfNeeded];
                     [self.tableView endUpdates];
                 } completion:^(BOOL finished) {
@@ -1200,14 +1221,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                     //animation
                     if (isMyCell) {
-                        [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+                        [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
                     }
                     else {
                         [previousCell showStatusLabel:NO animated:YES];
                     }
                     [previousCell layoutIfNeeded];
                     
-                    [cell showStatusLabel:YES animated:YES updateStatusIcon:YES];
+                    [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
                     [cell layoutIfNeeded];
                     [self.tableView beginUpdates];
                     [self.tableView endUpdates];
@@ -1238,7 +1259,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
     [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
         //animation
-        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:self.selectedMessage];
         [cell layoutIfNeeded];
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
@@ -1364,6 +1385,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     TAPImageDetailViewController *imageDetailViewController = [[TAPImageDetailViewController alloc] init];
     imageDetailViewController.delegate = self;
+    imageDetailViewController.message = myImageBubbleCell.message;
     
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
     NSArray *imageSliderImage = [NSArray array];
@@ -1390,6 +1412,111 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         myImageBubbleCell.bubbleImageView.alpha = 0.0f;
         _openedBubbleCell = myImageBubbleCell;
     }
+}
+
+#pragma mark TAPMyLocationBubbleTableViewCell
+- (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
+    if (tappedMessage.isFailedSend) {
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+
+        NSDictionary *dataDictionary = tappedMessage.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *currentAddress = [dataDictionary objectForKey:@"address"];
+        currentAddress = [TAPUtil nullToEmptyString:currentAddress];
+        CGFloat currentLatitude = [[dataDictionary objectForKey:@"latitude"] floatValue];
+        CGFloat currentLongitude = [[dataDictionary objectForKey:@"longitude"] floatValue];
+        
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView beginUpdates];
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            [self.tableView endUpdates];
+            
+            [[TAPChatManager sharedManager] sendLocationMessage:currentLatitude longitude:currentLongitude address:currentAddress];
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+    else if (!tappedMessage.isSending) {
+       //DV TO DO - handle tap open alert to google maps or maps
+        
+        NSDictionary *dataDictionary = tappedMessage.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *googleMapsAction = [UIAlertAction
+                                       actionWithTitle:@"Open in Google Maps"
+                                       style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction * action) {
+                                           [self performSelector:@selector(openLocationInGoogleMaps:) withObject:dataDictionary];
+                                       }];
+        
+        UIAlertAction *appleMapsAction = [UIAlertAction
+                                        actionWithTitle:@"Open in Maps"
+                                        style:UIAlertActionStyleDefault
+                                        handler:^(UIAlertAction * action) {
+                                            [self performSelector:@selector(openLocationInAppleMaps:) withObject:dataDictionary];
+                                        }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction
+                                       actionWithTitle:@"Cancel"
+                                       style:UIAlertActionStyleCancel
+                                       handler:^(UIAlertAction * action) {
+                                           //Do some thing here
+                                       }];
+        
+        [googleMapsAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"]; //DV Temp
+        [appleMapsAction setValue:[[UIImage imageNamed:@"TAPIconAppleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+        
+        [googleMapsAction setValue:@0 forKey:@"titleTextAlignment"];
+        [appleMapsAction setValue:@0 forKey:@"titleTextAlignment"];
+        
+        [googleMapsAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+        [appleMapsAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+        [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
+        
+        [alertController addAction:googleMapsAction];
+        [alertController addAction:appleMapsAction];
+        [alertController addAction:cancelAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)myLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    
+}
+
+- (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+    NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+
+    [self showInputAccessoryExtensionView:NO];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+    [self setReplyMessageWithMessage:tappedMessage];
+    [self showInputAccessoryExtensionView:YES];
+    
+    TAPMessageModel *quotedMessageModel = [tappedMessage copy];
+    [[TAPChatManager sharedManager] saveToQuotedMessage:tappedMessage userInfo:nil roomID:self.currentRoom.roomID];
+    
+    //remove selectedMessage
+    self.selectedMessage = nil;
+    
+    TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
+        //animation
+        [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
+//        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
+        [cell layoutIfNeeded];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+    } completion:^(BOOL finished) {
+        //completion
+    }];
 }
 
 #pragma mark TAPYourChatBubbleTableViewCell
@@ -1457,7 +1584,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                     //animation
                     if (isMyCell) {
-                        [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+                        [previousCell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
                     }
                     else {
                         [previousCell showStatusLabel:NO animated:YES];
@@ -1566,6 +1693,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     TAPImageDetailViewController *imageDetailViewController = [[TAPImageDetailViewController alloc] init];
     imageDetailViewController.delegate = self;
+    imageDetailViewController.message = yourImageBubbleCell.message;
     
     UIImage *cellImage = yourImageBubbleCell.bubbleImageView.image;
     NSArray *imageSliderImage = [NSArray array];
@@ -1592,6 +1720,44 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         yourImageBubbleCell.bubbleImageView.alpha = 0.0f;
         _openedBubbleCell = yourImageBubbleCell;
     }
+}
+
+#pragma mark TAPYourLocationBubbleTableViewCell
+- (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
+    
+}
+
+- (void)yourLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    
+}
+
+- (void)yourLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+    NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+    
+    [self showInputAccessoryExtensionView:NO];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+    [self setReplyMessageWithMessage:tappedMessage];
+    [self showInputAccessoryExtensionView:YES];
+    
+    TAPMessageModel *quotedMessageModel = [tappedMessage copy];
+    [[TAPChatManager sharedManager] saveToQuotedMessage:tappedMessage userInfo:nil roomID:self.currentRoom.roomID];
+    
+    //remove selectedMessage
+    self.selectedMessage = nil;
+    
+    TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
+        //animation
+        [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
+        //        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
+        [cell layoutIfNeeded];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+    } completion:^(BOOL finished) {
+        //completion
+    }];
+
 }
 
 #pragma mark TAPProductListBubbleTableViewCell
@@ -1767,6 +1933,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+#pragma mark TAPPickLocationViewController
+- (void)pickLocationViewControllerSetLocationWithLatitude:(CGFloat)latitude
+                                                longitude:(CGFloat)longitude
+                                                  address:(NSString *)address
+                                               postalCode:(NSString *)postalCode {
+    [[TAPChatManager sharedManager] sendLocationMessage:latitude longitude:longitude address:address];
+}
+
 #pragma mark - Custom Method
 - (void)setChatViewControllerType:(TAPChatViewControllerType)chatViewControllerType {
     _chatViewControllerType = chatViewControllerType;
@@ -1886,6 +2060,25 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }
             else {
                 [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
+            }
+        }
+        else if (currentMessage.type == TAPChatMessageTypeLocation) {
+            TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+            
+            if (isSendingAnimation) {
+                [cell receiveSentEvent];
+            }
+            else if (setAsDelivered) {
+                [cell receiveDeliveredEvent];
+            }
+            else if (setAsRead) {
+                [cell receiveReadEvent];
+            }
+            else {
+                [cell setMessage:message];
+                
+                //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                //        [self.tableView reloadData];
             }
         }
         else {
@@ -2107,7 +2300,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         //animation
         if ([cell isKindOfClass:[TAPMyChatBubbleTableViewCell class]]) {
             TAPMyChatBubbleTableViewCell *myChatCell = cell;
-            [myChatCell showStatusLabel:NO animated:YES updateStatusIcon:YES];
+            [myChatCell showStatusLabel:NO animated:YES updateStatusIcon:YES message:self.selectedMessage];
         }
         else if ([cell isKindOfClass:[TAPYourChatBubbleTableViewCell class]]) {
             TAPYourChatBubbleTableViewCell *yourChatCell = cell;
@@ -2293,6 +2486,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                                         [self performSelector:@selector(openGallery) withObject:nil];
                                     }];
     
+    UIAlertAction *locationAction = [UIAlertAction
+                                     actionWithTitle:@"Location"
+                                     style:UIAlertActionStyleDefault
+                                     handler:^(UIAlertAction * action) {
+                                         [self performSelector:@selector(pickLocation) withObject:nil];
+                                     }];
+    
     UIAlertAction *cancelAction = [UIAlertAction
                                    actionWithTitle:@"Cancel"
                                    style:UIAlertActionStyleCancel
@@ -2303,17 +2503,20 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     
     [cameraAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [galleryAction setValue:[[UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
-    
+    [locationAction setValue:[[UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
 
     [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
     [galleryAction setValue:@0 forKey:@"titleTextAlignment"];
+    [locationAction setValue:@0 forKey:@"titleTextAlignment"];
     
     [cameraAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [galleryAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [locationAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
     
     [alertController addAction:cameraAction];
     [alertController addAction:galleryAction];
+    [alertController addAction:locationAction];
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -2826,49 +3029,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
-- (void)openCamera {
-    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    
-    if (status == AVAuthorizationStatusAuthorized) {
-        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-        imagePicker.allowsEditing = NO;
-        imagePicker.delegate = self;
-        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-        
-        [self presentViewController:imagePicker animated:YES completion:^{
-            //completion
-        }];
-    }
-    else if (status == AVAuthorizationStatusNotDetermined) {
-        //request
-        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self openCamera];
-            });
-        }];
-    }
-    else {
-        //No permission. Trying to normally request it
-        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
-        [alertController addAction:cancelAction];
-        
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-            }
-        }];
-        [alertController addAction:settingsAction];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-}
-
 - (void)timerRefreshLastSeen {
     NSTimeInterval currentLastSeen = (double)self.onlineStatus.lastActive.doubleValue/1000.0f;
     [self updateLastSeenWithTimestamp:currentLastSeen];
@@ -3132,7 +3292,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 - (void)setReplyMessageWithMessage:(TAPMessageModel *)message {
-    self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];;
+    self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
     self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
 }
 
@@ -3464,6 +3624,95 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     _keyboardState = keyboardStateOptions;
     
     [self.keyboardOptionButton setImage:[UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+}
+
+//Attachment
+- (void)openCamera {
+    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    if (status == AVAuthorizationStatusAuthorized) {
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.allowsEditing = NO;
+        imagePicker.delegate = self;
+        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        
+        [self presentViewController:imagePicker animated:YES completion:^{
+            //completion
+        }];
+    }
+    else if (status == AVAuthorizationStatusNotDetermined) {
+        //request
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openCamera];
+            });
+        }];
+    }
+    else {
+        //No permission. Trying to normally request it
+        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        [alertController addAction:cancelAction];
+        
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if (IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }];
+        [alertController addAction:settingsAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+//Location
+- (void)pickLocation {
+    [[TAPLocationManager sharedManager] requestAuthorization];
+    
+    TAPPickLocationViewController *pickLocationViewController = [[TAPPickLocationViewController alloc] init];
+    pickLocationViewController.delegate = self;
+    pickLocationViewController.selectedLocationCoordinate = CLLocationCoordinate2DMake(-999, -999);
+    UINavigationController *pickLocationNavigationController = [[UINavigationController alloc] initWithRootViewController:pickLocationViewController];
+    [self presentViewController:pickLocationNavigationController animated:YES completion:nil];
+}
+
+- (void)openLocationInGoogleMaps:(NSDictionary *)dataDictionary {
+    
+    CGFloat latitude = [[dataDictionary objectForKey:@"latitude"] floatValue];
+    CGFloat longitude = [[dataDictionary objectForKey:@"longitude"] floatValue];
+    NSString *address = [dataDictionary objectForKey:@"address"];
+    address = [address stringByReplacingOccurrencesOfString:@" " withString:@"%20"]; //Convert address string format
+    
+    NSURL *googleMapsURL = [NSURL URLWithString:@"comgooglemaps://"];
+
+    if ([[UIApplication sharedApplication] canOpenURL:googleMapsURL]) {
+        NSString *urlString = [NSString stringWithFormat:@"comgooglemaps://?center=%f,%f&zoom=14&q=%f,%f",latitude, longitude, latitude, longitude];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
+    } else {
+        // GoogleMaps is not installed. Launch AppStore to install GoogleMaps app
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/id/app/id585027354"]];
+    }
+}
+
+- (void)openLocationInAppleMaps:(NSDictionary *)dataDictionary {
+    
+    CGFloat latitude = [[dataDictionary objectForKey:@"latitude"] floatValue];
+    CGFloat longitude = [[dataDictionary objectForKey:@"longitude"] floatValue];
+    NSString *address = [dataDictionary objectForKey:@"address"];
+    address = [address stringByReplacingOccurrencesOfString:@" " withString:@"%20"]; //Convert address string format
+
+    NSURL *appleMapsURL = [NSURL URLWithString:@"maps://"];
+    
+    if ([[UIApplication sharedApplication] canOpenURL:appleMapsURL]) {
+        NSString *urlString = [NSString stringWithFormat:@"maps://?ll=%f,%f&q=%@", latitude, longitude, address];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
+    } else {
+        NSLog(@"Can't use maps://"); //DV Temp
+    }
 }
     
 //DV NOTE - Uncomment this to use API download thumbnail image
