@@ -26,6 +26,8 @@
 		D71582FC217EFAEC00649C70 /* TAPCustomNotificationAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = D71582FA217EFAEC00649C70 /* TAPCustomNotificationAlertView.m */; };
 		D71582FF217EFB0000649C70 /* TAPCustomNotificationAlertViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D71582FD217EFB0000649C70 /* TAPCustomNotificationAlertViewController.h */; };
 		D7158300217EFB0000649C70 /* TAPCustomNotificationAlertViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D71582FE217EFB0000649C70 /* TAPCustomNotificationAlertViewController.m */; };
+		D72384D4223776CF0067F6C1 /* TAPScanQRCodePopupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D72384D2223776CE0067F6C1 /* TAPScanQRCodePopupViewController.m */; };
+		D72384D5223776CF0067F6C1 /* TAPScanQRCodePopupViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D72384D3223776CF0067F6C1 /* TAPScanQRCodePopupViewController.h */; };
 		D7244BC421D88297000BEEEE /* TAPPhotoAlbumListItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7244BC221D88296000BEEEE /* TAPPhotoAlbumListItemTableViewCell.m */; };
 		D7244BC521D88297000BEEEE /* TAPPhotoAlbumListItemTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7244BC321D88297000BEEEE /* TAPPhotoAlbumListItemTableViewCell.h */; };
 		D7244BC821D883A1000BEEEE /* TAPPhotoAlbumListView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7244BC621D883A0000BEEEE /* TAPPhotoAlbumListView.h */; };
@@ -308,6 +310,8 @@
 		D71582FA217EFAEC00649C70 /* TAPCustomNotificationAlertView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomNotificationAlertView.m; sourceTree = "<group>"; };
 		D71582FD217EFB0000649C70 /* TAPCustomNotificationAlertViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCustomNotificationAlertViewController.h; sourceTree = "<group>"; };
 		D71582FE217EFB0000649C70 /* TAPCustomNotificationAlertViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomNotificationAlertViewController.m; sourceTree = "<group>"; };
+		D72384D2223776CE0067F6C1 /* TAPScanQRCodePopupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TAPScanQRCodePopupViewController.m; path = "View Controllers/TAPScanQRCodePopupViewController.m"; sourceTree = SOURCE_ROOT; };
+		D72384D3223776CF0067F6C1 /* TAPScanQRCodePopupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TAPScanQRCodePopupViewController.h; path = "View Controllers/TAPScanQRCodePopupViewController.h"; sourceTree = SOURCE_ROOT; };
 		D7244BC221D88296000BEEEE /* TAPPhotoAlbumListItemTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPPhotoAlbumListItemTableViewCell.m; sourceTree = "<group>"; };
 		D7244BC321D88297000BEEEE /* TAPPhotoAlbumListItemTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPPhotoAlbumListItemTableViewCell.h; sourceTree = "<group>"; };
 		D7244BC621D883A0000BEEEE /* TAPPhotoAlbumListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPPhotoAlbumListView.h; sourceTree = "<group>"; };
@@ -881,6 +885,8 @@
 				D77B5F4A2158BBEA00253BDC /* TAPRoomListViewController.m */,
 				D77B5F452158BBEA00253BDC /* TAPScanQRCodeViewController.h */,
 				D77B5F3C2158BBE900253BDC /* TAPScanQRCodeViewController.m */,
+				D72384D3223776CF0067F6C1 /* TAPScanQRCodePopupViewController.h */,
+				D72384D2223776CE0067F6C1 /* TAPScanQRCodePopupViewController.m */,
 				D77B5F512158BBEA00253BDC /* TAPSearchViewController.h */,
 				D77B5F402158BBEA00253BDC /* TAPSearchViewController.m */,
 				D79A3E6B216C72C4004525CE /* TAPConnectionStatusViewController.h */,
@@ -1128,6 +1134,7 @@
 				D7FF4CE92176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.h in Headers */,
 				DF133C48219C475200A0E6CC /* TAPCustomAccessoryView.h in Headers */,
 				D71582FF217EFB0000649C70 /* TAPCustomNotificationAlertViewController.h in Headers */,
+				D72384D5223776CF0067F6C1 /* TAPScanQRCodePopupViewController.h in Headers */,
 				D77B5F062158BB8700253BDC /* TAPContactTableViewCell.h in Headers */,
 				D740A3B62192E99900A92EE2 /* TAPOrderCardBubbleTableViewCell.h in Headers */,
 				D77B5F0B2158BB8700253BDC /* TAPNewChatOptionTableViewCell.h in Headers */,
@@ -1328,6 +1335,7 @@
 				D77B5E8B2158BB2900253BDC /* NSData+CommonCrypto.m in Sources */,
 				D77B5EFD2158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.m in Sources */,
 				D77B5F252158BB9500253BDC /* TAPPopUpInfoView.m in Sources */,
+				D72384D4223776CF0067F6C1 /* TAPScanQRCodePopupViewController.m in Sources */,
 				F5301EF7217A2209007227D2 /* TAPContactRealmModel.m in Sources */,
 				D77B5F5C2158BBEA00253BDC /* TAPSearchViewController.m in Sources */,
 				D77B5E872158BB2900253BDC /* NSString+Base64.m in Sources */,

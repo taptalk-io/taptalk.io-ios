@@ -12,6 +12,7 @@
 
 #import "TAPRegisterViewController.h" //RN Temp
 #import "TAPRoomListViewController.h"
+#import "TAPScanQRCodePopupViewController.h"
 #import "TAPCustomNotificationAlertViewController.h"
 #import "TAPChatViewController.h"
 #import "TAPChatManager.h"
@@ -88,6 +89,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 //Property
 - (TAPRoomListViewController *)roomListViewController;
+- (TAPScanQRCodePopupViewController *)scanQRCodePopupViewController;
 - (TAPRegisterViewController *)registerViewController; //RN Temp
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController;
 
