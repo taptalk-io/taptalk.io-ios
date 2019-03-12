@@ -16,7 +16,7 @@
 - (void)showCustomBackButton;
 - (void)showCustomCloseButton;
 - (void)reachabilityChangeIsReachable:(BOOL)reachable;
-- (void)showPopupView:(BOOL)isVisible withPopupType:(TAPPopUpInfoViewControllerType *)type title:(NSString *)title detailInformation:(NSString *)detailInfo;
+- (void)showPopupView:(BOOL)isVisible withPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo;
 - (void)popUpInfoDidTappedLeftButton;
 - (void)popUpInfoTappedSingleButtonOrRightButton;
 

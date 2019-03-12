@@ -220,7 +220,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)showPopupView:(BOOL)isVisible withPopupType:(TAPPopUpInfoViewControllerType *)type title:(NSString *)title detailInformation:(NSString *)detailInfo {
+- (void)showPopupView:(BOOL)isVisible withPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo {
     //Note - isVisible is NO, set the title and detailInformation to empty string
     [self.popupInfoViewController setPopUpInfoViewControllerType:type withTitle:title detailInformation:detailInfo];
     if (isVisible) {
