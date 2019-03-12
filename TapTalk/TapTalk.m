@@ -19,6 +19,7 @@
 - (void)resetPersistent;
 
 @property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (strong, nonatomic) TAPScanQRCodePopupViewController *scanQRCodePopupViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 - (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
@@ -49,6 +50,7 @@
         
         _roomListViewController = [[TAPRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
+        _scanQRCodePopupViewController = [[TAPScanQRCodePopupViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
         
         //Add notification manager delegate
@@ -124,6 +126,10 @@
 #pragma mark - Property
 - (TAPRoomListViewController *)roomListViewController {
     return _roomListViewController;
+}
+
+- (TAPScanQRCodePopupViewController *)scanQRCodePopupViewController {
+    return _scanQRCodePopupViewController;
 }
 
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController {

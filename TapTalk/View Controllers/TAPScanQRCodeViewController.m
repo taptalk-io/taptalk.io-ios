@@ -8,7 +8,8 @@
 
 #import "TAPScanQRCodeViewController.h"
 #import "TAPScanQRCodeView.h"
-#import "TAPScanQRCodePopupView.h"
+//#import "TAPScanQRCodePopupView.h"
+#import "TAPScanQRCodePopupViewController.h"
 
 #import "ZBarCaptureReader.h"
 #import "ZBarReaderViewController.h"
@@ -18,7 +19,6 @@
 @interface TAPScanQRCodeViewController () <ZBarReaderViewDelegate>
 
 @property (strong, nonatomic) TAPScanQRCodeView *scanQRCodeView;
-@property (strong, nonatomic) TAPScanQRCodePopupView *scanQRCodePopupView;
 @property (strong, nonatomic) TAPUserModel *searchedUser;
 @property (nonatomic) BOOL isProcessingQRCode;
 
@@ -50,22 +50,16 @@
     
     [self.scanQRCodeView.QRCodeButton addTarget:self action:@selector(QRCodeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-     self.scanQRCodeView.readerView.readerDelegate = self;
+    self.scanQRCodeView.readerView.readerDelegate = self;
     
     [self.scanQRCodeView setScanQRCodeViewType:ScanQRCodeViewTypeScanQRCode];
     [self.view bringSubviewToFront:self.scanQRCodeView.overlayView];
-
-    _scanQRCodePopupView = [[TAPScanQRCodePopupView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
-    [self.scanQRCodePopupView.closePopupButton addTarget:self action:@selector(closePopupButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.scanQRCodePopupView.addContactButton addTarget:self action:@selector(addContactButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.scanQRCodePopupView.chatNowButton addTarget:self action:@selector(chatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.scanQRCodePopupView showPopupView:NO animated:NO];
-    [self.navigationController.view addSubview:self.scanQRCodePopupView];
-    [self.navigationController.view bringSubviewToFront:self.scanQRCodePopupView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];    
+    [super viewWillAppear:animated];
+    
+    _isProcessingQRCode = NO;
     [self.navigationController setNavigationBarHidden:NO];
 }
 
@@ -91,36 +85,17 @@
     _isProcessingQRCode = YES;
     [TAPUtil tapticNotificationFeedbackGeneratorWithType:UINotificationFeedbackTypeSuccess];
     
-    [self.scanQRCodePopupView showPopupView:YES animated:YES];
-    [self.scanQRCodePopupView setIsLoading:YES animated:YES];
-    [TAPDataManager callAPIGetUserByUserID:code success:^(TAPUserModel *user) {
-        
-        //Upsert User to Contact Manager
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
-        
-        _searchedUser = user;
-//        _isProcessingQRCode = NO;
-//        [self.scanQRCodePopupView setIsLoading:NO animated:YES];
-//        [self.scanQRCodePopupView setPopupInfoWithUserData:user];
-        
-        //DV Temp
-        //Note - Temporary query for friend data from db, if found means isContact = 1 until API response showing isContact
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+    TAPScanQRCodePopupViewController *scanQRCodePopupViewController = [[TAPScanQRCodePopupViewController alloc] init];
+    scanQRCodePopupViewController.code = code;
+    scanQRCodePopupViewController.previousNavigationController = self.navigationController;
+    scanQRCodePopupViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:scanQRCodePopupViewController animated:NO completion:^{
+        //completion
+        [scanQRCodePopupViewController animatePopupWithSuccess:^{
             _isProcessingQRCode = NO;
-            [self.scanQRCodePopupView setIsLoading:NO animated:YES];
-            [self.scanQRCodePopupView setPopupInfoWithUserData:user isContact:isContact];
-        } failure:^(NSError *error) {
-#ifdef DEBUG
-            NSLog(@"%@", error);
-#endif
+        } failure:^(NSError * _Nonnull error) {
+            _isProcessingQRCode = NO;
         }];
-        //END DV Temp
-        
-    } failure:^(NSError *error) {
-        _isProcessingQRCode = NO;
-        [self.scanQRCodePopupView setIsLoading:NO animated:YES];
-        [self.scanQRCodePopupView showPopupView:NO animated:YES];
-        [self showPopupView:YES withPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain];
     }];
 }
 
@@ -156,7 +131,7 @@
         [self.scanQRCodeView setScanQRCodeViewType:ScanQRCodeViewTypeDisplayQRCode];
     }
     else {
-         //Display scan QR Code menu
+        //Display scan QR Code menu
         [self.scanQRCodeView setScanQRCodeViewType:ScanQRCodeViewTypeScanQRCode];
         self.title = NSLocalizedString(@"Scan QR Code", @"");
     }
@@ -164,49 +139,6 @@
 
 - (void)setScanQRCodeViewControllerSourceType:(ScanQRCodeViewControllerSourceType)scanQRCodeViewControllerSourceType {
     _scanQRCodeViewControllerSourceType = scanQRCodeViewControllerSourceType;
-}
-
-- (void)closePopupButtonDidTapped {
-    _isProcessingQRCode = NO;
-    [self.scanQRCodePopupView setPopupViewToDefault];
-    [self.scanQRCodePopupView showPopupView:NO animated:NO];
-}
-
-- (void)addContactButtonDidTapped {
-    [self.scanQRCodePopupView animateExpandingView];
-    
-    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
-        //Add user to Contact Manager
-        self.searchedUser.isContact = YES;
-        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
-        
-        //Refresh Contact List From API
-        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-        } failure:^(NSError *error) {
-        }];
-        
-    } failure:^(NSError *error) {
-#ifdef DEBUG
-        NSLog(@"%@", error);
-#endif
-    }];
-}
-
-- (void)chatNowButtonDidTapped {
-    _isProcessingQRCode = NO;
-    [self.scanQRCodePopupView setPopupViewToDefault];
-    [self.scanQRCodePopupView showPopupView:NO animated:NO];
-    
-    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
-    
-    //CS Note - Remove this VC in Navigation Stack to skip on pop
-    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
-    [navigationArray removeObject:self];
-    self.navigationController.viewControllers = navigationArray;
-}
-
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [self showPopupView:NO withPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:@"" detailInformation:@""];
 }
 
 @end
