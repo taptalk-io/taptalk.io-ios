@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 
 @end
 

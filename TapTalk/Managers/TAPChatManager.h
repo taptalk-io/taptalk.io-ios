@@ -15,6 +15,11 @@
 #import "TAPTypingModel.h"
 #import "TAPQuoteModel.h"
 
+typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
+    TAPChatManagerQuoteActionTypeReply = 0,
+    TAPChatManagerQuoteActionTypeForward = 1
+};
+
 @protocol TAPChatManagerDelegate <NSObject>
 
 @optional
@@ -38,7 +43,9 @@
 @property (strong, nonatomic) TAPRoomModel *activeRoom;
 @property (strong, nonatomic) NSMutableDictionary *messageDraftDictionary;
 @property (strong, nonatomic) NSMutableDictionary *quotedMessageDictionary;
+@property (strong, nonatomic) NSMutableDictionary *quoteActionTypeDictionary;
 @property (strong, nonatomic) NSMutableDictionary *userInfoDictionary; //contains user info from custom quote
+@property (nonatomic) TAPChatManagerQuoteActionType chatManagerQuoteActionType;
 @property (nonatomic) BOOL isTyping;
 
 + (TAPChatManager *)sharedManager;
@@ -59,15 +66,21 @@
 - (void)sendTextMessage:(NSString *)textMessage;
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
-- (void)sendFileMessage:(TAPMessageModel *)message;
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room;
+- (void)sendEmitFileMessage:(TAPMessageModel *)message;
 - (void)sendProductMessage:(TAPMessageModel *)message;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address;
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room;
+- (void)sendFileMessage:(NSData *)data;
+- (void)sendFileMessage:(NSData *)data room:(TAPRoomModel *)room;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;
-
 - (void)saveToQuotedMessage:(id)quotedMessageObject userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID; //Object could be TAPMessageModel or TAPQuoteModel
+- (void)saveToQuoteActionWithType:(TAPChatManagerQuoteActionType)type roomID:(NSString *)roomID;//save to quoteActionTypeDictionary to identify whether it is reply or forward
+
 - (id)getQuotedMessageObjectWithRoomID:(NSString *)roomID; //Object could be TAPMessageModel or TAPQuoteModel
+- (TAPChatManagerQuoteActionType)getQuoteActionTypeWithRoomID:(NSString *)roomID;
 - (void)removeQuotedMessageObjectWithRoomID:(NSString *)roomID;
 
 - (void)runEnterBackgroundSequenceWithApplication:(UIApplication *)application;
@@ -86,5 +99,6 @@
 - (void)removeFromWaitingUploadFileMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID;
 - (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
+- (void)checkAndSendForwardedMessageWithRoom:(TAPRoomModel *)room;
 
 @end

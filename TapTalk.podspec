@@ -148,6 +148,8 @@ Pod::Spec.new do |s|
     s.dependency "GooglePlaces"
     s.dependency "GooglePlacePicker"
     s.dependency "GoogleMaps"
+    s.dependency "ZSWTappableLabel", "~> 2.0"
+
     
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

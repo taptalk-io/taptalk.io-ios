@@ -7,8 +7,9 @@
 //
 
 #import "TAPYourImageBubbleTableViewCell.h"
+#import "ZSWTappableLabel.h"
 
-@interface TAPYourImageBubbleTableViewCell ()
+@interface TAPYourImageBubbleTableViewCell () <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *progressBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
@@ -26,9 +27,11 @@
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
-@property (strong, nonatomic) IBOutlet UILabel *captionLabel;
+@property (strong, nonatomic) IBOutlet ZSWTappableLabel *captionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
 
@@ -55,6 +58,16 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyViewTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyViewBottomConstraint;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelTopConstraint;
+
+@property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
+
+@property (nonatomic) BOOL isShowForwardView;
+
 @property (strong, nonatomic) UIVisualEffectView *blurView;
 @property (strong, nonatomic) UIView *syncProgressSubView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
@@ -75,7 +88,6 @@
 @property (nonatomic) CGFloat newProgress;
 @property (nonatomic) NSInteger updateInterval;
 
-
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)quoteViewButtonDidTapped:(id)sender;
 - (IBAction)replyViewButtonDidTapped:(id)sender;
@@ -83,8 +95,13 @@
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width;
 - (void)showImageCaption:(BOOL)show;
 - (void)setImageCaptionWithString:(NSString *)captionString;
+
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
+
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
+- (void)showForwardView:(BOOL)show;
+- (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote;
 
 @end
@@ -141,7 +158,11 @@
     
     [self showQuoteView:NO];
     [self showReplyView:NO withMessage:nil];
+    [self showForwardView:NO];
     
+    self.captionLabel.tapDelegate = self;
+    self.captionLabel.longPressDelegate = self;
+    self.captionLabel.longPressDuration = 0.05f;
 }
 
 - (void)prepareForReuse {
@@ -155,12 +176,109 @@
     
     [self showQuoteView:NO];
     [self showReplyView:NO withMessage:nil];
+    
+    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                                          action:@selector(handleBubbleViewLongPress:)];
+    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
+}
+
+#pragma mark - ZSWTappedLabelDelegate
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+        tappedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeAddress:
+                NSLog(@"Address components: %@", result.addressComponents);
+                break;
+                
+            case NSTextCheckingTypePhoneNumber:
+                NSLog(@"Phone number: %@", result.phoneNumber);
+                if([self.delegate respondsToSelector:@selector(yourImageDidTappedPhoneNumber:originalString:)]) {
+                    [self.delegate yourImageDidTappedPhoneNumber:result.phoneNumber originalString:selectedWord];
+                }
+                break;
+                
+            case NSTextCheckingTypeDate:
+                NSLog(@"Date: %@", result.date);
+                break;
+                
+            case NSTextCheckingTypeLink:
+                NSLog(@"Link: %@", result.URL);
+                if([self.delegate respondsToSelector:@selector(yourImageDidTappedUrl:originalString:)]) {
+                    [self.delegate yourImageDidTappedUrl:result.URL originalString:selectedWord];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
+
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeAddress:
+                NSLog(@"Address components: %@", result.addressComponents);
+                break;
+                
+            case NSTextCheckingTypePhoneNumber:
+                NSLog(@"Phone number: %@", result.phoneNumber);
+                if([self.delegate respondsToSelector:@selector(yourImageLongPressedPhoneNumber:originalString:)]) {
+                    [self.delegate yourImageLongPressedPhoneNumber:result.phoneNumber originalString:selectedWord];
+                }
+                break;
+                
+            case NSTextCheckingTypeDate:
+                NSLog(@"Date: %@", result.date);
+                break;
+                
+            case NSTextCheckingTypeLink:
+                NSLog(@"Link: %@", result.URL);
+                if([self.delegate respondsToSelector:@selector(yourImageLongPressedUrl:originalString:)]) {
+                    [self.delegate yourImageLongPressedUrl:result.URL originalString:selectedWord];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 #pragma mark - Custom Method
@@ -256,11 +374,30 @@
     //        self.blurView.frame = CGRectMake(CGRectGetMinX(self.blurView.frame), CGRectGetMinY(self.blurView.frame), self.bubbleImageViewWidthConstraint.constant, self.bubbleImageViewHeightConstraint.constant);
     //        [self.bubbleImageView insertSubview:self.blurView atIndex:0];
     //    }
+    
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+        _isShowForwardView = YES;
+    }
+    else {
+        [self showForwardView:NO];
+        _isShowForwardView = NO;
+    }
+    
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
         
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
@@ -273,13 +410,37 @@
     }
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        
         [self showReplyView:NO withMessage:nil];
         [self setQuote:message.quote];
         [self showQuoteView:YES];
     }
     else {
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 0.0f;
+        }
+        
         [self showReplyView:NO withMessage:nil];
         [self showQuoteView:NO];
+    }
+    
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+    }
+    else {
+        [self showForwardView:NO];
     }
 }
 
@@ -381,6 +542,35 @@
 
 - (void)setImageCaptionWithString:(NSString *)captionString {
     self.captionLabel.text = [TAPUtil nullToEmptyString:captionString];
+    
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
+    
+    NSString *messageText = [TAPUtil nullToEmptyString:self.captionLabel.text];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
+    // the next line throws an exception if string is nil - make sure you check
+    [linkDetector enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:@"188CFF"];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[@"NSTextCheckingResult"] = result;
+        
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    [detectorPhoneNumber enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:@"188CFF"];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[@"NSTextCheckingResult"] = result;
+        
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    self.captionLabel.attributedText = attributedString;
+    
     if([captionString isEqualToString:@""]) {
         [self showImageCaption:NO];
     }
@@ -676,7 +866,14 @@
         self.replyMessageLabel.text = @"";
         self.replyViewHeightContraint.constant = 0.0f;
         self.replyViewTopConstraint.constant = 0.0f;
-        self.replyViewBottomConstraint.constant = 0.0f;
+        
+        if (self.isShowForwardView) {
+            self.replyViewBottomConstraint.constant = 8.0f;
+        }
+        else {
+            self.replyViewBottomConstraint.constant = 0.0f;
+        }
+        
         self.replyViewInnerViewLeadingContraint.constant = 0.0f;
         self.replyNameLabelLeadingConstraint.constant = 0.0f;
         self.replyNameLabelTrailingConstraint.constant = 0.0f;
@@ -707,6 +904,39 @@
     }
 }
 
+- (void)showForwardView:(BOOL)show {
+    if (show) {
+        self.forwardFromLabelHeightConstraint.constant = 16.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 16.0f;
+        self.forwardFromLabelLeadingConstraint.active = YES;
+        self.forwardTitleLabelLeadingConstraint.active = YES;
+        
+    }
+    else {
+        self.forwardFromLabelHeightConstraint.constant = 0.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 0.0f;
+        self.forwardFromLabelLeadingConstraint.active = NO;
+        self.forwardTitleLabelLeadingConstraint.active = NO;
+        
+    }
+}
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData {
+    
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    self.forwardFromLabel.text = appendedFullnameString;
+    
+    NSMutableAttributedString *attributedText =
+    [[NSMutableAttributedString alloc]
+     initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
+    
+    [attributedText addAttribute:NSFontAttributeName
+                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
+    
+    self.forwardFromLabel.attributedText = attributedText;
+}
+
 - (void)setQuote:(TAPQuoteModel *)quote {
     if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
         [self.quoteImageView setImageWithURLString:quote.imageURL];
@@ -727,6 +957,14 @@
 - (IBAction)replyViewButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourImageQuoteDidTappedWithMessage:)]) {
         [self.delegate yourImageQuoteDidTappedWithMessage:self.message];
+    }
+}
+
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(yourImageBubbleLongPressedWithMessage:)]) {
+            [self.delegate yourImageBubbleLongPressedWithMessage:self.message];
+        }
     }
 }
 

@@ -32,21 +32,6 @@
         self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for people in your contact list", @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
-        _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
-        NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
-        NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
-        NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
-        CGFloat searchBarCancelLetterSpacing = -0.4f;
-        [searchBarCancelAttributesDictionary setObject:@(searchBarCancelLetterSpacing) forKey:NSKernAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f] forKey:NSFontAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:NSForegroundColorAttributeName];
-        [searchBarCancelAttributedString addAttributes:searchBarCancelAttributesDictionary
-                                                 range:NSMakeRange(0, [searchBarCancelString length])];
-        [self.searchBarCancelButton setAttributedTitle:searchBarCancelAttributedString forState:UIControlStateNormal];
-        self.searchBarCancelButton.clipsToBounds = YES;
-        [self.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
-        
         _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame)) style:UITableViewStylePlain];
         self.contactsTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         self.contactsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;

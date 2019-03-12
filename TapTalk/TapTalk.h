@@ -12,7 +12,6 @@
 
 #import "TAPRegisterViewController.h" //RN Temp
 #import "TAPRoomListViewController.h"
-#import "TAPScanQRCodePopupViewController.h"
 #import "TAPCustomNotificationAlertViewController.h"
 #import "TAPChatViewController.h"
 #import "TAPChatManager.h"
@@ -89,7 +88,6 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 //Property
 - (TAPRoomListViewController *)roomListViewController;
-- (TAPScanQRCodePopupViewController *)scanQRCodePopupViewController;
 - (TAPRegisterViewController *)registerViewController; //RN Temp
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController;
 
@@ -148,8 +146,7 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)shouldRefreshAuthTicket;
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
-
-//TODO: Send Image Message
+- (void)sendImageMessage:(UIImage *)image caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 //Custom Keyboard
 - (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender

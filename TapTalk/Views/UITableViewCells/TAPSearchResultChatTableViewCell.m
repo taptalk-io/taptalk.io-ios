@@ -106,14 +106,15 @@
                                   searchedString:(NSString *)searchedString
                           numberOfUnreadMessages:(NSString *)unreadMessageCount {
     searchedString = [searchedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
     //DV Temp
     BOOL isExpert = NO;
     BOOL isGroup = NO;
     BOOL isMuted = NO;
     BOOL isOnline = NO;
-    NSString *profileImageURL = room.imageURL.fullsize;
     //END DV Temp
     
+    NSString *profileImageURL = room.imageURL.fullsize;
     NSInteger numberOfUnreadMessage = [unreadMessageCount integerValue];
     
     TAPRoomModel *currentRoom = room;

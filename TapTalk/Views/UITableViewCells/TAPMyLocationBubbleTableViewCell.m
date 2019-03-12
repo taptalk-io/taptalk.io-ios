@@ -21,6 +21,8 @@
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *retryIconImageView;
@@ -55,21 +57,34 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyViewTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyViewBottomConstraint;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelTopConstraint;
+
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
+@property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
 @property (strong, nonatomic) TAPGradientView *gradientView;
 
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
+@property (nonatomic) BOOL isShowForwardView;
 
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)retryButtonDidTapped:(id)sender;
 - (IBAction)quoteButtonDidTapped:(id)sender;
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer;
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
+- (void)showForwardView:(BOOL)show;
 - (void)setMapWithLatitude:(CGFloat)latitude longitude:(CGFloat)longitude;
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData;
+- (void)setQuote:(TAPQuoteModel *)quote;
 
 @end
 
@@ -120,7 +135,13 @@
                                                                               action:@selector(handleBubbleViewTap:)];
     [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
     
+    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                                          action:@selector(handleBubbleViewLongPress:)];
+    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
+    
     [self showQuoteView:NO];
+    [self showForwardView:NO];
 }
 
 - (void)prepareForReuse {
@@ -148,10 +169,28 @@
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
     
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+        _isShowForwardView = YES;
+    }
+    else {
+        [self showForwardView:NO];
+        _isShowForwardView = NO;
+    }
+    
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
@@ -164,11 +203,26 @@
     }
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        
         [self showReplyView:NO withMessage:nil];
         [self setQuote:message.quote];
         [self showQuoteView:YES];
     }
     else {
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 0.0f;
+        }
+        
         [self showReplyView:NO withMessage:nil];
         [self showQuoteView:NO];
     }
@@ -360,6 +414,14 @@
     }
 }
 
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(myLocationBubbleLongPressedWithMessage:)]) {
+            [self.delegate myLocationBubbleLongPressedWithMessage:self.message];
+        }
+    }
+}
+
 - (IBAction)chatBubbleButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myLocationBubbleViewDidTapped:)]) {
         [self.delegate myLocationBubbleViewDidTapped:self.message];
@@ -378,9 +440,9 @@
         self.replyMessageLabel.text = message.quote.content;
         self.replyViewHeightContraint.constant = 60.0f;
         self.replyViewBottomConstraint.active = YES;
-        self.replyViewBottomConstraint.constant = 3.0f;
+        self.replyViewBottomConstraint.constant = 8.0f;
         self.replyViewTopConstraint.active = YES;
-        self.replyViewTopConstraint.constant = 3.0f;
+        self.replyViewTopConstraint.constant = 6.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
         self.replyNameLabelLeadingConstraint.constant = 4.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
@@ -394,7 +456,12 @@
         self.replyMessageLabel.text = @"";
         self.replyViewHeightContraint.constant = 0.0f;
         self.replyViewBottomConstraint.active = YES;
-        self.replyViewBottomConstraint.constant = 0.0f;
+        if (self.isShowForwardView) {
+            self.replyViewBottomConstraint.constant = 8.0f;
+        }
+        else {
+            self.replyViewBottomConstraint.constant = 0.0f;
+        }
         self.replyViewTopConstraint.active = YES;
         self.replyViewTopConstraint.constant = 0.0f;
         self.replyViewInnerViewLeadingContraint.constant = 0.0f;
@@ -424,6 +491,37 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+}
+
+- (void)showForwardView:(BOOL)show {
+    if (show) {
+        self.forwardFromLabelHeightConstraint.constant = 16.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 16.0f;
+        self.forwardFromLabelLeadingConstraint.active = YES;
+        self.forwardTitleLabelLeadingConstraint.active = YES;
+    }
+    else {
+        self.forwardFromLabelHeightConstraint.constant = 0.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 0.0f;
+        self.forwardFromLabelLeadingConstraint.active = NO;
+        self.forwardTitleLabelLeadingConstraint.active = NO;
+    }
+}
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData {
+    
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    self.forwardFromLabel.text = appendedFullnameString;
+    
+    NSMutableAttributedString *attributedText =
+    [[NSMutableAttributedString alloc]
+     initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
+    
+    [attributedText addAttribute:NSFontAttributeName
+                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
+    
+    self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {

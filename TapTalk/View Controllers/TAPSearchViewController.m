@@ -15,6 +15,7 @@
 #import "TAPSearchResultMessageTableViewCell.h"
 
 @interface TAPSearchViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
+
 @property (strong, nonatomic) TAPSearchView *searchView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 @property (strong, nonatomic) UIButton *leftBarButton;
@@ -27,6 +28,7 @@
 @property (strong, nonatomic) NSMutableArray *searchResultChatAndContactArray;
 @property (strong, nonatomic) NSMutableArray *searchResultUnreadCountArray;
 @property (strong, nonatomic) NSString *updatedString;
+
 @end
 
 @implementation TAPSearchViewController

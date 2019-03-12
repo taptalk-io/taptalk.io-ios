@@ -14,6 +14,7 @@ def tapTalk_pods
     pod 'GooglePlaces'
     pod 'GooglePlacePicker'
     pod 'GoogleMaps'
+    pod 'ZSWTappableLabel', '~> 2.0'
 end
 
 target "TapTalk" do

@@ -2741,6 +2741,7 @@
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:username forKey:@"username"];
+    [parameterDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"ignoreCase"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         

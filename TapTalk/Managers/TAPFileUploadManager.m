@@ -8,6 +8,7 @@
 
 #import "TAPFileUploadManager.h"
 #import "TAPDataImageModel.h"
+#import "TAPDataFileModel.h"
 #import <TapTalk/Base64.h>
 @import AFNetworking;
 
@@ -20,8 +21,13 @@
 @property (strong, nonatomic) NSMutableDictionary *uploadProgressDictionary;
 
 - (void)runUploadImageWithRoomID:(NSString *)roomID;
+- (void)runUploadFileWithRoomID:(NSString *)roomID;
+
 - (TAPDataImageModel *)convertDictionaryToDataImageModel:(NSDictionary *)dictionary;
 - (NSDictionary *)convertDataImageModelToDictionary:(TAPDataImageModel *)dataImage;
+- (TAPDataFileModel *)convertDictionaryToDataFileModel:(NSDictionary *)dictionary;
+- (NSDictionary *)convertDataFileModelToDictionary:(TAPDataFileModel *)dataFile;
+
 - (void)resizeImage:(UIImage *)image message:(TAPMessageModel *)message maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage, TAPMessageModel *resultMessage))success;
 @end
 
@@ -73,7 +79,16 @@
     else {
         [uploadQueueRoomArray addObject:message];
         [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
-        [self runUploadImageWithRoomID:message.room.roomID];
+        
+        if (message.type == TAPChatMessageTypeImage) {
+            //Upload image
+            [self runUploadImageWithRoomID:message.room.roomID];
+        }
+        else if (message.type == TAPChatMessageTypeFile) {
+            //Upload File
+            [self runUploadFileWithRoomID:message.room.roomID];
+            
+        }
     }
 }
 
@@ -175,7 +190,7 @@
                     [TAPImageView removeImageFromCacheWithKey:resultMessage.localID];
                     
                     //Send emit
-                    [[TAPChatManager sharedManager] sendFileMessage:resultMessage];
+                    [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
                     
                     //Remove first object
                     [uploadQueueRoomArray removeObjectAtIndex:0];
@@ -260,8 +275,6 @@
     NSString *caption = [dictionary objectForKey:@"caption"];
     caption = [TAPUtil nullToEmptyString:caption];
     
-//    UIImage *dummyImage = [dictionary objectForKey:@"dummyImage"];
-    
     NSNumber *imageHeightRaw = [dictionary objectForKey:@"imageHeight"];
     CGFloat imageHeight = [imageHeightRaw floatValue];
     
@@ -272,7 +285,6 @@
     CGFloat size = [sizeRaw floatValue];
     
     dataImage.fileID = fileID;
-//    dataImage.dummyImage = dummyImage;
     dataImage.imageWidth = imageWidth;
     dataImage.imageHeight = imageHeight;
     dataImage.size = size;
@@ -294,8 +306,6 @@
     NSString *caption = dataImage.caption;
     caption = [TAPUtil nullToEmptyString:caption];
     
-//    UIImage *dummyImage = dataImage.dummyImage;
-    
     NSNumber *imageHeight = [NSNumber numberWithFloat:dataImage.imageHeight];
     
     NSString *imageWidth = [NSNumber numberWithFloat:dataImage.imageWidth];
@@ -305,9 +315,53 @@
     [dataDictionary setObject:fileID forKey:@"fileID"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:caption forKey:@"caption"];
-//    [dataDictionary setObject:dummyImage forKey:@"dummyImage"];
     [dataDictionary setObject:imageHeight forKey:@"imageHeight"];
     [dataDictionary setObject:imageWidth forKey:@"imageWidth"];
+    [dataDictionary setObject:size forKey:@"size"];
+    
+    return dataDictionary;
+}
+
+- (TAPDataFileModel *)convertDictionaryToDataFileModel:(NSDictionary *)dictionary {
+    TAPDataFileModel *dataFile = [TAPDataFileModel new];
+    
+    NSString *fileID = [dictionary objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    
+    NSString *fileName = [dictionary objectForKey:@"fileName"];
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    NSString *mediaType = [dictionary objectForKey:@"mediaType"];
+    mediaType = [TAPUtil nullToEmptyString:mediaType];
+    
+    NSNumber *sizeRaw = [dictionary objectForKey:@"size"];
+    CGFloat size = [sizeRaw floatValue];
+    
+    dataFile.fileID = fileID;
+    dataFile.fileName = fileName;
+    dataFile.mediaType = mediaType;
+    dataFile.size = size;
+    
+    return dataFile;
+}
+
+- (NSDictionary *)convertDataFileModelToDictionary:(TAPDataFileModel *)dataFile {
+    NSMutableDictionary *dataDictionary = [NSMutableDictionary new];
+    
+    NSString *fileID = dataFile.fileID;
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    
+    NSString *fileName = dataFile.fileName;
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    NSString *mediaType = dataFile.mediaType;
+    mediaType = [TAPUtil nullToEmptyString:mediaType];
+    
+    NSString *size = [NSNumber numberWithFloat:dataFile.size];
+    
+    [dataDictionary setObject:fileID forKey:@"fileID"];
+    [dataDictionary setObject:fileName forKey:@"fileName"];
+    [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:size forKey:@"size"];
     
     return dataDictionary;

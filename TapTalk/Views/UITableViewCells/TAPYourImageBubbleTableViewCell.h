@@ -17,6 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell;
+- (void)yourImageDidTappedUrl:(NSURL *)url
+               originalString:(NSString*)originalString;
+- (void)yourImageDidTappedPhoneNumber:(NSString *)phoneNumber
+                       originalString:(NSString*)originalString;
+- (void)yourImageLongPressedUrl:(NSURL *)url
+                 originalString:(NSString*)originalString;
+- (void)yourImageLongPressedPhoneNumber:(NSString *)phoneNumber
+                         originalString:(NSString*)originalString;
+- (void)yourImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 
 @end
 

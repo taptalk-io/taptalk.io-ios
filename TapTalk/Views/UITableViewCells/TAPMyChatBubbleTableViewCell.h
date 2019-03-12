@@ -15,13 +15,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)myChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myChatReplyDidTapped;
+- (void)myChatBubbleDidTappedUrl:(NSURL *)url
+                  originalString:(NSString*)originalString;
+- (void)myChatBubbleDidTappedPhoneNumber:(NSString *)phoneNumber
+                          originalString:(NSString*)originalString;
+- (void)myChatBubbleLongPressedUrl:(NSURL *)url
+                    originalString:(NSString*)originalString;
+- (void)myChatBubbleLongPressedPhoneNumber:(NSString *)phoneNumber
+                            originalString:(NSString*)originalString;
+- (void)myChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 
 @end
 
 @interface TAPMyChatBubbleTableViewCell : TAPBaseMyBubbleTableViewCell
 
 @property (weak, nonatomic) id<TAPMyChatBubbleTableViewCellDelegate> delegate;
-@property (weak, nonatomic) TAPMessageModel *message;
+@property (strong, nonatomic) TAPMessageModel *message;
 
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)receiveSentEvent;

@@ -19,7 +19,6 @@
 - (void)resetPersistent;
 
 @property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
-@property (strong, nonatomic) TAPScanQRCodePopupViewController *scanQRCodePopupViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 - (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
@@ -50,7 +49,6 @@
         
         _roomListViewController = [[TAPRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
-        _scanQRCodePopupViewController = [[TAPScanQRCodePopupViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
         
         //Add notification manager delegate
@@ -126,10 +124,6 @@
 #pragma mark - Property
 - (TAPRoomListViewController *)roomListViewController {
     return _roomListViewController;
-}
-
-- (TAPScanQRCodePopupViewController *)scanQRCodePopupViewController {
-    return _scanQRCodePopupViewController;
 }
 
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController {
@@ -559,6 +553,18 @@ fromNavigationController:(UINavigationController *)navigationController
     success();
 }
 
+- (void)sendImageMessage:(UIImage *)image caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
+    
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    [[TAPChatManager sharedManager] sendImageMessage:image caption:captionString room:room];
+    success();
+}
+
 - (void)shouldRefreshAuthTicket {
     [[TAPChatManager sharedManager] disconnect];
     
@@ -619,6 +625,9 @@ fromNavigationController:(UINavigationController *)navigationController
         NSString *ratingString = product.productRating;
         ratingString = [TAPUtil nullToEmptyString:ratingString];
         
+        NSString *weightString = product.productWeight;
+        weightString = [TAPUtil nullToEmptyString:weightString];
+        
         NSString *productDescriptionString = product.productDescription;
         productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
         
@@ -643,6 +652,7 @@ fromNavigationController:(UINavigationController *)navigationController
         [productDictionary setObject:currencyString forKey:@"currency"];
         [productDictionary setObject:priceString forKey:@"price"];
         [productDictionary setObject:ratingString forKey:@"rating"];
+        [productDictionary setObject:weightString forKey:@"weight"];
         [productDictionary setObject:productDescriptionString forKey:@"description"];
         [productDictionary setObject:productImageURLString forKey:@"imageURL"];
         [productDictionary setObject:leftOptionTextString forKey:@"buttonOption1Text"];
@@ -675,6 +685,9 @@ fromNavigationController:(UINavigationController *)navigationController
         NSString *ratingString = [productDictionary objectForKey:@"rating"];
         ratingString = [TAPUtil nullToEmptyString:ratingString];
         
+        NSString *weightString = [productDictionary objectForKey:@"weight"];
+        weightString = [TAPUtil nullToEmptyString:weightString];
+        
         NSString *productDescriptionString = [productDictionary objectForKey:@"description"];
         productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
         
@@ -699,6 +712,7 @@ fromNavigationController:(UINavigationController *)navigationController
         product.productCurrency = currencyString;
         product.productPrice = priceString;
         product.productRating = ratingString;
+        product.productWeight = weightString;
         product.productDescription = productDescriptionString;
         product.productImageURL = productImageURLString;
         product.buttonOption1Text = leftOptionTextString;

@@ -35,6 +35,10 @@
                 <outlet property="inputAccessoryExtensionHeightConstraint" destination="DfC-8U-UGY" id="6ay-1a-NhZ"/>
                 <outlet property="inputMessageAccessoryView" destination="CSi-i0-D86" id="ZCx-US-GVo"/>
                 <outlet property="keyboardOptionButton" destination="Szv-Nw-NOa" id="gi9-8y-7tg"/>
+                <outlet property="loadMoreMessageLoadingHeightConstraint" destination="5r8-9A-6c5" id="ok1-AR-hks"/>
+                <outlet property="loadMoreMessageLoadingLabel" destination="4jR-XS-ylY" id="pib-Sa-gDx"/>
+                <outlet property="loadMoreMessageLoadingView" destination="tGk-j5-N3W" id="YpL-Md-1BW"/>
+                <outlet property="loadMoreMessageLoadingViewImageView" destination="hJb-Mh-tLA" id="ePg-3k-bfW"/>
                 <outlet property="messageTextView" destination="bob-7z-ZfQ" id="leG-Ru-tqq"/>
                 <outlet property="messageTextViewHeightConstraint" destination="rqL-hN-oFI" id="pp8-L8-mlc"/>
                 <outlet property="messageViewHeightConstraint" destination="kgV-JJ-v3H" id="sxC-fv-cK2"/>
@@ -174,6 +178,48 @@
                         <constraint firstItem="eWX-ft-mhr" firstAttribute="top" secondItem="KlL-O7-bwy" secondAttribute="bottom" constant="35" id="oVI-bd-lPK"/>
                     </constraints>
                 </view>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tGk-j5-N3W">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UbU-Hc-qsk" userLabel="Inner Container View">
+                            <rect key="frame" x="181" y="0.0" width="13" height="0.0"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4jR-XS-ylY">
+                                    <rect key="frame" x="0.0" y="-10" width="0.0" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="C8L-NP-d4S"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="12"/>
+                                    <color key="textColor" red="0.47450980390000003" green="0.23921568630000001" blue="0.62745098040000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSettingUp" translatesAutoresizingMaskIntoConstraints="NO" id="hJb-Mh-tLA">
+                                    <rect key="frame" x="4" y="-4.5" width="9" height="9"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="9" id="Wtv-b8-ti1"/>
+                                        <constraint firstAttribute="width" constant="9" id="cCU-lt-NCe"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstItem="4jR-XS-ylY" firstAttribute="leading" secondItem="UbU-Hc-qsk" secondAttribute="leading" id="Hbl-rp-cYL"/>
+                                <constraint firstAttribute="trailing" secondItem="hJb-Mh-tLA" secondAttribute="trailing" id="Kbi-X9-9BE"/>
+                                <constraint firstItem="4jR-XS-ylY" firstAttribute="centerY" secondItem="UbU-Hc-qsk" secondAttribute="centerY" id="Ttb-PK-3tX"/>
+                                <constraint firstItem="hJb-Mh-tLA" firstAttribute="centerY" secondItem="UbU-Hc-qsk" secondAttribute="centerY" id="URo-jU-Lbo"/>
+                                <constraint firstItem="hJb-Mh-tLA" firstAttribute="leading" secondItem="4jR-XS-ylY" secondAttribute="trailing" constant="4" id="mN3-Fi-O7g"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" red="0.90196078430000004" green="0.87843137250000003" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" id="5r8-9A-6c5"/>
+                        <constraint firstItem="UbU-Hc-qsk" firstAttribute="top" secondItem="tGk-j5-N3W" secondAttribute="top" id="Ns3-lG-2o6"/>
+                        <constraint firstAttribute="bottom" secondItem="UbU-Hc-qsk" secondAttribute="bottom" id="nDS-6M-fBc"/>
+                        <constraint firstItem="UbU-Hc-qsk" firstAttribute="centerX" secondItem="tGk-j5-N3W" secondAttribute="centerX" id="zKg-Rz-Su3"/>
+                    </constraints>
+                    <viewLayoutGuide key="safeArea" id="xZ7-I3-Hxt"/>
+                </view>
                 <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vsl-X9-aw7">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                     <subviews>
@@ -198,13 +244,16 @@
             <constraints>
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="bottom" secondItem="7nB-bs-k4t" secondAttribute="bottom" constant="52" id="21J-Kg-7YA"/>
                 <constraint firstAttribute="trailing" secondItem="7nB-bs-k4t" secondAttribute="trailing" id="3h2-Xj-niR"/>
+                <constraint firstItem="tGk-j5-N3W" firstAttribute="trailing" secondItem="Dr2-Y3-9Wq" secondAttribute="trailing" id="4lC-Gk-ryI"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="centerX" secondItem="2El-oL-J7D" secondAttribute="centerX" id="L8O-6z-aWM"/>
                 <constraint firstItem="Vsl-X9-aw7" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="UFF-QB-ecd"/>
                 <constraint firstItem="QeJ-a5-K4g" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="UrM-67-ZAr"/>
                 <constraint firstItem="gfy-gG-oGe" firstAttribute="leading" secondItem="7nB-bs-k4t" secondAttribute="leading" id="atd-4L-ePd"/>
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="Vsl-X9-aw7" secondAttribute="trailing" id="bot-h3-FVg"/>
+                <constraint firstItem="tGk-j5-N3W" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="d9D-q1-TM4"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="top" secondItem="2El-oL-J7D" secondAttribute="bottom" constant="-10" id="dgL-2O-eka"/>
                 <constraint firstItem="7nB-bs-k4t" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="hgv-h0-S0m"/>
+                <constraint firstItem="tGk-j5-N3W" firstAttribute="top" secondItem="Dr2-Y3-9Wq" secondAttribute="top" id="iDb-1J-y46"/>
                 <constraint firstItem="QeJ-a5-K4g" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="l04-Cq-Q9I"/>
                 <constraint firstItem="gfy-gG-oGe" firstAttribute="trailing" secondItem="7nB-bs-k4t" secondAttribute="trailing" id="mhc-4n-ghY"/>
                 <constraint firstAttribute="trailing" secondItem="ZsM-Zn-PUI" secondAttribute="trailing" constant="11" id="obI-Tj-Z36"/>
@@ -216,7 +265,7 @@
             </constraints>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
             <viewLayoutGuide key="safeArea" id="Dr2-Y3-9Wq"/>
-            <point key="canvasLocation" x="9" y="-105"/>
+            <point key="canvasLocation" x="8.8000000000000007" y="-105.69715142428787"/>
         </view>
         <tapGestureRecognizer id="oU4-ow-zRI">
             <connections>
@@ -489,5 +538,6 @@
         <image name="TAPIconClose" width="16" height="16"/>
         <image name="TAPIconHamburger" width="28" height="28"/>
         <image name="TAPIconSendMessage" width="28" height="28"/>
+        <image name="TAPIconSettingUp" width="20" height="20"/>
     </resources>
 </document>

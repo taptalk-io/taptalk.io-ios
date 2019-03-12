@@ -23,6 +23,8 @@
 #import "TAPImagePreviewViewController.h"
 #import "TAPPhotoAlbumListViewController.h"
 #import "TAPPickLocationViewController.h"
+#import "TAPForwardListViewController.h"
+#import "TAPWebViewViewController.h"
 
 #import "TAPCustomAccessoryView.h"
 #import "TAPGradientView.h"
@@ -49,7 +51,12 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     inputAccessoryExtensionTypeReplyMessage = 1,
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPPickLocationViewControllerDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate>
+typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
+    LoadMoreMessageViewTypeOlderMessage = 0,
+    LoadMoreMessageViewTypeNewMessage = 1,
+};
+
+@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, TAPChatManagerDelegate, TAPGrowingTextViewDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPConnectionStatusViewControllerDelegate, UIImagePickerControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPImageDetailViewControllerDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPPickLocationViewControllerDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -130,12 +137,20 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *inputAccessoryExtensionHeightConstraint;
 @property (nonatomic) InputAccessoryExtensionType inputAccessoryExtensionType;
 
+//Load More Message Loading View
+@property (strong, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
+@property (strong, nonatomic) IBOutlet UILabel *loadMoreMessageLoadingLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *loadMoreMessageLoadingViewImageView;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *loadMoreMessageLoadingHeightConstraint;
+@property (nonatomic) CGFloat loadMoreMessageViewHeight;
+
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
 @property (nonatomic) BOOL isShowAccessoryView;
+@property (nonatomic) BOOL isFirstLoadData;
 
 @property (strong, nonatomic) TAPUserModel *otherUser;
 
@@ -172,6 +187,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)setAsTypingNoAfterDelay;
 - (void)showInputAccessoryExtensionView:(BOOL)show;
 - (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType;
+- (void)showLoadMoreMessageLoadingView:(BOOL)show
+                              withType:(LoadMoreMessageViewType)type;
 - (void)setReplyMessageWithMessage:(TAPMessageModel *)message;
 - (void)setQuoteWithQuote:(TAPQuoteModel *)quote;
 - (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image;
@@ -180,8 +197,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)fileUploadManagerFinishNotification:(NSNotification *)notification;
 - (void)fileUploadManagerFailureNotification:(NSNotification *)notification;
 - (void)fetchImageDataWithMessage:(TAPMessageModel *)message;
+- (void)handleLongPressedWithURL:(NSURL *)url originalString:(NSString *)originalString;
+- (void)handleLongPressedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString;
+- (void)handleTappedWithURL:(NSURL *)url originalString:(NSString *)originalString;
+- (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString;
+- (void)handleLongPressedWithMessage:(TAPMessageModel *)message;
 
 //Attachment
+- (void)openFiles;
 - (void)openCamera;
 - (void)openGallery;
 - (void)pickLocation;
@@ -435,6 +458,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             else {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
                 [self setReplyMessageWithMessage:quoteMessageModel];
+                
+                //Set send button to active when forward model is available
+                TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+                if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
+                    [self.sendButton setImage:[UIImage imageNamed:@"TAPIconSendMessageActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+                    self.sendButton.userInteractionEnabled = YES;
+                }
             }
         }
         else if ([quotedMessage isKindOfClass:[TAPQuoteModel class]]) {
@@ -1075,6 +1105,15 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+#pragma mark UIDocumentPicker
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    
+}
+
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    
+}
+
 #pragma mark TAPChatManager
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
     [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
@@ -1281,6 +1320,30 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+- (void)myChatBubbleDidTappedUrl:(NSURL *)url
+                  originalString:(NSString *)originalString {
+    [self handleTappedWithURL:url originalString:originalString];
+}
+
+- (void)myChatBubbleDidTappedPhoneNumber:(NSString *)phoneNumber
+                          originalString:(NSString *)originalString {
+    [self handleTappedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)myChatBubbleLongPressedUrl:(NSURL *)url
+                    originalString:(NSString *)originalString {
+    [self handleLongPressedWithURL:url originalString:originalString];
+}
+
+- (void)myChatBubbleLongPressedPhoneNumber:(NSString *)phoneNumber
+                            originalString:(NSString *)originalString {
+    [self handleLongPressedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)myChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    [self handleLongPressedWithMessage:longPressedMessage];
+}
+
 #pragma mark TAPMyImageBubbleTableViewCell
 - (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message {
     
@@ -1414,11 +1477,35 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+- (void)myImageDidTappedUrl:(NSURL *)url
+             originalString:(NSString *)originalString {
+    [self handleTappedWithURL:url originalString:originalString];
+}
+
+- (void)myImageDidTappedPhoneNumber:(NSString *)phoneNumber
+                     originalString:(NSString *)originalString {
+    [self handleTappedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)myImageLongPressedUrl:(NSURL *)url
+               originalString:(NSString *)originalString {
+    [self handleLongPressedWithURL:url originalString:originalString];
+}
+
+- (void)myImageLongPressedPhoneNumber:(NSString *)phoneNumber
+                       originalString:(NSString *)originalString {
+    [self handleLongPressedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)myImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    
+}
+
 #pragma mark TAPMyLocationBubbleTableViewCell
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
-
+        
         NSDictionary *dataDictionary = tappedMessage.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
         
@@ -1441,7 +1528,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }];
     }
     else if (!tappedMessage.isSending) {
-       //DV TO DO - handle tap open alert to google maps or maps
+        //DV TO DO - handle tap open alert to google maps or maps
         
         NSDictionary *dataDictionary = tappedMessage.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
@@ -1449,18 +1536,18 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *googleMapsAction = [UIAlertAction
-                                       actionWithTitle:@"Open in Google Maps"
-                                       style:UIAlertActionStyleDefault
-                                       handler:^(UIAlertAction * action) {
-                                           [self performSelector:@selector(openLocationInGoogleMaps:) withObject:dataDictionary];
-                                       }];
+                                           actionWithTitle:@"Open in Google Maps"
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                                               [self performSelector:@selector(openLocationInGoogleMaps:) withObject:dataDictionary];
+                                           }];
         
         UIAlertAction *appleMapsAction = [UIAlertAction
-                                        actionWithTitle:@"Open in Maps"
-                                        style:UIAlertActionStyleDefault
-                                        handler:^(UIAlertAction * action) {
-                                            [self performSelector:@selector(openLocationInAppleMaps:) withObject:dataDictionary];
-                                        }];
+                                          actionWithTitle:@"Open in Maps"
+                                          style:UIAlertActionStyleDefault
+                                          handler:^(UIAlertAction * action) {
+                                              [self performSelector:@selector(openLocationInAppleMaps:) withObject:dataDictionary];
+                                          }];
         
         UIAlertAction *cancelAction = [UIAlertAction
                                        actionWithTitle:@"Cancel"
@@ -1469,7 +1556,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                                            //Do some thing here
                                        }];
         
-        [googleMapsAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"]; //DV Temp
+        [googleMapsAction setValue:[[UIImage imageNamed:@"TAPIconGoogleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         [appleMapsAction setValue:[[UIImage imageNamed:@"TAPIconAppleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         [googleMapsAction setValue:@0 forKey:@"titleTextAlignment"];
@@ -1494,7 +1581,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 - (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
     NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-
+    
     [self showInputAccessoryExtensionView:NO];
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
     [self setReplyMessageWithMessage:tappedMessage];
@@ -1510,13 +1597,17 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
         //animation
         [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
-//        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
+        //        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
         [cell layoutIfNeeded];
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
     } completion:^(BOOL finished) {
         //completion
     }];
+}
+
+- (void)myLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    [self handleLongPressedWithMessage:longPressedMessage];
 }
 
 #pragma mark TAPYourChatBubbleTableViewCell
@@ -1644,6 +1735,30 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+- (void)yourChatBubbleDidTappedUrl:(NSURL *)url
+                  originalString:(NSString *)originalString {
+    [self handleTappedWithURL:url originalString:originalString];
+}
+
+- (void)yourChatBubbleDidTappedPhoneNumber:(NSString *)phoneNumber
+                          originalString:(NSString *)originalString {
+    [self handleTappedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)yourChatBubbleLongPressedUrl:(NSURL *)url
+                    originalString:(NSString *)originalString {
+    [self handleLongPressedWithURL:url originalString:originalString];
+}
+
+- (void)yourChatBubbleLongPressedPhoneNumber:(NSString *)phoneNumber
+                            originalString:(NSString *)originalString {
+    [self handleLongPressedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)yourChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    [self handleLongPressedWithMessage:longPressedMessage];
+}
+
 #pragma mark TAPYourImageBubbleTableViewCell
 - (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
@@ -1722,6 +1837,30 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+- (void)yourImageDidTappedUrl:(NSURL *)url
+               originalString:(NSString *)originalString {
+    [self handleTappedWithURL:url originalString:originalString];
+}
+
+- (void)yourImageDidTappedPhoneNumber:(NSString *)phoneNumber
+                       originalString:(NSString *)originalString {
+    [self handleTappedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)yourImageLongPressedUrl:(NSURL *)url
+                 originalString:(NSString *)originalString {
+    [self handleLongPressedWithURL:url originalString:originalString];
+}
+
+- (void)yourImageLongPressedPhoneNumber:(NSString *)phoneNumber
+                         originalString:(NSString *)originalString {
+    [self handleLongPressedWithPhoneNumber:phoneNumber originalString:originalString];
+}
+
+- (void)yourImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    
+}
+
 #pragma mark TAPYourLocationBubbleTableViewCell
 - (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     
@@ -1746,18 +1885,21 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     //remove selectedMessage
     self.selectedMessage = nil;
     
-    TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    TAPYourLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
     [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
         //animation
-        [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
-        //        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
+        [cell showStatusLabel:YES animated:YES];
         [cell layoutIfNeeded];
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
     } completion:^(BOOL finished) {
         //completion
     }];
+    
+}
 
+- (void)yourLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    [self handleLongPressedWithMessage:longPressedMessage];
 }
 
 #pragma mark TAPProductListBubbleTableViewCell
@@ -1829,9 +1971,21 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 #pragma mark TAPConnectionStatusViewController
 - (void)connectionStatusViewControllerDelegateHeightChange:(CGFloat)height {
     self.connectionStatusHeight = height;
+    
+    CGFloat currentHeight = height;
+    if (self.connectionStatusHeight == 0.0f && self.loadMoreMessageViewHeight== 0.0f) {
+        currentHeight = 0.0f;
+    }
+    else if (self.connectionStatusHeight > 0.0f) {
+        currentHeight = self.connectionStatusHeight;
+    }
+    else if (self.loadMoreMessageViewHeight > 0.0f) {
+        currentHeight = self.loadMoreMessageViewHeight;
+    }
+    
     [UIView animateWithDuration:0.2f animations:^{
         //change frame
-        self.tableViewTopConstraint.constant = height - 50.0f;
+        self.tableViewTopConstraint.constant = currentHeight - 50.0f;
         [self.view layoutIfNeeded];
     }];
 }
@@ -2324,6 +2478,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         self.messageTextView.text = @"";
     }
     else {
+        
+        //Check if forward message exist, send forward message
+        TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+        
+        if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
+            [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:self.currentRoom];
+        }
+        
         self.messageTextView.text = @"";
     }
     
@@ -2472,6 +2634,13 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 //    [alertController addAction:cancelAction];
     //END DV NOTE
     
+    UIAlertAction *documentsAction = [UIAlertAction
+                                      actionWithTitle:@"Documents"
+                                      style:UIAlertActionStyleDefault
+                                      handler:^(UIAlertAction * action) {
+                                          [self performSelector:@selector(openFiles) withObject:nil];
+                                      }];
+    
     UIAlertAction *cameraAction = [UIAlertAction
                                    actionWithTitle:@"Camera"
                                    style:UIAlertActionStyleDefault
@@ -2501,19 +2670,23 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                                        [self checkKeyboard];
                                    }];
     
+    [documentsAction setValue:[[UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [cameraAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [galleryAction setValue:[[UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [locationAction setValue:[[UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
 
+    [documentsAction setValue:@0 forKey:@"titleTextAlignment"];
     [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
     [galleryAction setValue:@0 forKey:@"titleTextAlignment"];
     [locationAction setValue:@0 forKey:@"titleTextAlignment"];
-    
+
+    [documentsAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [cameraAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [galleryAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [locationAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
     [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
-    
+
+    [alertController addAction:documentsAction];
     [alertController addAction:cameraAction];
     [alertController addAction:galleryAction];
     [alertController addAction:locationAction];
@@ -2534,7 +2707,6 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             //after animation
         }];
     }];
-    
 }
 
 - (void)backButtonDidTapped {
@@ -2665,6 +2837,8 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     NSDate *date = [NSDate date];
     NSTimeInterval createdDate = [date timeIntervalSince1970] * 1000.0f;
     
+    [self showLoadMoreMessageLoadingView:YES withType:LoadMoreMessageViewTypeNewMessage];
+    _isFirstLoadData = YES;
     [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[NSNumber numberWithDouble:createdDate] limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *messageArray) {
         if ([messageArray count] == 0) {
             //No chat history, first time chat
@@ -2711,8 +2885,14 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
                     [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:roomID maxCreated:minCreated];
                 }
+                else {
+                    [self showLoadMoreMessageLoadingView:NO withType:nil];
+                    _isFirstLoadData = NO;
+                }
                 
             } failure:^(NSError *error) {
+                [self showLoadMoreMessageLoadingView:NO withType:nil];
+                _isFirstLoadData = NO;
 #ifdef DEBUG
                 //Note - this alert only shown at debug
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
@@ -2726,7 +2906,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
             }];
         }
     } failure:^(NSError *error) {
-        
+        [self showLoadMoreMessageLoadingView:NO withType:nil];
     }];
 }
 
@@ -2750,7 +2930,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         }
         
         //Call API Before when message array less than limit (50)
-        if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
+        if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT && !self.isFirstLoadData) {
+
+            [self showLoadMoreMessageLoadingView:YES withType:LoadMoreMessageViewTypeOlderMessage];
             [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:lastMessage.room.roomID maxCreated:lastMessage.created];
         }
     } failure:^(NSError *error) {
@@ -2770,7 +2952,11 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 //Update View
                 [self updateMessageDataAndUIWithMessages:messageArray toTop:NO];
             }
+            [self showLoadMoreMessageLoadingView:NO withType:nil];
+            _isFirstLoadData = NO;
         } failure:^(NSError *error) {
+            [self showLoadMoreMessageLoadingView:NO withType:nil];
+            _isFirstLoadData = NO;
 #ifdef DEBUG
             //Note - this alert only shown at debug
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
@@ -2884,6 +3070,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     TAPRoomModel *roomData = [TAPChatManager sharedManager].activeRoom;
     NSString *roomID = roomData.roomID;
     
+    [self showLoadMoreMessageLoadingView:YES withType:LoadMoreMessageViewTypeNewMessage];
     [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:self.minCreatedMessage success:^(NSArray *messageArray) {
         //Update View
         [self updateMessageDataAndUIWithMessages:messageArray toTop:scrollToTop];
@@ -2892,9 +3079,9 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
         if ([messageArray count] != 0) {
             [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
         }
-        
+        [self showLoadMoreMessageLoadingView:NO withType:nil];
     } failure:^(NSError *error) {
-        
+        [self showLoadMoreMessageLoadingView:NO withType:nil];
     }];
 }
 
@@ -3291,9 +3478,85 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     }
 }
 
+- (void)showLoadMoreMessageLoadingView:(BOOL)show
+                              withType:(LoadMoreMessageViewType)type {
+
+    if (show) {
+        self.loadMoreMessageViewHeight = 20.0f;
+        
+        if (type == LoadMoreMessageViewTypeOlderMessage) {
+            self.loadMoreMessageLoadingLabel.text = NSLocalizedString(@"Loading Older Messages", @"");
+        }
+        else if (type == LoadMoreMessageViewTypeNewMessage) {
+            self.loadMoreMessageLoadingLabel.text = NSLocalizedString(@"Loading New Messages", @"");
+        }
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            //change frame
+            self.loadMoreMessageLoadingHeightConstraint.constant = self.loadMoreMessageViewHeight;
+            [self.view layoutIfNeeded];
+        }];
+        
+        if ([self.loadMoreMessageLoadingViewImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            animation.fromValue = [NSNumber numberWithFloat:0.0f];
+            animation.toValue = [NSNumber numberWithFloat: 2*M_PI];
+            animation.duration = 1.5f;
+            animation.repeatCount = INFINITY;
+            animation.removedOnCompletion = NO;
+            [self.loadMoreMessageLoadingViewImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+        }
+    }
+    else {
+        self.loadMoreMessageViewHeight = 0.0f;
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            //change frame
+            self.loadMoreMessageLoadingHeightConstraint.constant = self.loadMoreMessageViewHeight;
+            [self.view layoutIfNeeded];
+        }];
+        
+        //Remove Animation
+        if ([self.loadMoreMessageLoadingViewImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+            [self.loadMoreMessageLoadingViewImageView.layer removeAnimationForKey:@"SpinAnimation"];
+        }
+    }
+    
+    CGFloat currentHeight = self.loadMoreMessageViewHeight;
+    if (self.connectionStatusHeight == 0.0f && self.loadMoreMessageViewHeight== 0.0f) {
+        currentHeight = 0.0f;
+    }
+    else if (self.connectionStatusHeight > 0.0f) {
+        currentHeight = self.connectionStatusHeight;
+    }
+    else if (self.loadMoreMessageViewHeight > 0.0f) {
+        currentHeight = self.loadMoreMessageViewHeight;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        //change frame
+        self.tableViewTopConstraint.constant = currentHeight - 50.0f;
+        [self.view layoutIfNeeded];
+    }];
+}
+
 - (void)setReplyMessageWithMessage:(TAPMessageModel *)message {
-    self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
-    self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
+    
+    TAPChatManagerQuoteActionType type = [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+    if (type == TAPChatManagerQuoteActionTypeForward) {
+        if ([message.forwardFrom.localID isEqualToString:@""] && [message.forwardFrom.fullname isEqualToString:@""]) {
+            self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
+        }
+        else {
+            self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.forwardFrom.fullname];
+        }
+
+        self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
+    }
+    else {
+        self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
+        self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
+    }
 }
 
 - (void)setQuoteWithQuote:(TAPQuoteModel *)quote {
@@ -3627,6 +3890,16 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 }
 
 //Attachment
+- (void)openFiles {
+    UIDocumentPickerViewController *documentPickerViewController = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.data"] inMode:UIDocumentPickerModeImport];
+    documentPickerViewController.delegate = self;
+    [self presentViewController:documentPickerViewController animated:YES completion:^{
+//        if (@available(iOS 11.0, *)) {
+//            documentPickerViewController.allowsMultipleSelection = YES;
+//        }
+    }];
+}
+
 - (void)openCamera {
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     
@@ -3713,6 +3986,404 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     } else {
         NSLog(@"Can't use maps://"); //DV Temp
     }
+}
+
+- (void)handleLongPressedWithURL:(NSURL *)url originalString:(NSString *)originalString {
+    [TAPUtil tapticImpactFeedbackGenerator];
+    if ([url.scheme isEqualToString:@"mailto"]) {
+        //handle email address
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *composeAction = [UIAlertAction
+                                        actionWithTitle:@"Compose"
+                                        style:UIAlertActionStyleDefault
+                                        handler:^(UIAlertAction * action) {
+                                            if([[UIApplication sharedApplication] canOpenURL:url]) {
+                                                if(IS_IOS_10_OR_ABOVE) {
+                                                    [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
+                                                }
+                                                else {
+                                                    [[UIApplication sharedApplication] openURL:url];
+                                                }
+                                            }
+                                        }];
+        
+        UIAlertAction *copyAction = [UIAlertAction
+                                     actionWithTitle:@"Copy"
+                                     style:UIAlertActionStyleDefault
+                                     handler:^(UIAlertAction * action) {
+                                         UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                         [pasteboard setString:originalString];
+                                     }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction
+                                       actionWithTitle:@"Cancel"
+                                       style:UIAlertActionStyleCancel
+                                       handler:^(UIAlertAction * action) {
+                                           //Do some thing here
+                                           [self checkKeyboard];
+                                       }];
+        
+        [composeAction setValue:[[UIImage imageNamed:@"TAPIconComposeEmail" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+        [copyAction setValue:[[UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+        
+        [composeAction setValue:@0 forKey:@"titleTextAlignment"];
+        [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+        
+        [composeAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+        [copyAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+        [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
+        
+        [alertController addAction:composeAction];
+        [alertController addAction:copyAction];
+        [alertController addAction:cancelAction];
+        
+        if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+            self.isKeyboardWasShowed = YES;
+        }
+        else {
+            self.isKeyboardWasShowed = NO;
+        }
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            [self.messageTextView resignFirstResponder];
+            [self.secondaryTextField resignFirstResponder];
+        } completion:^(BOOL finished) {
+            [self presentViewController:alertController animated:YES completion:^{
+                //after animation
+            }];
+        }];
+    }
+    else {
+        //handle link
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *openAction = [UIAlertAction
+                                     actionWithTitle:@"Open"
+                                     style:UIAlertActionStyleDefault
+                                     handler:^(UIAlertAction * action) {
+                                         //CS TEMP - temporary open safari
+                                         if([[UIApplication sharedApplication] canOpenURL:url]) {
+                                             if(IS_IOS_10_OR_ABOVE) {
+                                                 [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
+                                             }
+                                             else {
+                                                 [[UIApplication sharedApplication] openURL:url];
+                                             }
+                                         }
+                                     }];
+        
+        UIAlertAction *copyAction = [UIAlertAction
+                                     actionWithTitle:@"Copy"
+                                     style:UIAlertActionStyleDefault
+                                     handler:^(UIAlertAction * action) {
+                                         UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                         [pasteboard setString:originalString];
+                                     }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction
+                                       actionWithTitle:@"Cancel"
+                                       style:UIAlertActionStyleCancel
+                                       handler:^(UIAlertAction * action) {
+                                           //Do some thing here
+                                           [self checkKeyboard];
+                                       }];
+        
+        [openAction setValue:[[UIImage imageNamed:@"TAPIconOpen" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+        [copyAction setValue:[[UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+        
+        
+        [openAction setValue:@0 forKey:@"titleTextAlignment"];
+        [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+        
+        [openAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+        [copyAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+        [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
+        
+        [alertController addAction:openAction];
+        [alertController addAction:copyAction];
+        [alertController addAction:cancelAction];
+        
+        if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+            self.isKeyboardWasShowed = YES;
+        }
+        else {
+            self.isKeyboardWasShowed = NO;
+        }
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            [self.messageTextView resignFirstResponder];
+            [self.secondaryTextField resignFirstResponder];
+        } completion:^(BOOL finished) {
+            [self presentViewController:alertController animated:YES completion:^{
+                //after animation
+            }];
+        }];
+    }
+}
+
+- (void)handleLongPressedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString {
+    [TAPUtil tapticImpactFeedbackGenerator];
+    //handle number
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *callAction = [UIAlertAction
+                                 actionWithTitle:@"Call Number"
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
+                                     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+                                         if(IS_IOS_10_OR_ABOVE) {
+                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
+                                         }
+                                         else {
+                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
+                                         }
+                                     }
+                                 }];
+    
+    UIAlertAction *smsAction = [UIAlertAction
+                                actionWithTitle:@"SMS Number"
+                                style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction * action) {
+                                    NSString *stringURL = [NSString stringWithFormat:@"sms:%@", phoneNumber];
+                                    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+                                        if(IS_IOS_10_OR_ABOVE) {
+                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
+                                        }
+                                        else {
+                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
+                                        }
+                                    }
+                                }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:@"Copy"
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:phoneNumber];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       //Do some thing here
+                                       [self checkKeyboard];
+                                   }];
+    
+    [callAction setValue:[[UIImage imageNamed:@"TAPIconCall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    [smsAction setValue:[[UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    [copyAction setValue:[[UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [callAction setValue:@0 forKey:@"titleTextAlignment"];
+    [smsAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    [callAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [smsAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [copyAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
+    
+    [alertController addAction:callAction];
+    [alertController addAction:smsAction];
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
+}
+
+- (void)handleTappedWithURL:(NSURL *)url originalString:(NSString *)originalString {
+    if ([url.scheme isEqualToString:@"mailto"]) {
+        //handle email address
+        //open mail app
+        if([[UIApplication sharedApplication] canOpenURL:url]) {
+            if(IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:url];
+            }
+        }
+    }
+    else {
+        //handle link
+        //open webview
+        if([[UIApplication sharedApplication] canOpenURL:url]) {
+            if(IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:url
+                                                   options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
+                                         completionHandler:^(BOOL success){
+                                             if(!success) {
+                                                 // present in app web view, the app is not installed
+                                                 TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
+                                                 webViewController.urlString = url.absoluteString;
+                                                 [self.navigationController pushViewController:webViewController animated:YES];
+                                             }
+                                         }];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:url];
+            }
+        }
+    }
+}
+
+- (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString {
+    NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
+    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+        if(IS_IOS_10_OR_ABOVE) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
+        }
+        else {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
+        }
+    }
+}
+
+- (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
+    [TAPUtil tapticImpactFeedbackGenerator];
+    //handle message long pressed
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *replyAction = [UIAlertAction
+                                 actionWithTitle:@"Reply"
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     //Reply Action Here
+                                     if (message.type == TAPChatMessageTypeText) {
+                                         [self showInputAccessoryExtensionView:NO];
+                                         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+                                         [self setReplyMessageWithMessage:message];
+                                         [self showInputAccessoryExtensionView:YES];
+                                         
+                                         TAPMessageModel *quotedMessageModel = [message copy];
+                                         [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+                                     }
+                                     else if (message.type == TAPChatMessageTypeImage) {
+                                         
+                                         TAPMessageModel *quotedMessageModel = [message copy];
+                                         
+                                         [self showInputAccessoryExtensionView:NO];
+                                         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+                                         [self showInputAccessoryExtensionView:YES];
+                                         
+                                         //convert to quote model
+                                         TAPQuoteModel *quote = [TAPQuoteModel new];
+                                         quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+                                         quote.title = quotedMessageModel.user.fullname;
+                                         quote.content = quotedMessageModel.body;
+                                         [self setQuoteWithQuote:quote];
+                                         
+                                         quotedMessageModel.quote = quote;
+                                         
+                                         [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+                                     }
+                                     else if (message.type == TAPChatMessageTypeLocation) {
+                                         [self showInputAccessoryExtensionView:NO];
+                                         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+                                         [self setReplyMessageWithMessage:message];
+                                         [self showInputAccessoryExtensionView:YES];
+                                         
+                                         TAPMessageModel *quotedMessageModel = [message copy];
+                                         [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+                                     }
+                                     else if (message.type == TAPChatMessageTypeFile) {
+                                         
+                                     }
+                                 }];
+    
+    UIAlertAction *forwardAction = [UIAlertAction
+                                actionWithTitle:@"Forward"
+                                style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction * action) {
+                                    //Forward Action Here
+                                    TAPForwardListViewController *forwardListViewController = [[TAPForwardListViewController alloc] init];
+                                    forwardListViewController.currentNavigationController = self.navigationController;
+                                    forwardListViewController.forwardedMessage = message;
+                                    UINavigationController *forwardListNavigationController = [[UINavigationController alloc] initWithRootViewController:forwardListViewController];
+                                    [self presentViewController:forwardListNavigationController animated:YES completion:nil];
+                                }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:@"Copy"
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     if (message.type == TAPChatMessageTypeText) {
+                                         [pasteboard setString:message.body];
+                                     }
+                                     else if (message.type == TAPChatMessageTypeImage) {
+                                         
+                                     }
+                                }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       //Do some thing here
+                                       [self checkKeyboard];
+                                   }];
+    
+    [replyAction setValue:[[UIImage imageNamed:@"TAPIconReplyChatGreen" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    [forwardAction setValue:[[UIImage imageNamed:@"TAPIconForward" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    [copyAction setValue:[[UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [replyAction setValue:@0 forKey:@"titleTextAlignment"];
+    [forwardAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    [replyAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [forwardAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [copyAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:@"titleTextColor"];
+    
+    [alertController addAction:replyAction];
+    
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) {
+        //DV Temp
+        //Show forward action for text and location only (temporary)
+        [alertController addAction:forwardAction];
+    }
+
+    if (message.type == TAPChatMessageTypeText) {
+        //Show copy action for chat type text only
+        [alertController addAction:copyAction];
+    }
+    
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
 }
     
 //DV NOTE - Uncomment this to use API download thumbnail image

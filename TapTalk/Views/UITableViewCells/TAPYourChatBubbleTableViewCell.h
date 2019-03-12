@@ -15,6 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourChatReplyDidTapped;
+- (void)yourChatBubbleDidTappedUrl:(NSURL *)url
+                  originalString:(NSString*)originalString;
+- (void)yourChatBubbleDidTappedPhoneNumber:(NSString *)phoneNumber
+                          originalString:(NSString*)originalString;
+- (void)yourChatBubbleLongPressedUrl:(NSURL *)url
+                    originalString:(NSString*)originalString;
+- (void)yourChatBubbleLongPressedPhoneNumber:(NSString *)phoneNumber
+                            originalString:(NSString*)originalString;
+- (void)yourChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 
 @end
 

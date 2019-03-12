@@ -8,6 +8,7 @@
 
 #import "TAPMyChatBubbleTableViewCell.h"
 #import "TAPGradientView.h"
+#import "ZSWTappableLabel.h"
 
 //typedef NS_ENUM(NSInteger, TAPMyChatBubbleStatus) {
 //    TAPMyChatBubbleStatusSending,
@@ -16,17 +17,19 @@
 //    TAPMyChatBubbleStatusRead
 //};
 
-@interface TAPMyChatBubbleTableViewCell()
+@interface TAPMyChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
-@property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
+@property (strong, nonatomic) IBOutlet ZSWTappableLabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *retryIconImageView;
@@ -57,7 +60,14 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewBottomConstraint;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelTopConstraint;
+
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
+@property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
 @property (strong, nonatomic) TAPGradientView *gradientView;
 
@@ -69,8 +79,13 @@
 - (IBAction)retryButtonDidTapped:(id)sender;
 - (IBAction)quoteButtonDidTapped:(id)sender;
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer;
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
+- (void)showForwardView:(BOOL)show;
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData;
+- (void)setQuote:(TAPQuoteModel *)quote;
 
 @end
 
@@ -109,7 +124,17 @@
                                                                               action:@selector(handleBubbleViewTap:)];
     [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
     
+    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewLongPress:)];
+    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
+    
     [self showQuoteView:NO];
+    [self showForwardView:NO];
+    
+    self.bubbleLabel.tapDelegate = self;
+    self.bubbleLabel.longPressDelegate = self;
+    self.bubbleLabel.longPressDuration = 0.05f;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -129,6 +154,99 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
+}
+
+#pragma mark - ZSWTappedLabelDelegate
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+        tappedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeAddress:
+                NSLog(@"Address components: %@", result.addressComponents);
+                break;
+                
+            case NSTextCheckingTypePhoneNumber:
+                NSLog(@"Phone number: %@", result.phoneNumber);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleDidTappedPhoneNumber:originalString:)]) {
+                    [self.delegate myChatBubbleDidTappedPhoneNumber:result.phoneNumber originalString:selectedWord];
+                }
+                break;
+                
+            case NSTextCheckingTypeDate:
+                NSLog(@"Date: %@", result.date);
+                break;
+                
+            case NSTextCheckingTypeLink:
+                NSLog(@"Link: %@", result.URL);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleDidTappedUrl:originalString:)]) {
+                    [self.delegate myChatBubbleDidTappedUrl:result.URL originalString:selectedWord];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
+
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeAddress:
+                NSLog(@"Address components: %@", result.addressComponents);
+                break;
+                
+            case NSTextCheckingTypePhoneNumber:
+                NSLog(@"Phone number: %@", result.phoneNumber);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedPhoneNumber:originalString:)]) {
+                    [self.delegate myChatBubbleLongPressedPhoneNumber:result.phoneNumber originalString:selectedWord];
+                }
+                break;
+                
+            case NSTextCheckingTypeDate:
+                NSLog(@"Date: %@", result.date);
+                break;
+                
+            case NSTextCheckingTypeLink:
+                NSLog(@"Link: %@", result.URL);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedUrl:originalString:)]) {
+                    [self.delegate myChatBubbleLongPressedUrl:result.URL originalString:selectedWord];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 #pragma mark - Custom Method
@@ -160,7 +278,43 @@
         [self showQuoteView:NO];
     }
     
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+    }
+    else {
+        [self showForwardView:NO];
+    }
+    
     self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
+    
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
+
+    NSString *messageText = [TAPUtil nullToEmptyString:self.bubbleLabel.text];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
+    // the next line throws an exception if string is nil - make sure you check
+    [linkDetector enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[@"NSTextCheckingResult"] = result;
+
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    [detectorPhoneNumber enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[@"NSTextCheckingResult"] = result;
+        
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    self.bubbleLabel.attributedText = attributedString;
 }
 
 - (void)receiveSentEvent {
@@ -297,6 +451,37 @@
     }
 }
 
+- (void)showForwardView:(BOOL)show {
+    if (show) {
+        self.forwardFromLabelHeightConstraint.constant = 16.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 16.0f;
+        self.forwardFromLabelLeadingConstraint.active = YES;
+        self.forwardTitleLabelLeadingConstraint.active = YES;
+    }
+    else {
+        self.forwardFromLabelHeightConstraint.constant = 0.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 0.0f;
+        self.forwardFromLabelLeadingConstraint.active = NO;
+        self.forwardTitleLabelLeadingConstraint.active = NO;
+    }
+}
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData {
+    
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    self.forwardFromLabel.text = appendedFullnameString;
+    
+    NSMutableAttributedString *attributedText =
+    [[NSMutableAttributedString alloc]
+     initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
+    
+    [attributedText addAttribute:NSFontAttributeName
+                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
+    
+    self.forwardFromLabel.attributedText = attributedText;
+}
+
 - (void)setQuote:(TAPQuoteModel *)quote {
     if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
         [self.quoteImageView setImageWithURLString:quote.imageURL];
@@ -306,6 +491,14 @@
     }
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
+}
+
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedWithMessage:)]) {
+            [self.delegate myChatBubbleLongPressedWithMessage:self.message];
+        }
+    }
 }
 
 @end
