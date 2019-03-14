@@ -147,6 +147,9 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)sendImageMessage:(UIImage *)image caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
+- (void)getTapTalkUserWithXCUserID:(NSString *)XCUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure;
+
+//TODO: Send Image Message
 
 //Custom Keyboard
 - (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender
