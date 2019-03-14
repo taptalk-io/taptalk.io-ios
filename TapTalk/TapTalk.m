@@ -778,4 +778,8 @@ fromNavigationController:(UINavigationController *)navigationController
     [TAPDataManager callAPIGetUserByXCUserID:clientUserID success:success failure:failure];
 }
 
+- (TAPUserModel *)getTapTalkActiveUser {
+    return [TAPDataManager getActiveUser];
+}
+
 @end
