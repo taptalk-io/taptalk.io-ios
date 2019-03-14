@@ -774,8 +774,8 @@ fromNavigationController:(UINavigationController *)navigationController
     }
 }
 
-- (void)getTapTalkUserWithXCUserID:(NSString *)XCUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure {
-    [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:success failure:failure];
+- (void)getTapTalkUserWithClientUserID:(NSString *)clientUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetUserByXCUserID:clientUserID success:success failure:failure];
 }
 
 @end
