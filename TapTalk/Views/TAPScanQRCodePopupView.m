@@ -255,8 +255,7 @@
     }
 }
 
-//- (void)setPopupInfoWithUserData:(TAPUserModel *)user {
-- (void)setPopupInfoWithUserData:(TAPUserModel *)user isContact:(BOOL)isContact { //DV Temp
+- (void)setPopupInfoWithUserData:(TAPUserModel *)user isContact:(BOOL)isContact {
     
     NSString *currentUserID = [TAPDataManager getActiveUser].userID;
     currentUserID = [TAPUtil nullToEmptyString:currentUserID];
@@ -267,15 +266,15 @@
         //Scan theirselves
         [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeSelf userData:user];
     }
-    
-    //DV Temp
-    if (isContact) {
-        //Already Friend
-        [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeAlreadyFriend userData:user];
-    }
     else {
-        //New Friend
-        [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeNewFriend userData:user];
+        if (isContact) {
+            //Already Friend
+            [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeAlreadyFriend userData:user];
+        }
+        else {
+            //New Friend
+            [self setQRCodePopupViewDataWithType:ScanQRCodePopupViewTypeNewFriend userData:user];
+        }
     }
 }
 
@@ -412,11 +411,11 @@
         //Showing Add To contact button
         self.greenView.alpha = 1.0f;
         self.selfInformedLabel.alpha = 0.0f;
-
+        
         self.addContactView.alpha = 1.0f;
         self.addContactButton.alpha = 1.0f;
         self.addContactButton.userInteractionEnabled = YES;
-
+        
         self.chatNowView.alpha = 0.0f;
         self.chatNowButton.alpha = 0.0f;
         self.chatNowButton.userInteractionEnabled = NO;
