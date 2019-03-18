@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id<TAPProductListCollectionViewCellDelegate> delegate;
 @property (strong, nonatomic) NSIndexPath *selectedIndexPath;
 @property (nonatomic) BOOL isSetAsSingleButtonView;
+@property (nonatomic) BOOL isCurrentActiveUserProduct; //Indicate whether the product is belong to current active user
 
 - (void)setProductCellWithData:(NSDictionary *)product;
 - (void)setAsSingleButtonView:(BOOL)isSetAsSingleButtonView;

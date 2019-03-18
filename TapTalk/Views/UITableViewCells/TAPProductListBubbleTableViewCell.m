@@ -87,6 +87,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     cell.delegate = self;
     cell.selectedIndexPath = indexPath;
+    cell.isCurrentActiveUserProduct = self.isCurrentActiveUserProduct;
     
     BOOL isSingleOption = NO;
     if (self.productListBubbleTableViewCellType == TAPProductListBubbleTableViewCellTypeSingleOption) {
