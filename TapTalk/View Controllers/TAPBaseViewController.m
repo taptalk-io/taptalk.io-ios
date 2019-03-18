@@ -12,7 +12,6 @@
 
 @interface TAPBaseViewController () <TAPPopUpInfoViewControllerDelegate>
 
-@property (strong, nonatomic) TAPPopUpInfoViewController *popupInfoViewController;
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 - (void)backButtonDidTapped;
 - (void)closeButtonDidTapped;
@@ -24,7 +23,6 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
-    _popupInfoViewController = [[TAPPopUpInfoViewController alloc] init];
 }
 
 - (void)viewDidLoad {
@@ -33,10 +31,10 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-//    [[NSNotificationCenter defaultCenter] addObserver:self
-//                                             selector:@selector(reachabilityDidChange:)
-//                                                 name:AFNetworkingReachabilityDidChangeNotification
-//                                               object:nil];
+    //    [[NSNotificationCenter defaultCenter] addObserver:self
+    //                                             selector:@selector(reachabilityDidChange:)
+    //                                                 name:AFNetworkingReachabilityDidChangeNotification
+    //                                               object:nil];
     
     [self.navigationController.navigationBar setTitleTextAttributes:
      @{NSForegroundColorAttributeName:[TAPUtil getColor:TAP_COLOR_BLACK_44],
@@ -55,32 +53,10 @@
     //End Note
     
     //WK Note - To show line under navigation bar
-//    [self.navigationController.navigationBar setShadowImage:self.navigationShadowImage];
+    //    [self.navigationController.navigationBar setShadowImage:self.navigationShadowImage];
     //End Note
     
     self.navigationController.navigationBar.translucent = NO;
-
-    self.popupInfoViewController.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds));
-    self.popupInfoViewController.delegate = self;
-    self.popupInfoViewController.view.alpha = 0.0f;
-
-    //Checking if there any navigationController
-    if ([self tabBarController] && ![[[self tabBarController] tabBar] isHidden]){
-        //is visible
-        [self.tabBarController.view addSubview:self.popupInfoViewController.view];
-        [self.tabBarController.view bringSubviewToFront:self.popupInfoViewController.view];
-
-    } else {
-        //is not visible or do not exists so is not visible
-        if (self.navigationController != nil){
-            [self.navigationController.view addSubview:self.popupInfoViewController.view];
-            [self.navigationController.view bringSubviewToFront:self.popupInfoViewController.view];
-        }
-        else {
-            [self.view addSubview:self.popupInfoViewController.view];
-            [self.view bringSubviewToFront:self.popupInfoViewController.view];
-        }
-    }
 }
 
 - (void)viewDidUnload {
@@ -116,14 +92,14 @@
 }
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleDefault;
@@ -189,7 +165,7 @@
 }
 
 - (void)reachabilityChangeIsReachable:(BOOL)reachable {
-
+    
 }
 
 - (void)showCustomBackButton {
@@ -220,19 +196,14 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)showPopupView:(BOOL)isVisible withPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo {
-    //Note - isVisible is NO, set the title and detailInformation to empty string
-    [self.popupInfoViewController setPopUpInfoViewControllerType:type withTitle:title detailInformation:detailInfo];
-    if (isVisible) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.popupInfoViewController.view.alpha = 1.0f;
-        }];
-    }
-    else {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.popupInfoViewController.view.alpha = 0.0f;
-        }];
-    }
+- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo {
+    
+    TAPPopUpInfoViewController *popupInfoViewController = [[TAPPopUpInfoViewController alloc] init];
+    popupInfoViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    popupInfoViewController.delegate = self;
+    [popupInfoViewController setPopUpInfoViewControllerType:type withTitle:title detailInformation:detailInfo];
+    [self presentViewController:popupInfoViewController animated:NO completion:^{
+    }];
 }
 
 - (void)popUpInfoDidTappedLeftButton {
