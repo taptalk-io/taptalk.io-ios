@@ -59,7 +59,13 @@
     self.backgroundContentView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_ED].CGColor;
     self.backgroundContentView.layer.borderWidth = 1.0f;
     self.backgroundContentView.layer.cornerRadius = 8.0f;
-    self.backgroundContentView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner | kCALayerMinXMaxYCorner;
+    
+    if (self.isCurrentActiveUserProduct) {
+        self.backgroundContentView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    }
+    else {
+        self.backgroundContentView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner | kCALayerMinXMaxYCorner;
+    }
     
     if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
         self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
@@ -87,7 +93,7 @@
 
 #pragma mark - Custom Method
 - (void)setProductCellWithData:(NSDictionary *)product {
-
+    
     NSString *productIDString = [product objectForKey:@"id"];
     productIDString = [TAPUtil nullToEmptyString:productIDString];
     
@@ -154,11 +160,11 @@
         self.singleOptionView.alpha = 1.0f;
         self.singleOptionButton.alpha = 1.0f;
         self.singleOptionButton.userInteractionEnabled = YES;
-
+        
         self.leftOptionView.alpha = 0.0f;
         self.leftOptionButton.alpha = 0.0f;
         self.leftOptionButton.userInteractionEnabled = NO;
-
+        
         self.rightOptionView.alpha = 0.0f;
         self.rightOptionButton.alpha = 0.0f;
         self.rightOptionButton.userInteractionEnabled = NO;

@@ -26,6 +26,7 @@ typedef NS_ENUM(NSInteger, TAPProductListBubbleTableViewCellType) {
 
 @property (nonatomic) TAPProductListBubbleTableViewCellType productListBubbleTableViewCellType;
 @property (weak, nonatomic) id<TAPProductListBubbleTableViewCellDelegate> delegate;
+@property (nonatomic) BOOL isCurrentActiveUserProduct; //Indicate whether the product is belong to current active user
 
 - (void)setProductListBubbleCellWithData:(NSArray *)productDataArray;
 - (void)setProductListBubbleTableViewCellType:(TAPProductListBubbleTableViewCellType)productListBubbleTableViewCellType;
