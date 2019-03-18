@@ -60,13 +60,6 @@
     self.backgroundContentView.layer.borderWidth = 1.0f;
     self.backgroundContentView.layer.cornerRadius = 8.0f;
     
-    if (self.isCurrentActiveUserProduct) {
-        self.backgroundContentView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
-    }
-    else {
-        self.backgroundContentView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner | kCALayerMinXMaxYCorner;
-    }
-    
     if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
         self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
         self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
@@ -199,6 +192,16 @@
 - (IBAction)singleOptionButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(leftOrSingleOptionButtonDidTappedWithIndexPath:isSingleOptionView:)]) {
         [self.delegate leftOrSingleOptionButtonDidTappedWithIndexPath:self.selectedIndexPath isSingleOptionView:self.isSetAsSingleButtonView];
+    }
+}
+
+- (void)setCellCornerRadiusPositionWithCurrentActiveUserProduct:(BOOL)isCurrentActiveUserProduct {
+    //Indicate whether the product is belong to current active user
+    if (isCurrentActiveUserProduct) {
+        self.backgroundContentView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    }
+    else {
+        self.backgroundContentView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner | kCALayerMinXMaxYCorner;
     }
 }
 
