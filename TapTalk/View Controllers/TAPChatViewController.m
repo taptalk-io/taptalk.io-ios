@@ -867,7 +867,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
                 [cell setProductListBubbleCellWithData:productListArray];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.delegate = self;
-                cell.isCurrentActiveUserProduct = YES;
+                cell.isCurrentActiveUserProduct = NO;
                 [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
                 return cell;
             }
