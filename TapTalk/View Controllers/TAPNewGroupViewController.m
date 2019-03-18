@@ -905,7 +905,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 if ([self.selectedIndexArray count] == kMaxGroupMember) {
                     //WK Temp
-                    [self showPopupView:YES withPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"")];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"")];
                     //END WK Temp
                 }
                 else {
@@ -1017,7 +1017,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButton {
-    [self showPopupView:NO withPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:@"" detailInformation:@""];
+    [super popUpInfoTappedSingleButtonOrRightButton];
 }
 
 @end
