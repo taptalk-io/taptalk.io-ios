@@ -801,6 +801,7 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
                 cell.delegate = self;
+                cell.isCurrentActiveUserProduct = YES;
                 return cell;
             }
             else if (message.type == TAPChatMessageTypeLocation) {
@@ -902,6 +903,7 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
                 [cell setProductListBubbleCellWithData:productListArray];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.delegate = self;
+                cell.isCurrentActiveUserProduct = YES;
                 [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
                 return cell;
             }
