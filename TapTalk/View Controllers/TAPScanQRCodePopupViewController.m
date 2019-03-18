@@ -40,10 +40,13 @@
 #pragma mark - Custom Method
 - (void)closePopupButtonDidTapped {
     [self.scanQRCodePopupView setPopupViewToDefault];
-    [self.scanQRCodePopupView showPopupView:NO animated:NO];
     
-    [self dismissViewControllerAnimated:NO completion:^{
-        //completion
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.scanQRCodePopupView showPopupView:NO animated:NO];
+    } completion:^(BOOL finished) {
+        [self dismissViewControllerAnimated:NO completion:^{
+            //completion
+        }];
     }];
 }
 
@@ -83,7 +86,7 @@
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButton {
-    [self showPopupView:NO withPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:@"" detailInformation:@""];
+    [super popUpInfoTappedSingleButtonOrRightButton];
     
     [self dismissViewControllerAnimated:NO completion:^{
         //completion
@@ -96,31 +99,34 @@
     [self.scanQRCodePopupView setIsLoading:YES animated:YES];
     [TAPDataManager callAPIGetUserByUserID:self.code success:^(TAPUserModel *user) {
         
-        //Upsert User to Contact Manager
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+        currentUserID = [TAPUtil nullToEmptyString:currentUserID];
         
-        self.searchedUser = user;
-        
-        //DV Temp
-        //Note - Temporary query for friend data from db, if found means isContact = 1 until API response showing isContact
-        [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+        if ([self.code isEqualToString:currentUserID]) {
+            //Add theirselves
             [self.scanQRCodePopupView setIsLoading:NO animated:YES];
-            [self.scanQRCodePopupView setPopupInfoWithUserData:user isContact:isContact];
-            
+            [self.scanQRCodePopupView setPopupInfoWithUserData:user isContact:YES];
             success();
-        } failure:^(NSError *error) {
+        }
+        else {
+            //Upsert User to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+            self.searchedUser = user;
+            [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+                [self.scanQRCodePopupView setIsLoading:NO animated:YES];
+                [self.scanQRCodePopupView setPopupInfoWithUserData:user isContact:isContact];
+                success();
+            } failure:^(NSError *error) {
 #ifdef DEBUG
-            NSLog(@"%@", error);
+                NSLog(@"%@", error);
 #endif
-            
-            failure(error);
-        }];
-        //END DV Temp
-        
+                failure(error);
+            }];
+        }
     } failure:^(NSError *error) {
         [self.scanQRCodePopupView setIsLoading:NO animated:YES];
         [self.scanQRCodePopupView showPopupView:NO animated:YES];
-        [self showPopupView:YES withPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain];
         
         failure(error);
     }];
