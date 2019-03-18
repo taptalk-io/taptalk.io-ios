@@ -27,8 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id <TAPPopUpInfoViewControllerDelegate> delegate;
 @property (strong, nonatomic) TAPPopUpInfoView *popUpInfoView;
 @property (nonatomic) TAPPopUpInfoViewControllerType popUpInfoViewControllerType;
+@property (strong, nonatomic) NSString *titleInformation;
+@property (strong, nonatomic) NSString *detailInformation;
 
 - (void)setPopUpInfoViewControllerType:(TAPPopUpInfoViewControllerType)popUpInfoViewControllerType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo;
+- (void)showPopupInfoView:(BOOL)isShow animated:(BOOL)animated completion:(void (^ __nullable)(void))completion;
 
 @end
 
