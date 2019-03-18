@@ -31,7 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setProductCellWithData:(NSDictionary *)product;
 - (void)setAsSingleButtonView:(BOOL)isSetAsSingleButtonView;
-- (void)setCellCornerRadiusPosition;
 - (void)setCellCornerRadiusPositionWithCurrentActiveUserProduct:(BOOL)isCurrentActiveUserProduct;
 @end
 
