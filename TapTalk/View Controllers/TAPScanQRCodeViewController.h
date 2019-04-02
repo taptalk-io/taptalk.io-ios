@@ -8,11 +8,6 @@
 
 #import "TAPBaseViewController.h"
 
-typedef NS_ENUM(NSInteger, ScanQRCodeViewControllerSourceType) {
-    ScanQRCodeViewControllerSourceTypeSearch = 0,
-    ScanQRCodeViewControllerSourceTypeDiscover = 1
-};
-
 @protocol TAPScanQRCodeViewControllerDelegate <NSObject>
 
 - (void)scanQRCodeViewControllerDoneAddFriend;
@@ -26,7 +21,6 @@ typedef NS_ENUM(NSInteger, ScanQRCodeViewControllerSourceType) {
 
 @property (strong, nonatomic) UIViewController *popViewController;
 @property (weak, nonatomic) id <TAPScanQRCodeViewControllerDelegate> delegate;
-@property (nonatomic) ScanQRCodeViewControllerSourceType scanQRCodeViewControllerSourceType;
 - (CIImage *)createQRForString:(NSString *)qrString;
 
 @end
