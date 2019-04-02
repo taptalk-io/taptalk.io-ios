@@ -137,8 +137,4 @@
     }
 }
 
-- (void)setScanQRCodeViewControllerSourceType:(ScanQRCodeViewControllerSourceType)scanQRCodeViewControllerSourceType {
-    _scanQRCodeViewControllerSourceType = scanQRCodeViewControllerSourceType;
-}
-
 @end
