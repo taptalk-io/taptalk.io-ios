@@ -392,7 +392,7 @@
     } completion:^(BOOL finished) {
         TAPSearchViewController *searchViewController = [[TAPSearchViewController alloc] init];
         UINavigationController *searchNavigationController = [[UINavigationController alloc] initWithRootViewController:searchViewController];
-        searchNavigationController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        searchNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         [self presentViewController:searchNavigationController animated:NO completion:^{
             UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
             //DV Note
