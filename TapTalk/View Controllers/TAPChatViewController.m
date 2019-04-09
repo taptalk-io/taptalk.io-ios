@@ -468,6 +468,7 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
     _isViewWillAppeared = YES;
+    [self reloadInputViews];
     self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
     
     self.connectionStatusViewController.view.frame = CGRectMake(CGRectGetMinX(self.connectionStatusViewController.view.frame), CGRectGetMinY(self.connectionStatusViewController.view.frame), CGRectGetWidth(self.connectionStatusViewController.view.frame), self.connectionStatusHeight);
@@ -2987,13 +2988,17 @@ typedef NS_ENUM(NSInteger, InputAccessoryExtensionType) {
 
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
-    if (self.isShowAccessoryView) {
-        return self.inputMessageAccessoryView;
+    if (self.isViewWillAppeared) {
+        if (self.isShowAccessoryView) {
+            return self.inputMessageAccessoryView;
+        }
+        else {
+            return nil;
+        }
     }
     else {
         return nil;
     }
-    
 }
 
 - (BOOL)canBecomeFirstResponder {
