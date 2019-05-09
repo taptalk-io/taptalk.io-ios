@@ -55,6 +55,7 @@
 @property (nonatomic, strong) NSString *quoteContent;
 @property (nonatomic, strong) NSString *quoteFileID; //Image from TapTalk
 @property (nonatomic, strong) NSString *quoteImageURL; //Image from Client
+@property (nonatomic, strong) NSString *quoteFileType; //Image from Client
 
 //ReplyTo
 @property (nonatomic, strong) NSString *replyToMessageID;

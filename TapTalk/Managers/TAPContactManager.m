@@ -11,9 +11,12 @@
 @interface TAPContactManager() <TAPConnectionManagerDelegate>
 
 @property (strong, nonatomic) NSMutableDictionary *contactUserDictionary;
+@property (strong, nonatomic) NSMutableDictionary *phoneUserDictionary;
+@property (strong, nonatomic) NSString *userCountryCode;
+@property (nonatomic) BOOL contactSyncPermissionAsked;
 
-- (void)saveContactToDatabase;
-- (void)populateContactFromDatabase;
+- (void)populateCountryCodeFromPreference;
+- (void)populateContactPermissionFromPreference;
 
 @end
 
@@ -33,6 +36,7 @@
     
     if (self) {
         _contactUserDictionary = [[NSMutableDictionary alloc] init];
+        _phoneUserDictionary = [[NSMutableDictionary alloc] init];
         [[TAPConnectionManager sharedManager] addDelegate:self];
     }
     
@@ -65,6 +69,7 @@
     if(user.userID != activeUser.userID && user.userID != nil) {
         //if user != self set to Dictionary
         [self.contactUserDictionary setObject:user forKey:user.userID];
+        [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
         
         if(save) {
             //save user to database directly
@@ -82,6 +87,13 @@
     TAPUserModel *user = [self.contactUserDictionary objectForKey:userID];
     return user;
 }
+         
+ - (BOOL)checkUserExistWithPhoneNumber:(NSString *)phoneNumberWithCode {
+     if ([self.phoneUserDictionary objectForKey:phoneNumberWithCode]) {
+         return YES;
+     }
+     return NO;
+ }
 
 - (void)saveContactToDatabase {
     NSArray *userDataArray = [self.contactUserDictionary allValues];
@@ -96,10 +108,43 @@
     [TAPDataManager getDatabaseAllUserSortBy:@"fullname" success:^(NSArray *resultArray) {
         for (TAPUserModel *user in resultArray) {
             [self.contactUserDictionary setObject:user forKey:user.userID];
+            [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
         }
     } failure:^(NSError *error) {
         
     }];
+    [[TAPContactManager sharedManager] populateCountryCodeFromPreference];
+    [[TAPContactManager sharedManager] populateContactPermissionFromPreference];
+}
+
+- (void)saveUserCountryCode:(NSString *)countryCode {
+    _userCountryCode = countryCode;
+    [[NSUserDefaults standardUserDefaults] setSecureObject:countryCode forKey:TAP_PREFS_USER_COUNTRY_CODE];
+    [[NSUserDefaults standardUserDefaults] synchronize];}
+
+- (NSString *)getUserCountryCode {
+    return [TAPUtil nullToEmptyString:self.userCountryCode];
+}
+
+- (void)populateCountryCodeFromPreference {
+    NSString *countryCode = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_USER_COUNTRY_CODE valid:nil];
+    countryCode = [TAPUtil nullToEmptyString:countryCode];
+    _userCountryCode = countryCode;
+}
+
+- (void)setContactPermissionAsked {
+    _contactSyncPermissionAsked = YES;
+    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)isContactPermissionAsked {
+    return self.contactSyncPermissionAsked;
+}
+
+- (void)populateContactPermissionFromPreference {
+    BOOL contactPermissionAsked = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED valid:nil];
+    _contactSyncPermissionAsked = contactPermissionAsked;
 }
 
 @end

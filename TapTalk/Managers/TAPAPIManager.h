@@ -28,7 +28,15 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeUpdateMessageReadStatus,
     TAPAPIManagerTypeUploadFile,
     TAPAPIManagerTypeDownloadFile,
-    TAPAPIManagerTypeGetBulkUserByID
+    TAPAPIManagerTypeGetBulkUserByID,
+    TAPAPIManagerTypeGetCountry,
+    TAPAPIManagerTypeRequestOTP,
+    TAPAPIManagerTypeVerifyOTP,
+    TAPAPIManagerTypeCheckUsername,
+    TAPAPIManagerTypeRegister,
+    TAPAPIManagerTypeAddContactByPhones,
+    TAPAPIManagerTypeUploadUserPhoto,
+    TAPAPIManagerTypeUpdateUser
 };
 
 @interface TAPAPIManager : NSObject

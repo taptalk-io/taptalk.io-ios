@@ -37,7 +37,7 @@
         [self.bgView addSubview:self.removeImageView];
         
         _contactNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactImageView.frame) + 8.0f, 52.0f, 13.0f)];
-        self.contactNameLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.contactNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         self.contactNameLabel.textAlignment = NSTextAlignmentCenter;
         [self.bgView addSubview:self.contactNameLabel];
     }

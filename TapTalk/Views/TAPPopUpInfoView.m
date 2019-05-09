@@ -49,7 +49,7 @@
         
         _detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 0.0f)];
         self.detailLabel.numberOfLines = 0;
-        self.detailLabel.font = [UIFont fontWithName:TAP_FONT_NAME_NORMAL size:13.0f];
+        self.detailLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.detailLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         [self.popupWhiteView addSubview:self.detailLabel];
         
@@ -57,15 +57,15 @@
         self.rightButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
         self.rightButton.layer.cornerRadius = 4.0f;
         self.rightButton.titleLabel.textColor = [UIColor whiteColor];
-        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self.popupWhiteView addSubview:self.rightButton];
         
         _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 6.0f - 85.0f, CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
         self.leftButton.layer.cornerRadius = 4.0f;
         self.leftButton.layer.borderWidth = 1.0f;
         self.leftButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
-        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN].CGColor;
-        self.leftButton.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1].CGColor;
+        self.leftButton.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         self.leftButton.backgroundColor = [UIColor whiteColor];
         [self.popupWhiteView addSubview:self.leftButton];
         
@@ -81,7 +81,7 @@
     self.rightButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame));
     
     self.leftButton.frame = CGRectMake(CGRectGetMinX(self.leftButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.leftButton.frame), CGRectGetHeight(self.leftButton.frame));
-    
+
     CGFloat popupInfoViewHeight = CGRectGetMaxY(self.rightButton.frame) + 16.0f;
     self.popupWhiteView.frame = CGRectMake(CGRectGetMinX(self.popupWhiteView.frame), (CGRectGetHeight(self.frame) - popupInfoViewHeight) / 2.0f, CGRectGetWidth(self.popupWhiteView.frame), popupInfoViewHeight);
 }
@@ -97,22 +97,35 @@
     }
 }
 
-- (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo {
+- (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString *)leftOptionTitle singleOrRightOptionButtonTitle:(NSString *)singleOrRightOptionTitle {
     _popupInfoViewType = popupInfoViewType;
     
     if (self.popupInfoViewType == TAPPopupInfoViewTypeErrorMessage) {
-        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeAlert];
-        self.titleLabel.text = title;
-        self.detailLabel.text = detailInfo;
-        [self.rightButton setTitle:@"OK" forState:UIControlStateNormal];
+        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDestructive];
     }
+    else if (self.popupInfoViewType == TAPPopupInfoViewTypeSuccessMessage) {
+        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
+    }
+    else if (self.popupInfoViewType == TAPPopupInfoViewTypeInfoDefault) {
+        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
+    }
+    else if (self.popupInfoViewType == TAPPopupInfoViewTypeInfoDestructive) {
+        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDestructive];
+    }
+    
+    self.titleLabel.text = title;
+    self.detailLabel.text = detailInfo;
+    [self.leftButton setTitle:leftOptionTitle forState:UIControlStateNormal];
+    [self.rightButton setTitle:singleOrRightOptionTitle forState:UIControlStateNormal];
     
     [self resizeSubview];
 }
 
+
 - (void)setPopupInfoViewThemeType:(TAPPopupInfoViewThemeType)popupInfoViewThemeType {
     _popupInfoViewThemeType = popupInfoViewThemeType;
-    if (self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeAlert) {
+    if (self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeDestructive) {
+        //Red theme
         [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
         
@@ -123,11 +136,12 @@
     else {
         //Default green theme
         [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREEN_2A];
         
-        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN].CGColor;
-        [self.leftButton setTitleColor:[TAPUtil getColor:TAP_COLOR_MOSELO_GREEN] forState:UIControlStateNormal];
+        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor;
+        [self.leftButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREY_9B] forState:UIControlStateNormal];
         self.leftButton.backgroundColor = [UIColor whiteColor];
+
     }
 }
 

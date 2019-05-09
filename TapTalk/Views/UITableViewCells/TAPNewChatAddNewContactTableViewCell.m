@@ -24,10 +24,10 @@
         self.bgView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         [self.contentView addSubview:self.bgView];
         
-        _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 20.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 18.0f)];
-        self.descriptionLabel.text = NSLocalizedString(@"Can’t find who you are looking for?", @"");
-        self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_NORMAL size:13.0f];
+        _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 24.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 18.0f)];
+        self.descriptionLabel.text = NSLocalizedString(@"Can’t find the contact you were looking for?", @"");
+        self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
         self.descriptionLabel.textAlignment = NSTextAlignmentCenter;
         NSMutableDictionary *descriptionAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat descriptionLetterSpacing = -0.2f;
@@ -38,10 +38,10 @@
         self.descriptionLabel.attributedText = descriptionAttributedString;
         [self.bgView addSubview:self.descriptionLabel];
         
-        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.descriptionLabel.frame), CGRectGetWidth(self.descriptionLabel.frame), 18.0f)];
+        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.descriptionLabel.frame) + 8.0f, CGRectGetWidth(self.descriptionLabel.frame), 22.0f)];
         self.titleLabel.text = NSLocalizedString(@"Add New Contact", @"");
-        self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREENBLUE_93];
-        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
+        self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         NSMutableDictionary *titleAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat titleLetterSpacing = -0.2f;

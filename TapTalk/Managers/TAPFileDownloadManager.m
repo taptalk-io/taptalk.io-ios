@@ -12,9 +12,10 @@
 @interface TAPFileDownloadManager ()
 
 @property (strong, nonatomic) NSMutableDictionary *thumbnailDictionary;
-//@property (strong, nonatomic) NSMutableDictionary *downloadQueueDictionary;
 @property (strong, nonatomic) NSMutableDictionary *downloadProgressDictionary;
 @property (strong, nonatomic) NSMutableDictionary *currentDownloadingDictionary;
+@property (strong, nonatomic) NSMutableDictionary *downloadedFilePathDictionary;
+@property (strong, nonatomic) NSMutableDictionary *failedDownloadDictionary;
 
 - (void)runDownloadImageWithRoomID:(NSString *)roomID
                            message:(TAPMessageModel *)message
@@ -51,9 +52,10 @@
     
     if (self) {
         _thumbnailDictionary = [[NSMutableDictionary alloc] init];
-//        _downloadQueueDictionary = [[NSMutableDictionary alloc] init];
         _downloadProgressDictionary = [[NSMutableDictionary alloc] init];
         _currentDownloadingDictionary = [[NSMutableDictionary alloc] init];
+        _downloadedFilePathDictionary = [[NSMutableDictionary alloc] init];
+        _failedDownloadDictionary = [[NSMutableDictionary alloc] init];
     }
     
     return self;
@@ -64,7 +66,7 @@
 }
 
 #pragma mark - Custom Method
-- (void)receiveImageFileWithMessage:(TAPMessageModel *)message
+- (void)receiveImageDataWithMessage:(TAPMessageModel *)message
                               start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
                             success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
@@ -148,6 +150,143 @@
     }];
 }
 
+- (void)receiveFileDataWithMessage:(TAPMessageModel *)message
+                             start:(void(^)(TAPMessageModel *receivedMessage))startProgress
+                          progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
+                           success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                           failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    NSDictionary *currentDataDictionary = message.data;
+    NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+    
+    //Call API Download File
+    startProgress(message);
+    
+    [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
+                                           roomID:message.room.roomID completionBlock:^(NSData *downloadedData) {
+                                               //CS Note
+                                               //Store downloaded data to local storage
+                                               
+                                               NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                                               NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+                                               
+                                               NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Files"];
+                                               
+                                               if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
+                                                   [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
+                                               }
+                                               
+                                               NSString *fileName = [message.data objectForKey:@"fileName"];
+                                               fileName = [TAPUtil nullToEmptyString:fileName];
+                                               
+                                               if ([fileName isEqualToString:@""]) {
+                                                   
+                                                   NSDate *currentDate = [NSDate date];
+                                                   NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+                                                   NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
+                                                   
+                                                   NSString *fileExtension = @"";
+                                                   if ([fileExtension isEqualToString:@""]) {
+                                                       fileExtension = [message.data objectForKey:@"mediaType"];
+                                                       fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+                                                       fileExtension = [fileExtension lastPathComponent];
+                                                   }
+
+                                                   fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
+                                               }
+                                               
+                                               destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
+                                               
+                                               NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
+                                                                                                     fileNameCounterStart:0];
+                                               
+                                               [downloadedData writeToFile:destinationFileString atomically:YES];
+
+                                               [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:currentFileID];
+                                                [self.failedDownloadDictionary removeObjectForKey:message.localID];
+                                               success(downloadedData, message);
+                                           } progressBlock:^(CGFloat progress, CGFloat total) {
+                                               progressBlock(progress, total, message);
+                                           } failureBlock:^(NSError *error) {
+                                               failure(error, message);
+                                               [self.failedDownloadDictionary setObject:message forKey:message.localID];
+                                           }];
+}
+
+- (void)receiveVideoDataWithMessage:(TAPMessageModel *)message
+                              start:(void(^)(TAPMessageModel *receivedMessage))startProgress
+                           progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
+                            success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                            failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    NSDictionary *currentDataDictionary = message.data;
+    NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+    
+    //Call API Download File
+    startProgress(message);
+    
+    [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:message.room.roomID completionBlock:^(NSData *downloadedData) {
+        //CS Note
+        //Store downloaded data to local storage
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+        
+        NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Videos"];
+        
+        if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
+        }
+        
+        NSString *fileName = [message.data objectForKey:@"fileName"];
+        fileName = [TAPUtil nullToEmptyString:fileName];
+        
+        if ([fileName isEqualToString:@""]) {
+            
+            NSDate *currentDate = [NSDate date];
+            NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+            NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
+            
+            NSString *fileExtension = @"";
+            if ([fileExtension isEqualToString:@""]) {
+                fileExtension = [message.data objectForKey:@"mediaType"];
+                fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+                fileExtension = [fileExtension lastPathComponent];
+            }
+            
+            fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
+        }
+        
+        destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
+        
+        NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
+                                                                 fileNameCounterStart:0];
+        
+        [downloadedData writeToFile:destinationFileString atomically:YES];
+        
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:currentFileID];
+        [self.failedDownloadDictionary removeObjectForKey:message.localID];
+        
+        //Get thumbnail image for video
+        [TAPImageView imageFromCacheWithKey:currentFileID success:^(UIImage *savedImage) {
+           if (savedImage == nil) {
+               NSURL *url = [NSURL fileURLWithPath:destinationFilePath];
+               AVAsset *asset = [AVAsset assetWithURL:url];
+               UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:destinationFilePath];
+               [TAPImageView saveImageToCache:thumbnailVideoImage withKey:currentFileID];
+           }
+
+           success(downloadedData, message);
+        }];
+
+//        success(downloadedData, message);
+        
+    } progressBlock:^(CGFloat progress, CGFloat total) {
+        progressBlock(progress, total, message);
+    } failureBlock:^(NSError *error) {
+        failure(error, message);
+        [self.failedDownloadDictionary setObject:message forKey:message.localID];
+    }];
+};
+
 - (void)runDownloadImageWithRoomID:(NSString *)roomID
                            message:(TAPMessageModel *)message
                           progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *currentDownloadMessage))progressBlock
@@ -178,8 +317,111 @@
     return progressDictionary;
 }
 
+- (void)saveDownloadedFilePathToDictionaryWithFilePath:(NSString *)filePath roomID:(NSString *)roomID fileID:(NSString *)fileID {
+    if (self.downloadedFilePathDictionary == nil) {
+        self.downloadedFilePathDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
+    NSMutableDictionary *downloadedFilePathPerRoomDictionary = [[self.downloadedFilePathDictionary objectForKey:roomID] mutableCopy];
+    
+    if (downloadedFilePathPerRoomDictionary == nil || [downloadedFilePathPerRoomDictionary count] == 0) {
+        downloadedFilePathPerRoomDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
+    [downloadedFilePathPerRoomDictionary setObject:filePath forKey:fileID];
+    [self.downloadedFilePathDictionary setObject:downloadedFilePathPerRoomDictionary forKey:roomID];
+}
+
+- (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID {
+    NSDictionary *downloadedFilePathPerRoomDictionary = [self.downloadedFilePathDictionary objectForKey:roomID];
+    
+    NSString *filePath = @"";
+    if ([downloadedFilePathPerRoomDictionary count] != 0) {
+        filePath = [downloadedFilePathPerRoomDictionary objectForKey:fileID];
+    }
+    
+    return filePath;
+}
+
+- (void)fetchDownloadedFilePathFromPreference {
+    NSDictionary *savedDictionary = [[NSUserDefaults standardUserDefaults] secureDictionaryForKey:TAP_PREFS_FILE_PATH_DICTIONARY valid:nil];
+    
+    if (self.downloadedFilePathDictionary == nil) {
+        _downloadedFilePathDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
+    _downloadedFilePathDictionary = [savedDictionary mutableCopy];
+}
+
+- (void)saveDownloadedFilePathToPreference {
+    NSDictionary *savedDictionary = [self.downloadedFilePathDictionary copy];
+    
+    [[NSUserDefaults standardUserDefaults] setSecureObject:savedDictionary forKey:TAP_PREFS_FILE_PATH_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)cancelDownloadWithMessage:(TAPMessageModel *)message {
+    NSString *fileID = [message.data objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    [[TAPNetworkManager sharedManager] cancelDownloadWithFileID:fileID];
+}
+
+- (BOOL)checkFailedDownloadWithLocalID:(NSString *)localID {
+    if ([self.failedDownloadDictionary objectForKey:localID]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)saveVideoToLocalDirectoryWithAsset:(AVAsset *)videoAsset message:(TAPMessageModel *)message {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+    
+    NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Videos"];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
+    }
+    
+    NSString *fileName = [message.data objectForKey:@"fileName"];
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    if ([fileName isEqualToString:@""]) {
+        NSDate *currentDate = [NSDate date];
+        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+        NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
+        
+        NSString *fileExtension = @"";
+        if ([fileExtension isEqualToString:@""]) {
+            fileExtension = [message.data objectForKey:@"mediaType"];
+            fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+            fileExtension = [fileExtension lastPathComponent];
+        }
+        
+        fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
+    }
+    
+    destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
+    
+    NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
+                                                             fileNameCounterStart:0];
+    
+    NSURL *fileURL = nil;
+    __block NSData *assetData = nil;
+    
+    // asset is you AVAsset object
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:videoAsset presetName:AVAssetExportPresetHighestQuality];
+    exportSession.outputURL = fileURL;
+    exportSession.outputFileType = AVFileTypeMPEG4;
+    [exportSession exportAsynchronouslyWithCompletionHandler:^{
+        assetData = [NSData dataWithContentsOfURL:fileURL];
+        [assetData writeToFile:destinationFileString atomically:YES];
+//        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID localID:message.localID];
+    }];
+}
+
 // DV NOTE - Uncomment this function to use API Thumbnail image
-//- (void)receiveImageFileWithMessage:(TAPMessageModel *)message
+//- (void)receiveImageDataWithMessage:(TAPMessageModel *)message
 //                           progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
 //              successThumbnailImage:(void (^)(UIImage *thumbnailImage, TAPMessageModel *receivedMessage))successThumbnail
 //                   successFullImage:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success

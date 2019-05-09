@@ -7,10 +7,14 @@ def tapTalk_pods
     pod 'AFNetworking', '~> 3.1.0'
     pod 'SocketRocket'
     pod 'JSONModel', '~> 1.1'
-    pod 'Realm'
+    pod 'Realm', '3.13.1'
     pod 'ZBarSDK', '~> 1.3'
     pod 'PodAsset'
     pod 'SDWebImage', '4.4.2'
+    pod 'GooglePlaces'
+    pod 'GooglePlacePicker'
+    pod 'GoogleMaps'
+    pod 'ZSWTappableLabel', '~> 2.0'
 end
 
 target "TapTalk" do

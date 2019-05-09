@@ -25,7 +25,7 @@
 #define IS_IPHONE_4_INCH ([[UIScreen mainScreen] bounds].size.height == 568)?YES:NO
 #define IS_IPHONE_4_7_INCH ([[UIScreen mainScreen] bounds].size.height == 667)?YES:NO
 #define IS_IPHONE_5_5_INCH ([[UIScreen mainScreen] bounds].size.height == 736)?YES:NO
-#define IS_IPHONE_X_FAMILY ([[UIScreen mainScreen] bounds].size.height == 812)?YES:NO
+#define IS_IPHONE_X_FAMILY ([TAPUtil safeAreaBottomPadding] > 0)?YES:NO
 
 #define IS_BELOW_IOS_7 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 7)?YES:NO
 #define IS_BELOW_IOS_8 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 8)?YES:NO
@@ -59,6 +59,9 @@
 #pragma mark - Date
 + (BOOL)date:(NSDate*)date isBetweenDate:(NSDate *)beginDate andDate:(NSDate *)endDate;
 + (NSInteger)daysDifferentBetweenDate:(NSDate *)date1 fromDate:(NSDate *)date2;
+
+#pragma mark - Time
++ (NSString *)stringFromTimeInterval:(NSTimeInterval)interval;
 
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value;
@@ -105,9 +108,12 @@
 
 #pragma mark - Validation
 + (BOOL)isAlphabetCharactersOnlyFromText:(NSString *)text;
++ (BOOL)isEmptyString:(NSString *)string;
 + (BOOL)validatePhoneNumber:(NSString *)candidate;
 + (BOOL)validateAllNumber:(NSString *)candidate;
 + (BOOL)validateEmail:(NSString *)candidate;
++ (BOOL)validateUsername:(NSString *)candidate;
++ (BOOL)validatePassword:(NSString *)candidate;
 
 #pragma mark - Taptic Feedback
 + (void)tapticImpactFeedbackGenerator;
@@ -120,10 +126,13 @@
 + (NSDictionary *)parameterFromURLString:(NSString *)urlString;
 + (CGFloat)currentDeviceStatusBarHeight;
 + (CGFloat)currentDeviceNavigationBarHeightWithStatusBar:(BOOL)statusBar iPhoneXLargeLayout:(BOOL)iPhoneXLargeLayout;
-+ (NSString *)mimeTypeForFileAtPath: (NSString *)path;
++ (NSString *)mimeTypeForFileAtPath:(NSString *)path;
++ (NSString *)mimeTypeForFileWithExtension:(NSString *)fileExtension;
++ (NSString *)mimeTypeForData:(NSData *)data;
 + (NSString *)getNewFileAndCheckExistingFilePath:(NSString *)path fileNameCounterStart:(NSInteger)counter;
 + (CGFloat)safeAreaBottomPadding;
 + (CGFloat)safeAreaTopPadding;
++ (void)delayCallback:(void(^)(void))callback forTotalSeconds:(double)delayInSeconds;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;

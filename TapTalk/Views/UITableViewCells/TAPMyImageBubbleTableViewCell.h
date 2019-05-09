@@ -25,6 +25,15 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell;
+- (void)myImageDidTappedUrl:(NSURL *)url
+                    originalString:(NSString*)originalString;
+- (void)myImageDidTappedPhoneNumber:(NSString *)phoneNumber
+                            originalString:(NSString*)originalString;
+- (void)myImageLongPressedUrl:(NSURL *)url
+                      originalString:(NSString*)originalString;
+- (void)myImageLongPressedPhoneNumber:(NSString *)phoneNumber
+                              originalString:(NSString *)originalString;
+- (void)myImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 
 @end
 
@@ -43,7 +52,8 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
+- (void)showStatusLabel:(BOOL)show;
 
 - (void)showProgressUploadView:(BOOL)show;
 - (void)animateFailedUploadingImage;

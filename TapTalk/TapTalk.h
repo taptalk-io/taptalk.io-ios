@@ -10,9 +10,8 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 
-#import "TAPRegisterViewController.h" //RN Temp
+#import "TAPLoginViewController.h"
 #import "TAPRoomListViewController.h"
-#import "TAPScanQRCodePopupViewController.h"
 #import "TAPCustomNotificationAlertViewController.h"
 #import "TAPChatViewController.h"
 #import "TAPChatManager.h"
@@ -21,6 +20,9 @@
 #import "TAPMessageModel.h"
 #import "TAPCustomKeyboardItemModel.h"
 #import "TAPProductModel.h"
+
+#import <AVKit/AVKit.h>
+#import <Photos/Photos.h>
 
 //! Project version number for TapTalk.
 FOUNDATION_EXPORT double TapTalkVersionNumber;
@@ -89,8 +91,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 
 //Property
 - (TAPRoomListViewController *)roomListViewController;
-- (TAPScanQRCodePopupViewController *)scanQRCodePopupViewController;
-- (TAPRegisterViewController *)registerViewController; //RN Temp
+- (TAPLoginViewController *)loginViewController;
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController;
 
 //AppDelegate Handling
@@ -149,9 +150,10 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)shouldRefreshAuthTicket;
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
+- (void)sendImageMessage:(UIImage *)image caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
+- (void)sendImageMessageWithAsset:(PHAsset *)asset caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)getTapTalkUserWithClientUserID:(NSString *)clientUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure;
 
-//TODO: Send Image Message
 
 //Custom Keyboard
 - (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender

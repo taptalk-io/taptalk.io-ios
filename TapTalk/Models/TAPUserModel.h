@@ -18,6 +18,9 @@
 @property (nonatomic, strong) NSString *email;
 @property (nonatomic, strong) NSString *phone;
 @property (nonatomic, strong) NSString *username;
+@property (nonatomic, strong) NSString *phoneWithCode;
+@property (nonatomic, strong) NSString *countryCallingCode;
+@property (nonatomic, strong) NSString *countryID;
 @property (nonatomic, strong) TAPImageURLModel *imageURL;
 @property (nonatomic, strong) TAPUserRoleModel *userRole;
 @property (strong, nonatomic) NSNumber *lastLogin;

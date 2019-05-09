@@ -51,10 +51,11 @@
     [self.connectionStatusView.layer insertSublayer:gradient atIndex:0];
     [self addSubview:self.connectionStatusView];
     
+    
     _connectionStatusLabelView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, CGRectGetHeight(self.connectionStatusView.frame))];
     
     _connectionStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, CGRectGetHeight(self.connectionStatusLabelView.frame))];
-    self.connectionStatusLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
+    self.connectionStatusLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
     self.connectionStatusLabel.textColor = [UIColor whiteColor];
     self.connectionStatusLabel.textAlignment = NSTextAlignmentCenter;
     [self.connectionStatusLabelView addSubview:self.connectionStatusLabel];

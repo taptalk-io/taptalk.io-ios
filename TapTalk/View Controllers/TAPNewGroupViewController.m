@@ -707,8 +707,8 @@
             keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
             
             UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(header.frame) - 16.0f - 16.0f, 34.0f)];
-            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
-            titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+            titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
             [header addSubview:titleLabel];
             
             if ([keysArray count] != 0) {
@@ -905,7 +905,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 if ([self.selectedIndexArray count] == kMaxGroupMember) {
                     //WK Temp
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"")];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                     //END WK Temp
                 }
                 else {
@@ -997,6 +997,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Custom Method
+- (void)popUpInfoTappedSingleButtonOrRightButton {
+    [super popUpInfoTappedSingleButtonOrRightButton];
+}
+
 - (void)validateSelectedIndexArray {
     if ([self.selectedIndexArray count] > 0) {
         [self.createGroupView showSelectedContacts:YES];
@@ -1014,10 +1018,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     TAPCreateGroupSubjectViewController *createGroupSubjectViewController = [[TAPCreateGroupSubjectViewController alloc] init];
     createGroupSubjectViewController.groupModel = self.groupModel;
     [self.navigationController pushViewController:createGroupSubjectViewController animated:YES];
-}
-
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
 }
 
 @end

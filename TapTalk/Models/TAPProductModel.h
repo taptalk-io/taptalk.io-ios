@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString *productCurrency;
 @property (strong, nonatomic) NSString *productPrice;
 @property (strong, nonatomic) NSString *productRating;
+@property (strong, nonatomic) NSString *productWeight;
 @property (strong, nonatomic) NSString *productDescription;
 @property (strong, nonatomic) NSString *productImageURL;
 @property (strong, nonatomic) NSString *buttonOption1Text;

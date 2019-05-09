@@ -92,6 +92,7 @@
         self.textView.keyboardAppearance = UIKeyboardAppearanceDefault;
         self.textView.returnKeyType = UIReturnKeyDefault;
         self.textView.inputView.autoresizingMask = YES;
+        [self.textView setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
                 
         [currentView addSubview:self.textView];
         

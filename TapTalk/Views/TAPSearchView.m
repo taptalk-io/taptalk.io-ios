@@ -30,13 +30,13 @@
         self.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         
         _recentSearchLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, 150.0f, 13.0f)];
-        self.recentSearchLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:13.0f];
+        self.recentSearchLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
         self.recentSearchLabel.text = @"Recent Searches";
-        self.recentSearchLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.recentSearchLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self addSubview:self.recentSearchLabel];
         
         _clearHistoryLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 150.0f, 8.0f, 150.0f, 13.0f)];
-        self.clearHistoryLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:13.0f];
+        self.clearHistoryLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
         self.clearHistoryLabel.text = @"Clear History";
         self.clearHistoryLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
         self.clearHistoryLabel.textAlignment = NSTextAlignmentRight;
@@ -67,18 +67,36 @@
         self.emptyStateView.alpha = 0.0f;
         [self addSubview:self.emptyStateView];
         
-        _emptyStateImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.emptyStateView.frame) - 170.0f) / 2.0f, 35.0f, 170.0f, 170.0f)];
-        self.emptyStateImageView.image = [UIImage imageNamed:@"TAPIconEmptySearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        [self.emptyStateView addSubview:self.emptyStateImageView];
+        //DV Note
+        //Temporary remove asset to change not from moselo style
+        //        _emptyStateImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.emptyStateView.frame) - 170.0f) / 2.0f, 35.0f, 170.0f, 170.0f)];
+        //        self.emptyStateImageView.image = [UIImage imageNamed:@"TAPIconEmptySearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        //        [self.emptyStateView addSubview:self.emptyStateImageView];
         
-        _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 36.0f)];
+        //        _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 40.0f)];
+        //        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+        //        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+        //        NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
+        //        //set attribute
+        //        NSMutableAttributedString *emptyAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.emptyStateLabel.text];
+        //        [emptyAttribuetdString addAttribute:NSFontAttributeName
+        //                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f]
+        //                                      range:range];
+        //        self.emptyStateLabel.attributedText = emptyAttribuetdString;
+        //        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        //        self.emptyStateLabel.numberOfLines = 2;
+        //        self.emptyStateLabel.textAlignment = NSTextAlignmentCenter;
+        //        [self.emptyStateView addSubview:self.emptyStateLabel];
+        //END DV Note
+        
+        _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 60.0f)];
         self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
-        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_NORMAL size:15.0f];
+        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
         NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //set attribute
         NSMutableAttributedString *emptyAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.emptyStateLabel.text];
         [emptyAttribuetdString addAttribute:NSFontAttributeName
-                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f]
+                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:24.0f]
                                       range:range];
         self.emptyStateLabel.attributedText = emptyAttribuetdString;
         self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];

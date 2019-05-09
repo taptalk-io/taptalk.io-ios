@@ -59,7 +59,7 @@
         
         _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
         self.numberOfUnreadMessageLabel.textColor = [UIColor whiteColor];
-        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), 70.0f - 1.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];

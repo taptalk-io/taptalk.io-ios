@@ -8,7 +8,6 @@
 
 #import "TAPScanQRCodeViewController.h"
 #import "TAPScanQRCodeView.h"
-//#import "TAPScanQRCodePopupView.h"
 #import "TAPScanQRCodePopupViewController.h"
 
 #import "ZBarCaptureReader.h"

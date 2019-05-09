@@ -12,9 +12,23 @@
 #import "TAPProfileCollectionViewCell.h"
 #import "TAPImageCollectionViewCell.h"
 
-@interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
+#import "TAPMediaDetailViewController.h"
+
+@interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate>
 
 @property (strong, nonatomic) TAPProfileView *profileView;
+@property (strong, nonatomic) TAPUserModel *updatedUser;
+@property (strong, nonatomic) NSMutableArray *mediaMessageDataArray;
+@property (strong, nonatomic) NSMutableDictionary *mediaMessageDataDictionary;
+@property (nonatomic) BOOL isFullNameChanged;
+@property (nonatomic) BOOL isUserProfileURLChanged;
+@property (nonatomic) BOOL isMediaLastPage;
+
+@property (weak, nonatomic) id openedBubbleCell;
+
+- (void)getUserProfileDataWithUserID:(NSString *)userID;
+- (void)fetchImageDataWithMessage:(TAPMessageModel *)message;
+- (void)fetchVideoDataWithMessage:(TAPMessageModel *)message;
 
 @end
 
@@ -49,11 +63,25 @@
     [self.profileView.navigationBackButton addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.profileView.backButton addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-//    [self.profileView.profileImageView setImageWithURLString:TAP_DUMMY_IMAGE_URL]; //WK Temp - Dummy image url
-    [self.profileView.profileImageView setImageWithURLString:self.room.imageURL.thumbnail]; //WK Temp - Dummy image url
+    [self.profileView.profileImageView setImageWithURLString:self.room.imageURL.fullsize];
     
     self.profileView.nameLabel.text = self.room.name;
     self.profileView.navigationNameLabel.text = self.room.name;
+    
+    [self getUserProfileDataWithUserID:self.userID];
+    
+    _mediaMessageDataArray = [[NSMutableArray alloc] init];
+    _mediaMessageDataDictionary = [[NSMutableDictionary alloc] init];
+    
+    [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:@"" numberOfItem:50 success:^(NSArray *mediaMessages) {
+        _mediaMessageDataArray = [mediaMessages mutableCopy];
+        for (TAPMessageModel *message in self.mediaMessageDataArray) {
+            [self.mediaMessageDataDictionary setObject:message forKey:message.localID];
+        }
+        [self.profileView.collectionView reloadData];
+    } failure:^(NSError *error) {
+        
+    }];
 }
 
 #pragma mark - Data Source
@@ -112,10 +140,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
     if (section == 0) {
-        return 4;
+        //DV Note
+        //Temporary Hidden For V1 because features is not complete (25 Mar 2019)
+//        return 4;
+        //END DV Note
+        
+        return 0;
     }
     else if (section == 1) {
-        return 9; //WK Temp
+        return [self.mediaMessageDataArray count]; //DV Temp
     }
     
     return 0;
@@ -123,43 +156,99 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
-        NSString *cellID = @"TAPProfileCollectionViewCell";
-        [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
-        TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
-        
-        if (indexPath.item == 0) {
-            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeNotification];
-            [cell showSeparatorView:YES];
-        }
-        else if (indexPath.item == 1) {
-            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeConversationColor];
-            [cell showSeparatorView:YES];
-        }
-        else if (indexPath.item == 2) {
-            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeBlock];
-            [cell showSeparatorView:YES];
-        }
-        else if (indexPath.item == 3) {
-            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeClearChat];
-            [cell showSeparatorView:NO];
-        }
-        
-        return cell;
+        //DV Note
+        //Temporary Hidden For V1 because features is not complete (25 Mar 2019)
+//        NSString *cellID = @"TAPProfileCollectionViewCell";
+//        [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
+//        TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+//
+//        if (indexPath.item == 0) {
+//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeNotification];
+//            [cell showSeparatorView:YES];
+//        }
+//        else if (indexPath.item == 1) {
+//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeConversationColor];
+//            [cell showSeparatorView:YES];
+//        }
+//        else if (indexPath.item == 2) {
+//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeBlock];
+//            [cell showSeparatorView:YES];
+//        }
+//        else if (indexPath.item == 3) {
+//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeClearChat];
+//            [cell showSeparatorView:NO];
+//        }
+//
+//        return cell;
+        //END DV Note
     }
     else if (indexPath.section == 1) {
         NSString *cellID = @"TAPImageCollectionViewCell";
         [collectionView registerClass:[TAPImageCollectionViewCell class] forCellWithReuseIdentifier:cellID];
 
         TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
-        if (cell == nil) {
-            NSLog(@"===>");
-        }
+        cell.delegate = self;
         
-        //DV Note
-        //Temporary Hidden For V1 (30 Jan 2019)
-        //Hide Shared Media
-//        [cell setImageCollectionViewCellWithURL:TAP_DUMMY_IMAGE_URL]; //WK Temp - Dummy image URL
-        //END DV Note
+        TAPMessageModel *message = [self.mediaMessageDataArray objectAtIndex:indexPath.row];
+        [cell setImageCollectionViewCellWithMessage:message];
+        
+        if (message.type == TAPChatMessageTypeImage) {
+            NSString *roomID = message.room.roomID;
+            NSDictionary *dataDictionary = message.data;
+            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+            fileID = [TAPUtil nullToEmptyString:fileID];
+            
+            [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                NSString *currentRoomID = resultMessage.room.roomID;
+                NSString *currentLocalID = resultMessage.localID;
+                NSDictionary *currentDataDictionary = resultMessage.data;
+                NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+                currentFileID = [TAPUtil nullToEmptyString:currentFileID];
+                
+                //Check image exist in cache
+                if (savedImage != nil) {
+                    //Image exist
+                    //set as downloaded
+                    //set image
+                    [cell setImageCollectionViewCellImageWithImage:savedImage];
+                    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+                    [cell setInfoLabelWithString:fileSize];
+                    [cell setAsDownloaded];
+
+                }
+                else {
+                    //Image not exist in cache
+                    //if not show download button
+                    [cell setAsNotDownloaded];
+                }
+            }];
+        }
+        else if (message.type == TAPChatMessageTypeVideo) {
+            
+            NSNumber *duration = [message.data objectForKey:@"duration"];
+            NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
+            NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+            
+            [cell setInfoLabelWithString:videoDurationString];
+            
+            //Check video exist in cache
+            NSDictionary *dataDictionary = message.data;
+            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+            NSString *localID = message.localID;
+            NSString *roomID = message.room.roomID;
+            
+            //Check video is done downloaded or not
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+            
+            if ([filePath isEqualToString:@""] || filePath == nil) {
+                //File not exist, download file
+                [cell setAsNotDownloaded];
+            }
+            else {
+                //File exist, show downloaded file
+                [cell setAsDownloaded];
+            }
+        }
         
         return cell;
     }
@@ -205,8 +294,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, CGRectGetHeight(headerView.frame))];
             titleLabel.text = @"SHARED MEDIA";
-            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
-            titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+            titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
             
             [headerView addSubview:titleLabel];
             
@@ -249,7 +338,104 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #pragma mark - Delegate
 #pragma mark CollectionView
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 1) {
+        TAPMessageModel *selectedMessage = [self.mediaMessageDataArray objectAtIndex:indexPath.row];
+        
+        NSArray *messageArray = [self.mediaMessageDataArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:selectedMessage];
+        
+        TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+
+        
+        if (selectedMessage.type == TAPChatMessageTypeImage) {
+            CGFloat bubbleImageViewMinY = 0.0f;
+            
+            TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+            [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+            mediaDetailViewController.delegate = self;
+            mediaDetailViewController.message = cell.currentMessage;
+            
+            UIImage *cellImage = cell.imageView.image;
+            NSArray *imageSliderImage = [NSArray array];
+            if(cellImage != nil) {
+                imageSliderImage = @[cellImage];
+                TAPMessageModel *currentMessage = cell.currentMessage;
+                NSString *cellImageURLString = [TAPUtil nullToEmptyString:[cell.currentMessage.data objectForKey:@"fileID"]];
+                
+                NSString *fileID = [cell.currentMessage.data objectForKey:@"fileID"];
+                fileID = [TAPUtil nullToEmptyString:fileID];
+                
+                [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
+                [mediaDetailViewController setImageArray:@[cellImage]];
+                
+                [mediaDetailViewController setActiveIndex:0];
+                
+                NSInteger selectedRow = [self.mediaMessageDataArray indexOfObject:cell.currentMessage];
+                NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:selectedRow inSection:1];
+                
+                UICollectionViewLayoutAttributes *attributes = [self.profileView.collectionView layoutAttributesForItemAtIndexPath:indexPath];
+
+                CGRect cellRectInCollectionView = attributes.frame;
+                
+                CGRect cellRectInView = [self.profileView.collectionView convertRect:cellRectInCollectionView toView:self.profileView];
+//                CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - (CGRectGetWidth([UIScreen mainScreen].bounds)-3.0f)/3, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], (CGRectGetWidth([UIScreen mainScreen].bounds)-3.0f)/3, (CGRectGetWidth([UIScreen mainScreen].bounds)-3.0f)/3);
+
+                [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:cellRectInView];
+                cell.imageView.alpha = 0.0f;
+                cell.thumbnailImageView.alpha = 0.0f;
+                _openedBubbleCell = cell;
+            }
+
+        }
+        if (selectedMessage.type == TAPChatMessageTypeVideo) {
+            NSDictionary *dataDictionary = selectedMessage.data;
+            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+            fileID = [TAPUtil nullToEmptyString:fileID];
+            
+            if (![fileID isEqualToString:@""]) {
+                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:fileID];
+                NSURL *url = [NSURL fileURLWithPath:filePath];
+                AVAsset *asset = [AVAsset assetWithURL:url];
+                
+                [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+                
+                //        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+                AVPlayerItem *item = [[AVPlayerItem alloc] initWithAsset:asset];
+                AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+                
+                AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+                controller.delegate = self;
+                controller.showsPlaybackControls = YES;
+                [self presentViewController:controller animated:YES completion:nil];
+                controller.player = player;
+                [player play];
+            }
+        }
+        
+    }
+   
     
+}
+
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 1 && indexPath.row == [self.mediaMessageDataArray count] - 10 && !self.isMediaLastPage) {
+        TAPMessageModel *lastMessage = (TAPMessageModel *)[self.mediaMessageDataArray lastObject];
+        [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:[lastMessage.created stringValue] numberOfItem:50 success:^(NSArray *mediaMessages) {
+            [self.mediaMessageDataArray addObjectsFromArray:mediaMessages];
+            
+            for (TAPMessageModel *message in mediaMessages) {
+                [self.mediaMessageDataDictionary setObject:message forKey:message.localID];
+            }
+            
+            [self.profileView.collectionView reloadData];
+            
+            if ([mediaMessages count] < 50) {
+                _isMediaLastPage = YES;
+            }
+        } failure:^(NSError *error) {
+            
+        }];
+    }
 }
 
 #pragma mark ScrollView
@@ -296,9 +482,328 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.profileView.collectionView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:scrollProgress];
 }
 
+#pragma mark - TAPImageCollectionViewCellDelegate
+- (void)imageCollectionViewCellDidTappedDownloadWithMessage:(TAPMessageModel *)message {
+    if (message.type == TAPChatMessageTypeImage) {
+        [self fetchImageDataWithMessage:message];
+    }
+    else if (message.type == TAPChatMessageTypeVideo) {
+        [self fetchVideoDataWithMessage:message];
+    }
+}
+
+- (void)imageCollectionViewCellDidTappedCancelWithMessage:(TAPMessageModel *)message {
+    [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:message];
+    TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:message.localID];
+    NSArray *messageArray = [self.mediaMessageDataArray copy];
+    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+    
+    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+    [cell animateFailedDownloadingMedia];
+}
+
+#pragma mark TAPMediaDetailViewController
+- (void)mediaDetailViewControllerWillStartClosingAnimation {
+    
+}
+
+- (void)mediaDetailViewControllerDidFinishClosingAnimation {
+    if ([self.openedBubbleCell isKindOfClass:[TAPImageCollectionViewCell class]]) {
+        TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)self.openedBubbleCell;
+        cell.imageView.alpha = 1.0f;
+        cell.thumbnailImageView.alpha = 1.0f;
+    }
+}
+
 #pragma mark - Custom Method
 - (void)backButtonDidTapped {
     [self.navigationController popViewControllerAnimated:YES];
+    
+    if (self.room.type == RoomTypePersonal && (self.isFullNameChanged || self.isUserProfileURLChanged)) {
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:self.room forKey:@"room"];
+        [objectDictionary setObject:self.updatedUser forKey:@"user"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_USER_PROFILE_CHANGES object:objectDictionary];
+    }
+}
+
+- (void)getUserProfileDataWithUserID:(NSString *)userID {
+    [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
+        
+        _updatedUser = user;
+        
+        NSString *existingUserFullName = self.room.name;
+        NSString *obtainedUserFullName = user.fullname;
+        
+        NSString *existingUserProfileURL = self.room.imageURL.fullsize;
+        NSString *obtainedUserProfileURL = user.imageURL.fullsize;
+        
+        _isFullNameChanged = NO;
+        _isUserProfileURLChanged = NO;
+        
+        if (![obtainedUserFullName isEqualToString:existingUserFullName]) {
+            //Change when name is different
+            _isFullNameChanged = YES;
+            self.profileView.nameLabel.text = obtainedUserFullName;
+            self.profileView.navigationNameLabel.text = obtainedUserFullName;
+        }
+        
+        if (![obtainedUserProfileURL isEqualToString:existingUserProfileURL]) {
+            _isUserProfileURLChanged = YES;
+            //Change when profile image is different
+            [self.profileView.profileImageView setImageWithURLString:obtainedUserProfileURL];
+        }
+        
+        if (self.room.type == RoomTypePersonal && (self.isFullNameChanged || self.isUserProfileURLChanged)) {
+            //Save changes to contact dictionary
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+        }
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)fetchImageDataWithMessage:(TAPMessageModel *)message {
+    [[TAPFileDownloadManager sharedManager] receiveImageDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                    [cell setInitialAnimateDownloadingMedia];
+            }
+        });
+    } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                [cell animateProgressDownloadingMediaWithProgress:progress total:total];
+            }
+        });
+    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                if (fullImage != nil) {
+                    [cell setImageCollectionViewCellImageWithImage:fullImage];
+                }
+                [cell animateFinishedDownloadingMedia];
+            }
+        });
+    } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeImage) {
+                
+                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                [cell animateFailedDownloadingMedia];
+            }
+        });
+    }];
+}
+
+- (void)fetchVideoDataWithMessage:(TAPMessageModel *)message {
+    [[TAPFileDownloadManager sharedManager] receiveVideoDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeVideo) {
+                
+                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                [cell setInitialAnimateDownloadingMedia];
+            }
+        });
+    } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"PROGRESS %f of %f", progress, total);
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeVideo) {
+                
+                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                [cell animateProgressDownloadingMediaWithProgress:progress total:total];
+                
+            }
+        });
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            if (type == TAPChatMessageTypeVideo) {
+                
+                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                [cell animateFinishedDownloadingMedia];
+                [cell setThumbnailImageForVideoWithMessage:message];
+                
+            }
+        });
+    } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+            NSString *currentActiveRoomID = currentRoom.roomID;
+            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+            
+            NSString *roomID = receivedMessage.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSString *localID = receivedMessage.localID;
+            localID = [TAPUtil nullToEmptyString:localID];
+            
+            if (![roomID isEqualToString:currentActiveRoomID]) {
+                return;
+            }
+            
+            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+            NSArray *messageArray = [self.mediaMessageDataArray copy];
+            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+            
+            TAPChatMessageType type = currentMessage.type;
+            
+            if (error.code == NSURLErrorCancelled) {
+                // canceled
+                if (type == TAPChatMessageTypeVideo) {
+                    
+                    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                    [cell animateFailedDownloadingMedia];
+                
+                }
+            } else {
+                // failed
+                if (type == TAPChatMessageTypeVideo) {
+                    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+                    [cell animateFailedDownloadingMedia];
+                }
+            }
+        });
+    }];
 }
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "TAPBaseCollectionViewCell.h"
+#import <Photos/Photos.h>
 
 @interface TAPImageSelectCollectionViewCell : TAPBaseCollectionViewCell
 
@@ -14,7 +15,7 @@
 @property (strong, nonatomic) UIImageView *checklistImageView;
 
 - (void)setCellWithImageString:(NSString *)imageURL;
-- (void)setCellWithImage:(UIImage *)image;
+- (void)setCellWithImage:(UIImage *)image andMediaAsset:(PHAsset *)asset;
 - (void)setCellAsSelected:(BOOL)isSelected;
 
 @end

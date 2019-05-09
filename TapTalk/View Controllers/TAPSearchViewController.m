@@ -15,6 +15,7 @@
 #import "TAPSearchResultMessageTableViewCell.h"
 
 @interface TAPSearchViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
+
 @property (strong, nonatomic) TAPSearchView *searchView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 @property (strong, nonatomic) UIButton *leftBarButton;
@@ -27,6 +28,7 @@
 @property (strong, nonatomic) NSMutableArray *searchResultChatAndContactArray;
 @property (strong, nonatomic) NSMutableArray *searchResultUnreadCountArray;
 @property (strong, nonatomic) NSString *updatedString;
+
 @end
 
 @implementation TAPSearchViewController
@@ -52,31 +54,11 @@
     
     self.navigationController.navigationBar.alpha = 0.0f;
     
-    //DV Note
-    //Temporary Hidden For V1 (30 Jan 2019)
-    //Hide Edit Button
-//    //LeftBarButton
-//    _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
-//    [self.leftBarButton setTitle:@"Edit" forState:UIControlStateNormal];
-//    [self.leftBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forState:UIControlStateNormal];
-//    self.leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
-//    self.leftBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
-//    [self.leftBarButton addTarget:self action:nil forControlEvents:UIControlEventTouchUpInside];
-//    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
-//    [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-//    self.navigationItem.leftBarButtonItem = nil;
-    //END DV Note
-    
-    //DV Note
-    //Temporary Hidden For V1 (1 Feb 2019)
-    //extend rightBarButton
-//    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-    //END DV Note
     [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    [self.rightBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forState:UIControlStateNormal];
+    [self.rightBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forState:UIControlStateNormal];
     self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
-    self.rightBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
+    self.rightBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
     [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
@@ -236,8 +218,8 @@
         headerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 13.0f)];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
-        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         NSString *titleString = @"";
         if (section == 0) {
             titleString = NSLocalizedString(@"CHATS AND CONTACTS", @"");
@@ -429,18 +411,16 @@
     
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-    //DV Note
-    //Temporary Hidden For V1 (1 Feb 2019)
-    //UNCOMMENT
-//    self.searchBarView.frame = CGRectMake(-57.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
-    //END DV Note
+    self.searchBarView.frame = CGRectMake(-57.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
+    
+    [TAPUtil delayCallback:^{
+        if ([self.delegate respondsToSelector:@selector(searchViewControllerDidTappedSearchCancelButton)]) {
+            [self.delegate searchViewControllerDidTappedSearchCancelButton];
+        }
+    } forTotalSeconds:0.1f];
     
     [UIView animateWithDuration:0.2f animations:^{
-        //DV Note
-        //Temporary Hidden For V1 (1 Feb 2019)
-        //UNCOMMENT
-//        self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 57.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
-        //END DV Note
+        self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 57.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
         
         self.view.alpha = 0.0f;
     } completion:^(BOOL finished) {

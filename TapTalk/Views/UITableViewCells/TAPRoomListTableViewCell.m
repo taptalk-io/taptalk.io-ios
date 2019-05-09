@@ -64,7 +64,7 @@
         
         _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - rightPadding, CGRectGetMinY(self.profileImageView.frame), 0.0f, 16.0f)];
         self.timeLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.timeLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:11.0f];
+        self.timeLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:11.0f];
         [self.bgView addSubview:self.timeLabel];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
@@ -74,7 +74,7 @@
         
         _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 8.0f, CGRectGetMinX(self.muteImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 20.0f)];
         self.roomNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.roomNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        self.roomNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
         [self.bgView addSubview:self.roomNameLabel];
         self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
         
@@ -89,18 +89,19 @@
         
         _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
         self.numberOfUnreadMessageLabel.textColor = [UIColor whiteColor];
-        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.numberOfUnreadMessageLabel.textAlignment = NSTextAlignmentCenter;
+        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
-        _lastMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame) - 50.0f - 4.0f, 44.0f)];
+        _lastMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame) - 50.0f - 4.0f, 42.0f)];
         self.lastMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.lastMessageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.lastMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
         self.lastMessageLabel.numberOfLines = 2;
         [self.bgView addSubview:self.lastMessageLabel];
         
         self.lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 17.0f)];
         self.lastSenderLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
-        self.lastSenderLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.lastSenderLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         [self.bgView addSubview:self.lastSenderLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
@@ -115,7 +116,7 @@
         
         _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
         self.typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.typingLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.typingLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.typingLabel.text = self.currentTypingString;
         self.typingLabel.numberOfLines = 1;
         [self.bgView addSubview:self.typingLabel];
@@ -358,14 +359,21 @@
             
             //Bubble Number
             CGSize newNumberOfUnreadMessageLabelSize = [self.numberOfUnreadMessageLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame))];
-            self.numberOfUnreadMessageLabel.frame = CGRectMake(CGRectGetMinX(self.numberOfUnreadMessageLabel.frame), CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
             
             //Bubble View
-            self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f), CGRectGetMinY(self.bubbleUnreadView.frame), CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f, CGRectGetHeight(self.bubbleUnreadView.frame));
+            CGFloat bubbleUnreadViewWidth = CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f;
+            if (bubbleUnreadViewWidth < CGRectGetHeight(self.bubbleUnreadView.frame)) {
+                bubbleUnreadViewWidth = CGRectGetHeight(self.bubbleUnreadView.frame);
+            }
+            
+            CGFloat numberOfUnreadMessageLabelXPosition = (bubbleUnreadViewWidth - newNumberOfUnreadMessageLabelSize.width) / 2.0f;
+            self.numberOfUnreadMessageLabel.frame = CGRectMake(numberOfUnreadMessageLabelXPosition, CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
+            
+            self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
             self.bubbleUnreadView.alpha = 1.0f;
             CAGradientLayer *gradient = [CAGradientLayer layer];
             gradient.frame = self.bubbleUnreadView.bounds;
-            gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"9954C2"].CGColor, (id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor, nil];
+            gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
             gradient.startPoint = CGPointMake(0.0f, 0.0f);
             gradient.endPoint = CGPointMake(0.0f, 1.0f);
             gradient.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;

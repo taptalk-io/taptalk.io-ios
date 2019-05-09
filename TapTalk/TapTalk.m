@@ -8,7 +8,10 @@
 
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
+
 @import AFNetworking;
+@import GooglePlaces;
+@import GoogleMaps;
 
 @interface TapTalk () <TAPNotificationManagerDelegate>
 
@@ -16,7 +19,6 @@
 - (void)resetPersistent;
 
 @property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
-@property (strong, nonatomic) TAPScanQRCodePopupViewController *scanQRCodePopupViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 - (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
@@ -47,11 +49,11 @@
         
         _roomListViewController = [[TAPRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
-        _scanQRCodePopupViewController = [[TAPScanQRCodePopupViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
         
         //Add notification manager delegate
         [TAPNotificationManager sharedManager].delegate = self;
+        
     }
     
     return self;
@@ -125,19 +127,14 @@
     return _roomListViewController;
 }
 
-- (TAPScanQRCodePopupViewController *)scanQRCodePopupViewController {
-    return _scanQRCodePopupViewController;
-}
-
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController {
     return _customNotificationAlertViewController;
 }
 
-//RN Temp
-- (TAPRegisterViewController *)registerViewController {
-    TAPRegisterViewController *registerViewController = [[TAPRegisterViewController alloc] initWithNibName:@"TAPRegisterViewController" bundle:[TAPUtil currentBundle]];
+- (TAPLoginViewController *)loginViewController {
+    TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
     
-    return registerViewController;
+    return loginViewController;
 }
 //END RN Temp
 
@@ -161,6 +158,9 @@
     
     //Validate and refresh access token
     [[TAPConnectionManager sharedManager] validateToken];
+    
+    //Populate User Country Code
+    [[TAPContactManager sharedManager] populateContactFromDatabase];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -171,6 +171,8 @@
     
     //Update application notification bubble
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToPreference];
+    
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -218,6 +220,9 @@
 
     //Start trigger timer to save new message
     [[TAPChatManager sharedManager] triggerSaveNewMessage];
+    
+    //Obtain downloaded file path from preference
+    [[TAPFileDownloadManager sharedManager] fetchDownloadedFilePathFromPreference];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -280,6 +285,13 @@
 #pragma mark - Exception Handling
 - (void)handleException:(NSException *)exception {
     [[TAPChatManager sharedManager] saveUnsentMessageAndDisconnect];
+    
+    //Save all retrieved contact to database
+    [[TAPContactManager sharedManager] saveContactToDatabase];
+    
+    //Save downloaded file path to preference
+    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToPreference];
+    
     _instanceState = TapTalkInstanceStateInactive;
     
     //Send stop typing emit
@@ -312,6 +324,10 @@
     //Other initialization
     [TAPNetworkManager sharedManager];
     [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    
+    //Google API Key
+    [GMSPlacesClient provideAPIKey:@"AIzaSyC6PNBIZsFfQZ5OQm4MFElW98hk8JIjaYk"];
+    [GMSServices provideAPIKey:@"AIzaSyC6PNBIZsFfQZ5OQm4MFElW98hk8JIjaYk"];
 }
 
 - (void)resetPersistent {
@@ -552,6 +568,30 @@ fromNavigationController:(UINavigationController *)navigationController
     success();
 }
 
+- (void)sendImageMessage:(UIImage *)image caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
+    
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    [[TAPChatManager sharedManager] sendImageMessage:image caption:captionString room:room];
+    success();
+}
+
+- (void)sendImageMessageWithAsset:(PHAsset *)asset caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
+    
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption room:room];
+    success();
+}
+
 - (void)shouldRefreshAuthTicket {
     [[TAPChatManager sharedManager] disconnect];
     
@@ -612,6 +652,9 @@ fromNavigationController:(UINavigationController *)navigationController
         NSString *ratingString = product.productRating;
         ratingString = [TAPUtil nullToEmptyString:ratingString];
         
+        NSString *weightString = product.productWeight;
+        weightString = [TAPUtil nullToEmptyString:weightString];
+        
         NSString *productDescriptionString = product.productDescription;
         productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
         
@@ -636,6 +679,7 @@ fromNavigationController:(UINavigationController *)navigationController
         [productDictionary setObject:currencyString forKey:@"currency"];
         [productDictionary setObject:priceString forKey:@"price"];
         [productDictionary setObject:ratingString forKey:@"rating"];
+        [productDictionary setObject:weightString forKey:@"weight"];
         [productDictionary setObject:productDescriptionString forKey:@"description"];
         [productDictionary setObject:productImageURLString forKey:@"imageURL"];
         [productDictionary setObject:leftOptionTextString forKey:@"buttonOption1Text"];
@@ -668,6 +712,9 @@ fromNavigationController:(UINavigationController *)navigationController
         NSString *ratingString = [productDictionary objectForKey:@"rating"];
         ratingString = [TAPUtil nullToEmptyString:ratingString];
         
+        NSString *weightString = [productDictionary objectForKey:@"weight"];
+        weightString = [TAPUtil nullToEmptyString:weightString];
+        
         NSString *productDescriptionString = [productDictionary objectForKey:@"description"];
         productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
         
@@ -692,6 +739,7 @@ fromNavigationController:(UINavigationController *)navigationController
         product.productCurrency = currencyString;
         product.productPrice = priceString;
         product.productRating = ratingString;
+        product.productWeight = weightString;
         product.productDescription = productDescriptionString;
         product.productImageURL = productImageURLString;
         product.buttonOption1Text = leftOptionTextString;
@@ -741,8 +789,11 @@ fromNavigationController:(UINavigationController *)navigationController
         [self.delegate tapTalkProfileButtonDidTapped:activeViewController otherUser:otherUser];
     }
     else {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
+        
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
         profileViewController.room = [TAPChatManager sharedManager].activeRoom;
+        profileViewController.userID = otherUserID;
         [activeViewController.navigationController pushViewController:profileViewController animated:YES];
     }
 }

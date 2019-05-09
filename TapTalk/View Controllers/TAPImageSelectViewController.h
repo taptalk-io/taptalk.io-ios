@@ -41,9 +41,8 @@ typedef NS_ENUM(NSInteger, ImageSelectViewControllerContinueType) {
 @property (nonatomic) ImageSelectViewControllerNavigateType imageSelectViewControllerNavigateType;
 @property (nonatomic) ImageSelectViewControllerType imageSelectViewControllerType;
 @property (nonatomic) ImageSelectViewControllerContinueType imageSelectViewControllerContinueType;
-@property (nonatomic) BOOL isFromAddService;
 @property (nonatomic) NSInteger currentTotalImageData;
-@property (strong, nonatomic) NSMutableArray *selectedImageDataArray;
+@property (strong, nonatomic) NSMutableArray *selectedMediaDataArray;
 @property (strong, nonatomic) PHAssetCollection *cameraRollCollection;
 @property (nonatomic) NSInteger albumIndexRow; //used in ImageSelectViewControllerTypeGalleryAlbum
 @property (nonatomic) NSInteger albumIndexSection; //used in ImageSelectViewControllerTypeGalleryAlbum

@@ -33,6 +33,7 @@ static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B
 + (void)removeImageFromCacheWithKey:(NSString *)key;
 
 - (void)setImageWithURLString:(NSString *)urlString;
+- (void)setAsTintedWithColor:(UIColor *)color;
 
 //TapTalk
 + (void)imageFromCacheWithKey:(NSString *)key message:(TAPMessageModel *)receivedMessage success:(void (^)(UIImage *savedImage, TAPMessageModel *resultMessage))success;

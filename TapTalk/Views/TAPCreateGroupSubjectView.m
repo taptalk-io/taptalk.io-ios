@@ -44,8 +44,8 @@
         
         _selectedContactsTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.bgScrollView.frame) - 16.0f - 16.0f, 13.0f)];
         self.selectedContactsTitleLabel.text = @"Group Members (10/50)";//WK Temp
-        self.selectedContactsTitleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
-        self.selectedContactsTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.selectedContactsTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        self.selectedContactsTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self.selectedContactsView addSubview:self.selectedContactsTitleLabel];
         
         UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -64,9 +64,9 @@
         NSString *groupPictureTitleString = NSLocalizedString(@"Group Picture", @"");
         NSString *groupPictureTitleUppercaseString = [groupPictureTitleString uppercaseString];
         self.groupPictureTitleLabel.text = groupPictureTitleUppercaseString;
-        self.groupPictureTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.groupPictureTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         self.groupPictureTitleLabel.textAlignment = NSTextAlignmentCenter;
-        self.groupPictureTitleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.groupPictureTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         [self.groupPictureNameView addSubview:self.groupPictureTitleLabel];
         
         _groupPictureView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.bgScrollView.frame) - 64.0f) / 2.0f, CGRectGetMaxY(self.groupPictureTitleLabel.frame) + 10.0f, 64.0f, 64.0f)];
@@ -92,27 +92,27 @@
         self.groupPictureDescriptionLabel.text = NSLocalizedString(@"Tap icon to change group profile image", @"");
         self.groupPictureDescriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         self.groupPictureDescriptionLabel.textAlignment = NSTextAlignmentCenter;
-        self.groupPictureDescriptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f];
+        self.groupPictureDescriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         [self.groupPictureNameView addSubview:self.groupPictureDescriptionLabel];
         
         _groupNameTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.groupPictureDescriptionLabel.frame) + 24.0f, CGRectGetWidth(self.groupPictureNameView.frame) - 16.0f - 16.0f, 13.0f)];
         NSString *groupNameTitleString = NSLocalizedString(@"Group Name", @"");
         NSString *groupNameTitleUppercaseString = [groupNameTitleString uppercaseString];
         self.groupNameTitleLabel.text = groupNameTitleUppercaseString;
-        self.groupNameTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.groupNameTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         self.groupNameTitleLabel.textAlignment = NSTextAlignmentCenter;
-        self.groupNameTitleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.groupNameTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         [self.groupPictureNameView addSubview:self.groupNameTitleLabel];
         
         _groupNameTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.groupNameTitleLabel.frame) + 10.0f, CGRectGetWidth(self.groupPictureNameView.frame) - 16.0f - 16.0f, 36.0f)];
         self.groupNameTextField.backgroundColor = [UIColor whiteColor];
-        self.groupNameTextField.tintColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.groupNameTextField.tintColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         NSString *placeHolderTitleString = NSLocalizedString(@"Type group name", @"");
         NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:placeHolderTitleString];
         NSMutableDictionary *placeHolderAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat placeHolderLetterSpacing = -0.2f;
         [placeHolderAttributesDictionary setObject:@(placeHolderLetterSpacing) forKey:NSKernAttributeName];
-        [placeHolderAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f] forKey:NSFontAttributeName];
+        [placeHolderAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f] forKey:NSFontAttributeName];
         [placeHolderAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_GREY_9B] forKey:NSForegroundColorAttributeName];
         [placeHolderAttributedString addAttributes:placeHolderAttributesDictionary
                                              range:NSMakeRange(0, [placeHolderTitleString length])];
@@ -122,7 +122,7 @@
         self.groupNameTextField.layer.borderColor = [TAPUtil getColor:@"E4E4E4"].CGColor;
         self.groupNameTextField.clipsToBounds = YES;
         self.groupNameTextField.textAlignment = NSTextAlignmentCenter;
-        self.groupNameTextField.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f];
+        self.groupNameTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         self.groupNameTextField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         [self.groupPictureNameView addSubview:self.groupNameTextField];
         
@@ -141,7 +141,7 @@
         [createAttributedString setAttributes:createAttributesDictionary
                                         range:NSMakeRange(0, [createString length])];
         [self.createButton setAttributedTitle:createAttributedString forState:UIControlStateNormal];
-        self.createButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:17.0f];
+        self.createButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
         self.createButton.layer.borderWidth = 1.0f;
         self.createButton.layer.borderColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
         self.createButton.layer.cornerRadius = 6.0f;

@@ -145,6 +145,11 @@
     }];
 }
 
+- (void)setAsTintedWithColor:(UIColor *)color {
+    self.image = [self.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.tintColor = color;
+}
+
 #pragma mark - TapTalk
 + (void)imageFromCacheWithKey:(NSString *)key message:(TAPMessageModel *)receivedMessage success:(void (^)(UIImage *savedImage, TAPMessageModel *resultMessage))success {
     //Run in background thread, async

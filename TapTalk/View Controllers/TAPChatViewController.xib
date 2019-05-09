@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
-        <array key="Lato-Bold.ttf">
-            <string>Lato-Bold</string>
+        <array key="PTRootUI-Bold.ttf">
+            <string>PTRootUI-Bold</string>
         </array>
-        <array key="Lato-Regular.ttf">
-            <string>Lato-Regular</string>
-        </array>
-        <array key="NeueEinstellung-Bold.otf">
-            <string>NeueEinstellung-Bold</string>
+        <array key="PTRootUI-Regular.ttf">
+            <string>PTRootUI-Regular</string>
         </array>
     </customFonts>
     <objects>
@@ -35,10 +32,15 @@
                 <outlet property="inputAccessoryExtensionHeightConstraint" destination="DfC-8U-UGY" id="6ay-1a-NhZ"/>
                 <outlet property="inputMessageAccessoryView" destination="CSi-i0-D86" id="ZCx-US-GVo"/>
                 <outlet property="keyboardOptionButton" destination="Szv-Nw-NOa" id="gi9-8y-7tg"/>
+                <outlet property="loadMoreMessageLoadingHeightConstraint" destination="5r8-9A-6c5" id="ok1-AR-hks"/>
+                <outlet property="loadMoreMessageLoadingLabel" destination="4jR-XS-ylY" id="pib-Sa-gDx"/>
+                <outlet property="loadMoreMessageLoadingView" destination="tGk-j5-N3W" id="YpL-Md-1BW"/>
+                <outlet property="loadMoreMessageLoadingViewImageView" destination="hJb-Mh-tLA" id="ePg-3k-bfW"/>
                 <outlet property="messageTextView" destination="bob-7z-ZfQ" id="leG-Ru-tqq"/>
                 <outlet property="messageTextViewHeightConstraint" destination="rqL-hN-oFI" id="pp8-L8-mlc"/>
                 <outlet property="messageViewHeightConstraint" destination="kgV-JJ-v3H" id="sxC-fv-cK2"/>
                 <outlet property="messageViewLeftConstraint" destination="FuL-NA-fsn" id="Rni-J3-Zg5"/>
+                <outlet property="quoteFileView" destination="Iea-Lj-Mbr" id="pkR-IK-s75"/>
                 <outlet property="quoteImageView" destination="Yxh-nm-eqd" id="bjL-2U-MAf"/>
                 <outlet property="quoteSubtitleLabel" destination="XYZ-Zy-cze" id="3tb-8M-ZWn"/>
                 <outlet property="quoteTitleLabel" destination="Mb2-og-FTg" id="ysP-ip-fwk"/>
@@ -102,12 +104,12 @@
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="op8-l4-6KQ"/>
                             </constraints>
-                            <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="10"/>
+                            <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="10"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
-                    <color key="backgroundColor" red="0.47058823529411764" green="0.25490196078431371" blue="0.59607843137254901" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstItem="SgL-Ca-N5g" firstAttribute="leading" secondItem="2El-oL-J7D" secondAttribute="leading" constant="7" id="TWh-rb-5ZP"/>
                         <constraint firstAttribute="trailing" secondItem="SgL-Ca-N5g" secondAttribute="trailing" constant="7" id="Tst-Ok-Gqh"/>
@@ -121,7 +123,7 @@
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KlL-O7-bwy">
                             <rect key="frame" x="16" y="51" width="343" height="0.0"/>
-                            <fontDescription key="fontDescription" name="NeueEinstellung-Bold" family="Neue Einstellung" pointSize="15"/>
+                            <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="15"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
@@ -157,7 +159,7 @@
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GmV-kq-wCX">
                             <rect key="frame" x="16" y="172" width="343" height="0.0"/>
-                            <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="15"/>
+                            <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="15"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
@@ -174,12 +176,54 @@
                         <constraint firstItem="eWX-ft-mhr" firstAttribute="top" secondItem="KlL-O7-bwy" secondAttribute="bottom" constant="35" id="oVI-bd-lPK"/>
                     </constraints>
                 </view>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tGk-j5-N3W">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UbU-Hc-qsk" userLabel="Inner Container View">
+                            <rect key="frame" x="181" y="0.0" width="13" height="0.0"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4jR-XS-ylY">
+                                    <rect key="frame" x="0.0" y="-10" width="0.0" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="C8L-NP-d4S"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="12"/>
+                                    <color key="textColor" red="0.47450980390000003" green="0.23921568630000001" blue="0.62745098040000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSettingUp" translatesAutoresizingMaskIntoConstraints="NO" id="hJb-Mh-tLA">
+                                    <rect key="frame" x="4" y="-4.5" width="9" height="9"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="9" id="Wtv-b8-ti1"/>
+                                        <constraint firstAttribute="width" constant="9" id="cCU-lt-NCe"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstItem="4jR-XS-ylY" firstAttribute="leading" secondItem="UbU-Hc-qsk" secondAttribute="leading" id="Hbl-rp-cYL"/>
+                                <constraint firstAttribute="trailing" secondItem="hJb-Mh-tLA" secondAttribute="trailing" id="Kbi-X9-9BE"/>
+                                <constraint firstItem="4jR-XS-ylY" firstAttribute="centerY" secondItem="UbU-Hc-qsk" secondAttribute="centerY" id="Ttb-PK-3tX"/>
+                                <constraint firstItem="hJb-Mh-tLA" firstAttribute="centerY" secondItem="UbU-Hc-qsk" secondAttribute="centerY" id="URo-jU-Lbo"/>
+                                <constraint firstItem="hJb-Mh-tLA" firstAttribute="leading" secondItem="4jR-XS-ylY" secondAttribute="trailing" constant="4" id="mN3-Fi-O7g"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" red="0.90196078430000004" green="0.87843137250000003" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" id="5r8-9A-6c5"/>
+                        <constraint firstItem="UbU-Hc-qsk" firstAttribute="top" secondItem="tGk-j5-N3W" secondAttribute="top" id="Ns3-lG-2o6"/>
+                        <constraint firstAttribute="bottom" secondItem="UbU-Hc-qsk" secondAttribute="bottom" id="nDS-6M-fBc"/>
+                        <constraint firstItem="UbU-Hc-qsk" firstAttribute="centerX" secondItem="tGk-j5-N3W" secondAttribute="centerX" id="zKg-Rz-Su3"/>
+                    </constraints>
+                    <viewLayoutGuide key="safeArea" id="xZ7-I3-Hxt"/>
+                </view>
                 <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vsl-X9-aw7">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ky7-8J-Xfj">
                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                            <fontDescription key="fontDescription" name="NeueEinstellung-Bold" family="Neue Einstellung" pointSize="15"/>
+                            <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="15"/>
                             <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
@@ -198,13 +242,16 @@
             <constraints>
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="bottom" secondItem="7nB-bs-k4t" secondAttribute="bottom" constant="52" id="21J-Kg-7YA"/>
                 <constraint firstAttribute="trailing" secondItem="7nB-bs-k4t" secondAttribute="trailing" id="3h2-Xj-niR"/>
+                <constraint firstItem="tGk-j5-N3W" firstAttribute="trailing" secondItem="Dr2-Y3-9Wq" secondAttribute="trailing" id="4lC-Gk-ryI"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="centerX" secondItem="2El-oL-J7D" secondAttribute="centerX" id="L8O-6z-aWM"/>
                 <constraint firstItem="Vsl-X9-aw7" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="UFF-QB-ecd"/>
                 <constraint firstItem="QeJ-a5-K4g" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="UrM-67-ZAr"/>
                 <constraint firstItem="gfy-gG-oGe" firstAttribute="leading" secondItem="7nB-bs-k4t" secondAttribute="leading" id="atd-4L-ePd"/>
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="Vsl-X9-aw7" secondAttribute="trailing" id="bot-h3-FVg"/>
+                <constraint firstItem="tGk-j5-N3W" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="d9D-q1-TM4"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="top" secondItem="2El-oL-J7D" secondAttribute="bottom" constant="-10" id="dgL-2O-eka"/>
                 <constraint firstItem="7nB-bs-k4t" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="hgv-h0-S0m"/>
+                <constraint firstItem="tGk-j5-N3W" firstAttribute="top" secondItem="Dr2-Y3-9Wq" secondAttribute="top" id="iDb-1J-y46"/>
                 <constraint firstItem="QeJ-a5-K4g" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="l04-Cq-Q9I"/>
                 <constraint firstItem="gfy-gG-oGe" firstAttribute="trailing" secondItem="7nB-bs-k4t" secondAttribute="trailing" id="mhc-4n-ghY"/>
                 <constraint firstAttribute="trailing" secondItem="ZsM-Zn-PUI" secondAttribute="trailing" constant="11" id="obI-Tj-Z36"/>
@@ -216,7 +263,7 @@
             </constraints>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
             <viewLayoutGuide key="safeArea" id="Dr2-Y3-9Wq"/>
-            <point key="canvasLocation" x="9" y="-105"/>
+            <point key="canvasLocation" x="8.8000000000000007" y="-105.69715142428787"/>
         </view>
         <tapGestureRecognizer id="oU4-ow-zRI">
             <connections>
@@ -260,12 +307,29 @@
                                                 <constraint firstAttribute="width" constant="52" id="Crk-5P-um7"/>
                                             </constraints>
                                         </imageView>
+                                        <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Iea-Lj-Mbr">
+                                            <rect key="frame" x="0.0" y="0.0" width="52" height="52"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDocumentsWhite" translatesAutoresizingMaskIntoConstraints="NO" id="dgt-Jb-5dv">
+                                                    <rect key="frame" x="14" y="14" width="24" height="24"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="24" id="Xx9-tB-hC6"/>
+                                                        <constraint firstAttribute="width" constant="24" id="xw0-a3-dA6"/>
+                                                    </constraints>
+                                                </imageView>
+                                            </subviews>
+                                            <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="dgt-Jb-5dv" firstAttribute="centerX" secondItem="Iea-Lj-Mbr" secondAttribute="centerX" id="Epl-NV-KNh"/>
+                                                <constraint firstItem="dgt-Jb-5dv" firstAttribute="centerY" secondItem="Iea-Lj-Mbr" secondAttribute="centerY" id="Xgp-0P-Ofc"/>
+                                            </constraints>
+                                        </view>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mb2-og-FTg">
                                             <rect key="frame" x="60" y="10" width="257" height="14"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="2ff-ng-dtq"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="11"/>
+                                            <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="11"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -274,21 +338,25 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="14" id="EUK-cr-Sfm"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="11"/>
+                                            <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
+                                        <constraint firstItem="Iea-Lj-Mbr" firstAttribute="bottom" secondItem="Yxh-nm-eqd" secondAttribute="bottom" id="0e6-PB-MQy"/>
                                         <constraint firstItem="Mb2-og-FTg" firstAttribute="top" secondItem="wN7-cE-sAX" secondAttribute="top" constant="10" id="2Nv-Pe-cKG"/>
                                         <constraint firstAttribute="trailing" secondItem="Mb2-og-FTg" secondAttribute="trailing" id="AAd-SA-nGl"/>
                                         <constraint firstItem="Yxh-nm-eqd" firstAttribute="top" secondItem="wN7-cE-sAX" secondAttribute="top" id="E9W-0L-gdM"/>
                                         <constraint firstItem="Mb2-og-FTg" firstAttribute="leading" secondItem="Yxh-nm-eqd" secondAttribute="trailing" constant="8" id="J0W-56-Ym6"/>
                                         <constraint firstItem="XYZ-Zy-cze" firstAttribute="leading" secondItem="Yxh-nm-eqd" secondAttribute="trailing" constant="8" id="KrX-3w-vnn"/>
                                         <constraint firstItem="XYZ-Zy-cze" firstAttribute="top" secondItem="Mb2-og-FTg" secondAttribute="bottom" constant="3" id="R8H-W3-0tI"/>
+                                        <constraint firstItem="Iea-Lj-Mbr" firstAttribute="trailing" secondItem="Yxh-nm-eqd" secondAttribute="trailing" id="UE2-NG-cVw"/>
+                                        <constraint firstItem="Iea-Lj-Mbr" firstAttribute="leading" secondItem="Yxh-nm-eqd" secondAttribute="leading" id="UE2-rl-Zor"/>
                                         <constraint firstAttribute="trailing" secondItem="XYZ-Zy-cze" secondAttribute="trailing" id="adD-0J-B13"/>
                                         <constraint firstItem="Yxh-nm-eqd" firstAttribute="leading" secondItem="wN7-cE-sAX" secondAttribute="leading" id="hxb-zK-wpI"/>
+                                        <constraint firstItem="Iea-Lj-Mbr" firstAttribute="top" secondItem="Yxh-nm-eqd" secondAttribute="top" id="quh-jM-Fki"/>
                                         <constraint firstAttribute="bottom" secondItem="Yxh-nm-eqd" secondAttribute="bottom" id="xBH-Gd-Qdu"/>
                                     </constraints>
                                 </view>
@@ -300,7 +368,7 @@
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vqc-8C-6tx" userLabel="Purple View">
                                                     <rect key="frame" x="0.0" y="0.0" width="4" height="36"/>
-                                                    <color key="backgroundColor" red="0.78823529411764703" green="0.42352941176470588" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" red="0.28235294117647058" green="0.74509803921568629" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="4" id="iyh-4j-71u"/>
                                                     </constraints>
@@ -310,7 +378,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="14" id="8RF-L2-DT2"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="11"/>
+                                                    <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="11"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -319,7 +387,7 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="Uq8-CI-uqD"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="11"/>
+                                                    <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -485,9 +553,11 @@
     </objects>
     <resources>
         <image name="TAPIconAttach" width="32" height="32"/>
-        <image name="TAPIconChatAnchor" width="56" height="56"/>
+        <image name="TAPIconChatAnchor" width="52" height="58"/>
         <image name="TAPIconClose" width="16" height="16"/>
+        <image name="TAPIconDocumentsWhite" width="24" height="24"/>
         <image name="TAPIconHamburger" width="28" height="28"/>
         <image name="TAPIconSendMessage" width="28" height="28"/>
+        <image name="TAPIconSettingUp" width="20" height="20"/>
     </resources>
 </document>

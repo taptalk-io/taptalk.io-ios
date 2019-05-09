@@ -7,29 +7,25 @@
 //
 
 #import "TAPMyChatBubbleTableViewCell.h"
-#import "TAPGradientView.h"
+#import "ZSWTappableLabel.h"
 
-//typedef NS_ENUM(NSInteger, TAPMyChatBubbleStatus) {
-//    TAPMyChatBubbleStatusSending,
-//    TAPMyChatBubbleStatusSent,
-//    TAPMyChatBubbleStatusDelivered,
-//    TAPMyChatBubbleStatusRead
-//};
-
-@interface TAPMyChatBubbleTableViewCell()
+@interface TAPMyChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
-@property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
+@property (strong, nonatomic) IBOutlet ZSWTappableLabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *retryIconImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
@@ -57,9 +53,14 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *quoteViewBottomConstraint;
 
-@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelTopConstraint;
 
-@property (strong, nonatomic) TAPGradientView *gradientView;
+@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
+@property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
@@ -69,8 +70,13 @@
 - (IBAction)retryButtonDidTapped:(id)sender;
 - (IBAction)quoteButtonDidTapped:(id)sender;
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer;
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
+- (void)showForwardView:(BOOL)show;
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData;
+- (void)setQuote:(TAPQuoteModel *)quote;
 
 @end
 
@@ -84,15 +90,6 @@
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
-    
-    self.gradientView = [[TAPGradientView alloc] initWithFrame:self.bubbleView.bounds];
-    
-    self.gradientView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.gradientView.layer.colors = @[ (__bridge id)[TAPUtil getColor:@"9954C2"].CGColor, (__bridge id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor];
-    
-    [self.bubbleView insertSubview:self.gradientView atIndex:0];
-    
-    self.gradientView.clipsToBounds = YES;
     self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 8.0f;
@@ -109,7 +106,17 @@
                                                                               action:@selector(handleBubbleViewTap:)];
     [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
     
+    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewLongPress:)];
+    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
+    
     [self showQuoteView:NO];
+    [self showForwardView:NO];
+    
+    self.bubbleLabel.tapDelegate = self;
+    self.bubbleLabel.longPressDelegate = self;
+    self.bubbleLabel.longPressDuration = 0.05f;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -129,6 +136,99 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
+}
+
+#pragma mark - ZSWTappedLabelDelegate
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+        tappedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeAddress:
+                NSLog(@"Address components: %@", result.addressComponents);
+                break;
+                
+            case NSTextCheckingTypePhoneNumber:
+                NSLog(@"Phone number: %@", result.phoneNumber);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleDidTappedPhoneNumber:originalString:)]) {
+                    [self.delegate myChatBubbleDidTappedPhoneNumber:result.phoneNumber originalString:selectedWord];
+                }
+                break;
+                
+            case NSTextCheckingTypeDate:
+                NSLog(@"Date: %@", result.date);
+                break;
+                
+            case NSTextCheckingTypeLink:
+                NSLog(@"Link: %@", result.URL);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleDidTappedUrl:originalString:)]) {
+                    [self.delegate myChatBubbleDidTappedUrl:result.URL originalString:selectedWord];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
+
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeAddress:
+                NSLog(@"Address components: %@", result.addressComponents);
+                break;
+                
+            case NSTextCheckingTypePhoneNumber:
+                NSLog(@"Phone number: %@", result.phoneNumber);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedPhoneNumber:originalString:)]) {
+                    [self.delegate myChatBubbleLongPressedPhoneNumber:result.phoneNumber originalString:selectedWord];
+                }
+                break;
+                
+            case NSTextCheckingTypeDate:
+                NSLog(@"Date: %@", result.date);
+                break;
+                
+            case NSTextCheckingTypeLink:
+                NSLog(@"Link: %@", result.URL);
+                if([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedUrl:originalString:)]) {
+                    [self.delegate myChatBubbleLongPressedUrl:result.URL originalString:selectedWord];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 #pragma mark - Custom Method
@@ -160,7 +260,43 @@
         [self showQuoteView:NO];
     }
     
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+    }
+    else {
+        [self showForwardView:NO];
+    }
+    
     self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
+    
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
+
+    NSString *messageText = [TAPUtil nullToEmptyString:self.bubbleLabel.text];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
+    // the next line throws an exception if string is nil - make sure you check
+    [linkDetector enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[@"NSTextCheckingResult"] = result;
+
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    [detectorPhoneNumber enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[@"NSTextCheckingResult"] = result;
+        
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    self.bubbleLabel.attributedText = attributedString;
 }
 
 - (void)receiveSentEvent {
@@ -175,8 +311,8 @@
     [super receiveReadEvent];
 }
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon {
-    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon];
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
+    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon message:message];
     
     self.chatBubbleButton.userInteractionEnabled = NO;
     
@@ -297,15 +433,65 @@
     }
 }
 
+- (void)showForwardView:(BOOL)show {
+    if (show) {
+        self.forwardFromLabelHeightConstraint.constant = 16.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 16.0f;
+        self.forwardFromLabelLeadingConstraint.active = YES;
+        self.forwardTitleLabelLeadingConstraint.active = YES;
+    }
+    else {
+        self.forwardFromLabelHeightConstraint.constant = 0.0f;
+        self.forwardTitleLabelHeightConstraint.constant = 0.0f;
+        self.forwardFromLabelLeadingConstraint.active = NO;
+        self.forwardTitleLabelLeadingConstraint.active = NO;
+    }
+}
+
+- (void)setForwardData:(TAPForwardFromModel *)forwardData {
+    
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    self.forwardFromLabel.text = appendedFullnameString;
+    
+    NSMutableAttributedString *attributedText =
+    [[NSMutableAttributedString alloc]
+     initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
+    
+    [attributedText addAttribute:NSFontAttributeName
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
+                           range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
+    
+    self.forwardFromLabel.attributedText = attributedText;
+}
+
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileImageView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileImageView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
+}
+
+- (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedWithMessage:)]) {
+            [self.delegate myChatBubbleLongPressedWithMessage:self.message];
+        }
+    }
 }
 
 @end

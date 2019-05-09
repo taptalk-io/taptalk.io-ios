@@ -35,13 +35,20 @@
         [self.chooseItemView addSubview:separatorView];
         
         _chooseItemLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 14.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 18.0f)];
-        self.chooseItemLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:11.0f];
+        self.chooseItemLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:11.0f];
         self.chooseItemLabel.textColor = [TAPUtil getColor:@"8E8E93"];
         self.chooseItemLabel.text = NSLocalizedString(@"Please choose 5 items to upload", @"");
         [self.chooseItemView addSubview:self.chooseItemLabel];
         
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.chooseItemView.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
-        self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil safeAreaBottomPadding], 0.0f);
+        
+        if (IS_IPHONE_X_FAMILY) {
+            self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil safeAreaBottomPadding] + 30.0f, 0.0f);
+        }
+        else {
+            self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil safeAreaBottomPadding], 0.0f);
+        }
+        
         self.tableView.separatorInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
         self.tableView.separatorColor = [UIColor clearColor];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -79,6 +86,6 @@
 //        self.chooseItemLabel.text = NSLocalizedString(@"Please choose 5 items to upload", @"");
 //    }
     
-    self.chooseItemLabel.text = NSLocalizedString(@"Please choose photo(s) to upload", @"");
+    self.chooseItemLabel.text = NSLocalizedString(@"Please choose media to upload", @"");
 }
 @end

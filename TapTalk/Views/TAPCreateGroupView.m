@@ -39,8 +39,8 @@
         NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
         float searchBarCancelLetterSpacing = -0.4f;
         [searchBarCancelAttributesDictionary setObject:@(searchBarCancelLetterSpacing) forKey:NSKernAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f] forKey:NSFontAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forKey:NSForegroundColorAttributeName];
+        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f] forKey:NSFontAttributeName];
+        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forKey:NSForegroundColorAttributeName];
         [searchBarCancelAttributedString addAttributes:searchBarCancelAttributesDictionary
                                                  range:NSMakeRange(0, [searchBarCancelString length])];
         [self.searchBarCancelButton setAttributedTitle:searchBarCancelAttributedString forState:UIControlStateNormal];
@@ -51,13 +51,13 @@
         _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame)) style:UITableViewStylePlain];
         self.contactsTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         self.contactsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [self.contactsTableView setSectionIndexColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]];
+        [self.contactsTableView setSectionIndexColor:[TAPUtil getColor:TAP_TABLE_VIEW_SECTION_INDEX_COLOR]];
         [self.bgView addSubview:self.contactsTableView];
         
         _searchResultTableView = [[UITableView alloc] initWithFrame:self.contactsTableView.frame];
         self.searchResultTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [self.searchResultTableView setSectionIndexColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]];
+        [self.searchResultTableView setSectionIndexColor:[TAPUtil getColor:TAP_TABLE_VIEW_SECTION_INDEX_COLOR]];
         self.searchResultTableView.alpha = 0.0f;
         [self.bgView addSubview:self.searchResultTableView];
         
@@ -67,8 +67,8 @@
         [self.bgView addSubview:self.selectedContactsView];
         
         _selectedContactsTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 13.0f)];
-        self.selectedContactsTitleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
-        self.selectedContactsTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.selectedContactsTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        self.selectedContactsTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self.selectedContactsView addSubview:self.selectedContactsTitleLabel];
         
         UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -89,14 +89,14 @@
         [continueAttributedString setAttributes:continueAttributesDictionary
                                           range:NSMakeRange(0, [continueString length])];
         [self.continueButton setAttributedTitle:continueAttributedString forState:UIControlStateNormal];
-        self.continueButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:17.0f];
+        self.continueButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
         self.continueButton.layer.borderWidth = 1.0f;
-        self.continueButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREENBLUE_93].CGColor;
+        self.continueButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
         self.continueButton.layer.cornerRadius = 6.0f;
         self.continueButton.clipsToBounds = YES;
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.continueButton.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_AQUAMARINE_C1].CGColor, (id)[TAPUtil getColor:TAP_COLOR_MOSELO_GREEN].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         gradient.cornerRadius = 6.0f;

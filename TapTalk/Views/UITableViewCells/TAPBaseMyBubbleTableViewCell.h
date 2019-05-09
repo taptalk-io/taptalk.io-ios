@@ -32,7 +32,7 @@ typedef NS_ENUM(NSInteger, TAPBaseMyBubbleStatus) {
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon;
+- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer;
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)retryButtonDidTapped:(id)sender;

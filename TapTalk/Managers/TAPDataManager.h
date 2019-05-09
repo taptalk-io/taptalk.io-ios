@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "TAPUserModel.h"
 #import "TAPRecentSearchModel.h"
+#import "TAPCountryModel.h"
+
 @import AFNetworking;
 
 @interface TAPDataManager : NSObject
@@ -26,7 +28,9 @@
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
 + (NSNumber *)getMessageLastUpdatedWithRoomID:(NSString *)roomID;
 
+//Convert from dictionary to model
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
++ (TAPCountryModel *)countryModelFromDictionary:(NSDictionary *)dictionary;
 
 + (NSString *)escapedDatabaseStringFromString:(NSString *)string;
 + (NSString *)normalizedDatabaseStringFromString:(NSString *)string;
@@ -56,6 +60,11 @@
                                      activeUserID:(NSString *)activeUserID
                                           success:(void (^)(NSArray *unreadMessages))success
                                           failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseMediaMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *mediaMessages))success
+                                         failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
                                            success:(void (^)(NSInteger unreadRoomCount))success
                                            failure:(void (^)(NSError *error))failure;
@@ -163,20 +172,57 @@
                                        failure:(void (^)(NSError *error, NSArray *messageArray))failure;
 + (NSURLSessionUploadTask *)callAPIUploadFileWithFileData:(NSData *)fileData
                                                    roomID:(NSString *)roomID
+                                                 fileName:(NSString *)fileName
                                                  fileType:(NSString *)fileType
                                                  mimeType:(NSString *)mimeType
                                                   caption:(NSString *)caption
                                           completionBlock:(void (^)(NSDictionary *responseObject))successBlock
                                             progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
                                              failureBlock:(void(^)(NSError *error))failureBlock;
++ (NSURLSessionUploadTask *)callAPIUploadUserImageWithImageData:(NSData *)imageData
+                                                completionBlock:(void (^)(TAPUserModel *user))successBlock
+                                                  progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                                                   failureBlock:(void(^)(NSError *error))failureBlock;
 + (void)callAPIDownloadFileWithFileID:(NSString *)fileID
                                roomID:(NSString *)roomID
                           isThumbnail:(BOOL)isThumbnail
                       completionBlock:(void (^)(UIImage *downloadedImage))successBlock
                         progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
                          failureBlock:(void(^)(NSError *error))failureBlock;
++ (void)callAPIDownloadFileWithFileID:(NSString *)fileID
+                               roomID:(NSString *)roomID
+                      completionBlock:(void (^)(NSData *downloadedData))successBlock
+                        progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                         failureBlock:(void(^)(NSError *error))failureBlock;
 + (void)callAPIGetBulkUserByUserID:(NSArray *)userIDArray
                        success:(void (^)(NSArray *userModelArray))success
                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetCountryListWithCurrentCountryCode:(NSString *)countryCode
+                                            success:(void (^)(NSArray *countryModelArray, NSArray *countryDictionaryArray, NSDictionary *countryListDictionary, TAPCountryModel *defaultLocaleCountry))success
+                                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIRequestVerificationCodeWithPhoneNumber:(NSString *)phoneNumber
+                                            countryID:(NSString *)countryID
+                                               method:(NSString *)method
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, NSString *successMessage))success
+                                              failure:(void (^)(NSError *error))failure;
++ (void)callAPIVerifyOTPWithCode:(NSString *)OTPcode
+                           OTPID:(NSString *)OTPID
+                          OTPKey:(NSString *)OTPKey
+                         success:(void (^)(BOOL isRegistered, NSString *userID, NSString *ticket))success
+                         failure:(void (^)(NSError *error))failure;
++ (void)callAPICheckUsername:(NSString *)username
+                     success:(void (^)(BOOL isExists, NSString *checkedUsername))success
+                     failure:(void (^)(NSError *error))failure;
++ (void)callAPIRegisterWithFullName:(NSString *)fullName
+                          countryID:(NSString *)countryID
+                              phone:(NSString *)phone
+                           username:(NSString *)username
+                              email:(NSString *)email
+                           password:(NSString *)password
+                            success:(void (^)(NSString *userID, NSString *ticket))success
+                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIAddContactWithPhones:(NSArray *)phoneNumbers
+                            success:(void (^)(NSArray *users))success
+                            failure:(void (^)(NSError *error))failure;
 
 @end

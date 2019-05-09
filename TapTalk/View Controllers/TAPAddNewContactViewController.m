@@ -62,6 +62,12 @@
     [self.navigationController.view bringSubviewToFront:self.addContactPopupView];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityStatusChange:) name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self showNavigationSeparator:NO];
 }
 
 - (void)dealloc {
@@ -71,12 +77,25 @@
 #pragma mark - Delegate
 #pragma mark TextField
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    if ([textField.text isEqualToString:@""]) {
+        [UIView animateWithDuration:0.3f animations:^{
+            CGRect searchBarViewFrame = self.addNewContactView.searchBarView.frame;
+            searchBarViewFrame.size.width = CGRectGetWidth(self.addNewContactView.searchBarView.frame) - 70.0f;
+            self.addNewContactView.searchBarView.frame = searchBarViewFrame;
+            
+            CGRect searchBarCancelButtonFrame = self.addNewContactView.searchBarCancelButton.frame;
+            searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
+            searchBarCancelButtonFrame.size.width = 70.0f;
+            self.addNewContactView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
+        } completion:^(BOOL finished) {
+            //completion
+        }];
+    }
     return YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
-    
     return NO;
 }
 
@@ -85,8 +104,25 @@
     _searchedUser = nil;
     
     [self.addNewContactView setSearchViewLayoutWithType:LayoutTypeDefault];
+    [self.addNewContactView showNoInternetView:NO];
+    [self.addNewContactView isShowEmptyState:NO];
+    [self.addNewContactView showLoading:NO];
     
-    return YES;
+    [UIView animateWithDuration:0.3f animations:^{
+        CGRect searchBarViewFrame = self.addNewContactView.searchBarView.frame;
+        searchBarViewFrame.size.width = CGRectGetWidth(self.addNewContactView.searchBarBackgroundView.frame) - 16.0f - 16.0f;
+        self.addNewContactView.searchBarView.frame = searchBarViewFrame;
+        [self.addNewContactView.searchBarView.searchTextField endEditing:YES];
+        
+        CGRect searchBarCancelButtonFrame = self.addNewContactView.searchBarCancelButton.frame;
+        searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
+        searchBarCancelButtonFrame.size.width = 0.0f;
+        self.addNewContactView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
+    } completion:^(BOOL finished) {
+        //completion
+    }];
+    
+    return NO;
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
@@ -148,12 +184,12 @@
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
     }
     
-    //    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
-    //
-    //    //CS NOTE - Remove this VC in Navigation Stack to skip on pop
-    //    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
-    //    [navigationArray removeObject:self];
-    //    self.navigationController.viewControllers = navigationArray;
+//    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+//
+//    //CS NOTE - Remove this VC in Navigation Stack to skip on pop
+//    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
+//    [navigationArray removeObject:self];
+//    self.navigationController.viewControllers = navigationArray;
 }
 
 - (void)addUserToContactButtonDidTapped {
@@ -164,7 +200,7 @@
     
     if ([currentUserID isEqualToString:searchedUserID]) {
         //Add theirselves
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"")];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
@@ -202,7 +238,7 @@
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
     }
     
-    //    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+//    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
 }
 
 - (void)addExpertToContactButtonDidTapped {
@@ -213,7 +249,7 @@
     
     if ([currentUserID isEqualToString:searchedUserID]) {
         //Add theirselves
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"")];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
@@ -238,26 +274,26 @@
 #endif
         }];
     }
-    //    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
-    //
-    //        //Add user to Contact Manager
-    //        self.searchedUser.isContact = YES;
-    //        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
-    //
-    //        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
-    //        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
-    //        [self.addContactPopupView showPopupView:YES animated:YES];
-    //        [self.addContactPopupView animateExpandingView];
-    //        [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
-    //    } failure:^(NSError *error) {
-    //#ifdef DEBUG
-    //        NSLog(@"%@", error);
-    //#endif
-    //    }];
+//    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+//
+//        //Add user to Contact Manager
+//        self.searchedUser.isContact = YES;
+//        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
+//
+//        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
+//        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
+//        [self.addContactPopupView showPopupView:YES animated:YES];
+//        [self.addContactPopupView animateExpandingView];
+//        [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
+//    } failure:^(NSError *error) {
+//#ifdef DEBUG
+//        NSLog(@"%@", error);
+//#endif
+//    }];
 }
 
 - (void)reloadDataWithString {
-    
+
     if ([self.updatedString isEqualToString:@""]) {
         _wasFailedGetData = NO;
         _searchedUser = nil;

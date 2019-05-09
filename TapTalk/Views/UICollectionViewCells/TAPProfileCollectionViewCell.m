@@ -32,7 +32,7 @@
         CGFloat switchWidth = 51.0f;
         CGFloat switchHeight = 31.0f;
         _switchButton = [[UISwitch alloc] initWithFrame:CGRectMake(CGRectGetWidth(frame) - rightPadding - switchWidth, (CGRectGetHeight(frame) - switchHeight) / 2.0f, switchWidth, switchHeight)];
-        self.switchButton.onTintColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.switchButton.onTintColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR];
         self.switchButton.layer.cornerRadius = CGRectGetHeight(self.switchButton.frame) / 2.0f;
         self.switchButton.layer.borderWidth = 1.0f;
         [self.switchButton addTarget:self action:@selector(switchValueChanged:) forControlEvents:UIControlEventValueChanged];
@@ -41,7 +41,7 @@
         CGFloat titleXPosition = CGRectGetMaxX(self.iconImageView.frame) + 4.0f; //4.0f is left padding of title
         CGFloat titleWidth = CGRectGetMinX(self.switchButton.frame) - 4.0f - titleXPosition; //4.0f is right padding of title
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(titleXPosition, 0.0f, titleWidth, CGRectGetHeight(frame))];
-        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f];
+        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         [self.contentView addSubview:self.titleLabel];
         
@@ -79,7 +79,7 @@
             [self.switchButton setOn:NO];
             self.switchButton.layer.borderColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
             
-            [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationInactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+            [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationAactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         }
         else {
             [self.switchButton setOn:YES];
@@ -129,7 +129,7 @@
     else {
         //CHANGED TO OFF
         self.switchButton.layer.borderColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
-        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationInactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
     }
     
     //WK Temp - maybe delegate to view controller here.

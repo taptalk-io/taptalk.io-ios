@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPProfileViewController : TAPBaseViewController
 
 @property (strong, nonatomic) TAPRoomModel *room;
+@property (strong, nonatomic) NSString *userID;
 
 @end
 

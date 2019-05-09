@@ -11,8 +11,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPSearchBarView : UIView
+
 @property (strong, nonatomic) UITextField *searchTextField;
 @property (strong, nonatomic) NSString *customPlaceHolderString;
+
+- (void)setAsActive:(BOOL)active animated:(BOOL)animated;
+
 @end
 
 NS_ASSUME_NONNULL_END

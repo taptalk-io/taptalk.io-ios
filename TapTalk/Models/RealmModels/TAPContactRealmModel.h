@@ -19,6 +19,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *phone;
 @property (nonatomic, strong) NSString *username;
 @property (nonatomic, strong) NSString *imageURL;
+@property (nonatomic, strong) NSString *phoneWithCode; //Added in DB config version 1 via migration
+@property (nonatomic, strong) NSString *countryCallingCode;  //Added in DB config version 1 via migration
+@property (nonatomic, strong) NSString *countryID; //Added in DB config version 1 via migration
+
 //User Role
 @property (strong, nonatomic) NSString *userRoleCode;
 @property (strong, nonatomic) NSString *userRoleName;
