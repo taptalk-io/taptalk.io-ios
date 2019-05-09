@@ -56,8 +56,8 @@
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         gradient.cornerRadius = 6.0f;
-        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREENBLUE_93].CGColor;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_AQUAMARINE_C1].CGColor, (id)[TAPUtil getColor:TAP_COLOR_MOSELO_GREEN].CGColor, nil];
+        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
         [self.createGroupSubjectView.createButton.layer replaceSublayer:[self.createGroupSubjectView.createButton.layer.sublayers objectAtIndex:0] with:gradient];
         self.createGroupSubjectView.createButton.userInteractionEnabled = YES;
     }
@@ -223,8 +223,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         self.createGroupSubjectView.placeHolderLabel.alpha = 0.0f;
         
         //enable button create
-        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREENBLUE_93].CGColor;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_AQUAMARINE_C1].CGColor, (id)[TAPUtil getColor:TAP_COLOR_MOSELO_GREEN].CGColor, nil];
+        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
+
         [self.createGroupSubjectView.createButton.layer replaceSublayer:[self.createGroupSubjectView.createButton.layer.sublayers objectAtIndex:0] with:gradient];
         self.createGroupSubjectView.createButton.userInteractionEnabled = YES;
     }

@@ -7,15 +7,7 @@
 //
 
 #import "TAPMyChatBubbleTableViewCell.h"
-#import "TAPGradientView.h"
 #import "ZSWTappableLabel.h"
-
-//typedef NS_ENUM(NSInteger, TAPMyChatBubbleStatus) {
-//    TAPMyChatBubbleStatusSending,
-//    TAPMyChatBubbleStatusSent,
-//    TAPMyChatBubbleStatusDelivered,
-//    TAPMyChatBubbleStatusRead
-//};
 
 @interface TAPMyChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
@@ -33,6 +25,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *retryIconImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
@@ -69,8 +62,6 @@
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
-@property (strong, nonatomic) TAPGradientView *gradientView;
-
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
@@ -99,15 +90,6 @@
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
-    
-    self.gradientView = [[TAPGradientView alloc] initWithFrame:self.bubbleView.bounds];
-    
-    self.gradientView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.gradientView.layer.colors = @[ (__bridge id)[TAPUtil getColor:@"9954C2"].CGColor, (__bridge id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor];
-    
-    [self.bubbleView insertSubview:self.gradientView atIndex:0];
-    
-    self.gradientView.clipsToBounds = YES;
     self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 8.0f;
@@ -476,19 +458,30 @@
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileImageView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileImageView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }

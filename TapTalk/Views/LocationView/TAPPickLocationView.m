@@ -43,7 +43,7 @@
         [self.addressView addSubview:self.addressIconImageView];
         
         _addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f, 16.0f, CGRectGetWidth(self.addressView.frame) - (CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f) - 16.0f, 64.0f)];
-        self.addressLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:12.0f];
+        self.addressLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:12.0f];
         self.addressLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_AA];
         self.addressLabel.numberOfLines = 0;
         [self.addressView addSubview:self.addressLabel];
@@ -74,11 +74,11 @@
         [self.searchBarView setReturnKeyType:UIReturnKeySearch];
         [self addSubview:self.searchBarView];
         
-        _pinIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.mapView.frame) - 36.0f) / 2.0f, (CGRectGetHeight(self.mapView.frame) / 2.0f) - 32.0f - 5.0f, 36.0f, 47.0f)]; //32.0 is height of icon without shadow and 5.0f is top shadow of the icon. meanwhile 47 is height of icon with shadow
+        _pinIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.mapView.frame) - 36.0f) / 2.0f, (CGRectGetHeight(self.mapView.frame) / 2.0f) - 32.0f - 5.0f, 36.0f, 57.0f)]; //32.0 is height of icon without shadow and 5.0f is top shadow of the icon. meanwhile 47 is height of icon with shadow
         self.pinIconImageView.image = [UIImage imageNamed:@"TAPIconLocationSelect" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self addSubview:self.pinIconImageView];
         
-        _pinLocationView = [[TAPPinLocationView alloc] initWithFrame:CGRectMake((CGRectGetWidth(frame) - 122.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 122.0f, 45.0f)];
+        _pinLocationView = [[TAPPinLocationView alloc] initWithFrame:CGRectMake((CGRectGetWidth(frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f)];
         self.pinLocationButton.frame = CGRectMake(CGRectGetMinX(self.pinLocationView.frame), CGRectGetMinY(self.pinLocationView.frame), CGRectGetWidth(self.pinLocationView.frame), CGRectGetHeight(self.pinLocationView.frame) - 15.0f);
         self.pinLocationView.clipsToBounds = YES;
         [self addSubview:self.pinLocationView];
@@ -144,7 +144,7 @@
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         
         [UIView animateWithDuration:0.2f animations:^{
-            self.pinLocationView.frame = CGRectMake((CGRectGetWidth(self.frame) - 122.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 122.0f, 45.0f);
+            self.pinLocationView.frame = CGRectMake((CGRectGetWidth(self.frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f);
             self.pinLocationView.layer.cornerRadius = 0.0f;
             self.pinLocationButton.frame = CGRectMake(CGRectGetMinX(self.pinLocationView.frame), CGRectGetMinY(self.pinLocationView.frame), CGRectGetWidth(self.pinLocationView.frame), CGRectGetHeight(self.pinLocationView.frame) - 15.0f);
             [self.pinLocationView hideSendLocationView:NO];

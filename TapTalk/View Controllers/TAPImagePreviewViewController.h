@@ -20,8 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id <TAPImagePreviewViewControllerDelegate> delegate;
 
-- (void)setImagePreviewData:(NSArray *)array;
-- (void)addMoreImagePreviewData:(NSArray *)array;
+- (void)setMediaPreviewDataWithData:(TAPMediaPreviewModel *)mediaPreviewData;
+- (void)setMediaPreviewDataWithArray:(NSMutableArray *)array;
 
 @end
 

@@ -10,7 +10,10 @@
 #import "TAPPopUpInfoView.h"
 
 typedef NS_ENUM(NSInteger, TAPPopUpInfoViewControllerType) {
-    TAPPopUpInfoViewControllerTypeErrorMessage,
+    TAPPopUpInfoViewControllerTypeErrorMessage, // 1 button red
+    TAPPopUpInfoViewControllerTypeSuccessMessage, // 1 button green
+    TAPPopUpInfoViewControllerTypeInfoDefault, // 2 button (grey, green)
+    TAPPopUpInfoViewControllerTypeInfoDestructive, // 2 button (grey, red)
 };
 
 @protocol TAPPopUpInfoViewControllerDelegate <NSObject>
@@ -30,7 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString *titleInformation;
 @property (strong, nonatomic) NSString *detailInformation;
 
-- (void)setPopUpInfoViewControllerType:(TAPPopUpInfoViewControllerType)popUpInfoViewControllerType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo;
+- (void)setPopUpInfoViewControllerType:(TAPPopUpInfoViewControllerType)popUpInfoViewControllerType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionTitle singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionTitle;
+
 - (void)showPopupInfoView:(BOOL)isShow animated:(BOOL)animated completion:(void (^ __nullable)(void))completion;
 
 @end

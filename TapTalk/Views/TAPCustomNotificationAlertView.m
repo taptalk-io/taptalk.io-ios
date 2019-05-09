@@ -38,7 +38,6 @@
         
         _contentView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, contentViewYPosition, CGRectGetWidth(self.frame) - 32.0f, CGRectGetHeight(self.frame) - contentViewYPosition)];
         self.contentView.backgroundColor = [UIColor whiteColor];
-//        self.contentView.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.3f]; //DV Temp
         self.contentView.layer.cornerRadius = 6.0f;
         self.contentView.clipsToBounds = YES;
         [self.firstNotificationView addSubview:self.contentView];
@@ -67,7 +66,7 @@
         [self.contentView addSubview:self.nameLabel];
         
         _messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.nameLabel.frame), CGRectGetMaxY(self.nameLabel.frame), CGRectGetWidth(self.nameLabel.frame), 18.0f)];
-        self.messageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.messageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.messageLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
         [self.contentView addSubview:self.messageLabel];
         
@@ -113,7 +112,7 @@
         [self.secondaryContentView addSubview:self.secondaryNameLabel];
         
         _secondaryMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.secondaryNameLabel.frame), CGRectGetMaxY(self.secondaryNameLabel.frame), CGRectGetWidth(self.secondaryNameLabel.frame), 18.0f)];
-        self.secondaryMessageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.secondaryMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.secondaryMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
         [self.secondaryContentView addSubview:self.secondaryMessageLabel];
         

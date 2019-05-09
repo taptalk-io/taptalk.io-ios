@@ -8,7 +8,7 @@
 
 #import "TAPBaseViewController.h"
 #import "TAPRoomModel.h"
-#import "TAPImagePreviewModel.h"
+#import "TAPMediaPreviewModel.h"
 
 typedef NS_ENUM(NSInteger, TAPChatViewControllerType) {
     TAPChatViewControllerTypeDefault = 0,

@@ -14,10 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPFileUploadManager *)sharedManager;
 
-- (NSInteger)obtainImageUploadStatusWithMessage:(TAPMessageModel *)message;
+- (NSInteger)obtainUploadStatusWithMessage:(TAPMessageModel *)message;
 - (void)sendFileWithData:(TAPMessageModel *)message;
+- (void)sendFileAsAssetWithData:(TAPMessageModel *)message;
 - (NSDictionary *)getUploadProgressWithLocalID:(NSString *)localID;
-- (void)cancelUploadingImageWithMessage:(TAPMessageModel *)message;
+- (void)cancelUploadingOperationWithMessage:(TAPMessageModel *)message;
+- (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success;
+- (void)saveToPendingUploadAssetDictionaryWithAsset:(PHAsset *)asset;
+- (PHAsset *)getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:(NSString *)assetIdentifier;
 
 @end
 

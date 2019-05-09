@@ -61,12 +61,12 @@
     self.backgroundContentView.layer.cornerRadius = 8.0f;
     
     if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
-        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
-        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:14.0f];
+        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
     }
     else {
-        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
-        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
+        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
+        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
     }
 }
 

@@ -15,6 +15,7 @@
 
 #import "TAPChatViewController.h"
 #import <Photos/Photos.h>
+#import <Contacts/Contacts.h>
 
 //WK Note - addNewChatView.contactsTableView tableViewCell
 #import "TAPNewChatOptionTableViewCell.h"
@@ -24,7 +25,7 @@
 //WK Note - addNewChatView.searchResultTableView tableViewCell
 #import "TAPNewChatAddNewContactTableViewCell.h"
 
-@interface TAPAddNewChatViewController () <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, TAPAddNewContactViewControllerDelegate>
+@interface TAPAddNewChatViewController () <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, TAPAddNewContactViewControllerDelegate, TAPCustomButtonViewDelegate>
 
 @property (strong, nonatomic) TAPAddNewChatView *addNewChatView;
 
@@ -38,6 +39,7 @@
 @property (strong, nonatomic) NSString *updatedString;
 
 - (void)loadContactListFromDatabase;
+- (void)syncContactWithLoading:(BOOL)loading;
 
 @end
 
@@ -51,6 +53,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.addNewChatView.searchBarView.searchTextField.delegate = self;
     self.addNewChatView.contactsTableView.delegate = self;
     self.addNewChatView.contactsTableView.dataSource = self;
@@ -72,10 +75,33 @@
     
     _searchResultUserMutableArray = [NSMutableArray array];
     _updatedString = @"";
+    
+    self.addNewChatView.syncButton.delegate = self;
+    
+    [self.addNewChatView showSyncContactButtonView:NO];
+    
+    CNContactStore *store = [[CNContactStore alloc] init];
+    [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (granted && [[TAPContactManager sharedManager] isContactPermissionAsked]) {
+            //2nd time sync contact and so on, no loading
+            [self syncContactWithLoading:NO];
+        }
+        else if (granted) {
+            //1st time sync contact, show loading
+            [self syncContactWithLoading:YES];
+        }
+        else {
+            //not granted, show sync button view
+            [self.addNewChatView showSyncContactButtonView:YES];
+        }
+        [[TAPContactManager sharedManager] setContactPermissionAsked];
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    [self showNavigationSeparator:NO];
     
     //Load Contact List From Database
     [self loadContactListFromDatabase];
@@ -170,7 +196,7 @@
             return 64.0f;
         }
         else if (indexPath.section == 1) {
-            return 70.0f;
+            return 78.0f;
         }
     }
     
@@ -296,8 +322,8 @@
             keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
             
             UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(header.frame) - 16.0f - 16.0f, 34.0f)];
-            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
-            titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+            titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
             [header addSubview:titleLabel];
             
             if ([keysArray count] != 0) {
@@ -506,7 +532,6 @@
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField {
     [self.searchResultUserMutableArray removeAllObjects];
-    
     [self.addNewChatView showOverlayView:YES];
     [UIView animateWithDuration:0.2f animations:^{
         self.addNewChatView.searchResultTableView.alpha = 0.0f;
@@ -523,7 +548,7 @@
     
     if (![trimmedNewString isEqualToString:@""]) {
         self.updatedString = newString;
-        
+        [self.addNewChatView showSyncContactButtonView:NO];
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         
         [TAPDataManager getDatabaseContactSearchKeyword:trimmedString sortBy:@"fullname" success:^(NSArray *resultArray) {
@@ -543,9 +568,7 @@
     }
     else {
         textField.text = @"";
-        
         [self.searchResultUserMutableArray removeAllObjects];
-        
         [self.addNewChatView showOverlayView:YES];
         [UIView animateWithDuration:0.2f animations:^{
             self.addNewChatView.searchResultTableView.alpha = 0.0f;
@@ -558,6 +581,12 @@
     }
     
     return YES;
+}
+
+#pragma mark TAPCustomButtonView
+- (void)customButtonViewDidTappedButton {
+    //Sync Button Tapped
+    [self syncContactWithLoading:YES];
 }
 
 #pragma mark TAPAddNewContactViewController
@@ -651,6 +680,121 @@
         [self.addNewChatView.contactsTableView reloadData];
     } failure:^(NSError *error) {
         
+    }];
+}
+
+- (void)syncContactWithLoading:(BOOL)loading {
+    CNContactStore *store = [[CNContactStore alloc] init];
+    [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (granted) {
+            if (loading) {
+              [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"Syncing Contacts", @"") type:TAPSyncNotificationViewTypeSyncing];
+            }
+            
+            //keys with fetching properties
+            NSArray *keys = @[CNContactPhoneNumbersKey];
+            NSString *containerId = store.defaultContainerIdentifier;
+            NSPredicate *predicate = [CNContact predicateForContactsInContainerWithIdentifier:containerId];
+            NSError *error;
+            NSArray *cnContacts = [store unifiedContactsMatchingPredicate:predicate keysToFetch:keys error:&error];
+            if (error) {
+                if (loading) {
+                    [self.addNewChatView hideSyncNotification];
+                }
+            } else {
+                NSMutableArray *numbersStringArray = [NSMutableArray array];
+                
+                for (CNContact *contact in cnContacts) {
+                    for (CNLabeledValue *label in contact.phoneNumbers) {
+                        NSString *phone = [label.value stringValue];
+                        phone = [phone stringByReplacingOccurrencesOfString:@" " withString:@""];
+                        
+                        if ([phone length] < 1 || [phone containsString:@"*"] || [phone containsString:@"#"] || [phone containsString:@";"] || [phone containsString:@","]) {
+                            //Skip if length is lest than 1, skip if phone contains *#:,
+                            continue;
+                        }
+                        
+                        //remove all characters
+                        NSString *phoneNumberString = [[phone componentsSeparatedByCharactersInSet:
+                                                        [[NSCharacterSet decimalDigitCharacterSet] invertedSet]]
+                                                       componentsJoinedByString:@""];
+                        
+                        NSString *userCountryCode = [[TAPContactManager sharedManager] getUserCountryCode];
+                        if (![phone hasPrefix:@"+"]) {
+                            if ([phoneNumberString hasPrefix:@"0"]) {
+                                phoneNumberString = [phoneNumberString stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:userCountryCode];
+                            }
+                            
+                            if (![phoneNumberString hasPrefix:@"0"] && ![phoneNumberString hasPrefix:userCountryCode]) {
+                                phoneNumberString = [NSString stringWithFormat:@"%@%@", userCountryCode, phoneNumberString];
+                            }
+                        }
+                        
+                        //Check if number is in contact list
+                        if (![[TAPContactManager sharedManager] checkUserExistWithPhoneNumber:phoneNumberString]) {
+                            [numbersStringArray addObject:phoneNumberString];
+                        }
+                    }
+                }
+                
+                if ([numbersStringArray count] > 0) {
+                    //There's New Contacts
+                    [TAPDataManager callAPIAddContactWithPhones:numbersStringArray success:^(NSArray *users) {
+                        [self loadContactListFromDatabase];
+                        if (loading) {
+                            [self.addNewChatView hideSyncNotification];
+                        }
+                        if ([users count] > 0) {
+                            //new contacts synced
+                            
+                            NSString *contactString = NSLocalizedString(@"Contact", @"");
+                            if ([users count] > 1) {
+                                contactString = NSLocalizedString(@"Contacts", @"");
+                            }
+                            
+                            NSString *syncedString = NSLocalizedString(@"Synced", @"");
+                            
+                            [self.addNewChatView showSyncNotificationWithString:[NSString stringWithFormat:@"%@ %ld %@", syncedString, [users count], contactString] type:TAPSyncNotificationViewTypeSynced];
+                        }
+                        else {
+                            //All contacts synced
+                            if (loading) {
+                                [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"All Contacts Synced", @"") type:TAPSyncNotificationViewTypeSynced];
+                            }
+                        }
+                    } failure:^(NSError *error) {
+                        if (loading) {
+                            [self.addNewChatView hideSyncNotification];
+                        }
+                    }];
+                }
+                else {
+                    //No New Contacts
+                    if (loading) {
+                        [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"All Contacts Synced", @"") type:TAPSyncNotificationViewTypeSynced];
+                    }
+                }
+            }
+        }
+        else {
+            NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSContactsUsageDescription"];
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+            [alertController addAction:cancelAction];
+            
+            UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                if (IS_IOS_10_OR_ABOVE) {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+                }
+                else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+            }];
+            [alertController addAction:settingsAction];
+            
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
     }];
 }
 

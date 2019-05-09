@@ -10,7 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPSearchViewControllerDelegate <NSObject>
+
+- (void)searchViewControllerDidTappedSearchCancelButton;
+
+@end
+
 @interface TAPSearchViewController : TAPBaseViewController
+
+@property (weak, nonatomic) id<TAPSearchViewControllerDelegate> delegate;
 
 @end
 

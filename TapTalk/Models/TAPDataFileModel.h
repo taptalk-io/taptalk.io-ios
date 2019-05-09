@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString *fileID;
 @property (strong, nonatomic) NSString *fileName;
 @property (strong, nonatomic) NSString *mediaType;
-@property (nonatomic) CGFloat size;
+@property (strong, nonatomic) NSNumber *size;
+
+//Not needed to send to message.data in API
+@property (strong, nonatomic) NSData *fileData;
 
 @end
 

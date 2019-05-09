@@ -49,7 +49,7 @@
         [self.customNavigationView addSubview:self.refreshButton];
         
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(85.0f, 0.0f, CGRectGetWidth(self.frame) - 85.0f - 85.0f, CGRectGetHeight(self.customNavigationView.frame))];
-        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_SEMIBOLD size:17.0f];
+        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:17.0f];
         self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self.customNavigationView addSubview:self.titleLabel];
@@ -100,7 +100,7 @@
         [self addSubview:self.webView];
         
         _progressView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.customNavigationView.frame), 0.0f, 3.0f)];
-        self.progressView.backgroundColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.progressView.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self addSubview:self.progressView];
     }
     

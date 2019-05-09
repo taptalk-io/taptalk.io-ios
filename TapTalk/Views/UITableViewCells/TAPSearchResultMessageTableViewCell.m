@@ -38,7 +38,7 @@
         
         _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - rightPadding, 16.0f, 0.0f, 16.0f)];
         self.timeLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.timeLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:11.0f];
+        self.timeLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:11.0f];
         [self.bgView addSubview:self.timeLabel];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
@@ -58,12 +58,12 @@
         
         _lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame) + 3.0f, 0.0f, 18.0f)];
         self.lastSenderLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.lastSenderLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.lastSenderLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         [self.bgView addSubview:self.lastSenderLabel];
         
         _lastMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame) + 3.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame) - 4.0f - CGRectGetWidth(self.messageStatusImageView.frame) - rightPadding, 18.0f)];
         self.lastMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.lastMessageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.lastMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         [self.bgView addSubview:self.lastMessageLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - leftPadding - rightPadding, 1.0f)];
@@ -299,7 +299,7 @@
     
     NSRange searchedRange = [lowercaseLastMessage rangeOfString:lowercaseSeachedString];
     [lastMessageAttributedString addAttribute:NSForegroundColorAttributeName
-                                        value:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]
+                                        value:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1]
                                         range:searchedRange];
     self.lastMessageLabel.attributedText = lastMessageAttributedString;
     

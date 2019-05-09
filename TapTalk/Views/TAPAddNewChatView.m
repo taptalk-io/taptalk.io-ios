@@ -10,9 +10,19 @@
 
 @interface TAPAddNewChatView()
 @property (strong, nonatomic) UIView *bgView;
+@property (strong, nonatomic) UIView *syncedContactNotificationView;
+@property (strong, nonatomic) UIView *syncContactButtonView;
+@property (strong, nonatomic) UIView *separatorView;
 
 @property (strong, nonatomic) UIView *overlayView;
 @property (strong, nonatomic) UIButton *overlayButton;
+
+@property (strong, nonatomic) UILabel *syncedContactNotificationLabel;
+@property (strong, nonatomic) UIImageView *syncedContactNotificationCheckMarkImageView;
+
+- (void)setSyncStatusWithString:(NSString *)string;
+- (void)showNotificationLoading:(BOOL)show;
+
 @end
 
 @implementation TAPAddNewChatView
@@ -24,24 +34,76 @@
         self.bgView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         [self addSubview:self.bgView];
         
+        _syncedContactNotificationView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), 20.0f)];
+        self.syncedContactNotificationView.backgroundColor = [UIColor whiteColor];
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = self.syncedContactNotificationView.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"3BC73D"].CGColor, [TAPUtil getColor:@"2DB80F"].CGColor,nil];
+        gradient.startPoint = CGPointMake(0.0f, 0.0f);
+        gradient.endPoint = CGPointMake(0.0f, 1.0f);
+        [self.syncedContactNotificationView.layer insertSublayer:gradient atIndex:0];
+        [self.bgView addSubview:self.syncedContactNotificationView];
+        
+        _syncedContactNotificationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 200.0f, CGRectGetHeight(self.syncedContactNotificationView.frame))];
+        self.syncedContactNotificationLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
+        self.syncedContactNotificationLabel.textColor = [UIColor whiteColor];
+        [self.syncedContactNotificationView addSubview:self.syncedContactNotificationLabel];
+        
+        _syncedContactNotificationCheckMarkImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.syncedContactNotificationLabel.frame) + 4.0f, (CGRectGetHeight(self.syncedContactNotificationView.frame) - 9.0f) / 2.0f, 9.0f, 9.0f)];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconConnected"];
+        [self.syncedContactNotificationView addSubview:self.syncedContactNotificationCheckMarkImageView];
+            
         _searchBarBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), 46.0f)];
-        self.searchBarView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.searchBarBackgroundView.backgroundColor = [UIColor whiteColor];
         [self.bgView addSubview:self.searchBarBackgroundView];
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
         self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for people in your contact list", @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
-        _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame)) style:UITableViewStylePlain];
+        _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
+        NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
+        NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
+        NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
+        CGFloat searchBarCancelLetterSpacing = -0.4f;
+        [searchBarCancelAttributesDictionary setObject:@(searchBarCancelLetterSpacing) forKey:NSKernAttributeName];
+        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f] forKey:NSFontAttributeName];
+        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forKey:NSForegroundColorAttributeName];
+        [searchBarCancelAttributedString addAttributes:searchBarCancelAttributesDictionary
+                                                 range:NSMakeRange(0, [searchBarCancelString length])];
+        [self.searchBarCancelButton setAttributedTitle:searchBarCancelAttributedString forState:UIControlStateNormal];
+        self.searchBarCancelButton.clipsToBounds = YES;
+        [self.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
+        
+        _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f, CGRectGetWidth(self.frame), 1.0f)];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+        [self.searchBarBackgroundView addSubview:self.separatorView];
+        
+        _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f - 62.0f - [TAPUtil safeAreaBottomPadding]) style:UITableViewStylePlain]; //62.0f - height of sync contact button view
         self.contactsTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         self.contactsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [self.contactsTableView setSectionIndexColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]];
+        [self.contactsTableView setSectionIndexColor:[TAPUtil getColor:TAP_TABLE_VIEW_SECTION_INDEX_COLOR]];
         [self.bgView addSubview:self.contactsTableView];
+        
+        _syncContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactsTableView.frame), CGRectGetWidth(self.bgView.frame), 62.0f + [TAPUtil safeAreaBottomPadding])];
+        self.syncContactButtonView.backgroundColor = [UIColor whiteColor];
+        [self.bgView addSubview:self.syncContactButtonView];
+        
+        UIView *syncContactTopSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.syncContactButtonView.frame), 1.0f)];
+        syncContactTopSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+        [self.syncContactButtonView addSubview:syncContactTopSeparatorView];
+        
+        _syncButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, CGRectGetWidth(self.frame), 42.0f)];
+        [self.syncButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
+        [self.syncButton setCustomButtonViewType:TAPCustomButtonViewTypeActive];
+        [self.syncButton setButtonWithTitle:NSLocalizedString(@"Sync Contacts Now", @"") andIcon:@"TAPIconSync"];
+        [self.syncContactButtonView addSubview:self.syncButton];
         
         _searchResultTableView = [[UITableView alloc] initWithFrame:self.contactsTableView.frame];
         self.searchResultTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [self.searchResultTableView setSectionIndexColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]];
+        [self.searchResultTableView setSectionIndexColor:[TAPUtil getColor:TAP_TABLE_VIEW_SECTION_INDEX_COLOR]];
         self.searchResultTableView.alpha = 0.0f;
         [self.bgView addSubview:self.searchResultTableView];
         
@@ -92,6 +154,123 @@
         [UIView animateWithDuration:0.2f animations:^{
             self.overlayView.alpha = 0.0f;
         }];
+    }
+}
+
+- (void)setSyncStatusWithString:(NSString *)string {
+    self.syncedContactNotificationLabel.text = string;
+    CGSize size = [self.syncedContactNotificationLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 20.0f)];
+    CGFloat maximumLabelWidth = CGRectGetWidth(self.frame) - 16.0f - 16.0f - 4.0f - 9.0f; //16 - left&right gap, 4 - gap to image view, 9 image view width
+    CGFloat newWidth = size.width;
+    if (newWidth > maximumLabelWidth) {
+        newWidth = maximumLabelWidth;
+    }
+    CGFloat newMinX = (CGRectGetWidth(self.syncedContactNotificationView.frame) - (newWidth + 4.0f + 9.0f))/2.0f;
+    self.syncedContactNotificationLabel.frame = CGRectMake(newMinX, 0.0f, newWidth, CGRectGetHeight(self.syncedContactNotificationLabel.frame));
+    self.syncedContactNotificationCheckMarkImageView.frame = CGRectMake(CGRectGetMaxX(self.syncedContactNotificationLabel.frame) + 4.0f, (CGRectGetHeight(self.syncedContactNotificationView.frame) - 9.0f) / 2.0f, 9.0f, 9.0f);
+}
+
+- (void)showSyncContactButtonView:(BOOL)show {
+    if (show) {
+        self.syncContactButtonView.alpha = 1.0f;
+        self.contactsTableView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - 62.0f - [TAPUtil safeAreaBottomPadding]);
+        self.searchResultTableView.frame = self.contactsTableView.frame;
+    }
+    else {
+        self.syncContactButtonView.alpha = 0.0f;
+        self.contactsTableView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame));
+        self.searchResultTableView.frame = self.contactsTableView.frame;
+    }
+}
+
+- (void)showSyncNotificationView:(BOOL)show {
+    if (show) {
+        self.searchBarBackgroundView.frame = CGRectMake(0.0f, 20.0f, CGRectGetWidth(self.bgView.frame), 46.0f);
+        self.contactsTableView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.contactsTableView.frame));
+    }
+    else {
+        self.searchBarBackgroundView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), 46.0f);
+        self.contactsTableView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.contactsTableView.frame));
+    }
+}
+
+- (void)showSyncNotificationWithString:(NSString *)string type:(TAPSyncNotificationViewType)type {
+    
+    if (type == TAPSyncNotificationViewTypeSyncing) {
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = self.syncedContactNotificationView.frame;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"FF9F00"].CGColor, [TAPUtil getColor:@"FFA107"].CGColor, [TAPUtil getColor:@"FFB438"].CGColor,nil];
+        gradient.startPoint = CGPointMake(0.0f, 0.0f);
+        gradient.endPoint = CGPointMake(0.0f, 1.0f);
+        [self.syncedContactNotificationView.layer replaceSublayer:[self.syncedContactNotificationView.layer.sublayers objectAtIndex:0] with:gradient];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconLoadingWhite"];
+        [self showNotificationLoading:YES];
+    }
+    else if (type == TAPSyncNotificationViewTypeSynced) {
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = self.syncedContactNotificationView.frame;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"3BC73D"].CGColor, [TAPUtil getColor:@"2DB80F"].CGColor,nil];
+        gradient.startPoint = CGPointMake(0.0f, 0.0f);
+        gradient.endPoint = CGPointMake(0.0f, 1.0f);
+        [self.syncedContactNotificationView.layer replaceSublayer:[self.syncedContactNotificationView.layer.sublayers objectAtIndex:0] with:gradient];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconConnected"];
+        [self showNotificationLoading:NO];
+    }
+    
+    [self setSyncStatusWithString:string];
+    
+    if (CGRectGetMinY(self.searchBarBackgroundView.frame) == 20.0f) {
+        //already shown
+        [UIView animateWithDuration:0.2f
+                              delay:0.5f
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             //animate
+                             [self showSyncNotificationView:NO];
+                         }
+                         completion:nil];
+    }
+    else {
+        [UIView animateWithDuration:0.2f animations:^{
+            [self showSyncNotificationView:YES];
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.2f
+                                  delay:0.5f
+                                options:UIViewAnimationOptionBeginFromCurrentState
+                             animations:^{
+                                 //animate
+                                 [self showSyncNotificationView:NO];
+                             }
+                             completion:nil];
+        }];
+    }
+}
+
+- (void)hideSyncNotification {
+    [UIView animateWithDuration:0.2f animations:^{
+        [self showSyncNotificationView:NO];
+    }];
+}
+
+- (void)showNotificationLoading:(BOOL)show {
+    if (show) {
+        //ADD ANIMATION
+        if ([self.syncedContactNotificationCheckMarkImageView.layer animationForKey:@"SpinAnimationCheckMark"] == nil) {
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            animation.fromValue = [NSNumber numberWithFloat:0.0f];
+            animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
+            animation.duration = 1.5f;
+            animation.repeatCount = INFINITY;
+            animation.cumulative = YES;
+            animation.removedOnCompletion = NO;
+            [self.syncedContactNotificationCheckMarkImageView.layer addAnimation:animation forKey:@"SpinAnimationCheckMark"];
+        }
+    }
+    else {
+        //REMOVE ANIMATION
+        if ([self.syncedContactNotificationCheckMarkImageView.layer animationForKey:@"SpinAnimationCheckMark"] != nil) {
+            [self.syncedContactNotificationCheckMarkImageView.layer removeAnimationForKey:@"SpinAnimationCheckMark"];
+        }
     }
 }
 

@@ -15,15 +15,19 @@ typedef NS_ENUM(NSInteger, TAPMyFileBubbleTableViewCellStateType) {
     TAPMyFileBubbleTableViewCellStateTypeNotDownloaded = 1,
     TAPMyFileBubbleTableViewCellStateTypeUploading = 2,
     TAPMyFileBubbleTableViewCellStateTypeDownloading = 3,
-    TAPMyFileBubbleTableViewCellStateTypeRetry = 4
+    TAPMyFileBubbleTableViewCellStateTypeRetryDownload = 4,
+    TAPMyFileBubbleTableViewCellStateTypeRetryUpload = 5
 };
 
 @protocol TAPMyFileBubbleTableViewCellDelegate <NSObject>
 
-- (void)myFileBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileReplyDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)myFileRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage;
 
 @end
 
@@ -37,14 +41,14 @@ typedef NS_ENUM(NSInteger, TAPMyFileBubbleTableViewCellStateType) {
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
-- (void)showProgressUploadView:(BOOL)show;
-- (void)showNotDownloadedState;
+- (void)showDownloadedState:(BOOL)isShow;
 - (void)animateFinishedUploadFile;
 - (void)animateFinishedDownloadFile;
+- (void)animateCancelDownloadFile;
 - (void)animateFailedUploadFile;
 - (void)animateFailedDownloadFile;
-- (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)animateProgressUploadingFileWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)animateProgressDownloadingFileWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)showFileBubbleStatusWithType:(TAPMyFileBubbleTableViewCellStateType)type;
 
 @end

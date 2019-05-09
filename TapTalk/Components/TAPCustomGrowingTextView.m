@@ -77,7 +77,7 @@
         _textView = [[TAPCustomTextView alloc] initWithFrame:self.bounds textContainer:textContainer];
         self.textView.delegate = self;
         self.textView.textContainer.lineFragmentPadding = 0;
-        self.textView.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f];
+        self.textView.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         self.textView.backgroundColor = [UIColor clearColor];
         self.textView.showsVerticalScrollIndicator = NO;
         self.textView.showsHorizontalScrollIndicator = NO;

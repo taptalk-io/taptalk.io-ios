@@ -28,14 +28,15 @@
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
         
-        _iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, 12.0f, 32.0f, 32.0f)];
+        _iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(14.0f, 18.0f, 20.0f, 20.0f)];
+        self.iconImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.bgView addSubview:self.iconImageView];
         
-        _rightArrow = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 8.0f, (CGRectGetHeight(self.bgView.frame) - 14.0f) / 2.0f, 8.0f, 14.0f)];
+        _rightArrow = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 20.0f, (CGRectGetHeight(self.bgView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.rightArrow.image = [UIImage imageNamed:@"TAPIconRightArrowCell" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bgView addSubview:self.rightArrow];
         
-        _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.iconImageView.frame) + 4.0f, 0.0f, CGRectGetMinX(self.rightArrow.frame) - 8.0f - (CGRectGetMaxX(self.iconImageView.frame) + 4.0f), CGRectGetHeight(self.bgView.frame))];
+        _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.iconImageView.frame) + 10.0f, 0.0f, CGRectGetMinX(self.rightArrow.frame) - 8.0f - (CGRectGetMaxX(self.iconImageView.frame) + 10.0f), CGRectGetHeight(self.bgView.frame))];
         [self.bgView addSubview:self.descriptionLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame), 1.0f)];
@@ -75,7 +76,7 @@
                                          range:NSMakeRange(0, [descriptionString length])];
     self.descriptionLabel.attributedText = descriptionAttributedString;
     self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-    self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f];
+    self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
 }
 
 @end

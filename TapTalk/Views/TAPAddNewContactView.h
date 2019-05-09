@@ -27,8 +27,10 @@ typedef NS_ENUM(NSInteger, LayoutType) {
 @property (strong, nonatomic) UIButton *addUserToContactButton;
 @property (strong, nonatomic) UIButton *userChatNowButton;
 @property (strong, nonatomic) UIButton *expertChatNowButton;
+
+@property (strong, nonatomic) UIView *searchBarBackgroundView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
-//@property (strong, nonatomic) UITextField *searchBarTextField;
+@property (strong, nonatomic) UIButton *searchBarCancelButton;
 
 - (void)isShowDefaultLabel:(BOOL)isShow animated:(BOOL)animated;
 - (void)isShowExpertVerifiedLogo:(BOOL)isShow;
@@ -40,6 +42,7 @@ typedef NS_ENUM(NSInteger, LayoutType) {
 
 - (void)setContactWithUser:(TAPUserModel *)user;
 - (void)showLoading:(BOOL)isLoading;
+- (void)searchBarCancelButtonDidTapped;
 
 @end
 

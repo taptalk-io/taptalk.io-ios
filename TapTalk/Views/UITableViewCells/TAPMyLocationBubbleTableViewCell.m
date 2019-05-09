@@ -7,7 +7,6 @@
 //
 
 #import "TAPMyLocationBubbleTableViewCell.h"
-#import "TAPGradientView.h"
 #import <MapKit/MapKit.h>
 
 @interface TAPMyLocationBubbleTableViewCell ()
@@ -26,6 +25,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *retryIconImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
 @property (strong, nonatomic) IBOutlet UIImageView *centerMarkerLocationImageView;
@@ -66,8 +66,6 @@
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
-@property (strong, nonatomic) TAPGradientView *gradientView;
-
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
@@ -98,16 +96,7 @@
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
-    self.sendingIconImageView.alpha = 0.0f;
-    
-    self.gradientView = [[TAPGradientView alloc] initWithFrame:self.bubbleView.bounds];
-
-    self.gradientView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.gradientView.layer.colors = @[ (__bridge id)[TAPUtil getColor:@"9954C2"].CGColor, (__bridge id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor];
-
-    [self.bubbleView insertSubview:self.gradientView atIndex:0];
-    
-    self.gradientView.clipsToBounds = YES;
+    self.sendingIconImageView.alpha = 0.0f;    
     self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 8.0f;
@@ -129,7 +118,6 @@
     self.mapView.layer.borderWidth = 1.0f;
     self.mapView.layer.cornerRadius = 8.0f;
     self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
-    
     
     _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                               action:@selector(handleBubbleViewTap:)];
@@ -169,6 +157,9 @@
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
     
+    BOOL replyToExists = NO;
+    BOOL quoteExists = NO;
+    
     if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
         [self showForwardView:YES];
         [self setForwardData:message.forwardFrom];
@@ -183,7 +174,7 @@
         //reply to exists
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
-        
+        replyToExists = YES;
         if (self.isShowForwardView) {
             self.forwardTitleLabelTopConstraint.constant = 10.0f;
         }
@@ -203,7 +194,7 @@
     }
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
-        
+        quoteExists = YES;
         if (self.isShowForwardView) {
             self.forwardTitleLabelTopConstraint.constant = 10.0f;
         }
@@ -238,6 +229,15 @@
     
     [self setMapWithLatitude:mapLatitude longitude:mapLongitude];
     self.bubbleLabel.text = [NSString stringWithFormat:@"%@", mapAddress];
+    
+    if (self.isShowForwardView || replyToExists || quoteExists) {
+        self.mapView.layer.cornerRadius = 0.0f;
+        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+    }
+    else {
+        self.mapView.layer.cornerRadius = 8.0f;
+        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+    }
 }
 
 - (void)receiveSentEvent {
@@ -499,12 +499,16 @@
         self.forwardTitleLabelHeightConstraint.constant = 16.0f;
         self.forwardFromLabelLeadingConstraint.active = YES;
         self.forwardTitleLabelLeadingConstraint.active = YES;
+        self.replyViewTopConstraint.constant = 6.0f;
+        self.quoteViewTopConstraint.constant = 6.0f;
     }
     else {
         self.forwardFromLabelHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelHeightConstraint.constant = 0.0f;
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
+        self.replyViewTopConstraint.constant = 0.0f;
+        self.quoteViewTopConstraint.constant = 0.0f;
     }
 }
 
@@ -518,19 +522,29 @@
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileImageView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileImageView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }

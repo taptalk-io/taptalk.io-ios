@@ -119,10 +119,10 @@
                 self.customNotificationAlertView.secondNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.secondNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.secondNotificationView.frame));
             }
         } completion:^(BOOL finished) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [TAPUtil delayCallback:^{
                 _isOnShowAnimation = NO;
                 [self checkMessageQueue];
-            });
+            } forTotalSeconds:0.2f];
         }];
     }
     else {
@@ -153,10 +153,10 @@
                     self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), -CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
                 }
             } completion:^(BOOL finished) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [TAPUtil delayCallback:^{
                     _isOnShowAnimation = NO;
                     [self checkMessageQueue];
-                });
+                } forTotalSeconds:0.15f];
             }];
         }
         else {

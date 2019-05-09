@@ -36,6 +36,25 @@
     return numberOfDaysInteger;
 }
 
+#pragma mark - Time
++ (NSString *)stringFromTimeInterval:(NSTimeInterval)interval {
+    NSInteger time = (NSInteger)interval;
+    NSInteger seconds = time % 60;
+    NSInteger minutes = (time / 60) % 60;
+    NSInteger hours = (time / 3600);
+    
+    NSString *totalTimeString = @"";
+    
+    if (hours == 0) {
+        totalTimeString = [NSString stringWithFormat:@"%02ld:%02ld", (long)minutes, (long)seconds];
+    }
+    else {
+        totalTimeString = [NSString stringWithFormat:@"%02ld:%02ld:%02ld", (long)hours, (long)minutes, (long)seconds];
+    }
+    
+    return totalTimeString;
+}
+
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value {
     NSString *emptyString = @"";
@@ -600,6 +619,13 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return valid;
 }
 
++ (BOOL)isEmptyString:(NSString *)string {
+    if (string == nil || [string isEqualToString:@""]) {
+        return YES;
+    }
+    return NO;
+}
+
 + (BOOL)validatePhoneNumber:(NSString *)candidate {
     NSString *phoneNumberRegex = @"^\\+?[0-9]*$";
     NSPredicate *phoneNumberTest = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", phoneNumberRegex];
@@ -627,6 +653,85 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", emailRegex];
     
     return [emailTest evaluateWithObject:candidate];
+}
+
++ (BOOL)validateUsername:(NSString *)candidate {
+    //Check range of allowed string
+    NSCharacterSet * characterSet = [[NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyz1234567890_."] invertedSet];
+    NSRange range = [candidate rangeOfCharacterFromSet:characterSet] ;
+    BOOL rangeResult = YES;
+    if (range.location != NSNotFound) {
+       rangeResult = NO;
+    }
+    
+    //Check first char is lowercaseString
+    NSCharacterSet * lowercaseCharacterSet = [NSCharacterSet lowercaseLetterCharacterSet];
+    NSString *firstCharacter = @"";
+    if ([candidate length] > 0) {
+        firstCharacter = [NSString stringWithFormat: @"%C", [candidate characterAtIndex:0]];
+    }
+    NSRange lowercaseRange = [firstCharacter rangeOfCharacterFromSet:lowercaseCharacterSet] ;
+    BOOL firstCharResult = YES;
+    if (lowercaseRange.location == NSNotFound) {
+        firstCharResult = NO;
+    }
+    
+    //Check last character is in the range a-z or 0-9
+    NSCharacterSet * lastCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyz1234567890"];
+    NSString *lastCharacter = @"";
+    if ([candidate length] > 0) {
+        lastCharacter = [NSString stringWithFormat: @"%C", [candidate characterAtIndex:[candidate length] - 1]];
+    }
+    NSRange lastCharacterRange = [lastCharacter rangeOfCharacterFromSet:lastCharacterSet] ;
+    BOOL lastCharResult = YES;
+    if (lastCharacterRange.location == NSNotFound) {
+        lastCharResult = NO;
+    }
+    
+    BOOL consecutiveResult = YES;
+    if ([candidate containsString:@".."] || [candidate containsString:@"__"] || [candidate containsString:@"._"] || [candidate containsString:@"_."]) {
+        consecutiveResult = NO;
+    }
+
+    if (!rangeResult || !firstCharResult || !lastCharResult || !consecutiveResult) {
+        return NO;
+    }
+    
+    return YES;
+}
+
++ (BOOL)validatePassword:(NSString *)candidate {
+    //1 lowercase, 1 uppercase, 1 special character, and 1 number (0–9).
+    
+    NSCharacterSet * characterSet = [NSCharacterSet uppercaseLetterCharacterSet] ;
+    NSRange range = [candidate rangeOfCharacterFromSet:characterSet] ;
+    if (range.location == NSNotFound) {
+        return NO ;
+    }
+    characterSet = [NSCharacterSet lowercaseLetterCharacterSet] ;
+    range = [candidate rangeOfCharacterFromSet:characterSet] ;
+    if (range.location == NSNotFound) {
+        return NO ;
+    }
+    
+    characterSet = [NSCharacterSet characterSetWithCharactersInString:@"~!@#$%^&*()_+{}|[]\\:\";'<>,.?/'"] ;
+    range = [candidate rangeOfCharacterFromSet:characterSet] ;
+    if (range.location == NSNotFound) {
+        return NO ;
+    }
+    
+    characterSet = [NSCharacterSet decimalDigitCharacterSet] ;
+    range = [candidate rangeOfCharacterFromSet:characterSet] ;
+    if (range.location == NSNotFound) {
+        return NO ;
+    }
+    
+    //uncomment to validate password length
+//    if([candidate length] < 9) {
+//        return NO;
+//    }
+    
+    return YES ;
 }
 
 #pragma mark - Others
@@ -716,7 +821,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return navigationBarHeight;
 }
 
-+ (NSString*)mimeTypeForFileAtPath: (NSString *)path {
++ (NSString*)mimeTypeForFileAtPath:(NSString *)path {
     // NSURL will read the entire file and may exceed available memory if the file is large enough. Therefore, we will write the first fiew bytes of the file to a head-stub for NSURL to get the MIMEType from.
     NSFileHandle *readFileHandle = [NSFileHandle fileHandleForReadingAtPath:path];
     NSData *fileHead = [readFileHandle readDataOfLength:100]; // we probably only need 2 bytes. we'll get the first 100 instead.
@@ -736,6 +841,12 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         return [response MIMEType];
     }
     return nil;
+}
+
++ (NSString *)mimeTypeForFileWithExtension:(NSString *)fileExtension {
+    NSString *UTI = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)fileExtension, NULL);
+    NSString *mimeType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)UTI, kUTTagClassMIMEType);
+    return mimeType;
 }
 
 + (NSString *)getNewFileAndCheckExistingFilePath:(NSString *)path fileNameCounterStart:(NSInteger)counter {
@@ -772,6 +883,39 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
       }
 }
 
++ (NSString *)mimeTypeForData:(NSData *)data {
+    uint8_t c;
+    [data getBytes:&c length:1];
+    
+    switch (c) {
+        case 0xFF:
+            return @"image/jpeg";
+            break;
+        case 0x89:
+            return @"image/png";
+            break;
+        case 0x47:
+            return @"image/gif";
+            break;
+        case 0x49:
+        case 0x4D:
+            return @"image/tiff";
+            break;
+        case 0x25:
+            return @"application/pdf";
+            break;
+        case 0xD0:
+            return @"application/vnd";
+            break;
+        case 0x46:
+            return @"text/plain";
+            break;
+        default:
+            return @"application/octet-stream";
+    }
+    return nil;
+}
+
 + (CGFloat)safeAreaBottomPadding {
     CGFloat bottomPadding = 0.0f;
     
@@ -792,6 +936,15 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
     
     return topPadding;
+}
+
++ (void)delayCallback:(void(^)(void))callback forTotalSeconds:(double)delayInSeconds {
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        if(callback) {
+            callback();
+        }
+    });
 }
 
 #pragma mark - TapTalk

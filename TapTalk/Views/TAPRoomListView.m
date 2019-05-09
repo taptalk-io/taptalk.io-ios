@@ -12,7 +12,6 @@
 @property (strong, nonatomic) UIView *bgView;
 
 @property (strong, nonatomic) UIView *noChatsView;
-@property (strong, nonatomic) UIImageView *noChatsImageView;
 @property (strong, nonatomic) UILabel *titleNoChatsLabel;
 @property (strong, nonatomic) UILabel *descriptionNoChatsLabel;
 @end
@@ -40,36 +39,26 @@
         self.noChatsView.alpha = 0.0f;
         [self.bgView addSubview:self.noChatsView];
         
-        _noChatsImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.noChatsView.frame) - 220.0f) / 2.0f, 53.0f, 220.0f, 220.0f)];
-        self.noChatsImageView.image = [UIImage imageNamed:@"TAPIconNoChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.noChatsImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.noChatsImageView.clipsToBounds = YES;
-        [self.noChatsView addSubview:self.noChatsImageView];
-        
-        _titleNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(64.0f, CGRectGetMaxY(self.noChatsImageView.frame), CGRectGetWidth(self.noChatsView.frame) - 64.0f - 64.0f, 24.0f)];
-        self.titleNoChatsLabel.text = NSLocalizedString(@"No Chats", @"");
-        self.titleNoChatsLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        _titleNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(64.0f, 159.0f, CGRectGetWidth(self.noChatsView.frame) - 64.0f - 64.0f, 30.0f)];
+        self.titleNoChatsLabel.text = NSLocalizedString(@"No chats to show", @"");
+        self.titleNoChatsLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
         self.titleNoChatsLabel.textAlignment = NSTextAlignmentCenter;
-        self.titleNoChatsLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        self.titleNoChatsLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:24.0f];
         [self.noChatsView addSubview:self.titleNoChatsLabel];
         
-        _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(64.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame), CGRectGetWidth(self.noChatsView.frame) - 64.0f - 64.0f, 38.0f)];
-        self.descriptionNoChatsLabel.text = NSLocalizedString(@"You can start a new chat by tapping the icon on the top right corner", @"");
-        self.descriptionNoChatsLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        
-        self.descriptionNoChatsLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.descriptionNoChatsLabel.numberOfLines = 3;
-        NSMutableDictionary *descriptionNoChatsAttributesDictionary = [NSMutableDictionary dictionary];
-        NSMutableParagraphStyle *descriptionNoChatsStyle = [[NSMutableParagraphStyle alloc] init];
-        descriptionNoChatsStyle.lineBreakMode = NSLineBreakByTruncatingTail;
-        [descriptionNoChatsStyle setLineSpacing:4];
-        [descriptionNoChatsAttributesDictionary setObject:descriptionNoChatsStyle forKey:NSParagraphStyleAttributeName];
-        NSMutableAttributedString *descriptionNoChatsAttributedString = [[NSMutableAttributedString alloc] initWithString:self.descriptionNoChatsLabel.text];
-        [descriptionNoChatsAttributedString addAttributes:descriptionNoChatsAttributesDictionary
-                                                    range:NSMakeRange(0, [self.descriptionNoChatsLabel.text length])];
-        self.descriptionNoChatsLabel.attributedText = descriptionNoChatsAttributedString;
+        _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 16.0f - 16.0f, 40.0f)];
+        self.descriptionNoChatsLabel.text = NSLocalizedString(@"It seems like you don't have any chats to show, but don't worry! Your chat list will grow once you", @"");
+        self.descriptionNoChatsLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.descriptionNoChatsLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.descriptionNoChatsLabel.numberOfLines = 2;
         self.descriptionNoChatsLabel.textAlignment = NSTextAlignmentCenter;
         [self.noChatsView addSubview:self.descriptionNoChatsLabel];
+        
+        _startChatNoChatsButton = [[UIButton alloc] initWithFrame:CGRectMake(64.0f, CGRectGetMaxY(self.descriptionNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 64.0f - 64.0f, 40.0f)];
+        [self.startChatNoChatsButton setTitle:NSLocalizedString(@"Start a New Chat", @"") forState:UIControlStateNormal];
+        [self.startChatNoChatsButton setTitleColor:[TAPUtil getColor:TAP_COLOR_ORANGE_00] forState:UIControlStateNormal];
+        self.startChatNoChatsButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        [self.noChatsView addSubview:self.startChatNoChatsButton];
     }
     
     return self;

@@ -14,16 +14,21 @@
 #import "TAPRoomListTableViewCell.h"
 #import "TAPRoomListModel.h"
 #import "TAPConnectionStatusViewController.h"
-#import <AFNetworking/AFNetworking.h>
 #import "TAPSearchViewController.h"
+#import "TAPMyAccountViewController.h"
 
-@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate>
+#import <AFNetworking/AFNetworking.h>
+
+#import "TAPLoginViewController.h" //DV Temp
+
+@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
 @property (strong, nonatomic) TAPRoomListView *roomListView;
 @property (strong, nonatomic) TAPSetupRoomListView *setupRoomListView;
 @property (strong, nonatomic) TAPConnectionStatusViewController *connectionStatusViewController;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
+@property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIButton *leftBarButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 
@@ -42,6 +47,7 @@
 - (void)queryNumberOfUnreadMessageInRoomListArrayInBackgroundAndUpdateUIAndReloadTableView:(BOOL)reloadTableView;
 - (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage;
 - (void)updateCellDataAtIndexPath:(NSIndexPath *)indexPath updateUnreadBubble:(BOOL)updateUnreadBubble;
+- (void)openNewChatViewController;
 
 @end
 
@@ -69,44 +75,34 @@
     [self.navigationController.view addSubview:self.setupRoomListView];
     [self.navigationController.view bringSubviewToFront:self.setupRoomListView];
     
+    [self.roomListView.startChatNoChatsButton addTarget:self action:@selector(openNewChatViewController) forControlEvents:UIControlEventTouchDown];
+    
     self.title = NSLocalizedString(@"Chats", @"");
     
-    //DV Note
-    //Temporary Hidden For V1 (30 Jan 2019)
-    //Hide Edit Button
     //LeftBarButton
-//    _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
-//    [self.leftBarButton setTitle:@"Edit" forState:UIControlStateNormal];
-//    [self.leftBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forState:UIControlStateNormal];
-//    self.leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
-//    self.leftBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
-//    [self.leftBarButton addTarget:self action:@selector(editButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-//    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
-//    [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-    //END DV Note
+    _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    
+    _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+    self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds)/2.0f;
+    self.profileImageView.clipsToBounds = YES;
+    [self.leftBarButton addSubview:self.profileImageView];
+    
+    self.leftBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 8.0f);
+    [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
+    [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     
     //RightBarButton
-    UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-    //DV Note
-    //Temporary Hidden For V1 (1 Feb 2019)
-    //extend rightBarButton
-//    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-//    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
-    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 20.0f, 0.0f, 0.0f);
-    //END DV Note
+    UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-    [self.rightBarButton addTarget:self action:@selector(addButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     
     //TitleView
-    //DV Note
-    //Temporary Hidden For V1 (1 Feb 2019)
-    //Extend titleView
-//    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, 30.0f)];
-    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(-55.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, 30.0f)];
-    //END DV Note
+    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
     self.searchBarView.searchTextField.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
@@ -140,6 +136,8 @@
     [super viewWillAppear:animated];
     _isViewAppear = YES;
     
+    [self.profileImageView setImageWithURLString:[TAPChatManager sharedManager].activeUser.imageURL.thumbnail];
+
     if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillAppear)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewWillAppear];
     }
@@ -363,59 +361,42 @@
 #pragma mark UITextField
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
     self.navigationItem.leftBarButtonItem = nil;
-    //DV Note
-    //Temporary Hidden For V1 (1 Feb 2019)
-    //UNCOMMENT
-//    self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
-    //END DV Note
+    [UIView animateWithDuration:0.2f animations:^{
+        self.leftBarButton.alpha = 0.0f;
+    }];
+    
+    self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
     
     [UIView animateWithDuration:0.2f animations:^{
-        //DV Note
-        //Temporary Hidden For V1 (1 Feb 2019)
-        //UNCOMMENT
-//        self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
-        //END DV Note
-        
-        //DV Note
-        //Temporary Hidden For V1 (1 Feb 2019)
-        //extend rightBarButton
-//        _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+        self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+
         _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-        //END DV Note
         [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
-        [self.rightBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forState:UIControlStateNormal];
+        [self.rightBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forState:UIControlStateNormal];
         self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
-        self.rightBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
+        self.rightBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
         [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+        
     } completion:^(BOOL finished) {
         TAPSearchViewController *searchViewController = [[TAPSearchViewController alloc] init];
+        searchViewController.delegate = self;
         UINavigationController *searchNavigationController = [[UINavigationController alloc] initWithRootViewController:searchViewController];
         searchNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         [self presentViewController:searchNavigationController animated:NO completion:^{
             UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-            //DV Note
-            //Temporary Hidden For V1 (1 Feb 2019)
-            //extend rightBarButton
-//            _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
             _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-            //END DV Note
             [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
             self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
-            [self.rightBarButton addTarget:self action:@selector(addButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
             UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
             [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
             
             UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
             [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-            //DV Note
-            //Temporary Hidden For V1 (1 Feb 2019)
-            //UNCOMMENT
-//            self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
-            
-//            self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
-            //END DV Note
+
+            self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
         }];
     }];
     
@@ -457,18 +438,22 @@
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
 }
 
-#pragma mark - Custom Method
-- (void)editButtonDidTapped {
-#ifdef DEBUG
-    NSLog(@"Edit");
-#endif
+#pragma mark TAPSearchViewController
+- (void)searchViewControllerDidTappedSearchCancelButton {
+    [UIView animateWithDuration:0.2f animations:^{
+        self.leftBarButton.alpha = 1.0f;
+    }];
 }
 
-- (void)addButtonDidTapped {
-    TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
-    addNewChatViewController.delegate = self;
-    UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
-    [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
+#pragma mark - Custom Method
+- (void)leftBarButtonDidTapped {
+    TAPMyAccountViewController *myAccountViewController = [[TAPMyAccountViewController alloc] init];
+    UINavigationController *myAccountNavigationController = [[UINavigationController alloc] initWithRootViewController:myAccountViewController];
+    [self presentViewController:myAccountNavigationController animated:YES completion:nil];
+}
+
+- (void)rightBarButtonDidTapped {
+    [self openNewChatViewController];
 }
 
 - (void)cancelButtonDidTapped {
@@ -802,7 +787,7 @@
             //Last message is different, move cell to top and update last message
             roomList.lastMessage = message;
 
-            if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && isNewMessage) {
                 //Message from other recipient, increment number of unread message
                 roomList.numberOfUnreadMessages++;
             }
@@ -866,6 +851,19 @@
     else {
         _isNeedRefreshOnNetworkDown = YES;
     }
+}
+
+- (void)openNewChatViewController {
+    TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
+    addNewChatViewController.delegate = self;
+    UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
+    [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
+    
+    //DV Temp
+    //    TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
+    //    UINavigationController *loginNavigationController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
+    //    [self presentViewController:loginNavigationController animated:YES completion:nil];
+    //END DV Temp
 }
 
 @end

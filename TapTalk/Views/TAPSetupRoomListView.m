@@ -75,7 +75,7 @@
         [self.descriptionFirstLoadView addSubview:self.descriptionFirstLoadLabel];
         
         _descriptionFirstLoadImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.descriptionFirstLoadLabel.frame) + 4.0f, 0.0f, 20.0f, 20.0f)];
-        self.descriptionFirstLoadImageView.image = [UIImage imageNamed:@"TAPIconSettingUp" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.descriptionFirstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoadingOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.descriptionFirstLoadView addSubview:self.descriptionFirstLoadImageView];
         
         self.descriptionFirstLoadView.frame = CGRectMake((CGRectGetWidth(self.firstLoadView.frame) - (CGRectGetWidth(self.descriptionFirstLoadLabel.frame) + 4.0f + CGRectGetWidth(self.descriptionFirstLoadImageView.frame))) / 2.0f, CGRectGetMinY(self.descriptionFirstLoadView.frame), CGRectGetWidth(self.descriptionFirstLoadLabel.frame) + 4.0f + CGRectGetWidth(self.descriptionFirstLoadImageView.frame), CGRectGetHeight(self.descriptionFirstLoadView.frame));

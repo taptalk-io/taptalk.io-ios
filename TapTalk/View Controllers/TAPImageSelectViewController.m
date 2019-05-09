@@ -46,6 +46,7 @@
 - (void)isShowLoadingIndicatorView:(BOOL)isShow;
 - (void)processPhotos;
 - (void)fetchCameraRollData;
+- (void)loopFetchThumbnailImageWithIndexCounter:(NSInteger)indexCount selectedResultArray:(NSMutableArray *)array;
 
 @end
 
@@ -63,7 +64,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     if(self.imageSelectViewControllerNavigateType == ImageSelectViewControllerNavigateTypePresent) {
-        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconCloseGreen" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonDidTapped)];
+        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonDidTapped)];
         [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     }
     else if(self.imageSelectViewControllerNavigateType == ImageSelectViewControllerNavigateTypePush) {
@@ -82,7 +83,7 @@
     _loadedImageThumbnailDictionary = [NSMutableDictionary dictionary];
     
     if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGallery) {
-        _selectedImageDataArray = [NSMutableArray array];
+        _selectedMediaDataArray = [NSMutableArray array];
 
         self.title = NSLocalizedString(@"Photo Gallery", @"");
         // Fetch all assets, sorted by date created.
@@ -99,7 +100,7 @@
         }
     }
     
-    if([self.selectedImageDataArray count] > 0) {
+    if([self.selectedMediaDataArray count] > 0) {
         self.imageSelectView.itemNumberView.alpha = 1.0f;
         self.imageSelectView.continueButton.userInteractionEnabled = YES;
         self.imageSelectView.continueButton.alpha = 1.0f;
@@ -165,7 +166,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     TAPImageSelectCollectionViewCell *cell = (TAPImageSelectCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifier forIndexPath:indexPath];
 
-    [cell setCellWithImage:(UIImage *)[self.loadedImageThumbnailDictionary objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]]];
+    UIImage *selectedImage = (UIImage *)[self.loadedImageThumbnailDictionary objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
+    PHAsset *asset = [self.galleryImageDataArray objectAtIndex:indexPath.row];
+    
+    [cell setCellWithImage:selectedImage andMediaAsset:asset];
 
     if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGalleryAlbum) {
         
@@ -186,7 +190,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else {
         if([self.galleryImageDataArray count] != 0) {
-            if([self.selectedImageDataArray containsObject:[self.galleryImageDataArray objectAtIndex:indexPath.row]]) {
+            if([self.selectedMediaDataArray containsObject:[self.galleryImageDataArray objectAtIndex:indexPath.row]]) {
                 //selected
                 [cell setCellAsSelected:YES];
             }
@@ -212,45 +216,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSString *selectedKeyString = [NSString stringWithFormat:@"%ld-%ld-%ld", (long)self.albumIndexSection , (long)self.albumIndexRow, (long)indexPath.row];
         
         if(![self.selectedImagePositionDictionary objectForKey:selectedKeyString]) {
-            //image not selected
-            if(self.isFromAddService) {
-                
-                NSInteger currentItemSelected = [self.selectedImageDataArray count];
-                NSInteger totalItemSelected = self.currentTotalImageData + currentItemSelected;
-                
-//                //user choose maximum limit of image choosen (5 images)
-//                if(totalItemSelected >= 5) {
-//                    //            if([self.selectedImageDataArray count] == 5) {
-//                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:NSLocalizedString(@"Uploaded images have exceeds the maximum limit (up to 5 images only)", @"") preferredStyle:UIAlertControllerStyleAlert];
-//
-//                    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//                    }];
-//
-//                    [alertController addAction:okAction];
-//                    [self presentViewController:alertController animated:YES completion:nil];
-//                    return;
-//                }
-            }
-            else {
-                //user choose maximum limit of image choosen (10 images)
-//                if([self.selectedImageDataArray count] == 10) {
-//                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:NSLocalizedString(@"You can only choose maximum 10 images", @"") preferredStyle:UIAlertControllerStyleAlert];
-//
-//                    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//                    }];
-//
-//                    [alertController addAction:okAction];
-//                    [self presentViewController:alertController animated:YES completion:nil];
-//                    return;
-//                }
-            }
+            
+            NSInteger currentItemSelected = [self.selectedMediaDataArray count];
+            NSInteger totalItemSelected = self.currentTotalImageData + currentItemSelected;
             
             //not selected, change to selected
-            [self.selectedImageDataArray addObject:imageObject];
+            [self.selectedMediaDataArray addObject:imageObject];
             [self.selectedImagePositionDictionary setObject:imageObject forKey:selectedKeyString];
             
             if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidAddSelectedImage:selectedDictionary:)]) {
-                [self.delegate imageSelectViewControllerDidAddSelectedImage:self.selectedImageDataArray selectedDictionary:self.selectedImagePositionDictionary];
+                [self.delegate imageSelectViewControllerDidAddSelectedImage:self.selectedMediaDataArray selectedDictionary:self.selectedImagePositionDictionary];
             }
             
             [currentSelectedCell setCellAsSelected:YES];
@@ -258,11 +233,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         else {
             //image selected
             //already selected, change to not selected
-            [self.selectedImageDataArray removeObject:imageObject];
+            [self.selectedMediaDataArray removeObject:imageObject];
             [self.selectedImagePositionDictionary removeObjectForKey:selectedKeyString];
             
             if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidAddSelectedImage:selectedDictionary:)]) {
-                [self.delegate imageSelectViewControllerDidAddSelectedImage:self.selectedImageDataArray selectedDictionary:self.selectedImagePositionDictionary];
+                [self.delegate imageSelectViewControllerDidAddSelectedImage:self.selectedMediaDataArray selectedDictionary:self.selectedImagePositionDictionary];
             }
             
             [currentSelectedCell setCellAsSelected:NO];
@@ -272,52 +247,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else {
         //check selected
-        if(![self.selectedImageDataArray containsObject:imageObject]) {
-            
-            if(self.isFromAddService) {
-                
-                NSInteger currentItemSelected = [self.selectedImageDataArray count];
-                NSInteger totalItemSelected = self.currentTotalImageData + currentItemSelected;
-                
-                //user choose maximum limit of image choosen (5 images)
-                if(totalItemSelected >= 5) {
-                    //            if([self.selectedImageDataArray count] == 5) {
-                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:NSLocalizedString(@"Uploaded images have exceeds the maximum limit (up to 5 images only)", @"") preferredStyle:UIAlertControllerStyleAlert];
-                    
-                    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    }];
-                    
-                    [alertController addAction:okAction];
-                    [self presentViewController:alertController animated:YES completion:nil];
-                    return;
-                }
-            }
-            else {
-                //user choose maximum limit of image choosen (10 images)
-                if([self.selectedImageDataArray count] == 10) {
-                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:NSLocalizedString(@"You can only choose maximum 10 images", @"") preferredStyle:UIAlertControllerStyleAlert];
-                    
-                    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    }];
-                    
-                    [alertController addAction:okAction];
-                    [self presentViewController:alertController animated:YES completion:nil];
-                    return;
-                }
-            }
-            
+        if(![self.selectedMediaDataArray containsObject:imageObject]) {
             //not selected, change to selected
-            [self.selectedImageDataArray addObject:imageObject];
+            [self.selectedMediaDataArray addObject:imageObject];
             [currentSelectedCell setCellAsSelected:YES];
         }
         else {
             //already selected, change to not selected
-            [self.selectedImageDataArray removeObject:imageObject];
+            [self.selectedMediaDataArray removeObject:imageObject];
             [currentSelectedCell setCellAsSelected:NO];
         }
     }
     
-    NSInteger totalSelectedCount = [self.selectedImageDataArray count];
+    NSInteger totalSelectedCount = [self.selectedMediaDataArray count];
     self.imageSelectView.itemNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)totalSelectedCount];
     
     if(totalSelectedCount > 0) {
@@ -393,7 +335,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)clearButtonDidTapped {
     dispatch_async(dispatch_get_main_queue(), ^(void){
     _isSelectedCleared = YES;
-    _selectedImageDataArray = [NSMutableArray array];
+    _selectedMediaDataArray = [NSMutableArray array];
     _selectedImagePositionDictionary = [NSMutableDictionary dictionary];
 
     if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGalleryAlbum) {
@@ -405,7 +347,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //Run UI Updates
         [self.imageSelectView.collectionView reloadData];
     
-        NSInteger totalSelectedCount = [self.selectedImageDataArray count];
+        NSInteger totalSelectedCount = [self.selectedMediaDataArray count];
         self.imageSelectView.itemNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)totalSelectedCount];
         
         //Clear itemNumber
@@ -419,10 +361,221 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)continueButtonDidTapped {
+    NSMutableArray *selectedResultArray = [NSMutableArray array];
+    [self loopFetchThumbnailImageWithIndexCounter:0 selectedResultArray:selectedResultArray];
+}
+
+//- (void)continueButtonDidTapped {
+//
+//    if (self.imageSelectViewControllerContinueType == ImageSelectViewControllerContinueTypeAddMore) {
+//
+//        NSMutableArray *selectedResultArray = [NSMutableArray array];
+//        PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+//        requestOptions.synchronous = NO;
+//        requestOptions.networkAccessAllowed = YES;
+//        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
+//        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+//
+//        PHImageManager *manager = [PHImageManager defaultManager];
+//
+//        self.imageSelectView.continueButton.enabled = NO;
+//        self.imageSelectView.clearButton.enabled = NO;
+//        self.imageSelectView.collectionView.userInteractionEnabled = NO;
+//        self.imageSelectView.itemNumberView.alpha = 0.0f;
+//        self.imageSelectView.continueButton.alpha = 0.0f;
+//        self.imageSelectView.activityIndicatorView.alpha = 1.0f;
+//        [self.imageSelectView.activityIndicatorView startAnimating];
+//
+//        NSInteger __block count = 0;
+//        for (PHAsset *currentAsset in self.selectedMediaDataArray) {
+//            __block UIImage *imageResult;
+//            [manager requestImageDataForAsset:currentAsset
+//                                      options:requestOptions
+//                                resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info)
+//             {
+//                 dispatch_async(dispatch_get_main_queue(), ^{
+//
+//                     imageResult = [UIImage imageWithData:imageData];
+//
+//                     if (currentAsset.mediaType == PHAssetMediaTypeImage) {
+//                         if(imageResult != nil) {
+//                             TAPMediaPreviewModel *mediaPreview = [TAPMediaPreviewModel new];
+//                             mediaPreview.image = imageResult;
+//                             mediaPreview.mediaType = @"image";
+//                             [selectedResultArray addObject:mediaPreview];
+//                         }
+//
+//                         count++;
+//                         if(count == [self.selectedMediaDataArray count]) {
+//                             self.imageSelectView.continueButton.enabled = YES;
+//                             self.imageSelectView.clearButton.enabled = YES;
+//                             self.imageSelectView.collectionView.userInteractionEnabled = YES;
+//                             self.imageSelectView.itemNumberView.alpha = 1.0f;
+//                             self.imageSelectView.continueButton.alpha = 1.0f;
+//                             self.imageSelectView.activityIndicatorView.alpha = 0.0f;
+//                             [self.imageSelectView.activityIndicatorView stopAnimating];
+//                             if(!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
+//                                 if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedContinueButtonWithDataArray:)]) {
+//                                     [self.delegate imageSelectViewControllerDidTappedContinueButtonWithDataArray:selectedResultArray];
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     else if (currentAsset.mediaType == PHAssetMediaTypeVideo) {
+//                         //Handle for video
+//                         PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+//                         options.version = PHVideoRequestOptionsVersionOriginal;
+//                         options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+//                         options.networkAccessAllowed = YES;
+//                         options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info){
+//                             NSLog(@"====== PROGRESS DOWNLOAD %f", progress);
+//
+//                         };
+//                         [manager requestAVAssetForVideo:currentAsset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+//
+//                             if (asset != nil) {
+//                                 TAPMediaPreviewModel *mediaPreview = [TAPMediaPreviewModel new];
+//                                 mediaPreview.videoAsset = asset;
+//                                 mediaPreview.image = imageResult;
+//                                 mediaPreview.mediaType = @"video";
+//                                 [selectedResultArray addObject:mediaPreview];
+//                             }
+//
+//                             dispatch_async(dispatch_get_main_queue(), ^{
+//
+//                                 count++;
+//                                 if(count == [self.selectedMediaDataArray count]) {
+//                                     self.imageSelectView.continueButton.enabled = YES;
+//                                     self.imageSelectView.clearButton.enabled = YES;
+//                                     self.imageSelectView.collectionView.userInteractionEnabled = YES;
+//                                     self.imageSelectView.itemNumberView.alpha = 1.0f;
+//                                     self.imageSelectView.continueButton.alpha = 1.0f;
+//                                     self.imageSelectView.activityIndicatorView.alpha = 0.0f;
+//                                     [self.imageSelectView.activityIndicatorView stopAnimating];
+//                                     if(!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
+//                                         if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedContinueButtonWithDataArray:)]) {
+//                                             [self.delegate imageSelectViewControllerDidTappedContinueButtonWithDataArray:selectedResultArray];
+//                                         }
+//                                     }
+//                                 }
+//                             });
+//                         }];
+//                     }
+//                 });
+//             }];
+//        }
+//    }
+//    else {
+//        TAPImagePreviewViewController *imagePreviewViewController  = [[TAPImagePreviewViewController alloc] init];
+//        imagePreviewViewController.delegate = self;
+//
+//        NSMutableArray *selectedResultArray = [NSMutableArray array];
+//        PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+//        requestOptions.synchronous = NO;
+//        requestOptions.networkAccessAllowed = YES;
+//        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
+//        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+//
+//        PHImageManager *manager = [PHImageManager defaultManager];
+//
+//        self.imageSelectView.continueButton.enabled = NO;
+//        self.imageSelectView.clearButton.enabled = NO;
+//        self.imageSelectView.collectionView.userInteractionEnabled = NO;
+//        self.imageSelectView.itemNumberView.alpha = 0.0f;
+//        self.imageSelectView.continueButton.alpha = 0.0f;
+//        self.imageSelectView.activityIndicatorView.alpha = 1.0f;
+//        [self.imageSelectView.activityIndicatorView startAnimating];
+//
+//        NSInteger __block count = 0;
+//        for (PHAsset *currentAsset in self.selectedMediaDataArray) {
+//
+//            __block UIImage *imageResult;
+//            [manager requestImageDataForAsset:currentAsset
+//                                      options:requestOptions
+//                                resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info)
+//             {
+//                 dispatch_async(dispatch_get_main_queue(), ^{
+//                     imageResult = [UIImage imageWithData:imageData];
+//                     if (currentAsset.mediaType == PHAssetMediaTypeImage) {
+//                         if(imageResult != nil) {
+//                             TAPMediaPreviewModel *mediaPreview = [TAPMediaPreviewModel new];
+//                             mediaPreview.image = imageResult;
+//                             mediaPreview.mediaType = @"image";
+//                             [selectedResultArray addObject:mediaPreview];
+//                             [imagePreviewViewController setMediaPreviewData:mediaPreview];
+//                         }
+//
+//                         count++;
+//                         if(count == [self.selectedMediaDataArray count]) {
+//                             self.imageSelectView.continueButton.enabled = YES;
+//                             self.imageSelectView.clearButton.enabled = YES;
+//                             self.imageSelectView.collectionView.userInteractionEnabled = YES;
+//                             self.imageSelectView.itemNumberView.alpha = 1.0f;
+//                             self.imageSelectView.continueButton.alpha = 1.0f;
+//                             self.imageSelectView.activityIndicatorView.alpha = 0.0f;
+//                             [self.imageSelectView.activityIndicatorView stopAnimating];
+//                             if(!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
+//                                 [self.navigationController pushViewController:imagePreviewViewController animated:YES];
+//                             }
+//                         }
+//                     }
+//                     else if (currentAsset.mediaType == PHAssetMediaTypeVideo) {
+//                         //Handle for video
+//                         PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+//                         options.version = PHVideoRequestOptionsVersionOriginal;
+//                         options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+//                         options.networkAccessAllowed = YES;
+//                         options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info){
+//                             NSLog(@"====== PROGRESS DOWNLOAD %f", progress);
+//                         };
+//                         [manager requestAVAssetForVideo:currentAsset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+//
+//                             if (asset != nil) {
+//                                 TAPMediaPreviewModel *mediaPreview = [TAPMediaPreviewModel new];
+//                                 mediaPreview.videoAsset = asset;
+//                                 mediaPreview.image = imageResult;
+//                                 mediaPreview.mediaType = @"video";
+//                                 [selectedResultArray addObject:mediaPreview];
+//                                 [imagePreviewViewController setMediaPreviewData:mediaPreview];
+//                             }
+//
+//                             dispatch_async(dispatch_get_main_queue(), ^{
+//
+////                                 if (asset != nil) {
+////                                     TAPMediaPreviewModel *mediaPreview = [TAPMediaPreviewModel new];
+////                                     mediaPreview.videoAsset = asset;
+////                                     mediaPreview.image = imageResult;
+////                                     mediaPreview.mediaType = @"video";
+////                                     [selectedResultArray addObject:mediaPreview];
+////                                     [imagePreviewViewController setMediaPreviewData:mediaPreview];
+////                                 }
+//
+//                                 count++;
+//                                 if(count == [self.selectedMediaDataArray count]) {
+//                                     self.imageSelectView.continueButton.enabled = YES;
+//                                     self.imageSelectView.clearButton.enabled = YES;
+//                                     self.imageSelectView.collectionView.userInteractionEnabled = YES;
+//                                     self.imageSelectView.itemNumberView.alpha = 1.0f;
+//                                     self.imageSelectView.continueButton.alpha = 1.0f;
+//                                     self.imageSelectView.activityIndicatorView.alpha = 0.0f;
+//                                     [self.imageSelectView.activityIndicatorView stopAnimating];
+//                                     if(!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
+//                                         [self.navigationController pushViewController:imagePreviewViewController animated:YES];
+//                                     }
+//                                 }
+//                             });
+//                         }];
+//                     }
+//                 });
+//             }];
+//        }
+//    }
+//}
+
+- (void)loopFetchThumbnailImageWithIndexCounter:(NSInteger)indexCount selectedResultArray:(NSMutableArray *)array {
+    __block NSInteger indexCounter = indexCount;
     
-    if (self.imageSelectViewControllerContinueType == ImageSelectViewControllerContinueTypeAddMore) {
-        
-        NSMutableArray *selectedResultArray = [NSMutableArray array];
+    @autoreleasepool {
         PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
         requestOptions.synchronous = NO;
         requestOptions.networkAccessAllowed = YES;
@@ -431,108 +584,68 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         PHImageManager *manager = [PHImageManager defaultManager];
         
-        self.imageSelectView.continueButton.enabled = NO;
-        self.imageSelectView.clearButton.enabled = NO;
-        self.imageSelectView.collectionView.userInteractionEnabled = NO;
-        self.imageSelectView.itemNumberView.alpha = 0.0f;
-        self.imageSelectView.continueButton.alpha = 0.0f;
-        self.imageSelectView.activityIndicatorView.alpha = 1.0f;
-        [self.imageSelectView.activityIndicatorView startAnimating];
+        // assets contains PHAsset objects.
+        PHAsset *currentAsset = [self.selectedMediaDataArray objectAtIndex:indexCounter];
+        __block UIImage *imageResult;
+        __block NSMutableArray *selectedResultArray = array;
         
-        NSInteger __block count = 0;
-        for (PHAsset *currentAsset in self.selectedImageDataArray) {
-            __block UIImage *imageResult;
-            [manager requestImageDataForAsset:currentAsset
-                                      options:requestOptions
-                                resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info)
-             {
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     
-                     imageResult = [UIImage imageWithData:imageData];
-                     if(imageResult != nil) {
-                         TAPImagePreviewModel *imagePreview = [TAPImagePreviewModel new];
-                         imagePreview.image = imageResult;
-                         [selectedResultArray addObject:imagePreview];
-                     }
-                     
-                     count++;
-                     if(count == [self.selectedImageDataArray count]) {
-                         self.imageSelectView.continueButton.enabled = YES;
-                         self.imageSelectView.clearButton.enabled = YES;
-                         self.imageSelectView.collectionView.userInteractionEnabled = YES;
-                         self.imageSelectView.itemNumberView.alpha = 1.0f;
-                         self.imageSelectView.continueButton.alpha = 1.0f;
-                         self.imageSelectView.activityIndicatorView.alpha = 0.0f;
-                         [self.imageSelectView.activityIndicatorView stopAnimating];
-                         if(!(self.selectedImageDataArray == nil) && ([self.selectedImageDataArray count] > 0)) {
-                             if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedContinueButtonWithDataArray:)]) {
-                                 [self.delegate imageSelectViewControllerDidTappedContinueButtonWithDataArray:selectedResultArray];
-                             }
-                         }
-                     }
-                 });
-             }];
-        }
-    }
-    else {
-        TAPImagePreviewViewController *imagePreviewViewController  = [[TAPImagePreviewViewController alloc] init];
-        imagePreviewViewController.delegate = self;
-        
-        NSMutableArray *selectedResultArray = [NSMutableArray array];
-        PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-        requestOptions.synchronous = NO;
-        requestOptions.networkAccessAllowed = YES;
-        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
-        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-        
-        PHImageManager *manager = [PHImageManager defaultManager];
-        
-        self.imageSelectView.continueButton.enabled = NO;
-        self.imageSelectView.clearButton.enabled = NO;
-        self.imageSelectView.collectionView.userInteractionEnabled = NO;
-        self.imageSelectView.itemNumberView.alpha = 0.0f;
-        self.imageSelectView.continueButton.alpha = 0.0f;
-        self.imageSelectView.activityIndicatorView.alpha = 1.0f;
-        [self.imageSelectView.activityIndicatorView startAnimating];
-        
-        NSInteger __block count = 0;
-        for (PHAsset *currentAsset in self.selectedImageDataArray) {
-            __block UIImage *imageResult;
-            [manager requestImageDataForAsset:currentAsset
-                                      options:requestOptions
-                                resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info)
-             {
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     
-                     imageResult = [UIImage imageWithData:imageData];
-                     if(imageResult != nil) {
-                         TAPImagePreviewModel *imagePreview = [TAPImagePreviewModel new];
-                         imagePreview.image = imageResult;
-                         [selectedResultArray addObject:imagePreview];
-                     }
-                     
-                     [imagePreviewViewController setImagePreviewData:selectedResultArray];
-                     
-                     count++;
-                     if(count == [self.selectedImageDataArray count]) {
-                         self.imageSelectView.continueButton.enabled = YES;
-                         self.imageSelectView.clearButton.enabled = YES;
-                         self.imageSelectView.collectionView.userInteractionEnabled = YES;
-                         self.imageSelectView.itemNumberView.alpha = 1.0f;
-                         self.imageSelectView.continueButton.alpha = 1.0f;
-                         self.imageSelectView.activityIndicatorView.alpha = 0.0f;
-                         [self.imageSelectView.activityIndicatorView stopAnimating];
-                         if(!(self.selectedImageDataArray == nil) && ([self.selectedImageDataArray count] > 0)) {
-                             
-    //                         imagePreviewViewController.delegate = self;
-                             [self.navigationController pushViewController:imagePreviewViewController animated:YES];
-                         }
-                     }
-                 });
-             }];
-        }
+        [manager requestImageForAsset:currentAsset targetSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds)/2, CGRectGetWidth([UIScreen mainScreen].bounds)/2) contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                @autoreleasepool {
+                    imageResult = result;
+                    NSError *error = [info objectForKey:PHImageErrorKey];
+                    if (error) {
+#ifdef DEBUG
+                        NSLog(@"[CameraRoll] Image request error: %@",error);
+#endif
+                    } else {
+                        if (imageResult != nil) {
+                            TAPMediaPreviewModel *mediaPreview = [TAPMediaPreviewModel new];
+                            mediaPreview.asset = currentAsset;
+                            mediaPreview.thumbnailImage = imageResult;
+                            
+                            if (currentAsset.mediaType == PHAssetMediaTypeImage) {
+                                mediaPreview.mediaType = @"image";
+                            }
+                            else if (currentAsset.mediaType == PHAssetMediaTypeVideo) {
+                                mediaPreview.mediaType = @"video";
+                            }
+                            
+                            [selectedResultArray addObject:mediaPreview];
+                            
+                            if (indexCounter < [self.selectedMediaDataArray count] - 1) {
+                                // Recurring loop
+                                indexCounter++;
+                                [self loopFetchThumbnailImageWithIndexCounter:indexCounter selectedResultArray:selectedResultArray];
+                            }
+                            else {
+                                //Done loop
+                                if (self.imageSelectViewControllerContinueType == ImageSelectViewControllerContinueTypeAddMore) {
+                                    if (!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
+                                        if ([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedContinueButtonWithDataArray:)]) {
+                                            [self.delegate imageSelectViewControllerDidTappedContinueButtonWithDataArray:selectedResultArray];
+                                        }
+                                    }
+                                }
+                                else {
+                                    TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+                                    imagePreviewViewController.delegate = self;
+                                    
+                                    if (!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
+                                        [imagePreviewViewController setMediaPreviewDataWithArray:selectedResultArray];
+                                        [self.navigationController pushViewController:imagePreviewViewController animated:YES];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }];
     }
 }
+
+
 - (void)setImageSelectViewControllerNavigateType:(ImageSelectViewControllerNavigateType)imageSelectViewControllerNavigateType {
     _imageSelectViewControllerNavigateType = imageSelectViewControllerNavigateType;
 }
@@ -561,14 +674,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     PHFetchOptions *fetchOptions = [[PHFetchOptions alloc] init];
     fetchOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
     
-    PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:fetchOptions];
+    PHFetchResult *imageResult = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:fetchOptions];
+    PHFetchResult *videoResult = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeVideo options:fetchOptions];
     
-    NSLog(@"total photos: %d",(int)result.count);
+#ifdef DEBUG
+    NSLog(@"total photos: %d total videos: %d",(int)imageResult.count, (int)videoResult.count);
+#endif
     
-    for(PHAsset *asset in result) {
+    for(PHAsset *asset in imageResult) {
         [self.tempGalleryImageDataArray addObject:asset];
         [self.galleryImageDataArray addObject:asset];
     }
+    
+    for(PHAsset *asset in videoResult) {
+        [self.tempGalleryImageDataArray addObject:asset];
+        [self.galleryImageDataArray addObject:asset];
+    }
+    
     self.indexImageCount = 0;
     [self processPhotos];
 }
@@ -697,11 +819,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     _tempGalleryImageDataArray = [NSMutableArray array];
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
+//    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
     
     _cameraRollPhotos = [PHAsset fetchAssetsInAssetCollection:self.cameraRollCollection options:options];
     for(PHAsset *asset in self.cameraRollPhotos) {
         [self.tempGalleryImageDataArray addObject:asset];
+        [self.galleryImageDataArray addObject:asset];
     }
 
     self.indexImageCount = 0;

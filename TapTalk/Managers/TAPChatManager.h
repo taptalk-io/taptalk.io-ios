@@ -14,6 +14,10 @@
 #import "TAPOnlineStatusModel.h"
 #import "TAPTypingModel.h"
 #import "TAPQuoteModel.h"
+#import "TAPDataFileModel.h"
+
+#import <AVKit/AVKit.h>
+#import <Photos/Photos.h>
 
 typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
     TAPChatManagerQuoteActionTypeReply = 0,
@@ -45,6 +49,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 @property (strong, nonatomic) NSMutableDictionary *quotedMessageDictionary;
 @property (strong, nonatomic) NSMutableDictionary *quoteActionTypeDictionary;
 @property (strong, nonatomic) NSMutableDictionary *userInfoDictionary; //contains user info from custom quote
+@property (strong, nonatomic) NSMutableDictionary *filePathStoredDictionary;
 @property (nonatomic) TAPChatManagerQuoteActionType chatManagerQuoteActionType;
 @property (nonatomic) BOOL isTyping;
 
@@ -67,12 +72,16 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room;
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption;
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room;
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData;
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room;
 - (void)sendEmitFileMessage:(TAPMessageModel *)message;
 - (void)sendProductMessage:(TAPMessageModel *)message;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room;
-- (void)sendFileMessage:(NSData *)data;
-- (void)sendFileMessage:(NSData *)data room:(TAPRoomModel *)room;
+- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
+- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;

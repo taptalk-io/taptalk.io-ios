@@ -24,6 +24,7 @@
 
 //Textfield
 @property (strong, nonatomic) UITextField *searchBarTextField;
+@property (strong, nonatomic) UIView *shadowView;
 
 @end
 
@@ -34,6 +35,17 @@
     
     if (self) {
         self.backgroundColor = [UIColor clearColor];
+        
+        
+        _shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
+        self.shadowView.backgroundColor = [UIColor whiteColor];
+        self.shadowView.layer.cornerRadius = 8.0f;
+        self.shadowView.layer.shadowRadius = 5.0f;
+        self.shadowView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.shadowView.layer.shadowOpacity = 1.0f;
+        self.shadowView.layer.masksToBounds = NO;
+        self.shadowView.alpha = 0.0f;
+        [self addSubview:self.shadowView];
         
         _searchBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.searchBarView.backgroundColor = [UIColor whiteColor];
@@ -61,7 +73,7 @@
         _clearViewLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.clearView.frame), CGRectGetHeight(self.clearView.frame))];
         self.clearViewLabel.text = NSLocalizedString(@"CLEAR", @"");
         self.clearViewLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.clearViewLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:10.0f];
+        self.clearViewLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
         [self.clearView addSubview:self.clearViewLabel];
         
         _clearViewButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.clearView.frame), CGRectGetHeight(self.clearView.frame))];
@@ -71,7 +83,8 @@
         _searchBarTextField = [[UITextField alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.leftView.frame), 0.0f, CGRectGetMinX(self.clearView.frame) - CGRectGetMaxX(self.leftView.frame) - 8.0f, CGRectGetHeight(self.searchBarView.frame))]; //width -8.0f for gap between textfield and clear view.
         self.searchBarTextField.backgroundColor = [UIColor whiteColor];
         self.searchBarTextField.layer.cornerRadius = 4.0f;
-        self.searchBarTextField.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.searchBarTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
+        [self.searchBarTextField setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
         [self.searchBarView addSubview:self.searchBarTextField];
         self.searchBarTextField.delegate = self;
     }
@@ -119,6 +132,7 @@
 
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    [self setAsActive:YES animated:YES];
     if ([self.delegate respondsToSelector:@selector(searchBarViewTextFieldShouldBeginEditing:)]) {
         [self.delegate searchBarViewTextFieldShouldBeginEditing:textField];
     }
@@ -141,6 +155,7 @@
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
+    [self setAsActive:NO animated:YES];
     if ([self.delegate respondsToSelector:@selector(searchBarViewTextFieldDidEndEditing:)]) {
         [self.delegate searchBarViewTextFieldDidEndEditing:textField];
     }
@@ -153,6 +168,7 @@
 }
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField {
+    [self setAsActive:NO animated:NO];
     if ([self.delegate respondsToSelector:@selector(searchBarViewTextFieldShouldClear:)]) {
         [self.delegate searchBarViewTextFieldShouldClear:textField];
     }
@@ -236,6 +252,35 @@
     }
     else {
         self.searchBarTextField.alpha = 0.0f;
+    }
+}
+
+- (void)setAsActive:(BOOL)active animated:(BOOL)animated {
+    if (animated) {
+        if (active) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.shadowView.alpha = 1.0f;
+                self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
+                self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.shadowView.alpha = 0.0f;
+                self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_E4].CGColor;
+            }];
+        }
+    }
+    else {
+        if (active) {
+            self.shadowView.alpha = 1.0f;
+            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
+            self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+        }
+        else {
+            self.shadowView.alpha = 0.0f;
+            self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_E4].CGColor;
+        }
     }
 }
 

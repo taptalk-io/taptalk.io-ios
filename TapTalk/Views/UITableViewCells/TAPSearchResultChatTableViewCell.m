@@ -54,7 +54,7 @@
         
         _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
         self.numberOfUnreadMessageLabel.textColor = [UIColor whiteColor];
-        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - rightPadding, 0.0f, 0.0f, 13.0f)];
@@ -71,7 +71,7 @@
         //WK Note - Not being used in this feature
 //        _onlineStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.profileImageView.frame) + 8.0f), 20.0f)];
 //        self.onlineStatusLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-//        self.onlineStatusLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+//        self.onlineStatusLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
 //        [self.bgView addSubview:self.onlineStatusLabel];
 //
 //        _onlineStatusView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame) + 6.0f, 8.0f, 8.0f)];
@@ -143,14 +143,21 @@
         
         //Bubble Number
         CGSize newNumberOfUnreadMessageLabelSize = [self.numberOfUnreadMessageLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame))];
-        self.numberOfUnreadMessageLabel.frame = CGRectMake(CGRectGetMinX(self.numberOfUnreadMessageLabel.frame), CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
         
         //Bubble View
-        self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f), CGRectGetMinY(self.bubbleUnreadView.frame), CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f, CGRectGetHeight(self.bubbleUnreadView.frame));
+        CGFloat bubbleUnreadViewWidth = CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f;
+        if (bubbleUnreadViewWidth < CGRectGetHeight(self.bubbleUnreadView.frame)) {
+            bubbleUnreadViewWidth = CGRectGetHeight(self.bubbleUnreadView.frame);
+        }
+        
+        CGFloat numberOfUnreadMessageLabelXPosition = (bubbleUnreadViewWidth - newNumberOfUnreadMessageLabelSize.width) / 2.0f;
+        self.numberOfUnreadMessageLabel.frame = CGRectMake(numberOfUnreadMessageLabelXPosition, CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
+        
+        self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
         self.bubbleUnreadView.alpha = 1.0f;
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.bubbleUnreadView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"9954C2"].CGColor, (id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         gradient.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
@@ -225,7 +232,7 @@
     
     NSRange searchedRange = [lowercaseRoomName rangeOfString:lowercaseSeachedString];
     [roomNameAttributedString addAttribute:NSForegroundColorAttributeName
-                                     value:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93]
+                                     value:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1]
                                      range:searchedRange];
     
     self.roomNameLabel.attributedText = roomNameAttributedString;

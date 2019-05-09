@@ -9,6 +9,9 @@
 #import "TAPMyImageBubbleTableViewCell.h"
 #import "ZSWTappableLabel.h"
 
+#import <AVKit/AVKit.h>
+#import <Photos/Photos.h>
+
 @interface TAPMyImageBubbleTableViewCell () <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
@@ -19,6 +22,7 @@
 @property (strong, nonatomic) IBOutlet TAPImageView *thumbnailBubbleImageView;
 //@property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *cancelImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *downloadImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
@@ -37,6 +41,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconLeftConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconBottomConstraint;
@@ -44,6 +51,7 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyButtonRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyViewHeightContraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyViewInnerViewLeadingContraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyNameLabelLeadingConstraint;
@@ -75,6 +83,7 @@
 @property (strong, nonatomic) UIView *syncProgressSubView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
 @property (nonatomic) CGFloat lastProgress;
+@property (nonatomic) CGFloat newProgress;
 
 @property (nonatomic) BOOL isDownloaded;
 @property (nonatomic) CGFloat maxWidth;
@@ -88,7 +97,6 @@
 @property (nonatomic) CGFloat endAngle;
 @property (nonatomic) CGFloat borderWidth;
 @property (nonatomic) CGFloat pathWidth;
-@property (nonatomic) CGFloat newProgress;
 @property (nonatomic) NSInteger updateInterval;
 
 - (void)getImageSizeFromImage:(UIImage *)image;
@@ -371,19 +379,36 @@
         NSLog(@"CELL WIDTH %f CELL HEIGHT %f", self.cellWidth, self.cellHeight);
 #endif
         
-        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            if (savedImage != nil) {
-//                [self getImageSizeFromImage:savedImage];
-//                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-//                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-                [self.bubbleImageView setImage:savedImage];
-            }
-            else {
-                self.bubbleImageViewWidthConstraint.constant = 0.0f;
-                self.bubbleImageViewHeightConstraint.constant = 0.0f;
-            }
-        }];
+        NSDictionary *dataDictionary = message.data;
+//        PHAsset *asset = nil;
+//        asset = [dataDictionary objectForKey:@"asset"];
+        NSString *assetIdentifier = [dataDictionary objectForKey:@"assetIdentifier"];
+        PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
 
+        if (asset != nil) {
+            [[TAPFetchMediaManager sharedManager] fetchImageDataForAsset:asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
+                
+            } resultHandler:^(UIImage * _Nonnull resultImage) {
+                if (resultImage != nil) {
+                    [self.bubbleImageView setImage:resultImage];
+                }
+                else {
+                    self.bubbleImageViewWidthConstraint.constant = 0.0f;
+                    self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                }
+            }];
+        }
+        else {
+            [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                if (savedImage != nil) {
+                    [self.bubbleImageView setImage:savedImage];
+                }
+                else {
+                    self.bubbleImageViewWidthConstraint.constant = 0.0f;
+                    self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                }
+            }];
+        }
     }
     else {        
         //already called fetchImageDataWithMessage function in view controller for fetch image
@@ -413,6 +438,92 @@
 
 - (void)receiveReadEvent {
     [super receiveReadEvent];
+}
+
+- (void)showStatusLabel:(BOOL)show {
+    if (show) {
+        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
+        
+        NSDate *currentDate = [NSDate date];
+        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+        
+        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
+        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+        
+        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+        
+        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+        
+        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
+        NSString *lastMessageDateString = @"";
+        if (timeGap <= midnightTimeGap) {
+            //Today
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"HH:mm";
+            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+        }
+        else if (timeGap <= 86400.0f + midnightTimeGap) {
+            //Yesterday
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"HH:mm";
+            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+        }
+        else {
+            //Set date
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
+            
+            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+        }
+        
+        NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+        self.statusLabel.text = statusString;
+        
+        if (self.message.isFailedSend) {
+            NSString *failedStatusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
+            self.statusLabel.text = failedStatusString;
+        }
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            self.statusLabel.alpha = 1.0f;
+            self.statusLabelTopConstraint.constant = 2.0f;
+            self.statusLabelHeightConstraint.constant = 13.0f;
+            self.replyButtonRightConstraint.constant = 2.0f;
+            
+            if (self.message.isFailedSend) {
+                self.statusIconImageView.alpha = 0.0f;
+                self.replyButton.alpha = 0.0f;
+            }
+            else {
+                self.statusIconImageView.alpha = 1.0f;
+                self.replyButton.alpha = 1.0f;
+            }
+            
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
+        } completion:^(BOOL finished) {
+        }];
+    }
+    else {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.statusLabel.alpha = 0.0f;
+            self.statusLabelTopConstraint.constant = 0.0f;
+            self.statusLabelHeightConstraint.constant = 0.0f;
+            self.replyButton.alpha = 0.0f;
+            self.replyButtonRightConstraint.constant = -28.0f;
+            self.statusIconImageView.alpha = 1.0f;
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
+        } completion:^(BOOL finished) {
+        }];
+    }
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
@@ -456,7 +567,13 @@
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;
-        _cellHeight = 244.0f;
+        _cellHeight = self.cellWidth / image.size.width * image.size.height;
+        if (self.cellHeight > self.maxHeight) {
+            _cellHeight = self.maxHeight;
+        }
+        else if (self.cellHeight < self.minHeight) {
+            _cellHeight = self.minHeight;
+        }
         return;
     }
     
@@ -537,7 +654,15 @@
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;
-        _cellHeight = 244.0f;
+        _cellHeight = self.cellWidth / width * height;
+        
+        if (self.cellHeight > self.maxHeight) {
+            _cellHeight = self.maxHeight;
+        }
+        else if (self.cellHeight < self.minHeight) {
+            _cellHeight = self.minHeight;
+        }
+        
         return;
     }
     
@@ -762,15 +887,26 @@
     if (show) {
         self.captionLabelTopConstraint.constant = 10.0f;
         self.captionLabelBottomConstraint.constant = 10.0f;
+        
+        CGSize captionLabelSize = [self.captionLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.captionLabel.bounds), CGFLOAT_MAX)];
+        self.captionLabelHeightConstraint.constant = captionLabelSize.height;
     }
     else {
         self.captionLabelTopConstraint.constant = 0.0f;
         self.captionLabelBottomConstraint.constant = 0.0f;
+        self.captionLabelHeightConstraint.constant = 0.0f;
     }
 }
 
 - (void)setImageCaptionWithString:(NSString *)captionString {
-    self.captionLabel.text = [TAPUtil nullToEmptyString:captionString];
+    captionString = [TAPUtil nullToEmptyString:captionString];
+    
+    self.captionLabel.text = captionString;
+    
+    if([captionString isEqualToString:@""]) {
+        [self showImageCaption:NO];
+        return;
+    }
     
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
@@ -800,12 +936,7 @@
     }];
     self.captionLabel.attributedText = attributedString;
     
-    if([captionString isEqualToString:@""]) {
-        [self showImageCaption:NO];
-    }
-    else {
-        [self showImageCaption:YES];
-    }
+    [self showImageCaption:YES];
 }
 
 - (void)setFullImage:(UIImage *)image {
@@ -904,19 +1035,30 @@
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileImageView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileImageView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }

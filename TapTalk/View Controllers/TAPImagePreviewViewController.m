@@ -9,28 +9,34 @@
 #import "TAPImagePreviewViewController.h"
 #import "TAPImagePreviewView.h"
 #import <Photos/Photos.h>
+#import <AVKit/AVKit.h>
 
 #import "TAPPhotoAlbumListViewController.h"
 #import "TAPCustomGrowingTextView.h"
 
-#import "TapThumbnailImagePreviewCollectionViewCell.h"
+#import "TAPThumbnailImagePreviewCollectionViewCell.h"
 #import "TAPImagePreviewCollectionViewCell.h"
 
-#import "TAPImagePreviewModel.h"
+#import "TAPMediaPreviewModel.h"
 
-@interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate>
+@interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, AVPlayerViewControllerDelegate>
 
 @property (strong, nonatomic) TAPImagePreviewView *imagePreviewView;
 
-@property (strong, nonatomic) NSMutableArray *imageDataArray;
+@property (strong, nonatomic) NSMutableArray *mediaDataArray;
+@property (strong, nonatomic) NSMutableDictionary *excedeedSizeLimitMediaDictionary;
 @property (nonatomic) NSInteger selectedIndex;
 @property (nonatomic) CGFloat captionTextViewHeight;
 @property (nonatomic) BOOL isScrolledFromThumbnailImageTapped;
+@property (nonatomic) BOOL showVideoPlayer;
+@property (nonatomic) BOOL *isContainExcedeedFileSizeLimit;
 
 - (void)cancelButtonDidTapped;
 - (void)morePictureButtonDidTapped;
 - (void)sendButtonDidTapped;
 - (void)openGallery;
+- (BOOL)isAssetSizeExcedeedLimitWithData:(TAPMediaPreviewModel *)mediaPreview;
+- (void)filterAssetSizeExcedeedLimitWithArray:(NSArray *)dataArray;
 
 @end
 
@@ -72,12 +78,13 @@
     [self.imagePreviewView.sendButton addTarget:self action:@selector(sendButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     _selectedIndex = 0;
+    _showVideoPlayer = NO;
     
     self.captionTextViewHeight = 22.0f;
     self.imagePreviewView.captionTextView.delegate = self;
     self.imagePreviewView.captionTextView.minimumHeight = 22.0f;
     self.imagePreviewView.captionTextView.maximumHeight = 60.0f;
-    [self.imagePreviewView.captionTextView setFont:[UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f]];
+    [self.imagePreviewView.captionTextView setFont:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f]];
     [self.imagePreviewView.captionTextView setTextColor:[UIColor whiteColor]];
     self.imagePreviewView.captionTextView.tintColor = [UIColor whiteColor];
     [self.imagePreviewView.captionTextView setPlaceholderColor:[UIColor whiteColor]];
@@ -86,16 +93,23 @@
     self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
     [self.imagePreviewView isShowCounterCharCount:NO];
     
-    if ([self.imageDataArray count] != 0 && [self.imageDataArray count] > 1) {
+    if ([self.mediaDataArray count] != 0 && [self.mediaDataArray count] > 1) {
         [self.imagePreviewView isShowAsSingleImagePreview:NO animated:NO];
     }
     else {
         [self.imagePreviewView isShowAsSingleImagePreview:YES animated:NO];
     }
     
-    [self.imagePreviewView setItemNumberWithCurrentNumber:1 ofTotalNumber:[self.imageDataArray count]];
+    [self.imagePreviewView setItemNumberWithCurrentNumber:1 ofTotalNumber:[self.mediaDataArray count]];
     [self.imagePreviewView.imagePreviewCollectionView reloadData];
     [self.imagePreviewView.thumbnailCollectionView reloadData];
+    
+    if ([self.mediaDataArray count] != 0) {
+        //Show excedeed bottom view if needed
+        TAPMediaPreviewModel *firstMediaPreview = [self.mediaDataArray firstObject];
+        BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:firstMediaPreview];
+        [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
+    }
 }
 
 #pragma mark - Data Source
@@ -163,7 +177,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-    return [self.imageDataArray count];
+    return [self.mediaDataArray count];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -171,24 +185,127 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSString *cellID = @"TAPImagePreviewCollectionViewCell";
         [collectionView registerClass:[TAPImagePreviewCollectionViewCell class] forCellWithReuseIdentifier:cellID];
         TAPImagePreviewCollectionViewCell *cell = (TAPImagePreviewCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+        cell.currentIndexPath = indexPath;
+        cell.delegate = self;
         
-        if ([self.imageDataArray count] != 0 && self.imageDataArray != nil) {
-            TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:indexPath.item];
-            UIImage *currentImage = currentImagePreview.image;
+        if ([self.mediaDataArray count] != 0 && self.mediaDataArray != nil) {
+            
+            TAPMediaPreviewModel *mediaPreview = [self.mediaDataArray objectAtIndex:indexPath.item];
+            UIImage *currentImage = mediaPreview.thumbnailImage;
             [cell setImagePreviewImage:currentImage];
+            cell.mediaPreviewData = mediaPreview;
+            
+            BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:mediaPreview];
+            if (isExceeded) {
+                cell.isExceededMaxFileSize = YES;
+            }
+            else {
+                cell.isExceededMaxFileSize = NO;
+            }
+            
+            if (mediaPreview.asset == nil) {
+                //Data is UIImage from camera
+                UIImage *image = mediaPreview.image;
+                [cell setImagePreviewImage:image];
+                cell.mediaPreviewData = mediaPreview;
+            }
+            else {
+                //Data is PHAsset (video or image)
+                if (mediaPreview.asset.mediaType == PHAssetMediaTypeImage) {
+                    [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeImage];
+                    [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+                    [cell showProgressView:NO animated:NO];
+                    
+                    NSNumber *fetchProgress = [[TAPFetchMediaManager sharedManager] getFetchProgressWithAsset:mediaPreview.asset];
+                    if (fetchProgress == nil) {
+                        //Download not started
+                        [[TAPFetchMediaManager sharedManager] fetchImageDataForAsset:mediaPreview.asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
+                            
+#ifdef DEBUG
+                            NSLog(@"====== PROGRESS DOWNLOAD IMAGE %f", progress);
+#endif
+                            
+                            [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDownloading];
+                            [cell animateProgressMediaWithProgress:progress total:1.0f];
+                            if (progress == 1.0f) {
+                                [TAPUtil delayCallback:^{
+                                    [cell animateFinishedDownload];
+                                } forTotalSeconds:0.3f];
+                            }
+                        }resultHandler:^(UIImage * _Nonnull resultImage) {
+                            mediaPreview.image = resultImage;
+                            [cell setImagePreviewImage:resultImage];
+                            cell.mediaPreviewData = mediaPreview;
+                        }];
+                    }
+                    else {
+                        //Download is in progress
+                        [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDownloading];
+                        [cell showProgressView:YES animated:NO];
+                        [cell animateProgressMediaWithProgress:[fetchProgress doubleValue] total:1.0f];
+                    }
+                }
+                else if (mediaPreview.asset.mediaType == PHAssetMediaTypeVideo) {
+                    [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeVideo];
+                    
+                    NSNumber *fetchProgress = [[TAPFetchMediaManager sharedManager] getFetchProgressWithAsset:mediaPreview.asset];
+                    if (fetchProgress == nil) {
+                        //Download not started
+                        [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+                        [cell showProgressView:NO animated:NO];
+                        [cell showPlayButton:YES animated:NO];
+                    }
+                    else {
+                        //Download is in progress
+                        [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDownloading];
+                        [cell showProgressView:YES animated:NO];
+                        [cell animateProgressMediaWithProgress:[fetchProgress doubleValue] total:1.0f];
+                    }
+                    
+                }
+            }
         }
         
         return cell;
     }
     else if (collectionView == self.imagePreviewView.thumbnailCollectionView) {
-        NSString *cellID = @"TapThumbnailImagePreviewCollectionViewCell";
-        [collectionView registerClass:[TapThumbnailImagePreviewCollectionViewCell class] forCellWithReuseIdentifier:cellID];
-        TapThumbnailImagePreviewCollectionViewCell *cell = (TapThumbnailImagePreviewCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+        NSString *cellID = @"TAPThumbnailImagePreviewCollectionViewCell";
+        [collectionView registerClass:[TAPThumbnailImagePreviewCollectionViewCell class] forCellWithReuseIdentifier:cellID];
+        TAPThumbnailImagePreviewCollectionViewCell *cell = (TAPThumbnailImagePreviewCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
 
-        if ([self.imageDataArray count] != 0 && self.imageDataArray != nil) {
-            TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:indexPath.item];
-            UIImage *currentImage = currentImagePreview.image;
-            [cell setThumbnailImageView:currentImage];
+        if ([self.mediaDataArray count] != 0 && self.mediaDataArray != nil) {
+            
+            TAPMediaPreviewModel *mediaPreview = [self.mediaDataArray objectAtIndex:indexPath.item];
+        
+            BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:mediaPreview];
+            if (isExceeded) {
+                cell.isExceededMaxFileSize = YES;
+                [cell setAsExceededFileSize:YES animated:NO];
+            }
+            else {
+                cell.isExceededMaxFileSize = NO;
+                [cell setAsExceededFileSize:NO animated:NO];
+            }
+            
+            if (mediaPreview.asset.mediaType == PHAssetMediaTypeImage || mediaPreview.asset == nil) {
+                [cell setThumbnailImagePreviewCollectionViewCellType:TAPThumbnailImagePreviewCollectionViewCellTypeImage];
+            }
+            else if (mediaPreview.asset.mediaType == PHAssetMediaTypeVideo) {
+                [cell setThumbnailImagePreviewCollectionViewCellType:TAPThumbnailImagePreviewCollectionViewCellTypeVideo];
+            }
+            
+            UIImage *thumbnailImage = nil;
+            if (mediaPreview.asset == nil) {
+                //data is from Camera - UIImage
+                thumbnailImage = mediaPreview.image;
+            }
+            else {
+                //data is from PHAsset
+                thumbnailImage = mediaPreview.thumbnailImage;
+            }
+            
+            [cell setThumbnailImageView:thumbnailImage];
+            cell.mediaPreviewData = mediaPreview;
         }
         
         if (indexPath.item == self.selectedIndex) {
@@ -234,7 +351,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
     if (collectionView == self.imagePreviewView.imagePreviewCollectionView) {
         if (indexPath.item != self.selectedIndex) {
-            TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:self.selectedIndex];
+            TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
             NSString *savedCaptionString = currentImagePreview.caption;
             savedCaptionString = [TAPUtil nullToEmptyString:savedCaptionString];
             
@@ -254,6 +371,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if (collectionView == self.imagePreviewView.thumbnailCollectionView) {
         
+        _showVideoPlayer = NO;
         _isScrolledFromThumbnailImageTapped = YES;
         
         if(indexPath.item == self.selectedIndex) {
@@ -266,34 +384,46 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //Remove from data array
             NSLog(@"indexpath item: %ld", indexPath.item);
             
-            if (indexPath.item == [self.imageDataArray count] - 1) {
+            if (indexPath.item == [self.mediaDataArray count] - 1) {
                 //Move index to -1 when delete last index
                 _selectedIndex = self.selectedIndex - 1;
             }
             
-            [self.imageDataArray removeObjectAtIndex:indexPath.item];
+            PHAsset *toBeDeletedAsset = [self.mediaDataArray objectAtIndex:indexPath.item];
+            
+            [self.mediaDataArray removeObjectAtIndex:indexPath.item];
+            
+//            NSString *generatedAssetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:toBeDeletedAsset];
+            NSString *generatedAssetKey = toBeDeletedAsset.localIdentifier;
+            [self.excedeedSizeLimitMediaDictionary removeObjectForKey:generatedAssetKey];
+            
+            [self filterAssetSizeExcedeedLimitWithArray:self.mediaDataArray];
             
             [self.imagePreviewView.imagePreviewCollectionView reloadData];
             [self.imagePreviewView.thumbnailCollectionView reloadData];
             
-            [self.imagePreviewView setItemNumberWithCurrentNumber:indexPath.item + 1 ofTotalNumber:[self.imageDataArray count]];
+            [self.imagePreviewView setItemNumberWithCurrentNumber:indexPath.item + 1 ofTotalNumber:[self.mediaDataArray count]];
             
-            if ([self.imageDataArray count] > 0 && [self.imageDataArray count] < 2) {
+            if ([self.mediaDataArray count] > 0 && [self.mediaDataArray count] < 2) {
                 [self.imagePreviewView isShowAsSingleImagePreview:YES animated:YES];
             }
+        
+            TAPMediaPreviewModel *nextSelectedMediaPreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
+            BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:nextSelectedMediaPreview];
+            [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
         }
         else {
-            TapThumbnailImagePreviewCollectionViewCell *previousCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.selectedIndex inSection:0]];
+            TAPThumbnailImagePreviewCollectionViewCell *previousCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.selectedIndex inSection:0]];
             [previousCell setAsSelected:NO];
             
             _selectedIndex = indexPath.item;
             
-            TapThumbnailImagePreviewCollectionViewCell *currentSelectedCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+            TAPThumbnailImagePreviewCollectionViewCell *currentSelectedCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
             [currentSelectedCell setAsSelected:YES];
             
             [self.imagePreviewView.imagePreviewCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
             
-            TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:self.selectedIndex];
+            TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
             NSString *savedCaptionString = currentImagePreview.caption;
             savedCaptionString = [TAPUtil nullToEmptyString:savedCaptionString];
             
@@ -309,6 +439,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
                 [self.imagePreviewView isShowCounterCharCount:NO];
             }
+            
+            //Show excedeed bottom view if needed
+            BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:currentImagePreview];
+            [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
         }
     }
 }
@@ -324,8 +458,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if(currentIndex < 0) {
             currentIndex = 0;
         }
-        else if(currentIndex > [self.imageDataArray count] - 1) {
-            currentIndex = [self.imageDataArray count] - 1;
+        else if(currentIndex > [self.mediaDataArray count] - 1) {
+            currentIndex = [self.mediaDataArray count] - 1;
         }
         
         if (currentIndex != self.selectedIndex) {
@@ -337,7 +471,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
                 [self.imagePreviewView.thumbnailCollectionView setContentOffset:CGPointMake(-self.imagePreviewView.thumbnailCollectionView.contentInset.left, self.imagePreviewView.thumbnailCollectionView.contentOffset.y) animated:YES];
             }
-            else if (currentIndex == [self.imageDataArray count] - 1) {
+            else if (currentIndex == [self.mediaDataArray count] - 1) {
                 //Last index
                 [self.imagePreviewView.thumbnailCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
                 
@@ -348,16 +482,32 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 [self.imagePreviewView.thumbnailCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
             }
-            
+
             if (!self.isScrolledFromThumbnailImageTapped) {
                 [self.imagePreviewView.thumbnailCollectionView reloadData];
             }
             
+            //Show excedeed file limit size if needed
+            TAPMediaPreviewModel *currentMediaPreview = [self.mediaDataArray objectAtIndex:currentIndex];
+            BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:currentMediaPreview];
+            if (isExceeded) {
+                [self.imagePreviewView showExcedeedFileSizeAlertView:YES animated:YES];
+            }
+            else {
+                [self.imagePreviewView showExcedeedFileSizeAlertView:NO animated:YES];
+            }
+            
+        }
+        else {
+            //currentIndex == self.selectedIndex
+            _showVideoPlayer = NO;
         }
         
-        [self.imagePreviewView setItemNumberWithCurrentNumber:currentIndex + 1 ofTotalNumber:[self.imageDataArray count]];
+        [self.imagePreviewView setItemNumberWithCurrentNumber:currentIndex + 1 ofTotalNumber:[self.mediaDataArray count]];
     }
 }
+
+
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if (scrollView == self.imagePreviewView.imagePreviewCollectionView) {
@@ -372,8 +522,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         _isScrolledFromThumbnailImageTapped = NO;
     }
     
-    if (scrollView == self.imagePreviewView.imagePreviewCollectionView) {        
-        TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:self.selectedIndex];
+    if (scrollView == self.imagePreviewView.imagePreviewCollectionView) {
+        
+        TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
+        
         NSString *savedCaptionString = currentImagePreview.caption;
         savedCaptionString = [TAPUtil nullToEmptyString:savedCaptionString];
         
@@ -437,22 +589,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     if ([trimmedCaptionString isEqualToString:@""]) {
         //remove saved caption
-        TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:self.selectedIndex];
+        TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
         currentImagePreview.caption = @"";
     }
     else {
-        TAPImagePreviewModel *currentImagePreview = [self.imageDataArray objectAtIndex:self.selectedIndex];
+        TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
         currentImagePreview.caption = captionString;
     }
 }
 
 #pragma mark TAPPhotoAlbumListViewController
 - (void)photoAlbumListViewControllerSelectImageWithDataArray:(NSArray *)dataArray {
-    [self addMoreImagePreviewData:dataArray];
+    
+    [self setMediaPreviewDataWithArray:dataArray];
     self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", TAP_LIMIT_OF_CAPTION_CHARACTER, TAP_LIMIT_OF_CAPTION_CHARACTER];
     [self.imagePreviewView isShowCounterCharCount:NO];
     
-    if ([self.imageDataArray count] != 0 && [self.imageDataArray count] > 1) {
+    if ([self.mediaDataArray count] != 0 && [self.mediaDataArray count] > 1) {
         [self.imagePreviewView isShowAsSingleImagePreview:NO animated:NO];
     }
     else {
@@ -464,9 +617,58 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [self.imagePreviewView.thumbnailCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
     [self.imagePreviewView.imagePreviewCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
     
-    [self.imagePreviewView setItemNumberWithCurrentNumber:1 ofTotalNumber:[self.imageDataArray count]];
+    [self.imagePreviewView setItemNumberWithCurrentNumber:1 ofTotalNumber:[self.mediaDataArray count]];
     [self.imagePreviewView.imagePreviewCollectionView reloadData];
     [self.imagePreviewView.thumbnailCollectionView reloadData];
+}
+
+#pragma mark TAPImagePreviewCollectionViewCell
+- (void)imagePreviewCollectionViewCellDidPlayVideoButtonDidTappedWithMediaPreview:(TAPMediaPreviewModel *)mediaPreview indexPath:(NSIndexPath *)indexPath {
+    
+    TAPImagePreviewCollectionViewCell *cell = (TAPImagePreviewCollectionViewCell *)[self.imagePreviewView.imagePreviewCollectionView cellForItemAtIndexPath:indexPath];
+    [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDownloading];
+    [cell showProgressView:YES animated:YES];
+    
+    _showVideoPlayer = YES;
+    [[TAPFetchMediaManager sharedManager] fetchVideoDataForAsset:mediaPreview.asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
+        
+#ifdef DEBUG
+        NSLog(@"====== PROGRESS DOWNLOAD VIDEO %f", progress);
+#endif
+        
+        [cell animateProgressMediaWithProgress:progress total:1.0f];
+        if (progress == 1.0f) {
+            [TAPUtil delayCallback:^{
+                [cell animateFinishedDownload];
+            } forTotalSeconds:0.3f];
+        }
+        
+    } resultHandler:^(AVAsset * _Nonnull resultVideoAsset) {
+        mediaPreview.videoAsset = resultVideoAsset;
+        cell.mediaPreviewData = mediaPreview;
+        
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        
+        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:resultVideoAsset];
+        AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+        
+        if (self.showVideoPlayer) {
+            AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+            controller.delegate = self;
+            controller.showsPlaybackControls = YES;
+            [self presentViewController:controller animated:YES completion:nil];
+            controller.player = player;
+            [player play];
+        }
+        
+        [TAPUtil delayCallback:^{
+            [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+            [cell showProgressView:NO animated:NO];
+            [cell showPlayButton:YES animated:NO];
+            _showVideoPlayer = NO;
+        } forTotalSeconds:0.5f];
+    }];
+    
 }
 
 #pragma mark - Custom Method
@@ -493,20 +695,33 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - CGRectGetHeight(self.imagePreviewView.captionView.frame), CGRectGetWidth(self.imagePreviewView.captionView.frame), CGRectGetHeight(self.imagePreviewView.captionView.frame));
 }
 
-- (void)setImagePreviewData:(NSArray *)array {
-    self.imageDataArray = [[NSMutableArray alloc] init];
-    self.imageDataArray = [array mutableCopy];
+- (void)setMediaPreviewDataWithData:(TAPMediaPreviewModel *)mediaPreviewData {
+    if (self.mediaDataArray == nil || [self.mediaDataArray count] == 0) {
+        self.mediaDataArray = [[NSMutableArray alloc] init];
+    }
+    
+    [self.mediaDataArray addObject:mediaPreviewData];
 }
 
-- (void)addMoreImagePreviewData:(NSArray *)array {
-    [self.imageDataArray addObjectsFromArray:[array mutableCopy]];
+- (void)setMediaPreviewDataWithArray:(NSMutableArray *)array {
+    if (self.mediaDataArray == nil || [self.mediaDataArray count] == 0) {
+        self.mediaDataArray = [[NSMutableArray alloc] init];
+    }
+    
+    [self.mediaDataArray addObjectsFromArray:array];
+    
+    [self filterAssetSizeExcedeedLimitWithArray:self.mediaDataArray];
 }
 
 - (void)cancelButtonDidTapped {
-    [self dismissViewControllerAnimated:YES completion:nil]; //DV Temp
+    _showVideoPlayer = NO;
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)morePictureButtonDidTapped {
+    
+    _showVideoPlayer = NO;
+    
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
@@ -586,11 +801,102 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)sendButtonDidTapped {
     [self.view endEditing:YES];
     
-    if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
-        [self.delegate imagePreviewDidTapSendButtonWithData:self.imageDataArray];
+    for (TAPMediaPreviewModel *mediaPreview in self.mediaDataArray) {
+        BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:mediaPreview];
+        if (isExceeded) {
+            _isContainExcedeedFileSizeLimit = YES;
+        }
     }
     
+    if (self.isContainExcedeedFileSizeLimit) {
+        //Show popup warning
+        
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Some files may not send", @"") detailInformation:[NSString stringWithFormat:@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the %ldMB upload limit and won’t be sent.", TAP_MAX_VIDEO_SIZE] leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Continue"];
+    }
+    else {
+        if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
+            [self.delegate imagePreviewDidTapSendButtonWithData:self.mediaDataArray];
+        }
+        
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+}
+
+- (void)popUpInfoTappedSingleButtonOrRightButton {
+    [super popUpInfoTappedSingleButtonOrRightButton];
+    
+    NSMutableArray *filteredDataArray = [[NSMutableArray alloc] init];
+    for (TAPMediaPreviewModel *mediaPreview in self.mediaDataArray) {
+        BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:mediaPreview];
+        if (!isExceeded) {
+            [filteredDataArray addObject:mediaPreview];
+        }
+    }
+    
+//    if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
+//        [self.delegate imagePreviewDidTapSendButtonWithData:filteredDataArray];
+//    }
+    
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (BOOL)isAssetSizeExcedeedLimitWithData:(TAPMediaPreviewModel *)mediaPreview {
+
+    BOOL isExceededMaxFileSize = NO;
+    
+    NSInteger fileSizeLimitStatus = mediaPreview.fileSizeLimitStatus;
+    if (fileSizeLimitStatus == 1) {
+        isExceededMaxFileSize = YES;
+    }
+    
+    return isExceededMaxFileSize;
+}
+
+- (void)filterAssetSizeExcedeedLimitWithArray:(NSArray *)dataArray {
+
+    if ([self.excedeedSizeLimitMediaDictionary count] == 0 || self.excedeedSizeLimitMediaDictionary == nil) {
+        _excedeedSizeLimitMediaDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    if ([dataArray count] == 0 || dataArray == nil) {
+        return;
+    }
+    
+    for (TAPMediaPreviewModel *mediaPreview in dataArray) {
+        if (mediaPreview.fileSizeLimitStatus == 0) {
+            PHAsset *asset = mediaPreview.asset;
+            
+            if (asset != nil) {
+                NSArray *assetResourceArray = [PHAssetResource assetResourcesForAsset:asset];
+                PHAssetResource *assetResource = [assetResourceArray firstObject];
+                double fileSize = [[assetResource valueForKey:@"fileSize"] doubleValue];
+                double filesizeInMB = fileSize / 1000000; //convert to MB
+                
+                if (filesizeInMB > TAP_MAX_VIDEO_SIZE && asset.mediaType == PHAssetMediaTypeVideo) {
+                    mediaPreview.fileSizeLimitStatus = 1; // exceeded limit
+                    //    NSString *generatedAssetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:asset];
+                    NSString *generatedAssetKey = asset.localIdentifier;
+                    [self.excedeedSizeLimitMediaDictionary setObject:mediaPreview forKey:generatedAssetKey];
+                }
+                else {
+                    mediaPreview.fileSizeLimitStatus = 2; // not exceeded limit
+                }
+            }
+            else {
+                //For mediaPreview with UIImage (Not PHAsset)
+                mediaPreview.fileSizeLimitStatus = 2; // not exceeded limit
+            }
+
+        }
+    }
+    
+    if ([self.excedeedSizeLimitMediaDictionary count] == [self.mediaDataArray count]) {
+        //Disable send button
+        [self.imagePreviewView enableSendButton:NO];
+    }
+    else {
+        [self.imagePreviewView enableSendButton:YES];
+    }
 }
 
 @end

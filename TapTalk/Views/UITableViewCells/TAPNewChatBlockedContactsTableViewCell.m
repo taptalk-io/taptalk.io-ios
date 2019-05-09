@@ -28,7 +28,7 @@
         _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 28.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 18.0f)];
         self.descriptionLabel.text = NSLocalizedString(@"Can’t find the contact you were looking for?", @"");
         self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_NORMAL size:13.0f];
+        self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.descriptionLabel.textAlignment = NSTextAlignmentCenter;
         NSMutableDictionary *descriptionAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat descriptionLetterSpacing = -0.2f;

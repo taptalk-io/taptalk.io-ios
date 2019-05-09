@@ -11,13 +11,15 @@
 @interface TAPImagePreviewView ()
 
 @property (strong, nonatomic) UIView *contentBackgroundView;
-
 @property (strong, nonatomic) UIView *thumbnailBackgroundGradientView;
-
 @property (strong, nonatomic) UIView *topMenuView;
 @property (strong, nonatomic) UILabel *numberOfImageInfoLabel;
-
 @property (strong, nonatomic) UIImageView *morePictureImageView;
+
+@property (strong, nonatomic) UIView *alertView;
+@property (strong, nonatomic) UILabel *alertTitleLabel;
+@property (strong, nonatomic) UILabel *alertDetailLabel;
+@property (strong, nonatomic) UIImageView *alertImageView;
 
 @end
 
@@ -59,7 +61,7 @@
         [self addSubview:self.imagePreviewCollectionView];
         
         _numberOfImageInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 32.0f - 50.0f, (CGRectGetHeight(self.topMenuView.frame) - 21.0f) / 2.0f, 50.0f, 21.0f)];
-        self.numberOfImageInfoLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
+        self.numberOfImageInfoLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
         self.numberOfImageInfoLabel.textColor = [UIColor whiteColor];
         self.numberOfImageInfoLabel.textAlignment = NSTextAlignmentCenter;
         [self.topMenuView addSubview:self.numberOfImageInfoLabel];
@@ -67,7 +69,7 @@
         _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.topMenuView.frame) - 21.0f) / 2.0f, 60.0f, 21.0f)];
         [self.cancelButton setTitle:NSLocalizedString(@"Cancel", @"") forState:UIControlStateNormal];
         self.cancelButton.backgroundColor = [UIColor clearColor];
-        self.cancelButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
+        self.cancelButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
         [self.cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.topMenuView addSubview:self.cancelButton];
         
@@ -91,7 +93,7 @@
         self.bottomMenuView.backgroundColor = [UIColor blackColor];
         [self addSubview:self.bottomMenuView];
         
-        _morePictureImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.bottomMenuView.frame) - 30.0f) / 2.0f, 30.0f, 30.0f)];
+        _morePictureImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.bottomMenuView.frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
         self.morePictureImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.morePictureImageView.image = [UIImage imageNamed:@"TAPIconAddImage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bottomMenuView addSubview:self.morePictureImageView];
@@ -102,7 +104,7 @@
         _sendButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bottomMenuView.frame) - 40.0f - 16.0f, (CGRectGetHeight(self.bottomMenuView.frame) - 21.0f) / 2.0f, 40.0f, 21.0f)];
         [self.sendButton setTitle:NSLocalizedString(@"Send", @"") forState:UIControlStateNormal];
         self.sendButton.backgroundColor = [UIColor clearColor];
-        self.sendButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:17.0f];
+        self.sendButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
         [self.sendButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.sendButton.titleLabel.textAlignment = NSTextAlignmentRight;
         [self.bottomMenuView addSubview:self.sendButton];
@@ -126,10 +128,48 @@
         
         _wordCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - wordCountLabelWidth - 16.0f, CGRectGetMinY(self.captionSeparatorView.frame) - 15.0f - 13.0f, wordCountLabelWidth, 13.0f)];
         self.wordCountLabel.textAlignment = NSTextAlignmentRight;
-        self.wordCountLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
+        self.wordCountLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
         self.wordCountLabel.textColor = [UIColor whiteColor];
-        
         [self.captionView addSubview:self.wordCountLabel];
+        
+        //Alert View
+        _alertContainerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMinY(self.bottomMenuView.frame) - 92.0f, CGRectGetWidth(self.frame), 92.0f)];
+        self.alertContainerView.alpha = 0.0f;
+        self.alertContainerView.backgroundColor = [UIColor clearColor];
+        self.alertContainerView.clipsToBounds = YES;
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = self.alertContainerView.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)[UIColor clearColor].CGColor, [[TAPUtil getColor:@"040404"] colorWithAlphaComponent:0.4f].CGColor, nil];
+        gradient.startPoint = CGPointMake(0.0f, 0.0f);
+        gradient.endPoint = CGPointMake(0.0f, 1.0f);
+        [self.alertContainerView.layer insertSublayer:gradient atIndex:0];
+        [self addSubview:self.alertContainerView];
+        
+        _alertView = [[UIView alloc] initWithFrame:CGRectMake(10.0f, 20.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 20.0f, 62.0f)];
+        self.alertView.backgroundColor = [TAPUtil getColor:@"FDF1F2"];
+        self.alertView.layer.borderWidth = 1.0f;
+        self.alertView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A].CGColor;
+        self.alertView.layer.cornerRadius = 8.0f;
+        [self.alertContainerView addSubview:self.alertView];
+        
+        _alertImageView = [[UIImageView alloc] initWithFrame:CGRectMake(14.0f, 14.0f, 16.0f, 16.0f)];
+        self.alertImageView.image = [UIImage imageNamed:@"TAPIconWarning" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.alertImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.alertImageView.clipsToBounds = YES;
+        self.alertImageView.layer.cornerRadius = CGRectGetHeight(self.alertImageView.frame) / 2.0f;
+        [self.alertView addSubview:self.alertImageView];
+        
+        _alertTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.alertImageView.frame) + 6.0f, 12.0f, CGRectGetWidth(self.alertView.frame) - CGRectGetWidth(self.alertImageView.frame) - 6.0f - 10.0f - 10.0f, 20.0f)];
+        self.alertTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:14.0f];
+        self.alertTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
+        self.alertTitleLabel.text = [NSString stringWithFormat:@"Exceeded %ldMB upload limit", TAP_MAX_VIDEO_SIZE];
+        [self.alertView addSubview:self.alertTitleLabel];
+        
+        _alertDetailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.alertTitleLabel.frame), CGRectGetMaxY(self.alertTitleLabel.frame), CGRectGetWidth(self.alertTitleLabel.frame), 16.0f)];
+        self.alertDetailLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:12.0f];
+        self.alertDetailLabel.textColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
+        self.alertDetailLabel.text = NSLocalizedString(@"Please remove this video to continue", @"");
+        [self.alertView addSubview:self.alertDetailLabel];
     }
     
     return self;
@@ -191,6 +231,44 @@
             self.thumbnailCollectionView.userInteractionEnabled = YES;
             self.thumbnailBackgroundGradientView.alpha = 1.0f;
         }
+    }
+}
+
+- (void)showExcedeedFileSizeAlertView:(BOOL)isShow animated:(BOOL)animated {
+    if (animated) {
+        if (isShow) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.alertContainerView.alpha = 1.0f;
+                self.captionView.alpha = 0.0f;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.alertContainerView.alpha = 0.0f;
+                self.captionView.alpha = 1.0f;
+            }];
+        }
+    }
+    else {
+        if (isShow) {
+            self.alertContainerView.alpha = 1.0f;
+            self.captionView.alpha = 0.0f;
+        }
+        else {
+            self.alertContainerView.alpha = 0.0f;
+            self.captionView.alpha = 1.0f;
+        }
+    }
+}
+
+- (void)enableSendButton:(BOOL)isEnable {
+    if (isEnable) {
+        [self.sendButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.sendButton.userInteractionEnabled = YES;
+    }
+    else {
+        [self.sendButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5f] forState:UIControlStateNormal];
+        self.sendButton.userInteractionEnabled = NO;
     }
 }
 

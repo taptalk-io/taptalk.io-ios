@@ -10,6 +10,9 @@
 
 @interface TAPPopUpInfoViewController ()
 
+@property (strong, nonatomic) NSString *leftOptionButtonString;
+@property (strong, nonatomic) NSString *singleOrRightOptionButtonString;
+
 - (void)popUpInfoViewHandleDidTappedLeftButton;
 - (void)popUpInfoViewHandleDidTappedRightButton;
 
@@ -35,8 +38,20 @@
     self.view.backgroundColor = [UIColor clearColor];
     
     if (self.popUpInfoViewControllerType == TAPPopUpInfoViewControllerTypeErrorMessage) {
-        [self.popUpInfoView setPopupInfoViewType:TAPPopupInfoViewTypeErrorMessage withTitle:self.titleInformation detailInformation:self.detailInformation];
+        [self.popUpInfoView setPopupInfoViewType:TAPPopupInfoViewTypeErrorMessage withTitle:self.titleInformation detailInformation:self.detailInformation leftOptionButtonTitle:self.leftOptionButtonString singleOrRightOptionButtonTitle:self.singleOrRightOptionButtonString];
         [self.popUpInfoView isShowTwoOptionButton:NO];
+    }
+    else if (self.popUpInfoViewControllerType == TAPPopUpInfoViewControllerTypeSuccessMessage) {
+        [self.popUpInfoView setPopupInfoViewType:TAPPopupInfoViewTypeSuccessMessage withTitle:self.titleInformation detailInformation:self.detailInformation leftOptionButtonTitle:self.leftOptionButtonString singleOrRightOptionButtonTitle:self.singleOrRightOptionButtonString];
+        [self.popUpInfoView isShowTwoOptionButton:NO];
+    }
+    else if (self.popUpInfoViewControllerType == TAPPopUpInfoViewControllerTypeInfoDefault) {
+        [self.popUpInfoView setPopupInfoViewType:TAPPopupInfoViewTypeInfoDefault withTitle:self.titleInformation detailInformation:self.detailInformation leftOptionButtonTitle:self.leftOptionButtonString singleOrRightOptionButtonTitle:self.singleOrRightOptionButtonString];
+        [self.popUpInfoView isShowTwoOptionButton:YES];
+    }
+    else if (self.popUpInfoViewControllerType == TAPPopUpInfoViewControllerTypeInfoDestructive) {
+        [self.popUpInfoView setPopupInfoViewType:TAPPopupInfoViewTypeInfoDestructive withTitle:self.titleInformation detailInformation:self.detailInformation leftOptionButtonTitle:self.leftOptionButtonString singleOrRightOptionButtonTitle:self.singleOrRightOptionButtonString];
+        [self.popUpInfoView isShowTwoOptionButton:YES];
     }
 }
 
@@ -69,10 +84,24 @@
     }];
 }
 
-- (void)setPopUpInfoViewControllerType:(TAPPopUpInfoViewControllerType)popUpInfoViewControllerType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo {
+- (void)setPopUpInfoViewControllerType:(TAPPopUpInfoViewControllerType)popUpInfoViewControllerType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionTitle singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionTitle {
     _popUpInfoViewControllerType = popUpInfoViewControllerType;
     _titleInformation = title;
     _detailInformation = detailInfo;
+    
+    if (leftOptionTitle == nil) {
+        _leftOptionButtonString = NSLocalizedString(@"Cancel", @"");
+    }
+    else {
+        _leftOptionButtonString = leftOptionTitle;
+    }
+    
+    if (singleOrRightOptionTitle == nil) {
+        _singleOrRightOptionButtonString = NSLocalizedString(@"OK", @"");
+    }
+    else {
+        _singleOrRightOptionButtonString = singleOrRightOptionTitle;
+    }
 }
 
 - (void)showPopupInfoView:(BOOL)isShow animated:(BOOL)animated completion:(void (^)(void))completion {

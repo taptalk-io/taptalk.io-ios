@@ -126,7 +126,7 @@
     } failure:^(NSError *error) {
         [self.scanQRCodePopupView setIsLoading:NO animated:YES];
         [self.scanQRCodePopupView showPopupView:NO animated:YES];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         
         failure(error);
     }];

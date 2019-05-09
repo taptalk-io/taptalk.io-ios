@@ -14,6 +14,7 @@
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
+@property (strong, nonatomic) IBOutlet UIView *fileView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
@@ -23,12 +24,13 @@
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
+@property (strong, nonatomic) IBOutlet UILabel *fileDescriptionSizePlaceholderLabel;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 
 @property (strong, nonatomic) IBOutlet UIView *progressContainerView;
-@property (strong, nonatomic) IBOutlet UIView *progressBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *innerBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
 
 @property (strong, nonatomic) IBOutlet UIView *cancelView;
@@ -72,8 +74,6 @@
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
-@property (strong, nonatomic) TAPGradientView *gradientView;
-
 @property (strong, nonatomic) UIView *syncProgressSubView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
 @property (nonatomic) CGFloat lastProgress;
@@ -114,7 +114,46 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    // Initialization code
+    
+    _startAngle = M_PI * 1.5;
+    _endAngle = self.startAngle + (M_PI * 2);
+    _borderWidth = 0.0f;
+    _pathWidth = 4.0f;
+    _newProgress = 0.0f;
+    _updateInterval = 1;
+    _cellWidth = 0.0f;
+    _cellHeight = 0.0f;
+    
+    self.bubbleView.clipsToBounds = YES;
+    self.statusLabelTopConstraint.constant = 0.0f;
+    self.statusLabelHeightConstraint.constant = 0.0f;
+    self.statusLabel.alpha = 0.0f;
+    
+    self.progressContainerView.layer.cornerRadius = CGRectGetHeight(self.innerBackgroundView.frame) / 2.0f;
+    self.progressBarView.layer.cornerRadius = CGRectGetHeight(self.progressBarView.frame) / 2.0f;
+    
+    _isDownloaded = NO;
+    
+    self.bubbleView.clipsToBounds = YES;
+    
+    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    
+    self.replyView.layer. cornerRadius = 4.0f;
+    
+    self.quoteImageView.layer.cornerRadius = 8.0f;
+    self.quoteView.layer.cornerRadius = 8.0f;
+    self.fileView.layer.cornerRadius = 8.0f;
+    
+    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                                          action:@selector(handleBubbleViewLongPress:)];
+    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
+    
+    [self showQuoteView:NO];
+    [self showForwardView:NO];
+    
+    [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeNotDownloaded];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -125,6 +164,12 @@
 
 #pragma mark - Custom Method
 - (void)setMessage:(TAPMessageModel *)message {
+    
+    if(message == nil) {
+        return;
+    }
+        
+    _message = message;
     
     if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
         [self showForwardView:YES];
@@ -184,17 +229,69 @@
         [self showQuoteView:NO];
     }
     
-    //    NSDictionary *dataDictionary = message.data;
-    //    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    //
-    //    NSString *mapAddress = [dataDictionary objectForKey:@"address"];
-    //    mapAddress = [TAPUtil nullToEmptyString:mapAddress];
-    //
-    //    CGFloat mapLatitude = [[dataDictionary objectForKey:@"latitude"] floatValue];
-    //    CGFloat mapLongitude = [[dataDictionary objectForKey:@"longitude"] floatValue];
-    //
-    //    [self setMapWithLatitude:mapLatitude longitude:mapLongitude];
-    //    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", mapAddress];
+    NSString *fileName = [message.data objectForKey:@"fileName"];
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    NSString *fileExtension  = [[fileName pathExtension] uppercaseString];
+    
+    fileName = [fileName stringByDeletingPathExtension];
+    
+    if ([fileExtension isEqualToString:@""]) {
+        fileExtension = [message.data objectForKey:@"mediaType"];
+        fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+        fileExtension = [fileExtension lastPathComponent];
+        fileExtension = [fileExtension uppercaseString];
+    }
+    
+    self.bubbleLabel.text = fileName;
+    
+    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+    self.fileDescriptionSizePlaceholderLabel.text = [NSString stringWithFormat:@"999.99 MB / %@", fileSize];
+    self.fileDescriptionLabel.text = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+    
+    NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
+    
+    NSDate *currentDate = [NSDate date];
+    NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+    
+    NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
+    NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+    [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+    midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+    NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+    
+    NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+    NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+    
+    NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+    
+    NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
+    NSString *lastMessageDateString = @"";
+    if (timeGap <= midnightTimeGap) {
+        //Today
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+    }
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
+        //Yesterday
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+    }
+    else {
+        //Set date
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
+        
+        NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+    }
+    
+    NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+    self.statusLabel.text = statusString;
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
@@ -288,6 +385,30 @@
     }
 }
 
+- (IBAction)retryDownloadButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileRetryDownloadButtonDidTapped:)]) {
+        [self.delegate yourFileRetryDownloadButtonDidTapped:self.message];
+    }
+}
+
+- (IBAction)downloadButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileDownloadButtonDidTapped:)]) {
+        [self.delegate yourFileDownloadButtonDidTapped:self.message];
+    }
+}
+
+- (IBAction)doneDownloadButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileOpenFileButtonDidTapped:)]) {
+        [self.delegate yourFileOpenFileButtonDidTapped:self.message];
+    }
+}
+
+- (IBAction)cancelButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileCancelButtonDidTapped:)]) {
+        [self.delegate yourFileCancelButtonDidTapped:self.message];
+    }
+}
+
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
     if ([self.delegate respondsToSelector:@selector(yourFileBubbleViewDidTapped:)]) {
         [self.delegate yourFileBubbleViewDidTapped:self.message];
@@ -322,7 +443,7 @@
         self.replyViewBottomConstraint.active = YES;
         self.replyViewBottomConstraint.constant = 8.0f;
         self.replyViewTopConstraint.active = YES;
-        self.replyViewTopConstraint.constant = 4.0f;
+        self.replyViewTopConstraint.constant = 0.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
         self.replyNameLabelLeadingConstraint.constant = 4.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
@@ -343,7 +464,7 @@
             self.replyViewTopConstraint.constant = 8.0f;
         }
         else {
-            self.replyViewTopConstraint.constant = 0.0f;
+            self.replyViewTopConstraint.constant = 10.0f;
         }
         
         self.replyViewInnerViewLeadingContraint.constant = 0.0f;
@@ -361,6 +482,7 @@
         self.quoteViewLeadingConstraint.active = YES;
         self.quoteViewTrailingConstraint.active = YES;
         self.quoteViewTopConstraint.active = YES;
+        self.quoteViewTopConstraint.constant = 0.0f;
         self.quoteViewBottomConstraint.active = YES;
         self.quoteView.alpha = 1.0f;
         self.replyViewBottomConstraint.active = NO;
@@ -400,33 +522,34 @@
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }
 
-- (void)showProgressUploadView:(BOOL)show {
-    if (show) {
-        self.progressBackgroundView.alpha = 1.0f;
-    }
-    else {
-        self.progressBackgroundView.alpha = 0.0f;
-    }
-}
-
-- (void)showNotDownloadedState {
+- (void)showDownloadedState:(BOOL)isShow {
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
     self.progressLayer.strokeStart = 0.0f;
@@ -435,9 +558,12 @@
     _progressLayer = nil;
     _syncProgressSubView = nil;
     
-    self.progressBackgroundView.alpha = 0.0f;
-    
-    [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeNotDownloaded];
+    if (isShow) {
+        [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDoneDownloadedUploaded];
+    }
+    else {
+        [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeNotDownloaded];
+    }
 }
 
 - (void)animateFinishedDownloadFile {
@@ -449,11 +575,19 @@
     _progressLayer = nil;
     _syncProgressSubView = nil;
     
-    [UIView animateWithDuration:0.2f animations:^{
-        self.progressBackgroundView.alpha = 0.0f;
-    }];
-    
     [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDoneDownloadedUploaded];
+}
+
+- (void)animateCancelDownloadFile {
+    self.lastProgress = 0.0f;
+    self.progressLayer.strokeEnd = 0.0f;
+    self.progressLayer.strokeStart = 0.0f;
+    [self.progressLayer removeAllAnimations];
+    [self.syncProgressSubView removeFromSuperview];
+    _progressLayer = nil;
+    _syncProgressSubView = nil;
+    
+    [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeNotDownloaded];
 }
 
 - (void)animateFailedDownloadFile {
@@ -468,7 +602,7 @@
     [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeRetry];
 }
 
-- (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total {
+- (void)animateProgressDownloadingFileWithProgress:(CGFloat)progress total:(CGFloat)total {
     CGFloat lastProgress = self.lastProgress;
     _newProgress = progress/total;
     
@@ -504,6 +638,27 @@
 
 - (void)showFileBubbleStatusWithType:(TAPYourFileBubbleTableViewCellStateType)type {
     
+    // borderWidth is a float representing a value used as a margin (outer border).
+    // pathwidth is the width of the progress path (inner).
+    _startAngle = M_PI * 1.5;
+    _endAngle = self.startAngle + (M_PI * 2);
+    _borderWidth = 0.0f;
+    _pathWidth = 4.0f;
+    
+    // progress is a float storing current progress
+    // newProgress is a float storing updated progress
+    // updateInterval is a float specifying the duration of the animation.
+    _newProgress = 0.0f;
+    _updateInterval = 1;
+    
+    // set initial
+    _syncProgressSubView = [[UIView alloc] initWithFrame:self.progressBarView.bounds];
+    [self.progressBarView addSubview:self.syncProgressSubView];
+    _progressLayer = [CAShapeLayer layer];
+    _lastProgress = 0.0f;
+    
+    [self showStatusLabel:YES animated:NO];
+    
     if (type == TAPYourFileBubbleTableViewCellStateTypeDoneDownloadedUploaded) {
         self.cancelView.alpha = 0.0f;
         self.downloadView.alpha = 0.0f;
@@ -517,8 +672,8 @@
         self.retryDownloadView.alpha = 0.0f;
     }
     else if (type == TAPYourFileBubbleTableViewCellStateTypeDownloading) {
-        self.cancelView.alpha = 0.0f;
-        self.downloadView.alpha = 1.0f;
+        self.cancelView.alpha = 1.0f;
+        self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
         self.retryDownloadView.alpha = 0.0f;
     }

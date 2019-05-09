@@ -9,10 +9,13 @@
 #import "TAPBaseViewController.h"
 #import <AFNetworking/AFNetworking.h>
 #import "TAPPopUpInfoViewController.h"
+#import "TAPLeftCustomNavigationButton.h"
 
 @interface TAPBaseViewController () <TAPPopUpInfoViewControllerDelegate>
 
 @property (strong, nonatomic) UIImage *navigationShadowImage;
+@property (nonatomic) CGFloat navigationBarShadowOpacity;
+
 - (void)backButtonDidTapped;
 - (void)closeButtonDidTapped;
 
@@ -31,10 +34,10 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    //    [[NSNotificationCenter defaultCenter] addObserver:self
-    //                                             selector:@selector(reachabilityDidChange:)
-    //                                                 name:AFNetworkingReachabilityDidChangeNotification
-    //                                               object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(reachabilityDidChange:)
+//                                                 name:AFNetworkingReachabilityDidChangeNotification
+//                                               object:nil];
     
     [self.navigationController.navigationBar setTitleTextAttributes:
      @{NSForegroundColorAttributeName:[TAPUtil getColor:TAP_COLOR_BLACK_44],
@@ -47,13 +50,14 @@
     self.navigationController.navigationBar.layer.shadowRadius = 1.0;
     self.navigationController.navigationBar.layer.shadowOpacity = 0.4;
     _navigationShadowImage = self.navigationController.navigationBar.shadowImage;
+    _navigationBarShadowOpacity = self.navigationController.navigationBar.layer.shadowOpacity;
     
     [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc]init] forBarMetrics:UIBarMetricsDefault];
     //End Note
     
     //WK Note - To show line under navigation bar
-    //    [self.navigationController.navigationBar setShadowImage:self.navigationShadowImage];
+//    [self.navigationController.navigationBar setShadowImage:self.navigationShadowImage];
     //End Note
     
     self.navigationController.navigationBar.translucent = NO;
@@ -82,6 +86,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
     self.automaticallyAdjustsScrollViewInsets = NO;
+    
+    [self showNavigationSeparator:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -92,14 +98,14 @@
 }
 
 /*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleDefault;
@@ -165,7 +171,7 @@
 }
 
 - (void)reachabilityChangeIsReachable:(BOOL)reachable {
-    
+
 }
 
 - (void)showCustomBackButton {
@@ -178,12 +184,29 @@
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 
+- (void)showCustomBackButtonOrange {
+    TAPLeftCustomNavigationButton *button = [TAPLeftCustomNavigationButton buttonWithType:UIButtonTypeCustom];
+    button.translatesAutoresizingMaskIntoConstraints = NO;
+    [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    button.contentEdgeInsets = UIEdgeInsetsMake(4.0f, 0.0f, 4.0f, 18.0f);
+    
+    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:button];
+
+    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrowOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+
+    UIBarButtonItem *positiveSeparator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    positiveSeparator.width = 6.0f;
+    
+    self.navigationItem.leftBarButtonItems = @[positiveSeparator, item];
+}
+
 - (void)backButtonDidTapped {
     [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)showCustomCloseButton {
-    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconCloseGreen" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
@@ -196,22 +219,47 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo {
+//Note
+//Set left or right button option title to nil to set to default value ("OK" for single or right option button, "Cancel" for left option button)
+- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString {
     
     TAPPopUpInfoViewController *popupInfoViewController = [[TAPPopUpInfoViewController alloc] init];
     popupInfoViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     popupInfoViewController.delegate = self;
-    [popupInfoViewController setPopUpInfoViewControllerType:type withTitle:title detailInformation:detailInfo];
+    [popupInfoViewController setPopUpInfoViewControllerType:type withTitle:title detailInformation:detailInfo leftOptionButtonTitle:leftOptionString singleOrRightOptionButtonTitle:singleOrRightOptionString];
+
     [self presentViewController:popupInfoViewController animated:NO completion:^{
     }];
 }
 
 - (void)popUpInfoDidTappedLeftButton {
-    
+
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButton {
     
+}
+
+- (void)showNavigationSeparator:(BOOL)show {
+    if (show) {
+        [self.navigationController.navigationBar setShadowImage:nil];
+        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+        
+        if (self.navigationBarShadowOpacity != 0.0f) {
+            self.navigationController.navigationBar.layer.shadowOpacity = self.navigationBarShadowOpacity;
+        }
+        
+    }
+    else {
+        
+        if (self.navigationBarShadowOpacity == 0.0f) {
+            _navigationBarShadowOpacity = self.navigationController.navigationBar.layer.shadowOpacity;
+        }
+        
+        [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
+        [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
+        self.navigationController.navigationBar.layer.shadowOpacity = 0.0f;
+    }
 }
 
 

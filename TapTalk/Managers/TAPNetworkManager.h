@@ -53,10 +53,27 @@ refreshToken:(NSString *)refreshToken
 
 - (NSURLSessionUploadTask *)upload:(NSString *)urlString
                           fileData:(NSData *)fileData
+                          fileName:(NSString *)fileName
+                          fileType:(NSString *)filetype
                           mimeType:(NSString *)mimeType
                         parameters:(NSDictionary *)parameters
                           progress:(void (^)(NSProgress *uploadProgress))progress
                            success:(void (^)(NSDictionary *responseObject))success
                            failure:(void (^)(NSError *error))failure;
+
+- (NSURLSessionUploadTask *)upload:(NSString *)urlString
+                          fileData:(NSData *)fileData
+                        parameters:(NSDictionary *)parameters
+                          progress:(void (^)(NSProgress *uploadProgress))progress
+                           success:(void (^)(NSDictionary *responseObject))success
+                           failure:(void (^)(NSError *error))failure;
+
+- (void)download:(NSString *)urlString
+      parameters:(NSMutableDictionary *)parameters
+        progress:(void (^)(NSProgress *downloadProgress))progress
+         success:(void (^)(NSData *downloadedData))success
+         failure:(void (^)(NSError *error))failure;
+
+- (void)cancelDownloadWithFileID:(NSString *)fileID;
 
 @end

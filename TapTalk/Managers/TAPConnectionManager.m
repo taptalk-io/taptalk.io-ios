@@ -10,9 +10,9 @@
 
 #import <AFNetworking/AFNetworking.h>
 
-#define kSocketURLDevelopment @"wss://hp-dev.moselo.com:8080/pigeon"
-#define kSocketURLStaging @"wss://hp-staging.moselo.com:8080/pigeon"
-#define kSocketURLProduction @"wss://hp.moselo.com:8080/pigeon"
+#define kSocketURLDevelopment @"wss://hp-dev.moselo.com/connect"
+#define kSocketURLStaging @"wss://hp-staging.moselo.com/connect"
+#define kSocketURLProduction @"wss://taptalk-production.moselo.com/connect"
 
 //#define kSocketURLDevelopment @"wss://engine-dev.taptalk.io:8080/pigeon"
 //#define kSocketURLStaging @"wss://engine-staging.taptalk.io:8080/pigeon"

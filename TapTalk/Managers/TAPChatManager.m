@@ -8,6 +8,7 @@
 
 #import "TAPChatManager.h"
 #import "TAPConnectionManager.h"
+#import <TapTalk/Base64.h>
 
 #define kCharacterLimit 1000
 #define kMaximumRetryAttempt 10
@@ -72,6 +73,7 @@
         _quotedMessageDictionary = [[NSMutableDictionary alloc] init];
         _quoteActionTypeDictionary = [[NSMutableDictionary alloc] init];
         _userInfoDictionary = [[NSMutableDictionary alloc] init];
+        _filePathStoredDictionary = [[NSMutableDictionary alloc] init];
         _activeUser = [TAPDataManager getActiveUser];
         _checkPendingBackgroundTaskRetryAttempt = 0;
         _isEnterBackgroundSequenceActive = NO;
@@ -228,22 +230,21 @@
         //Add message to waiting response array
         [self.waitingResponseDictionary setObject:message forKey:message.localID];
         
-//        //Encrypt message
-//        message.body = [TAPEncryptorManager encryptString:message.body key:message.localID];
-//        message.quote.content = [TAPEncryptorManager encryptString:message.quote.content key:message.localID];
-//
-//        NSMutableDictionary *parametersDictionary = [NSMutableDictionary dictionary];
-//        parametersDictionary = [[message toDictionary] mutableCopy];
-//
-//        NSDictionary *dataDictionary = [parametersDictionary objectForKey:@"data"];
-//        NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
-//        NSString *encryptedDataJSONString = [TAPEncryptorManager encryptString:dataJSONString key:message.localID];
-        
-//        [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
-        
+        //Encrypt message
         NSDictionary *encryptedParametersDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModel:message];
+
+        //Convert CountryID from string to integer (because server only accept countryID as integer)
+        NSMutableDictionary *parameterDictionary = [[NSMutableDictionary alloc] init];
+        parameterDictionary = [encryptedParametersDictionary mutableCopy];
+        NSMutableDictionary *userDictionary = [[parameterDictionary objectForKey:@"user"] mutableCopy];
         
-        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:encryptedParametersDictionary];
+        NSString *countryIDString = [userDictionary valueForKeyPath:@"countryID"];
+        NSInteger countryIDInteger = [countryIDString integerValue];
+        NSNumber *countryIDNumber = [NSNumber numberWithInteger:countryIDInteger];
+        [userDictionary setObject:countryIDNumber forKey:@"countryID"];
+        [parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
+        
+        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:parameterDictionary];
     }
 }
 
@@ -418,9 +419,112 @@
     NSNumber *imageHeight = [NSNumber numberWithFloat:image.size.height];
     NSNumber *imageWidth = [NSNumber numberWithFloat:image.size.width];
     
-//    [dataDictionary setObject:image forKey:@"dummyImage"];
     [dataDictionary setObject:imageHeight forKey:@"height"];
     [dataDictionary setObject:imageWidth forKey:@"width"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    
+    //check if userInfo is available, if available add to data in message model
+    //userInfo custom user information from client, used for custom quote click action
+    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
+    if (userInfo != nil) {
+        [dataDictionary setObject:userInfo forKey:@"userInfo"];
+    }
+    
+    message.data = [dataDictionary copy];
+    
+    //Check if quote message available
+    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
+    if (quotedMessageObject != nil) {
+        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+            //if message quoted from message model then should construct quote and reply to model
+            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+            quotedMessage = [quotedMessage copy];
+            
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+                //TYPE FILE
+                message.quote = quotedMessage.quote;
+            }
+            else if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                message.quote = [quotedMessage.quote copy];
+                message.quote.title = quotedMessage.user.fullname;
+                message.quote.content = quotedMessage.body;
+            }
+            else {
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = quotedMessage.user.fullname;
+                quote.content = quotedMessage.body;
+                message.quote = [quote copy];
+            }
+            
+            TAPReplyToModel *replyTo = [TAPReplyToModel new];
+            replyTo.messageID = quotedMessage.messageID;
+            replyTo.localID = quotedMessage.localID;
+            replyTo.messageType = quotedMessage.type;
+            message.replyTo = replyTo;
+        }
+        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+            //if message quoted from quote model then should just construct quote model
+            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
+            message.quote = [quotedMessage copy];
+        }
+    }
+    
+    //Save image to cache with localID key
+    [TAPImageView saveImageToCache:image withKey:message.localID];
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+    
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+}
+
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessage:image caption:caption room:room];
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room {
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedString(@"🖼 Photo", @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
+    }
+    
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage];
+    
+    NSMutableDictionary *dataDictionary = message.data;
+    if (dataDictionary == nil) {
+        dataDictionary = [[NSMutableDictionary alloc] init];
+    }
+//#ifdef DEBUG
+//    NSLog(@"IMAGE BEFORE CACHE SIZE HEIGHT: %f, WIDTH: %f", image.size.height, image.size.width);
+//#endif
+//
+    
+    CGFloat imageWidthFloat = (CGFloat)asset.pixelWidth;
+    CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
+    
+    NSNumber *imageHeight = [NSNumber numberWithFloat:imageHeightFloat];
+    NSNumber *imageWidth = [NSNumber numberWithFloat:imageWidthFloat];
+    
+    NSString *assetIdentifier = asset.localIdentifier;
+
+    //Save asset to dictionary
+    [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAsset:asset];
+    
+    [dataDictionary setObject:imageHeight forKey:@"height"];
+    [dataDictionary setObject:imageWidth forKey:@"width"];
+//    [dataDictionary setObject:asset forKey:@"asset"];
+    [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
     [dataDictionary setObject:caption forKey:@"caption"];
     
     //check if userInfo is available, if available add to data in message model
@@ -464,19 +568,128 @@
         }
     }
     
-    //Save image to cache with localID key
-    [TAPImageView saveImageToCache:image withKey:message.localID];
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+
+    [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessageWithPHAsset:asset caption:caption room:room];
+}
+
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room {
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedString(@"🎥 Video", @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
+    }
+    
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeVideo];
+    
+    NSMutableDictionary *dataDictionary = message.data;
+    if (dataDictionary == nil) {
+        dataDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
+    CGFloat imageWidthFloat = (CGFloat)asset.pixelWidth;
+    CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
+    
+    NSNumber *imageHeight = [NSNumber numberWithFloat:imageHeightFloat];
+    NSNumber *imageWidth = [NSNumber numberWithFloat:imageWidthFloat];
+    
+    NSTimeInterval videoDuration = ceil(asset.duration);
+    NSInteger videoDurationInteger = videoDuration * 1000; // in miliseconds
+    
+    NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+    
+    NSString *assetIdentifier = asset.localIdentifier;
+    
+//    PHAsset *obtainedAsset = [[TAPFetchMediaManager sharedManager] getAssetFromUserPreferenceWithKey:assetKey];
+    
+//    PHFetchOptions *allMediaOptions = [[PHFetchOptions alloc] init];
+//    allMediaOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
+//    PHFetchResult *allMedia = [PHAsset fetchAssetsWithOptions:allMediaOptions];
+//
+//    [allMedia enumerateObjectsUsingBlock:^(PHAsset * _Nonnull resultAsset, NSUInteger idx, BOOL * _Nonnull stop) {
+//
+//        if([assetIdentifier isEqualToString:resultAsset.localIdentifier]) {
+//            // asset here
+//        }
+//    }];
+    
+    //Save asset to dictionary
+    [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAsset:asset];
+    
+    [dataDictionary setObject:imageHeight forKey:@"height"];
+    [dataDictionary setObject:imageWidth forKey:@"width"];
+//    [dataDictionary setObject:asset forKey:@"asset"];
+    [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
+    [dataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    [dataDictionary setObject:[NSNumber numberWithInteger:videoDurationInteger] forKey:@"duration"];
+    
+    //check if userInfo is available, if available add to data in message model
+    //userInfo custom user information from client, used for custom quote click action
+    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
+    if (userInfo != nil) {
+        [dataDictionary setObject:userInfo forKey:@"userInfo"];
+    }
+    
+    message.data = [dataDictionary copy];
+    
+    //Check if quote message available
+    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
+    if (quotedMessageObject != nil) {
+        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+            //if message quoted from message model then should construct quote and reply to model
+            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+            quotedMessage = [quotedMessage copy];
+            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+                message.quote = [quotedMessage.quote copy];
+                message.quote.title = quotedMessage.user.fullname;
+                message.quote.content = quotedMessage.body;
+            }
+            else {
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = quotedMessage.user.fullname;
+                quote.content = quotedMessage.body;
+                message.quote = [quote copy];
+            }
+            
+            TAPReplyToModel *replyTo = [TAPReplyToModel new];
+            replyTo.messageID = quotedMessage.messageID;
+            replyTo.localID = quotedMessage.localID;
+            replyTo.messageType = quotedMessage.type;
+            message.replyTo = replyTo;
+        }
+        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+            //if message quoted from quote model then should just construct quote model
+            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
+            message.quote = [quotedMessage copy];
+        }
+    }
     
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     
-    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
 
-- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendImageMessage:image caption:caption room:room];
+    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData room:room];
 }
 
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address {
@@ -518,7 +731,11 @@
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
-            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+                //TYPE FILE
+                message.quote = quotedMessage.quote;
+            }
+            else if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
                 message.quote = [quotedMessage.quote copy];
                 message.quote.title = quotedMessage.user.fullname;
                 message.quote.content = quotedMessage.body;
@@ -548,22 +765,36 @@
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
 }
 
-- (void)sendFileMessage:(NSData *)data {
-    
+- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sentFileMessage:dataFile filePath:filePath room:room];
 }
 
-- (void)sentFileMessage:(NSData *)data fileName:(NSString *)fileName room:(TAPRoomModel *)room {
+- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room {
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
+    
+    NSString *fileName = dataFile.fileName;
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    NSString *mediaType = dataFile.mediaType;
+    mediaType = [TAPUtil nullToEmptyString:mediaType];
+    
+    NSNumber *size = dataFile.size;
     
     NSString *messageBodyString = [NSString stringWithFormat:@"📎 %@", fileName];
     
     TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeFile];
-    
+        
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
         dataDictionary = [[NSMutableDictionary alloc] init];
     }
+
+    [dataDictionary setObject:filePath forKey:@"filePath"];
+    [dataDictionary setObject:fileName forKey:@"fileName"];
+    [dataDictionary setObject:mediaType forKey:@"mediaType"];
+    [dataDictionary setObject:size forKey:@"size"];
     
     //check if userInfo is available, if available add to data in message model
     //userInfo custom user information from client, used for custom quote click action
@@ -581,7 +812,11 @@
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
-            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+                //TYPE FILE
+                message.quote = quotedMessage.quote;
+            }
+            else if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
                 message.quote = [quotedMessage.quote copy];
                 message.quote.title = quotedMessage.user.fullname;
                 message.quote.content = quotedMessage.body;
@@ -606,14 +841,11 @@
         }
     }
     
-    //Save image to cache with localID key
-//    [TAPImageView saveImageToCache:image withKey:message.localID];
-    
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     
-    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
 }
 
 - (void)setActiveUser:(TAPUserModel *)activeUser {
@@ -726,7 +958,7 @@
     //Add User to Contact Manager
     [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
     
-    decryptedMessage.isSending = NO; //DV TEMP - Temporary set isSending to NO waiting for server
+    decryptedMessage.isSending = NO;
     
 #ifdef DEBUG
     NSLog(@"Receive Message: %@", decryptedMessage.body);
@@ -1074,7 +1306,7 @@
 }
 
 - (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID {
-   TAPMessageModel *message = [self.waitingResponseDictionary objectForKey:localID];
+   TAPMessageModel *message = [self.waitingUploadDictionary objectForKey:localID];
     return message;
 }
 
@@ -1124,6 +1356,23 @@
         //Remove from dictionary
         [self.quoteActionTypeDictionary removeObjectForKey:room.roomID];
         [self.quotedMessageDictionary removeObjectForKey:room.roomID];
+    }
+}
+
+- (void)saveFilePathToDictionaryWithPath:(NSString *)path
+                                 localID:(NSString *)localID
+                                  roomID:(NSString *)roomID {
+    
+    NSMutableDictionary *storedFilePathPerRoomDictionary = [self.filePathStoredDictionary objectForKey:roomID];
+    
+    if ([storedFilePathPerRoomDictionary count] != 0) {
+        [storedFilePathPerRoomDictionary setObject:path forKey:localID];
+        [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:roomID];
+    }
+    else {
+        storedFilePathPerRoomDictionary = [[NSMutableDictionary alloc] init];
+        [storedFilePathPerRoomDictionary setObject:path forKey:localID];
+        [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:roomID];
     }
 }
 

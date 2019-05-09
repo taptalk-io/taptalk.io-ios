@@ -46,9 +46,9 @@
     //RightBarButton
     UIButton* leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [leftBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    [leftBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREENBLUE_93] forState:UIControlStateNormal];
+    [leftBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1] forState:UIControlStateNormal];
     leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
-    leftBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:17.0f];
+    leftBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
     [leftBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
@@ -176,8 +176,8 @@
         headerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 13.0f)];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:11.0f];
-        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         titleLabel.text = NSLocalizedString(@"CHATS AND CONTACTS", @"");
         [headerView addSubview:titleLabel];
         
@@ -227,6 +227,18 @@
         [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.currentNavigationController animated:YES];
     }
     
+    if (self.forwardedMessage.type == TAPChatMessageTypeFile || self.forwardedMessage.type == TAPChatMessageTypeVideo) {
+        NSDictionary *dataDictionary = self.forwardedMessage.data;
+        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+        
+        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:self.forwardedMessage.room.roomID fileID:fileID];
+        filePath = [TAPUtil nullToEmptyString:filePath];
+        
+        if (![filePath isEqualToString:@""]) {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:currentSelectedRoomID fileID:fileID];
+        }
+    }
+    
     [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:currentSelectedRoomID];
     [[TAPChatManager sharedManager] saveToQuotedMessage:self.forwardedMessage userInfo:[NSDictionary dictionary] roomID:currentSelectedRoomID];
 }
@@ -241,8 +253,10 @@
     [self.searchResultChatAndContactArray removeAllObjects];
     
     [UIView animateWithDuration:0.2f animations:^{
-        self.forwardListView.recentChatTableView.alpha = 1.0f;
+        [self.forwardListView isShowRecentChatView:YES animated:NO];
+        [self.forwardListView isShowEmptyState:NO];
         self.forwardListView.searchResultTableView.alpha = 0.0f;
+        self.forwardListView.recentChatTableView.alpha = 1.0f;
     } completion:^(BOOL finished) {
         //completion
         [self.forwardListView.searchResultTableView reloadData];

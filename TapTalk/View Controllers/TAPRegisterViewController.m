@@ -2,540 +2,231 @@
 //  TAPRegisterViewController.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 16/8/18.
-//  Copyright © 2018 Moselo. All rights reserved.
+//  Created by Dominic Vedericho on 02/04/19.
+//  Copyright © 2019 Moselo. All rights reserved.
 //
 
 #import "TAPRegisterViewController.h"
+#import "TAPRegisterView.h"
 
-@interface TAPRegisterViewController ()
-@property (strong, nonatomic) IBOutlet UITextField *nameTextField;
-@property (strong, nonatomic) IBOutlet UIButton *confirmButton;
+@interface TAPRegisterViewController () <TAPCustomTextFieldViewDelegate, UIScrollViewDelegate, TAPCustomButtonViewDelegate, UIImagePickerControllerDelegate>
 
-//DV Temp
-@property (strong, nonatomic) NSDictionary *contactListDictionary;
-//END DV Temp
+@property (strong, nonatomic) TAPRegisterView *registerView;
+
+@property (nonatomic) BOOL passwordTextFieldJustEndEditing;
+
+@property (nonatomic) BOOL isUsernameValid;
+@property (nonatomic) BOOL isFullNameValid;
+@property (nonatomic) BOOL isEmailValid;
+@property (nonatomic) BOOL isPasswordValid;
+
+@property (strong, nonatomic) NSString *lastCheckUsernameString;
+@property (strong, nonatomic) NSString *lastCheckFullNameString;
+@property (strong, nonatomic) NSString *lastCheckEmailString;
+
+@property (strong, nonatomic) UIImage *selectedProfileImage;
+
+- (void)refreshButtonState;
+- (void)checkUsername;
+- (void)checkFullName;
+- (void)checkEmail;
+- (void)checkUsernameAPI:(NSString *)username;
+- (void)removeProfilePictureButtonDidTapped;
+- (void)changeProfilePictureButtonDidTapped;
+- (void)openCamera;
+- (void)openGallery;
 
 @end
 
 @implementation TAPRegisterViewController
+
 #pragma mark - Lifecycle
+- (void)loadView {
+    [super loadView];
+    _registerView = [[TAPRegisterView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
+    [self.view addSubview:self.registerView];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.confirmButton.layer.cornerRadius = 4.0f;
-    self.confirmButton.clipsToBounds = YES;
-    // Do any additional setup after loading the view from its nib.
+    // Do any additional setup after loading the view.
+    [self showCustomBackButtonOrange];
+
+    self.registerView.scrollView.delegate = self;
+    self.registerView.fullNameTextField.delegate = self;
+    self.registerView.usernameTextField.delegate = self;
+    self.registerView.mobileNumberTextField.delegate = self;
+    self.registerView.emailTextField.delegate = self;
+    self.registerView.passwordTextField.delegate = self;
+    self.registerView.retypePasswordTextField.delegate = self;
+    self.registerView.continueButtonView.delegate = self;
     
-    //DV Temp
-    TAPUserModel *firstUser = [TAPUserModel new];
-    firstUser.userID = @"1";
-    firstUser.xcUserID = @"1";
-    firstUser.fullname = @"Ritchie Nathaniel";
-    firstUser.email = @"ritchie@moselo.com";
-    firstUser.phone = @"08979809026";
-    firstUser.username = @"ritchie";
-    firstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ritchie_1542363733889f.jpg";
-    firstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ritchie_1542363733889t.jpg";
-    firstUser.userRole.code = @"user";
+    //set mobile number obtained from otp login
+    [self.registerView.mobileNumberTextField setPhoneNumber:self.phoneNumber country:self.country];
     
-    TAPUserModel *secondUser = [TAPUserModel new];
-    secondUser.userID = @"2";
-    secondUser.xcUserID = @"2";
-    secondUser.fullname = @"Dominic Vedericho";
-    secondUser.email = @"dominic@moselo.com";
-    secondUser.phone = @"08979809026";
-    secondUser.username = @"dominic";
-    secondUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dominic_1542363733889f.jpg";
-    secondUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dominic_1542363733889t.jpg";
-    secondUser.userRole.code = @"user";
-    
-    TAPUserModel *thirdUser = [TAPUserModel new];
-    thirdUser.userID = @"3";
-    thirdUser.xcUserID = @"3";
-    thirdUser.fullname = @"Rionaldo Linggautama";
-    thirdUser.email = @"rionaldo@moselo.com";
-    thirdUser.phone = @"08979809026";
-    thirdUser.username = @"rionaldo";
-    thirdUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rionaldo_1542363733889f.jpg";
-    thirdUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rionaldo_1542363733889t.jpg";
-    thirdUser.userRole.code = @"user";
-    
-    TAPUserModel *fourthUser = [TAPUserModel new];
-    fourthUser.userID = @"4";
-    fourthUser.xcUserID = @"4";
-    fourthUser.fullname = @"Kevin Reynaldo";
-    fourthUser.email = @"kevin@moselo.com";
-    fourthUser.phone = @"08979809026";
-    fourthUser.username = @"kevin";
-    fourthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevin_1542363733889f.jpg";
-    fourthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevin_1542363733889t.jpg";
-    fourthUser.userRole.code = @"user";
-    
-    TAPUserModel *fifthUser = [TAPUserModel new];
-    fifthUser.userID = @"5";
-    fifthUser.xcUserID = @"5";
-    fifthUser.fullname = @"Welly Kencana";
-    fifthUser.email = @"welly@moselo.com";
-    fifthUser.phone = @"08979809026";
-    fifthUser.username = @"welly";
-    fifthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/welly_1542363733889f.jpg";
-    fifthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/welly_1542363733889t.jpg";
-    fifthUser.userRole.code = @"user";
-    
-    TAPUserModel *sixthUser = [TAPUserModel new];
-    sixthUser.userID = @"6";
-    sixthUser.xcUserID = @"6";
-    sixthUser.fullname = @"Jony Lim";
-    sixthUser.email = @"jony@moselo.com";
-    sixthUser.phone = @"08979809026";
-    sixthUser.username = @"jony";
-    sixthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jony_1542363733889f.jpg";
-    sixthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jony_1542363733889t.jpg";
-    sixthUser.userRole.code = @"user";
-    
-    TAPUserModel *seventhUser = [TAPUserModel new];
-    seventhUser.userID = @"7";
-    seventhUser.xcUserID = @"7";
-    seventhUser.fullname = @"Michael Tansy";
-    seventhUser.email = @"michael@moselo.com";
-    seventhUser.phone = @"08979809026";
-    seventhUser.username = @"michael";
-    seventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/michael_1542363733889f.jpg";
-    seventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/michael_1542363733889t.jpg";
-    seventhUser.userRole.code = @"user";
-    
-    TAPUserModel *eighthUser = [TAPUserModel new];
-    eighthUser.userID = @"8";
-    eighthUser.xcUserID = @"8";
-    eighthUser.fullname = @"Richard Fang";
-    eighthUser.email = @"richard@moselo.com";
-    eighthUser.phone = @"08979809026";
-    eighthUser.username = @"richard";
-    eighthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/richard_1542363733889f.jpg";
-    eighthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/richard_1542363733889t.jpg";
-    eighthUser.userRole.code = @"user";
-    
-    TAPUserModel *ninthUser = [TAPUserModel new];
-    ninthUser.userID = @"9";
-    ninthUser.xcUserID = @"9";
-    ninthUser.fullname = @"Erwin Andreas";
-    ninthUser.email = @"erwin@moselo.com";
-    ninthUser.phone = @"08979809026";
-    ninthUser.username = @"erwin";
-    ninthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/erwin_1542363733889f.jpg";
-    ninthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/erwin_1542363733889t.jpg";
-    ninthUser.userRole.code = @"user";
-    
-    TAPUserModel *tenthUser = [TAPUserModel new];
-    tenthUser.userID = @"10";
-    tenthUser.xcUserID = @"10";
-    tenthUser.fullname = @"Jefry Lorentono";
-    tenthUser.email = @"jefry@moselo.com";
-    tenthUser.phone = @"08979809026";
-    tenthUser.username = @"jefry";
-    tenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jefry_1542363733889f.jpg";
-    tenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/jefry_1542363733889t.jpg";
-    tenthUser.userRole.code = @"user";
-    
-    TAPUserModel *eleventhUser = [TAPUserModel new];
-    eleventhUser.userID = @"11";
-    eleventhUser.xcUserID = @"11";
-    eleventhUser.fullname = @"Cundy Sunardy";
-    eleventhUser.email = @"cundy@moselo.com";
-    eleventhUser.phone = @"08979809026";
-    eleventhUser.username = @"cundy";
-    eleventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/cundy_1542363733889f.jpg";
-    eleventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/cundy_1542363733889t.jpg";
-    eleventhUser.userRole.code = @"user";
-    
-    TAPUserModel *twelfthUser = [TAPUserModel new];
-    twelfthUser.userID = @"12";
-    twelfthUser.xcUserID = @"12";
-    twelfthUser.fullname = @"Rizka Fatmawati";
-    twelfthUser.email = @"rizka@moselo.com";
-    twelfthUser.phone = @"08979809026";
-    twelfthUser.username = @"rizka";
-    twelfthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rizka_1542363733889f.jpg";
-    twelfthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/rizka_1542363733889t.jpg";
-    twelfthUser.userRole.code = @"user";
-    
-    TAPUserModel *thirteenthUser = [TAPUserModel new];
-    thirteenthUser.userID = @"13";
-    thirteenthUser.xcUserID = @"13";
-    thirteenthUser.fullname = @"Test 1";
-    thirteenthUser.email = @"test1@moselo.com";
-    thirteenthUser.phone = @"08979809026";
-    thirteenthUser.username = @"test1";
-    thirteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test1_1542363733889f.jpg";
-    thirteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test1_1542363733889t.jpg";
-    thirteenthUser.userRole.code = @"user";
-    
-    TAPUserModel *fourteenthUser = [TAPUserModel new];
-    fourteenthUser.userID = @"14";
-    fourteenthUser.xcUserID = @"14";
-    fourteenthUser.fullname = @"Test 2";
-    fourteenthUser.email = @"test2@moselo.com";
-    fourteenthUser.phone = @"08979809026";
-    fourteenthUser.username = @"test2";
-    fourteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test2_1542363733889f.jpg";
-    fourteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test2_1542363733889t.jpg";
-    fourteenthUser.userRole.code = @"user";
-    
-    TAPUserModel *fifteenthUser = [TAPUserModel new];
-    fifteenthUser.userID = @"15";
-    fifteenthUser.xcUserID = @"15";
-    fifteenthUser.fullname = @"Test 3";
-    fifteenthUser.email = @"test3@moselo.com";
-    fifteenthUser.phone = @"08979809026";
-    fifteenthUser.username = @"test3";
-    fifteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test3_1542363733889f.jpg";
-    fifteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/test3_1542363733889t.jpg";
-    fifteenthUser.userRole.code = @"user";
-    
-    TAPUserModel *sixteenthUser = [TAPUserModel new];
-    sixteenthUser.userID = @"17";
-    sixteenthUser.xcUserID = @"16";
-    sixteenthUser.fullname = @"Santo";
-    sixteenthUser.email = @"santo@moselo.com";
-    sixteenthUser.phone = @"08979809026";
-    sixteenthUser.username = @"santo";
-    sixteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/santo_1542363733889f.jpg";
-    sixteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/santo_1542363733889t.jpg";
-    sixteenthUser.userRole.code = @"user";
-    
-    TAPUserModel *seventeenthUser = [TAPUserModel new];
-    seventeenthUser.userID = @"18";
-    seventeenthUser.xcUserID = @"17";
-    seventeenthUser.fullname = @"Veronica Dian";
-    seventeenthUser.email = @"veronica@moselo.com";
-    seventeenthUser.phone = @"08979809026";
-    seventeenthUser.username = @"veronica";
-    seventeenthUser.isRequestPending = NO;
-    seventeenthUser.isRequestAccepted = YES;
-    seventeenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/veronica_1542363733889f.jpg";
-    seventeenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/veronica_1542363733889t.jpg";
-    seventeenthUser.userRole.code = @"user";
-    
-    TAPUserModel *eighteenthUser = [TAPUserModel new];
-    eighteenthUser.userID = @"19";
-    eighteenthUser.xcUserID = @"18";
-    eighteenthUser.fullname = @"Poppy Sibarani";
-    eighteenthUser.email = @"poppy@moselo.com";
-    eighteenthUser.phone = @"08979809026";
-    eighteenthUser.username = @"poppy";
-    eighteenthUser.isRequestPending = NO;
-    eighteenthUser.isRequestAccepted = YES;
-    eighteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/poppy_1542363733889f.jpg";
-    eighteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/poppy_1542363733889t.jpg";
-    eighteenthUser.userRole.code = @"user";
-    
-    TAPUserModel *nineteenthUser = [TAPUserModel new];
-    nineteenthUser.userID = @"20";
-    nineteenthUser.xcUserID = @"19";
-    nineteenthUser.fullname = @"Axel Soedarsono";
-    nineteenthUser.email = @"axel@moselo.com";
-    nineteenthUser.phone = @"08979809026";
-    nineteenthUser.username = @"axel";
-    nineteenthUser.isRequestPending = NO;
-    nineteenthUser.isRequestAccepted = YES;
-    nineteenthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/axel_1542363733889f.jpg";
-    nineteenthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/axel_1542363733889t.jpg";
-    nineteenthUser.userRole.code = @"user";
-    
-    TAPUserModel *twentiethUser = [TAPUserModel new];
-    twentiethUser.userID = @"21";
-    twentiethUser.xcUserID = @"20";
-    twentiethUser.fullname = @"Ovita";
-    twentiethUser.email = @"ovita@moselo.com";
-    twentiethUser.phone = @"08979809026";
-    twentiethUser.username = @"ovita";
-    twentiethUser.isRequestPending = NO;
-    twentiethUser.isRequestAccepted = YES;
-    twentiethUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ovita_1542363733889f.jpg";
-    twentiethUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ovita_1542363733889t.jpg";
-    twentiethUser.userRole.code = @"user";
-    
-    TAPUserModel *twentyFirstUser = [TAPUserModel new];
-    twentyFirstUser.userID = @"22";
-    twentyFirstUser.xcUserID = @"21";
-    twentyFirstUser.fullname = @"Putri Prima";
-    twentyFirstUser.email = @"putri@moselo.com";
-    twentyFirstUser.phone = @"08979809026";
-    twentyFirstUser.username = @"putri";
-    twentyFirstUser.isRequestPending = NO;
-    twentyFirstUser.isRequestAccepted = YES;
-    twentyFirstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/putri_1542363733889f.jpg";
-    twentyFirstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/putri_1542363733889t.jpg";
-    twentyFirstUser.userRole.code = @"user";
-    
-    TAPUserModel *twentySecondUser = [TAPUserModel new];
-    twentySecondUser.userID = @"23";
-    twentySecondUser.xcUserID = @"22";
-    twentySecondUser.fullname = @"Amalia Nanda";
-    twentySecondUser.email = @"amalia@moselo.com";
-    twentySecondUser.phone = @"08979809026";
-    twentySecondUser.username = @"amalia";
-    twentySecondUser.isRequestPending = NO;
-    twentySecondUser.isRequestAccepted = YES;
-    twentySecondUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/amalia_1542363733889f.jpg";
-    twentySecondUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/amalia_1542363733889t.jpg";
-    twentySecondUser.userRole.code = @"user";
-    
-    TAPUserModel *twentyThirdUser = [TAPUserModel new];
-    twentyThirdUser.userID = @"24";
-    twentyThirdUser.xcUserID = @"23";
-    twentyThirdUser.fullname = @"Ronal Gorba";
-    twentyThirdUser.email = @"ronal@moselo.com";
-    twentyThirdUser.phone = @"08979809026";
-    twentyThirdUser.username = @"ronal";
-    twentyThirdUser.isRequestPending = NO;
-    twentyThirdUser.isRequestAccepted = YES;
-    twentyThirdUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ronal_1542363733889f.jpg";
-    twentyThirdUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ronal_1542363733889t.jpg";
-    twentyThirdUser.userRole.code = @"user";
-    
-    TAPUserModel *twentyFourthUser = [TAPUserModel new];
-    twentyFourthUser.userID = @"25";
-    twentyFourthUser.xcUserID = @"24";
-    twentyFourthUser.fullname = @"Ardanti Wulandari";
-    twentyFourthUser.email = @"ardanti@moselo.com";
-    twentyFourthUser.phone = @"08979809026";
-    twentyFourthUser.username = @"ardanti";
-    twentyFourthUser.isRequestPending = NO;
-    twentyFourthUser.isRequestAccepted = YES;
-    twentyFourthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ardanti_1542363733889f.jpg";
-    twentyFourthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ardanti_1542363733889t.jpg";
-    twentyFourthUser.userRole.code = @"user";
-    
-    TAPUserModel *twentyFifthUser = [TAPUserModel new];
-    twentyFifthUser.userID = @"26";
-    twentyFifthUser.xcUserID = @"25";
-    twentyFifthUser.fullname = @"Anita";
-    twentyFifthUser.email = @"anita@moselo.com";
-    twentyFifthUser.phone = @"08979809026";
-    twentyFifthUser.username = @"anita";
-    twentyFifthUser.isRequestPending = NO;
-    twentyFifthUser.isRequestAccepted = YES;
-    twentyFifthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/anita_1542363733889f.jpg";
-    twentyFifthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/anita_1542363733889t.jpg";
-    twentyFifthUser.userRole.code = @"user";
-    
-    TAPUserModel *twentySixthUser = [TAPUserModel new];
-    twentySixthUser.userID = @"27";
-    twentySixthUser.xcUserID = @"26";
-    twentySixthUser.fullname = @"Kevin Fianto";
-    twentySixthUser.email = @"kevin.fianto@moselo.com";
-    twentySixthUser.phone = @"08979809026";
-    twentySixthUser.username = @"kevinfianto";
-    twentySixthUser.isRequestPending = NO;
-    twentySixthUser.isRequestAccepted = YES;
-    twentySixthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevinfianto_1542363733889f.jpg";
-    twentySixthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/kevinfianto_1542363733889t.jpg";
-    twentySixthUser.userRole.code = @"user";
-    
-    TAPUserModel *twentySeventhUser = [TAPUserModel new];
-    twentySeventhUser.userID = @"28";
-    twentySeventhUser.xcUserID = @"27";
-    twentySeventhUser.fullname = @"Dessy Silitonga";
-    twentySeventhUser.email = @"dessy@moselo.com";
-    twentySeventhUser.phone = @"08979809026";
-    twentySeventhUser.username = @"dessy";
-    twentySeventhUser.isRequestPending = NO;
-    twentySeventhUser.isRequestAccepted = YES;
-    twentySeventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dessy_1542363733889f.jpg";
-    twentySeventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/dessy_1542363733889t.jpg";
-    twentySecondUser.userRole.code = @"user";
-    
-    TAPUserModel *twentyEightUser = [TAPUserModel new];
-    twentyEightUser.userID = @"29";
-    twentyEightUser.xcUserID = @"28";
-    twentyEightUser.fullname = @"Neni Nurhasanah";
-    twentyEightUser.email = @"neni@moselo.com";
-    twentyEightUser.phone = @"08979809026";
-    twentyEightUser.username = @"neni";
-    twentyEightUser.isRequestPending = NO;
-    twentyEightUser.isRequestAccepted = YES;
-    twentyEightUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/neni_1542363733889f.jpg";
-    twentyEightUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/neni_1542363733889t.jpg";
-    twentyEightUser.userRole.code = @"user";
-    
-    TAPUserModel *twentyNinthUser = [TAPUserModel new];
-    twentyNinthUser.userID = @"30";
-    twentyNinthUser.xcUserID = @"29";
-    twentyNinthUser.fullname = @"Bernama Sabur";
-    twentyNinthUser.email = @"bernama@moselo.com";
-    twentyNinthUser.phone = @"08979809026";
-    twentyNinthUser.username = @"bernama";
-    twentyNinthUser.isRequestPending = NO;
-    twentyNinthUser.isRequestAccepted = YES;
-    twentyNinthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/bernama_1542363733889f.jpg";
-    twentyNinthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/bernama_1542363733889t.jpg";
-    twentyNinthUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtiethUser = [TAPUserModel new];
-    thirtiethUser.userID = @"31";
-    thirtiethUser.xcUserID = @"30";
-    thirtiethUser.fullname = @"William Raymond";
-    thirtiethUser.email = @"william@moselo.com";
-    thirtiethUser.phone = @"08979809026";
-    thirtiethUser.username = @"william";
-    thirtiethUser.isRequestPending = NO;
-    thirtiethUser.isRequestAccepted = YES;
-    thirtiethUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/william_1542363733889f.jpg";
-    thirtiethUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/william_1542363733889t.jpg";
-    thirtiethUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtyFirstUser = [TAPUserModel new];
-    thirtyFirstUser.userID = @"32";
-    thirtyFirstUser.xcUserID = @"31";
-    thirtyFirstUser.fullname = @"Sarah Febrina";
-    thirtyFirstUser.email = @"sarah@moselo.com";
-    thirtyFirstUser.phone = @"08979809026";
-    thirtyFirstUser.username = @"sarah";
-    thirtyFirstUser.isRequestPending = NO;
-    thirtyFirstUser.isRequestAccepted = YES;
-    thirtyFirstUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sarah_1542363733889f.jpg";
-    thirtyFirstUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sarah_1542363733889t.jpg";
-    thirtyFirstUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtySecondUser = [TAPUserModel new];
-    thirtySecondUser.userID = @"33";
-    thirtySecondUser.xcUserID = @"32";
-    thirtySecondUser.fullname = @"Retyan Arthasani";
-    thirtySecondUser.email = @"retyan@moselo.com";
-    thirtySecondUser.phone = @"08979809026";
-    thirtySecondUser.username = @"retyan";
-    thirtySecondUser.isRequestPending = NO;
-    thirtySecondUser.isRequestAccepted = YES;
-    thirtySecondUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/retyan_1542363733889f.jpg";
-    thirtySecondUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/retyan_1542363733889t.jpg";
-    thirtySecondUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtyThirdUser = [TAPUserModel new];
-    thirtyThirdUser.userID = @"34";
-    thirtyThirdUser.xcUserID = @"33";
-    thirtyThirdUser.fullname = @"Sekar Sari";
-    thirtyThirdUser.email = @"sekar@moselo.com";
-    thirtyThirdUser.phone = @"08979809026";
-    thirtyThirdUser.username = @"sekar";
-    thirtyThirdUser.isRequestPending = NO;
-    thirtyThirdUser.isRequestAccepted = YES;
-    thirtyThirdUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sekar_1542363733889f.jpg";
-    thirtyThirdUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/sekar_1542363733889t.jpg";
-    thirtyThirdUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtyFourthUser = [TAPUserModel new];
-    thirtyFourthUser.userID = @"35";
-    thirtyFourthUser.xcUserID = @"34";
-    thirtyFourthUser.fullname = @"Meilika";
-    thirtyFourthUser.email = @"mei@moselo.com";
-    thirtyFourthUser.phone = @"08979809026";
-    thirtyFourthUser.username = @"mei";
-    thirtyFourthUser.isRequestPending = NO;
-    thirtyFourthUser.isRequestAccepted = YES;
-    thirtyFourthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/mei_1542363733889f.jpg";
-    thirtyFourthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/mei_1542363733889t.jpg";
-    thirtyFourthUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtyFifthUser = [TAPUserModel new];
-    thirtyFifthUser.userID = @"36";
-    thirtyFifthUser.xcUserID = @"35";
-    thirtyFifthUser.fullname = @"Yuendry";
-    thirtyFifthUser.email = @"yuen@moselo.com";
-    thirtyFifthUser.phone = @"08979809026";
-    thirtyFifthUser.username = @"yuendry";
-    thirtyFifthUser.isRequestPending = NO;
-    thirtyFifthUser.isRequestAccepted = YES;
-    thirtyFifthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/yuendry_1542363733889f.jpg";
-    thirtyFifthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/yuendry_1542363733889t.jpg";
-    thirtyFifthUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtySixthUser = [TAPUserModel new];
-    thirtySixthUser.userID = @"37";
-    thirtySixthUser.xcUserID = @"36";
-    thirtySixthUser.fullname = @"Ervin";
-    thirtySixthUser.email = @"ervin@moselo.com";
-    thirtySixthUser.phone = @"08979809026";
-    thirtySixthUser.username = @"ervin";
-    thirtySixthUser.isRequestPending = NO;
-    thirtySixthUser.isRequestAccepted = YES;
-    thirtySixthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ervin_1542363733889f.jpg";
-    thirtySixthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/ervin_1542363733889t.jpg";
-    thirtySixthUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtySeventhUser = [TAPUserModel new];
-    thirtySeventhUser.userID = @"38";
-    thirtySeventhUser.xcUserID = @"37";
-    thirtySeventhUser.fullname = @"Fauzi";
-    thirtySeventhUser.email = @"fauzi@moselo.com";
-    thirtySeventhUser.phone = @"08979809026";
-    thirtySeventhUser.username = @"fauzi";
-    thirtySeventhUser.isRequestPending = NO;
-    thirtySeventhUser.isRequestAccepted = YES;
-    thirtySeventhUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/fauzi_1542363733889f.jpg";
-    thirtySeventhUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/fauzi_1542363733889t.jpg";
-    thirtySeventhUser.userRole.code = @"user";
-    
-    TAPUserModel *thirtyEighthUser = [TAPUserModel new];
-    thirtyEighthUser.userID = @"39";
-    thirtyEighthUser.xcUserID = @"38";
-    thirtyEighthUser.fullname = @"Lucas";
-    thirtyEighthUser.email = @"lucas@moselo.com";
-    thirtyEighthUser.phone = @"08979809026";
-    thirtyEighthUser.username = @"lucas";
-    thirtyEighthUser.isRequestPending = NO;
-    thirtyEighthUser.isRequestAccepted = YES;
-    thirtyEighthUser.imageURL.fullsize = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/lucas_1542363733889f.jpg";
-    thirtyEighthUser.imageURL.thumbnail = @"https://s3-ap-southeast-1.amazonaws.com/taptalk-dev/images/lucas_1542363733889t.jpg";
-    thirtyEighthUser.userRole.code = @"user";
-    
-    _contactListDictionary = @{@"ritchie" : firstUser, @"dominic" : secondUser, @"rionaldo" : thirdUser, @"kevin" : fourthUser, @"welly" : fifthUser, @"jony" : sixthUser, @"michael" : seventhUser, @"richard" : eighthUser, @"erwin" : ninthUser, @"jefry" : tenthUser, @"cundy" : eleventhUser, @"rizka" : twelfthUser, @"test1" : thirteenthUser, @"test2" : fourteenthUser, @"test3" : fifteenthUser, @"santo" : sixteenthUser, @"veronica" : seventeenthUser, @"poppy" : eighteenthUser, @"axel" : nineteenthUser, @"ovita" : twentiethUser, @"putri" : twentyFirstUser, @"amalia" : twentySecondUser, @"ronal" : twentyThirdUser, @"ardanti" : twentyFourthUser, @"anita" : twentyFifthUser, @"kevinfianto" : twentySixthUser, @"dessy" : twentySeventhUser, @"neni" : twentyEightUser, @"bernama" : twentyNinthUser, @"william" : thirtiethUser, @"sarah" : thirtyFirstUser, @"retyan" : thirtySecondUser, @"sekar" : thirtyThirdUser, @"mei" : thirtyFourthUser, @"yuendry" : thirtyFifthUser, @"ervin" : thirtySixthUser, @"fauzi" : thirtySeventhUser, @"lucas" : thirtyEighthUser};
-    //END DV Temp
+    [self.registerView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.registerView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [self.nameTextField becomeFirstResponder];
+    [self showNavigationSeparator:NO];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)viewWillDisappear:(BOOL)animated {
+   [super viewWillDisappear:animated];
 }
 
-#pragma mark - Custom Method
-- (IBAction)confirmButtonDidTapped:(id)sender {
-    if ([self.nameTextField.text isEqualToString:@""]) {
-        return;
+#pragma mark - Delegate
+#pragma mark TAPCustomTextFieldView
+- (BOOL)customTextFieldViewTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    NSString *newText = [textField.text stringByReplacingCharactersInRange:range withString:string];
+
+    if (textField == self.registerView.fullNameTextField.textField) {
+        _isFullNameValid = NO;
+        _lastCheckFullNameString = newText;
+        [self performSelector:@selector(checkFullName) withObject:newText afterDelay:1.0f];
     }
-    
-    //DV Temp
-    //DV Note - 14 Sept Temporary added for checking 1 on 1 chat
-    
-    NSString *username = self.nameTextField.text;
-    
-    TAPUserModel *selectedUser = [self.contactListDictionary objectForKey:username];
-    NSString *userID = selectedUser.userID;
-    userID = [TAPUtil nullToEmptyString:userID];
-    
-    if (selectedUser == nil) {
-        self.nameTextField.text = @"";
+    else if (textField == self.registerView.usernameTextField.textField) {
+        _isUsernameValid = NO;
+        _lastCheckUsernameString = newText;
+        [self performSelector:@selector(checkUsername) withObject:nil afterDelay:1.0f];
+    }
+    else if (textField == self.registerView.emailTextField.textField) {
+        _isEmailValid = NO;
+        _lastCheckEmailString = newText;
+        [self performSelector:@selector(checkEmail) withObject:newText afterDelay:1.0f];
+    }
+    else if (textField == self.registerView.passwordTextField.textField) {
+        if ([TAPUtil isEmptyString:string] && [self.registerView.passwordTextField.textField isSecureTextEntry] && self.passwordTextFieldJustEndEditing) {
+            [self.registerView.passwordTextField setAsError:NO animated:YES];
+            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView refreshViewPosition];
+            _isPasswordValid = YES;
+        }
+        else if (![TAPUtil validatePassword:newText] && ![TAPUtil isEmptyString:newText]) {
+            [self.registerView.passwordTextField setAsError:YES animated:YES];
+            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"Invalid password", @"")];
+            [self.registerView refreshViewPosition];
+            _isPasswordValid = NO;
+        }
+        else {
+            [self.registerView.passwordTextField setAsError:NO animated:YES];
+            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView refreshViewPosition];
+            _isPasswordValid = YES;
+        }
         
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Username Not Found!", @"") message:@"Please input the correct username" preferredStyle:UIAlertControllerStyleAlert];
-
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }];
-
-        [alertController addAction:okAction];
-        [self presentViewController:alertController animated:YES completion:nil];
-        return;
+        if (![TAPUtil isEmptyString:self.registerView.retypePasswordTextField.textField.text]) {
+         
+            if (![self.registerView.retypePasswordTextField.textField.text isEqualToString:newText]) {
+                [self.registerView.retypePasswordTextField setAsError:YES animated:YES];
+                [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"Password does not match", @"")];
+                [self.registerView refreshViewPosition];
+                _isPasswordValid = NO;
+            }
+            else {
+                [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
+                [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.registerView refreshViewPosition];
+                _isPasswordValid = YES;
+            }
+        }
+        _passwordTextFieldJustEndEditing = NO;
+    }
+    else if (textField == self.registerView.retypePasswordTextField.textField) {
+        if (![newText isEqualToString:self.registerView.passwordTextField.textField.text] && ![TAPUtil isEmptyString:newText]) {
+            [self.registerView.retypePasswordTextField setAsError:YES animated:YES];
+            [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"Password does not match", @"")];
+            [self.registerView refreshViewPosition];
+        }
+        else {
+            [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
+            [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView refreshViewPosition];
+        }
     }
     
-    [TAPDataManager callAPIGetAuthTicketWithUser:selectedUser success:^(NSString *authTicket) {
-        [[TapTalk sharedInstance] setAuthTicket:authTicket success:^{
-            
+    [self refreshButtonState];
+    
+    return YES;
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldReturn:(UITextField *)textField {
+    
+    if (textField == self.registerView.fullNameTextField.textField) {
+        [self.registerView.usernameTextField.textField becomeFirstResponder];
+    }
+    else if (textField == self.registerView.usernameTextField.textField) {
+        [self.registerView.usernameTextField.textField resignFirstResponder];
+    }
+    
+    return YES;
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldBeginEditing:(UITextField *)textField {
+ 
+    return YES;
+}
+
+- (void)customTextFieldViewTextFieldDidBeginEditing:(UITextField *)textField {
+    
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldEndEditing:(UITextField *)textField {
+    if (textField == self.registerView.passwordTextField.textField) {
+        _passwordTextFieldJustEndEditing = YES;
+    }
+    return YES;
+}
+
+- (void)customTextFieldViewTextFieldDidEndEditing:(UITextField *)textField {
+
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldClear:(UITextField *)textField {
+    return YES;
+}
+
+#pragma mark TAPCustomButtonView
+- (void)customButtonViewDidTappedButton {
+   //CONTINUE BUTTON TAPPED
+    [self.registerView.continueButtonView setAsLoading:YES animated:NO];
+    [self.registerView setContentEditable:NO];
+    
+    [TAPDataManager callAPIRegisterWithFullName:self.registerView.fullNameTextField.textField.text countryID:self.country.countryID phone:self.phoneNumber username:self.registerView.usernameTextField.textField.text email:self.registerView.emailTextField.textField.text password:self.registerView.passwordTextField.textField.text success:^(NSString *userID, NSString *ticket) {
+        //Already Registered
+        [[TapTalk sharedInstance] setAuthTicket:ticket success:^{
+            [[TAPContactManager sharedManager] saveUserCountryCode:self.country.countryCallingCode];
+        if (self.selectedProfileImage == nil) {
+         //no Image
+            [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+            [self.registerView setContentEditable:YES];
             [self dismissViewControllerAnimated:YES completion:nil];
+        }
+        else {
+         //upload Image
+            [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+                
+                NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+                
+                [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
+                    [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+                    [self.registerView setContentEditable:YES];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                } progressBlock:^(CGFloat progress, CGFloat total) {
+                } failureBlock:^(NSError *error) {
+                    //Show error, retry or skip popup
+                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+                    
+                    [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+                    [self.registerView setContentEditable:YES];
+                }];
+            }];
+        }
+
+    
         } failure:^(NSError *error) {
             
             //DV Temp
@@ -555,29 +246,354 @@
             [self presentViewController:alertController animated:YES completion:nil];
         }];
     } failure:^(NSError *error) {
-        //DV Temp
-        //DV Note - show error with custom popup
-//        NSInteger errorCode = error.code;
-//        if (errorCode != 999) {
-//            [self showFailAPIWithMessageString:error.domain show:YES];
-//        }
-#ifdef DEBUG
-        //Note - this alert only shown at debug
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }];
-        
-        [alertController addAction:okAction];
-        [self presentViewController:alertController animated:YES completion:nil];
-#endif
+        [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:error.domain leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@""];
+        [self.registerView setContentEditable:YES];
     }];
 }
 
-- (void)presentRegisterViewControllerIfNeededFromViewController:(UIViewController *)viewController force:(BOOL)force {
-    if (![[TapTalk sharedInstance] isAuthenticated] || force) {
-        [viewController presentViewController:self animated:YES completion:nil];
+#pragma mark UIScrollView
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self.view endEditing:YES];
+}
+
+#pragma mark UIImagePickerController
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:^{
+        if ([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:@"public.image"]) {
+            //IMAGE TYPE
+            UIImage *selectedImage;
+            
+            if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+                selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+            }
+            else if (picker.sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
+                selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+            }
+            
+            self.selectedProfileImage = selectedImage;
+            [self.registerView setProfilePictureWithImage:self.selectedProfileImage];
+        }
+    }];
+}
+
+#pragma mark - Custom Method
+- (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
+    [super keyboardWillShowWithHeight:keyboardHeight];
+    [UIView animateWithDuration:0.2f animations:^{
+         self.registerView.scrollView.frame = CGRectMake(CGRectGetMinX(self.registerView.scrollView.frame), CGRectGetMinY(self.registerView.scrollView.frame), CGRectGetWidth(self.registerView.scrollView.frame), CGRectGetHeight(self.registerView.frame) - keyboardHeight);
+    }];
+}
+
+- (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
+    [super keyboardWillHideWithHeight:keyboardHeight];
+    [UIView animateWithDuration:0.2f animations:^{
+        self.registerView.scrollView.frame = [TAPBaseView frameWithNavigationBar];
+    }];
+}
+
+- (void)refreshButtonState {
+    if (![TAPUtil isEmptyString:self.registerView.fullNameTextField.textField.text] && ![TAPUtil isEmptyString:self.registerView.usernameTextField.textField.text] && ![TAPUtil isEmptyString:self.registerView.mobileNumberTextField.textField.text] && self.isFullNameValid && self.isUsernameValid) {
+        
+        if (![TAPUtil isEmptyString:self.registerView.passwordTextField.textField.text] || ![TAPUtil isEmptyString:self.registerView.retypePasswordTextField.textField.text]) {
+            //IF PASSWORD FILLED
+            if (self.isPasswordValid) {
+                [self.registerView setContinueButtonEnabled:YES];
+            }
+            else {
+                [self.registerView setContinueButtonEnabled:NO];
+            }
+        }
+        else if (![TAPUtil isEmptyString:self.registerView.emailTextField.textField.text]) {
+            //IF EMAIL FILLED
+            if (self.isEmailValid) {
+                [self.registerView setContinueButtonEnabled:YES];
+            }
+            else {
+                [self.registerView setContinueButtonEnabled:NO];
+            }
+        }
+        else {
+            //PASSWORD AND EMAIL NOT FILLED
+            [self.registerView setContinueButtonEnabled:YES];
+        }
+    }
+    else {
+        [self.registerView setContinueButtonEnabled:NO];
     }
 }
+
+- (void)checkUsername {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    NSString *username = self.lastCheckUsernameString;
+    if (![TAPUtil validateUsername:username] && ![TAPUtil isEmptyString:username]) {
+        [self.registerView.usernameTextField setAsError:YES animated:YES];
+        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"Invalid Username", @"")];
+        [self.registerView refreshViewPosition];
+        _isUsernameValid = NO;
+    }
+    else if (([username length] < 4 || [username length] > 32) && ![TAPUtil isEmptyString:username]) {
+        [self.registerView.usernameTextField setAsError:YES animated:YES];
+        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"Username's length must be 4-32 characters", @"")];
+        [self.registerView refreshViewPosition];
+        _isUsernameValid = NO;
+    }
+    else {
+        [self.registerView.usernameTextField setAsError:NO animated:YES];
+        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView refreshViewPosition];
+        if (![TAPUtil isEmptyString:username]) {
+            [self checkUsernameAPI:username];
+        }
+        else {
+            _isUsernameValid = NO;
+        }
+    }
+    [self refreshButtonState];
+}
+
+- (void)checkFullName {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    NSString *fullName = self.lastCheckFullNameString;
+    if (![TAPUtil isAlphabetCharactersOnlyFromText:fullName] && ![TAPUtil isEmptyString:fullName]) {
+        [self.registerView.fullNameTextField setAsError:YES animated:YES];
+        [self.registerView.fullNameTextField setErrorInfoText:NSLocalizedString(@"Invalid Full Name", @"")];
+        [self.registerView refreshViewPosition];
+        _isFullNameValid = NO;
+    }
+    else {
+        [self.registerView.fullNameTextField setAsError:NO animated:YES];
+        [self.registerView.fullNameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView refreshViewPosition];
+        _isFullNameValid = YES;
+    }
+    [self refreshButtonState];
+}
+
+- (void)checkUsernameAPI:(NSString *)username {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [TAPDataManager callAPICheckUsername:username success:^(BOOL isExists, NSString *checkedUsername) {
+        if ([checkedUsername isEqualToString:self.registerView.usernameTextField.textField.text]) {
+            if (isExists) {
+                [self.registerView.usernameTextField setAsError:YES animated:YES];
+                [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"Username already exists", @"")];
+                [self.registerView refreshViewPosition];
+                _isUsernameValid = NO;
+            }
+            else {
+                [self.registerView.usernameTextField setAsError:NO animated:YES];
+                [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.registerView refreshViewPosition];
+                _isUsernameValid = YES;
+            }
+            [self refreshButtonState];
+        }
+    } failure:^(NSError *error) {
+        //        NSLog(@"ERROR - %@", error);
+        _isUsernameValid = NO;
+        [self.registerView.usernameTextField setAsError:YES animated:YES];
+        if (error.code == 999) {
+            [self.registerView.usernameTextField setErrorInfoText:@"Unable to verify username, please check your connection and try again"];
+        }
+        else {
+            [self.registerView.usernameTextField setErrorInfoText:error.domain];
+        }
+        
+        [self.registerView refreshViewPosition];
+        [self refreshButtonState];
+    }];
+}
+
+- (void)checkEmail {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    NSString *email = self.lastCheckEmailString;
+    if (![TAPUtil validateEmail:email] && ![TAPUtil isEmptyString:email]) {
+        [self.registerView.emailTextField setAsError:YES animated:YES];
+        [self.registerView.emailTextField setErrorInfoText:NSLocalizedString(@"Invalid email address", @"")];
+        [self.registerView refreshViewPosition];
+        _isEmailValid = NO;
+    }
+    else {
+        [self.registerView.emailTextField setAsError:NO animated:YES];
+        [self.registerView.emailTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView refreshViewPosition];
+        _isEmailValid = YES;
+    }
+    [self refreshButtonState];
+}
+
+- (void)removeProfilePictureButtonDidTapped {
+    self.selectedProfileImage = nil;
+    [self.registerView setProfilePictureWithImage:self.selectedProfileImage];
+}
+
+- (void)changeProfilePictureButtonDidTapped {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *cameraAction = [UIAlertAction
+                                       actionWithTitle:@"Camera"
+                                       style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction * action) {
+                                           [self openCamera];
+                                       }];
+    
+    UIAlertAction *galleryAction = [UIAlertAction
+                                      actionWithTitle:@"Gallery"
+                                      style:UIAlertActionStyleDefault
+                                      handler:^(UIAlertAction * action) {
+                                          [self openGallery];
+                                      }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       //Do some thing here
+                                   }];
+    
+    [cameraAction setValue:[[UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    [galleryAction setValue:[[UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
+    [galleryAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    [cameraAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [galleryAction setValue:[TAPUtil getColor:TAP_COLOR_BLACK_2C] forKey:@"titleTextColor"];
+    [cancelAction setValue:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1] forKey:@"titleTextColor"];
+    
+    [alertController addAction:cameraAction];
+    [alertController addAction:galleryAction];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)openCamera {
+    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    if (status == AVAuthorizationStatusAuthorized) {
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.allowsEditing = NO;
+        imagePicker.delegate = self;
+        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        
+        [self presentViewController:imagePicker animated:YES completion:^{
+            //completion
+        }];
+    }
+    else if (status == AVAuthorizationStatusNotDetermined) {
+        //request
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openCamera];
+            });
+        }];
+    }
+    else {
+        //No permission. Trying to normally request it
+        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        [alertController addAction:cancelAction];
+        
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if (IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }];
+        [alertController addAction:settingsAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)openGallery {
+    
+    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    
+    if (status == PHAuthorizationStatusAuthorized) {
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.allowsEditing = NO;
+        imagePicker.delegate = self;
+        imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+
+        [self presentViewController:imagePicker animated:YES completion:^{
+            //completion
+        }];
+    }
+    else if (status == PHAuthorizationStatusNotDetermined) {
+        //request
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openGallery];
+            });
+        }];
+    }
+    else {
+        //No permission. Trying to normally request it
+        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        [alertController addAction:cancelAction];
+        
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if (IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }];
+        [alertController addAction:settingsAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)popUpInfoTappedSingleButtonOrRightButton {
+    [super popUpInfoTappedSingleButtonOrRightButton];
+    //Skip Upload Image
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)popUpInfoDidTappedLeftButton {
+    [super popUpInfoDidTappedLeftButton];
+    
+    [self.registerView.continueButtonView setAsLoading:YES animated:NO];
+    [self.registerView setContentEditable:NO];
+    
+    [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+        
+        NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+        
+        [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
+            [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+            [self.registerView setContentEditable:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
+        } progressBlock:^(CGFloat progress, CGFloat total) {
+        } failureBlock:^(NSError *error) {
+            //Show error, retry or skip popup
+            
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+            
+            [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+            [self.registerView setContentEditable:YES];
+        }];
+    }];
+}
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
 
 @end

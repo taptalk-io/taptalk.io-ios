@@ -53,6 +53,7 @@
         
         //Add notification manager delegate
         [TAPNotificationManager sharedManager].delegate = self;
+        
     }
     
     return self;
@@ -130,11 +131,10 @@
     return _customNotificationAlertViewController;
 }
 
-//RN Temp
-- (TAPRegisterViewController *)registerViewController {
-    TAPRegisterViewController *registerViewController = [[TAPRegisterViewController alloc] initWithNibName:@"TAPRegisterViewController" bundle:[TAPUtil currentBundle]];
+- (TAPLoginViewController *)loginViewController {
+    TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
     
-    return registerViewController;
+    return loginViewController;
 }
 //END RN Temp
 
@@ -158,6 +158,9 @@
     
     //Validate and refresh access token
     [[TAPConnectionManager sharedManager] validateToken];
+    
+    //Populate User Country Code
+    [[TAPContactManager sharedManager] populateContactFromDatabase];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -168,6 +171,8 @@
     
     //Update application notification bubble
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToPreference];
+    
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -215,6 +220,9 @@
 
     //Start trigger timer to save new message
     [[TAPChatManager sharedManager] triggerSaveNewMessage];
+    
+    //Obtain downloaded file path from preference
+    [[TAPFileDownloadManager sharedManager] fetchDownloadedFilePathFromPreference];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -277,6 +285,13 @@
 #pragma mark - Exception Handling
 - (void)handleException:(NSException *)exception {
     [[TAPChatManager sharedManager] saveUnsentMessageAndDisconnect];
+    
+    //Save all retrieved contact to database
+    [[TAPContactManager sharedManager] saveContactToDatabase];
+    
+    //Save downloaded file path to preference
+    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToPreference];
+    
     _instanceState = TapTalkInstanceStateInactive;
     
     //Send stop typing emit
@@ -565,6 +580,18 @@ fromNavigationController:(UINavigationController *)navigationController
     success();
 }
 
+- (void)sendImageMessageWithAsset:(PHAsset *)asset caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
+    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
+    
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption room:room];
+    success();
+}
+
 - (void)shouldRefreshAuthTicket {
     [[TAPChatManager sharedManager] disconnect];
     
@@ -762,8 +789,11 @@ fromNavigationController:(UINavigationController *)navigationController
         [self.delegate tapTalkProfileButtonDidTapped:activeViewController otherUser:otherUser];
     }
     else {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
+        
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
         profileViewController.room = [TAPChatManager sharedManager].activeRoom;
+        profileViewController.userID = otherUserID;
         [activeViewController.navigationController pushViewController:profileViewController animated:YES];
     }
 }

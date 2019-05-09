@@ -22,6 +22,7 @@
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
+@property (strong, nonatomic) IBOutlet UIView *fileView;
 
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
@@ -37,6 +38,7 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelHeightConstraint;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -155,6 +157,7 @@
     
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
+    self.fileView.layer.cornerRadius = 8.0f;
     
     [self showQuoteView:NO];
     [self showReplyView:NO withMessage:nil];
@@ -533,15 +536,26 @@
     if (show) {
         self.captionLabelTopConstraint.constant = 10.0f;
         self.captionLabelBottomConstraint.constant = 10.0f;
+        
+        CGSize captionLabelSize = [self.captionLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.captionLabel.bounds), CGFLOAT_MAX)];
+        self.captionLabelHeightConstraint.constant = captionLabelSize.height;
     }
     else {
         self.captionLabelTopConstraint.constant = 0.0f;
         self.captionLabelBottomConstraint.constant = 0.0f;
+        self.captionLabelHeightConstraint.constant = 0.0f;
     }
 }
 
 - (void)setImageCaptionWithString:(NSString *)captionString {
-    self.captionLabel.text = [TAPUtil nullToEmptyString:captionString];
+    captionString = [TAPUtil nullToEmptyString:captionString];
+    
+    self.captionLabel.text = captionString;
+    
+    if ([captionString isEqualToString:@""]) {
+        [self showImageCaption:NO];
+        return;
+    }
     
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
@@ -571,12 +585,7 @@
     }];
     self.captionLabel.attributedText = attributedString;
     
-    if([captionString isEqualToString:@""]) {
-        [self showImageCaption:NO];
-    }
-    else {
-        [self showImageCaption:YES];
-    }
+    [self showImageCaption:YES];
 }
 
 - (void)getImageSizeFromImage:(UIImage *)image {
@@ -584,7 +593,13 @@
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;
-        _cellHeight = 244.0f;
+        _cellHeight = self.cellWidth / image.size.width * image.size.height;
+        if (self.cellHeight > self.maxHeight) {
+            _cellHeight = self.maxHeight;
+        }
+        else if (self.cellHeight < self.minHeight) {
+            _cellHeight = self.minHeight;
+        }
         return;
     }
     
@@ -665,7 +680,14 @@
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;
-        _cellHeight = 244.0f;
+        _cellHeight = self.cellWidth / width * height;
+        
+        if (self.cellHeight > self.maxHeight) {
+            _cellHeight = self.maxHeight;
+        }
+        else if (self.cellHeight < self.minHeight) {
+            _cellHeight = self.minHeight;
+        }
         return;
     }
     
@@ -931,19 +953,29 @@
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }

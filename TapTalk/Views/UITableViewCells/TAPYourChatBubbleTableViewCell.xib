@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
-        <array key="Lato-Bold.ttf">
-            <string>Lato-Bold</string>
+        <array key="PTRootUI-Bold.ttf">
+            <string>PTRootUI-Bold</string>
         </array>
-        <array key="Lato-Regular.ttf">
-            <string>Lato-Regular</string>
+        <array key="PTRootUI-Regular.ttf">
+            <string>PTRootUI-Regular</string>
         </array>
     </customFonts>
     <objects>
@@ -32,7 +32,7 @@
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="13" id="Jwj-oD-WMp"/>
                         </constraints>
-                        <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="11"/>
+                        <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                         <color key="textColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -56,7 +56,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="Gbz-2b-0at"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="12"/>
+                                <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="12"/>
                                 <color key="textColor" red="0.17254901960784313" green="0.17254901960784313" blue="0.17254901960784313" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -66,7 +66,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="sdG-AQ-3zw"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="12"/>
+                                <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="12"/>
                                 <color key="textColor" red="0.17254901960784313" green="0.17254901960784313" blue="0.17254901960784313" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -79,21 +79,38 @@
                                             <constraint firstAttribute="width" constant="48" id="Umz-qF-62T"/>
                                         </constraints>
                                     </imageView>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ksp-Bb-TAm">
+                                        <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDocumentsWhite" translatesAutoresizingMaskIntoConstraints="NO" id="mME-P6-9Yw">
+                                                <rect key="frame" x="12" y="12" width="24" height="24"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="24" id="1S7-kb-Nvo"/>
+                                                    <constraint firstAttribute="height" constant="24" id="qvM-uX-st8"/>
+                                                </constraints>
+                                            </imageView>
+                                        </subviews>
+                                        <color key="backgroundColor" red="0.28235294117647058" green="0.74509803921568629" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstItem="mME-P6-9Yw" firstAttribute="centerX" secondItem="Ksp-Bb-TAm" secondAttribute="centerX" id="Kwk-1a-Mms"/>
+                                            <constraint firstItem="mME-P6-9Yw" firstAttribute="centerY" secondItem="Ksp-Bb-TAm" secondAttribute="centerY" id="d0x-lG-Bjb"/>
+                                        </constraints>
+                                    </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-Cb-TqI">
                                         <rect key="frame" x="56" y="8" width="0.0" height="14"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" priority="750" constant="14" id="Ibk-al-l0N"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="11"/>
-                                        <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="11"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dNK-xN-CEq">
                                         <rect key="frame" x="56" y="22" width="0.0" height="0.0"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="11"/>
-                                        <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jVg-e6-q2b" userLabel="Quote Button">
@@ -104,7 +121,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="WK2-Cb-TqI" firstAttribute="top" secondItem="1Lt-qW-6Jy" secondAttribute="top" constant="8" id="0V3-zF-JIz"/>
                                     <constraint firstAttribute="height" constant="48" id="10P-Ku-EsO"/>
@@ -112,11 +129,15 @@
                                     <constraint firstAttribute="bottom" secondItem="qpq-L7-Tb4" secondAttribute="bottom" id="8Qm-Px-rhQ"/>
                                     <constraint firstAttribute="trailing" secondItem="jVg-e6-q2b" secondAttribute="trailing" id="Ccv-oN-dLk"/>
                                     <constraint firstItem="jVg-e6-q2b" firstAttribute="top" secondItem="1Lt-qW-6Jy" secondAttribute="top" id="DTh-Vc-hgM"/>
+                                    <constraint firstItem="Ksp-Bb-TAm" firstAttribute="trailing" secondItem="qpq-L7-Tb4" secondAttribute="trailing" id="EZt-KN-kdV"/>
+                                    <constraint firstItem="Ksp-Bb-TAm" firstAttribute="bottom" secondItem="qpq-L7-Tb4" secondAttribute="bottom" id="Jzq-ts-F07"/>
                                     <constraint firstAttribute="trailing" secondItem="WK2-Cb-TqI" secondAttribute="trailing" constant="8" id="N7N-XT-Qce"/>
                                     <constraint firstItem="WK2-Cb-TqI" firstAttribute="leading" secondItem="qpq-L7-Tb4" secondAttribute="trailing" constant="8" id="Pjh-90-f1r"/>
                                     <constraint firstItem="qpq-L7-Tb4" firstAttribute="top" secondItem="1Lt-qW-6Jy" secondAttribute="top" id="b71-Ml-bCz"/>
                                     <constraint firstItem="dNK-xN-CEq" firstAttribute="leading" secondItem="qpq-L7-Tb4" secondAttribute="trailing" constant="8" id="lA7-aY-E9w"/>
                                     <constraint firstItem="dNK-xN-CEq" firstAttribute="top" secondItem="WK2-Cb-TqI" secondAttribute="bottom" id="oWc-mT-Cmx"/>
+                                    <constraint firstItem="Ksp-Bb-TAm" firstAttribute="leading" secondItem="qpq-L7-Tb4" secondAttribute="leading" id="q1a-N1-xYS"/>
+                                    <constraint firstItem="Ksp-Bb-TAm" firstAttribute="top" secondItem="qpq-L7-Tb4" secondAttribute="top" id="wo7-sk-5yV"/>
                                     <constraint firstItem="jVg-e6-q2b" firstAttribute="leading" secondItem="1Lt-qW-6Jy" secondAttribute="leading" id="yJh-wC-2Pg"/>
                                     <constraint firstAttribute="trailing" secondItem="dNK-xN-CEq" secondAttribute="trailing" constant="8" id="ySy-MR-IT9"/>
                                     <constraint firstAttribute="bottom" secondItem="jVg-e6-q2b" secondAttribute="bottom" id="zwu-g9-7qm"/>
@@ -134,19 +155,19 @@
                                                 <constraints>
                                                     <constraint firstAttribute="height" priority="750" constant="14" id="nOw-ud-U52"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="11"/>
-                                                <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="11"/>
+                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8qR-65-Fwn">
                                                 <rect key="frame" x="4" y="17" width="49.5" height="29"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="11"/>
-                                                <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
+                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
-                                        <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="8qR-65-Fwn" secondAttribute="trailing" constant="8" id="0Ef-o3-PDd"/>
                                             <constraint firstAttribute="trailing" secondItem="RdE-Qb-IJF" secondAttribute="trailing" constant="8" id="aDR-o6-LYJ"/>
@@ -165,7 +186,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="0.78823529411764703" green="0.42352941176470588" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="1" green="0.63137254901960782" blue="0.27058823529411763" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="WQB-9d-e4m" firstAttribute="top" secondItem="Vj4-9m-HWu" secondAttribute="top" id="1eB-cI-qqF"/>
                                     <constraint firstItem="2i0-ox-IfK" firstAttribute="top" secondItem="WQB-9d-e4m" secondAttribute="top" id="6H7-7w-Wlo"/>
@@ -181,7 +202,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a8I-Kn-plq" customClass="ZSWTappableLabel">
                                 <rect key="frame" x="12" y="97" width="64" height="0.0"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="15"/>
+                                <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="15"/>
                                 <color key="textColor" red="0.17254901960784313" green="0.17254901960784313" blue="0.17254901960784313" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -238,6 +259,7 @@
                 <outlet property="bubbleLabel" destination="a8I-Kn-plq" id="6TZ-Cf-Asw"/>
                 <outlet property="bubbleView" destination="dnm-L1-3kp" id="9XT-kZ-iTs"/>
                 <outlet property="chatBubbleButton" destination="I5e-iw-lrB" id="l7C-l5-eC1"/>
+                <outlet property="fileView" destination="Ksp-Bb-TAm" id="fLF-sx-J6B"/>
                 <outlet property="forwardFromLabel" destination="2bz-e4-LIp" id="JcM-hW-89C"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="sdG-AQ-3zw" id="lgT-4z-6Kg"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="RDG-nS-9r4" id="MIe-lk-Byu"/>
@@ -275,6 +297,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="TAPIconDocumentsWhite" width="24" height="24"/>
         <image name="TAPIconReplyChat" width="28" height="28"/>
     </resources>
 </document>

@@ -18,6 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save;
 - (TAPUserModel *)getUserWithUserID:(NSString *)userID;
 - (void)populateContactFromDatabase;
+- (void)saveContactToDatabase;
+- (void)saveUserCountryCode:(NSString *)countryCode;
+- (void)setContactPermissionAsked;
+- (BOOL)isContactPermissionAsked;
+- (NSString *)getUserCountryCode;
+- (BOOL)checkUserExistWithPhoneNumber:(NSString *)phoneNumberWithCode;
 
 @end
 

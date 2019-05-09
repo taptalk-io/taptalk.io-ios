@@ -23,6 +23,10 @@ typedef NS_ENUM(NSInteger, TAPYourFileBubbleTableViewCellStateType) {
 - (void)yourFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourFileReplyDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourFileBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)yourFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)yourFileRetryDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)yourFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)yourFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage;
 
 @end
 
@@ -35,10 +39,11 @@ typedef NS_ENUM(NSInteger, TAPYourFileBubbleTableViewCellStateType) {
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated;
 - (void)showProgressDownloadView:(BOOL)show;
-- (void)showNotDownloadedState;
+- (void)showDownloadedState:(BOOL)isShow;
 - (void)animateFinishedDownloadFile;
+- (void)animateCancelDownloadFile;
 - (void)animateFailedDownloadFile;
-- (void)animateProgressDownloadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)animateProgressDownloadingFileWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)showFileBubbleStatusWithType:(TAPYourFileBubbleTableViewCellStateType)type;
 
 @end

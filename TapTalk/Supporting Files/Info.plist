@@ -28,5 +28,12 @@
 	<array>
 		<string>comgooglemaps</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>PTRootUI-Bold.ttf</string>
+		<string>PTRootUI-Medium.ttf</string>
+		<string>PTRootUI-Regular.ttf</string>
+		<string>PTRootUI-Light.ttf</string>
+	</array>
 </dict>
 </plist>

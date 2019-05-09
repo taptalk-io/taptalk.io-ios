@@ -46,7 +46,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconCloseGreen" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonDidTapped)];
+    _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonDidTapped)];
     [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     
     self.photoAlbumListView.tableView.dataSource = self;
@@ -54,7 +54,7 @@
     
     _smartAlbumArray = [[NSMutableArray alloc] init];
     _collectionArray = [[NSMutableArray alloc] init];
-    _selectedImageDataArray = [[NSMutableArray alloc] init];
+    _selectedMediaDataArray = [[NSMutableArray alloc] init];
     _selectedImagePositionDictionary = [[NSMutableDictionary alloc] init];
     
     [self.photoAlbumListView setChooseItemLabelWithItemCount:self.currentTotalImageData];
@@ -107,7 +107,7 @@
     
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
+//    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
     
     if(indexPath.section == 0) {
         //Smart Album
@@ -183,7 +183,6 @@
         //smart album
         TAPImageSelectViewController *imageSelectViewController = [[TAPImageSelectViewController alloc] init];
         imageSelectViewController.delegate = self;
-        imageSelectViewController.isFromAddService = YES;
         imageSelectViewController.currentTotalImageData = self.currentTotalImageData;
         [imageSelectViewController setImageSelectViewControllerType:ImageSelectViewControllerTypeGalleryAlbum];
         [imageSelectViewController setImageSelectViewControllerNavigateType:ImageSelectViewControllerNavigateTypePush];
@@ -201,7 +200,7 @@
         PHAssetCollection *collection = [collectionDictionary objectForKey:@"collection"];
         imageSelectViewController.cameraRollCollection = collection;
         
-        imageSelectViewController.selectedImageDataArray = self.selectedImageDataArray;
+        imageSelectViewController.selectedMediaDataArray = self.selectedMediaDataArray;
         imageSelectViewController.selectedImagePositionDictionary = self.selectedImagePositionDictionary;
         imageSelectViewController.delegate = self;
         imageSelectViewController.albumIndexRow = indexPath.row;
@@ -212,7 +211,6 @@
         //user collection
         TAPImageSelectViewController *imageSelectViewController = [[TAPImageSelectViewController alloc] init];
         imageSelectViewController.delegate = self;
-        imageSelectViewController.isFromAddService = YES;
         imageSelectViewController.currentTotalImageData = self.currentTotalImageData;
         [imageSelectViewController setImageSelectViewControllerType:ImageSelectViewControllerTypeGalleryAlbum];
         [imageSelectViewController setImageSelectViewControllerNavigateType:ImageSelectViewControllerNavigateTypePush];
@@ -229,7 +227,7 @@
         PHAssetCollection *collection = [collectionDictionary objectForKey:@"collection"];
         imageSelectViewController.cameraRollCollection = collection;
         
-        imageSelectViewController.selectedImageDataArray = self.selectedImageDataArray;
+        imageSelectViewController.selectedMediaDataArray = self.selectedMediaDataArray;
         imageSelectViewController.selectedImagePositionDictionary = self.selectedImagePositionDictionary;
         imageSelectViewController.delegate = self;
         imageSelectViewController.albumIndexRow = indexPath.row;
@@ -240,7 +238,7 @@
 
 #pragma mark TAPImageSelectViewController
 - (void)imageSelectViewControllerDidAddSelectedImage:(NSMutableArray *)selectedImageArray selectedDictionary:(NSMutableDictionary *)selectedDictionary {
-    self.selectedImageDataArray = selectedImageArray;
+    self.selectedMediaDataArray = selectedImageArray;
     self.selectedImagePositionDictionary = selectedDictionary;
 }
 
@@ -277,7 +275,7 @@
     
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
+//    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
     
     self.smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:albumOptions];
     self.userCollections = [PHCollectionList fetchTopLevelUserCollectionsWithOptions:nil];

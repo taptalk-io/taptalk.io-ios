@@ -29,12 +29,12 @@
         
         _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 3.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f - 100.0f, 23.0f)];
         self.nameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.nameLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:15.0f];
+        self.nameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         [self.contentView addSubview:self.nameLabel];
         
         _countLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.nameLabel.frame) - 4.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f - 100.0f, 18.0f)];
         self.countLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.countLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:11.0f];
+        self.countLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:11.0f];
         [self.contentView addSubview:self.countLabel];
         
         _separatorView =  [[UIView alloc] initWithFrame:CGRectMake(0.0f, cellHeight - 1.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 1.0f)];
@@ -42,13 +42,13 @@
         [self.contentView addSubview:self.separatorView];
         
         _selectedCountView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 15.0f - 16.0f, (cellHeight - 15.0f)/2, 15.0f, 15.0f)];
-        self.selectedCountView.backgroundColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.selectedCountView.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         self.selectedCountView.layer.cornerRadius = CGRectGetWidth(self.selectedCountView.frame)/2.0f;
         [self.contentView addSubview:self.selectedCountView];
         
         _selectedCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 15.0f, 15.0f)];
         self.selectedCountLabel.textColor = [UIColor whiteColor];
-        self.selectedCountLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:10.0f];
+        self.selectedCountLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
         self.selectedCountLabel.textAlignment = NSTextAlignmentCenter;
         [self.selectedCountView addSubview:self.selectedCountLabel];
     }

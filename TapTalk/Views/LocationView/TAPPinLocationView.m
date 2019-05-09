@@ -26,7 +26,7 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         
-        _sendLocationView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - 15.0f)];
+        _sendLocationView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - 15.0f)];
         self.sendLocationView.backgroundColor = [UIColor whiteColor];
         self.sendLocationView.layer.cornerRadius = 2.0f;
         self.sendLocationView.layer.shadowOffset = CGSizeMake(6.0f, 6.0f);
@@ -36,7 +36,7 @@
         [self addSubview:self.sendLocationView];
         
         _sendIconView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.sendLocationView.frame) - 30.0f, 0.0f, 30.0f, 30.0f)];
-        self.sendIconView.backgroundColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
+        self.sendIconView.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self.sendLocationView addSubview:self.sendIconView];
         
         _sendIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
@@ -44,7 +44,7 @@
         [self.sendIconView addSubview:self.sendIconImageView];
         
         _sendLocationLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, 8.0f, CGRectGetMinX(self.sendIconView.frame) - 8.0f - 8.0f, 14.0f)];
-        self.sendLocationLabel.font = [UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f];
+        self.sendLocationLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
         self.sendLocationLabel.text = NSLocalizedString(@"Send Location", @"");
         self.sendLocationLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         self.sendLocationLabel.textAlignment = NSTextAlignmentCenter;

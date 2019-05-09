@@ -9,12 +9,15 @@
 #import "TAPBaseView.h"
 
 typedef NS_ENUM(NSInteger, TAPPopupInfoViewType) {
-    TAPPopupInfoViewTypeErrorMessage,
+    TAPPopupInfoViewTypeErrorMessage, // 1 button red
+    TAPPopupInfoViewTypeSuccessMessage, // 1 button green
+    TAPPopupInfoViewTypeInfoDefault, // 2 button (grey, green)
+    TAPPopupInfoViewTypeInfoDestructive,// 2 button (grey, red)
 };
 
 typedef NS_ENUM(NSInteger, TAPPopupInfoViewThemeType) {
     TAPPopupInfoViewThemeTypeDefault, //Green theme
-    TAPPopupInfoViewThemeTypeAlert //Red theme
+    TAPPopupInfoViewThemeTypeDestructive //Red theme
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -27,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIButton *rightButton;
 
 - (void)isShowTwoOptionButton:(BOOL)isShow;
-- (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo;
+- (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString *)leftOptionTitle singleOrRightOptionButtonTitle:(NSString *)singleOrRightOptionTitle;
 - (void)setPopupInfoViewThemeType:(TAPPopupInfoViewThemeType)popupInfoViewThemeType;
 
 @end

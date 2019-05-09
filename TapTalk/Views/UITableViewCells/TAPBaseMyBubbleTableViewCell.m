@@ -66,14 +66,14 @@
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     
-    self.gradientView = [[TAPGradientView alloc] initWithFrame:self.bubbleView.bounds];
-    
-    self.gradientView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.gradientView.layer.colors = @[ (__bridge id)[TAPUtil getColor:@"9954C2"].CGColor, (__bridge id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor];
-    
-    [self.bubbleView insertSubview:self.gradientView atIndex:0];
-    
-    self.gradientView.clipsToBounds = YES;
+//    self.gradientView = [[TAPGradientView alloc] initWithFrame:self.bubbleView.bounds];
+//
+//    self.gradientView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//    self.gradientView.layer.colors = @[ (__bridge id)[TAPUtil getColor:@"9954C2"].CGColor, (__bridge id)[TAPUtil getColor:TAP_COLOR_PURPLE_98].CGColor];
+//
+//    [self.bubbleView insertSubview:self.gradientView atIndex:0];
+//
+//    self.gradientView.clipsToBounds = YES;
     self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 8.0f;
@@ -82,10 +82,6 @@
     self.retryButton.alpha = 1.0f;
     
     self.replyView.layer. cornerRadius = 4.0f;
-    
-//    _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-//                                                                              action:@selector(handleBubbleViewTap:)];
-//    [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
 }
 
 - (void)prepareForReuse {
@@ -118,17 +114,6 @@
     message.body = [TAPUtil nullToEmptyString:message.body];
     
     _message = message;
-    
-//    //WK Temp
-//    BOOL isReply = YES;
-//    //    if ([message.messageID integerValue] % 2 == 1) {
-//    //        isReply = YES;
-//    //    }
-//    //    else {
-//    //        isReply = NO;
-//    //    }
-//    [self showReplyView:isReply withMessage:message];
-//    //End Temp
     
     if (!message.isFailedSend) {
         self.retryIconImageView.alpha = 0.0f;
@@ -393,9 +378,7 @@
 }
 
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
-//    if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
-//        [self.delegate myChatBubbleViewDidTapped:self.message];
-//    }
+
 }
 
 @end

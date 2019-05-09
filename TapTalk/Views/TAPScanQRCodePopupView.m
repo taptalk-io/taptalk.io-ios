@@ -14,7 +14,7 @@
 @property (strong, nonatomic) UIVisualEffectView *visualEffectView;
 @property (strong, nonatomic) UIView *backgroundGradientView;
 @property (strong, nonatomic) UIView *whiteBaseView;
-@property (strong, nonatomic) UIView *greenView;
+@property (strong, nonatomic) UIView *colorGradientView;
 @property (strong, nonatomic) UIImageView *closePopupImageView;
 @property (strong, nonatomic) TAPImageView *addedUserImageView;
 @property (strong, nonatomic) UILabel *addedUserUsernameLabel;
@@ -88,7 +88,7 @@
         _backgroundGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
         CAGradientLayer *backgroundGradientLayer = [CAGradientLayer layer];
         backgroundGradientLayer.frame = self.backgroundGradientView.bounds;
-        backgroundGradientLayer.colors = @[(id)[TAPUtil getColor:@"C854A5"].CGColor, (id)[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE].CGColor];
+        backgroundGradientLayer.colors = @[(id)[TAPUtil getColor:TAP_COLOR_DODGERBLUE_FF].CGColor, (id)[TAPUtil getColor:TAP_COLOR_BLURPLE_D7].CGColor];
         [self.backgroundGradientView.layer insertSublayer:backgroundGradientLayer atIndex:0];
         [self addSubview:self.backgroundGradientView];
         
@@ -101,9 +101,14 @@
         self.whiteBaseView.clipsToBounds = YES;
         [self addSubview:self.whiteBaseView];
         
-        _greenView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.whiteBaseView.frame) - 54.0f, CGRectGetWidth(self.whiteBaseView.frame), 54.0f)];
-        self.greenView.backgroundColor = [TAPUtil getColor:TAP_COLOR_MOSELO_GREEN];
-        [self.whiteBaseView addSubview:self.greenView];
+        _colorGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.whiteBaseView.frame) - 54.0f, CGRectGetWidth(self.whiteBaseView.frame), 54.0f)];
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = self.colorGradientView.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_ORANGE_33].CGColor, (id)[TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor, nil];
+        gradient.startPoint = CGPointMake(0.0f, 0.0f);
+        gradient.endPoint = CGPointMake(0.0f, 1.0f);
+        [self.colorGradientView.layer insertSublayer:gradient atIndex:0];
+        [self.whiteBaseView addSubview:self.colorGradientView];
         
         _closePopupImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 28.0f, 24.0f, 28.0f, 28.0f)];
         self.closePopupImageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -132,21 +137,21 @@
         
         _addedUserUsernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserImageView.frame) + self.profilePictureBottomGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 22.0f)];
         self.addedUserUsernameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:20.0f];
-        self.addedUserUsernameLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.addedUserUsernameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
         self.addedUserUsernameLabel.textAlignment = NSTextAlignmentCenter;
         self.addedUserUsernameLabel.numberOfLines = 2;
         [self.whiteBaseView addSubview:self.addedUserUsernameLabel];
         
         _addedUserFullnameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.addedUserUsernameLabel.frame), CGRectGetMaxY(self.addedUserUsernameLabel.frame) + self.addedUserUsernameLabelBottomGap, CGRectGetWidth(self.addedUserUsernameLabel.frame), 18.0f)];
         self.addedUserFullnameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.addedUserFullnameLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.addedUserFullnameLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
         self.addedUserFullnameLabel.textAlignment = NSTextAlignmentCenter;
         [self.whiteBaseView addSubview:self.addedUserFullnameLabel];
         
         _selfInformedLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserFullnameLabel.frame) + self.selfInformedLabelTopGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 18.0f)];
-        self.selfInformedLabel.text = NSLocalizedString(@"This is you", @"");
-        self.selfInformedLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.selfInformedLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.selfInformedLabel.text = NSLocalizedString(@"This is you!", @"");
+        self.selfInformedLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
+        self.selfInformedLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
         self.selfInformedLabel.textAlignment = NSTextAlignmentCenter;
         self.selfInformedLabel.alpha = 0.0f;
         [self.whiteBaseView addSubview:self.selfInformedLabel];
@@ -161,15 +166,15 @@
         _successAddContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.successAddContactImageView.frame) + self.successAddUserLabelTopGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 22.0f)];
         self.successAddContactLabel.alpha = 0.0f;
         self.successAddContactLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.successAddContactLabel.textColor = [TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE];
+        self.successAddContactLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
         self.successAddContactLabel.numberOfLines = 0;
         self.successAddContactLabel.textAlignment = NSTextAlignmentCenter;
         [self.whiteBaseView addSubview:self.successAddContactLabel];
         
         //Add To Contact View
-        _addContactView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.greenView.frame), CGRectGetHeight(self.greenView.frame))];
+        _addContactView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame))];
         self.addContactView.backgroundColor = [UIColor clearColor];
-        [self.greenView addSubview:self.addContactView];
+        [self.colorGradientView addSubview:self.addContactView];
         
         _addContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.addContactView.frame) - 22.0f) / 2.0f, 76.0f, 22.0f)];
         self.addContactLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
@@ -190,13 +195,13 @@
         self.addContactLabel.frame = CGRectMake(CGRectGetMaxX(self.addContactLogoImageView.frame) + 5.0f, CGRectGetMinY(self.addContactLabel.frame), CGRectGetWidth(self.addContactLabel.frame), CGRectGetHeight(self.addContactLabel.frame));
         
         _addContactButton = [[UIButton alloc] initWithFrame:self.addContactView.frame];
-        [self.greenView addSubview:self.addContactButton];
+        [self.colorGradientView addSubview:self.addContactButton];
         
         //Chat Now View
-        _chatNowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.greenView.frame), CGRectGetHeight(self.greenView.frame))];
+        _chatNowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame))];
         self.chatNowView.backgroundColor = [UIColor clearColor];
         self.chatNowView.alpha = 0.0f;
-        [self.greenView addSubview:self.chatNowView];
+        [self.colorGradientView addSubview:self.chatNowView];
         
         _chatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.chatNowView.frame) - 22.0f) / 2.0f, 76.0f, 22.0f)];
         self.chatNowLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
@@ -217,7 +222,7 @@
         self.chatNowLabel.frame = CGRectMake(CGRectGetMaxX(self.chatNowLogoImageView.frame) + 5.0f, CGRectGetMinY(self.chatNowLabel.frame), CGRectGetWidth(self.chatNowLabel.frame), CGRectGetHeight(self.chatNowLabel.frame));
         
         _chatNowButton = [[UIButton alloc] initWithFrame:self.chatNowView.frame];
-        [self.greenView addSubview:self.chatNowButton];
+        [self.colorGradientView addSubview:self.chatNowButton];
         
         _loadingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
         self.loadingView.backgroundColor = [UIColor blackColor];
@@ -311,14 +316,14 @@
         //First time add user, showing icon add friend
         NSString *localizedTemplateSuccessHeaderString = NSLocalizedString(@"You have added ", @"");
         NSString *localizedTemplateSuccessFooterString = NSLocalizedString(@"to your contacts", @"");
-        self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@ %@", localizedTemplateSuccessHeaderString, addedUserUsername, localizedTemplateSuccessFooterString];
+        self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@ %@", localizedTemplateSuccessHeaderString, addedUserFullName, localizedTemplateSuccessFooterString];
         
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
         
         NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
         [attributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f] forKey:NSFontAttributeName];
-        [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE] forKey:NSForegroundColorAttributeName];
+        [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_BLACK_19] forKey:NSForegroundColorAttributeName];
         [attributesDictionary setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
         
         NSMutableAttributedString *addedUserUsernameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
@@ -333,14 +338,14 @@
     }
     else if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
         NSString *localizedTemplateSuccessString = NSLocalizedString(@"is already in your contacts", @"");
-        self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@", addedUserUsername, localizedTemplateSuccessString];
+        self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@", addedUserFullName, localizedTemplateSuccessString];
         
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
         
         NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
         [attributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f] forKey:NSFontAttributeName];
-        [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_MOSELO_PURPLE] forKey:NSForegroundColorAttributeName];
+        [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_BLACK_19] forKey:NSForegroundColorAttributeName];
         [attributesDictionary setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
         
         NSMutableAttributedString *addedUserUsernameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
@@ -392,7 +397,7 @@
     
     CGFloat addedUserFullnameLabelHeight = CGRectGetHeight(self.addedUserFullnameLabel.frame);
     
-    CGFloat buttonViewHeight = CGRectGetHeight(self.greenView.frame);
+    CGFloat buttonViewHeight = CGRectGetHeight(self.colorGradientView.frame);
     
     CGFloat totalBaseViewHeight = self.profilePictureYPosition + profilePictureHeight + self.profilePictureBottomGap + usernameHeight + self.addedUserUsernameLabelBottomGap + addedUserFullnameLabelHeight + self.addedUserFullnameLabelBottomGap + buttonViewHeight;
     
@@ -403,25 +408,25 @@
     
     self.whiteBaseView.frame = CGRectMake(CGRectGetMinX(self.whiteBaseView.frame), (CGRectGetHeight(self.frame) - totalBaseViewHeight) / 2.0f, CGRectGetWidth(self.whiteBaseView.frame), totalBaseViewHeight);
     
-    self.greenView.frame = CGRectMake(CGRectGetMinX(self.greenView.frame), CGRectGetHeight(self.whiteBaseView.frame) - CGRectGetHeight(self.greenView.frame), CGRectGetWidth(self.greenView.frame), CGRectGetHeight(self.greenView.frame));
+    self.colorGradientView.frame = CGRectMake(CGRectGetMinX(self.colorGradientView.frame), CGRectGetHeight(self.whiteBaseView.frame) - CGRectGetHeight(self.colorGradientView.frame), CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame));
 }
 
 - (void)animateBouncePopupViewWithType:(ScanQRCodePopupViewType)type {
     if (type == ScanQRCodePopupViewTypeNewFriend) {
         //Showing Add To contact button
-        self.greenView.alpha = 1.0f;
+        self.colorGradientView.alpha = 1.0f;
         self.selfInformedLabel.alpha = 0.0f;
-        
+
         self.addContactView.alpha = 1.0f;
         self.addContactButton.alpha = 1.0f;
         self.addContactButton.userInteractionEnabled = YES;
-        
+
         self.chatNowView.alpha = 0.0f;
         self.chatNowButton.alpha = 0.0f;
         self.chatNowButton.userInteractionEnabled = NO;
     }
     else if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
-        self.greenView.alpha = 0.0f;
+        self.colorGradientView.alpha = 0.0f;
         self.selfInformedLabel.alpha = 0.0f;
         
         self.addContactView.alpha = 0.0f;
@@ -433,7 +438,7 @@
         self.chatNowButton.userInteractionEnabled = YES;
     }
     else if (type == ScanQRCodePopupViewTypeSelf) {
-        self.greenView.alpha = 0.0f;
+        self.colorGradientView.alpha = 0.0f;
         self.addContactButton.userInteractionEnabled = NO;
         self.chatNowButton.userInteractionEnabled = NO;
         self.selfInformedLabel.alpha = 1.0f;
@@ -485,11 +490,11 @@
     [UIView animateWithDuration:0.25f animations:^{
         //Animate Base White Frame Changing
         self.whiteBaseView.frame = CGRectMake(CGRectGetMinX(self.whiteBaseView.frame), ((CGRectGetHeight(self.frame) - whiteViewHeight) / 2.0f) - (additionalChangingHeight / 2.0f), CGRectGetWidth(self.whiteBaseView.frame), whiteViewHeight + additionalChangingHeight);
-        self.greenView.frame = CGRectMake(CGRectGetMinX(self.greenView.frame), CGRectGetHeight(self.whiteBaseView.frame) -  CGRectGetHeight(self.greenView.frame), CGRectGetWidth(self.greenView.frame), CGRectGetHeight(self.greenView.frame));
+        self.colorGradientView.frame = CGRectMake(CGRectGetMinX(self.colorGradientView.frame), CGRectGetHeight(self.whiteBaseView.frame) -  CGRectGetHeight(self.colorGradientView.frame), CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame));
         
         //Animate User Image Changing
         self.currentUserImageView.alpha = 1.0f;
-        self.greenView.alpha = 1.0f;
+        self.colorGradientView.alpha = 1.0f;
         
         [UIView animateWithDuration:0.5f delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
             
@@ -557,7 +562,7 @@
 - (CGFloat)calculateFriendListViewChangingHeight {
     
     CGFloat profilePictureHeight = CGRectGetHeight(self.addedUserImageView.frame);
-    CGFloat buttonViewHeight = CGRectGetHeight(self.greenView.frame);
+    CGFloat buttonViewHeight = CGRectGetHeight(self.colorGradientView.frame);
     
     CGFloat totalBaseViewHeight = self.profilePictureYPosition + profilePictureHeight + self.addedUserLogoTopGap  + CGRectGetHeight(self.successAddContactImageView.frame) + self.successAddUserLabelTopGap + CGRectGetHeight(self.successAddContactLabel.frame) + buttonViewHeight;
     
@@ -609,13 +614,13 @@
 //
 //        //Animate Base White Frame Changing
 //        self.whiteBaseView.frame = CGRectMake(CGRectGetMinX(self.whiteBaseView.frame), CGRectGetMinY(self.whiteBaseView.frame) - (kHeightChanging / 2.0f), CGRectGetWidth(self.whiteBaseView.frame), CGRectGetHeight(self.whiteBaseView.frame) + kHeightChanging);
-//        self.greenView.frame = CGRectMake(CGRectGetMinX(self.greenView.frame), CGRectGetHeight(self.whiteBaseView.frame) - 54.0f, CGRectGetWidth(self.greenView.frame), CGRectGetHeight(self.greenView.frame));
+//        self.colorGradientView.frame = CGRectMake(CGRectGetMinX(self.colorGradientView.frame), CGRectGetHeight(self.whiteBaseView.frame) - 54.0f, CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame));
 //
 //        //Animate User Image Changing
 //        self.addedUserImageView.alpha = 0.0f;
 //        self.leftUserImageView.alpha = 1.0f;
 //        self.rightUserImageView.alpha = 1.0f;
-//        self.greenView.alpha = 1.0f;
+//        self.colorGradientView.alpha = 1.0f;
 //
 //        [UIView animateWithDuration:0.5f animations:^{
 //            self.leftUserImageView.frame = CGRectMake(((CGRectGetWidth(self.whiteBaseView.frame) / 2.0f) - CGRectGetWidth(self.leftUserImageView.frame)) + 12.0f, CGRectGetMinY(self.leftUserImageView.frame), CGRectGetWidth(self.leftUserImageView.frame), CGRectGetHeight(self.leftUserImageView.frame));

@@ -7,11 +7,10 @@
 //
 
 #import "TAPAPIManager.h"
-
-static NSString * const kBaseURLProduction = @"https://hp.moselo.com:8080";
+static NSString * const kBaseURLProduction = @"https://taptalk-production.moselo.com";
 static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com:8080";
 static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com:8080";
-
+ 
 //static NSString * const kBaseURLProduction = @"https://engine.taptalk.io:8080";
 //static NSString * const kBaseURLStaging = @"https://engine-staging.taptalk.io:8080";
 //static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io:8080";
@@ -139,6 +138,34 @@ static NSString * const kAPIVersionString = @"v1";
     }
     else if (type == TAPAPIManagerTypeGetBulkUserByID) {
         NSString *apiPath = @"client/user/get_all_by_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetCountry) {
+        NSString *apiPath = @"client/country/list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRequestOTP) {
+        NSString *apiPath = @"client/login/request_otp";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeVerifyOTP) {
+        NSString *apiPath = @"client/login/verify_otp";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeCheckUsername) {
+        NSString *apiPath = @"client/user/exists/username";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRegister) {
+        NSString *apiPath = @"client/register";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeAddContactByPhones) {
+        NSString *apiPath = @"client/contact/add_by_phones";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUploadUserPhoto) {
+        NSString *apiPath = @"client/user/photo/upload";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     

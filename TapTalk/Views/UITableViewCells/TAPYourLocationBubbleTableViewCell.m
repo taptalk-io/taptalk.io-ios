@@ -14,6 +14,7 @@
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
+@property (strong, nonatomic) IBOutlet UIView *fileView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
@@ -93,6 +94,7 @@
     
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
+    self.fileView.layer.cornerRadius = 8.0f;
     
     [self.mapView setShowsUserLocation:YES];
     [self.mapView setShowsPointsOfInterest:YES];
@@ -134,6 +136,9 @@
 - (void)setMessage:(TAPMessageModel *)message {
     _message = message;
     
+    BOOL replyToExists = NO;
+    BOOL quoteExists = NO;
+    
     if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
         [self showForwardView:YES];
         [self setForwardData:message.forwardFrom];
@@ -148,6 +153,7 @@
         //reply to exists
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
+        replyToExists = YES;
         
         if (self.isShowForwardView) {
             self.forwardTitleLabelTopConstraint.constant = 10.0f;
@@ -168,7 +174,8 @@
     }
     else if (![message.quote.title isEqualToString:@""] && message != nil) {
         //quote exists
-        
+        quoteExists = YES;
+
         if (self.isShowForwardView) {
             self.forwardTitleLabelTopConstraint.constant = 10.0f;
         }
@@ -204,6 +211,15 @@
     
     [self setMapWithLatitude:mapLatitude longitude:mapLongitude];
     self.bubbleLabel.text = [NSString stringWithFormat:@"%@", mapAddress];
+    
+    if (self.isShowForwardView || replyToExists || quoteExists) {
+        self.mapView.layer.cornerRadius = 0.0f;
+        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+    }
+    else {
+        self.mapView.layer.cornerRadius = 8.0f;
+        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+    }
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
@@ -397,14 +413,16 @@
         self.forwardTitleLabelHeightConstraint.constant = 16.0f;
         self.forwardFromLabelLeadingConstraint.active = YES;
         self.forwardTitleLabelLeadingConstraint.active = YES;
-        
+        self.replyViewTopConstraint.constant = 6.0f;
+        self.quoteViewTopConstraint.constant = 6.0f;
     }
     else {
         self.forwardFromLabelHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelHeightConstraint.constant = 0.0f;
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
-        
+        self.replyViewTopConstraint.constant = 0.0f;
+        self.quoteViewTopConstraint.constant = 0.0f;
     }
 }
 
@@ -418,19 +436,29 @@
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_LATO_BOLD size:12.0f]
+                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote {
-    if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.imageURL];
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+        //TYPE FILE
+        self.fileView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
     }
-    else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-        [self.quoteImageView setImageWithURLString:quote.fileID];
+    else {
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        self.fileView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
     }
+    
     self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }

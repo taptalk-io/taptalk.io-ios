@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *content;
 @property (nonatomic, strong) NSString *fileID; //Image from TapTalk
 @property (nonatomic, strong) NSString *imageURL; //Image from Client
+@property (nonatomic, strong) NSString *fileType; //fileType is the same as message type casted to NSString
 
 @end
 

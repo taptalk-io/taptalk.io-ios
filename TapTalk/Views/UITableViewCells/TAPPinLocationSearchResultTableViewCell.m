@@ -27,7 +27,7 @@
         [self.contentView addSubview:self.bgView];
         
         _searchResultLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 36.0f)];
-        self.searchResultLabel.font = [UIFont fontWithName:TAP_FONT_LATO_REGULAR size:13.0f];
+        self.searchResultLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.searchResultLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         [self.bgView addSubview:self.searchResultLabel];
         
