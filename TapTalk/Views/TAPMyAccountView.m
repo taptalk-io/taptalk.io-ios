@@ -15,6 +15,10 @@
 @property (strong, nonatomic) UIImageView *changeIconImageView;
 @property (strong, nonatomic) UIImageView *loadingImageView;
 
+@property (strong, nonatomic) UILabel *logoutLabel;
+@property (strong, nonatomic) UIView *logoutSeparatorView;
+@property (strong, nonatomic) UIImageView *logoutIconImageView;
+
 @property (strong, nonatomic) UIView *progressBarBackgroundView;
 @property (strong, nonatomic) UIView *progressBarView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
@@ -174,7 +178,33 @@
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMinY(self.emailTextField.frame), CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.emailTextField];
         
-        _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
+        _logoutView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 50.0f)];
+        self.logoutView.backgroundColor = [UIColor whiteColor];
+        self.logoutView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+        self.logoutView.layer.borderWidth = 1.0f;
+        self.logoutView.layer.cornerRadius = 8.0f;
+        [self.scrollView addSubview:self.logoutView];
+        
+        _logoutSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f, 0.0f, 1.0f, CGRectGetHeight(self.logoutView.frame))];
+        self.logoutSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+        [self.logoutView addSubview:self.logoutSeparatorView];
+        
+        _logoutIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.logoutView.frame) - 15.0f - 20.0f, (CGRectGetHeight(self.logoutView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
+        self.logoutIconImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.logoutIconImageView.image = [UIImage imageNamed:@"TAPIconLogout" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        [self.logoutView addSubview:self.logoutIconImageView];
+        
+        CGFloat logoutLabelWidth = CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f - 15.0f - 15.0f;
+        _logoutLabel = [[UILabel alloc] initWithFrame:CGRectMake(15.0f, 0.0f, logoutLabelWidth, CGRectGetHeight(self.logoutView.frame))];
+        self.logoutLabel.text = NSLocalizedString(@"Logout", @"");
+        self.logoutLabel.textColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57];
+        self.logoutLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        [self.logoutView addSubview:self.logoutLabel];
+        
+        _logoutButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame))];
+        [self.logoutView addSubview:self.logoutButton];
+        
+        _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
         [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
 //        [self.scrollView addSubview:self.continueButtonView]; //CS TEMP - hide continue button
@@ -202,12 +232,13 @@
         self.usernameTextField.frame = CGRectMake(CGRectGetMinX(self.usernameTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame) + 24.0f, CGRectGetWidth(self.usernameTextField.frame), [self.usernameTextField getTextFieldHeight]);
         self.mobileNumberTextField.frame = CGRectMake(CGRectGetMinX(self.mobileNumberTextField.frame), CGRectGetMaxY(self.usernameTextField.frame) + 24.0f, CGRectGetWidth(self.mobileNumberTextField.frame), [self.mobileNumberTextField getTextFieldHeight]);
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.mobileNumberTextField.frame) + 24.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
+        self.logoutView.frame = CGRectMake(CGRectGetMinX(self.logoutView.frame), CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame));
         //CS TEMP - uncomment below code to show password
         //        self.passwordTextField.frame = CGRectMake(CGRectGetMinX(self.passwordTextField.frame), CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.passwordTextField.frame), [self.passwordTextField getTextFieldHeight]);
         //        self.retypePasswordTextField.frame = CGRectMake(CGRectGetMinX(self.retypePasswordTextField.frame), CGRectGetMaxY(self.passwordTextField.frame) + 24.0f, CGRectGetWidth(self.retypePasswordTextField.frame), [self.retypePasswordTextField getTextFieldHeight]);
         //        self.continueButtonView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.retypePasswordTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f);
         //END CS TEMP
-        self.continueButtonView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f); // CS TEMP - remove this line of code to show password
+        self.continueButtonView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f); // CS TEMP - remove this line of code to show password
         
         CGFloat bottomGap = 16.0f;
         if (IS_IPHONE_X_FAMILY) {

@@ -753,6 +753,39 @@ fromNavigationController:(UINavigationController *)navigationController
     return convertedProductArray;
 }
 
+//Other
+- (void)logoutAndClearAllData {
+    
+    //Delete all data in database
+    [TAPDatabaseManager deleteAllDataInDatabaseWithSuccess:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
+    
+    //Remove all preference
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACTIVE_USER];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PUSH_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACCESS_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_REFRESH_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_REFRESH_TOKEN_EXPIRED_TIME];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACCESS_TOKEN_EXPIRED_TIME];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_UPDATED_CHAT_ROOM];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_FILE_PATH_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_COUNTRY_LIST_ARRAY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_COUNTRY_LIST_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_UPDATED_COUNTRY_LIST_TIMESTAMP];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_LOGIN_PHONE_TEMP_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_COUNTRY_CODE];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
+    [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
+}
+
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     

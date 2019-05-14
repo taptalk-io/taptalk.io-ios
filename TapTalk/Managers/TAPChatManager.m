@@ -958,7 +958,7 @@
     //Add User to Contact Manager
     [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
     
-    decryptedMessage.isSending = NO;
+    decryptedMessage.isSending = NO; //DV TEMP - Temporary set isSending to NO waiting for server
     
 #ifdef DEBUG
     NSLog(@"Receive Message: %@", decryptedMessage.body);

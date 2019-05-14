@@ -36,6 +36,7 @@
 - (void)openCamera;
 - (void)openGallery;
 - (void)fetchUserDataWithUser:(TAPUserModel *)user;
+- (void)logoutButtonDidTapped;
 
 @end
 
@@ -62,6 +63,7 @@
     [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     [self.myAccountView setContinueButtonEnabled:YES];
     
@@ -256,7 +258,7 @@
                     [self.myAccountView animateProgressUploadingImageWithProgress:progress total:total];
                 } failureBlock:^(NSError *error) {
                     //Show error, retry or skip popup
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Cancel"];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Account" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Cancel"];
                     
                     [self.myAccountView setAsLoading:NO];
                 }];
@@ -567,33 +569,51 @@
     [self.myAccountView setProfilePictureWithImageURL:imageURL];
 }
 
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
-    //Skip Upload Image
-    [self fetchUserDataWithUser:self.currentUser];
+- (void)logoutButtonDidTapped {
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Logout" title:NSLocalizedString(@"Log Out", @"") detailInformation:NSLocalizedString(@"Are you sure you want to log out?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Logout"];
 }
 
-- (void)popUpInfoDidTappedLeftButton {
-    [super popUpInfoDidTappedLeftButton];
-    
-    [self.myAccountView setAsLoading:YES];
-    
-    [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
-        
-        NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
-        
-        [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
-            [self.myAccountView setAsLoading:NO];
-        } progressBlock:^(CGFloat progress, CGFloat total) {
-            [self.myAccountView animateProgressUploadingImageWithProgress:progress total:total];
-        } failureBlock:^(NSError *error) {
-            //Show error, retry or skip popup
-            
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Cancel"];
-            
-            [self.myAccountView setAsLoading:NO];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+
+    if ([popupIdentifier isEqualToString:@"Error Upload Profile Image In Account"]) {
+        //Skip Upload Image
+        [self fetchUserDataWithUser:self.currentUser];
+    }
+    else if ([popupIdentifier isEqualToString:@"Logout"]) {
+        //Logout
+        [self dismissViewControllerAnimated:NO completion:^{
+            [[TapTalk sharedInstance] logoutAndClearAllData];
         }];
-    }];
+    }
+}
+
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoDidTappedLeftButtonWithIdentifier:popupIdentifier];
+    
+    if ([popupIdentifier isEqualToString:@"Error Upload Profile Image In Account"]) {
+        [self.myAccountView setAsLoading:YES];
+        
+        [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+            
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+            
+            [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
+                [self.myAccountView setAsLoading:NO];
+            } progressBlock:^(CGFloat progress, CGFloat total) {
+                [self.myAccountView animateProgressUploadingImageWithProgress:progress total:total];
+            } failureBlock:^(NSError *error) {
+                //Show error, retry or skip popup
+                
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Account" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Cancel"];
+                
+                [self.myAccountView setAsLoading:NO];
+            }];
+        }];
+    }
+    else if ([popupIdentifier isEqualToString:@"Logout"]) {
+        
+    }
 }
 
 @end

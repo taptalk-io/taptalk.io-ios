@@ -771,8 +771,7 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
                     [cell setMessage:message];
                 }
                 
-//                [cell showStatusLabel:YES animated:NO updateStatusIcon:NO message:message];
-                [cell showStatusLabel:YES];
+                [cell showStatusLabel:YES animated:NO updateStatusIcon:NO message:message];
                 
                 if (message.isFailedSend) {
                     //Update view to failed send
@@ -1359,7 +1358,7 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
             
             if ([fileSize doubleValue] > TAP_MAX_FILE_SIZE) {
                 //File size is larger than max file size
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Maximum file size is 25 MB.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error File Size Excedeed"  title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Maximum file size is 25 MB.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 return;
             }
             
@@ -1382,12 +1381,6 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
             NSLog(@"FileName: %@ \nMimeType:%@ \nFileSize: %ld",decodedFileName, mimeType, [fileSize doubleValue]);
 #endif
             [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath];
-            
-            [TAPUtil delayCallback:^{
-                if ([self.messageArray count] != 0) {
-                    [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
-                }
-            } forTotalSeconds:0.2f];
         }
     }];
 }
@@ -2908,12 +2901,6 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
             }
         }
     }
-    
-    [TAPUtil delayCallback:^{
-        if ([self.messageArray count] != 0) {
-            [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
-        }
-    } forTotalSeconds:0.2f];
 
     //check if keyboard was showed
     //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
@@ -2982,12 +2969,6 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
         }
     }
     
-    [TAPUtil delayCallback:^{
-        if ([self.messageArray count] != 0) {
-            [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
-        }
-    } forTotalSeconds:0.2f];
-    
     //check if keyboard was showed
     //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
     [self performSelector:@selector(checkKeyboard) withObject:nil afterDelay:0.05f];
@@ -3025,12 +3006,6 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     }
-    
-    [TAPUtil delayCallback:^{
-        if ([self.messageArray count] != 0) {
-            [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
-        }
-    } forTotalSeconds:0.2f];
 }
 
 #pragma mark QLPreviewController
@@ -5553,8 +5528,12 @@ typedef NS_ENUM(NSInteger, LoadMoreMessageViewType) {
     }
 }
 
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+    
+    if ([popupIdentifier isEqualToString:@"Error File Size Excedeed"]) {
+        
+    }
 }
 
 - (IBAction)sendButtonDidTapped:(id)sender {

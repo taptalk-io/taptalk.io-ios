@@ -66,8 +66,8 @@
 - (void)popUpInfoViewHandleDidTappedLeftButton {
     [self showPopupInfoView:NO animated:YES completion:^{
         [self dismissViewControllerAnimated:NO completion:^{
-            if ([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedLeftButton)]) {
-                [self.delegate popUpInfoViewControllerDidTappedLeftButton];
+            if ([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedLeftButtonWithIdentifier:)]) {
+                [self.delegate popUpInfoViewControllerDidTappedLeftButtonWithIdentifier:self.popupIdentifier];
             }
         }];
     }];
@@ -77,8 +77,8 @@
 - (void)popUpInfoViewHandleDidTappedRightButton {
     [self showPopupInfoView:NO animated:YES completion:^{
         [self dismissViewControllerAnimated:NO completion:^{
-            if ([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedSingleButtonOrRightButton)]) {
-                [self.delegate popUpInfoViewControllerDidTappedSingleButtonOrRightButton];
+            if ([self.delegate respondsToSelector:@selector(popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:)]) {
+                [self.delegate popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:self.popupIdentifier];
             }
         }];
     }];

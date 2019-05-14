@@ -218,7 +218,7 @@
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                 } failureBlock:^(NSError *error) {
                     //Show error, retry or skip popup
-                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Register" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
                     
                     [self.registerView.continueButtonView setAsLoading:NO animated:YES];
                     [self.registerView setContentEditable:YES];
@@ -247,7 +247,7 @@
         }];
     } failure:^(NSError *error) {
         [self.registerView.continueButtonView setAsLoading:NO animated:YES];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:error.domain leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@""];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Register" title:NSLocalizedString(@"Error", @"") detailInformation:error.domain leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@""];
         [self.registerView setContentEditable:YES];
     }];
 }
@@ -555,36 +555,47 @@
     }
 }
 
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
-    //Skip Upload Image
-    [self dismissViewControllerAnimated:YES completion:nil];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+    
+    if ([popupIdentifier isEqualToString:@"Error Upload Profile Image In Register"]) {
+        //Skip Upload Image
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Register"]) {
+        
+    }
 }
 
-- (void)popUpInfoDidTappedLeftButton {
-    [super popUpInfoDidTappedLeftButton];
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoDidTappedLeftButtonWithIdentifier:popupIdentifier];
     
-    [self.registerView.continueButtonView setAsLoading:YES animated:NO];
-    [self.registerView setContentEditable:NO];
-    
-    [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+    if ([popupIdentifier isEqualToString:@"Error Upload Profile Image In Register"]) {
+        [self.registerView.continueButtonView setAsLoading:YES animated:NO];
+        [self.registerView setContentEditable:NO];
         
-        NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
-        
-        [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
-            [self.registerView.continueButtonView setAsLoading:NO animated:YES];
-            [self.registerView setContentEditable:YES];
-            [self dismissViewControllerAnimated:YES completion:nil];
-        } progressBlock:^(CGFloat progress, CGFloat total) {
-        } failureBlock:^(NSError *error) {
-            //Show error, retry or skip popup
+        [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
             
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
             
-            [self.registerView.continueButtonView setAsLoading:NO animated:YES];
-            [self.registerView setContentEditable:YES];
+            [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
+                [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+                [self.registerView setContentEditable:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            } progressBlock:^(CGFloat progress, CGFloat total) {
+            } failureBlock:^(NSError *error) {
+                //Show error, retry or skip popup
+                
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Register" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+                
+                [self.registerView.continueButtonView setAsLoading:NO animated:YES];
+                [self.registerView setContentEditable:YES];
+            }];
         }];
-    }];
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Register"]) {
+        
+    }
 }
 /*
 #pragma mark - Navigation

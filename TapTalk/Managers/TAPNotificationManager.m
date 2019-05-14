@@ -116,25 +116,6 @@
     NSDictionary *messageDictionary = [NSDictionary dictionary];
     messageDictionary = [userInfo valueForKeyPath:@"data.message"];
     
-    //DV Temp
-    //DV Note - Temporary add incoming notification to prefs
-//    NSString *localID = [messageDictionary objectForKey:@"localID"];
-//    NSMutableArray *pushNotificationArray = [[NSMutableArray alloc] init];
-//    NSMutableArray *obtainedArray = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_INCOMING_PUSH_NOTIFICATION valid:nil];
-//    
-//    if (pushNotificationArray == nil) {
-//        pushNotificationArray = [[NSMutableArray alloc] init];
-//    }
-//    else {
-//        [pushNotificationArray addObjectsFromArray:obtainedArray];
-//    }
-//    
-//    [pushNotificationArray addObject:localID];
-//
-//    [[NSUserDefaults standardUserDefaults] setSecureObject:pushNotificationArray forKey:TAP_PREFS_INCOMING_PUSH_NOTIFICATION];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
-    //END DV Temp
-    
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
     
     [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldNotShowNotification:YES];

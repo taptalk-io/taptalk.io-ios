@@ -168,6 +168,9 @@ fromNavigationController:(UINavigationController *)navigationController
 //Custom Quote
 - (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
 
+//Other
+- (void)logoutAndClearAllData;
+
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
 - (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;

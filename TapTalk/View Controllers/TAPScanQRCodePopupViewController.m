@@ -85,12 +85,14 @@
     }];
 }
 
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
     
-    [self dismissViewControllerAnimated:NO completion:^{
-        //completion
-    }];
+    if ([popupIdentifier isEqualToString:@"Error Scan QR Code"]) {
+        [self dismissViewControllerAnimated:NO completion:^{
+            //completion
+        }];
+    }
 }
 
 - (void)animatePopupWithSuccess:(void (^)(void))success
@@ -126,7 +128,7 @@
     } failure:^(NSError *error) {
         [self.scanQRCodePopupView setIsLoading:NO animated:YES];
         [self.scanQRCodePopupView showPopupView:NO animated:YES];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Scan QR Code" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         
         failure(error);
     }];

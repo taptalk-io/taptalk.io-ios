@@ -3414,10 +3414,6 @@
             callingCode = [TAPUtil nullToEmptyString:callingCode];
             country.countryCallingCode = callingCode;
             
-            NSString *flagIconURL = [countryDictionary objectForKey:@"flagIconURL"];
-            flagIconURL = [TAPUtil nullToEmptyString:flagIconURL];
-            country.flagIconURL = flagIconURL;
-            
             NSString *currencyCode = [countryDictionary objectForKey:@"currencyCode"];
             currencyCode = [TAPUtil nullToEmptyString:currencyCode];
             country.countryCurrencyCode = currencyCode;

@@ -811,7 +811,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     if (self.isContainExcedeedFileSizeLimit) {
         //Show popup warning
         
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Some files may not send", @"") detailInformation:[NSString stringWithFormat:@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the %ldMB upload limit and won’t be sent.", TAP_MAX_VIDEO_SIZE] leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Continue"];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedString(@"Some files may not send", @"") detailInformation:[NSString stringWithFormat:@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the %ldMB upload limit and won’t be sent.", TAP_MAX_VIDEO_SIZE] leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Continue"];
     }
     else {
         if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
@@ -822,22 +822,24 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
 }
 
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
     
-    NSMutableArray *filteredDataArray = [[NSMutableArray alloc] init];
-    for (TAPMediaPreviewModel *mediaPreview in self.mediaDataArray) {
-        BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:mediaPreview];
-        if (!isExceeded) {
-            [filteredDataArray addObject:mediaPreview];
+    if ([popupIdentifier isEqualToString:@"Error Image Size Excedeed"]) {
+        NSMutableArray *filteredDataArray = [[NSMutableArray alloc] init];
+        for (TAPMediaPreviewModel *mediaPreview in self.mediaDataArray) {
+            BOOL isExceeded = [self isAssetSizeExcedeedLimitWithData:mediaPreview];
+            if (!isExceeded) {
+                [filteredDataArray addObject:mediaPreview];
+            }
         }
+        
+        //    if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
+        //        [self.delegate imagePreviewDidTapSendButtonWithData:filteredDataArray];
+        //    }
+        
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
-    
-//    if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
-//        [self.delegate imagePreviewDidTapSendButtonWithData:filteredDataArray];
-//    }
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (BOOL)isAssetSizeExcedeedLimitWithData:(TAPMediaPreviewModel *)mediaPreview {

@@ -66,6 +66,7 @@
     //TitleView
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(-55.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, 30.0f)];
     self.searchBarView.searchTextField.delegate = self;
+    self.searchBarView.searchTextField.layer.cornerRadius = 10.0f;
     [self.navigationItem setTitleView:self.searchBarView];
     
     [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray) {
