@@ -39,12 +39,6 @@
 #define TAP_PREFS_USER_COUNTRY_CODE @"Prefs.TapTalkUserCountryCode"
 #define TAP_PREFS_CONTACT_PERMISSION_ASKED @"Prefs.TapTalkContactPermissionAsked"
 
-//DV Temp
-//DV Note - 14 Sept Temporary added for checking 1 on 1 chat
-#define TAP_PREFS_OTHER_USER_ID @"Prefs.TapTalkOtherUserID"
-#define TAP_PREFS_INCOMING_PUSH_NOTIFICATION @"Prefs.TapTalkIncomingPushNotification"
-//END DV Temp
-
 //User Customized Prefs
 #define TAP_PREFS_USER_AGENT @"Prefs.TapTalkUserAgent"
 #define TAP_PREFS_APP_KEY_ID @"Prefs.TapTalkAppKeyID"

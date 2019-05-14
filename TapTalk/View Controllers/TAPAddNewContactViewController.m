@@ -65,11 +65,6 @@
     
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self showNavigationSeparator:NO];
-}
-
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
 }
@@ -77,25 +72,12 @@
 #pragma mark - Delegate
 #pragma mark TextField
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
-    if ([textField.text isEqualToString:@""]) {
-        [UIView animateWithDuration:0.3f animations:^{
-            CGRect searchBarViewFrame = self.addNewContactView.searchBarView.frame;
-            searchBarViewFrame.size.width = CGRectGetWidth(self.addNewContactView.searchBarView.frame) - 70.0f;
-            self.addNewContactView.searchBarView.frame = searchBarViewFrame;
-            
-            CGRect searchBarCancelButtonFrame = self.addNewContactView.searchBarCancelButton.frame;
-            searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
-            searchBarCancelButtonFrame.size.width = 70.0f;
-            self.addNewContactView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
-        } completion:^(BOOL finished) {
-            //completion
-        }];
-    }
     return YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
+    
     return NO;
 }
 
@@ -108,21 +90,7 @@
     [self.addNewContactView isShowEmptyState:NO];
     [self.addNewContactView showLoading:NO];
     
-    [UIView animateWithDuration:0.3f animations:^{
-        CGRect searchBarViewFrame = self.addNewContactView.searchBarView.frame;
-        searchBarViewFrame.size.width = CGRectGetWidth(self.addNewContactView.searchBarBackgroundView.frame) - 16.0f - 16.0f;
-        self.addNewContactView.searchBarView.frame = searchBarViewFrame;
-        [self.addNewContactView.searchBarView.searchTextField endEditing:YES];
-        
-        CGRect searchBarCancelButtonFrame = self.addNewContactView.searchBarCancelButton.frame;
-        searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
-        searchBarCancelButtonFrame.size.width = 0.0f;
-        self.addNewContactView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
-    } completion:^(BOOL finished) {
-        //completion
-    }];
-    
-    return NO;
+    return YES;
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
@@ -169,8 +137,15 @@
 }
 
 #pragma mark - Custom Method
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+    
+    if ([popupIdentifier isEqualToString:@"Error Add User To Contact"]) {
+        
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Add Expert To Contact"]) {
+        
+    }
 }
 
 - (void)userChatNowButtonDidTapped {
@@ -200,7 +175,7 @@
     
     if ([currentUserID isEqualToString:searchedUserID]) {
         //Add theirselves
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
@@ -249,7 +224,7 @@
     
     if ([currentUserID isEqualToString:searchedUserID]) {
         //Add theirselves
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add Expert To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {

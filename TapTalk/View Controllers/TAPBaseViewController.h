@@ -17,9 +17,9 @@
 - (void)showCustomBackButtonOrange;
 - (void)showCustomCloseButton;
 - (void)reachabilityChangeIsReachable:(BOOL)reachable;
-- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString ;
-- (void)popUpInfoDidTappedLeftButton;
-- (void)popUpInfoTappedSingleButtonOrRightButton;
+- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString *)popupIdentifier title:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString ;
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier;
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier;
 - (void)showNavigationSeparator:(BOOL)show;
 
 @end

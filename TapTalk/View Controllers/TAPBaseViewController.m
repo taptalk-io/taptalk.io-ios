@@ -113,12 +113,12 @@
 
 #pragma mark - Delegate
 #pragma TAPPopUpInfoViewController
-- (void)popUpInfoViewControllerDidTappedLeftButton {
-    [self popUpInfoDidTappedLeftButton];
+- (void)popUpInfoViewControllerDidTappedLeftButtonWithIdentifier:(NSString *)identifier {
+    [self popUpInfoDidTappedLeftButtonWithIdentifier:identifier];
 }
 
-- (void)popUpInfoViewControllerDidTappedSingleButtonOrRightButton {
-    [self popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)identifier {
+    [self popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:identifier];
 }
 
 #pragma mark - Custom Method
@@ -221,10 +221,11 @@
 
 //Note
 //Set left or right button option title to nil to set to default value ("OK" for single or right option button, "Cancel" for left option button)
-- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type title:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString {
+- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString *)popupIdentifier title:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString {
     
     TAPPopUpInfoViewController *popupInfoViewController = [[TAPPopUpInfoViewController alloc] init];
     popupInfoViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    popupInfoViewController.popupIdentifier = popupIdentifier;
     popupInfoViewController.delegate = self;
     [popupInfoViewController setPopUpInfoViewControllerType:type withTitle:title detailInformation:detailInfo leftOptionButtonTitle:leftOptionString singleOrRightOptionButtonTitle:singleOrRightOptionString];
 
@@ -232,11 +233,11 @@
     }];
 }
 
-- (void)popUpInfoDidTappedLeftButton {
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
 
 }
 
-- (void)popUpInfoTappedSingleButtonOrRightButton {
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
     
 }
 

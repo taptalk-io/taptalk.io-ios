@@ -469,6 +469,27 @@
     success();
 }
 
++ (void)deleteAllDataInDatabaseWithSuccess:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        @autoreleasepool {
+            RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+            [realm beginWriteTransaction];
+            [realm deleteAllObjects];
+            [realm commitWriteTransaction];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+                    // handle error
+                    failure(error);
+                }];
+                
+                success();
+            });
+        }
+    });
+}
+
 + (void)deleteAllDataFromTableName:(NSString *)tableName
                            success:(void (^)(void))success
                            failure:(void (^)(NSError *error))failure {

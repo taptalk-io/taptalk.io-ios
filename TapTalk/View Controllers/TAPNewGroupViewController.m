@@ -905,7 +905,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 if ([self.selectedIndexArray count] == kMaxGroupMember) {
                     //WK Temp
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add More Member In Group" title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                     //END WK Temp
                 }
                 else {
@@ -997,8 +997,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Custom Method
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+    
+    if ([popupIdentifier isEqualToString:@"Error Add More Member In Group"]) {
+        
+    }
 }
 
 - (void)validateSelectedIndexArray {

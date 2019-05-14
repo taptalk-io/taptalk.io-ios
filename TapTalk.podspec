@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "TapTalk"
-  s.version      = "1.0.0"
+  s.version      = "0.2.5"
   s.summary      = "Powerful Chat Engine"
 
   # This description is used to generate tags and improve search results.
@@ -78,7 +78,7 @@ Pod::Spec.new do |s|
   #
 
 #   s.source       = { :path => '.' }
-    s.source       = { :git => 'git@git.moselo.com:taptalk/taptalk-ios.git', :tag => '1.0.0' }
+    s.source       = { :git => 'git@git.moselo.com:taptalk/taptalk-ios.git', :tag => '0.2.4' }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -141,7 +141,7 @@ Pod::Spec.new do |s|
     s.dependency "AFNetworking", "~> 3.1.0"
     s.dependency "SocketRocket"
     s.dependency "JSONModel", "~> 1.1"
-    s.dependency "Realm", "3.13.1"
+    s.dependency "Realm"
     s.dependency "SDWebImage", "4.4.2"
     s.dependency "ZBarSDK", "~> 1.3"
     s.dependency "PodAsset"

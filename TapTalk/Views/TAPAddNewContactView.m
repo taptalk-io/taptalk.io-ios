@@ -11,7 +11,6 @@
 @interface TAPAddNewContactView ()
 
 @property (strong, nonatomic) UILabel *defaultLabel;
-@property (strong, nonatomic) UIView *shadowView;
 
 @property (strong, nonatomic) UIView *searchExpertView;
 @property (strong, nonatomic) TAPImageView *coverImageView;
@@ -63,37 +62,10 @@
     if (self) {
         self.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
         
-        _shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 46.0f)];
-        self.shadowView.backgroundColor = [UIColor whiteColor];
-//        self.shadowView.layer.cornerRadius = 2.0f;
-        self.shadowView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
-        self.shadowView.layer.shadowOpacity = 1.0f;
-        self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_BLACK_19] colorWithAlphaComponent:0.2f].CGColor;
-        self.shadowView.layer.masksToBounds = NO;
-        [self addSubview:self.shadowView];
-        
-        _searchBarBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 46.0f)];
-        self.searchBarBackgroundView.backgroundColor = [UIColor whiteColor];
-        [self addSubview:self.searchBarBackgroundView];
-        
-        _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
+        _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 30.0f)];
+        self.searchBarView.searchTextField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search by Username", @"");
-        [self.searchBarBackgroundView addSubview:self.searchBarView];
-        
-        _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
-        NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
-        NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
-        NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
-        CGFloat searchBarCancelLetterSpacing = -0.4f;
-        [searchBarCancelAttributesDictionary setObject:@(searchBarCancelLetterSpacing) forKey:NSKernAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f] forKey:NSFontAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forKey:NSForegroundColorAttributeName];
-        [searchBarCancelAttributedString addAttributes:searchBarCancelAttributesDictionary
-                                                 range:NSMakeRange(0, [searchBarCancelString length])];
-        [self.searchBarCancelButton setAttributedTitle:searchBarCancelAttributedString forState:UIControlStateNormal];
-        self.searchBarCancelButton.clipsToBounds = YES;
-        [self.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
+        [self addSubview:self.searchBarView];
         
         UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 22.0f, 30.0f)];
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 8.0f, 14.0f, 14.0f)];
@@ -104,7 +76,7 @@
         //Default Label
         _defaultLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarView.frame) + 23.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 40.0f)];
         self.backgroundColor = [UIColor clearColor];
-        self.defaultLabel.text = NSLocalizedString(@"Usernames are not case sensitive, but make sure you input the exact characters", @"");
+        self.defaultLabel.text = NSLocalizedString(@"Usernames are case sensitive, so make sure you input correctly", @"");
         self.defaultLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         self.defaultLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         self.defaultLabel.textAlignment = NSTextAlignmentCenter;
@@ -115,14 +87,10 @@
         [defaultLabelAttributedString addAttribute:NSKernAttributeName
                                              value:@-0.2f
                                              range:NSMakeRange(0, [self.defaultLabel.text length])];
-    
-        [defaultLabelAttributedString addAttribute:NSFontAttributeName
-                                               value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f]
-                                               range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"not case sensitive", @"")]];
         
         [defaultLabelAttributedString addAttribute:NSFontAttributeName
-                                             value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f]
-                                             range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"exact characters", @"")]];
+                                               value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f]
+                                               range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"case sensitive", @"")]];
 
         self.defaultLabel.attributedText = defaultLabelAttributedString;
         
@@ -726,23 +694,6 @@
             self.noInternetView.alpha = 0.0f;
         }];
     }
-}
-
-- (void)searchBarCancelButtonDidTapped {
-    [UIView animateWithDuration:0.3f animations:^{
-        CGRect searchBarViewFrame = self.searchBarView.frame;
-        searchBarViewFrame.size.width = CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f;
-        self.searchBarView.frame = searchBarViewFrame;
-        self.searchBarView.searchTextField.text = @"";
-        [self.searchBarView.searchTextField endEditing:YES];
-        
-        CGRect searchBarCancelButtonFrame = self.searchBarCancelButton.frame;
-        searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
-        searchBarCancelButtonFrame.size.width = 0.0f;
-        self.searchBarCancelButton.frame = searchBarCancelButtonFrame;
-    } completion:^(BOOL finished) {
-        //completion
-    }];
 }
 
 @end

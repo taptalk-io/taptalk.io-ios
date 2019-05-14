@@ -61,6 +61,8 @@
                                                tableName:(NSString *)tableName
                                                  success:(void (^)(void))success
                                                  failure:(void (^)(NSError *error))failure;
++ (void)deleteAllDataInDatabaseWithSuccess:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)deleteAllDataFromTableName:(NSString *)tableName
                            success:(void (^)(void))success
                            failure:(void (^)(NSError *error))failure;

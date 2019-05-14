@@ -54,7 +54,7 @@
                                             value:[TAPUtil getColor:TAP_COLOR_GREY_9B]
                                             range:NSMakeRange(0, [NSLocalizedString(@"Search", @"") length])];
         self.searchTextField.attributedPlaceholder = placeHolderAttributedString;
-        self.searchTextField.layer.cornerRadius = 10.0f;
+        self.searchTextField.layer.cornerRadius = CGRectGetHeight(self.searchTextField.frame) / 2.0f;
         self.searchTextField.layer.borderWidth = 1.0f;
         self.searchTextField.layer.borderColor = [TAPUtil getColor:@"E4E4E4"].CGColor;
         self.searchTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];

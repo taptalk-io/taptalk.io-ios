@@ -130,8 +130,8 @@
 }
 
 #pragma mark - Custom Method
-- (void)popUpInfoTappedSingleButtonOrRightButton {
-    [super popUpInfoTappedSingleButtonOrRightButton];
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
 }
 
 - (void)backButtonDidTapped {

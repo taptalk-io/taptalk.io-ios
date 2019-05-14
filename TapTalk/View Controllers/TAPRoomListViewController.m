@@ -103,6 +103,7 @@
     
     //TitleView
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
+    self.searchBarView.searchTextField.layer.cornerRadius = 10.0f;
     self.searchBarView.searchTextField.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
@@ -136,7 +137,13 @@
     [super viewWillAppear:animated];
     _isViewAppear = YES;
     
-    [self.profileImageView setImageWithURLString:[TAPChatManager sharedManager].activeUser.imageURL.thumbnail];
+    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        [self.profileImageView setImageWithURLString:profileImageURL];
+    }
 
     if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillAppear)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewWillAppear];
