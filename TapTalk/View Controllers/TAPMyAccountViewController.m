@@ -582,6 +582,11 @@
     }
     else if ([popupIdentifier isEqualToString:@"Logout"]) {
         //Logout
+        
+        if ([self.delegate respondsToSelector:@selector(myAccountViewControllerDidTappedLogoutButton)]) {
+            [self.delegate myAccountViewControllerDidTappedLogoutButton];
+        }
+        
         [self dismissViewControllerAnimated:NO completion:^{
             [[TapTalk sharedInstance] logoutAndClearAllData];
         }];

@@ -8,7 +8,7 @@
 
 #import "TAPNetworkManager.h"
 
-static const NSInteger kAPITimeOut = 300;
+static const NSInteger kAPITimeOut = 60;
 
 @interface TAPNetworkManager ()
 
@@ -432,7 +432,6 @@ refreshToken:(NSString *)refreshToken
                 NSData *captionData = [captionString dataUsingEncoding:NSUTF8StringEncoding];
                 [formData appendPartWithFormData:captionData name:@"caption"];
             }
-            
         }
         else if ([filetype isEqualToString:@"file"]) {
             [formData appendPartWithFileData:fileData name:@"file" fileName:fileName mimeType:mimeType];

@@ -13,7 +13,7 @@
 #import "TAPContactTableViewCell.h"
 #import "TAPSearchResultMessageTableViewCell.h"
 
-@interface TAPForwardListViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface TAPForwardListViewController () <UITableViewDataSource, UITableViewDelegate, TAPSearchBarViewDelegate>
 
 @property (strong, nonatomic) TAPForwardListView *forwardListView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
@@ -55,7 +55,7 @@
     
     self.title = NSLocalizedString(@"Forward", @"");
     
-    self.forwardListView.searchBarView.searchTextField.delegate = self;
+    self.forwardListView.searchBarView.delegate = self;
     self.forwardListView.recentChatTableView.delegate = self;
     self.forwardListView.recentChatTableView.dataSource = self;
     self.forwardListView.searchResultTableView.delegate = self;
@@ -248,8 +248,8 @@
     [self.searchBarView.searchTextField resignFirstResponder];
 }
 
-#pragma mark UITextField
-- (BOOL)textFieldShouldClear:(UITextField *)textField {
+#pragma mark TAPSearchBarView
+- (BOOL)searchBarTextFieldShouldClear:(UITextField *)textField {
     [self.searchResultChatAndContactArray removeAllObjects];
     
     [UIView animateWithDuration:0.2f animations:^{
@@ -265,11 +265,11 @@
     return YES;
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldReturn:(UITextField *)textField {
     return NO;
 }
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+- (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
@@ -329,6 +329,7 @@
 
 #pragma mark - Custom Method
 - (void)cancelButtonDidTapped {
+    [self.forwardListView.searchBarView handleCancelButtonTappedState];
     [self.forwardListView.searchBarView.searchTextField resignFirstResponder];
     self.forwardListView.searchBarView.searchTextField.text = @"";
     [self dismissViewControllerAnimated:YES completion:nil];

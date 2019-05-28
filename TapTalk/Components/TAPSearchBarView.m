@@ -8,7 +8,7 @@
 
 #import "TAPSearchBarView.h"
 
-@interface TAPSearchBarView()
+@interface TAPSearchBarView() <UITextFieldDelegate>
 
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *shadowView;
@@ -37,6 +37,7 @@
         [self addSubview:self.bgView];
         
         _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
+        self.searchTextField.delegate = self;
         self.searchTextField.backgroundColor = [UIColor whiteColor];
         [self.searchTextField setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
         self.searchTextField.clearButtonMode = YES;
@@ -54,23 +55,76 @@
                                             value:[TAPUtil getColor:TAP_COLOR_GREY_9B]
                                             range:NSMakeRange(0, [NSLocalizedString(@"Search", @"") length])];
         self.searchTextField.attributedPlaceholder = placeHolderAttributedString;
-        self.searchTextField.layer.cornerRadius = CGRectGetHeight(self.searchTextField.frame) / 2.0f;
+        self.searchTextField.layer.cornerRadius = 10.0f;
         self.searchTextField.layer.borderWidth = 1.0f;
         self.searchTextField.layer.borderColor = [TAPUtil getColor:@"E4E4E4"].CGColor;
         self.searchTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
         self.searchTextField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
         self.searchTextField.clipsToBounds = YES;
-//        UIView *shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, -1.0f, CGRectGetWidth(self.searchTextField.frame), 0.3f)];
-//        shadowView.backgroundColor = [UIColor whiteColor];
-//        shadowView.layer.shadowColor = [UIColor blackColor].CGColor;
-//        shadowView.layer.shadowOffset = CGSizeMake(0.0f, 2.0f);
-//        shadowView.layer.shadowOpacity = 0.3f;
-//        shadowView.layer.shadowRadius = 2.0f;
-//        [self.searchTextField addSubview:shadowView];
         [self.bgView addSubview:self.searchTextField];
     }
     
     return self;
+}
+
+#pragma mark - Delegate
+#pragma mark UITextField
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if ([self.delegate respondsToSelector:@selector(searchBarTextField:shouldChangeCharactersInRange:replacementString:)]) {
+        return [self.delegate searchBarTextField:textField shouldChangeCharactersInRange:range replacementString:string];
+    }
+    return YES;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if ([self.delegate respondsToSelector:@selector(searchBarTextFieldShouldReturn:)]) {
+        return [self.delegate searchBarTextFieldShouldReturn:textField];
+    }
+    
+    return YES;
+}
+
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    
+    [self setAsActive:YES animated:YES];
+    
+    if ([self.delegate respondsToSelector:@selector(searchBarTextFieldShouldBeginEditing:)]) {
+        return [self.delegate searchBarTextFieldShouldBeginEditing:textField];
+    }
+    
+    return YES;
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    if ([self.delegate respondsToSelector:@selector(searchBarTextFieldDidBeginEditing:)]) {
+        [self.delegate searchBarTextFieldDidBeginEditing:textField];
+    }
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+    
+    [self setAsActive:NO animated:YES];
+    
+    if ([self.delegate respondsToSelector:@selector(searchBarTextFieldShouldEndEditing:)]) {
+        return [self.delegate searchBarTextFieldShouldEndEditing:textField];
+    }
+    
+    return YES;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    if ([self.delegate respondsToSelector:@selector(searchBarTextFieldDidEndEditing:)]) {
+        [self.delegate searchBarTextFieldDidEndEditing:textField];
+    }
+}
+
+- (BOOL)textFieldShouldClear:(UITextField *)textField {
+    if ([self.delegate respondsToSelector:@selector(searchBarTextFieldShouldClear:)]) {
+        return [self.delegate searchBarTextFieldShouldClear:textField];
+    }
+    
+    return YES;
 }
 
 #pragma mark - Custom Method
@@ -122,6 +176,10 @@
     self.shadowView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame));
     self.bgView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame));
     self.searchTextField.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame));
+}
+
+- (void)handleCancelButtonTappedState {
+    [self setAsActive:NO animated:YES];
 }
 
 @end

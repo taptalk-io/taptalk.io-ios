@@ -28,6 +28,7 @@
 @property (nonatomic) BOOL requireChangePassword;
 @property (strong, nonatomic) NSNumber *created;
 @property (strong, nonatomic) NSNumber *updated;
+@property (strong, nonatomic) NSNumber *deleted;
 
 //Optional
 @property (nonatomic) BOOL isRequestPending;

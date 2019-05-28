@@ -10,9 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, TAPSetupRoomListViewType) {
+    TAPSetupRoomListViewTypeSettingUp = 0,
+    TAPSetupRoomListViewTypeSuccess = 1
+};
+
 @interface TAPSetupRoomListView : TAPBaseView
 
-- (void)showFirstLoadingView:(BOOL)isVisible;
+- (void)showSetupViewWithType:(TAPSetupRoomListViewType)type;
+- (void)showFirstLoadingView:(BOOL)isVisible withType:(TAPSetupRoomListViewType)type;
 
 @end
 

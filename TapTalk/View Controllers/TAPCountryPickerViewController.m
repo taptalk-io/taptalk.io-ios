@@ -10,13 +10,11 @@
 #import "TAPCountryPickerView.h"
 #import "TAPCountryPickerTableViewCell.h"
 
-@interface TAPCountryPickerViewController () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
+@interface TAPCountryPickerViewController () <UITableViewDelegate, UITableViewDataSource, TAPSearchBarViewDelegate>
 
 @property (strong, nonatomic) TAPCountryPickerView *countryPickerView;
 
 @property (strong, nonatomic) UIButton *leftBarButton;
-
-//@property (strong, nonatomic) NSMutableDictionary *countryListDictionary;
 
 @property (strong, nonatomic) NSArray *alphabetSectionTitles;
 @property (strong, nonatomic) NSMutableDictionary *indexSectionDictionary;
@@ -58,7 +56,6 @@
     [self.countryPickerView.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     _indexSectionDictionary = [[NSMutableDictionary alloc] init];
-//    _countryListDictionary = [[NSMutableDictionary alloc] init];
     _searchResultCountryMutableArray = [[NSMutableArray alloc] init];
     _searchResultIndexSectionDictionary = [[NSMutableArray alloc] init];
     _countryListArray = [[NSArray alloc] init];
@@ -66,7 +63,7 @@
     
     self.title = NSLocalizedString(@"Select Country", @"");
     
-    self.countryPickerView.searchBarView.searchTextField.delegate = self;
+    self.countryPickerView.searchBarView.delegate = self;
     self.countryPickerView.tableView.delegate = self;
     self.countryPickerView.tableView.dataSource = self;
     self.countryPickerView.searchResultTableView.delegate = self;
@@ -254,6 +251,7 @@
             titleLabel.text = [keysArray objectAtIndex:section];
         }
         
+        return headerView;
     }
     
     UIView *header = [[UIView alloc] init];
@@ -358,8 +356,8 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-#pragma mark UITextField
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+#pragma mark TAPSearchBarView
+- (BOOL)searchBarTextFieldShouldBeginEditing:(UITextField *)textField {
     
     [self.countryPickerView.searchBarView setAsActive:YES animated:YES];
     
@@ -385,14 +383,14 @@
     return YES;
 }
 
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldEndEditing:(UITextField *)textField {
     
     [self.countryPickerView.searchBarView setAsActive:YES animated:YES];
     
     return YES;
 }
 
-- (BOOL)textFieldShouldClear:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldClear:(UITextField *)textField {
     [self.searchResultCountryMutableArray removeAllObjects];
     [self.searchResultIndexSectionDictionary removeAllObjects];
     
@@ -407,7 +405,7 @@
     return YES;
 }
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+- (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
@@ -472,6 +470,7 @@
 }
 
 - (void)searchBarCancelButtonDidTapped {
+    [self.countryPickerView.searchBarView handleCancelButtonTappedState];
     [self.searchResultCountryMutableArray removeAllObjects];
     [self.searchResultIndexSectionDictionary removeAllObjects];
 

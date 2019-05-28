@@ -13,6 +13,7 @@
 #import "TAPReplyToModel.h"
 #import "TAPForwardFromModel.h"
 #import "Configs.h"
+#import "TAPChatMessageType.h"
 
 @interface TAPMessageModel : TAPBaseModel
 
@@ -41,6 +42,8 @@
 //If add new property, don't forget to update copyMessageModel method
 
 + (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type;
++ (instancetype)createMessageWithUser:(TAPUserModel *)user created:(NSNumber *)created room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type;
+
 - (TAPMessageModel *)copyMessageModel;
 
 @end

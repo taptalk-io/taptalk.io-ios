@@ -70,7 +70,7 @@
         
         _searchBarView = [[TAPLocationSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(frame) - 16.0f - 16.0f, 36.0f)];
         self.searchBarView.placeholder = NSLocalizedString(@"Search Address", @"");
-        self.searchBarView.leftViewImage = [UIImage imageNamed:@"TAPIconSearchBlack" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.searchBarView.leftViewImage = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.searchBarView setReturnKeyType:UIReturnKeySearch];
         [self addSubview:self.searchBarView];
         

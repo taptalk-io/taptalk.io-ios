@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
+@property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
@@ -80,6 +81,8 @@
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
+@property (strong, nonatomic) NSString *statusLabelTimeString;
+
 @property (strong, nonatomic) UIView *syncProgressSubView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
 @property (nonatomic) CGFloat lastProgress;
@@ -118,6 +121,7 @@
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote;
+- (void)setBubbleCellColor;
 
 @end
 
@@ -168,6 +172,8 @@
     [self showForwardView:NO];
     
     [self showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
+    
+    [self setBubbleCellColor];
 }
 
 - (void)prepareForReuse {
@@ -196,6 +202,25 @@
 }
 
 #pragma mark - Custom Method
+- (void)setBubbleCellColor {
+    self.bubbleView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+    self.quoteView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
+    self.replyInnerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
+    self.replyView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_45];
+    self.progressContainerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
+    
+    self.replyNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.replyMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.quoteTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.quoteSubtitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.forwardTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.forwardFromLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    
+    self.bubbleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.fileDescriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.fileDescriptionSizePlaceholderLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+}
+
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
     
@@ -319,7 +344,8 @@
     }
     
     NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
-    self.statusLabel.text = statusString;
+    self.statusLabelTimeString = statusString;
+    self.statusLabel.text = self.statusLabelTimeString;
 }
 
 - (void)receiveSentEvent {
@@ -423,7 +449,14 @@
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
-        self.replyNameLabel.text = message.quote.title;
+        //check id message sender is equal to active user id, if yes change the title to "You"
+        if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            self.replyNameLabel.text = NSLocalizedString(@"You", @"");
+        }
+        else {
+            self.replyNameLabel.text = message.quote.title;
+        }
+
         self.replyMessageLabel.text = message.quote.content;
         self.replyViewHeightContraint.constant = 60.0f;
         self.replyViewBottomConstraint.active = YES;
@@ -503,6 +536,12 @@
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
     
     NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    
+    //check id message sender is equal to active user id, if yes change the title to "You"
+    if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        appendedFullnameString = NSLocalizedString(@"From: You", @"");
+    }
+    
     self.forwardFromLabel.text = appendedFullnameString;
     
     NSMutableAttributedString *attributedText =
@@ -607,6 +646,8 @@
     self.sendingIconLeftConstraint.constant = 4.0f;
     self.sendingIconImageView.alpha = 0.0f;
     self.sendingIconBottomConstraint.constant = -5.0f;
+    
+    self.statusIconImageView.alpha = 0.0f;
 }
 
 - (void)animateFailedDownloadFile {
@@ -717,6 +758,7 @@
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
+        self.statusLabel.text = self.statusLabelTimeString;
         [self showStatusLabel:YES];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeNotDownloaded) {
@@ -726,6 +768,7 @@
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
+        self.statusLabel.text = self.statusLabelTimeString;
         [self showStatusLabel:YES];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeUploading) {
@@ -735,6 +778,7 @@
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
+        self.statusLabel.text = self.statusLabelTimeString;
         [self showStatusLabel:NO];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeDownloading) {
@@ -744,6 +788,7 @@
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
+        self.statusLabel.text = self.statusLabelTimeString;
         [self showStatusLabel:YES];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeRetryUpload) {
@@ -751,17 +796,22 @@
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
         self.retryDownloadView.alpha = 1.0f;
-        self.retryIconImageView.alpha = 1.0f;
-        self.retryButton.alpha = 1.0f;
-        [self showStatusLabel:NO];
+        self.retryIconImageView.alpha = 0.0f;
+        self.retryButton.alpha = 0.0f;
+        NSString *statusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
+        self.statusLabel.text = statusString;
+        [self showStatusLabel:YES];
+        self.replyButton.alpha = 0.0f;
+        self.replyButtonRightConstraint.constant = -28.0f;
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeRetryDownload) {
         self.cancelView.alpha = 0.0f;
-        self.downloadView.alpha = 0.0f;
+        self.downloadView.alpha = 1.0f;
         self.doneDownloadView.alpha = 0.0f;
-        self.retryDownloadView.alpha = 1.0f;
+        self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
+        self.statusLabel.text = self.statusLabelTimeString;
         [self showStatusLabel:YES];
     }
 }

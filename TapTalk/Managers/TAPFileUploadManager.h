@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success;
 - (void)saveToPendingUploadAssetDictionaryWithAsset:(PHAsset *)asset;
 - (PHAsset *)getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:(NSString *)assetIdentifier;
+- (void)clearFileUploadManagerData;
+- (BOOL)isUploadingFile;
 
 @end
 

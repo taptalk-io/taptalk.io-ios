@@ -14,7 +14,7 @@
 #define TAP_MAX_THUMBNAIL_IMAGE_SIZE 20.0f
 #define TAP_MAX_FILE_SIZE 25 * 1024 * 1024 //25 MB
 #define TAP_MAX_VIDEO_SIZE 25 //in MB
-#define TAP_UPDATED_TIME_LIMIT 7 * 24 * 60 * 60 //1 week (in seconds)
+#define TAP_UPDATED_TIME_LIMIT 24 * 60 * 60 //1 day (in seconds)
 
 #define TAP_DUMMY_IMAGE_URL @"https://instagram.fcgk6-1.fna.fbcdn.net/vp/a957263ad8322a1661f604e2942f1acc/5C5B8666/t51.2885-15/e35/41659851_331857600921431_1280889939227049984_n.jpg"//DV Temp
 
@@ -45,6 +45,7 @@
 #define TAP_PREFS_APP_KEY_SECRET @"Prefs.TapTalkAppKeySecret"
 
 //Color
+#define TAP_COLOR_WHITE @"FFFFFF"
 #define TAP_COLOR_GREEN_AD @"2ECCAD"
 #define TAP_COLOR_GREEN_2A @"7EC82A"
 #define TAP_COLOR_PURPLE_98 @"784198"
@@ -69,15 +70,20 @@
 #define TAP_COLOR_BLURPLE_D7 @"362AD7"
 #define TAP_COLOR_ORANGE_33 @"FF9833"
 #define TAP_COLOR_ORANGE_00 @"FF7E00"
+#define TAP_COLOR_ORANGE_200 @"E87200"
+#define TAP_COLOR_ORANGE_45 @"FFA045"
+#define TAP_COLOR_BLUE_FA @"5AC8FA"
 
 //Component Color
 #define TAP_COLOR_PRIMARY_COLOR_1 TAP_COLOR_ORANGE_00
 
-#define TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR TAP_COLOR_BLURPLE_D7
-#define TAP_COLOR_TEXT_FIELD_POINTER_COLOR TAP_COLOR_BLURPLE_D7
-#define TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR TAP_COLOR_ORANGE_00
-#define TAP_KEYBOARD_ACCESSORY_DONE_BUTTON_COLOR TAP_COLOR_ORANGE_00
-#define TAP_TABLE_VIEW_SECTION_INDEX_COLOR TAP_COLOR_ORANGE_00
+#define TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR TAP_COLOR_PRIMARY_COLOR_1
+#define TAP_COLOR_TEXT_FIELD_POINTER_COLOR TAP_COLOR_PRIMARY_COLOR_1
+#define TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR TAP_COLOR_PRIMARY_COLOR_1
+#define TAP_KEYBOARD_ACCESSORY_DONE_BUTTON_COLOR TAP_COLOR_PRIMARY_COLOR_1
+#define TAP_TABLE_VIEW_SECTION_INDEX_COLOR TAP_COLOR_PRIMARY_COLOR_1
+#define TAP_COLOR_LINK_BASE_COLOR TAP_COLOR_ORANGE_200
+#define TAP_COLOR_LINK_HIGHLIGHTED_COLOR TAP_COLOR_BLUE_FA
 
 #define TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR TAP_COLOR_ORANGE_33
 #define TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR TAP_COLOR_ORANGE_00
@@ -123,23 +129,3 @@
 #define kTAPEventAuthentication @"user/authentication"
 #define kTAPEventUserOnline @"user/status"
 #define kTAPEventUserUpdated @"user/updated"
-
-typedef NS_ENUM(NSInteger, TAPChatMessageType) {
-    //First Digit
-    //1 for Standard Chat Bubble
-    //2 for Commerce Chat Bubble
-    //3 for User Customized Chat Bubble
-    
-    TAPChatMessageTypeText = 1001,
-    TAPChatMessageTypeImage = 1002,
-    TAPChatMessageTypeVideo = 1003,
-    TAPChatMessageTypeFile = 1004,
-    TAPChatMessageTypeLocation = 1005,
-    TAPChatMessageTypeContact = 1006,
-    TAPChatMessageTypeSticker = 1007,
-    
-    TAPChatMessageTypeProduct = 2001,
-    TAPChatMessageTypeCategory = 2002,
-    TAPChatMessageTypeOrderCard = 2003,
-    TAPChatMessageTypePaymentConfirmation = 2004
-};

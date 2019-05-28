@@ -74,7 +74,7 @@
                                         </constraints>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ovg-iv-IsZ">
-                                        <rect key="frame" x="56" y="8" width="0.0" height="14"/>
+                                        <rect key="frame" x="56" y="10" width="0.0" height="14"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" priority="750" constant="14" id="cXa-I3-WiT"/>
@@ -84,7 +84,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PI5-6Q-h86">
-                                        <rect key="frame" x="56" y="22" width="0.0" height="0.0"/>
+                                        <rect key="frame" x="56" y="24" width="0.0" height="0.0"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -98,7 +98,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" identifier="QuoteView"/>
                                 <constraints>
                                     <constraint firstItem="BaN-rP-Ibw" firstAttribute="leading" secondItem="6Dp-3N-kPt" secondAttribute="leading" id="01i-bV-gj5"/>
@@ -108,7 +108,7 @@
                                     <constraint firstItem="it5-Ef-cgs" firstAttribute="top" secondItem="gln-2A-fYE" secondAttribute="top" id="3ry-4r-X9c"/>
                                     <constraint firstItem="gln-2A-fYE" firstAttribute="top" secondItem="6Dp-3N-kPt" secondAttribute="top" id="Ekn-op-5iE"/>
                                     <constraint firstAttribute="bottom" secondItem="gln-2A-fYE" secondAttribute="bottom" id="F8f-QM-8Kd"/>
-                                    <constraint firstItem="Ovg-iv-IsZ" firstAttribute="top" secondItem="6Dp-3N-kPt" secondAttribute="top" constant="8" id="HJa-UC-7kj"/>
+                                    <constraint firstItem="Ovg-iv-IsZ" firstAttribute="top" secondItem="6Dp-3N-kPt" secondAttribute="top" constant="10" id="HJa-UC-7kj"/>
                                     <constraint firstAttribute="trailing" secondItem="BaN-rP-Ibw" secondAttribute="trailing" id="J3e-sq-h3Z"/>
                                     <constraint firstAttribute="bottom" secondItem="BaN-rP-Ibw" secondAttribute="bottom" id="OHH-Je-bbQ"/>
                                     <constraint firstItem="Ovg-iv-IsZ" firstAttribute="leading" secondItem="gln-2A-fYE" secondAttribute="trailing" constant="8" id="Vs6-NI-5SN"/>
@@ -128,7 +128,7 @@
                                         <rect key="frame" x="4" y="0.0" width="60" height="48"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3K2-5r-ayk">
-                                                <rect key="frame" x="4" y="2" width="48" height="14"/>
+                                                <rect key="frame" x="4" y="10" width="48" height="14"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" priority="750" constant="14" id="5KF-lh-tSF"/>
@@ -138,22 +138,22 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JXE-S2-myJ">
-                                                <rect key="frame" x="4" y="17" width="48" height="29"/>
+                                                <rect key="frame" x="4" y="25" width="48" height="13"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
-                                        <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstItem="JXE-S2-myJ" firstAttribute="top" secondItem="3K2-5r-ayk" secondAttribute="bottom" constant="1" id="6Si-kD-elt"/>
                                             <constraint firstItem="JXE-S2-myJ" firstAttribute="leading" secondItem="zrP-2f-SbD" secondAttribute="leading" priority="999" constant="4" id="JaQ-ws-dby"/>
-                                            <constraint firstItem="3K2-5r-ayk" firstAttribute="top" secondItem="zrP-2f-SbD" secondAttribute="top" constant="2" id="YhY-8b-uxA"/>
+                                            <constraint firstItem="3K2-5r-ayk" firstAttribute="top" secondItem="zrP-2f-SbD" secondAttribute="top" constant="10" id="YhY-8b-uxA"/>
                                             <constraint firstAttribute="trailing" secondItem="3K2-5r-ayk" secondAttribute="trailing" constant="8" id="hRA-IC-rLt"/>
                                             <constraint firstAttribute="trailing" secondItem="JXE-S2-myJ" secondAttribute="trailing" constant="8" id="iox-rT-rzG"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" id="jnE-EH-dUR"/>
-                                            <constraint firstAttribute="bottom" secondItem="JXE-S2-myJ" secondAttribute="bottom" priority="750" constant="2" id="kJ4-ue-Sg5"/>
+                                            <constraint firstAttribute="bottom" secondItem="JXE-S2-myJ" secondAttribute="bottom" priority="750" constant="10" id="kJ4-ue-Sg5"/>
                                             <constraint firstItem="3K2-5r-ayk" firstAttribute="leading" secondItem="zrP-2f-SbD" secondAttribute="leading" constant="4" id="quo-G5-5uE"/>
                                         </constraints>
                                     </view>
@@ -165,7 +165,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="1" green="0.63137254899999995" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="1" green="0.62745098040000002" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" identifier="ReplyView"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" priority="999" constant="60" id="1ML-CJ-l3G"/>
@@ -438,6 +438,7 @@
                     <constraint firstItem="u5V-oM-bLv" firstAttribute="top" secondItem="6yA-Ee-rcg" secondAttribute="bottom" priority="999" constant="2" id="UUC-V8-Rim"/>
                     <constraint firstAttribute="trailing" secondItem="u5V-oM-bLv" secondAttribute="trailing" constant="16" id="XD3-uj-GXx"/>
                     <constraint firstItem="6yA-Ee-rcg" firstAttribute="bottom" secondItem="MjL-ub-o2J" secondAttribute="bottom" constant="2" id="cS6-S5-LOM"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="6yA-Ee-rcg" secondAttribute="trailing" constant="80" id="jEl-9V-kGa"/>
                     <constraint firstAttribute="bottom" secondItem="u5V-oM-bLv" secondAttribute="bottom" constant="8" id="llx-VW-Kpc"/>
                     <constraint firstItem="MjL-ub-o2J" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="trailing" constant="2" id="prH-UE-mmb"/>
                     <constraint firstItem="u5V-oM-bLv" firstAttribute="leading" secondItem="qj8-8w-hdL" secondAttribute="leading" constant="16" id="rNT-E9-geB"/>
@@ -482,6 +483,7 @@
                 <outlet property="replyButtonLeadingConstraint" destination="Guq-c2-luY" id="okr-Ig-90U"/>
                 <outlet property="replyButtonLeftConstraint" destination="prH-UE-mmb" id="fio-Ks-3IM"/>
                 <outlet property="replyButtonTrailingConstraint" destination="Z9h-D2-Shf" id="MLZ-i2-Xel"/>
+                <outlet property="replyInnerView" destination="zrP-2f-SbD" id="3tt-hr-sH1"/>
                 <outlet property="replyMessageLabel" destination="JXE-S2-myJ" id="aA4-Wg-tbm"/>
                 <outlet property="replyMessageLabelLeadingConstraint" destination="JaQ-ws-dby" id="Kik-tm-yfK"/>
                 <outlet property="replyMessageLabelTrailingConstraint" destination="iox-rT-rzG" id="jHX-dV-HHX"/>

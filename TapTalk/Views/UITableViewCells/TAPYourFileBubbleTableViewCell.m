@@ -13,6 +13,7 @@
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
+@property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet UIView *fileView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
@@ -107,6 +108,7 @@
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote;
+- (void)setBubbleCellColor;
 
 @end
 
@@ -163,6 +165,26 @@
 }
 
 #pragma mark - Custom Method
+- (void)setBubbleCellColor {
+    self.bubbleView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.quoteView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+    self.replyInnerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+    self.replyView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_45];
+    self.progressContainerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+    self.fileView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+    
+    self.replyNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.replyMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.quoteTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.quoteSubtitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.forwardTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.forwardFromLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    
+    self.bubbleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.fileDescriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    self.fileDescriptionSizePlaceholderLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+}
+
 - (void)setMessage:(TAPMessageModel *)message {
     
     if(message == nil) {
@@ -437,7 +459,14 @@
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
-        self.replyNameLabel.text = message.quote.title;
+        //check id message sender is equal to active user id, if yes change the title to "You"
+        if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            self.replyNameLabel.text = NSLocalizedString(@"You", @"");
+        }
+        else {
+            self.replyNameLabel.text = message.quote.title;
+        }
+
         self.replyMessageLabel.text = message.quote.content;
         self.replyViewHeightContraint.constant = 60.0f;
         self.replyViewBottomConstraint.active = YES;
@@ -515,6 +544,12 @@
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
     
     NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    
+    //check id message sender is equal to active user id, if yes change the title to "You"
+    if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        appendedFullnameString = NSLocalizedString(@"From: You", @"");
+    }
+    
     self.forwardFromLabel.text = appendedFullnameString;
     
     NSMutableAttributedString *attributedText =

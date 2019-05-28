@@ -201,8 +201,6 @@
         else {
             self.onlineStatusView.alpha = 0.0f;
             self.onlineStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.profileImageView.frame) + 8.0f), 20.0f);
-            
-            self.onlineStatusLabel.text = @"Active 6 minutes ago";
         }
     }
     

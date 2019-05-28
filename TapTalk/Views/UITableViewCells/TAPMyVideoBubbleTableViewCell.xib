@@ -84,7 +84,7 @@
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="juu-GA-adW">
-                                        <rect key="frame" x="56" y="8" width="150" height="14"/>
+                                        <rect key="frame" x="56" y="10" width="150" height="14"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" priority="750" constant="14" id="t40-0h-NgI"/>
@@ -94,7 +94,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AWL-JF-KkS">
-                                        <rect key="frame" x="56" y="22" width="150" height="0.0"/>
+                                        <rect key="frame" x="56" y="24" width="150" height="0.0"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -108,7 +108,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="0.28235294119999998" green="0.23921568630000001" blue="0.85490196080000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.90980392160000001" green="0.44705882349999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" identifier="QuoteView"/>
                                 <constraints>
                                     <constraint firstItem="juu-GA-adW" firstAttribute="leading" secondItem="BaD-7C-LYq" secondAttribute="trailing" constant="8" id="21g-mH-CuM"/>
@@ -124,7 +124,7 @@
                                     <constraint firstAttribute="bottom" secondItem="0l0-Pp-5pP" secondAttribute="bottom" id="eDv-g1-041"/>
                                     <constraint firstAttribute="trailing" secondItem="juu-GA-adW" secondAttribute="trailing" constant="8" id="kUz-yF-BKL"/>
                                     <constraint firstItem="AWL-JF-KkS" firstAttribute="top" secondItem="juu-GA-adW" secondAttribute="bottom" id="pia-18-fxB"/>
-                                    <constraint firstItem="juu-GA-adW" firstAttribute="top" secondItem="gL3-9h-IdT" secondAttribute="top" constant="8" id="voK-tp-dqX"/>
+                                    <constraint firstItem="juu-GA-adW" firstAttribute="top" secondItem="gL3-9h-IdT" secondAttribute="top" constant="10" id="voK-tp-dqX"/>
                                 </constraints>
                             </view>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wuz-YG-xDg">
@@ -134,7 +134,7 @@
                                         <rect key="frame" x="4" y="0.0" width="210" height="48"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6OM-jQ-J9b">
-                                                <rect key="frame" x="4" y="2" width="198" height="14"/>
+                                                <rect key="frame" x="4" y="10" width="198" height="14"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" priority="750" constant="14" id="L1U-Ot-zEQ"/>
@@ -144,22 +144,22 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhu-g1-ZSu">
-                                                <rect key="frame" x="4" y="17" width="198" height="29"/>
+                                                <rect key="frame" x="4" y="25" width="198" height="13"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
-                                        <color key="backgroundColor" red="0.28235294119999998" green="0.23921568630000001" blue="0.85490196080000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="0.90980392160000001" green="0.44705882349999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstItem="6OM-jQ-J9b" firstAttribute="leading" secondItem="hPL-bR-euj" secondAttribute="leading" constant="4" id="4i4-EZ-WX4"/>
                                             <constraint firstAttribute="trailing" secondItem="6OM-jQ-J9b" secondAttribute="trailing" constant="8" id="7eE-Lr-f9u"/>
-                                            <constraint firstItem="6OM-jQ-J9b" firstAttribute="top" secondItem="hPL-bR-euj" secondAttribute="top" constant="2" id="89t-vK-tEe"/>
+                                            <constraint firstItem="6OM-jQ-J9b" firstAttribute="top" secondItem="hPL-bR-euj" secondAttribute="top" constant="10" id="89t-vK-tEe"/>
                                             <constraint firstItem="Uhu-g1-ZSu" firstAttribute="top" secondItem="6OM-jQ-J9b" secondAttribute="bottom" constant="1" id="EIq-w6-uPt"/>
                                             <constraint firstItem="Uhu-g1-ZSu" firstAttribute="leading" secondItem="hPL-bR-euj" secondAttribute="leading" constant="4" id="am7-lt-J05"/>
                                             <constraint firstAttribute="trailing" secondItem="Uhu-g1-ZSu" secondAttribute="trailing" constant="8" id="dkM-h9-jqP"/>
-                                            <constraint firstAttribute="bottom" secondItem="Uhu-g1-ZSu" secondAttribute="bottom" priority="750" constant="2" id="fyi-5G-tFq"/>
+                                            <constraint firstAttribute="bottom" secondItem="Uhu-g1-ZSu" secondAttribute="bottom" priority="750" constant="10" id="fyi-5G-tFq"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" id="hIu-1y-gci"/>
                                         </constraints>
                                     </view>
@@ -171,7 +171,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="0.28235294119999998" green="0.74509803919999995" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="1" green="0.62745098040000002" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration" identifier="ReplyView"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="jCL-ys-ORy" secondAttribute="bottom" id="0Ae-Z0-TRf"/>
@@ -376,7 +376,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" red="0.28235294119999998" green="0.23921568630000001" blue="0.85490196080000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
                             <constraint firstItem="gL3-9h-IdT" firstAttribute="leading" secondItem="kau-oU-53h" secondAttribute="leading" constant="10" id="0nd-05-1JQ"/>
@@ -492,6 +492,7 @@
                 <outlet property="replyButtonLeadingConstraint" destination="Ctr-QO-F1a" id="2q3-Ds-Lys"/>
                 <outlet property="replyButtonRightConstraint" destination="5kk-ss-c8K" id="VYD-gp-A1R"/>
                 <outlet property="replyButtonTrailingConstraint" destination="pDW-8c-LIk" id="SIS-5P-j9A"/>
+                <outlet property="replyInnerView" destination="hPL-bR-euj" id="DUN-S6-uIp"/>
                 <outlet property="replyMessageLabel" destination="Uhu-g1-ZSu" id="R6C-Uq-rLB"/>
                 <outlet property="replyMessageLabelLeadingConstraint" destination="am7-lt-J05" id="Z9Q-Hs-dGU"/>
                 <outlet property="replyMessageLabelTrailingConstraint" destination="dkM-h9-jqP" id="BP4-9Z-9zM"/>

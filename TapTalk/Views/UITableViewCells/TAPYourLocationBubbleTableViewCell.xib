@@ -97,7 +97,7 @@
                                         </constraints>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="W6T-i0-e2D">
-                                        <rect key="frame" x="56" y="8" width="0.0" height="14"/>
+                                        <rect key="frame" x="56" y="10" width="0.0" height="14"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" priority="750" constant="14" id="edQ-X4-DaN"/>
@@ -107,7 +107,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bwN-CT-1gM">
-                                        <rect key="frame" x="56" y="22" width="0.0" height="0.0"/>
+                                        <rect key="frame" x="56" y="24" width="0.0" height="0.0"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -121,7 +121,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="3Ba-e5-Tab" firstAttribute="leading" secondItem="tRD-Yd-xyH" secondAttribute="leading" id="1FS-PH-qCY"/>
                                     <constraint firstItem="bwN-CT-1gM" firstAttribute="leading" secondItem="tRD-Yd-xyH" secondAttribute="trailing" constant="8" id="7ya-tm-03x"/>
@@ -136,7 +136,7 @@
                                     <constraint firstAttribute="trailing" secondItem="bwN-CT-1gM" secondAttribute="trailing" constant="8" id="Vrr-qr-x5Y"/>
                                     <constraint firstItem="DDu-17-UVu" firstAttribute="leading" secondItem="UjC-aW-zoe" secondAttribute="leading" id="cOf-fT-cKA"/>
                                     <constraint firstItem="DDu-17-UVu" firstAttribute="top" secondItem="UjC-aW-zoe" secondAttribute="top" id="eEy-uW-mXE"/>
-                                    <constraint firstItem="W6T-i0-e2D" firstAttribute="top" secondItem="UjC-aW-zoe" secondAttribute="top" constant="8" id="fq2-rN-CII"/>
+                                    <constraint firstItem="W6T-i0-e2D" firstAttribute="top" secondItem="UjC-aW-zoe" secondAttribute="top" constant="10" id="fq2-rN-CII"/>
                                     <constraint firstAttribute="trailing" secondItem="W6T-i0-e2D" secondAttribute="trailing" constant="8" id="rN4-TL-nFz"/>
                                     <constraint firstItem="3Ba-e5-Tab" firstAttribute="bottom" secondItem="tRD-Yd-xyH" secondAttribute="bottom" id="sKH-gq-VwX"/>
                                     <constraint firstAttribute="height" constant="48" id="sf1-1S-H2i"/>
@@ -150,7 +150,7 @@
                                         <rect key="frame" x="4" y="0.0" width="61.5" height="48"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zlb-X6-59q">
-                                                <rect key="frame" x="4" y="2" width="49.5" height="14"/>
+                                                <rect key="frame" x="4" y="10" width="49.5" height="14"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" priority="750" constant="14" id="XtY-jl-SRa"/>
@@ -160,22 +160,22 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XPn-o1-F3V">
-                                                <rect key="frame" x="4" y="17" width="49.5" height="29"/>
+                                                <rect key="frame" x="4" y="25" width="49.5" height="13"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
-                                        <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstItem="XPn-o1-F3V" firstAttribute="leading" secondItem="zdr-Wq-dLu" secondAttribute="leading" constant="4" id="1i5-eu-e3l"/>
                                             <constraint firstAttribute="trailing" secondItem="XPn-o1-F3V" secondAttribute="trailing" constant="8" id="AfB-jz-Tci"/>
                                             <constraint firstAttribute="trailing" secondItem="Zlb-X6-59q" secondAttribute="trailing" constant="8" id="KxA-Dc-P9j"/>
                                             <constraint firstItem="XPn-o1-F3V" firstAttribute="top" secondItem="Zlb-X6-59q" secondAttribute="bottom" constant="1" id="Sja-7D-AhI"/>
                                             <constraint firstItem="Zlb-X6-59q" firstAttribute="leading" secondItem="zdr-Wq-dLu" secondAttribute="leading" constant="4" id="cMf-BH-sXL"/>
-                                            <constraint firstAttribute="bottom" secondItem="XPn-o1-F3V" secondAttribute="bottom" priority="750" constant="2" id="hQY-aB-suo"/>
-                                            <constraint firstItem="Zlb-X6-59q" firstAttribute="top" secondItem="zdr-Wq-dLu" secondAttribute="top" constant="2" id="vd8-fH-GQt"/>
+                                            <constraint firstAttribute="bottom" secondItem="XPn-o1-F3V" secondAttribute="bottom" priority="750" constant="10" id="hQY-aB-suo"/>
+                                            <constraint firstItem="Zlb-X6-59q" firstAttribute="top" secondItem="zdr-Wq-dLu" secondAttribute="top" constant="10" id="vd8-fH-GQt"/>
                                         </constraints>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3vp-pf-9Bc" userLabel="Reply Button">
@@ -186,7 +186,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="1" green="0.63137254899999995" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="1" green="0.62745098040000002" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="zdr-Wq-dLu" secondAttribute="bottom" id="0LG-Hr-xlN"/>
                                     <constraint firstItem="3vp-pf-9Bc" firstAttribute="bottom" secondItem="zdr-Wq-dLu" secondAttribute="bottom" id="DhS-nh-x17"/>
@@ -300,6 +300,7 @@
                 <outlet property="replyButtonLeadingConstraint" destination="jPT-5Z-3MX" id="kU8-8n-ExS"/>
                 <outlet property="replyButtonLeftConstraint" destination="OCV-AH-row" id="gbB-Ee-HcZ"/>
                 <outlet property="replyButtonTrailingConstraint" destination="v43-OM-1v9" id="6ox-qO-V4U"/>
+                <outlet property="replyInnerView" destination="zdr-Wq-dLu" id="1Y1-ro-toA"/>
                 <outlet property="replyMessageLabel" destination="XPn-o1-F3V" id="XQL-bw-OeZ"/>
                 <outlet property="replyMessageLabelLeadingConstraint" destination="1i5-eu-e3l" id="jhZ-V5-XUp"/>
                 <outlet property="replyMessageLabelTrailingConstraint" destination="AfB-jz-Tci" id="ph9-Pc-X5x"/>

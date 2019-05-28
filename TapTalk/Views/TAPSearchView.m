@@ -31,13 +31,13 @@
         
         _recentSearchLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, 150.0f, 13.0f)];
         self.recentSearchLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
-        self.recentSearchLabel.text = @"Recent Searches";
+        self.recentSearchLabel.text = @"RECENT SEARCHES";
         self.recentSearchLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         [self addSubview:self.recentSearchLabel];
         
         _clearHistoryLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 150.0f, 8.0f, 150.0f, 13.0f)];
         self.clearHistoryLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
-        self.clearHistoryLabel.text = @"Clear History";
+        self.clearHistoryLabel.text = @"CLEAR HISTORY";
         self.clearHistoryLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
         self.clearHistoryLabel.textAlignment = NSTextAlignmentRight;
         CGSize clearHistorySize = [self.clearHistoryLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.clearHistoryLabel.frame))];

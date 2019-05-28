@@ -8,12 +8,12 @@
 
 #import "TAPAPIManager.h"
 static NSString * const kBaseURLProduction = @"https://taptalk-production.moselo.com";
-static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com:8080";
-static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com:8080";
+static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com";
+static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com";
  
-//static NSString * const kBaseURLProduction = @"https://engine.taptalk.io:8080";
-//static NSString * const kBaseURLStaging = @"https://engine-staging.taptalk.io:8080";
-//static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io:8080";
+//static NSString * const kBaseURLProduction = @"https://engine.taptalk.io";
+//static NSString * const kBaseURLStaging = @"https://engine-staging.taptalk.io";
+//static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io";
 
 static NSString * const kAPIVersionString = @"v1";
 
@@ -73,7 +73,7 @@ static NSString * const kAPIVersionString = @"v1";
     }
     else if (type == TAPAPIManagerTypeValidateAccessToken) {
         NSString *formattedAPIBaseURL = [self.APIBaseURL stringByReplacingOccurrencesOfString:@"api" withString:@""];
-        NSString *apiPath = @"pigeon?check=1";
+        NSString *apiPath = @"connect?check=1";
         return [NSString stringWithFormat:@"%@%@", formattedAPIBaseURL, apiPath];
     }
     else if (type == TAPAPIManagerTypeGetMessageRoomListAndUnread) {

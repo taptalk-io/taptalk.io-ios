@@ -272,6 +272,10 @@
 - (void)presentLoginViewControllerIfNeededFromViewController:(UIViewController *)viewController force:(BOOL)force {
     UINavigationController *loginNavigationController = [[UINavigationController alloc] initWithRootViewController:self];
     if (![[TapTalk sharedInstance] isAuthenticated] || force) {
+        
+        //Prevention to clear existing data
+        [[TapTalk sharedInstance] clearAllData];
+        
         [viewController presentViewController:loginNavigationController animated:YES completion:nil];
     }
 }

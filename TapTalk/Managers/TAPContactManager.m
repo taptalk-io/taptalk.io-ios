@@ -147,4 +147,11 @@
     _contactSyncPermissionAsked = contactPermissionAsked;
 }
 
+- (void)clearContactManagerData {
+    [self.contactUserDictionary removeAllObjects];
+    [self.phoneUserDictionary removeAllObjects];
+    self.userCountryCode = @"";
+    _contactSyncPermissionAsked = NO;
+}
+
 @end

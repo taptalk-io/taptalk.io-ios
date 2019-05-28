@@ -307,6 +307,9 @@
                     replyTo.messageID = quotedMessage.messageID;
                     replyTo.localID = quotedMessage.localID;
                     replyTo.messageType = quotedMessage.type;
+                    replyTo.fullname = quotedMessage.user.fullname;
+                    replyTo.xcUserID = quotedMessage.user.xcUserID;
+                    replyTo.userID = quotedMessage.user.userID;
                     message.replyTo = [replyTo copy];
                 }
                 else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -362,6 +365,9 @@
                 replyTo.messageID = quotedMessage.messageID;
                 replyTo.localID = quotedMessage.localID;
                 replyTo.messageType = quotedMessage.type;
+                replyTo.fullname = quotedMessage.user.fullname;
+                replyTo.xcUserID = quotedMessage.user.xcUserID;
+                replyTo.userID = quotedMessage.user.userID;
                 message.replyTo = replyTo;
             }
             else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -460,6 +466,9 @@
             replyTo.messageID = quotedMessage.messageID;
             replyTo.localID = quotedMessage.localID;
             replyTo.messageType = quotedMessage.type;
+            replyTo.fullname = quotedMessage.user.fullname;
+            replyTo.xcUserID = quotedMessage.user.xcUserID;
+            replyTo.userID = quotedMessage.user.userID;
             message.replyTo = replyTo;
         }
         else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -559,6 +568,9 @@
             replyTo.messageID = quotedMessage.messageID;
             replyTo.localID = quotedMessage.localID;
             replyTo.messageType = quotedMessage.type;
+            replyTo.fullname = quotedMessage.user.fullname;
+            replyTo.xcUserID = quotedMessage.user.xcUserID;
+            replyTo.userID = quotedMessage.user.userID;
             message.replyTo = replyTo;
         }
         else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -671,6 +683,9 @@
             replyTo.messageID = quotedMessage.messageID;
             replyTo.localID = quotedMessage.localID;
             replyTo.messageType = quotedMessage.type;
+            replyTo.fullname = quotedMessage.user.fullname;
+            replyTo.xcUserID = quotedMessage.user.xcUserID;
+            replyTo.userID = quotedMessage.user.userID;
             message.replyTo = replyTo;
         }
         else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -751,6 +766,9 @@
             replyTo.messageID = quotedMessage.messageID;
             replyTo.localID = quotedMessage.localID;
             replyTo.messageType = quotedMessage.type;
+            replyTo.fullname = quotedMessage.user.fullname;
+            replyTo.xcUserID = quotedMessage.user.xcUserID;
+            replyTo.userID = quotedMessage.user.userID;
             message.replyTo = replyTo;
         }
         else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -832,6 +850,9 @@
             replyTo.messageID = quotedMessage.messageID;
             replyTo.localID = quotedMessage.localID;
             replyTo.messageType = quotedMessage.type;
+            replyTo.fullname = quotedMessage.user.fullname;
+            replyTo.xcUserID = quotedMessage.user.xcUserID;
+            replyTo.userID = quotedMessage.user.userID;
             message.replyTo = replyTo;
         }
         else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
@@ -846,6 +867,15 @@
     
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
     [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+}
+
+- (void)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index {
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser created:created room:room body:@"" type:TAPChatMessageTypeUnreadMessageIdentifier];
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(chatManagerDidAddUnreadMessageIdentifier:indexPosition:)]) {
+            [delegate chatManagerDidAddUnreadMessageIdentifier:message indexPosition:index];
+        }
+    }
 }
 
 - (void)setActiveUser:(TAPUserModel *)activeUser {
@@ -896,8 +926,9 @@
         isPendingMessageExist = YES;
     }
     
-    //RN To Do - Check file upload progress
-    
+    if ([[TAPFileUploadManager sharedManager] isUploadingFile]) {
+        isFileUploadProgressExist = YES;
+    }
     
     if ((isPendingMessageExist || isFileUploadProgressExist || [[TAPMessageStatusManager sharedManager] hasPendingProcess]) && self.checkPendingBackgroundTaskRetryAttempt < kMaximumRetryAttempt) {
         _checkPendingBackgroundTaskRetryAttempt++;
@@ -958,7 +989,7 @@
     //Add User to Contact Manager
     [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
     
-    decryptedMessage.isSending = NO; //DV TEMP - Temporary set isSending to NO waiting for server
+    decryptedMessage.isSending = NO;
     
 #ifdef DEBUG
     NSLog(@"Receive Message: %@", decryptedMessage.body);
@@ -1374,6 +1405,26 @@
         [storedFilePathPerRoomDictionary setObject:path forKey:localID];
         [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:roomID];
     }
+}
+
+- (void)updateMessageToFailedWithLocalID:(NSString *)localID {
+    
+    TAPMessageModel *message = [self getMessageFromWaitingUploadDictionaryWithKey:localID];
+    if (message) {
+        message.isSending = NO;
+        message.isFailedSend = YES;
+        [self.waitingUploadDictionary setObject:message forKey:message.localID];
+    }
+}
+
+- (void)clearChatManagerData {
+    [TAPChatManager sharedManager].activeUser = nil;
+    [TAPChatManager sharedManager].activeRoom = nil;
+    [[TAPChatManager sharedManager].messageDraftDictionary removeAllObjects];
+    [[TAPChatManager sharedManager].quotedMessageDictionary removeAllObjects];
+    [[TAPChatManager sharedManager].quoteActionTypeDictionary removeAllObjects];
+    [[TAPChatManager sharedManager].userInfoDictionary removeAllObjects];
+    [[TAPChatManager sharedManager].filePathStoredDictionary removeAllObjects];
 }
 
 @end

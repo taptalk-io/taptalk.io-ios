@@ -73,10 +73,10 @@
         _phoneNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 24.0f)];
         
         if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
-            self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+            self.phoneNumberLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
         }
         else {
-            self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+            self.phoneNumberLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
         }
         
         self.phoneNumberLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];

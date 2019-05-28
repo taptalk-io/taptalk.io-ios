@@ -76,9 +76,9 @@
         [self.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
         
-        _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.frame), 1.0f)];
+        _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f, CGRectGetWidth(self.frame), 1.0f)];
         self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
-        [self.bgView addSubview:self.separatorView];
+        [self.searchBarBackgroundView addSubview:self.separatorView];
         
         _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f - 62.0f - [TAPUtil safeAreaBottomPadding]) style:UITableViewStylePlain]; //62.0f - height of sync contact button view
         self.contactsTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
@@ -124,6 +124,7 @@
 
 #pragma mark - Custom Method
 - (void)searchBarCancelButtonDidTapped {
+    [self.searchBarView handleCancelButtonTappedState];
     [self showOverlayView:NO];
     
     [UIView animateWithDuration:0.3f animations:^{

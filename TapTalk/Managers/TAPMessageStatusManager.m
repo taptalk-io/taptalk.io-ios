@@ -266,4 +266,11 @@
     [self.readCountDictionary removeAllObjects];
 }
 
+- (void)clearMessageStatusManagerData {
+    [self.readMessageQueueArray removeAllObjects];
+    [self.deliveryMessageQueueArray removeAllObjects];
+    [self.filteredBulkDeliveryMessageArray removeAllObjects];
+    [self.readCountDictionary removeAllObjects];
+}
+
 @end

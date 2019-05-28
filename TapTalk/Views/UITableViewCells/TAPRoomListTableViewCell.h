@@ -22,5 +22,6 @@ typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
 
 - (void)setRoomListTableViewCellWithData:(TAPRoomListModel *)roomList updateUnreadBubble:(BOOL)updateUnreadBubble;
 - (void)setAsTyping:(BOOL)typing;
+- (void)showMessageDraftWithMessage:(NSString *)draftMessage;
 
 @end

@@ -229,6 +229,18 @@
     replyToLocalID = [TAPUtil nullToEmptyString:replyToLocalID];
     replyTo.localID = replyToLocalID;
     
+    NSString *replyToUserID = [dictionary objectForKey:@"replyToUserID"];
+    replyToUserID = [TAPUtil nullToEmptyString:replyToUserID];
+    replyTo.userID = replyToUserID;
+    
+    NSString *replyToXcUserID = [dictionary objectForKey:@"replyToXcUserID"];
+    replyToXcUserID = [TAPUtil nullToEmptyString:replyToXcUserID];
+    replyTo.xcUserID = replyToXcUserID;
+    
+    NSString *replyToFullname = [dictionary objectForKey:@"replyToFullname"];
+    replyToFullname = [TAPUtil nullToEmptyString:replyToFullname];
+    replyTo.fullname = replyToFullname;
+    
     NSInteger replyMessageType = [[dictionary objectForKey:@"replyMessageType"] integerValue];
     replyTo.messageType = replyMessageType;
     message.replyTo = replyTo;
@@ -417,6 +429,18 @@
     NSString *replyToLocalID = [replyToDictionary objectForKey:@"localID"];
     replyToLocalID = [TAPUtil nullToEmptyString:replyToLocalID];
     replyTo.localID = replyToLocalID;
+    
+    NSString *replyToUserID = [replyToDictionary objectForKey:@"userID"];
+    replyToUserID = [TAPUtil nullToEmptyString:replyToUserID];
+    replyTo.userID = replyToUserID;
+    
+    NSString *replyToXcUserID = [dictionary objectForKey:@"xcUserID"];
+    replyToXcUserID = [TAPUtil nullToEmptyString:replyToXcUserID];
+    replyTo.xcUserID = replyToXcUserID;
+    
+    NSString *replyToFullName = [dictionary objectForKey:@"fullname"];
+    replyToFullName = [TAPUtil nullToEmptyString:replyToFullName];
+    replyTo.fullname = replyToFullName;
     
     NSInteger replyMessageType = [[replyToDictionary objectForKey:@"messageType"] integerValue];
     replyTo.messageType = replyMessageType;
@@ -698,6 +722,18 @@
     NSString *localID = [replyToDictionary objectForKey:@"localID"];
     localID = [TAPUtil nullToEmptyString:localID];
     [messageMutableDictionary setValue:localID forKey:@"replyToLocalID"];
+    
+    NSString *replyToUserID = [replyToDictionary objectForKey:@"userID"];
+    replyToUserID = [TAPUtil nullToEmptyString:replyToUserID];
+    [messageMutableDictionary setValue:replyToUserID forKey:@"replyToUserID"];
+    
+    NSString *replyToXcUserID = [replyToDictionary objectForKey:@"xcUserID"];
+    replyToXcUserID = [TAPUtil nullToEmptyString:replyToXcUserID];
+    [messageMutableDictionary setValue:replyToXcUserID forKey:@"replyToXcUserID"];
+    
+    NSString *fullname = [replyToDictionary objectForKey:@"fullname"];
+    fullname = [TAPUtil nullToEmptyString:fullname];
+    [messageMutableDictionary setValue:fullname forKey:@"replyToFullname"];
     
     NSNumber *messageType = [replyToDictionary objectForKey:@"messageType"];
     messageType = [TAPUtil nullToEmptyNumber:messageType];
@@ -1056,6 +1092,7 @@
         
         if ([messageArray count] == 0) {
             success([NSArray array]);
+            return;
         }
         else {
             NSMutableArray *modelArray = [NSMutableArray array];
@@ -1086,11 +1123,25 @@
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
                         failure:(void (^)(NSError *error))failure {
     NSString *query = [NSString stringWithFormat:@"roomID == '%@'", roomID];
+    [TAPDataManager getAllMessageWithRoomID:roomID query:query sortByKey:columnName ascending:isAscending success:^(NSArray<TAPMessageModel *> *messageArray) {
+        success(messageArray);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)getAllMessageWithRoomID:(NSString *)roomID
+                          query:(NSString *)query
+                      sortByKey:(NSString *)columnName
+                      ascending:(BOOL)isAscending
+                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                        failure:(void (^)(NSError *error))failure {
     [TAPDatabaseManager loadAllDataFromDatabaseWithQuery:query tableName:kDatabaseTableMessage sortByKey:columnName ascending:isAscending success:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         
         if ([messageArray count] == 0) {
             success([NSArray array]);
+            return;
         }
         else {
             NSMutableArray *modelArray = [NSMutableArray array];
@@ -1111,7 +1162,70 @@
             success(modelArray);
         }
     } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)getAllMessageWithRoomID:(NSString *)roomID
+                   messageTypes:(NSArray *)messageTypeArray
+             minimumDateCreated:(NSTimeInterval)minCreated
+                      sortByKey:(NSString *)columnName
+                      ascending:(BOOL)isAscending
+                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                        failure:(void (^)(NSError *error))failure {
+    
+    //Generate message type query string
+    NSString *subQueryTypeString = @"";
+    if ([messageTypeArray count] == 1) {
+        TAPChatMessageType messageType = [[messageTypeArray firstObject] integerValue];
+        subQueryTypeString = [subQueryTypeString stringByAppendingString:[NSString stringWithFormat:@"type == %ld", messageType]];
+    }
+    else if ([messageTypeArray count] > 1) {
+        subQueryTypeString = @"(";
+        for (NSInteger counter = 0; counter < [messageTypeArray count]; counter++) {
+            TAPChatMessageType messageType = [[messageTypeArray objectAtIndex:counter] integerValue];
+            if (counter == [messageTypeArray count] - 1) {
+                subQueryTypeString = [subQueryTypeString stringByAppendingString:[NSString stringWithFormat:@"type == %ld", messageType]];
+            }
+            else {
+                subQueryTypeString = [subQueryTypeString stringByAppendingString:[NSString stringWithFormat:@"type == %ld || ", messageType]];
+            }
+        }
+        subQueryTypeString = [subQueryTypeString stringByAppendingString:@")"];
+    }
+    
+    NSNumber *minCreatedNumber = [NSNumber numberWithDouble:minCreated];
+    NSInteger minCreatedInteger = [minCreatedNumber integerValue];
+    
+    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && created < %ld && %@", roomID, (long)minCreatedInteger, subQueryTypeString];
+    
+    [TAPDatabaseManager loadAllDataFromDatabaseWithQuery:queryString tableName:kDatabaseTableMessage sortByKey:columnName ascending:isAscending success:^(NSArray *resultArray) {
+        NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         
+        if ([messageArray count] == 0) {
+            success([NSArray array]);
+            return;
+        }
+        else {
+            NSMutableArray *modelArray = [NSMutableArray array];
+            for (NSInteger count = 0; count < [messageArray count]; count++) {
+                NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray objectAtIndex:count]];
+                
+                TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+                [modelArray addObject:messageModel];
+                
+                NSError *error;
+                
+                if (error) {
+                    failure(error);
+                    return;
+                }
+            }
+            
+            success(modelArray);
+        }
+    } failure:^(NSError *error) {
+        failure(error);
     }];
 }
 
@@ -1192,7 +1306,7 @@
 
 + (void)getDatabaseAllUnreadMessagesWithSuccess:(void (^)(NSArray *unreadMessages))success
                                         failure:(void (^)(NSError *error))failure {
-    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:@"isRead == 0" sortByColumnName:@"" isAscending:NO success:^(NSArray *resultArray) {
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:@"isRead == 0 && isHidden == 0 && isDeleted == 0" sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
         NSMutableArray *obtainedArray = [NSMutableArray array];
@@ -1214,7 +1328,7 @@
                                           failure:(void (^)(NSError *))failure {
     
     NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && !(userID LIKE '%@')", roomID, activeUserID];
-    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"" isAscending:NO success:^(NSArray *resultArray) {
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
@@ -1237,12 +1351,10 @@
                                          success:(void (^)(NSArray *mediaMessages))success
                                          failure:(void (^)(NSError *error))failure {
     
-//    @Query("select * from Message_Table where type in (" + TYPE_IMAGE + ", " + TYPE_VIDEO +  ") and created < :lastTimestamp and roomID = :roomID and isHidden = 0 and isDeleted = 0 order by created desc limit " + numOfItem)
-    
-    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && created < %lf && (type == %ld || type == %ld)", roomID, [lastTimestamp doubleValue], TAPChatMessageTypeImage, TAPChatMessageTypeVideo];
+    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && created < %lf && (type == %ld || type == %ld)", roomID, [lastTimestamp doubleValue], TAPChatMessageTypeImage, TAPChatMessageTypeVideo];
     
     if ([lastTimestamp isEqualToString:@""]) {
-        queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && (type == %ld || type == %ld)", roomID, TAPChatMessageTypeImage, TAPChatMessageTypeVideo];
+        queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && (type == %ld || type == %ld)", roomID, TAPChatMessageTypeImage, TAPChatMessageTypeVideo];
     }
     
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:NO success:^(NSArray *resultArray) {
@@ -1270,7 +1382,7 @@
                                            failure:(void (^)(NSError *))failure {
     NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && isDeleted == 0 && !(userID LIKE '%@')", activeUserID];
     
-    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"" isAscending:NO distinctBy:@"roomID" success:^(NSArray *resultArray) {
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES distinctBy:@"roomID" success:^(NSArray *resultArray) {
         
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
@@ -1357,6 +1469,7 @@
                               failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
     
@@ -1379,6 +1492,7 @@
                                       failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
@@ -1401,6 +1515,7 @@
                                                   failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
@@ -1423,6 +1538,7 @@
                                            failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *recentSearchDictionaryArray = [NSMutableArray array];
@@ -1445,6 +1561,7 @@
                                       failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *userDictionaryArray = [NSMutableArray array];
@@ -1467,6 +1584,7 @@
                                           failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
@@ -1494,6 +1612,7 @@
                                               failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
@@ -1520,6 +1639,7 @@
                               failure:(void (^)(NSError *error))failure {
     if ([dataArray count] <= 0) {
         success();
+        return;
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
@@ -1542,6 +1662,7 @@
                                          failure:(void (^)(NSError *error))failure {
     if ([predicateString isEqualToString:@""]) {
         success();
+        return;
     }
     else {
         [TAPDatabaseManager deleteDataInDatabaseWithPredicateString:predicateString tableName:kDatabaseTableMessage success:^{
@@ -2522,12 +2643,10 @@
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseContactWithData:userResultArray success:^{
-            
+            success(userResultArray);
         } failure:^(NSError *error) {
             
         }];
-        
-        success(userResultArray);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
@@ -3414,6 +3533,10 @@
             callingCode = [TAPUtil nullToEmptyString:callingCode];
             country.countryCallingCode = callingCode;
             
+            NSString *flagIconURL = [countryDictionary objectForKey:@"flagIconURL"];
+            flagIconURL = [TAPUtil nullToEmptyString:flagIconURL];
+            country.flagIconURL = flagIconURL;
+            
             NSString *currencyCode = [countryDictionary objectForKey:@"currencyCode"];
             currencyCode = [TAPUtil nullToEmptyString:currencyCode];
             country.countryCurrencyCode = currencyCode;
@@ -3831,12 +3954,12 @@
         }
         
         NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
-        NSArray *userArray = [dataDictionary objectForKey:@"contacts"];
+        NSArray *userArray = [dataDictionary objectForKey:@"users"];
         userArray = [TAPUtil nullToEmptyArray:userArray];
         
         NSMutableArray *userResultArray = [NSMutableArray array];
         for (NSDictionary *userDictionary in userArray) {
-            NSDictionary *obtainedUserDictionary = [userDictionary objectForKey:@"user"];
+            NSDictionary *obtainedUserDictionary = userDictionary;
             obtainedUserDictionary = [TAPUtil nullToEmptyDictionary:obtainedUserDictionary];
             
             TAPUserModel *user = [TAPUserModel new];
@@ -3935,12 +4058,11 @@
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseContactWithData:userResultArray success:^{
-            
+            success(userResultArray);
+
         } failure:^(NSError *error) {
             
         }];
-        
-        success(userResultArray);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

@@ -10,7 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPMyAccountViewControllerDelegate <NSObject>
+
+- (void)myAccountViewControllerDidTappedLogoutButton;
+
+@end
+
 @interface TAPMyAccountViewController : TAPBaseViewController
+
+@property (weak, nonatomic) id<TAPMyAccountViewControllerDelegate> delegate;
 
 @end
 

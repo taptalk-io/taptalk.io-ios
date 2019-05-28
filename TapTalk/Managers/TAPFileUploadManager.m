@@ -313,19 +313,19 @@
                 if (obtainedMesage != nil) {
                     
                     //Update isFailedSend to 1 and isSending to 0
-                    [TAPDataManager updateMessageToFailedWithLocalID:currentMessage.localID];
-                    
-                    //Remove from waiting upload dictionary
-                    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
+                    [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
                     
                     //Remove first object
-                    [uploadQueueRoomArray removeObjectAtIndex:0];
-                    
-                    if ([uploadQueueRoomArray count] == 0) {
-                        [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
-                    }
-                    else {
-                        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
+                    if ([uploadQueueRoomArray count] > 0) {
+                        
+                        [uploadQueueRoomArray removeObjectAtIndex:0];
+                        
+                        if ([uploadQueueRoomArray count] == 0) {
+                            [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
+                        }
+                        else {
+                            [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
+                        }
                     }
                 }
                 
@@ -404,6 +404,9 @@
         //Remove from waiting upload dictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
 
+        //Save file path to cache
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:currentMessage.room.roomID fileID:fileID];
+        
         //Send emit
         [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
 
@@ -484,20 +487,20 @@
         if (obtainedMesage != nil) {
             
             //Update isFailedSend to 1 and isSending to 0
-            [TAPDataManager updateMessageToFailedWithLocalID:currentMessage.localID];
-            
-            //Remove from waiting upload dictionary
-            [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
-            
+            [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
+
             //Remove first object
-            [uploadQueueRoomArray removeObjectAtIndex:0];
-            
-            if ([uploadQueueRoomArray count] == 0) {
-                [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
+            if ([uploadQueueRoomArray count] > 0) {
+                [uploadQueueRoomArray removeObjectAtIndex:0];
+                
+                if ([uploadQueueRoomArray count] == 0) {
+                    [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
+                }
+                else {
+                    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
+                }
             }
-            else {
-                [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
-            }
+           
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
@@ -712,6 +715,18 @@
                 obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
                 if (obtainedDictionary == nil) {
                     obtainedDictionary = [NSMutableDictionary dictionary];
+                    
+                    if ([uploadQueueRoomArray count] > 0) {
+                        //Remove first object
+                        [uploadQueueRoomArray removeObjectAtIndex:0];
+                        
+                        if ([uploadQueueRoomArray count] == 0) {
+                            [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
+                        }
+                        else {
+                            [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
+                        }
+                    }
                 }
                 
                 [obtainedDictionary setObject:currentMessage forKey:@"message"];
@@ -730,12 +745,8 @@
                 
                 TAPMessageModel *obtainedMesage = [[TAPChatManager sharedManager] getMessageFromWaitingUploadDictionaryWithKey:currentMessage.localID];
                 if (obtainedMesage != nil) {
-                    
                     //Update isFailedSend to 1 and isSending to 0
-                    [TAPDataManager updateMessageToFailedWithLocalID:currentMessage.localID];
-                    
-                    //Remove from waiting upload dictionary
-                    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
+                    [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
                 }
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
@@ -982,10 +993,19 @@
                     if (obtainedMesage != nil) {
                         
                         //Update isFailedSend to 1 and isSending to 0
-                        [TAPDataManager updateMessageToFailedWithLocalID:resultMessage.localID];
+                        [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
                         
-                        //Remove from waiting upload dictionary
-                        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
+                        if ([uploadQueueRoomArray count] > 0) {
+                            //Remove first object
+                            [uploadQueueRoomArray removeObjectAtIndex:0];
+                            
+                            if ([uploadQueueRoomArray count] == 0) {
+                                [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
+                            }
+                            else {
+                                [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
+                            }
+                        }
                     }
                     
                     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
@@ -1281,6 +1301,19 @@
 - (PHAsset *)getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:(NSString *)assetIdentifier {
     PHAsset *obtainedAsset = [self.pendingUploadAssetDictionary objectForKey:assetIdentifier];
     return obtainedAsset;
+}
+
+- (void)clearFileUploadManagerData {
+    [self.uploadQueueDictionary removeAllObjects];
+    [self.uploadProgressDictionary removeAllObjects];
+    [self.pendingUploadAssetDictionary removeAllObjects];
+}
+
+- (BOOL)isUploadingFile {
+    if ([self.pendingUploadAssetDictionary count] > 0 || [self.uploadQueueDictionary count] > 0 || [self.uploadProgressDictionary count] > 0) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

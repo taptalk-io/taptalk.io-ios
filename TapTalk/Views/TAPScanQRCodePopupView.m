@@ -149,7 +149,7 @@
         [self.whiteBaseView addSubview:self.addedUserFullnameLabel];
         
         _selfInformedLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserFullnameLabel.frame) + self.selfInformedLabelTopGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 18.0f)];
-        self.selfInformedLabel.text = NSLocalizedString(@"This is you!", @"");
+        self.selfInformedLabel.text = NSLocalizedString(@"This is you", @"");
         self.selfInformedLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
         self.selfInformedLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
         self.selfInformedLabel.textAlignment = NSTextAlignmentCenter;
@@ -314,7 +314,7 @@
     }
     else if (type == ScanQRCodePopupViewTypeNewFriend) {
         //First time add user, showing icon add friend
-        NSString *localizedTemplateSuccessHeaderString = NSLocalizedString(@"You have added ", @"");
+        NSString *localizedTemplateSuccessHeaderString = NSLocalizedString(@"You have added", @"");
         NSString *localizedTemplateSuccessFooterString = NSLocalizedString(@"to your contacts", @"");
         self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@ %@", localizedTemplateSuccessHeaderString, addedUserFullName, localizedTemplateSuccessFooterString];
         
@@ -326,11 +326,11 @@
         [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_BLACK_19] forKey:NSForegroundColorAttributeName];
         [attributesDictionary setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
         
-        NSMutableAttributedString *addedUserUsernameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
-        NSRange addedUsernameRange = [self.successAddContactLabel.text rangeOfString:addedUserUsername];
-        [addedUserUsernameAttributedString addAttributes:attributesDictionary
-                                                   range:addedUsernameRange];
-        self.successAddContactLabel.attributedText = addedUserUsernameAttributedString;
+        NSMutableAttributedString *addedUserFullnameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
+        NSRange addedFullnameRange = [self.successAddContactLabel.text rangeOfString:addedUserFullName];
+        [addedUserFullnameAttributedString addAttributes:attributesDictionary
+                                                   range:addedFullnameRange];
+        self.successAddContactLabel.attributedText = addedUserFullnameAttributedString;
         
         self.successAddContactLabel.textAlignment = NSTextAlignmentCenter;
         
@@ -348,11 +348,11 @@
         [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_BLACK_19] forKey:NSForegroundColorAttributeName];
         [attributesDictionary setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
         
-        NSMutableAttributedString *addedUserUsernameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
-        NSRange addedUsernameRange = [self.successAddContactLabel.text rangeOfString:addedUserUsername];
-        [addedUserUsernameAttributedString addAttributes:attributesDictionary
-                                                   range:addedUsernameRange];
-        self.successAddContactLabel.attributedText = addedUserUsernameAttributedString;
+        NSMutableAttributedString *addedUserFullnameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
+        NSRange addedFullnameRange = [self.successAddContactLabel.text rangeOfString:addedUserFullName];
+        [addedUserFullnameAttributedString addAttributes:attributesDictionary
+                                                   range:addedFullnameRange];
+        self.successAddContactLabel.attributedText = addedUserFullnameAttributedString;
         
         self.successAddContactLabel.textAlignment = NSTextAlignmentCenter;
         

@@ -150,6 +150,9 @@
     //Update to isFailedSend = 1
     [[TAPChatManager sharedManager] updateSendingMessageToFailed];
     
+    //Obtain downloaded file path from preference
+    [[TAPFileDownloadManager sharedManager] fetchDownloadedFilePathFromPreference];
+    
     //Clean database message that is more than 1 month old every 1 week.
     [TAPOldDataManager runCleaningOldDataSequence];
     
@@ -161,6 +164,9 @@
     
     //Populate User Country Code
     [[TAPContactManager sharedManager] populateContactFromDatabase];
+    
+    //Set Default user agent as "ios"
+    [[TapTalk sharedInstance] setUserAgent:@"ios"];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -535,6 +541,14 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)openRoomWithRoom:(TAPRoomModel *)room
 fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated {
+    
+    [self openRoomWithRoom:room scrollToMessageWithLocalID:nil fromNavigationController:navigationController animated:isAnimated];
+}
+
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+scrollToMessageWithLocalID:(NSString *)messageLocalID
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated {
     [[TAPChatManager sharedManager] openRoom:room];
     
     //Save all unsent message (in case user retrieve message on another room)
@@ -544,6 +558,7 @@ fromNavigationController:(UINavigationController *)navigationController
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
     chatViewController.hidesBottomBarWhenPushed = YES;
+    chatViewController.scrollToMessageLocalIDString = messageLocalID;
     [navigationController pushViewController:chatViewController animated:isAnimated];
 }
 
@@ -756,6 +771,13 @@ fromNavigationController:(UINavigationController *)navigationController
 //Other
 - (void)logoutAndClearAllData {
     
+    [[TapTalk sharedInstance] clearAllData];
+    
+    TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
+    [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
+}
+
+- (void)clearAllData {
     //Delete all data in database
     [TAPDatabaseManager deleteAllDataInDatabaseWithSuccess:^{
         
@@ -782,8 +804,16 @@ fromNavigationController:(UINavigationController *)navigationController
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
-    [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
+    //Clear Manager Data
+    [[TAPChatManager sharedManager] clearChatManagerData];
+    [[TAPContactManager sharedManager] clearContactManagerData];
+    [[TAPFetchMediaManager sharedManager] clearFetchMediaManagerData];
+    [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
+    [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
+    [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
+    
+    //Disconnect Socket
+    [[TAPChatManager sharedManager] disconnect];
 }
 
 //TapTalk Internal Usage Method

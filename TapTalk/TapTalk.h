@@ -147,6 +147,10 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)openRoomWithRoom:(TAPRoomModel *)room
 fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated;
+- (void)openRoomWithRoom:(TAPRoomModel *)room
+scrollToMessageWithLocalID:(NSString *)messageLocalID
+fromNavigationController:(UINavigationController *)navigationController
+                animated:(BOOL)isAnimated;
 - (void)shouldRefreshAuthTicket;
 - (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 - (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
@@ -170,6 +174,7 @@ fromNavigationController:(UINavigationController *)navigationController
 
 //Other
 - (void)logoutAndClearAllData;
+- (void)clearAllData;
 
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;

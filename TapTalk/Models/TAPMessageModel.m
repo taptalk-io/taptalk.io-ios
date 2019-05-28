@@ -13,7 +13,7 @@
 #pragma mark - Lifecycle
 
 #pragma mark - Custom Method
-+ (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type {
++ (instancetype)createMessageWithUser:(TAPUserModel *)user created:(NSNumber *)created room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type {
     TAPMessageModel *messageForReturn = [[TAPMessageModel alloc] init];
     
     //DV Note - Set message ID to string 0 because server accepted as an integer, so empty string will cause a trouble in server
@@ -25,12 +25,14 @@
     messageForReturn.type = type;
     messageForReturn.body = body;
     messageForReturn.localID = [messageForReturn generateLocalIDwithLength:32];
+    messageForReturn.created = created;
     messageForReturn.isSending = YES;
     messageForReturn.isDeleted = NO;
     messageForReturn.isFailedSend = NO;
     messageForReturn.isRead = NO;
     messageForReturn.isDelivered = NO;
     messageForReturn.isHidden = NO;
+    
     
     //Obtain other user ID
     NSString *roomID = room.roomID;
@@ -52,10 +54,16 @@
     //If group, recipient ID is group ID
     messageForReturn.recipientID = otherUserID;
     
+    return messageForReturn;
+}
+
++ (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type {
     NSDate *date = [NSDate date];
     double createdDate = [date timeIntervalSince1970] * 1000.0f;
-    messageForReturn.created = [NSNumber numberWithLong:createdDate];
+    NSNumber *createdDateNumber = [NSNumber numberWithLong:createdDate];
     
+    TAPMessageModel *messageForReturn = [[TAPMessageModel alloc] init];
+    messageForReturn = [self createMessageWithUser:user created:createdDateNumber room:room body:body type:type];
     return messageForReturn;
 }
 
