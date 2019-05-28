@@ -14,7 +14,7 @@
 #import "TAPContactTableViewCell.h"
 #import "TAPSearchResultMessageTableViewCell.h"
 
-@interface TAPSearchViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface TAPSearchViewController () <UITableViewDataSource, UITableViewDelegate, TAPSearchBarViewDelegate>
 
 @property (strong, nonatomic) TAPSearchView *searchView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
@@ -65,8 +65,7 @@
     
     //TitleView
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(-55.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, 30.0f)];
-    self.searchBarView.searchTextField.delegate = self;
-    self.searchBarView.searchTextField.layer.cornerRadius = 10.0f;
+    self.searchBarView.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
     [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray) {
@@ -304,7 +303,7 @@
             //MESSAGES
             TAPMessageModel *selectedMessage = [self.searchResultMessageArray objectAtIndex:indexPath.row];
             TAPRoomModel *selectedRoom = selectedMessage.room;
-            [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController animated:YES];
+            [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom scrollToMessageWithLocalID:selectedMessage.localID fromNavigationController:self.navigationController animated:YES];
         }
     }
 }
@@ -314,8 +313,8 @@
     [self.searchBarView.searchTextField resignFirstResponder];
 }
 
-#pragma mark UITextField
-- (BOOL)textFieldShouldClear:(UITextField *)textField {
+#pragma mark TAPSearchBarView
+- (BOOL)searchBarTextFieldShouldClear:(UITextField *)textField {
     [self.searchResultMessageArray removeAllObjects];
     [self.searchResultChatAndContactArray removeAllObjects];
     [self.searchResultUnreadCountArray removeAllObjects];
@@ -331,11 +330,11 @@
     return YES;
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldReturn:(UITextField *)textField {
     return NO;
 }
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+- (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
@@ -398,6 +397,7 @@
 
 #pragma mark - Custom Method
 - (void)cancelButtonDidTapped {
+    [self.searchBarView handleCancelButtonTappedState];
     [self.searchBarView.searchTextField resignFirstResponder];
     
     self.searchBarView.searchTextField.text = @"";

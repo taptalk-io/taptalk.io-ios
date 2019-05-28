@@ -120,6 +120,7 @@
 
 #pragma mark - Custom Method
 - (void)searchBarCancelButtonDidTapped {
+    [self.searchBarView handleCancelButtonTappedState];
     [self showOverlayView:NO];
     
     [UIView animateWithDuration:0.3f animations:^{

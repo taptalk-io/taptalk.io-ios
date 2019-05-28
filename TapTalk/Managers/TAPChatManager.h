@@ -29,6 +29,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 @optional
 
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message;
+- (void)chatManagerDidAddUnreadMessageIdentifier:(TAPMessageModel *)message indexPosition:(NSInteger)index;
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message;
@@ -82,6 +83,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room;
+- (void)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;
@@ -109,5 +111,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (TAPMessageModel *)getMessageFromWaitingUploadDictionaryWithKey:(NSString *)localID;
 - (NSString *)getOtherUserIDWithRoomID:(NSString *)roomID;
 - (void)checkAndSendForwardedMessageWithRoom:(TAPRoomModel *)room;
+- (void)updateMessageToFailedWithLocalID:(NSString *)localID;
+- (void)clearChatManagerData;
 
 @end

@@ -266,7 +266,7 @@
 
 
     } failure:^(NSError *error) {
-        _isLoading = NO;
+        _isLoading = NO; 
         [self.verificationOTPView showLoading:NO animated:NO title:@""];
         [self.verificationOTPView setVerificationInformationAsInvalidOTP:YES];
     }];

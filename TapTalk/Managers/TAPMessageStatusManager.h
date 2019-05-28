@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)hasPendingProcess;
 - (NSInteger)getReadCountAndClearDictionaryForRoomID:(NSString *)roomID;
 - (void)clearReadCountDictionary;
+- (void)clearMessageStatusManagerData;
 
 @end
 

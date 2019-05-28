@@ -18,7 +18,7 @@
 
 #define kMaxGroupMember 50 - 1 //1 is group admin.
 
-@interface TAPNewGroupViewController () <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource>
+@interface TAPNewGroupViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, TAPSearchBarViewDelegate>
 @property (strong, nonatomic) TAPCreateGroupView *createGroupView;
 
 @property (strong, nonatomic) NSArray *alphabetSectionTitles;
@@ -41,7 +41,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.createGroupView.searchBarView.searchTextField.delegate = self;
+    self.createGroupView.searchBarView.delegate = self;
     
     self.createGroupView.contactsTableView.delegate = self;
     self.createGroupView.contactsTableView.dataSource = self;
@@ -942,8 +942,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 //    [self.createGroupView.contactsTableView reloadRowsAtIndexPaths:@[selectedIndexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 
-#pragma mark TextField
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+#pragma mark TAPCreateGroupView
+- (BOOL)searchBarTextFieldShouldBeginEditing:(UITextField *)textField {
     if (textField == self.createGroupView.searchBarView.searchTextField) {
         [self.createGroupView showOverlayView:YES];
         [UIView animateWithDuration:0.3f animations:^{
@@ -963,7 +963,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     return YES;
 }
 
-- (BOOL)textFieldShouldClear:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldClear:(UITextField *)textField {
     [self.createGroupView showOverlayView:YES];
     [UIView animateWithDuration:0.2f animations:^{
         self.createGroupView.searchResultTableView.alpha = 0.0f;
@@ -973,7 +973,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     return YES;
 }
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+- (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     
     if ([newString length] <= 0) {

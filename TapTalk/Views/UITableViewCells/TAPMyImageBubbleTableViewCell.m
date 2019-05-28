@@ -17,6 +17,7 @@
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *progressBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
+@property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet TAPImageView *thumbnailBubbleImageView;
@@ -41,6 +42,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconLeftConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconBottomConstraint;
@@ -108,6 +112,7 @@
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote;
+- (void)setBubbleCellColor;
 
 @end
 
@@ -175,6 +180,8 @@
     self.captionLabel.tapDelegate = self;
     self.captionLabel.longPressDelegate = self;
     self.captionLabel.longPressDuration = 0.05f;
+    
+    [self setBubbleCellColor];
 }
 
 - (void)prepareForReuse {
@@ -283,6 +290,22 @@
 }
 
 #pragma mark - Custom Method
+- (void)setBubbleCellColor {
+    self.bubbleView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+    self.quoteView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
+    self.replyInnerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
+    self.replyView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_45];
+    
+    self.replyNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.replyMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.quoteTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.quoteSubtitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.forwardTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    self.forwardFromLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    
+    self.captionLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+}
+
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
     
@@ -435,6 +458,92 @@
 
 - (void)receiveReadEvent {
     [super receiveReadEvent];
+}
+
+- (void)showStatusLabel:(BOOL)show {
+    if (show) {
+        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
+        
+        NSDate *currentDate = [NSDate date];
+        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+        
+        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
+        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+        
+        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+        
+        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+        
+        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
+        NSString *lastMessageDateString = @"";
+        if (timeGap <= midnightTimeGap) {
+            //Today
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"HH:mm";
+            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+        }
+        else if (timeGap <= 86400.0f + midnightTimeGap) {
+            //Yesterday
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"HH:mm";
+            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+        }
+        else {
+            //Set date
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
+            
+            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+        }
+        
+        NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+        self.statusLabel.text = statusString;
+        
+        if (self.message.isFailedSend) {
+            NSString *failedStatusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
+            self.statusLabel.text = failedStatusString;
+        }
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            self.statusLabel.alpha = 1.0f;
+            self.statusLabelTopConstraint.constant = 2.0f;
+            self.statusLabelHeightConstraint.constant = 13.0f;
+            self.replyButtonRightConstraint.constant = 2.0f;
+            
+            if (self.message.isFailedSend) {
+                self.statusIconImageView.alpha = 0.0f;
+                self.replyButton.alpha = 0.0f;
+            }
+            else {
+                self.statusIconImageView.alpha = 1.0f;
+                self.replyButton.alpha = 1.0f;
+            }
+            
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
+        } completion:^(BOOL finished) {
+        }];
+    }
+    else {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.statusLabel.alpha = 0.0f;
+            self.statusLabelTopConstraint.constant = 0.0f;
+            self.statusLabelHeightConstraint.constant = 0.0f;
+            self.replyButton.alpha = 0.0f;
+            self.replyButtonRightConstraint.constant = -28.0f;
+            self.statusIconImageView.alpha = 1.0f;
+            [self.contentView layoutIfNeeded];
+            [self layoutIfNeeded];
+        } completion:^(BOOL finished) {
+        }];
+    }
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
@@ -864,7 +973,14 @@
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
-        self.replyNameLabel.text = message.quote.title;
+        //check id message sender is equal to active user id, if yes change the title to "You"
+        if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            self.replyNameLabel.text = NSLocalizedString(@"You", @"");
+        }
+        else {
+            self.replyNameLabel.text = message.quote.title;
+        }
+
         self.replyMessageLabel.text = message.quote.content;
         self.replyViewHeightContraint.constant = 60.0f;
         self.replyViewBottomConstraint.constant = 10.0f;
@@ -939,6 +1055,12 @@
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
     
     NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    
+    //check id message sender is equal to active user id, if yes change the title to "You"
+    if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        appendedFullnameString = NSLocalizedString(@"From: You", @"");
+    }
+    
     self.forwardFromLabel.text = appendedFullnameString;
     
     NSMutableAttributedString *attributedText =

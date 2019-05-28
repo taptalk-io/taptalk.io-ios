@@ -50,6 +50,19 @@
                       ascending:(BOOL)isAscending
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
                         failure:(void (^)(NSError *error))failure;
++ (void)getAllMessageWithRoomID:(NSString *)roomID
+                          query:(NSString *)query
+                      sortByKey:(NSString *)columnName
+                      ascending:(BOOL)isAscending
+                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                        failure:(void (^)(NSError *error))failure;
++ (void)getAllMessageWithRoomID:(NSString *)roomID
+                   messageTypes:(NSArray *)messageTypeArray
+             minimumDateCreated:(NSTimeInterval)minCreated
+                      sortByKey:(NSString *)columnName
+                      ascending:(BOOL)isAscending
+                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                        failure:(void (^)(NSError *error))failure;
 + (void)getRoomListSuccess:(void (^)(NSArray *resultArray))success
                    failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray))success

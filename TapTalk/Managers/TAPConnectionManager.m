@@ -14,9 +14,9 @@
 #define kSocketURLStaging @"wss://hp-staging.moselo.com/connect"
 #define kSocketURLProduction @"wss://taptalk-production.moselo.com/connect"
 
-//#define kSocketURLDevelopment @"wss://engine-dev.taptalk.io:8080/pigeon"
-//#define kSocketURLStaging @"wss://engine-staging.taptalk.io:8080/pigeon"
-//#define kSocketURLProduction @"wss://engine.taptalk.io:8080/pigeon"
+//#define kSocketURLDevelopment @"wss://engine-dev.taptalk.io/connect"
+//#define kSocketURLStaging @"wss://engine-staging.taptalk.io/connect"
+//#define kSocketURLProduction @"wss://engine.taptalk.io/connect"
 
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f
@@ -286,7 +286,7 @@
 - (void)validateToken {
     NSString *accessToken = [TAPDataManager getAccessToken];
 
-    if (accessToken == nil || [accessToken isEqualToString:@""]) {
+        if (accessToken == nil || [accessToken isEqualToString:@""]) {
         return;
     }
     

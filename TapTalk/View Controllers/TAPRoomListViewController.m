@@ -21,7 +21,7 @@
 
 #import "TAPLoginViewController.h" //DV Temp
 
-@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate>
+@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate, TAPMyAccountViewControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
 @property (strong, nonatomic) TAPRoomListView *roomListView;
@@ -48,6 +48,7 @@
 - (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage;
 - (void)updateCellDataAtIndexPath:(NSIndexPath *)indexPath updateUnreadBubble:(BOOL)updateUnreadBubble;
 - (void)openNewChatViewController;
+- (void)hideSetupViewWithDelay:(double)delayTime;
 
 @end
 
@@ -85,6 +86,7 @@
     _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
     self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds)/2.0f;
     self.profileImageView.clipsToBounds = YES;
+    self.profileImageView.contentMode = UIViewContentModeScaleAspectFit;
     [self.leftBarButton addSubview:self.profileImageView];
     
     self.leftBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 8.0f);
@@ -103,7 +105,6 @@
     
     //TitleView
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
-    self.searchBarView.searchTextField.layer.cornerRadius = 10.0f;
     self.searchBarView.searchTextField.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
@@ -452,9 +453,17 @@
     }];
 }
 
+#pragma mark - TAPMyAccountViewController
+- (void)myAccountViewControllerDidTappedLogoutButton {
+    [self.roomListArray removeAllObjects];
+    [self.roomListDictionary removeAllObjects];
+    [self.roomListView.roomListTableView reloadData];
+}
+
 #pragma mark - Custom Method
 - (void)leftBarButtonDidTapped {
     TAPMyAccountViewController *myAccountViewController = [[TAPMyAccountViewController alloc] init];
+    myAccountViewController.delegate = self;
     UINavigationController *myAccountNavigationController = [[UINavigationController alloc] initWithRootViewController:myAccountViewController];
     [self presentViewController:myAccountNavigationController animated:YES completion:nil];
 }
@@ -503,9 +512,12 @@
     //Check if should show first loading view
     BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
     if (!isDoneFirstSetup) {
-        [self.setupRoomListView showFirstLoadingView:YES];
+        [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeSettingUp];
+        [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeSettingUp];
     }
     
+    NSLog(@"ACTIVE USER: %@", [[TAPChatManager sharedManager].activeUser description]);
+    NSLog(@"DATA MANAGER ACTIVE USER: %@", [[TAPDataManager getActiveUser] description]);
     if ([TAPChatManager sharedManager].activeUser == nil) {
         
         //Refresh auth ticket
@@ -546,7 +558,7 @@
             });
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.setupRoomListView showFirstLoadingView:NO];
+                [self hideSetupViewWithDelay:0.0f];
             });
         }];
     });
@@ -569,7 +581,7 @@
             [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.setupRoomListView showFirstLoadingView:NO];
+                [self hideSetupViewWithDelay:0.0f];
             });
         }];
         
@@ -606,7 +618,8 @@
 - (void)reloadLocalDataAndUpdateUILogicAnimated:(BOOL)animated {
     [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.setupRoomListView showFirstLoadingView:NO];
+            [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeSuccess];
+            [self hideSetupViewWithDelay:0.5f];
             [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
             [[NSUserDefaults standardUserDefaults] synchronize];
             
@@ -842,6 +855,13 @@
     TAPRoomListTableViewCell *cell = [self.roomListView.roomListTableView cellForRowAtIndexPath:indexPath];
     TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
     [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:updateUnreadBubble];
+    
+    //Check message draft
+    NSString *draftMessage = [[TAPChatManager sharedManager] getMessageFromDraftWithRoomID:roomList.lastMessage.room.roomID];
+    draftMessage = [TAPUtil nullToEmptyString:draftMessage];
+    if (![draftMessage isEqualToString:@""]) {
+        [cell showMessageDraftWithMessage:draftMessage];
+    }
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
@@ -865,12 +885,12 @@
     addNewChatViewController.delegate = self;
     UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
     [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
-    
-    //DV Temp
-    //    TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
-    //    UINavigationController *loginNavigationController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
-    //    [self presentViewController:loginNavigationController animated:YES completion:nil];
-    //END DV Temp
+}
+
+- (void)hideSetupViewWithDelay:(double)delayTime {
+    [TAPUtil delayCallback:^{
+        [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeSuccess];
+    } forTotalSeconds:delayTime];
 }
 
 @end

@@ -475,6 +475,11 @@
     [self showFinishSavingImageState];
 }
 
+//Override completionSelector method of save video to gallery
+- (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [self showFinishSavingImageState];
+}
+
 - (void)showFinishSavingImageState {
     [self.mediaDetailView setSaveLoadingAsFinishedState:YES];
     [self performSelector:@selector(removeSaveImageLoadingView) withObject:nil afterDelay:1.0f];

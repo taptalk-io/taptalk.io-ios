@@ -13,11 +13,10 @@
 @property (strong, nonatomic) TAPImageView *videoIndicatorImageView;
 @property (strong, nonatomic) UILabel *infoLabel;
 
-@property (strong, nonatomic) UIVisualEffectView *blurView;
-
 @property (strong, nonatomic) UIView *downloadButtonView;
 @property (strong, nonatomic) UIView *progressView;
 @property (strong, nonatomic) UIView *progressBarView;
+@property (strong, nonatomic) UIView *bottomGradientView;
 
 @property (strong, nonatomic) UIButton *downloadButton;
 @property (strong, nonatomic) UIButton *cancelButton;
@@ -54,13 +53,18 @@
         _imageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.imageView.clipsToBounds = YES;
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;
-        self.thumbnailImageView.alpha = 0.0f;
+        self.imageView.backgroundColor = [UIColor clearColor];
         [self.contentView addSubview:self.imageView];
         
-        UIVisualEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
-        _blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-        self.blurView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.imageView.bounds), CGRectGetHeight(self.imageView.bounds));
-        [self.contentView addSubview:self.blurView];
+        _bottomGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(frame)/2, CGRectGetWidth(frame), CGRectGetHeight(frame)/2)];
+        self.bottomGradientView.backgroundColor = [UIColor clearColor];
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = self.bottomGradientView.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"04040F"].CGColor, (id)[UIColor clearColor].CGColor, nil];
+        gradient.startPoint = CGPointMake(0.0f, 1.0f);
+        gradient.endPoint = CGPointMake(0.0f, 0.0f);
+        [self.bottomGradientView.layer insertSublayer:gradient atIndex:0];
+        [self.contentView addSubview:self.bottomGradientView];
         
         _downloadButtonView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(frame) - 48.0f)/2, (CGRectGetWidth(frame) - 48.0f)/2, 48.0f, 48.0f)];
         self.downloadButtonView.backgroundColor = [[TAPUtil getColor:@"04040F"] colorWithAlphaComponent:0.4f];
@@ -136,8 +140,7 @@
     NSDictionary *dataDictionary = message.data;
     
     if (![thumbnailImageString isEqualToString:@""]) {
-        NSData *thumbnailImageData = [[NSData alloc]
-                                      initWithBase64EncodedString:thumbnailImageString options:0];
+      NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageString options:NSDataBase64DecodingIgnoreUnknownCharacters];
         UIImage *thumbnailImage = [UIImage imageWithData:thumbnailImageData];
         self.thumbnailImageView.image = thumbnailImage;
     }
@@ -147,20 +150,23 @@
     }
     else if (message.type == TAPChatMessageTypeVideo) {
         self.videoIndicatorImageView.alpha = 1.0f;
+        self.bottomGradientView.alpha = 1.0f;
     }
 }
 
 - (void)animateFinishedDownloadingMedia {
-    self.lastProgress = 0.0f;
-    self.progressLayer.strokeEnd = 0.0f;
-    self.progressLayer.strokeStart = 0.0f;
-    [self.progressLayer removeAllAnimations];
 
-    _progressLayer = nil;
-
+    [self animateProgressDownloadingMediaWithProgress:1.0f total:1.0f];
+    
     [UIView animateWithDuration:0.2f animations:^{
-        self.blurView.alpha = 0.0f;
         self.progressView.alpha = 0.0f;
+    } completion:^(BOOL finished) {
+        [self.progressLayer removeAllAnimations];
+        self.lastProgress = 0.0f;
+        self.progressLayer.strokeEnd = 0.0f;
+        self.progressLayer.strokeStart = 0.0f;
+        
+        _progressLayer = nil;
     }];
 }
 
@@ -235,32 +241,33 @@
 - (void)setAsDownloaded {
     [self showDownloadButtonView:NO];
     [self showProgressView:NO];
+    if (self.currentMessage.type == TAPChatMessageTypeImage) {
+        self.bottomGradientView.alpha = 0.0f;
+        self.infoLabel.alpha = 0.0f;
+    }
 }
 
 - (void)showDownloadButtonView:(BOOL)show {
     if (show) {
-        self.blurView.alpha = 1.0f;
         self.downloadButtonView.alpha = 1.0f;
     }
     else {
-        self.blurView.alpha = 0.0f;
         self.downloadButtonView.alpha = 0.0f;
     }
 }
 
 - (void)showProgressView:(BOOL)show {
     if (show) {
-        self.blurView.alpha = 1.0f;
         self.progressView.alpha = 1.0f;
     }
     else {
-        self.blurView.alpha = 0.0f;
         self.progressView.alpha = 0.0f;
     }
 }
 
 - (void)setInitialAnimateDownloadingMedia {
     
+    [self showDownloadButtonView:NO];
     self.progressView.alpha = 1.0f;
     
     // borderWidth is a float representing a value used as a margin (outer border).
@@ -284,6 +291,8 @@
 - (void)setAsNotDownloaded {
     [self showProgressView:NO];
     [self showDownloadButtonView:YES];
+    self.infoLabel.alpha = 1.0f;
+    self.bottomGradientView.alpha = 1.0f;
 }
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
@@ -305,7 +314,7 @@
             NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
             UIImage *image = [UIImage imageWithData:thumbnailImageData];
             if (image != nil) {
-                self.imageView.image = image;
+                self.thumbnailImageView.image = image;
             }
         }
     }];

@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, TAPChatViewControllerType) {
 @property (weak, nonatomic) id<TAPChatViewControllerDelegate> delegate;
 @property (nonatomic) TAPChatViewControllerType chatViewControllerType;
 @property (strong, nonatomic) TAPRoomModel *currentRoom;
+@property (strong, nonatomic) NSString *scrollToMessageLocalIDString;
 
 - (void)setChatViewControllerType:(TAPChatViewControllerType)chatViewControllerType;
 

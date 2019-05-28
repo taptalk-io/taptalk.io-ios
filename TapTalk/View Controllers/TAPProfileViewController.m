@@ -30,6 +30,11 @@
 - (void)fetchImageDataWithMessage:(TAPMessageModel *)message;
 - (void)fetchVideoDataWithMessage:(TAPMessageModel *)message;
 
+- (void)fileDownloadManagerProgressNotification:(NSNotification *)notification;
+- (void)fileDownloadManagerStartNotification:(NSNotification *)notification;
+- (void)fileDownloadManagerFinishNotification:(NSNotification *)notification;
+- (void)fileDownloadManagerFailureNotification:(NSNotification *)notification;
+
 @end
 
 @implementation TAPProfileViewController
@@ -82,6 +87,18 @@
     } failure:^(NSError *error) {
         
     }];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerProgressNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerStartNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFinishNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFailureNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
 }
 
 #pragma mark - Data Source
@@ -205,20 +222,34 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
                 currentFileID = [TAPUtil nullToEmptyString:currentFileID];
                 
+                NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+         
                 //Check image exist in cache
                 if (savedImage != nil) {
                     //Image exist
                     //set as downloaded
                     //set image
                     [cell setImageCollectionViewCellImageWithImage:savedImage];
+                    [cell setAsDownloaded];
+                    [cell setInfoLabelWithString:@""];
+                }
+                //Check image is downloading
+                else if (progressDictionary != nil) {
+                    
+                    CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
+                    CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
+                    [cell setInitialAnimateDownloadingMedia];
+                    
                     NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
                     [cell setInfoLabelWithString:fileSize];
-                    [cell setAsDownloaded];
-
+                    
+                    [cell animateProgressDownloadingMediaWithProgress:progress total:total];
                 }
                 else {
                     //Image not exist in cache
                     //if not show download button
+                    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+                    [cell setInfoLabelWithString:fileSize];
                     [cell setAsNotDownloaded];
                 }
             }];
@@ -229,7 +260,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
             NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
             
-            [cell setInfoLabelWithString:videoDurationString];
+            NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
             
             //Check video exist in cache
             NSDictionary *dataDictionary = message.data;
@@ -240,13 +271,27 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //Check video is done downloaded or not
             NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
             
+            NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+       
+            
             if ([filePath isEqualToString:@""] || filePath == nil) {
                 //File not exist, download file
                 [cell setAsNotDownloaded];
+                [cell setInfoLabelWithString:fileSize];
+            }
+            else if (progressDictionary != nil) {
+                //File is in downloading progress
+                CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
+                CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
+                [cell setInitialAnimateDownloadingMedia];
+                [cell setInfoLabelWithString:fileSize];
+                [cell animateProgressDownloadingMediaWithProgress:progress total:total];
             }
             else {
                 //File exist, show downloaded file
+                [cell setInfoLabelWithString:videoDurationString];
                 [cell setAsDownloaded];
+                [cell setThumbnailImageForVideoWithMessage:message];
             }
         }
         
@@ -392,8 +437,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSString *fileID = [dataDictionary objectForKey:@"fileID"];
             fileID = [TAPUtil nullToEmptyString:fileID];
             
-            if (![fileID isEqualToString:@""]) {
-                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:fileID];
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:fileID];
+            
+            if (![fileID isEqualToString:@""] && filePath != nil) {
                 NSURL *url = [NSURL fileURLWithPath:filePath];
                 AVAsset *asset = [AVAsset assetWithURL:url];
                 
@@ -516,6 +562,182 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Custom Method
+#pragma mark Download Notification
+- (void)fileDownloadManagerProgressNotification:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+        
+        TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+        
+        NSString *roomID = obtainedMessage.room.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
+        
+        TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+        NSString *currentActiveRoomID = currentRoom.roomID;
+        currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+        
+        if (![roomID isEqualToString:currentActiveRoomID]) {
+            return;
+        }
+        
+        NSString *localID = obtainedMessage.localID;
+        localID = [TAPUtil nullToEmptyString:localID];
+        
+        NSString *progressString = [notificationParameterDictionary objectForKey:@"progress"];
+        CGFloat progress = [progressString floatValue];
+        
+        NSString *totalString = [notificationParameterDictionary objectForKey:@"total"];
+        CGFloat total = [totalString floatValue];
+        
+        TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+        NSArray *messageArray = [self.mediaMessageDataArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+        
+        TAPChatMessageType type = currentMessage.type;
+        TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+        if (type == TAPChatMessageTypeImage) {
+            [cell animateProgressDownloadingMediaWithProgress:progress total:total];
+        }
+        else if (type == TAPChatMessageTypeVideo) {
+            [cell animateProgressDownloadingMediaWithProgress:progress total:total];
+        }
+    });
+}
+
+- (void)fileDownloadManagerStartNotification:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+        
+        TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+        
+        NSString *roomID = obtainedMessage.room.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
+        
+        TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+        NSString *currentActiveRoomID = currentRoom.roomID;
+        currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+        
+        if (![roomID isEqualToString:currentActiveRoomID]) {
+            return;
+        }
+        
+        NSString *localID = obtainedMessage.localID;
+        localID = [TAPUtil nullToEmptyString:localID];
+        
+        TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+        NSArray *messageArray = [self.mediaMessageDataArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+        
+        TAPChatMessageType type = currentMessage.type;
+        TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+
+        if (type == TAPChatMessageTypeImage) {
+            [cell setInitialAnimateDownloadingMedia];
+        }
+        else if (type == TAPChatMessageTypeVideo) {
+            [cell setInitialAnimateDownloadingMedia];
+        }
+    });
+}
+
+- (void)fileDownloadManagerFinishNotification:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+        
+        TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+        
+        NSString *roomID = obtainedMessage.room.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
+        
+        TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+        NSString *currentActiveRoomID = currentRoom.roomID;
+        currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+        
+        if (![roomID isEqualToString:currentActiveRoomID]) {
+            return;
+        }
+        
+        NSString *localID = obtainedMessage.localID;
+        localID = [TAPUtil nullToEmptyString:localID];
+        
+        TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+        NSArray *messageArray = [self.mediaMessageDataArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+        
+        TAPChatMessageType type = currentMessage.type;
+        
+        TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+        
+        if (type == TAPChatMessageTypeImage) {
+            UIImage *fullImage = [notificationParameterDictionary objectForKey:@"fullImage"];
+
+            if (fullImage != nil) {
+                [cell setImageCollectionViewCellImageWithImage:fullImage];
+            }
+            [cell animateFinishedDownloadingMedia];
+            [cell setAsDownloaded];
+            [cell setInfoLabelWithString:@""];
+        }
+        else if (type == TAPChatMessageTypeVideo) {
+            [cell animateFinishedDownloadingMedia];
+            [cell setAsDownloaded];
+            NSNumber *duration = [currentMessage.data objectForKey:@"duration"];
+            NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
+            NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+            [cell setInfoLabelWithString:videoDurationString];
+            [cell setThumbnailImageForVideoWithMessage:currentMessage];
+            
+        }
+    });
+}
+
+- (void)fileDownloadManagerFailureNotification:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+        
+        TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+        NSError *error = [notificationParameterDictionary objectForKey:@"error"];
+        
+        NSString *roomID = obtainedMessage.room.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
+        
+        TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+        NSString *currentActiveRoomID = currentRoom.roomID;
+        currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+        
+        if (![roomID isEqualToString:currentActiveRoomID]) {
+            return;
+        }
+        
+        NSString *localID = obtainedMessage.localID;
+        localID = [TAPUtil nullToEmptyString:localID];
+        
+        TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
+        NSArray *messageArray = [self.mediaMessageDataArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+        
+        TAPChatMessageType type = currentMessage.type;
+        
+        TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
+        
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[currentMessage.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        
+        if (type == TAPChatMessageTypeImage) {
+            [cell animateFailedDownloadingMedia];
+            //if not show download button
+            [cell setInfoLabelWithString:fileSize];
+            [cell setAsNotDownloaded];
+        }
+        else if (type == TAPChatMessageTypeVideo) {
+            [cell animateFailedDownloadingMedia];
+            //File not exist, download file
+            [cell setAsNotDownloaded];
+            [cell setInfoLabelWithString:fileSize];
+        }
+    });
+}
+
+#pragma mark Others
 - (void)backButtonDidTapped {
     [self.navigationController popViewControllerAnimated:YES];
     
@@ -566,243 +788,25 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)fetchImageDataWithMessage:(TAPMessageModel *)message {
     [[TAPFileDownloadManager sharedManager] receiveImageDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeImage) {
-                
-                    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                    [cell setInitialAnimateDownloadingMedia];
-            }
-        });
+        //Already handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeImage) {
-                
-                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                [cell animateProgressDownloadingMediaWithProgress:progress total:total];
-            }
-        });
+        //Already handled via Notification
     } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeImage) {
-                
-                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                if (fullImage != nil) {
-                    [cell setImageCollectionViewCellImageWithImage:fullImage];
-                }
-                [cell animateFinishedDownloadingMedia];
-            }
-        });
+        //Already handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeImage) {
-                
-                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                [cell animateFailedDownloadingMedia];
-            }
-        });
+        //Already handled via Notification
     }];
 }
 
 - (void)fetchVideoDataWithMessage:(TAPMessageModel *)message {
     [[TAPFileDownloadManager sharedManager] receiveVideoDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeVideo) {
-                
-                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                [cell setInitialAnimateDownloadingMedia];
-            }
-        });
+        //Already handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"PROGRESS %f of %f", progress, total);
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeVideo) {
-                
-                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                [cell animateProgressDownloadingMediaWithProgress:progress total:total];
-                
-            }
-        });
+        //Already handled via Notification
     } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            if (type == TAPChatMessageTypeVideo) {
-                
-                TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                [cell animateFinishedDownloadingMedia];
-                [cell setThumbnailImageForVideoWithMessage:message];
-                
-            }
-        });
+        //Already handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-            NSString *currentActiveRoomID = currentRoom.roomID;
-            currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-            
-            NSString *roomID = receivedMessage.room.roomID;
-            roomID = [TAPUtil nullToEmptyString:roomID];
-            
-            NSString *localID = receivedMessage.localID;
-            localID = [TAPUtil nullToEmptyString:localID];
-            
-            if (![roomID isEqualToString:currentActiveRoomID]) {
-                return;
-            }
-            
-            TAPMessageModel *currentMessage = [self.mediaMessageDataDictionary objectForKey:localID];
-            NSArray *messageArray = [self.mediaMessageDataArray copy];
-            NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-            
-            TAPChatMessageType type = currentMessage.type;
-            
-            if (error.code == NSURLErrorCancelled) {
-                // canceled
-                if (type == TAPChatMessageTypeVideo) {
-                    
-                    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                    [cell animateFailedDownloadingMedia];
-                
-                }
-            } else {
-                // failed
-                if (type == TAPChatMessageTypeVideo) {
-                    TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:1]];
-                    [cell animateFailedDownloadingMedia];
-                }
-            }
-        });
+        //Already handled via Notification
     }];
 }
 

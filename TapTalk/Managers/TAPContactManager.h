@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isContactPermissionAsked;
 - (NSString *)getUserCountryCode;
 - (BOOL)checkUserExistWithPhoneNumber:(NSString *)phoneNumberWithCode;
+- (void)clearContactManagerData;
 
 @end
 

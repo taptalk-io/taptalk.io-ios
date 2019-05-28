@@ -60,6 +60,9 @@
 //ReplyTo
 @property (nonatomic, strong) NSString *replyToMessageID;
 @property (nonatomic, strong) NSString *replyToLocalID;
+@property (nonatomic, strong) NSString *replyToUserID;
+@property (nonatomic, strong) NSString *replyToXcUserID;
+@property (nonatomic, strong) NSString *replyToFullname;
 @property (nonatomic) TAPChatMessageType replyMessageType;
 
 //ForwardFrom

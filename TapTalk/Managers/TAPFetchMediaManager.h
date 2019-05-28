@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeFetchAssetFromDictionaryForAsset:(PHAsset *)asset;
 - (NSNumber *)getFetchProgressWithAsset:(PHAsset *)asset;
 - (UIImage *)generateThumbnailImageFromFilePathString:(NSString *)filePathString;
+- (void)clearFetchMediaManagerData;
 
 @end
 

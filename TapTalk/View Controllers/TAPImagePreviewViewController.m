@@ -389,11 +389,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 _selectedIndex = self.selectedIndex - 1;
             }
             
-            PHAsset *toBeDeletedAsset = [self.mediaDataArray objectAtIndex:indexPath.item];
+            TAPMediaPreviewModel *toBeDeletedMediaPreview = [self.mediaDataArray objectAtIndex:indexPath.item];
+            PHAsset *toBeDeletedAsset = toBeDeletedMediaPreview.asset;
             
             [self.mediaDataArray removeObjectAtIndex:indexPath.item];
             
-//            NSString *generatedAssetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:toBeDeletedAsset];
             NSString *generatedAssetKey = toBeDeletedAsset.localIdentifier;
             [self.excedeedSizeLimitMediaDictionary removeObjectForKey:generatedAssetKey];
             

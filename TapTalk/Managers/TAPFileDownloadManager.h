@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cancelDownloadWithMessage:(TAPMessageModel *)message;
 - (BOOL)checkFailedDownloadWithLocalID:(NSString *)localID;
 - (void)saveVideoToLocalDirectoryWithAsset:(AVAsset *)videoAsset message:(TAPMessageModel *)message;
+- (void)clearFileDownloadManagerData;
 
 // DV NOTE - Uncomment this function to use API Thumbnail image
 //- (void)receiveImageDataWithMessage:(TAPMessageModel *)message

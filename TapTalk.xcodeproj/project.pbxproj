@@ -72,6 +72,8 @@
 		D754CFB92216ECD9008CE9F9 /* TAPPickLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D754CFB72216ECD9008CE9F9 /* TAPPickLocationViewController.m */; };
 		D75D27DB2186D8EA00FDF4ED /* TAPMessageStatusManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D75D27D92186D8EA00FDF4ED /* TAPMessageStatusManager.h */; };
 		D75D27DC2186D8EA00FDF4ED /* TAPMessageStatusManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D75D27DA2186D8EA00FDF4ED /* TAPMessageStatusManager.m */; };
+		D75EC5EE2296690C00A4F435 /* TAPDataMediaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D75EC5EC2296690B00A4F435 /* TAPDataMediaModel.h */; };
+		D75EC5EF2296690C00A4F435 /* TAPDataMediaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D75EC5ED2296690C00A4F435 /* TAPDataMediaModel.m */; };
 		D76948BA21B10D2B00AE0BE6 /* TAPCustomBubbleManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D76948B821B10D2B00AE0BE6 /* TAPCustomBubbleManager.h */; };
 		D76948BB21B10D2B00AE0BE6 /* TAPCustomBubbleManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D76948B921B10D2B00AE0BE6 /* TAPCustomBubbleManager.m */; };
 		D769A2E72253597B0059DC9B /* TAPOldRegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D769A2E52253597A0059DC9B /* TAPOldRegisterViewController.m */; };
@@ -85,8 +87,6 @@
 		D775E3972189D7660003A40C /* moselo-notification.caf in Resources */ = {isa = PBXBuildFile; fileRef = D775E3962189D7660003A40C /* moselo-notification.caf */; };
 		D77866BF224205C000A98F05 /* TAPFetchMediaManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D77866BD224205C000A98F05 /* TAPFetchMediaManager.h */; };
 		D77866C0224205C000A98F05 /* TAPFetchMediaManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D77866BE224205C000A98F05 /* TAPFetchMediaManager.m */; };
-		D7789CE021E4B69B005B3AE1 /* TAPDataImageModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D7789CDE21E4B69B005B3AE1 /* TAPDataImageModel.h */; };
-		D7789CE121E4B69B005B3AE1 /* TAPDataImageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D7789CDF21E4B69B005B3AE1 /* TAPDataImageModel.m */; };
 		D778FA982216F0D9000E3A00 /* TAPPinLocationView.h in Headers */ = {isa = PBXBuildFile; fileRef = D778FA962216F0D9000E3A00 /* TAPPinLocationView.h */; };
 		D778FA992216F0D9000E3A00 /* TAPPinLocationView.m in Sources */ = {isa = PBXBuildFile; fileRef = D778FA972216F0D9000E3A00 /* TAPPinLocationView.m */; };
 		D778FA9C221D7E4F000E3A00 /* TAPPinLocationSearchResultTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D778FA9A221D7E4F000E3A00 /* TAPPinLocationSearchResultTableViewCell.h */; };
@@ -315,6 +315,9 @@
 		DF8899CB22784651001CCB0D /* TAPLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF8899C922784651001CCB0D /* TAPLoadingView.m */; };
 		DF8899CE22784698001CCB0D /* TAPLoadingViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = DF8899CC22784698001CCB0D /* TAPLoadingViewController.h */; };
 		DF8899CF22784698001CCB0D /* TAPLoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF8899CD22784698001CCB0D /* TAPLoadingViewController.m */; };
+		DF936AA322968F7F00F17B4C /* TAPLoadingTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = DF936AA022968F7F00F17B4C /* TAPLoadingTableViewCell.h */; };
+		DF936AA422968F7F00F17B4C /* TAPLoadingTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DF936AA122968F7F00F17B4C /* TAPLoadingTableViewCell.m */; };
+		DF936AA522968F7F00F17B4C /* TAPLoadingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF936AA222968F7F00F17B4C /* TAPLoadingTableViewCell.xib */; };
 		DFA598FF21B7B17D0082C5F3 /* TAPOnlineStatusModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */; };
 		DFA5990021B7B17D0082C5F3 /* TAPOnlineStatusModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA598FE21B7B17D0082C5F3 /* TAPOnlineStatusModel.m */; };
 		DFA5990321B7D3A30082C5F3 /* TAPContactManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA5990121B7D3A30082C5F3 /* TAPContactManager.h */; };
@@ -440,6 +443,9 @@
 		D754CFB72216ECD9008CE9F9 /* TAPPickLocationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPPickLocationViewController.m; sourceTree = "<group>"; };
 		D75D27D92186D8EA00FDF4ED /* TAPMessageStatusManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPMessageStatusManager.h; sourceTree = "<group>"; };
 		D75D27DA2186D8EA00FDF4ED /* TAPMessageStatusManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPMessageStatusManager.m; sourceTree = "<group>"; };
+		D75EC5EC2296690B00A4F435 /* TAPDataMediaModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPDataMediaModel.h; sourceTree = "<group>"; };
+		D75EC5ED2296690C00A4F435 /* TAPDataMediaModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPDataMediaModel.m; sourceTree = "<group>"; };
+		D75EC5F0229669B800A4F435 /* TAPChatMessageType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPChatMessageType.h; sourceTree = "<group>"; };
 		D76948B821B10D2B00AE0BE6 /* TAPCustomBubbleManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCustomBubbleManager.h; sourceTree = "<group>"; };
 		D76948B921B10D2B00AE0BE6 /* TAPCustomBubbleManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomBubbleManager.m; sourceTree = "<group>"; };
 		D769A2E52253597A0059DC9B /* TAPOldRegisterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPOldRegisterViewController.m; sourceTree = "<group>"; };
@@ -453,8 +459,6 @@
 		D775E3962189D7660003A40C /* moselo-notification.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "moselo-notification.caf"; sourceTree = "<group>"; };
 		D77866BD224205C000A98F05 /* TAPFetchMediaManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPFetchMediaManager.h; sourceTree = "<group>"; };
 		D77866BE224205C000A98F05 /* TAPFetchMediaManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPFetchMediaManager.m; sourceTree = "<group>"; };
-		D7789CDE21E4B69B005B3AE1 /* TAPDataImageModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPDataImageModel.h; sourceTree = "<group>"; };
-		D7789CDF21E4B69B005B3AE1 /* TAPDataImageModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPDataImageModel.m; sourceTree = "<group>"; };
 		D778FA962216F0D9000E3A00 /* TAPPinLocationView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPPinLocationView.h; sourceTree = "<group>"; };
 		D778FA972216F0D9000E3A00 /* TAPPinLocationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPPinLocationView.m; sourceTree = "<group>"; };
 		D778FA9A221D7E4F000E3A00 /* TAPPinLocationSearchResultTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPPinLocationSearchResultTableViewCell.h; sourceTree = "<group>"; };
@@ -687,6 +691,9 @@
 		DF8899C922784651001CCB0D /* TAPLoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPLoadingView.m; sourceTree = "<group>"; };
 		DF8899CC22784698001CCB0D /* TAPLoadingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPLoadingViewController.h; sourceTree = "<group>"; };
 		DF8899CD22784698001CCB0D /* TAPLoadingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPLoadingViewController.m; sourceTree = "<group>"; };
+		DF936AA022968F7F00F17B4C /* TAPLoadingTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPLoadingTableViewCell.h; sourceTree = "<group>"; };
+		DF936AA122968F7F00F17B4C /* TAPLoadingTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPLoadingTableViewCell.m; sourceTree = "<group>"; };
+		DF936AA222968F7F00F17B4C /* TAPLoadingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TAPLoadingTableViewCell.xib; sourceTree = "<group>"; };
 		DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPOnlineStatusModel.h; sourceTree = "<group>"; };
 		DFA598FE21B7B17D0082C5F3 /* TAPOnlineStatusModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPOnlineStatusModel.m; sourceTree = "<group>"; };
 		DFA5990121B7D3A30082C5F3 /* TAPContactManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPContactManager.h; sourceTree = "<group>"; };
@@ -935,44 +942,44 @@
 				D77B5F8E2158C4C500253BDC /* RealmModels */,
 				D77B5EC12158BB6D00253BDC /* TAPBaseModel.h */,
 				D77B5EC92158BB6E00253BDC /* TAPBaseModel.m */,
+				D7CAADFD2251FE1A005493D9 /* TAPCountryModel.h */,
+				D7CAADFE2251FE1A005493D9 /* TAPCountryModel.m */,
+				DFEFE68B21AFC79100E486F8 /* TAPCustomKeyboardItemModel.h */,
+				DFEFE68C21AFC79100E486F8 /* TAPCustomKeyboardItemModel.m */,
+				D7115362222E54A90033C082 /* TAPDataFileModel.h */,
+				D7115363222E54A90033C082 /* TAPDataFileModel.m */,
+				D75EC5EC2296690B00A4F435 /* TAPDataMediaModel.h */,
+				D75EC5ED2296690C00A4F435 /* TAPDataMediaModel.m */,
+				DF2513CD21E61BE3000D165A /* TAPForwardFromModel.h */,
+				DF2513CE21E61BE3000D165A /* TAPForwardFromModel.m */,
 				D77B5EC32158BB6E00253BDC /* TAPGroupModel.h */,
 				D77B5EC62158BB6E00253BDC /* TAPGroupModel.m */,
 				D77B5EC42158BB6E00253BDC /* TAPImageURLModel.h */,
 				D77B5EC52158BB6E00253BDC /* TAPImageURLModel.m */,
+				D72F395D2240A14C00F4FC38 /* TAPMediaPreviewModel.h */,
+				D72F395C2240A14C00F4FC38 /* TAPMediaPreviewModel.m */,
 				D77B5EBF2158BB6D00253BDC /* TAPMessageModel.h */,
 				D77B5ECD2158BB6E00253BDC /* TAPMessageModel.m */,
+				DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */,
+				DFA598FE21B7B17D0082C5F3 /* TAPOnlineStatusModel.m */,
+				D73E2E8B220088550083E997 /* TAPProductModel.h */,
+				D73E2E8C220088550083E997 /* TAPProductModel.m */,
+				DF2513D121E61C3E000D165A /* TAPQuoteModel.h */,
+				DF2513D221E61C3E000D165A /* TAPQuoteModel.m */,
 				D77B5EC82158BB6E00253BDC /* TAPRecentSearchModel.h */,
 				D77B5ECC2158BB6E00253BDC /* TAPRecentSearchModel.m */,
+				DF2513C921E61BCB000D165A /* TAPReplyToModel.h */,
+				DF2513CA21E61BCB000D165A /* TAPReplyToModel.m */,
+				D74BA2AC2162066200DF494C /* TAPRoomListModel.h */,
+				D74BA2AD2162066200DF494C /* TAPRoomListModel.m */,
 				D77B5EC22158BB6E00253BDC /* TAPRoomModel.h */,
 				D77B5EC02158BB6D00253BDC /* TAPRoomModel.m */,
+				DF45149521BA52FE00C1C539 /* TAPTypingModel.h */,
+				DF45149621BA52FE00C1C539 /* TAPTypingModel.m */,
 				D77B5ECA2158BB6E00253BDC /* TAPUserModel.h */,
 				D77B5ECB2158BB6E00253BDC /* TAPUserModel.m */,
 				D7B4954D215B55B800F07BEC /* TAPUserRoleModel.h */,
 				D7B4954E215B55B800F07BEC /* TAPUserRoleModel.m */,
-				D74BA2AC2162066200DF494C /* TAPRoomListModel.h */,
-				D74BA2AD2162066200DF494C /* TAPRoomListModel.m */,
-				DFEFE68B21AFC79100E486F8 /* TAPCustomKeyboardItemModel.h */,
-				DFEFE68C21AFC79100E486F8 /* TAPCustomKeyboardItemModel.m */,
-				DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */,
-				DFA598FE21B7B17D0082C5F3 /* TAPOnlineStatusModel.m */,
-				DF45149521BA52FE00C1C539 /* TAPTypingModel.h */,
-				DF45149621BA52FE00C1C539 /* TAPTypingModel.m */,
-				D72F395D2240A14C00F4FC38 /* TAPMediaPreviewModel.h */,
-				D72F395C2240A14C00F4FC38 /* TAPMediaPreviewModel.m */,
-				D7789CDE21E4B69B005B3AE1 /* TAPDataImageModel.h */,
-				D7789CDF21E4B69B005B3AE1 /* TAPDataImageModel.m */,
-				DF2513D121E61C3E000D165A /* TAPQuoteModel.h */,
-				DF2513D221E61C3E000D165A /* TAPQuoteModel.m */,
-				DF2513C921E61BCB000D165A /* TAPReplyToModel.h */,
-				DF2513CA21E61BCB000D165A /* TAPReplyToModel.m */,
-				DF2513CD21E61BE3000D165A /* TAPForwardFromModel.h */,
-				DF2513CE21E61BE3000D165A /* TAPForwardFromModel.m */,
-				D73E2E8B220088550083E997 /* TAPProductModel.h */,
-				D73E2E8C220088550083E997 /* TAPProductModel.m */,
-				D7115362222E54A90033C082 /* TAPDataFileModel.h */,
-				D7115363222E54A90033C082 /* TAPDataFileModel.m */,
-				D7CAADFD2251FE1A005493D9 /* TAPCountryModel.h */,
-				D7CAADFE2251FE1A005493D9 /* TAPCountryModel.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -986,6 +993,7 @@
 				D77B5F712158BC0B00253BDC /* TapTalk-Prefix.pch */,
 				D77B5E4D2158BA8C00253BDC /* Info.plist */,
 				D77B5F742158BC7A00253BDC /* Configs.h */,
+				D75EC5F0229669B800A4F435 /* TAPChatMessageType.h */,
 			);
 			path = "Supporting Files";
 			sourceTree = "<group>";
@@ -1285,6 +1293,9 @@
 				D7E26BDE225E042200B50506 /* TAPYourVideoBubbleTableViewCell.h */,
 				D7E26BE0225E042200B50506 /* TAPYourVideoBubbleTableViewCell.m */,
 				D7E26BDF225E042200B50506 /* TAPYourVideoBubbleTableViewCell.xib */,
+				DF936AA022968F7F00F17B4C /* TAPLoadingTableViewCell.h */,
+				DF936AA122968F7F00F17B4C /* TAPLoadingTableViewCell.m */,
+				DF936AA222968F7F00F17B4C /* TAPLoadingTableViewCell.xib */,
 			);
 			name = "Chat Bubble Cell";
 			sourceTree = "<group>";
@@ -1330,7 +1341,6 @@
 				B357EBB92158F7E50049E288 /* TapTalk.h in Headers */,
 				B681FA5621F707470074749B /* Base64.h in Headers */,
 				D77B5F2E2158BB9500253BDC /* TAPBaseView.h in Headers */,
-				D7789CE021E4B69B005B3AE1 /* TAPDataImageModel.h in Headers */,
 				D778FAA0221D7FA3000E3A00 /* TAPLocationSearchBarView.h in Headers */,
 				D7F986D12251B7EE0087B652 /* TAPLoginViewController.h in Headers */,
 				D77B5EDA2158BB6E00253BDC /* TAPUserModel.h in Headers */,
@@ -1406,6 +1416,7 @@
 				D7358CB3227AD28400C65C67 /* TAPCountryPickerTableViewCell.h in Headers */,
 				D77B5F0B2158BB8700253BDC /* TAPNewChatOptionTableViewCell.h in Headers */,
 				D7F986D52251B8470087B652 /* TAPVerificationOTPView.h in Headers */,
+				DF936AA322968F7F00F17B4C /* TAPLoadingTableViewCell.h in Headers */,
 				D7FB9EE721C8D71900E26FC7 /* TapThumbnailImagePreviewCollectionViewCell.h in Headers */,
 				DFFEFEA32227E64400017739 /* TAPWebViewView.h in Headers */,
 				D7A98E46221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.h in Headers */,
@@ -1430,6 +1441,7 @@
 				DF2513D321E61C3E000D165A /* TAPQuoteModel.h in Headers */,
 				B681FA4E21F04D190074749B /* TAPFileUploadManager.h in Headers */,
 				D77B5F592158BBEA00253BDC /* TAPPopUpInfoViewController.h in Headers */,
+				D75EC5EE2296690C00A4F435 /* TAPDataMediaModel.h in Headers */,
 				D7FF4CE32176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.h in Headers */,
 				D7A98E3E221EFFFE0007BF81 /* TAPMyLocationBubbleTableViewCell.h in Headers */,
 				D70DA2782225274400824E86 /* TAPForwardListView.h in Headers */,
@@ -1582,6 +1594,7 @@
 				D795E12F222CF1BD008E7B99 /* TAPMyFileBubbleTableViewCell.xib in Resources */,
 				F51B8E9221621AB300C03479 /* TAPYourChatBubbleTableViewCell.xib in Resources */,
 				D7F986F92251C1C40087B652 /* PTRootUI-Medium.ttf in Resources */,
+				DF936AA522968F7F00F17B4C /* TAPLoadingTableViewCell.xib in Resources */,
 				D7A98E34221EFF1B0007BF81 /* Assets.xcassets in Resources */,
 				D795E135222CF1D7008E7B99 /* TAPYourFileBubbleTableViewCell.xib in Resources */,
 				F5E0B26F215B7BBB0040163B /* TAPMyChatBubbleTableViewCell.xib in Resources */,
@@ -1623,8 +1636,6 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TapTalk/Pods-TapTalk-resources.sh",
 				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
@@ -1632,8 +1643,6 @@
 				"${PODS_ROOT}/GooglePlaces/Frameworks/GooglePlaces.framework/Resources/GooglePlaces.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GooglePlacePicker.bundle",
@@ -1661,6 +1670,7 @@
 				D7115365222E54A90033C082 /* TAPDataFileModel.m in Sources */,
 				D77B5F5C2158BBEA00253BDC /* TAPSearchViewController.m in Sources */,
 				D7F986CE2251B7D90087B652 /* TAPLoginView.m in Sources */,
+				D75EC5EF2296690C00A4F435 /* TAPDataMediaModel.m in Sources */,
 				D77B5E872158BB2900253BDC /* NSString+Base64.m in Sources */,
 				D778FAA5221D83C8000E3A00 /* TAPLocationManager.m in Sources */,
 				B681FA4F21F04D190074749B /* TAPFileUploadManager.m in Sources */,
@@ -1749,6 +1759,7 @@
 				F56AAE602186F4E000E0ECC3 /* TAPYourImageBubbleTableViewCell.m in Sources */,
 				D754CFB92216ECD9008CE9F9 /* TAPPickLocationViewController.m in Sources */,
 				D781081C227DBB6500B41034 /* TAPMyAccountView.m in Sources */,
+				DF936AA422968F7F00F17B4C /* TAPLoadingTableViewCell.m in Sources */,
 				F571763C216DC81300B50F3C /* TAPKeyboardViewController.m in Sources */,
 				B357EBBA2158F7E50049E288 /* TapTalk.m in Sources */,
 				D77B5EAE2158BB4000253BDC /* TAPDatabaseManager.m in Sources */,
@@ -1786,7 +1797,6 @@
 				D7F95BDB21CB885B00885FC6 /* TAPCustomGrowingTextView.m in Sources */,
 				D7358CAC227AD02200C65C67 /* TAPCountryPickerView.m in Sources */,
 				D77B5EBA2158BB6300253BDC /* TAPMessageRealmModel.m in Sources */,
-				D7789CE121E4B69B005B3AE1 /* TAPDataImageModel.m in Sources */,
 				DFA5990421B7D3A30082C5F3 /* TAPContactManager.m in Sources */,
 				D77B5ED92158BB6E00253BDC /* TAPBaseModel.m in Sources */,
 				DF133C47219C475200A0E6CC /* TAPCustomAccessoryView.m in Sources */,
@@ -1892,12 +1902,8 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-fembed-bitcode\n-fembed-bitcode",
-				);
-				OTHER_LDFLAGS = (
-					"-fembed-bitcode\n-fembed-bitcode",
-				);
+				OTHER_CFLAGS = "-fembed-bitcode\n-fembed-bitcode";
+				OTHER_LDFLAGS = "-fembed-bitcode\n-fembed-bitcode";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1955,12 +1961,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OTHER_CFLAGS = (
-					"-fembed-bitcode\n-fembed-bitcode",
-				);
-				OTHER_LDFLAGS = (
-					"-fembed-bitcode\n-fembed-bitcode",
-				);
+				OTHER_CFLAGS = "-fembed-bitcode\n-fembed-bitcode";
+				OTHER_LDFLAGS = "-fembed-bitcode\n-fembed-bitcode";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";

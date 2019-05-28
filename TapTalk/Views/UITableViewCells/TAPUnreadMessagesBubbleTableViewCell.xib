@@ -17,43 +17,80 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="TAPUnreadMessagesBubbleTableViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="74"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="FOD-4O-9yd" customClass="TAPUnreadMessagesBubbleTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="73.5"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="FOD-4O-9yd" id="ez7-yu-1Kh">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="41.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UEZ-90-Ile">
-                        <rect key="frame" x="0.0" y="30.5" width="320" height="20"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aoz-el-zNp">
+                        <rect key="frame" x="0.0" y="6.5" width="320" height="20"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unread Messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uGX-mZ-YPB">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="20"/>
-                                <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="12"/>
-                                <color key="textColor" red="0.60784313725490191" green="0.60784313725490191" blue="0.60784313725490191" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eJA-ae-AfO">
+                                <rect key="frame" x="100" y="0.0" width="120" height="20"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unread Messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uGX-mZ-YPB">
+                                        <rect key="frame" x="0.0" y="0.0" width="100" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="DEF-9t-81i"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="12"/>
+                                        <color key="textColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconArrowDown" translatesAutoresizingMaskIntoConstraints="NO" id="7Pt-re-bpV">
+                                        <rect key="frame" x="100" y="0.0" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="N5X-sL-rEX"/>
+                                            <constraint firstAttribute="width" constant="20" id="kas-co-YiA"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="7Pt-re-bpV" secondAttribute="bottom" id="BXN-Cy-jFf"/>
+                                    <constraint firstItem="uGX-mZ-YPB" firstAttribute="leading" secondItem="eJA-ae-AfO" secondAttribute="leading" id="Bt4-Xk-gpE"/>
+                                    <constraint firstItem="7Pt-re-bpV" firstAttribute="leading" secondItem="uGX-mZ-YPB" secondAttribute="trailing" id="D0k-8X-w5E"/>
+                                    <constraint firstItem="uGX-mZ-YPB" firstAttribute="top" secondItem="eJA-ae-AfO" secondAttribute="top" id="FkI-M2-7Rs"/>
+                                    <constraint firstAttribute="bottom" secondItem="uGX-mZ-YPB" secondAttribute="bottom" id="atF-Xj-4ty"/>
+                                    <constraint firstItem="7Pt-re-bpV" firstAttribute="top" secondItem="eJA-ae-AfO" secondAttribute="top" id="jQy-gM-2EJ"/>
+                                    <constraint firstAttribute="width" constant="120" id="tbh-4S-uBN"/>
+                                </constraints>
+                            </view>
                         </subviews>
-                        <color key="backgroundColor" red="0.89411764705882346" green="0.89411764705882346" blue="0.89411764705882346" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="1" green="0.49411764705882355" blue="0.0" alpha="0.10000000000000001" colorSpace="calibratedRGB"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="uGX-mZ-YPB" secondAttribute="trailing" id="2RG-sX-glG"/>
-                            <constraint firstItem="uGX-mZ-YPB" firstAttribute="leading" secondItem="UEZ-90-Ile" secondAttribute="leading" id="DJF-vr-5DB"/>
-                            <constraint firstAttribute="bottom" secondItem="uGX-mZ-YPB" secondAttribute="bottom" id="IqU-IR-4Li"/>
-                            <constraint firstItem="uGX-mZ-YPB" firstAttribute="top" secondItem="UEZ-90-Ile" secondAttribute="top" id="glu-rZ-jWg"/>
-                            <constraint firstAttribute="height" constant="20" id="xGz-xl-VXe"/>
+                            <constraint firstAttribute="height" constant="20" id="7yp-gG-isc"/>
+                            <constraint firstItem="eJA-ae-AfO" firstAttribute="leading" secondItem="7Vv-uV-wUE" secondAttribute="leading" constant="100" id="FlF-K7-jfH"/>
+                            <constraint firstItem="7Vv-uV-wUE" firstAttribute="bottom" secondItem="eJA-ae-AfO" secondAttribute="bottom" id="W1x-I3-kre"/>
+                            <constraint firstItem="eJA-ae-AfO" firstAttribute="top" secondItem="aoz-el-zNp" secondAttribute="top" id="wRh-il-nga"/>
+                            <constraint firstItem="7Vv-uV-wUE" firstAttribute="trailing" secondItem="eJA-ae-AfO" secondAttribute="trailing" constant="100" id="wuE-d7-jeI"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="7Vv-uV-wUE"/>
                     </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="calibratedRGB"/>
                 <constraints>
-                    <constraint firstItem="UEZ-90-Ile" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="5KM-PZ-zXK"/>
-                    <constraint firstAttribute="bottom" secondItem="UEZ-90-Ile" secondAttribute="bottom" constant="24" id="ECM-0p-aDJ"/>
-                    <constraint firstAttribute="trailing" secondItem="UEZ-90-Ile" secondAttribute="trailing" id="NWM-ud-mHJ"/>
-                    <constraint firstItem="UEZ-90-Ile" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="30" id="bDy-rp-MPC"/>
+                    <constraint firstAttribute="bottom" secondItem="aoz-el-zNp" secondAttribute="bottom" constant="16" id="4e1-is-96y"/>
+                    <constraint firstItem="aoz-el-zNp" firstAttribute="top" secondItem="ez7-yu-1Kh" secondAttribute="top" constant="6" id="cat-Jl-1uz"/>
+                    <constraint firstAttribute="trailing" secondItem="aoz-el-zNp" secondAttribute="trailing" id="kvW-Fq-i1E"/>
+                    <constraint firstItem="aoz-el-zNp" firstAttribute="leading" secondItem="ez7-yu-1Kh" secondAttribute="leading" id="mdN-VV-dp0"/>
                 </constraints>
             </tableViewCellContentView>
-            <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <viewLayoutGuide key="safeArea" id="dTh-Am-CWS"/>
+            <connections>
+                <outlet property="arrowImageView" destination="7Pt-re-bpV" id="zP9-qb-Dys"/>
+                <outlet property="backgroundBarView" destination="aoz-el-zNp" id="EaU-rp-234"/>
+                <outlet property="leftGapConstraint" destination="FlF-K7-jfH" id="hQt-zS-rHt"/>
+                <outlet property="rightGapConstraint" destination="wuE-d7-jeI" id="Vb5-8U-PKP"/>
+                <outlet property="unreadMessageLabel" destination="uGX-mZ-YPB" id="f54-pH-RCn"/>
+            </connections>
+            <point key="canvasLocation" x="78" y="201"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="TAPIconArrowDown" width="20" height="20"/>
+    </resources>
 </document>

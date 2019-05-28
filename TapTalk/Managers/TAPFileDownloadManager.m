@@ -92,6 +92,16 @@
         if (savedImage != nil) {
             //Image exist
             success(savedImage, resultMessage);
+            
+            CGFloat progress = 1.0f;
+            CGFloat total = 1.0f;
+            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+            [objectDictionary setObject:resultMessage forKey:@"message"];
+            [objectDictionary setObject:savedImage forKey:@"fullImage"];
+            [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+            [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
         }
         else {
             //Image not exist in cache
@@ -105,17 +115,53 @@
             //Notify start downloading
             startProgress(resultMessage);
             
+            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+            [objectDictionary setObject:resultMessage forKey:@"message"];
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
+            
             [self runDownloadImageWithRoomID:currentRoomID message:resultMessage progress:^(CGFloat progress, CGFloat total, TAPMessageModel *currentDownloadMessage) {
                 
                 NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                [objectDictionary setObject:currentDownloadMessage forKey:@"message"];
+                [objectDictionary setObject:resultMessage forKey:@"message"];
                 [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
                 [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
                 
                 [self.downloadProgressDictionary setObject:objectDictionary forKey:currentDownloadMessage.localID];
                 
+                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
+                
                 progressBlock(progress, total, resultMessage);
             } success:^(UIImage *fullImage, TAPMessageModel *currentDownloadMessage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *roomID = currentDownloadMessage.room.roomID;
+                    NSString *localID = currentDownloadMessage.localID;
+                    NSDictionary *dataDictionary = currentDownloadMessage.data;
+                    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+                    fileID = [TAPUtil nullToEmptyString:fileID];
+                    
+                    NSInteger currentProcessingCounter = [[self.currentDownloadingDictionary objectForKey:fileID] integerValue];
+                    if (currentProcessingCounter == 1) {
+                        //done processing
+                        [self.currentDownloadingDictionary removeObjectForKey:fileID];
+                    }
+                    
+                    [self.downloadProgressDictionary removeObjectForKey:currentDownloadMessage.localID];
+                    
+                    if (fullImage != nil) {
+                        CGFloat progress = 1.0f;
+                        CGFloat total = 1.0f;
+                        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                        [objectDictionary setObject:currentDownloadMessage forKey:@"message"];
+                        [objectDictionary setObject:fullImage forKey:@"fullImage"];
+                        [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                        [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+                        
+                        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+                        
+                        success(fullImage, currentDownloadMessage);
+                    }
+                });
+            } failure:^(NSError *error, TAPMessageModel *currentDownloadMessage) {
                 NSString *roomID = currentDownloadMessage.room.roomID;
                 NSString *localID = currentDownloadMessage.localID;
                 NSDictionary *dataDictionary = currentDownloadMessage.data;
@@ -130,20 +176,12 @@
                 
                 [self.downloadProgressDictionary removeObjectForKey:currentDownloadMessage.localID];
                 
-                success(fullImage, currentDownloadMessage);
-            } failure:^(NSError *error, TAPMessageModel *currentDownloadMessage) {
-                NSString *roomID = currentDownloadMessage.room.roomID;
-                NSString *localID = currentDownloadMessage.localID;
-                NSDictionary *dataDictionary = currentDownloadMessage.data;
-                NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-                fileID = [TAPUtil nullToEmptyString:fileID];
+                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                [objectDictionary setObject:currentDownloadMessage forKey:@"message"];
+                [objectDictionary setObject:error forKey:@"error"];
                 
-                NSInteger currentProcessingCounter = [[self.currentDownloadingDictionary objectForKey:fileID] integerValue];
-                if (currentProcessingCounter == 1) {
-                    //done processing
-                    [self.currentDownloadingDictionary removeObjectForKey:fileID];
-                }
-                
+                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
+
                 failure(error, currentDownloadMessage);
             }];
         }
@@ -160,6 +198,10 @@
     
     //Call API Download File
     startProgress(message);
+    
+    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+    [objectDictionary setObject:message forKey:@"message"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
     
     [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
                                            roomID:message.room.roomID completionBlock:^(NSData *downloadedData) {
@@ -203,12 +245,41 @@
 
                                                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:currentFileID];
                                                 [self.failedDownloadDictionary removeObjectForKey:message.localID];
+                                               
+                                               [self.downloadProgressDictionary removeObjectForKey:message.localID];
+                                               
+                                               CGFloat progress = 1.0f;
+                                               CGFloat total = 1.0f;
+                                               NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                                               [objectDictionary setObject:message forKey:@"message"];
+                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+                                               
+                                               [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+                                               
                                                success(downloadedData, message);
                                            } progressBlock:^(CGFloat progress, CGFloat total) {
+                                               
+                                               NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                                               [objectDictionary setObject:message forKey:@"message"];
+                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+                                               [self.downloadProgressDictionary setObject:objectDictionary forKey:message.localID];
+                                               
+                                               [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
+                                               
                                                progressBlock(progress, total, message);
                                            } failureBlock:^(NSError *error) {
                                                failure(error, message);
                                                [self.failedDownloadDictionary setObject:message forKey:message.localID];
+                                               
+                                               [self.downloadProgressDictionary removeObjectForKey:message.localID];
+                                               
+                                               NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                                               [objectDictionary setObject:message forKey:@"message"];
+                                               [objectDictionary setObject:error forKey:@"error"];
+                                               
+                                               [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
                                            }];
 }
 
@@ -222,6 +293,10 @@
     
     //Call API Download File
     startProgress(message);
+    
+    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+    [objectDictionary setObject:message forKey:@"message"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
     
     [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:message.room.roomID completionBlock:^(NSData *downloadedData) {
         //CS Note
@@ -275,15 +350,43 @@
            }
 
            success(downloadedData, message);
+            
+            [self.downloadProgressDictionary removeObjectForKey:message.localID];
+            
+            CGFloat progress = 1.0f;
+            CGFloat total = 1.0f;
+            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+            [objectDictionary setObject:message forKey:@"message"];
+            [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+            [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
         }];
-
-//        success(downloadedData, message);
         
     } progressBlock:^(CGFloat progress, CGFloat total) {
+        
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:message forKey:@"message"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+        
+        [self.downloadProgressDictionary setObject:objectDictionary forKey:message.localID];
+        
+         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
+        
         progressBlock(progress, total, message);
     } failureBlock:^(NSError *error) {
         failure(error, message);
         [self.failedDownloadDictionary setObject:message forKey:message.localID];
+        
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:message forKey:@"message"];
+        [objectDictionary setObject:error forKey:@"error"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
+        
+        [self.downloadProgressDictionary removeObjectForKey:message.localID];
+
     }];
 };
 
@@ -330,10 +433,16 @@
     
     [downloadedFilePathPerRoomDictionary setObject:filePath forKey:fileID];
     [self.downloadedFilePathDictionary setObject:downloadedFilePathPerRoomDictionary forKey:roomID];
+    
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+        //save directly to DB when in background
+        [self saveDownloadedFilePathToPreference];
+    }
 }
 
 - (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID {
     NSDictionary *downloadedFilePathPerRoomDictionary = [self.downloadedFilePathDictionary objectForKey:roomID];
+    downloadedFilePathPerRoomDictionary = [TAPUtil nullToEmptyDictionary:downloadedFilePathPerRoomDictionary];
     
     NSString *filePath = @"";
     if ([downloadedFilePathPerRoomDictionary count] != 0) {
@@ -418,6 +527,14 @@
         [assetData writeToFile:destinationFileString atomically:YES];
 //        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID localID:message.localID];
     }];
+}
+
+- (void)clearFileDownloadManagerData {
+    [self.thumbnailDictionary removeAllObjects];
+    [self.downloadProgressDictionary removeAllObjects];
+    [self.currentDownloadingDictionary removeAllObjects];
+    [self.downloadedFilePathDictionary removeAllObjects];
+    [self.failedDownloadDictionary removeAllObjects];
 }
 
 // DV NOTE - Uncomment this function to use API Thumbnail image

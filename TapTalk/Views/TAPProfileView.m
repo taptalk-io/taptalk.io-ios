@@ -31,6 +31,7 @@
         
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), self.profileImageHeight)];
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.profileImageView.clipsToBounds = YES;
         [self addSubview:self.profileImageView];
         
         _gradientImageView = [[UIView alloc] initWithFrame:self.profileImageView.frame];

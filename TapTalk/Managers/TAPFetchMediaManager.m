@@ -235,4 +235,10 @@
     return resultImage;
 }
 
+- (void)clearFetchMediaManagerData {
+    [self.imageFetchResultDictionary removeAllObjects];
+    [self.videoFetchResultDictionary removeAllObjects];
+    [self.fetchProgressDictionary removeAllObjects];
+}
+
 @end

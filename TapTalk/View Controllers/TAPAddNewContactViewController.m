@@ -11,7 +11,7 @@
 #import "TAPScanQRCodePopupView.h"
 #import <AFNetworking/AFNetworking.h>
 
-@interface TAPAddNewContactViewController () <UITextFieldDelegate>
+@interface TAPAddNewContactViewController () <TAPSearchBarViewDelegate>
 
 @property (strong, nonatomic) TAPAddNewContactView *addNewContactView;
 @property (strong, nonatomic) TAPScanQRCodePopupView *addContactPopupView;
@@ -48,7 +48,7 @@
     [self.addNewContactView.addUserToContactButton addTarget:self action:@selector(addUserToContactButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.addNewContactView.addExpertToContactButton addTarget:self action:@selector(addExpertToContactButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-    self.addNewContactView.searchBarView.searchTextField.delegate = self;
+    self.addNewContactView.searchBarView.delegate = self;
     [self.addNewContactView.searchBarView.searchTextField becomeFirstResponder];
     
     _wasFailedGetData = NO;
@@ -65,23 +65,41 @@
     
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self showNavigationSeparator:NO];
+}
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
 }
 
 #pragma mark - Delegate
-#pragma mark TextField
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+#pragma mark TAPSearchBar
+- (BOOL)searchBarTextFieldShouldBeginEditing:(UITextField *)textField {
+    if ([textField.text isEqualToString:@""]) {
+        [UIView animateWithDuration:0.3f animations:^{
+            CGRect searchBarViewFrame = self.addNewContactView.searchBarView.frame;
+            searchBarViewFrame.size.width = CGRectGetWidth(self.addNewContactView.searchBarView.frame) - 70.0f;
+            self.addNewContactView.searchBarView.frame = searchBarViewFrame;
+            
+            CGRect searchBarCancelButtonFrame = self.addNewContactView.searchBarCancelButton.frame;
+            searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
+            searchBarCancelButtonFrame.size.width = 70.0f;
+            self.addNewContactView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
+        } completion:^(BOOL finished) {
+            //completion
+        }];
+    }
     return YES;
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldReturn:(UITextField *)textField {
     [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
-    
     return NO;
 }
 
-- (BOOL)textFieldShouldClear:(UITextField *)textField {
+- (BOOL)searchBarTextFieldShouldClear:(UITextField *)textField {
     self.addNewContactView.searchBarView.searchTextField.text = @"";
     _searchedUser = nil;
     
@@ -90,10 +108,24 @@
     [self.addNewContactView isShowEmptyState:NO];
     [self.addNewContactView showLoading:NO];
     
-    return YES;
+    [UIView animateWithDuration:0.3f animations:^{
+        CGRect searchBarViewFrame = self.addNewContactView.searchBarView.frame;
+        searchBarViewFrame.size.width = CGRectGetWidth(self.addNewContactView.searchBarBackgroundView.frame) - 16.0f - 16.0f;
+        self.addNewContactView.searchBarView.frame = searchBarViewFrame;
+        [self.addNewContactView.searchBarView.searchTextField endEditing:YES];
+        
+        CGRect searchBarCancelButtonFrame = self.addNewContactView.searchBarCancelButton.frame;
+        searchBarCancelButtonFrame.origin.x = CGRectGetMaxX(searchBarViewFrame) + 8.0f;
+        searchBarCancelButtonFrame.size.width = 0.0f;
+        self.addNewContactView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
+    } completion:^(BOOL finished) {
+        //completion
+    }];
+    
+    return NO;
 }
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+- (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     

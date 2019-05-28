@@ -12,7 +12,9 @@
 @interface TAPRoomListTableViewCell()
 
 @property (strong, nonatomic) UIView *bgView;
+@property (strong, nonatomic) UIView *typingView;
 @property (strong, nonatomic) TAPImageView *profileImageView;
+@property (strong, nonatomic) UIImageView *typingAnimationImageView;
 @property (strong, nonatomic) UIImageView *expertIconImageView;
 @property (strong, nonatomic) UILabel *roomNameLabel;
 @property (strong, nonatomic) UIImageView *muteImageView;
@@ -26,13 +28,6 @@
 @property (strong, nonatomic) UIView *separatorView;
 @property (nonatomic) TAPMessageStatusType messageStatusType;
 @property (nonatomic) BOOL *isShouldForceUpdateUnreadBubble;
-
-@property (strong, nonatomic) NSTimer *typingTimer;
-@property (strong, nonatomic) NSString *fullTypingString;
-@property (strong, nonatomic) NSString *initialTypingString;
-@property (strong, nonatomic) NSString *currentTypingString;
-
-- (void)animateTyping;
 
 @end
 
@@ -108,18 +103,26 @@
         self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
         [self.bgView addSubview:self.separatorView];
         
-        //Typing Animation
-        _typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(animateTyping) userInfo:nil repeats:YES];
-        self.fullTypingString = NSLocalizedString(@"Typing...", @"");
-        self.initialTypingString = NSLocalizedString(@"Typing.", @"");
-        self.currentTypingString = self.initialTypingString;
+        _typingView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame) + 2.0f, CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
+        self.typingView.backgroundColor = [UIColor clearColor];
+        self.typingView.alpha = 0.0f;
+        [self.bgView addSubview:self.typingView];
         
-        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
-        self.typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        _typingAnimationImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 16.0f, 16.0f)];
+        self.typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.typingAnimationImageView.animationDuration = 0.6f;
+        self.typingAnimationImageView.animationRepeatCount = 0.0f;
+        [self.typingAnimationImageView startAnimating];
+        [self.typingView addSubview:self.typingAnimationImageView];
+        
+        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
+        self.typingLabel.text = NSLocalizedString(@"typing", @"");
         self.typingLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.typingLabel.text = self.currentTypingString;
-        self.typingLabel.numberOfLines = 1;
-        [self.bgView addSubview:self.typingLabel];
+        self.typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        [self.typingLabel sizeToFit];
+        self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
+        [self.typingView addSubview:self.typingLabel];
+        
     }
     
     return self;
@@ -455,31 +458,59 @@
 
 - (void)setAsTyping:(BOOL)typing {
     if (typing) {
-        self.typingLabel.alpha = 1.0f;
+        self.typingView.alpha = 1.0f;
+        [self.typingAnimationImageView startAnimating];
         self.lastMessageLabel.alpha = 0.0f;
         [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
     }
     else {
-        self.typingLabel.alpha = 0.0f;
+        self.typingView.alpha = 0.0f;
+        [self.typingAnimationImageView stopAnimating];
         self.lastMessageLabel.alpha = 1.0f;
-    }
-}
-
-- (void)animateTyping {
-    if([self.currentTypingString length] < [self.fullTypingString length]) {
-        self.currentTypingString = [self.fullTypingString substringWithRange:NSMakeRange(0, [self.currentTypingString length] + 1)];
-        self.typingLabel.text = self.currentTypingString;
-    }
-    else if([self.currentTypingString isEqualToString:self.fullTypingString]) {
-        self.currentTypingString = self.initialTypingString;
-        self.typingLabel.text = self.currentTypingString;
     }
 }
 
 - (void)setAsTypingNoAfterDelay {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setAsTypingNoAfterDelay) object:nil];
-    self.typingLabel.alpha = 0.0f;
+    self.typingView.alpha = 0.0f;
+    [self.typingAnimationImageView stopAnimating];
     self.lastMessageLabel.alpha = 1.0f;
+}
+
+- (void)showMessageDraftWithMessage:(NSString *)draftMessage {
+    self.messageStatusType = TAPMessageStatusTypeNone;
+    self.messageStatusImageView.alpha = 0.0f;
+    self.timeLabel.text = @"";
+    
+    self.lastMessageLabel.text = [NSString stringWithFormat:@"Draft: %@", draftMessage];
+
+    NSMutableDictionary *lastMessageAttributesDictionary = [NSMutableDictionary dictionary];
+    CGFloat lastMessageLetterSpacing = -0.2f;
+    [lastMessageAttributesDictionary setObject:@(lastMessageLetterSpacing) forKey:NSKernAttributeName];
+    NSMutableParagraphStyle *lastMessageStyle = [[NSMutableParagraphStyle alloc] init];
+    lastMessageStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+    [lastMessageStyle setLineSpacing:2];
+    [lastMessageAttributesDictionary setObject:lastMessageStyle forKey:NSParagraphStyleAttributeName];
+    
+    NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
+    [attributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f] forKey:NSFontAttributeName];
+    [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_REDPINK_57] forKey:NSForegroundColorAttributeName];
+    [attributesDictionary setObject:lastMessageStyle forKey:NSParagraphStyleAttributeName];
+    
+    NSMutableAttributedString *lastMessageAttributedString = [[NSMutableAttributedString alloc] initWithString:[TAPUtil nullToEmptyString:self.lastMessageLabel.text]];
+
+    [lastMessageAttributedString addAttributes:lastMessageAttributesDictionary
+                                         range:NSMakeRange(0, [self.lastMessageLabel.text length])];
+    
+    NSRange draftRange = [self.lastMessageLabel.text rangeOfString:@"Draft:"];
+    [lastMessageAttributedString addAttributes:attributesDictionary
+                                         range:draftRange];
+    
+    self.lastMessageLabel.attributedText = lastMessageAttributedString;
+    
+    //Resize lastMessageLabel
+    CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) -16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
+    self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, newLastMessageLabelSize.height);
 }
 
 @end

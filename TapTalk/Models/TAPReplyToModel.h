@@ -8,11 +8,15 @@
 
 #import "TAPBaseModel.h"
 #import "Configs.h"
+#import "TAPChatMessageType.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPReplyToModel : TAPBaseModel
 
+@property (nonatomic, strong) NSString *userID;
+@property (nonatomic, strong) NSString *xcUserID;
+@property (nonatomic, strong) NSString *fullname;
 @property (nonatomic, strong) NSString *messageID;
 @property (nonatomic, strong) NSString *localID;
 @property (nonatomic) TAPChatMessageType messageType;

@@ -62,9 +62,7 @@
         
         _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 6.0f - 85.0f, CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
         self.leftButton.layer.cornerRadius = 4.0f;
-        self.leftButton.layer.borderWidth = 1.0f;
         self.leftButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
-        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1].CGColor;
         self.leftButton.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
         self.leftButton.backgroundColor = [UIColor whiteColor];
         [self.popupWhiteView addSubview:self.leftButton];
@@ -129,7 +127,6 @@
         [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
         
-        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor;
         [self.leftButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREY_9B] forState:UIControlStateNormal];
         self.leftButton.backgroundColor = [UIColor whiteColor];
     }
@@ -138,7 +135,6 @@
         [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREEN_2A];
         
-        self.leftButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor;
         [self.leftButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREY_9B] forState:UIControlStateNormal];
         self.leftButton.backgroundColor = [UIColor whiteColor];
 
