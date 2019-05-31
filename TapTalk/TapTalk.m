@@ -796,9 +796,6 @@ fromNavigationController:(UINavigationController *)navigationController
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_UPDATED_CHAT_ROOM];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_FILE_PATH_DICTIONARY];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_COUNTRY_LIST_ARRAY];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_COUNTRY_LIST_DICTIONARY];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_UPDATED_COUNTRY_LIST_TIMESTAMP];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_LOGIN_PHONE_TEMP_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_COUNTRY_CODE];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
