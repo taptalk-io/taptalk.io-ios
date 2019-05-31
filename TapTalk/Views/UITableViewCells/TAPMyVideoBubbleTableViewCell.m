@@ -115,12 +115,11 @@
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
 - (void)showForwardView:(BOOL)show;
-- (void)setQuote:(TAPQuoteModel *)quote;
+- (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID;
 - (void)showStatusLabel:(BOOL)show;
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
-- (void)setQuote:(TAPQuoteModel *)quote;
 - (void)setBubbleCellColor;
 
 - (IBAction)downloadButtonDidTapped:(id)sender;
@@ -374,7 +373,7 @@
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
-            [self setQuote:message.quote];
+            [self setQuote:message.quote userID:message.replyTo.userID];
         }
         else {
             [self showReplyView:YES withMessage:message];
@@ -392,7 +391,7 @@
         }
         
         [self showReplyView:NO withMessage:nil];
-        [self setQuote:message.quote];
+        [self setQuote:message.quote userID:@""];
         [self showQuoteView:YES];
     }
     else {
@@ -924,14 +923,20 @@
     self.forwardFromLabel.attributedText = attributedText;
 }
 
-- (void)setQuote:(TAPQuoteModel *)quote {
+- (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
     if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
         [self.quoteImageView setImageWithURLString:quote.imageURL];
     }
     else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
         [self.quoteImageView setImageWithURLString:quote.fileID];
     }
-    self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
+    //check id message sender is equal to active user id, if yes change the title to "You"
+    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
+    }
+    else {
+        self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
+    }
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }
 
@@ -1158,14 +1163,14 @@
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
         self.retryDownloadView.alpha = 1.0f;
-        [self showStatusLabel:NO];
+        [self showStatusLabel:YES];
     }
     else if (type == TAPMyVideoBubbleTableViewCellStateTypeRetryDownload) {
         self.cancelView.alpha = 0.0f;
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
         self.retryDownloadView.alpha = 1.0f;
-        [self showStatusLabel:NO];
+        [self showStatusLabel:YES];
     }
 }
 

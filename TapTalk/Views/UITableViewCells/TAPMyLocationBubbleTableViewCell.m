@@ -83,7 +83,7 @@
 - (void)setMapWithLatitude:(CGFloat)latitude longitude:(CGFloat)longitude;
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
-- (void)setQuote:(TAPQuoteModel *)quote;
+- (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID;
 - (void)setBubbleCellColor;
 
 @end
@@ -206,7 +206,7 @@
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
-            [self setQuote:message.quote];
+            [self setQuote:message.quote userID:message.replyTo.userID];
         }
         else {
             [self showReplyView:YES withMessage:message];
@@ -224,7 +224,7 @@
         }
         
         [self showReplyView:NO withMessage:nil];
-        [self setQuote:message.quote];
+        [self setQuote:message.quote userID:@""];
         [self showQuoteView:YES];
     }
     else {
@@ -562,7 +562,7 @@
     self.forwardFromLabel.attributedText = attributedText;
 }
 
-- (void)setQuote:(TAPQuoteModel *)quote {
+- (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
         //TYPE FILE
         self.fileImageView.alpha = 1.0f;
@@ -579,7 +579,13 @@
         self.quoteImageView.alpha = 1.0f;
     }
     
-    self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
+    //check id message sender is equal to active user id, if yes change the title to "You"
+    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
+    }
+    else {
+        self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];
+    }
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }
 

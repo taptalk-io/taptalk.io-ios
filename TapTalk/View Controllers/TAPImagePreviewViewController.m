@@ -232,10 +232,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                                     [cell animateFinishedDownload];
                                 } forTotalSeconds:0.3f];
                             }
-                        }resultHandler:^(UIImage * _Nonnull resultImage) {
+                        } resultHandler:^(UIImage * _Nonnull resultImage) {
                             mediaPreview.image = resultImage;
                             [cell setImagePreviewImage:resultImage];
                             cell.mediaPreviewData = mediaPreview;
+                        } failureHandler:^{
+                            
                         }];
                     }
                     else {
@@ -667,8 +669,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [cell showPlayButton:YES animated:NO];
             _showVideoPlayer = NO;
         } forTotalSeconds:0.5f];
+    } failureHandler:^{
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Cannot play video at the moment, please check your connection and try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+
     }];
-    
 }
 
 #pragma mark - Custom Method
@@ -839,6 +843,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //    }
         
         [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Cannot Fetch Video"]) {
+        //Do nothing because hide popup handled when we press the button
     }
 }
 

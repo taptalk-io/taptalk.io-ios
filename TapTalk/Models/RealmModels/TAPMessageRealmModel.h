@@ -46,6 +46,7 @@
 @property (strong, nonatomic) NSNumber<RLMBool> *requireChangePassword;
 @property (strong, nonatomic) NSNumber<RLMDouble> *userCreated;
 @property (strong, nonatomic) NSNumber<RLMDouble> *userUpdated;
+@property (strong, nonatomic) NSNumber<RLMDouble> *userDeleted; //added in schema 3 migration
 
 //Data
 @property (nonatomic, strong) NSString *data; //contains JSONString converted from NSDictionary

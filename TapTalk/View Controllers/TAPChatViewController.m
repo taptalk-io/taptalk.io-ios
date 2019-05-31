@@ -97,6 +97,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIImageView *topFloatingIndicatorImageView;
 @property (strong, nonatomic) IBOutlet UIButton *topFloatingIndicatorButton;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *topFloatingIndicatorWidthConstraint;
+
+@property (strong, nonatomic) IBOutlet UIView *deletedRoomView;
+
 @property (nonatomic) TopFloatingIndicatorViewType topFloatingIndicatorViewType;
 
 @property (strong, nonatomic) UIView *titleView;
@@ -173,6 +176,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIImageView *loadMoreMessageLoadingViewImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *loadMoreMessageLoadingHeightConstraint;
 @property (nonatomic) CGFloat loadMoreMessageViewHeight;
+
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedRoomViewHeightConstrait;
 
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
@@ -471,6 +476,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
     _otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    if (self.otherUser == nil) {
+        self.inputMessageAccessoryView.alpha = 0.0f;
+    }
     
     NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:self.otherUser];
     if([keyboardArray count] > 0) {
@@ -564,6 +572,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
     }
     
+    self.deletedRoomViewHeightConstrait.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -604,6 +614,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self checkAndRefreshOnlineStatus];
     [self setKeyboardStateDefault];
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -1643,6 +1654,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myChatReplyDidTapped {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     //set selected message to chat field
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
@@ -1675,7 +1691,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //reply to exists
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
+            
         }
     }
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
@@ -1739,6 +1760,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     TAPMessageModel *quotedMessageModel = [message copy];
     
     //WK Note : Do reply here later.
@@ -1869,7 +1895,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //reply to exists
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
         }
     }
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
@@ -1881,6 +1910,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myFileReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     TAPMessageModel *quotedMessageModel = [tappedMessage copy];
     
     //WK Note : Do reply here later.
@@ -1934,12 +1968,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     
     if ([fileID isEqualToString:@""] || fileID == nil) {
+        
+        //Remove from waiting upload dictionary in ChatManager
+        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
+        
         //File exist, retry upload file
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
-        
+
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            [self.messageArray removeObjectAtIndex:messageIndex];
-            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            
+            [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
+
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             [self.tableView beginUpdates];
             [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
@@ -2118,6 +2157,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     
@@ -2164,6 +2208,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myVideoReplyDidTappedWithMessage:(TAPMessageModel *)message {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     TAPMessageModel *quotedMessageModel = [message copy];
     
     //WK Note : Do reply here later.
@@ -2400,6 +2449,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourChatReplyDidTapped {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     //set selected message to chat field
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
@@ -2432,7 +2486,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //reply to exists
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
         }
     }
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
@@ -2469,6 +2526,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPYourImageBubbleTableViewCell
 - (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
     
     TAPMessageModel *quotedMessageModel = [message copy];
     
@@ -2581,7 +2642,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //reply to exists
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
         }
     }
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
@@ -2593,6 +2657,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourFileReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     TAPMessageModel *quotedMessageModel = [tappedMessage copy];
     
     //WK Note : Do reply here later.
@@ -2713,7 +2782,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //reply to exists
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
         }
     }
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
@@ -2725,6 +2797,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     
@@ -2771,6 +2848,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourVideoReplyDidTappedWithMessage:(TAPMessageModel *)message {
+    if (self.otherUser == nil) {
+        return;
+    }
     
     TAPMessageModel *quotedMessageModel = [message copy];
     
@@ -4236,6 +4316,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
+    
+    if (self.otherUser == nil) {
+        return;
+    }
+    
     [TAPUtil tapticImpactFeedbackGenerator];
     //handle message long pressed
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
@@ -4545,6 +4630,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #pragma mark Input Accessory View
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
+    
     if (self.isViewWillAppeared) {
         if (self.isShowAccessoryView) {
             return self.inputMessageAccessoryView;
@@ -4974,6 +5060,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)retrieveExistingMessages {
     //Prevent retreive before message if already last page
     if (self.isLastPage) {
+        [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
         return;
     }
     
@@ -5923,10 +6010,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfDays, dayString];
         
-        if (timeGap <= 86400.0f) {
+        if (timeGap <= 86400.0f || numberOfDays == 1) {
             lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active yesterday", @"")];
         }
-        
     }
     else if (timeGap <= 86400.0f*7 + midnightTimeGap) {
         //Set a week ago
@@ -6153,6 +6239,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
         [TAPDataManager callAPIGetUserByUserID:otherUserID success:^(TAPUserModel *user) {
             
+            self.inputMessageAccessoryView.alpha = 1.0f;
+
             //Upsert User to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
             
@@ -6169,7 +6257,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self updateLastSeenWithTimestamp:currentLastSeen];
             
         } failure:^(NSError *error) {
-            
+            if (error.code == 40401) {
+                //user not found
+                //hide textview
+                self.inputMessageAccessoryView.alpha = 0.0f;
+                self.deletedRoomView.alpha = 1.0f;
+            }
         }];
     }
 }
