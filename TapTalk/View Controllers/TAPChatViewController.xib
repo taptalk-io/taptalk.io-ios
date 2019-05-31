@@ -29,6 +29,8 @@
                 <outlet property="chatAnchorBadgeView" destination="2El-oL-J7D" id="sXG-qS-wsg"/>
                 <outlet property="chatAnchorButton" destination="ZsM-Zn-PUI" id="j6B-Pm-JYZ"/>
                 <outlet property="chatAnchorButtonBottomConstrait" destination="r4g-gD-s1T" id="5PI-or-eS0"/>
+                <outlet property="deletedRoomView" destination="LC9-67-sIb" id="GdA-2O-EAE"/>
+                <outlet property="deletedRoomViewHeightConstrait" destination="EH6-O0-IWS" id="tJP-5J-hN1"/>
                 <outlet property="dummyNavigationBarTitleLabel" destination="ky7-8J-Xfj" id="8p2-Ii-dRW"/>
                 <outlet property="dummyNavigationBarView" destination="Vsl-X9-aw7" id="SMw-Yx-Ubs"/>
                 <outlet property="emptyDescriptionLabel" destination="2uI-Vl-chf" id="Rtf-NL-9ef"/>
@@ -311,6 +313,52 @@
                         <action selector="topFloatingIndicatorButtonDidTapped:" destination="-1" eventType="touchUpInside" id="Jh7-P9-pGl"/>
                     </connections>
                 </button>
+                <view clipsSubviews="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LC9-67-sIb">
+                    <rect key="frame" x="0.0" y="603" width="375" height="0.0"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kgs-QW-Obm">
+                            <rect key="frame" x="104.5" y="5" width="166.5" height="21"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is a chat history" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="des-jS-dAa">
+                                    <rect key="frame" x="18" y="0.0" width="148.5" height="21"/>
+                                    <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="16"/>
+                                    <color key="textColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconHistory" translatesAutoresizingMaskIntoConstraints="NO" id="bpC-bi-dD5">
+                                    <rect key="frame" x="0.0" y="3.5" width="14" height="14"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="14" id="OXm-vh-Q17"/>
+                                        <constraint firstAttribute="width" constant="14" id="cb8-OR-nQR"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstItem="des-jS-dAa" firstAttribute="leading" secondItem="bpC-bi-dD5" secondAttribute="trailing" constant="4" id="EqK-gS-TO6"/>
+                                <constraint firstAttribute="bottom" secondItem="des-jS-dAa" secondAttribute="bottom" id="LBt-aT-4Oa"/>
+                                <constraint firstAttribute="trailing" secondItem="des-jS-dAa" secondAttribute="trailing" id="TJa-yK-LQR"/>
+                                <constraint firstItem="bpC-bi-dD5" firstAttribute="centerY" secondItem="kgs-QW-Obm" secondAttribute="centerY" id="WJZ-5y-etS"/>
+                                <constraint firstItem="des-jS-dAa" firstAttribute="top" secondItem="kgs-QW-Obm" secondAttribute="top" id="nAc-l9-e6R"/>
+                                <constraint firstItem="bpC-bi-dD5" firstAttribute="leading" secondItem="kgs-QW-Obm" secondAttribute="leading" id="nFN-1T-Crc"/>
+                            </constraints>
+                        </view>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This user is no longer availbale" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DuO-ux-hS4">
+                            <rect key="frame" x="90.5" y="26" width="194" height="18"/>
+                            <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="14"/>
+                            <color key="textColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" red="1" green="0.95686274509803915" blue="0.69411764705882351" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="DuO-ux-hS4" firstAttribute="top" secondItem="kgs-QW-Obm" secondAttribute="bottom" id="9oU-Ho-tqD"/>
+                        <constraint firstAttribute="height" id="EH6-O0-IWS"/>
+                        <constraint firstItem="kgs-QW-Obm" firstAttribute="centerX" secondItem="LC9-67-sIb" secondAttribute="centerX" id="f6k-Lh-y6l"/>
+                        <constraint firstItem="kgs-QW-Obm" firstAttribute="top" secondItem="LC9-67-sIb" secondAttribute="top" constant="5" id="kUd-7T-gje"/>
+                        <constraint firstItem="DuO-ux-hS4" firstAttribute="centerX" secondItem="LC9-67-sIb" secondAttribute="centerX" id="uQe-FO-ajF"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
@@ -322,6 +370,8 @@
                 <constraint firstAttribute="trailing" secondItem="7nB-bs-k4t" secondAttribute="trailing" id="3h2-Xj-niR"/>
                 <constraint firstItem="tGk-j5-N3W" firstAttribute="trailing" secondItem="Dr2-Y3-9Wq" secondAttribute="trailing" id="4lC-Gk-ryI"/>
                 <constraint firstItem="54H-Ok-ud4" firstAttribute="trailing" secondItem="kwo-aS-WWG" secondAttribute="trailing" id="9lu-dC-s4U"/>
+                <constraint firstItem="LC9-67-sIb" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="EHY-wG-k1J"/>
+                <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="LC9-67-sIb" secondAttribute="trailing" id="H7I-7U-OfG"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="centerX" secondItem="2El-oL-J7D" secondAttribute="centerX" id="L8O-6z-aWM"/>
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="dWy-vT-5Kr" secondAttribute="trailing" constant="11" id="SCI-vg-jss"/>
                 <constraint firstItem="54H-Ok-ud4" firstAttribute="top" secondItem="kwo-aS-WWG" secondAttribute="top" id="SyC-14-Jd4"/>
@@ -333,6 +383,7 @@
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="Vsl-X9-aw7" secondAttribute="trailing" id="bot-h3-FVg"/>
                 <constraint firstItem="tGk-j5-N3W" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="d9D-q1-TM4"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="top" secondItem="2El-oL-J7D" secondAttribute="bottom" constant="-10" id="dgL-2O-eka"/>
+                <constraint firstAttribute="bottom" secondItem="LC9-67-sIb" secondAttribute="bottom" id="di0-bf-WSM"/>
                 <constraint firstItem="7nB-bs-k4t" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="hgv-h0-S0m"/>
                 <constraint firstItem="tGk-j5-N3W" firstAttribute="top" secondItem="Dr2-Y3-9Wq" secondAttribute="top" id="iDb-1J-y46"/>
                 <constraint firstItem="QeJ-a5-K4g" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="l04-Cq-Q9I"/>
@@ -641,6 +692,7 @@
         <image name="TAPIconClose" width="16" height="16"/>
         <image name="TAPIconDocumentsWhite" width="24" height="24"/>
         <image name="TAPIconHamburger" width="28" height="28"/>
+        <image name="TAPIconHistory" width="14" height="14"/>
         <image name="TAPIconSendMessage" width="28" height="28"/>
         <image name="TAPIconSettingUp" width="20" height="20"/>
     </resources>

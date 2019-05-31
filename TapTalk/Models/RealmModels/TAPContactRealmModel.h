@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL requireChangePassword;
 @property (nonatomic, strong) NSNumber<RLMDouble> *created;
 @property (nonatomic, strong) NSNumber<RLMDouble> *updated;
+@property (nonatomic, strong) NSNumber<RLMDouble> *deleted; //Added in DB config version 3 via migration
 @property (nonatomic, strong) NSNumber<RLMBool> *isRequestPending;
 @property (nonatomic, strong) NSNumber<RLMBool> *isRequestAccepted;
 @property (nonatomic, strong) NSNumber<RLMBool> *isContact;

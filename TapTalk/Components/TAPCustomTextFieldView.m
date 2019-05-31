@@ -468,7 +468,9 @@
                                     [[NSCharacterSet decimalDigitCharacterSet] invertedSet]]
                                    componentsJoinedByString:@""];
     
-    if ([phoneNumber hasPrefix:country.countryCallingCode]) {
+    NSString *countryCallingCode = country.countryCallingCode;
+    countryCallingCode = [TAPUtil nullToEmptyString:countryCallingCode];
+    if ([phoneNumber hasPrefix:countryCallingCode] && ![countryCallingCode isEqualToString:@""]) {
         phoneNumber = [phoneNumber stringByReplacingCharactersInRange:NSMakeRange(0, [country.countryCallingCode length]) withString:@""];
     }
     

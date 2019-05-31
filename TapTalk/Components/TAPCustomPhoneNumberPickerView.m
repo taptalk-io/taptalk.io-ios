@@ -277,9 +277,11 @@
     if (![countryCodeNumber isEqualToString:@""] && countryCodeNumber != nil) {
         formattedCountryCodeNumber = [NSString stringWithFormat:@"+%@", countryCodeNumber];
     }
+    else {
+        formattedCountryCodeNumber = @"-";
+    }
     
     if (countryFlagImageURL == nil || [countryFlagImageURL isEqualToString:@""]) {
-        
         //CS TEMP - set default country to Indonesia
         if ([countryCodeNumber isEqualToString:@"62"]) {
             [self.countryFlagImageView setImage:[UIImage imageNamed:@"TAPIconFlagIndonesia" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
