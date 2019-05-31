@@ -159,7 +159,8 @@
 
 - (void)fetchImageDataForAsset:(PHAsset *)asset
                progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary))progressHandler
-                 resultHandler:(void(^)(UIImage *image))resultHandler {
+                 resultHandler:(void(^)(UIImage *image))resultHandler
+                failureHandler:(nonnull void (^)())failureHandler {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         //    NSString *assetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:asset];
@@ -175,9 +176,14 @@
                 });
             } resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    UIImage *resultImage = [UIImage imageWithData:imageData];
-                    [self.imageFetchResultDictionary setObject:resultImage forKey:assetKey];
-                    resultHandler(resultImage);
+                    if (imageData == nil) {
+                        failureHandler();
+                    }
+                    else {
+                        UIImage *resultImage = [UIImage imageWithData:imageData];
+                        [self.imageFetchResultDictionary setObject:resultImage forKey:assetKey];
+                        resultHandler(resultImage);
+                    }
                 });
             }];
         }
@@ -191,7 +197,8 @@
 
 - (void)fetchVideoDataForAsset:(PHAsset *)asset
                progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary))progressHandler
-                 resultHandler:(void (^)(AVAsset *resultVideoAsset))resultHandler {
+                 resultHandler:(void (^)(AVAsset *resultVideoAsset))resultHandler
+                failureHandler:(void (^)())failureHandler {
     
     //    NSString *assetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:asset];
     NSString *assetKey = asset.localIdentifier;
@@ -202,8 +209,13 @@
         [[TAPFetchMediaManager sharedManager] requestAssetForVideo:asset progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary) {
             progressHandler(progress, error, stop, dictionary);
         } resultHandler:^(AVAsset * _Nullable videoAsset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-            [self.videoFetchResultDictionary setObject:videoAsset forKey:assetKey];
-            resultHandler(videoAsset);
+            if (videoAsset == nil) {
+                failureHandler();
+            }
+            else {
+                [self.videoFetchResultDictionary setObject:videoAsset forKey:assetKey];
+                resultHandler(videoAsset);
+            }
         }];
     }
     else {

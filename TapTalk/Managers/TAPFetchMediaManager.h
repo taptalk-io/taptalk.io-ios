@@ -18,10 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)fetchImageDataForAsset:(PHAsset *)asset
                progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary))progressHandler
-                 resultHandler:(void(^)(UIImage *resultImage))resultHandler;
+                 resultHandler:(void(^)(UIImage *resultImage))resultHandler
+                failureHandler:(void (^)())failureHandler;
 - (void)fetchVideoDataForAsset:(PHAsset *)asset
                progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary))progressHandler
-                 resultHandler:(void (^)(AVAsset *resultVideoAsset))resultHandler;
+                 resultHandler:(void (^)(AVAsset *resultVideoAsset))resultHandler
+                failureHandler:(void (^)())failureHandler;
 - (void)removeFetchAssetFromDictionaryForAsset:(PHAsset *)asset;
 - (NSNumber *)getFetchProgressWithAsset:(PHAsset *)asset;
 - (UIImage *)generateThumbnailImageFromFilePathString:(NSString *)filePathString;

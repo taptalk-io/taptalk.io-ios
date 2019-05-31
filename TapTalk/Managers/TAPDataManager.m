@@ -195,6 +195,11 @@
     NSNumber *userUpdated = [dictionary objectForKey:@"userUpdated"];
     userUpdated = [TAPUtil nullToEmptyNumber:userUpdated];
     user.updated = userUpdated;
+    
+    NSNumber *userDeleted = [dictionary objectForKey:@"userDeleted"];
+    userDeleted = [TAPUtil nullToEmptyNumber:userDeleted];
+    user.deleted = userDeleted;
+    
     message.user = user;
     
     TAPQuoteModel *quote = [TAPQuoteModel new];
@@ -394,6 +399,11 @@
     NSNumber *userUpdated = [userDictionary objectForKey:@"updated"];
     userUpdated = [TAPUtil nullToEmptyNumber:userUpdated];
     user.updated = userUpdated;
+    
+    NSNumber *userDeleted = [dictionary objectForKey:@"deleted"];
+    userDeleted = [TAPUtil nullToEmptyNumber:userDeleted];
+    user.deleted = userDeleted;
+    
     message.user = user;
     
     NSDictionary *quoteDictionary = [dictionary objectForKey:@"quote"];
@@ -551,6 +561,10 @@
     NSNumber *updated = [dictionary objectForKey:@"updated"];
     updated = [TAPUtil nullToEmptyNumber:updated];
     user.updated = updated;
+    
+    NSNumber *deleted = [dictionary objectForKey:@"deleted"];
+    deleted = [TAPUtil nullToEmptyNumber:deleted];
+    user.deleted = deleted;
     
     return user;
 }
@@ -852,6 +866,11 @@
     NSNumber *updated = [userDictionary objectForKey:@"updated"];
     updated = [TAPUtil nullToEmptyNumber:updated];
     [userMutableDictionary setValue:updated forKey:@"updated"];
+    
+    NSNumber *deleted = [userDictionary objectForKey:@"deleted"];
+    deleted = [TAPUtil nullToEmptyNumber:deleted];
+    [userMutableDictionary setValue:deleted forKey:@"deleted"];
+    
     [userMutableDictionary removeObjectForKey:@"user"];
     
     return userMutableDictionary;
@@ -1740,7 +1759,7 @@
                             success:(void (^)(NSArray *resultArray))success
                             failure:(void (^)(NSError *error))failure {
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableContact
-                             whereClauseQuery:@"isContact = true"
+                             whereClauseQuery:@"isContact = true AND (deleted = 0 OR deleted = null)"
                              sortByColumnName:columnName
                                   isAscending:YES
                                       success:^(NSArray *resultArray) {
@@ -2626,6 +2645,10 @@
             NSNumber *updated = [obtainedUserDictionary objectForKey:@"updated"];
             updated = [TAPUtil nullToEmptyNumber:updated];
             user.updated = updated;
+            
+            NSNumber *deleted = [obtainedUserDictionary objectForKey:@"deleted"];
+            deleted = [TAPUtil nullToEmptyNumber:deleted];
+            user.deleted = deleted;
   
             BOOL isRequestPending = [[userDictionary objectForKey:@"isRequestPending"] boolValue];
             user.isRequestPending = isRequestPending;
@@ -4041,6 +4064,10 @@
             NSNumber *updated = [obtainedUserDictionary objectForKey:@"updated"];
             updated = [TAPUtil nullToEmptyNumber:updated];
             user.updated = updated;
+            
+            NSNumber *deleted = [obtainedUserDictionary objectForKey:@"deleted"];
+            deleted = [TAPUtil nullToEmptyNumber:deleted];
+            user.deleted = deleted;
             
             BOOL isRequestPending = [[userDictionary objectForKey:@"isRequestPending"] boolValue];
             user.isRequestPending = isRequestPending;
