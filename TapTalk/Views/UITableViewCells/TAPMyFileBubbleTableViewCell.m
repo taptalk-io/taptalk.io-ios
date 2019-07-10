@@ -121,7 +121,7 @@
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID;
-- (void)setBubbleCellColor;
+- (void)setBubbleCellStyle;
 
 @end
 
@@ -173,7 +173,7 @@
     
     [self showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
     
-    [self setBubbleCellColor];
+    [self setBubbleCellStyle];
 }
 
 - (void)prepareForReuse {
@@ -202,24 +202,73 @@
 }
 
 #pragma mark - Custom Method
-- (void)setBubbleCellColor {
-    self.bubbleView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-    self.quoteView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
-    self.replyInnerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
-    self.replyView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_45];
-    self.progressContainerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_200];
+- (void)setBubbleCellStyle {
+    self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleBackground];
+    self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteBackground];
+    self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteBackground];
+    self.replyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorQuoteLayoutDecorationBackground];
+    self.progressContainerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightFileButtonBackground];
     
-    self.replyNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.replyMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.quoteTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.quoteSubtitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.forwardTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.forwardFromLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleQuoteTitle];
+    UIColor *quoteTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleQuoteTitle];
+
+    UIFont *quoteContentFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleQuoteContent];
+    UIColor *quoteContentColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleQuoteContent];
+
+    UIFont *bubbleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleMessageBody];
+    UIColor *bubbleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBody];
+
+    UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
+    UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
+
+    UIFont *fileNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightFileBubbleName];
+    UIColor *fileNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightFileBubbleName];
     
-    self.bubbleLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.fileDescriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.fileDescriptionSizePlaceholderLabel.textColor = [TAPUtil getColor:TAP_COLOR_WHITE];
+    UIFont *fileInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightFileBubbleInfo];
+    UIColor *fileInfoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightFileBubbleInfo];
+
+    self.replyNameLabel.textColor = quoteTitleColor;
+    self.replyNameLabel.font = quoteTitleFont;
+    
+    self.replyMessageLabel.textColor = quoteContentColor;
+    self.replyMessageLabel.font = quoteContentFont;
+    
+    self.quoteTitleLabel.textColor = quoteTitleColor;
+    self.quoteTitleLabel.font = quoteTitleFont;
+    
+    self.quoteSubtitleLabel.textColor = quoteContentColor;
+    self.quoteSubtitleLabel.font = quoteContentFont;
+    
+    self.forwardTitleLabel.textColor = quoteContentColor;
+    self.forwardTitleLabel.font = quoteContentFont;
+    
+    self.forwardFromLabel.textColor = quoteContentColor;
+    self.forwardFromLabel.font = quoteContentFont;
+    
+    self.bubbleLabel.textColor = bubbleLabelColor;
+    self.bubbleLabel.font = bubbleLabelFont;
+    
+    self.statusLabel.textColor = statusLabelColor;
+    self.statusLabel.font = statusLabelFont;
+    
+    self.fileDescriptionLabel.textColor = fileNameLabelColor;
+    self.fileDescriptionLabel.font = fileNameLabelFont;
+    
+    self.fileDescriptionSizePlaceholderLabel.textColor = fileInfoLabelColor;
+    self.fileDescriptionSizePlaceholderLabel.font = fileInfoLabelFont;
+    
+    UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownload]];
+    self.cancelImageView.image = abortImage;
+    
+    UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.fileImageView.image = documentsImage;
+    self.doneDownloadImageView.image = documentsImage;
+    
+    UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.retryDownloadImageView.image = retryImage;
 }
+
 
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
@@ -548,8 +597,9 @@
     [[NSMutableAttributedString alloc]
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
+    UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleQuoteTitle];
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
+                           value:quoteTitleFont
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
@@ -682,7 +732,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
     
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);
@@ -716,7 +766,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
     
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);

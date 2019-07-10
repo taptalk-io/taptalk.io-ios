@@ -49,37 +49,31 @@
     if (self) {
         CGFloat currentStatusBarHeight = [TAPUtil currentDeviceStatusBarHeight];
         
-        _backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(11.0f, currentStatusBarHeight + 12.0f, 12.0f, 21.0f)];
+        _backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(11.0f, currentStatusBarHeight + 12.0f, 24.0f, 35.0f)];
         self.backImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.backImageView.image = [UIImage imageNamed:@"TAPIconBackArrowOrange" inBundle:[NSBundle mainBundle] compatibleWithTraitCollection:nil];
+        UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
+        self.backImageView.image = buttonImage;
         [self addSubview:self.backImageView];
         
-        _backButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, currentStatusBarHeight, 34.0f, 45.0f)];
+        _backButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, currentStatusBarHeight, 45.0f, 45.0f)];
         [self addSubview:self.backButton];
 
+        UIFont *titleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLoginVerificationInfoLabel];
+        UIColor *titleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLoginVerificationInfoLabel];
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50.0f, currentStatusBarHeight + 165.0f, CGRectGetWidth(self.frame) - 50.0f - 50.0f, 20.0f)];
-        if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
-            self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:16.0f];
-        }
-        else {
-            self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:14.0f];
-        }
-
-        self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.titleLabel.font = titleLabelFont;
+        self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"Enter the 6 digit OTP we’ve sent to", @"");
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.titleLabel];
+
         
+        UIFont *phoneNumberFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLoginVerificationPhoneNumberLabel];
+        UIColor *phoneNumberColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLoginVerificationPhoneNumberLabel];
         _phoneNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 24.0f)];
-        
-        if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
-            self.phoneNumberLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
-        }
-        else {
-            self.phoneNumberLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
-        }
-        
-        self.phoneNumberLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.phoneNumberLabel.font = phoneNumberFont;
+        self.phoneNumberLabel.textColor = phoneNumberColor;
         self.phoneNumberLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.phoneNumberLabel];
         
@@ -101,89 +95,95 @@
         [self.codeContainerView addSubview:self.codeTextField];
         
         _firstCodeSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 22.0f, codeWidth, 2.0f)];
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         [self.codeContainerView addSubview:self.firstCodeSeparatorView];
         
         _secondCodeSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.firstCodeSeparatorView.frame) + innerGap, CGRectGetMinY(self.firstCodeSeparatorView.frame), CGRectGetWidth(self.firstCodeSeparatorView.frame), CGRectGetHeight(self.firstCodeSeparatorView.frame))];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         [self.codeContainerView addSubview:self.secondCodeSeparatorView];
         
         _thirdCodeSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.secondCodeSeparatorView.frame) + innerGap, CGRectGetMinY(self.firstCodeSeparatorView.frame), CGRectGetWidth(self.firstCodeSeparatorView.frame), CGRectGetHeight(self.firstCodeSeparatorView.frame))];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         [self.codeContainerView addSubview:self.thirdCodeSeparatorView];
         
         _fourthCodeSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.thirdCodeSeparatorView.frame) + innerGap, CGRectGetMinY(self.firstCodeSeparatorView.frame), CGRectGetWidth(self.firstCodeSeparatorView.frame), CGRectGetHeight(self.firstCodeSeparatorView.frame))];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         [self.codeContainerView addSubview:self.fourthCodeSeparatorView];
         
         _fifthCodeSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.fourthCodeSeparatorView.frame) + innerGap, CGRectGetMinY(self.firstCodeSeparatorView.frame), CGRectGetWidth(self.firstCodeSeparatorView.frame), CGRectGetHeight(self.firstCodeSeparatorView.frame))];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         [self.codeContainerView addSubview:self.fifthCodeSeparatorView];
         
         _sixthCodeSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.fifthCodeSeparatorView.frame) + innerGap, CGRectGetMinY(self.firstCodeSeparatorView.frame), CGRectGetWidth(self.firstCodeSeparatorView.frame), CGRectGetHeight(self.firstCodeSeparatorView.frame))];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         [self.codeContainerView addSubview:self.sixthCodeSeparatorView];
         
         _firstCodeFilledView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, codeWidth, codeWidth)];
-        self.firstCodeFilledView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeFilledView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.firstCodeFilledView.layer.cornerRadius = CGRectGetHeight(self.firstCodeFilledView.frame) / 2.0f;
         self.firstCodeFilledView.clipsToBounds = YES;
         self.firstCodeFilledView.alpha = 0.0f;
         [self.codeContainerView addSubview:self.firstCodeFilledView];
         
         _secondCodeFilledView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.firstCodeFilledView.frame) + innerGap, CGRectGetMinY(self.firstCodeFilledView.frame), CGRectGetWidth(self.firstCodeFilledView.frame), CGRectGetHeight(self.firstCodeFilledView.frame))];
-        self.secondCodeFilledView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.secondCodeFilledView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.secondCodeFilledView.layer.cornerRadius = CGRectGetHeight(self.secondCodeFilledView.frame) / 2.0f;
         self.secondCodeFilledView.clipsToBounds = YES;
         self.secondCodeFilledView.alpha = 0.0f;
         [self.codeContainerView addSubview:self.secondCodeFilledView];
         
         _thirdCodeFilledView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.secondCodeFilledView.frame) + innerGap, CGRectGetMinY(self.firstCodeFilledView.frame), CGRectGetWidth(self.firstCodeFilledView.frame), CGRectGetHeight(self.firstCodeFilledView.frame))];
-        self.thirdCodeFilledView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.thirdCodeFilledView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.thirdCodeFilledView.layer.cornerRadius = CGRectGetHeight(self.thirdCodeFilledView.frame) / 2.0f;
         self.thirdCodeFilledView.clipsToBounds = YES;
         self.thirdCodeFilledView.alpha = 0.0f;
         [self.codeContainerView addSubview:self.thirdCodeFilledView];
         
         _fourthCodeFilledView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.thirdCodeFilledView.frame) + innerGap, CGRectGetMinY(self.firstCodeFilledView.frame), CGRectGetWidth(self.firstCodeFilledView.frame), CGRectGetHeight(self.firstCodeFilledView.frame))];
-        self.fourthCodeFilledView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.fourthCodeFilledView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.fourthCodeFilledView.layer.cornerRadius = CGRectGetHeight(self.fourthCodeFilledView.frame) / 2.0f;
         self.fourthCodeFilledView.clipsToBounds = YES;
         self.fourthCodeFilledView.alpha = 0.0f;
         [self.codeContainerView addSubview:self.fourthCodeFilledView];
         
         _fifthCodeFilledView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.fourthCodeFilledView.frame) + innerGap, CGRectGetMinY(self.firstCodeFilledView.frame), CGRectGetWidth(self.firstCodeFilledView.frame), CGRectGetHeight(self.firstCodeFilledView.frame))];
-        self.fifthCodeFilledView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.fifthCodeFilledView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.fifthCodeFilledView.layer.cornerRadius = CGRectGetHeight(self.fifthCodeFilledView.frame) / 2.0f;
         self.fifthCodeFilledView.clipsToBounds = YES;
         self.fifthCodeFilledView.alpha = 0.0f;
         [self.codeContainerView addSubview:self.fifthCodeFilledView];
         
         _sixthCodeFilledView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.fifthCodeFilledView.frame) + innerGap, CGRectGetMinY(self.firstCodeFilledView.frame), CGRectGetWidth(self.firstCodeFilledView.frame), CGRectGetHeight(self.firstCodeFilledView.frame))];
-        self.sixthCodeFilledView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.sixthCodeFilledView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.sixthCodeFilledView.layer.cornerRadius = CGRectGetHeight(self.sixthCodeFilledView.frame) / 2.0f;
         self.sixthCodeFilledView.clipsToBounds = YES;
         self.sixthCodeFilledView.alpha = 0.0f;
         [self.codeContainerView addSubview:self.sixthCodeFilledView];
         
+        UIFont *infoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
         _verificationInformationLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.codeContainerView.frame) + 34.0f, CGRectGetWidth(self.titleLabel.frame), 20.0f)];
-        self.verificationInformationLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
-        self.verificationInformationLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.verificationInformationLabel.font = infoLabelFont;
+        self.verificationInformationLabel.textColor = infoLabelColor;
         self.verificationInformationLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.verificationInformationLabel];
-        
+
+        UIFont *countdownLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLoginVerificationStatusCountdownLabel];
+        UIColor *countdownLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLoginVerificationStatusCountdownLabel];
         _counterResendLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.verificationInformationLabel.frame) + 8.0f, CGRectGetWidth(self.titleLabel.frame), 50.0f)];
-        self.counterResendLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
-        self.counterResendLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.counterResendLabel.font = countdownLabelFont;
+        self.counterResendLabel.textColor = countdownLabelColor;
         self.counterResendLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.counterResendLabel];
-        
+
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _resendVerificationButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.verificationInformationLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 50.0f)];
         self.resendVerificationButton.alpha = 0.0f;
         self.resendVerificationButton.userInteractionEnabled = NO;
         [self.resendVerificationButton setTitle:NSLocalizedString(@"Request Again", @"") forState:UIControlStateNormal];
-        self.resendVerificationButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
-        [self.resendVerificationButton setTitleColor:[TAPUtil getColor:TAP_COLOR_ORANGE_00] forState:UIControlStateNormal];
+        self.resendVerificationButton.titleLabel.font = clickableLabelFont;
+        [self.resendVerificationButton setTitleColor:clickableLabelColor forState:UIControlStateNormal];
         self.resendVerificationButton.backgroundColor = [UIColor clearColor];
         [self addSubview:self.resendVerificationButton];
         
@@ -192,8 +192,8 @@
         [self addSubview:self.loadingView];
         
         _loadingInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 120.0f, 22.0f)];
-        self.loadingInfoLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
-        self.loadingInfoLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.loadingInfoLabel.font = clickableLabelFont;
+        self.loadingInfoLabel.textColor = clickableLabelColor;
         [self.loadingView addSubview:self.loadingInfoLabel];
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.loadingInfoLabel.frame) + 8.0f, 1.0f, 20.0f, 20.0f)];
@@ -204,9 +204,11 @@
         self.doneResendOTPView.alpha = 0.0f;
         [self addSubview:self.doneResendOTPView];
         
+        UIFont *verificationSuccessLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLoginVerificationStatusSuccessLabel];
+        UIColor *verificationSuccessLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLoginVerificationStatusSuccessLabel];
         _doneResendOTPLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 120.0f, 22.0f)];
-        self.doneResendOTPLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
-        self.doneResendOTPLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREEN_2A];
+        self.doneResendOTPLabel.font = verificationSuccessLabelFont;
+        self.doneResendOTPLabel.textColor = verificationSuccessLabelColor;
         self.doneResendOTPLabel.text = NSLocalizedString(@"OTP Successfully Sent", @"");
         [self.doneResendOTPView addSubview:self.doneResendOTPLabel];
         
@@ -222,12 +224,11 @@
 
 - (void)setVerificationInformationAsInvalidOTP:(BOOL)isInvalid {
     if (isInvalid) {
-        self.verificationInformationLabel.textColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57];
+        self.verificationInformationLabel.textColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorError];
         self.verificationInformationLabel.text = NSLocalizedString(@"Invalid OTP, please try again", @"");
-        
     }
     else {
-        self.verificationInformationLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.verificationInformationLabel.textColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         self.verificationInformationLabel.text = NSLocalizedString(@"Didn’t receive the 6 digit OTP?", @"");
     }
 }
@@ -239,12 +240,12 @@
 - (void)inputCodeWithUserInputData:(NSString *)userInputData {
     if(userInputData.length == 0) {
         
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
 
         self.firstCodeSeparatorView.alpha = 1.0f;
         self.secondCodeSeparatorView.alpha = 1.0f;
@@ -262,12 +263,12 @@
     }
     else if(userInputData.length == 1) {
 
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         
         self.thirdCodeSeparatorView.alpha = 1.0f;
         self.fourthCodeSeparatorView.alpha = 1.0f;
@@ -289,12 +290,12 @@
         }];
     }
     else if(userInputData.length == 2) {
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         
         self.firstCodeSeparatorView.alpha = 0.0f;
    
@@ -318,12 +319,12 @@
         }];
     }
     else if(userInputData.length == 3) {
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         
         self.firstCodeSeparatorView.alpha = 0.0f;
         self.secondCodeSeparatorView.alpha = 0.0f;
@@ -347,12 +348,12 @@
         }];
     }
     else if(userInputData.length == 4) {
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         
         self.firstCodeSeparatorView.alpha = 0.0f;
         self.secondCodeSeparatorView.alpha = 0.0f;
@@ -376,12 +377,12 @@
     }
     else if(userInputData.length == 5) {
         
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
         
         self.firstCodeSeparatorView.alpha = 0.0f;
         self.secondCodeSeparatorView.alpha = 0.0f;
@@ -403,12 +404,12 @@
         }];
     }
     else if(userInputData.length == 6) {
-        self.firstCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.secondCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.thirdCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fourthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.fifthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.sixthCodeSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.firstCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.secondCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.thirdCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fourthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.fifthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
+        self.sixthCodeSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
         
         self.firstCodeSeparatorView.alpha = 0.0f;
         self.secondCodeSeparatorView.alpha = 0.0f;

@@ -2,13 +2,22 @@
 //  TAPProfileView.h
 //  TapTalk
 //
-//  Created by Welly Kencana on 30/10/18.
+//  Created by Dominic Vedericho on 30/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
 #import "TAPBaseView.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
+    TAPProfileLoadingTypeAppointAdmin,
+    TAPProfileLoadingTypeRemoveAdmin,
+    TAPProfileLoadingTypeRemoveMember,
+    TAPProfileLoadingTypeAddToContact,
+    TAPProfileLoadingTypeLeaveGroup,
+    TAPProfileLoadingTypeDoneLoading,
+};
 
 @interface TAPProfileView : TAPBaseView
 
@@ -18,7 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UILabel *nameLabel;
 @property (strong, nonatomic) UILabel *navigationNameLabel;
 @property (strong, nonatomic) UIButton *backButton;
+@property (strong, nonatomic) UIButton *editButton;
 @property (strong, nonatomic) UIButton *navigationBackButton;
+@property (strong, nonatomic) UIButton *navigationEditButton;
 
 @property (nonatomic) CGFloat nameLabelHeight;
 @property (nonatomic) CGFloat nameLabelBottomPadding;
@@ -27,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat navigationNameLabelBottomPadding;
 @property (nonatomic) CGFloat navigationNameLabelYPosition;
 @property (nonatomic) CGFloat navigationBarHeight;
+
+- (void)showLoadingView:(BOOL)isShow;
+- (void)setAsLoadingState:(BOOL)isLoading withType:(TAPProfileLoadingType)type;
 
 @end
 

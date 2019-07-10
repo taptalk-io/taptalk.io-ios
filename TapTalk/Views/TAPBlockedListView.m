@@ -2,7 +2,7 @@
 //  TAPBlockedListView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 14/9/18.
+//  Created by Dominic Vedericho on 14/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -26,7 +26,7 @@
         [self addSubview:self.bgView];
         
         _tableView = [[UITableView alloc] initWithFrame:self.bgView.frame style:UITableViewStyleGrouped];
-        self.tableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.bgView addSubview:self.tableView];
     }

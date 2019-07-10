@@ -2,7 +2,7 @@
 //  TAPContactCollectionViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 18/9/18.
+//  Created by Dominic Vedericho on 18/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -36,8 +36,11 @@
         self.removeImageView.image = [UIImage imageNamed:@"TAPIconRemove" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bgView addSubview:self.removeImageView];
         
+        UIFont *nameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSelectedMemberListName];
+        UIColor *nameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSelectedMemberListName];
         _contactNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactImageView.frame) + 8.0f, 52.0f, 13.0f)];
-        self.contactNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        self.contactNameLabel.font = nameLabelFont;
+        self.contactNameLabel.textColor = nameLabelColor;
         self.contactNameLabel.textAlignment = NSTextAlignmentCenter;
         [self.bgView addSubview:self.contactNameLabel];
     }
@@ -46,12 +49,19 @@
 }
 
 #pragma mark - Custom Method
-//WK Temp
-- (void)setContactCollectionViewCellWithModel:(NSString *)nantiDigantiJadiModel {
-    NSString *profileImageURL = TAP_DUMMY_IMAGE_URL;
-    NSString *contactName = nantiDigantiJadiModel;
+- (void)setContactCollectionViewCellWithModel:(TAPUserModel *)user {
+    NSString *profileImageURL = user.imageURL.thumbnail;
+    NSString *contactName = user.fullname;
+    if ([user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        contactName = NSLocalizedString(@"You", @"");
+    }
     
-    [self.contactImageView setImageWithURLString:profileImageURL];
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        self.contactImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        [self.contactImageView setImageWithURLString:profileImageURL];
+    }
     NSMutableDictionary *contactNameAttributesDictionary = [NSMutableDictionary dictionary];
     CGFloat contactNameLetterSpacing = -0.2f;
     [contactNameAttributesDictionary setObject:@(contactNameLetterSpacing) forKey:NSKernAttributeName];
@@ -60,7 +70,6 @@
                                          range:NSMakeRange(0, [contactName length])];
     self.contactNameLabel.attributedText = contactNameAttributedString;
 }
-//END WK Temp
 
 - (void)showRemoveIcon:(BOOL)isVisible {
     if (isVisible) {

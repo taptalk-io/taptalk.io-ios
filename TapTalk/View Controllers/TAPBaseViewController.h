@@ -16,10 +16,13 @@
 - (void)showCustomBackButton;
 - (void)showCustomBackButtonOrange;
 - (void)showCustomCloseButton;
+- (void)showCustomCancelButton;
+- (void)showCustomEditButton;
+- (void)showCustomCancelButtonRight;
 - (void)reachabilityChangeIsReachable:(BOOL)reachable;
-- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString *)popupIdentifier title:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString ;
-- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier;
-- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier;
+- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString * _Nonnull)popupIdentifier title:(NSString * _Nonnull)title detailInformation:(NSString * _Nonnull)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString ;
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
 - (void)showNavigationSeparator:(BOOL)show;
 
 @end

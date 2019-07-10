@@ -18,8 +18,8 @@ typedef NS_ENUM(NSInteger, TAPPopUpInfoViewControllerType) {
 
 @protocol TAPPopUpInfoViewControllerDelegate <NSObject>
 
-- (void)popUpInfoViewControllerDidTappedLeftButtonWithIdentifier:(NSString *)identifier;
-- (void)popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)identifier;
+- (void)popUpInfoViewControllerDidTappedLeftButtonWithIdentifier:(NSString *_Nonnull)identifier;
+- (void)popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:(NSString *_Nonnull)identifier;
 
 @end
 

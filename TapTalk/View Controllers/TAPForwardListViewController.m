@@ -43,12 +43,13 @@
     
     [self.navigationController setNavigationBarHidden:NO];
     
-    //RightBarButton
+    UIFont *navigationBarButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
+    UIColor *navigationBarButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
     UIButton* leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [leftBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    [leftBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1] forState:UIControlStateNormal];
+    [leftBarButton setTitleColor:navigationBarButtonColor forState:UIControlStateNormal];
     leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
-    leftBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
+    leftBarButton.titleLabel.font = navigationBarButtonFont;
     [leftBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
@@ -173,12 +174,22 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if (tableView == self.forwardListView.searchResultTableView) {
         UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 28.0f)];
-        headerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        headerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
+        UIFont *sectionHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 13.0f)];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
-        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+        titleLabel.font = sectionHeaderLabelFont;
+        titleLabel.textColor = sectionHeaderLabelColor;
         titleLabel.text = NSLocalizedString(@"CHATS AND CONTACTS", @"");
+        
+        NSMutableAttributedString *titleLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:titleLabel.text];
+        [titleLabelAttributedString addAttribute:NSKernAttributeName
+                                           value:@1.5f
+                                           range:NSMakeRange(0, [titleLabel.text length])];
+        titleLabel.attributedText = titleLabelAttributedString;
+
+        
         [headerView addSubview:titleLabel];
         
         return headerView;

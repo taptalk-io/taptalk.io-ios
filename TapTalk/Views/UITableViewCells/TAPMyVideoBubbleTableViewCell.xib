@@ -24,10 +24,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="psI-Hz-5HN">
-                        <rect key="frame" x="51" y="406" width="17" height="10"/>
+                        <rect key="frame" x="52" y="402" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="17" id="bZt-OV-iHu"/>
-                            <constraint firstAttribute="height" constant="10" id="jhW-5Z-xEB"/>
+                            <constraint firstAttribute="width" constant="16" id="bZt-OV-iHu"/>
+                            <constraint firstAttribute="height" constant="16" id="jhW-5Z-xEB"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MuH-gq-RYu">
@@ -41,7 +41,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kqB-yN-cYJ">
-                        <rect key="frame" x="40" y="367" width="28" height="28"/>
+                        <rect key="frame" x="40" y="363" width="28" height="28"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="28" id="Uis-Ar-q8V"/>
                             <constraint firstAttribute="height" constant="28" id="sSi-po-mhP"/>
@@ -230,11 +230,11 @@
                                     <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pnr-RL-nnj">
                                         <rect key="frame" x="9" y="9" width="30" height="30"/>
                                         <subviews>
-                                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryDownloadFile" translatesAutoresizingMaskIntoConstraints="NO" id="dJH-aX-pXd">
-                                                <rect key="frame" x="8" y="7" width="14" height="16"/>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetry" translatesAutoresizingMaskIntoConstraints="NO" id="dJH-aX-pXd">
+                                                <rect key="frame" x="-1" y="-1" width="32" height="32"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="16" id="cgL-Kx-4jH"/>
-                                                    <constraint firstAttribute="width" constant="14" id="hjb-Bu-59g"/>
+                                                    <constraint firstAttribute="height" constant="32" id="cgL-Kx-4jH"/>
+                                                    <constraint firstAttribute="width" constant="32" id="hjb-Bu-59g"/>
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6gk-Ca-fOC">
@@ -261,10 +261,10 @@
                                         <rect key="frame" x="9" y="9" width="30" height="30"/>
                                         <subviews>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconAbort" translatesAutoresizingMaskIntoConstraints="NO" id="mch-Cd-1n4">
-                                                <rect key="frame" x="8" y="8" width="14" height="14"/>
+                                                <rect key="frame" x="-1" y="-1" width="32" height="32"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="width" constant="14" id="Mzu-5P-jxI"/>
-                                                    <constraint firstAttribute="height" constant="14" id="qpM-Jm-Ec8"/>
+                                                    <constraint firstAttribute="width" constant="32" id="Mzu-5P-jxI"/>
+                                                    <constraint firstAttribute="height" constant="32" id="qpM-Jm-Ec8"/>
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0GI-qK-cYi">
@@ -290,11 +290,11 @@
                                     <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cQc-8b-fdE">
                                         <rect key="frame" x="9" y="9" width="30" height="30"/>
                                         <subviews>
-                                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownloadFile" translatesAutoresizingMaskIntoConstraints="NO" id="AJ7-dv-fkm">
-                                                <rect key="frame" x="9" y="7" width="12" height="16"/>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownload" translatesAutoresizingMaskIntoConstraints="NO" id="AJ7-dv-fkm">
+                                                <rect key="frame" x="-1" y="-1" width="32" height="32"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="16" id="Is7-z8-uyd"/>
-                                                    <constraint firstAttribute="width" constant="12" id="Pa1-UV-s6t"/>
+                                                    <constraint firstAttribute="height" constant="32" id="Is7-z8-uyd"/>
+                                                    <constraint firstAttribute="width" constant="32" id="Pa1-UV-s6t"/>
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LJZ-90-hjP">
@@ -409,7 +409,7 @@
                             <constraint firstItem="PBO-gY-LD0" firstAttribute="top" secondItem="roR-Uc-8gv" secondAttribute="bottom" constant="10" id="zht-O8-huy"/>
                         </constraints>
                     </view>
-                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSendingChat" translatesAutoresizingMaskIntoConstraints="NO" id="Aqq-vh-MYF">
+                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="Aqq-vh-MYF">
                         <rect key="frame" x="308" y="402" width="10" height="11"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="10" id="UiS-5V-8f4"/>
@@ -445,7 +445,7 @@
                     <constraint firstAttribute="bottom" secondItem="MuH-gq-RYu" secondAttribute="bottom" constant="8" id="WBI-Cv-kpq"/>
                     <constraint firstItem="idr-Ld-l85" firstAttribute="leading" secondItem="kUz-GB-fdM" secondAttribute="leading" id="WQV-8J-83y"/>
                     <constraint firstAttribute="trailing" secondItem="kau-oU-53h" secondAttribute="trailing" constant="16" id="ZbF-4m-p1v"/>
-                    <constraint firstItem="kau-oU-53h" firstAttribute="bottom" secondItem="psI-Hz-5HN" secondAttribute="bottom" constant="2" id="c7t-PP-YiO"/>
+                    <constraint firstItem="kau-oU-53h" firstAttribute="bottom" secondItem="psI-Hz-5HN" secondAttribute="bottom" id="c7t-PP-YiO"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="top" id="gDh-p4-b6e"/>
                     <constraint firstItem="MuH-gq-RYu" firstAttribute="top" secondItem="kau-oU-53h" secondAttribute="bottom" priority="999" constant="2" id="jVy-i7-ioI"/>
                     <constraint firstItem="psI-Hz-5HN" firstAttribute="top" secondItem="kqB-yN-cYJ" secondAttribute="bottom" constant="11" id="jzG-sV-hj3"/>
@@ -527,12 +527,12 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="TAPIconAbort" width="14" height="14"/>
-        <image name="TAPIconDownloadFile" width="12" height="16"/>
+        <image name="TAPIconAbort" width="32" height="32"/>
+        <image name="TAPIconDownload" width="32" height="32"/>
         <image name="TAPIconPlayWhite" width="15" height="15"/>
         <image name="TAPIconReplyChat" width="28" height="28"/>
+        <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
-        <image name="TAPIconRetryDownloadFile" width="14" height="16"/>
-        <image name="TAPIconSendingChat" width="10" height="11"/>
+        <image name="TAPIconSending" width="20" height="20"/>
     </resources>
 </document>

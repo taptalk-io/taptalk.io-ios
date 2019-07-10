@@ -19,6 +19,8 @@
 @property (strong, nonatomic) UIView *logoutSeparatorView;
 @property (strong, nonatomic) UIImageView *logoutIconImageView;
 
+@property (strong, nonatomic) UIView *halfRoundWhiteBackgroundView;
+
 @property (strong, nonatomic) UIView *progressBarBackgroundView;
 @property (strong, nonatomic) UIView *progressBarView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
@@ -39,24 +41,24 @@
     self = [super initWithFrame:frame];
     
     if(self) {
-        self.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.scrollView.backgroundColor = [UIColor whiteColor];
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.scrollView.frame));
         self.scrollView.showsVerticalScrollIndicator = NO;
         self.scrollView.showsHorizontalScrollIndicator = NO;
-        self.scrollView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.scrollView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self addSubview:self.scrollView];
         
         CGFloat profilePictureTopGap = 26.0f;
-        if (IS_IPHONE_X_FAMILY) {
+        if (!IS_IPHONE_X_FAMILY) {
             profilePictureTopGap = 6.0f; //-20.0f for navigation bar height different from iphone 8 and below
         }
-        
+    
         //Min Y profile image view + profile image view height + gap with change label + change label height + bottom gap
         CGFloat halfRoundWhiteBackgroundViewHeight = [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] + profilePictureTopGap + 96.0f + 8.0f + 22.0f + 24.0f;
-        _halfRoundWhiteBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, -halfRoundWhiteBackgroundViewHeight, CGRectGetWidth(self.frame), halfRoundWhiteBackgroundViewHeight * 2)];
+        _halfRoundWhiteBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(- 4.0f, -halfRoundWhiteBackgroundViewHeight, CGRectGetWidth(self.frame) + 8.0f, halfRoundWhiteBackgroundViewHeight * 2)];
         self.halfRoundWhiteBackgroundView.layer.cornerRadius = CGRectGetWidth(self.halfRoundWhiteBackgroundView.frame) / 2.0f;
         self.halfRoundWhiteBackgroundView.layer.borderWidth = 1.0f;
         self.halfRoundWhiteBackgroundView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
@@ -72,7 +74,7 @@
         [self.scrollView addSubview:self.additionalWhiteBounceView];
         
         _shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO])];
-        self.shadowView.backgroundColor = [[TAPUtil getColor:TAP_COLOR_BLACK_19] colorWithAlphaComponent:0.3f];
+        self.shadowView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.3f];
         self.shadowView.layer.shadowRadius = 2.0f;
         self.shadowView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
         self.shadowView.layer.shadowOpacity = 1.0f;
@@ -91,8 +93,9 @@
         
         //12.0f = nav bar height (44.0f) - height / 2
         _cancelImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, [TAPUtil currentDeviceStatusBarHeight] + 10.0f, 24.0f, 24.0f)];
-        self.cancelImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.cancelImageView.image = [UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *closeImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        closeImage = [closeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
+        self.cancelImageView.image = closeImage;
         [self addSubview:self.cancelImageView];
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, [TAPUtil currentDeviceStatusBarHeight] + 10.0f, 24.0f, 24.0f)];
@@ -104,118 +107,125 @@
         _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.cancelImageView.frame) - 8.0f, CGRectGetMinY(self.cancelImageView.frame) - 8.0f, 40.0f, 40.0f)];
         [self addSubview:self.cancelButton];
         
+        UIFont *navigationBarTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarTitleLabel];
+        UIColor *navigationBarTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarTitleLabel];
         CGFloat leftGap = CGRectGetMaxX(self.cancelButton.frame) + 32.0f;
         _navigationHeaderLabel = [[UILabel alloc] initWithFrame:CGRectMake(leftGap, [TAPUtil currentDeviceStatusBarHeight] + 9.0f, CGRectGetWidth(self.navigationHeaderView.frame) - leftGap - leftGap, 25.0f)];
-        self.navigationHeaderLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.navigationHeaderLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:20.0f];
+        self.navigationHeaderLabel.textColor = navigationBarTitleLabelColor;
+        self.navigationHeaderLabel.font = navigationBarTitleLabelFont;
         self.navigationHeaderLabel.textAlignment = NSTextAlignmentCenter;
         self.navigationHeaderLabel.text = NSLocalizedString(@"My Account", @"");
         [self.navigationHeaderView addSubview:self.navigationHeaderLabel];
         
-        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2, CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap, 96.0f, 96.0f)];
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
         self.profileImageView.layer.cornerRadius = CGRectGetWidth(self.profileImageView.frame) / 2.0f;
         self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
         self.profileImageView.layer.masksToBounds = YES;
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.scrollView addSubview:self.profileImageView];
-        
+
         _progressBarBackgroundView = [[UIView alloc] initWithFrame:self.profileImageView.frame];
         self.progressBarBackgroundView.layer.cornerRadius = CGRectGetWidth(self.progressBarBackgroundView.frame) / 2.0f;
         self.progressBarBackgroundView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5f];
         self.progressBarBackgroundView.alpha = 0.0f;
         [self.scrollView addSubview:self.progressBarBackgroundView];
-        
+
         _progressBarView = [[UIView alloc] initWithFrame:CGRectMake(12.0f, 12.0f, CGRectGetWidth(self.progressBarBackgroundView.frame) - 12.0f - 12.0f, CGRectGetWidth(self.progressBarBackgroundView.frame) - 12.0f - 12.0f)];
         self.progressBarView.backgroundColor = [UIColor clearColor];
         [self.progressBarBackgroundView addSubview:self.progressBarView];
-        
+
         //CS TEMP - hide remove profilebutton temporaryly
 //        _removeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 24.0f, CGRectGetMinY(self.profileImageView.frame), 24.0f, 24.0f)];
 //        [self.removeProfilePictureButton setImage:[UIImage imageNamed: @"TAPIconRemoveRedShine"] forState:UIControlStateNormal];
 //        self.removeProfilePictureButton.alpha = 0.0f;
 //        [self.scrollView addSubview:self.removeProfilePictureButton];
         
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _changeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame) + 8.0f, 100.0f, 22.0f)];
-        self.changeLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        self.changeLabel.font = clickableLabelFont;
         self.changeLabel.text = NSLocalizedString(@"Change", @"");
-        self.changeLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.changeLabel.textColor = clickableLabelColor;
         CGSize changeLabelSize = [self.changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
         self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
         [self.scrollView addSubview:self.changeLabel];
-        
+
         _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame) + 8.0f, CGRectGetWidth(self.frame), 22.0f)];
-        self.loadingLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:16.0f];
-        self.loadingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.loadingLabel.font = clickableLabelFont;
+        self.loadingLabel.textColor = clickableLabelColor;
         self.loadingLabel.text = NSLocalizedString(@"Uploading", @"");
         self.loadingLabel.alpha = 0.0f;
         self.loadingLabel.textAlignment = NSTextAlignmentCenter;
         [self.scrollView addSubview:self.loadingLabel];
-        
+
         _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
-        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconEditOrange"];
+        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
         [self.scrollView addSubview:self.changeIconImageView];
-        
+
         _changeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.changeLabel.frame), CGRectGetMinY(self.changeLabel.frame) - 8.0f, CGRectGetWidth(self.changeLabel.frame) + 4.0f + CGRectGetWidth(self.changeIconImageView.frame), 40.0f)];
         [self.scrollView addSubview:self.changeProfilePictureButton];
-        
+
         _fullNameTextField = [[TAPCustomTextFieldView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame) + 48.0f, CGRectGetWidth(self.frame), 0.0f)];
         [self.fullNameTextField setTapCustomTextFieldViewType:TAPCustomTextFieldViewTypeFullName];
         self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.fullNameTextField];
-        
+
         _usernameTextField = [[TAPCustomTextFieldView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.fullNameTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 0.0f)];
         [self.usernameTextField setTapCustomTextFieldViewType:TAPCustomTextFieldViewTypeUsernameWithoutDescription];
         self.usernameTextField.frame = CGRectMake(CGRectGetMinX(self.usernameTextField.frame), CGRectGetMinY(self.usernameTextField.frame), CGRectGetWidth(self.usernameTextField.frame), [self.usernameTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.usernameTextField];
-        
+
         _mobileNumberTextField = [[TAPCustomTextFieldView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.usernameTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 0.0f)];
         [self.mobileNumberTextField setTapCustomTextFieldViewType:TAPCustomTextFieldViewTypeMobileNumber];
         self.mobileNumberTextField.frame = CGRectMake(CGRectGetMinX(self.mobileNumberTextField.frame), CGRectGetMinY(self.mobileNumberTextField.frame), CGRectGetWidth(self.mobileNumberTextField.frame), [self.mobileNumberTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.mobileNumberTextField];
-        
+
         _emailTextField = [[TAPCustomTextFieldView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.mobileNumberTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 0.0f)];
         [self.emailTextField setTapCustomTextFieldViewType:TAPCustomTextFieldViewTypeEmailOptional];
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMinY(self.emailTextField.frame), CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.emailTextField];
-        
+
         _logoutView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 50.0f)];
         self.logoutView.backgroundColor = [UIColor whiteColor];
         self.logoutView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
         self.logoutView.layer.borderWidth = 1.0f;
         self.logoutView.layer.cornerRadius = 8.0f;
         [self.scrollView addSubview:self.logoutView];
-        
+
         _logoutSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f, 0.0f, 1.0f, CGRectGetHeight(self.logoutView.frame))];
         self.logoutSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.logoutView addSubview:self.logoutSeparatorView];
-        
+
         _logoutIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.logoutView.frame) - 15.0f - 20.0f, (CGRectGetHeight(self.logoutView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.logoutIconImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.logoutIconImageView.image = [UIImage imageNamed:@"TAPIconLogout" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.logoutView addSubview:self.logoutIconImageView];
         
+        UIFont *clickableDestructiveFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableDestructiveLabel];
+        UIColor *clickableDestructiveColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableDestructiveLabel];
         CGFloat logoutLabelWidth = CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f - 15.0f - 15.0f;
         _logoutLabel = [[UILabel alloc] initWithFrame:CGRectMake(15.0f, 0.0f, logoutLabelWidth, CGRectGetHeight(self.logoutView.frame))];
         self.logoutLabel.text = NSLocalizedString(@"Logout", @"");
-        self.logoutLabel.textColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57];
-        self.logoutLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        self.logoutLabel.textColor = clickableDestructiveColor;
+        self.logoutLabel.font = clickableDestructiveFont;
         [self.logoutView addSubview:self.logoutLabel];
-        
+
         _logoutButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame))];
         [self.logoutView addSubview:self.logoutButton];
-        
+
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
         [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
 //        [self.scrollView addSubview:self.continueButtonView]; //CS TEMP - hide continue button
-        
+
         CGFloat bottomGap = 16.0f;
         if (IS_IPHONE_X_FAMILY) {
             bottomGap = [TAPUtil safeAreaBottomPadding];
         }
-        
-        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap);
-        
+
+        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame) + bottomGap);
+//        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap); //CS TEMP - hide continue button
+
         _startAngle = M_PI * 1.5;
         _endAngle = self.startAngle + (M_PI * 2);
         _newProgress = 0.0f;
@@ -316,7 +326,7 @@
         if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
             animation.fromValue = [NSNumber numberWithFloat:0.0f];
-            animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
+            animation.toValue = [NSNumber numberWithFloat:(2 * M_PI)];
             animation.duration = 1.5f;
             animation.repeatCount = INFINITY;
             animation.cumulative = YES;
@@ -347,7 +357,9 @@
     self.progressBarBackgroundView.alpha = 1.0f;
     
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
+#ifdef DEBUG
     NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
+#endif
     
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
@@ -355,7 +367,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
     
     self.progressLayer.lineCap = kCALineCapSquare;
-    self.progressLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
     self.progressLayer.lineWidth = 6.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);

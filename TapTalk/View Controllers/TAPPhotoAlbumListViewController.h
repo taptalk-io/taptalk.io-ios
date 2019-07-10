@@ -24,7 +24,6 @@ typedef NS_ENUM(NSInteger, TAPPhotoAlbumListViewControllerType) {
 
 @property (weak, nonatomic) id <TAPPhotoAlbumListViewControllerDelegate> delegate;
 @property (nonatomic) TAPPhotoAlbumListViewControllerType photoAlbumListViewControllerType;
-@property (nonatomic) NSInteger currentTotalImageData;
 @property (strong, nonatomic) NSMutableArray *selectedMediaDataArray;
 @property (strong, nonatomic) NSMutableDictionary *selectedImagePositionDictionary; //dictionary key format albumsection-albumrow-imagerow ex:1-2-3
 

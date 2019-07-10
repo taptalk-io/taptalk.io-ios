@@ -45,7 +45,7 @@
         self.videoTypeView.clipsToBounds = YES;
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.videoTypeView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[[TAPUtil getColor:@"0A0A22"] colorWithAlphaComponent:0.0f].CGColor, (id)[TAPUtil getColor:@"04040f"].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[[TAPUtil getColor:@"0A0A22"] colorWithAlphaComponent:0.0f].CGColor, (id)[TAPUtil getColor:@"04040F"].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.videoTypeView.layer insertSublayer:gradient atIndex:0];
@@ -57,11 +57,13 @@
         self.videoTypeImageView.image = [UIImage imageNamed:@"TAPIconThumbnailVideo" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.videoTypeView addSubview:self.videoTypeImageView];
         
+        UIFont *mediaInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaListInfoLabel];
+        UIColor *mediaInfoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaListInfoLabel];
         _videoDurationLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.videoTypeView.frame) - 60.0f - 8.0f, CGRectGetHeight(self.videoTypeView.frame) - 15.0f - 6.0f, 60.0f, 15.0f)];
         self.videoDurationLabel.backgroundColor = [UIColor clearColor];
-        self.videoDurationLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
+        self.videoDurationLabel.font = mediaInfoLabelFont;
+        self.videoDurationLabel.textColor = mediaInfoLabelColor;
         self.videoDurationLabel.textAlignment = NSTextAlignmentRight;
-        self.videoDurationLabel.textColor = [UIColor whiteColor];
         [self.videoTypeView addSubview:self.videoDurationLabel];
     }
     return self;

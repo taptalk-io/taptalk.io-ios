@@ -2,7 +2,7 @@
 //  AddNewChatViewController.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 13/9/18.
+//  Created by Dominic Vedericho on 13/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -11,7 +11,7 @@
 #import "TAPScanQRCodeViewController.h"
 #import "TAPBlockedListViewController.h"
 #import "TAPAddNewContactViewController.h"
-#import "TAPNewGroupViewController.h"
+#import "TAPCreateGroupViewController.h"
 
 #import "TAPChatViewController.h"
 #import <Photos/Photos.h>
@@ -131,13 +131,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView == self.addNewChatView.contactsTableView) {
         if (section == 0) {
-            //DV Note
-            //Temporary Hidden For V1 (30 Jan 2019)
-            //Hide Create Group
-//            return 3; //options (Add New Contact, Create Group, Scan QR Code)
-            //END DV Note
-            
-            return 2; //options (Add New Contact, Scan QR Code)
+            return 3; //options (Add New Contact, Create Group, Scan QR Code)
         }
         else if (section <= [[self.indexSectionDictionary allKeys] count]) {
             
@@ -213,13 +207,9 @@
             else if (indexPath.row == 1) {
                 [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeScanQRCode];
             }
-            //DV Note
-            //Temporary Hidden For V1 (30 Jan 2019)
-            //Hide Create Group
-//            else if (indexPath.row == 2) {
-//                [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewGroup];
-//            }
-            //END DV Note
+            else if (indexPath.row == 2) {
+                [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewGroup];
+            }
             
             return cell;
         }
@@ -242,10 +232,10 @@
             [cell isRequireSelection:NO];
             
             if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
-                [cell showSeparatorLine:NO];
+                [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeFull];
             }
             else {
-                [cell showSeparatorLine:YES];
+                [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
             }
             
             return cell;
@@ -275,10 +265,10 @@
             [cell isRequireSelection:NO];
             
             if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
-                [cell showSeparatorLine:NO];
+                [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeFull];
             }
             else {
-                [cell showSeparatorLine:YES];
+                [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
             }
             
             return cell;
@@ -316,9 +306,11 @@
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
             keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
             
+            UIFont *sectionHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+            UIColor *sectionHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
             UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(header.frame) - 16.0f - 16.0f, 34.0f)];
-            titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
-            titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+            titleLabel.textColor = sectionHeaderLabelColor;
+            titleLabel.font = sectionHeaderLabelFont;
             [header addSubview:titleLabel];
             
             if ([keysArray count] != 0) {
@@ -411,15 +403,14 @@
                 //Scan QR Code
                 [self openScanQRCode];
             }
-            //DV Note
-            //Temporary Hidden For V1 (30 Jan 2019)
-            //Hide Create Group
-//            else if (indexPath.row == 2) {
-//                //New Group
-//                TAPNewGroupViewController *createGroupViewController = [[TAPNewGroupViewController alloc] init]; //newGroupViewController
-//                [self.navigationController pushViewController:createGroupViewController animated:YES];
-//            }
-            //END DV Note
+            else if (indexPath.row == 2) {
+                //New Group
+                TAPCreateGroupViewController *createGroupViewController = [[TAPCreateGroupViewController alloc] init]; //createGroupViewController
+                createGroupViewController.roomListViewController = self.roomListViewController;
+                createGroupViewController.tapCreateGroupViewControllerType = TAPCreateGroupViewControllerTypeDefault;
+                [self.navigationController pushViewController:createGroupViewController animated:YES];
+                
+            }
         }
         else if (indexPath.section <= [[self.indexSectionDictionary allKeys] count]) {
             //Contacts

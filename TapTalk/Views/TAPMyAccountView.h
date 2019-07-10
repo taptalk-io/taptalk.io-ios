@@ -21,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIButton *cancelButton;
 @property (strong, nonatomic) UILabel *navigationHeaderLabel;
 @property (strong, nonatomic) UIView *navigationSeparatorView;
-@property (strong, nonatomic) UIView *halfRoundWhiteBackgroundView;
 @property (strong, nonatomic) UIView *additionalWhiteBounceView;
 
 @property (strong, nonatomic) UIScrollView *scrollView;

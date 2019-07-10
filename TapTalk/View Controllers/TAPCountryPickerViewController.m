@@ -45,10 +45,13 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    UIFont *navigationBarButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
+    UIColor *navigationBarButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
+    
     _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [self.leftBarButton setTitle:@"Close" forState:UIControlStateNormal];
-    [self.leftBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_ORANGE_00] forState:UIControlStateNormal];
-    self.leftBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
+    [self.leftBarButton setTitleColor:navigationBarButtonColor forState:UIControlStateNormal];
+    self.leftBarButton.titleLabel.font = navigationBarButtonFont;
     [self.leftBarButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
@@ -199,7 +202,7 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if (tableView == self.countryPickerView.tableView) {
         UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 28.0f)];
-        headerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        headerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
         if (section > 0) {
             UIView *topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
@@ -215,9 +218,11 @@
         NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
         keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
         
+        UIFont *sectionHeaderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(headerView.frame) - 16.0f - 16.0f, 34.0f)];
-        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        titleLabel.textColor = sectionHeaderColor;
+        titleLabel.font = sectionHeaderFont;
         [headerView addSubview:titleLabel];
         
         if ([keysArray count] != 0) {
@@ -228,7 +233,7 @@
     }
     else if (tableView == self.countryPickerView.searchResultTableView) {
         UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 28.0f)];
-        headerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        headerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
         UIView *topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
         topSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
@@ -242,9 +247,11 @@
         NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
         keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
         
+        UIFont *sectionHeaderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(headerView.frame) - 16.0f - 16.0f, 34.0f)];
-        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        titleLabel.textColor = sectionHeaderColor;
+        titleLabel.font = sectionHeaderFont;
         [headerView addSubview:titleLabel];
         
         if ([keysArray count] != 0) {
@@ -394,8 +401,6 @@
     [self.searchResultCountryMutableArray removeAllObjects];
     [self.searchResultIndexSectionDictionary removeAllObjects];
     
-//    [self.addNewChatView showOverlayView:YES];
-//    [self.addNewChatView showSyncContactButtonView:YES];
     [UIView animateWithDuration:0.2f animations:^{
         self.countryPickerView.searchResultTableView.alpha = 0.0f;
     } completion:^(BOOL finished) {
@@ -415,7 +420,6 @@
         [self.searchResultCountryMutableArray removeAllObjects];
         _searchResultIndexSectionDictionary = [NSMutableDictionary dictionary];
         
-//        [self.addNewChatView showSyncContactButtonView:NO];
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
         for (NSInteger counter = 0; counter < [self.countryListArray count]; counter++) {
@@ -497,7 +501,6 @@
     _countryListArray = countryDataArray;
     for (TAPCountryModel *country in self.countryListArray) {
         NSString *countryName = country.countryCommonName;
-//        [self.countryListDictionary setValue:country forKey:countryName];
         
         NSString *firstAlphabet = [[countryName substringWithRange:NSMakeRange(0, 1)] uppercaseString];
         if ([self.alphabetSectionTitles containsObject:firstAlphabet]) {

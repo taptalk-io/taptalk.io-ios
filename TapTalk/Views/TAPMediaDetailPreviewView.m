@@ -2,7 +2,7 @@
 //  TAPMediaDetailPreviewView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 29/1/19.
+//  Created by Dominic Vedericho on 29/1/19.
 //
 
 #import "TAPMediaDetailPreviewView.h"

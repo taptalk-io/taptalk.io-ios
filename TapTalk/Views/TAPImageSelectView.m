@@ -34,35 +34,42 @@
         [self addSubview:self.bottomView];
         
         UIView *separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bottomView.frame), 1.0f)];
-        separatorView.backgroundColor = [TAPUtil getColor:@"DDDDDD"];
+        separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.bottomView addSubview:separatorView];
         
+        UIFont *imagePickerClearButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGalleryPickerCancelButton];
+        UIColor *imagePickerClearButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGalleryPickerCancelButton];
         _clearButton = [[UIButton alloc] initWithFrame:CGRectMake(10.0f, 0.0f, 50.0f, CGRectGetHeight(self.bottomView.frame) - 1.0f)];
         [self.clearButton setTitle:NSLocalizedString(@"Clear", @"") forState:UIControlStateNormal];
-        self.clearButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
-        [self.clearButton setTitleColor:[TAPUtil getColor:@"777777"] forState:UIControlStateNormal];
+        self.clearButton.titleLabel.font = imagePickerClearButtonFont;
+        [self.clearButton setTitleColor:imagePickerClearButtonColor forState:UIControlStateNormal];
         [self.bottomView addSubview:self.clearButton];
         
         _continueContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bottomView.frame) - 110.0f, 0.0f, 110.0f, CGRectGetHeight(self.bottomView.frame))];
         [self.bottomView addSubview:self.continueContainerView];
         
+        
         _itemNumberView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.continueContainerView.frame) - 22.0f) / 2.0f, 26.0f, 22.0f)];
-        self.itemNumberView.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+        self.itemNumberView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         self.itemNumberView.layer.cornerRadius = CGRectGetHeight(self.itemNumberView.frame) / 2.0f;
         self.itemNumberView.clipsToBounds = YES;
         [self.continueContainerView addSubview:self.itemNumberView];
         
+        UIFont *selectedCountLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontUnreadBadgeLabel];
+        UIColor *selectedCountLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorUnreadBadgeLabel];
         _itemNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(3.0f, 3.0f, CGRectGetWidth(self.itemNumberView.frame) - 6.0f, CGRectGetHeight(self.itemNumberView.frame) - 6.0f)];
-        self.itemNumberLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
+        self.itemNumberLabel.font = selectedCountLabelFont;
+        self.itemNumberLabel.textColor = selectedCountLabelColor;
         self.itemNumberLabel.text = @"0";
         self.itemNumberLabel.textAlignment = NSTextAlignmentCenter;
-        self.itemNumberLabel.textColor = [UIColor whiteColor];
         [self.itemNumberView addSubview:self.itemNumberLabel];
         
+        UIFont *imagePickerContinueButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGalleryPickerContinueButton];
+        UIColor *imagePickerContinueButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGalleryPickerContinueButton];
         _continueButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.itemNumberView.frame)+ 6.0f, 0.0f, 65.0f, CGRectGetHeight(self.continueContainerView.frame))];
         [self.continueButton setTitle:NSLocalizedString(@"Continue", @"") forState:UIControlStateNormal];
-        self.continueButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
-        [self.continueButton setTitleColor:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1] forState:UIControlStateNormal];
+        self.continueButton.titleLabel.font = imagePickerContinueButtonFont;
+        [self.continueButton setTitleColor:imagePickerContinueButtonColor forState:UIControlStateNormal];
         [self.continueContainerView addSubview:self.continueButton];
         
         _activityIndicatorView = [[UIActivityIndicatorView alloc] init];

@@ -20,16 +20,18 @@
         [self addSubview:self.headerKeyboardNumberView];
         
         _topSeparatorKeyboardView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.headerKeyboardNumberView.frame), [TAPUtil lineMinimumHeight])];
-        self.topSeparatorKeyboardView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_8C];
+        self.topSeparatorKeyboardView.backgroundColor = [TAPUtil getColor:@"8C8C8C"];
         [self.headerKeyboardNumberView addSubview:self.topSeparatorKeyboardView];
         
         _bottomSeparatorKeyboardView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.headerKeyboardNumberView.frame) - [TAPUtil lineMinimumHeight], CGRectGetWidth(self.headerKeyboardNumberView.frame), [TAPUtil lineMinimumHeight])];
-        self.bottomSeparatorKeyboardView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_8C];
+        self.bottomSeparatorKeyboardView.backgroundColor = [TAPUtil getColor:@"8C8C8C"];
         [self.headerKeyboardNumberView addSubview:self.bottomSeparatorKeyboardView];
         
+        UIFont *keyboardFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontKeyboardAccessoryLabel];
+        UIColor *keyboardColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorKeyboardAccessoryLabel];
         _doneKeyboardButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.headerKeyboardNumberView.frame) - 80.0f, 0.0f, 80.0f, 44.0f)];
-        [self.doneKeyboardButton.titleLabel setFont:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f]];
-        [self.doneKeyboardButton setTitleColor:[TAPUtil getColor:TAP_KEYBOARD_ACCESSORY_DONE_BUTTON_COLOR] forState:UIControlStateNormal];
+        [self.doneKeyboardButton.titleLabel setFont:keyboardFont];
+        [self.doneKeyboardButton setTitleColor:keyboardColor forState:UIControlStateNormal];
         [self.headerKeyboardNumberView addSubview:self.doneKeyboardButton];
         
         _activityIndicator = [[UIActivityIndicatorView alloc] init];

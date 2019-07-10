@@ -2,7 +2,7 @@
 //  TAPImageCollectionViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 31/10/18.
+//  Created by Dominic Vedericho on 31/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -71,8 +71,8 @@
         self.downloadButtonView.layer.cornerRadius = CGRectGetWidth(self.downloadButtonView.frame)/2;
         [self.contentView addSubview:self.downloadButtonView];
         
-        UIImageView *downloadImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.downloadButtonView.frame) - 14.0f)/2, (CGRectGetWidth(self.downloadButtonView.frame) - 14.0f)/2, 14.0f, 14.0f)];
-        downloadImageView.image = [UIImage imageNamed:@"TAPIconDownloadImage"];
+        UIImageView *downloadImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.downloadButtonView.frame) - 32.0f)/2, (CGRectGetWidth(self.downloadButtonView.frame) - 32.0f) / 2, 32.0f, 32.0f)];
+        downloadImageView.image = [UIImage imageNamed:@"TAPIconDownload"];
         [self.downloadButtonView addSubview:downloadImageView];
         
         _downloadButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.downloadButtonView.bounds), CGRectGetWidth(self.downloadButtonView.bounds))];
@@ -87,8 +87,10 @@
         self.progressBarView.backgroundColor = [UIColor clearColor];
         [self.progressView addSubview:self.progressBarView];
         
-        UIImageView *cancelImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.downloadButtonView.frame) - 14.0f)/2, (CGRectGetWidth(self.downloadButtonView.frame) - 14.0f)/2, 14.0f, 14.0f)];
-        cancelImageView.image = [UIImage imageNamed:@"TAPIconCancelUpload"];
+        UIImageView *cancelImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.downloadButtonView.frame) - 32.0f)/2, (CGRectGetWidth(self.downloadButtonView.frame) - 32.0f) / 2, 32.0f, 32.0f)];
+        UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownload]];
+        cancelImageView.image = abortImage;
         [self.progressView addSubview:cancelImageView];
         
         _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.progressView.bounds), CGRectGetWidth(self.progressView.bounds))];
@@ -98,9 +100,11 @@
         self.videoIndicatorImageView.image = [UIImage imageNamed:@"TAPIconThumbnailVideo"];
         [self.contentView addSubview:self.videoIndicatorImageView];
         
+        UIFont *mediaInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaListInfoLabel];
+        UIColor *mediaInfoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaListInfoLabel];
         _infoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.videoIndicatorImageView.frame) + 4.0f, CGRectGetMinY(self.videoIndicatorImageView.frame), CGRectGetWidth(frame) - CGRectGetMaxX(self.videoIndicatorImageView.frame) - 4.0f - 8.0f, 14.0f)];
-        self.infoLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
-        self.infoLabel.textColor = [UIColor whiteColor];
+        self.infoLabel.font = mediaInfoLabelFont;
+        self.infoLabel.textColor = mediaInfoLabelColor;
         self.infoLabel.textAlignment = NSTextAlignmentRight;
         [self.contentView addSubview:self.infoLabel];
         
@@ -189,15 +193,17 @@
     _newProgress = progress/total;
 
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
+#ifdef DEBUG
     NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
-
+#endif
+    
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
     [self.progressLayer setFrame:self.progressBarView.bounds];
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
 
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);

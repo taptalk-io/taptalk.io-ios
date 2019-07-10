@@ -42,12 +42,15 @@
         [self addSubview:self.buttonContainerView];
         
         _buttonIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 32.0f, 32.0f)];
+        self.buttonIconImageView.image = [self.buttonIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         [self.buttonContainerView addSubview:self.buttonIconImageView];
         
+        UIFont *buttonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+        UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
         _buttonTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.buttonContainerView.frame), CGRectGetHeight(self.buttonContainerView.frame))];
         self.buttonTitleLabel.textAlignment = NSTextAlignmentCenter;
-        self.buttonTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
-        self.buttonTitleLabel.textColor = [UIColor whiteColor];
+        self.buttonTitleLabel.font = buttonFont;
+        self.buttonTitleLabel.textColor = buttonColor;
         [self.buttonContainerView addSubview:self.buttonTitleLabel];
         
         _button = [[UIButton alloc] initWithFrame:self.buttonContainerView.frame];
@@ -68,36 +71,59 @@
     _customButtonViewType = customButtonViewType;
     
     if (self.customButtonViewType == TAPCustomButtonViewTypeActive) {
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = self.buttonContainerView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_ORANGE_33].CGColor, (id)[TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor, nil];
-        gradient.startPoint = CGPointMake(0.0f, 0.0f);
-        gradient.endPoint = CGPointMake(0.0f, 1.0f);
-        [self.buttonContainerView.layer insertSublayer:gradient atIndex:0];
-        
-        self.buttonContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
-        self.button.userInteractionEnabled = YES;
-        
-        if (self.customButtonViewStyleType == TAPCustomButtonViewStyleTypeWithIcon) {
-            self.shadowView.layer.shadowColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
+        if (self.customButtonViewStyleType == TAPCustomButtonViewStyleTypePlain || self.customButtonViewStyleType == TAPCustomButtonViewStyleTypeWithIcon) {
+            //orange gradient background
+            CAGradientLayer *gradient = [CAGradientLayer layer];
+            gradient.frame = self.buttonContainerView.bounds;
+            gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+            gradient.startPoint = CGPointMake(0.0f, 0.0f);
+            gradient.endPoint = CGPointMake(0.0f, 1.0f);
+            [self.buttonContainerView.layer insertSublayer:gradient atIndex:0];
+            
+            self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
+            self.button.userInteractionEnabled = YES;
+            
+            if (self.customButtonViewStyleType == TAPCustomButtonViewStyleTypeWithIcon) {
+                self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
+            }
+            else {
+                UIColor *shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder];
+                self.shadowView.layer.shadowColor = [shadowColor colorWithAlphaComponent:0.5f].CGColor;
+            }
+            self.shadowView.alpha = 1.0f;
         }
         else {
-            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_ORANGE_00] colorWithAlphaComponent:0.5f].CGColor;
+            //destructive type, no button background
+            self.buttonContainerView.layer.borderColor = [UIColor clearColor].CGColor;
+            self.button.userInteractionEnabled = YES;
+            self.shadowView.layer.shadowColor = [UIColor clearColor].CGColor;
+            self.shadowView.alpha = 0.0f;
         }
-        
     }
     else if (self.customButtonViewType == TAPCustomButtonViewTypeInactive) {
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = self.buttonContainerView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor, (id)[TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, nil];
-        gradient.startPoint = CGPointMake(0.0f, 0.0f);
-        gradient.endPoint = CGPointMake(0.0f, 1.0f);
-        [self.buttonContainerView.layer insertSublayer:gradient atIndex:0];
+        if (self.customButtonViewStyleType == TAPCustomButtonViewStyleTypePlain || self.customButtonViewStyleType == TAPCustomButtonViewStyleTypeWithIcon) {
+            //grey gradient background
+            CAGradientLayer *gradient = [CAGradientLayer layer];
+            gradient.frame = self.buttonContainerView.bounds;
+            gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBackgroundGradientDark].CGColor, nil];
+            gradient.startPoint = CGPointMake(0.0f, 0.0f);
+            gradient.endPoint = CGPointMake(0.0f, 1.0f);
+            [self.buttonContainerView.layer insertSublayer:gradient atIndex:0];
+            
+            self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
+            self.button.userInteractionEnabled = NO;
+            
+            self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
+            self.shadowView.alpha = 1.0f;
+        }
+        else {
+            //destructive type, no button background
+            self.buttonContainerView.layer.borderColor = [UIColor clearColor].CGColor;
+            self.button.userInteractionEnabled = NO;
+            self.shadowView.layer.shadowColor = [UIColor clearColor].CGColor;
+            self.shadowView.alpha = 0.0f;
+        }
         
-        self.buttonContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
-        self.button.userInteractionEnabled = NO;
-        
-        self.shadowView.layer.shadowColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
     }
 }
 
@@ -120,6 +146,34 @@
         self.buttonTitleLabel.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.buttonContainerView.frame), CGRectGetHeight(self.buttonContainerView.frame));
         self.button.frame = self.buttonContainerView.frame;
         self.buttonLoadingImageView.frame = CGRectMake((CGRectGetWidth(self.buttonContainerView.frame) - 20.0f) / 2.0f, (CGRectGetHeight(self.buttonContainerView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f);
+        
+        //Set icon tint color
+       self.buttonIconImageView.image = [self.buttonIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+    }
+    else if (customButtonViewStyleType == TAPCustomButtonViewStyleTypeDestructivePlain) {
+        self.buttonIconImageView.alpha = 0.0f;
+        //Left and Right gap is 16.0f
+        self.shadowView.frame =  CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, CGRectGetHeight(self.frame));
+        self.buttonContainerView.frame = CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, CGRectGetHeight(self.frame));
+        self.buttonTitleLabel.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.buttonContainerView.frame), CGRectGetHeight(self.buttonContainerView.frame));
+        self.button.frame = self.buttonContainerView.frame;
+        self.buttonLoadingImageView.frame = CGRectMake((CGRectGetWidth(self.buttonContainerView.frame) - 20.0f) / 2.0f, (CGRectGetHeight(self.buttonContainerView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f);
+        UIColor *clickableDestructiveButtonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableDestructiveLabel];
+        self.buttonTitleLabel.textColor = clickableDestructiveButtonLabelColor;
+    }
+    else if (customButtonViewStyleType == TAPCustomButtonViewStyleTypeDestructiveWithIcon) {
+        self.buttonIconImageView.alpha = 1.0f;
+        //Left and Right gap is 10.0f
+        self.shadowView.frame =  CGRectMake(10.0f, 0.0f, CGRectGetWidth(self.frame) - 10.0f - 10.0f, CGRectGetHeight(self.frame));
+        self.buttonContainerView.frame = CGRectMake(10.0f, 0.0f, CGRectGetWidth(self.frame) - 10.0f - 10.0f, CGRectGetHeight(self.frame));
+        self.buttonTitleLabel.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.buttonContainerView.frame), CGRectGetHeight(self.buttonContainerView.frame));
+        self.button.frame = self.buttonContainerView.frame;
+        self.buttonLoadingImageView.frame = CGRectMake((CGRectGetWidth(self.buttonContainerView.frame) - 20.0f) / 2.0f, (CGRectGetHeight(self.buttonContainerView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f);
+        UIColor *clickableDestructiveButtonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableDestructiveLabel];
+        self.buttonTitleLabel.textColor = clickableDestructiveButtonLabelColor;
+        
+        //Set icon tint color
+        self.buttonIconImageView.image = [self.buttonIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconDestructive]];
     }
 }
 
@@ -129,30 +183,29 @@
             [UIView animateWithDuration:0.2f animations:^{
                 CAGradientLayer *gradient = [CAGradientLayer layer];
                 gradient.frame = self.buttonContainerView.bounds;
-                gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_ORANGE_33].CGColor, (id)[TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor, nil];
+                gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
                 gradient.startPoint = CGPointMake(0.0f, 0.0f);
                 gradient.endPoint = CGPointMake(0.0f, 1.0f);
                 [self.buttonContainerView.layer replaceSublayer:[self.buttonContainerView.layer.sublayers objectAtIndex:0] with:gradient];
                 
-                self.buttonContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+                self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
                 self.button.userInteractionEnabled = YES;
                 
-                self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_ORANGE_00] colorWithAlphaComponent:0.5f].CGColor;
-            }];
+                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder] colorWithAlphaComponent:0.5f].CGColor;            }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 CAGradientLayer *gradient = [CAGradientLayer layer];
                 gradient.frame = self.buttonContainerView.bounds;
-                gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor, (id)[TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, nil];
+                gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBackgroundGradientDark].CGColor, nil];
                 gradient.startPoint = CGPointMake(0.0f, 0.0f);
                 gradient.endPoint = CGPointMake(0.0f, 1.0f);
                 [self.buttonContainerView.layer replaceSublayer:[self.buttonContainerView.layer.sublayers objectAtIndex:0] with:gradient];
                 
-                self.buttonContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
+                self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
                 self.button.userInteractionEnabled = NO;
                 
-                self.shadowView.layer.shadowColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
+                self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
             }];
         }
     }
@@ -160,28 +213,28 @@
         if (active) {
             CAGradientLayer *gradient = [CAGradientLayer layer];
             gradient.frame = self.buttonContainerView.bounds;
-            gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_ORANGE_33].CGColor, (id)[TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor, nil];
+            gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
             gradient.startPoint = CGPointMake(0.0f, 0.0f);
             gradient.endPoint = CGPointMake(0.0f, 1.0f);
             [self.buttonContainerView.layer replaceSublayer:[self.buttonContainerView.layer.sublayers objectAtIndex:0] with:gradient];
             
-            self.buttonContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+            self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
             self.button.userInteractionEnabled = YES;
             
-            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_ORANGE_00] colorWithAlphaComponent:0.5f].CGColor;
+            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder] colorWithAlphaComponent:0.5f].CGColor;
         }
         else {
             CAGradientLayer *gradient = [CAGradientLayer layer];
             gradient.frame = self.buttonContainerView.bounds;
-            gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor, (id)[TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, nil];
+            gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBackgroundGradientDark].CGColor, nil];
             gradient.startPoint = CGPointMake(0.0f, 0.0f);
             gradient.endPoint = CGPointMake(0.0f, 1.0f);
             [self.buttonContainerView.layer replaceSublayer:[self.buttonContainerView.layer.sublayers objectAtIndex:0] with:gradient];
             
-            self.buttonContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
+            self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
             self.button.userInteractionEnabled = NO;
             
-            self.shadowView.layer.shadowColor = [TAPUtil getColor:TAP_COLOR_GREY_CE].CGColor;
+            self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
         }
     }
 }
@@ -190,9 +243,9 @@
     self.buttonTitleLabel.text = title;
 }
 
-- (void)setButtonWithTitle:(NSString *)title andIcon:(NSString *)imageName {
+- (void)setButtonWithTitle:(NSString *)title andIcon:(NSString *)imageName iconPosition:(TAPCustomButtonViewIconPosititon)tapCustomButtonViewIconPosititon {
     self.buttonTitleLabel.text = title;
-    self.buttonIconImageView.image = [UIImage imageNamed:imageName];
+    self.buttonIconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     
     CGSize size = [self.buttonTitleLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 20.0f)];
     CGFloat maximumLabelWidth = CGRectGetWidth(self.frame) - 10.0f - 10.0f - 4.0f - 32.0f; //10 - left&right gap, 4 - gap to image view, 32 image view width
@@ -201,8 +254,15 @@
         newWidth = maximumLabelWidth;
     }
     CGFloat newMinX = (CGRectGetWidth(self.buttonContainerView.frame) - (newWidth + 4.0f + 32.0f))/2.0f;
-    self.buttonIconImageView.frame = CGRectMake(newMinX, 5.0f, 32.0f, CGRectGetHeight(self.buttonIconImageView.frame));
-    self.buttonTitleLabel.frame = CGRectMake(CGRectGetMaxX(self.buttonIconImageView.frame) + 4.0f, CGRectGetMinY(self.buttonTitleLabel.frame), newWidth, CGRectGetHeight(self.buttonTitleLabel.frame));
+    
+    if (tapCustomButtonViewIconPosititon == TAPCustomButtonViewIconPosititonLeft) {
+        self.buttonIconImageView.frame = CGRectMake(newMinX, 5.0f, 32.0f, CGRectGetHeight(self.buttonIconImageView.frame));
+        self.buttonTitleLabel.frame = CGRectMake(CGRectGetMaxX(self.buttonIconImageView.frame) + 4.0f, CGRectGetMinY(self.buttonTitleLabel.frame), newWidth, CGRectGetHeight(self.buttonTitleLabel.frame));
+    }
+    else {
+        self.buttonTitleLabel.frame = CGRectMake(newMinX, CGRectGetMinY(self.buttonTitleLabel.frame), newWidth, CGRectGetHeight(self.buttonTitleLabel.frame));
+        self.buttonIconImageView.frame = CGRectMake(CGRectGetMaxX(self.buttonTitleLabel.frame) + 4.0f, 5.0f, 32.0f, CGRectGetHeight(self.buttonIconImageView.frame));
+    }
 }
 
 - (void)setAsLoading:(BOOL)loading animated:(BOOL)animated {

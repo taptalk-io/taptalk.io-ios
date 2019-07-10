@@ -39,12 +39,15 @@
         [self addSubview:self.addressView];
         
         _addressIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, 20.0f, 20.0f)];
-        self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocationLoading" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        //DV Temp Icon - 9B9B9B
         [self.addressView addSubview:self.addressIconImageView];
         
+        UIFont *placeholderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerAddressPlaceholder];
+        UIColor *placeholderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddressPlaceholder];
         _addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f, 16.0f, CGRectGetWidth(self.addressView.frame) - (CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f) - 16.0f, 64.0f)];
-        self.addressLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:12.0f];
-        self.addressLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_AA];
+        self.addressLabel.font = placeholderLabelFont;
+        self.addressLabel.textColor = placeholderLabelColor;
         self.addressLabel.numberOfLines = 0;
         [self.addressView addSubview:self.addressLabel];
         
@@ -90,7 +93,7 @@
         _searchTableView = [[UITableView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchBarView.frame), CGRectGetMaxY(self.searchBarView.frame) + 5.0f, CGRectGetWidth(self.searchBarView.frame), 0.0f)];
         self.searchTableView.showsVerticalScrollIndicator = NO;
         self.searchTableView.showsHorizontalScrollIndicator = NO;
-        self.searchTableView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_E4].CGColor;
+        self.searchTableView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
         self.searchTableView.layer.borderWidth = 1.0f;
         self.searchTableView.layer.cornerRadius = 10.0f;
         [self.searchTableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
@@ -112,6 +115,10 @@
 
 #pragma mark - Custom Method
 - (void)setAsLoading:(BOOL)isLoading {
+    
+    UIColor *addressColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddress];
+    UIColor *placeholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddressPlaceholder];
+    
     if (isLoading) {
         NSString *addressString = NSLocalizedString(@"Searching for address", @"");
         self.addressLabel.text = addressString;
@@ -123,11 +130,12 @@
                                         value:addressLabelStyle
                                         range:NSMakeRange(0, [self.addressLabel.text length])];
         self.addressLabel.attributedText = addressAttributedString;
-        self.addressLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_AA];
+        self.addressLabel.textColor = placeholderColor;
         CGSize addressLabelSize = [self.addressLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.addressLabel.frame), CGFLOAT_MAX)];
         self.addressLabel.frame = CGRectMake(CGRectGetMinX(self.addressLabel.frame), CGRectGetMinY(self.addressLabel.frame), CGRectGetWidth(self.addressLabel.frame), addressLabelSize.height);
         
-        self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocationLoading" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        //DV Temp Icon - 9B9B9B
         
         [UIView animateWithDuration:0.2f animations:^{
             CGRect setLocationViewFrame = self.pinLocationView.frame;
@@ -140,8 +148,9 @@
         }];
     }
     else {
-        self.addressLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.addressLabel.textColor = addressColor;
+        self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        //DV Temp Icon - 191919
         
         [UIView animateWithDuration:0.2f animations:^{
             self.pinLocationView.frame = CGRectMake((CGRectGetWidth(self.frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f);
@@ -155,8 +164,11 @@
 }
 
 - (void)setAddress:(NSString *)addressString {
-    self.addressLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-    self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    
+    UIColor *addressLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddress];
+    self.addressLabel.textColor = addressLabelColor;
+    self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    //DV Temp Icon - 191919
     
     self.addressLabel.text = addressString;
     NSMutableAttributedString *addressAttributedString = [[NSMutableAttributedString alloc] initWithString:self.addressLabel.text];

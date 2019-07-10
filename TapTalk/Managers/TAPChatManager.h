@@ -34,8 +34,6 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message;
-- (void)chatManagerDidReceiveDeleteMessageInActiveRoom:(TAPMessageModel *)message;
-- (void)chatManagerDidReceiveDeleteMessageOnOtherRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus;
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing;

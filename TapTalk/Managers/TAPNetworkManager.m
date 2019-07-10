@@ -510,6 +510,12 @@ refreshToken:(NSString *)refreshToken
         
     [formData appendPartWithFileData:fileData name:@"file" fileName:@"images.png" mimeType:@"image/jpeg"];
         
+    NSArray *parameterKeyArray = [parameters allKeys];
+    for (NSString *key in parameterKeyArray) {
+        NSData *keyData = [[parameters objectForKey:key] dataUsingEncoding:NSUTF8StringEncoding];
+        [formData appendPartWithFormData:keyData name:key];
+    }
+        
     } error:nil];
     
     [request setTimeoutInterval:20000];

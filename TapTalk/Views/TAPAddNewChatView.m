@@ -2,7 +2,7 @@
 //  TAPAddNewChatView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 13/9/18.
+//  Created by Dominic Vedericho on 13/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -31,7 +31,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
-        self.bgView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self addSubview:self.bgView];
         
         _syncedContactNotificationView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), 20.0f)];
@@ -45,7 +45,9 @@
         [self.bgView addSubview:self.syncedContactNotificationView];
         
         _syncedContactNotificationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 200.0f, CGRectGetHeight(self.syncedContactNotificationView.frame))];
-        self.syncedContactNotificationLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
+        UIFont *obtainedFont = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+        obtainedFont = [obtainedFont fontWithSize:12.0f];
+        self.syncedContactNotificationLabel.font = obtainedFont;
         self.syncedContactNotificationLabel.textColor = [UIColor whiteColor];
         [self.syncedContactNotificationView addSubview:self.syncedContactNotificationLabel];
         
@@ -61,14 +63,16 @@
         self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for people in your contact list", @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
+        UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
+        UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
         NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
         NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
         NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat searchBarCancelLetterSpacing = -0.4f;
         [searchBarCancelAttributesDictionary setObject:@(searchBarCancelLetterSpacing) forKey:NSKernAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f] forKey:NSFontAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forKey:NSForegroundColorAttributeName];
+        [searchBarCancelAttributesDictionary setObject:searchBarCancelFont forKey:NSFontAttributeName];
+        [searchBarCancelAttributesDictionary setObject:searchBarCancelColor forKey:NSForegroundColorAttributeName];
         [searchBarCancelAttributedString addAttributes:searchBarCancelAttributesDictionary
                                                  range:NSMakeRange(0, [searchBarCancelString length])];
         [self.searchBarCancelButton setAttributedTitle:searchBarCancelAttributedString forState:UIControlStateNormal];
@@ -77,13 +81,13 @@
         [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f, CGRectGetWidth(self.frame), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.searchBarBackgroundView addSubview:self.separatorView];
         
         _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f - 62.0f - [TAPUtil safeAreaBottomPadding]) style:UITableViewStylePlain]; //62.0f - height of sync contact button view
-        self.contactsTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.contactsTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.contactsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [self.contactsTableView setSectionIndexColor:[TAPUtil getColor:TAP_TABLE_VIEW_SECTION_INDEX_COLOR]];
+        [self.contactsTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];
         [self.bgView addSubview:self.contactsTableView];
         
         _syncContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactsTableView.frame), CGRectGetWidth(self.bgView.frame), 62.0f + [TAPUtil safeAreaBottomPadding])];
@@ -97,13 +101,13 @@
         _syncButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, CGRectGetWidth(self.frame), 42.0f)];
         [self.syncButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.syncButton setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.syncButton setButtonWithTitle:NSLocalizedString(@"Sync Contacts Now", @"") andIcon:@"TAPIconSync"];
+        [self.syncButton setButtonWithTitle:NSLocalizedString(@"Sync Contacts Now", @"") andIcon:@"TAPIconSync" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         [self.syncContactButtonView addSubview:self.syncButton];
         
         _searchResultTableView = [[UITableView alloc] initWithFrame:self.contactsTableView.frame];
-        self.searchResultTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.searchResultTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [self.searchResultTableView setSectionIndexColor:[TAPUtil getColor:TAP_TABLE_VIEW_SECTION_INDEX_COLOR]];
+        [self.searchResultTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];
         self.searchResultTableView.alpha = 0.0f;
         [self.bgView addSubview:self.searchResultTableView];
         

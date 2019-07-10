@@ -61,14 +61,13 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
         _shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 46.0f)];
         self.shadowView.backgroundColor = [UIColor whiteColor];
-//        self.shadowView.layer.cornerRadius = 2.0f;
         self.shadowView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
         self.shadowView.layer.shadowOpacity = 1.0f;
-        self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_BLACK_19] colorWithAlphaComponent:0.2f].CGColor;
+        self.shadowView.layer.shadowColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.2f].CGColor;
         self.shadowView.layer.masksToBounds = NO;
         [self addSubview:self.shadowView];
         
@@ -80,14 +79,16 @@
         self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search by Username", @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
+        UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
+        UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
         NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
         NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
         NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat searchBarCancelLetterSpacing = -0.4f;
         [searchBarCancelAttributesDictionary setObject:@(searchBarCancelLetterSpacing) forKey:NSKernAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f] forKey:NSFontAttributeName];
-        [searchBarCancelAttributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forKey:NSForegroundColorAttributeName];
+        [searchBarCancelAttributesDictionary setObject:searchBarCancelFont forKey:NSFontAttributeName];
+        [searchBarCancelAttributesDictionary setObject:searchBarCancelColor forKey:NSForegroundColorAttributeName];
         [searchBarCancelAttributedString addAttributes:searchBarCancelAttributesDictionary
                                                  range:NSMakeRange(0, [searchBarCancelString length])];
         [self.searchBarCancelButton setAttributedTitle:searchBarCancelAttributedString forState:UIControlStateNormal];
@@ -102,11 +103,15 @@
         self.searchBarView.searchTextField.rightView = rightView;
         
         //Default Label
+        UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        UIColor *infoLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
+        UIFont *infoLabelBodyBoldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBodyBold];
+        
         _defaultLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarView.frame) + 23.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 40.0f)];
         self.backgroundColor = [UIColor clearColor];
         self.defaultLabel.text = NSLocalizedString(@"Usernames are not case sensitive, but make sure you input the exact characters", @"");
-        self.defaultLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.defaultLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+        self.defaultLabel.textColor = infoLabelBodyColor;
+        self.defaultLabel.font = infoLabelBodyFont;
         self.defaultLabel.textAlignment = NSTextAlignmentCenter;
         self.defaultLabel.numberOfLines = 0;
 
@@ -117,11 +122,11 @@
                                              range:NSMakeRange(0, [self.defaultLabel.text length])];
     
         [defaultLabelAttributedString addAttribute:NSFontAttributeName
-                                               value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f]
+                                               value:infoLabelBodyBoldFont
                                                range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"not case sensitive", @"")]];
         
         [defaultLabelAttributedString addAttribute:NSFontAttributeName
-                                             value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f]
+                                             value:infoLabelBodyBoldFont
                                              range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"exact characters", @"")]];
 
         self.defaultLabel.attributedText = defaultLabelAttributedString;
@@ -132,11 +137,11 @@
         [self addSubview:self.defaultLabel];
         
         //Search Expert View
-        _searchExpertView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarView.frame) + 12.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 244.0f)];
+        _searchExpertView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarView.frame) + 16.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 244.0f)];
         self.searchExpertView.clipsToBounds = YES;
         self.searchExpertView.layer.cornerRadius = 8.0f;
         self.searchExpertView.backgroundColor = [UIColor whiteColor];
-        self.searchExpertView.layer.shadowColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
+        self.searchExpertView.layer.shadowColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
         self.searchExpertView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
         self.searchExpertView.layer.shadowOpacity = 0.4f;
         self.searchExpertView.layer.shadowRadius = 4.0f;
@@ -171,28 +176,32 @@
         self.expertVerifiedImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.searchExpertView addSubview:self.expertVerifiedImageView];
         
+        UIFont *nameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchNewContactResultName];
+        UIColor *nameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchNewContactResultName];
         _expertNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.expertImageView.frame) + 9.0f, CGRectGetWidth(self.searchExpertView.frame) - 16.0f, 20.0f)];
-        self.expertNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        self.expertNameLabel.font = nameLabelFont;
         self.expertNameLabel.textAlignment = NSTextAlignmentCenter;
-        self.expertNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.expertNameLabel.textColor = nameLabelColor;
         [self.searchExpertView addSubview:self.expertNameLabel];
         
+        UIFont *usernameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchNewContactResultUsername];
+        UIColor *usernameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchNewContactResultUsername];
         _expertCategoryLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.expertNameLabel.frame), CGRectGetMaxY(self.expertNameLabel.frame) + 3.0f, CGRectGetWidth(self.expertNameLabel.frame), 16.0f)];
-        self.expertCategoryLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
+        self.expertCategoryLabel.font = usernameLabelFont;
         self.expertCategoryLabel.textAlignment = NSTextAlignmentCenter;
-        self.expertCategoryLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.expertCategoryLabel.textColor = usernameLabelColor;
         [self.searchExpertView addSubview:self.expertCategoryLabel];
         
         _addExpertToContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.expertNameLabel.frame), CGRectGetMaxY(self.expertCategoryLabel.frame) + 26.0f, CGRectGetWidth(self.expertNameLabel.frame), 44.0f)];
         self.addExpertToContactButtonView.alpha = 0.0f;
         self.addExpertToContactButtonView.layer.borderWidth = 1.0f;
-        self.addExpertToContactButtonView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        self.addExpertToContactButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
         self.addExpertToContactButtonView.layer.cornerRadius = 6.0f;
         
         CAGradientLayer *addExpertToContactButtonViewGradient = [CAGradientLayer layer];
         addExpertToContactButtonViewGradient.frame = self.addExpertToContactButtonView.bounds;
-        addExpertToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
-
+        addExpertToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+        
         addExpertToContactButtonViewGradient.startPoint = CGPointMake(0.0f, 0.0f);
         addExpertToContactButtonViewGradient.endPoint = CGPointMake(0.0f, 1.0f);
         addExpertToContactButtonViewGradient.cornerRadius = 6.0f;
@@ -200,10 +209,12 @@
         
         [self.searchExpertView addSubview:self.addExpertToContactButtonView];
         
+        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
         _addExpertToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
         self.addExpertToContactLabel.text = NSLocalizedString(@"Add to Contacts", @"");
-        self.addExpertToContactLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.addExpertToContactLabel.textColor = [UIColor whiteColor];
+        self.addExpertToContactLabel.font = buttonLabelFont;
+        self.addExpertToContactLabel.textColor = buttonLabelColor;
         self.addExpertToContactLabel.textAlignment = NSTextAlignmentCenter;
         [self.addExpertToContactButtonView addSubview:self.addExpertToContactLabel];
         
@@ -215,12 +226,12 @@
         _expertChatNowButtonView = [[UIView alloc] initWithFrame:self.addExpertToContactButtonView.frame];
         self.expertChatNowButtonView.alpha = 0.0f;
         self.expertChatNowButtonView.layer.borderWidth = 1.0f;
-        self.expertChatNowButtonView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        self.expertChatNowButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
         self.expertChatNowButtonView.layer.cornerRadius = 6.0f;
         
         CAGradientLayer *expertChatNowGradient = [CAGradientLayer layer];
         expertChatNowGradient.frame = self.expertChatNowButtonView.bounds;
-        expertChatNowGradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
+        expertChatNowGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
         expertChatNowGradient.startPoint = CGPointMake(0.0f, 0.0f);
         expertChatNowGradient.endPoint = CGPointMake(0.0f, 1.0f);
         expertChatNowGradient.cornerRadius = 6.0f;
@@ -229,8 +240,8 @@
         
         _expertChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
         self.expertChatNowLabel.text = NSLocalizedString(@"Chat Now", @"");
-        self.expertChatNowLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.expertChatNowLabel.textColor = [UIColor whiteColor];
+        self.expertChatNowLabel.font = buttonLabelFont;
+        self.expertChatNowLabel.textColor = buttonLabelColor;
         self.expertChatNowLabel.textAlignment = NSTextAlignmentCenter;
         
         CGSize expertChatNowLabelSize = [self.expertChatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.expertChatNowLabel.frame))];
@@ -240,7 +251,9 @@
         [self.expertChatNowButtonView addSubview:self.expertChatNowLabel];
         
         _expertChatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.expertChatNowLabel.frame) + 8.0f, ((CGRectGetHeight(self.addExpertToContactButtonView.frame) - 16.0f) / 2.0f) + 2.0f, 16.0f, 16.0f)];
-        self.expertChatNowLogoImageView.image = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *expertChatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        expertChatNowLogoImage = [expertChatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        self.expertChatNowLogoImageView.image = expertChatNowLogoImage;
         self.expertChatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.expertChatNowButtonView addSubview:self.expertChatNowLogoImageView];
         
@@ -254,15 +267,17 @@
         self.searchSelfExpertView.alpha = 0.0f;
         [self.searchExpertView addSubview:self.searchSelfExpertView];
         
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _searchSelfExpertLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.searchSelfExpertView.frame), CGRectGetHeight(self.searchSelfExpertView.frame))];
         self.searchSelfExpertLabel.text = NSLocalizedString(@"This is you", @"");
-        self.searchSelfExpertLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.searchSelfExpertLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.searchSelfExpertLabel.font = clickableLabelFont;
+        self.searchSelfExpertLabel.textColor = clickableLabelColor;
         self.searchSelfExpertLabel.textAlignment = NSTextAlignmentCenter;
         [self.searchSelfExpertView addSubview:self.searchSelfExpertLabel];
         
         //Search User View
-        _searchUserShadowView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchExpertView.frame), CGRectGetMinY(self.searchExpertView.frame), CGRectGetWidth(self.searchExpertView.frame), 180.0f)];
+        _searchUserShadowView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchExpertView.frame), CGRectGetMinY(self.searchExpertView.frame) + 16.0f, CGRectGetWidth(self.searchExpertView.frame), 209.0f)];
         self.searchUserShadowView.backgroundColor = [UIColor whiteColor];
         self.searchUserShadowView.layer.shadowOffset = CGSizeMake(0.0f, 3.0f);
         self.searchUserShadowView.layer.shadowOpacity = 1.0f;
@@ -274,44 +289,44 @@
         self.searchUserShadowView.layer.cornerRadius = 8.0f;
         [self addSubview:self.searchUserShadowView];
         
-        _searchUserView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchExpertView.frame), CGRectGetMinY(self.searchExpertView.frame), CGRectGetWidth(self.searchExpertView.frame), 180.0f)];
+        _searchUserView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchExpertView.frame), CGRectGetMinY(self.searchExpertView.frame) + 16.0f, CGRectGetWidth(self.searchExpertView.frame), 209.0f)];
         self.searchUserView.clipsToBounds = YES;
         self.searchUserView.layer.cornerRadius = 8.0f;
         self.searchUserView.backgroundColor = [UIColor whiteColor];
-        self.searchUserView.layer.shadowColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
+        self.searchUserView.layer.shadowColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
         self.searchUserView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
         self.searchUserView.layer.shadowOpacity = 0.4f;
         self.searchUserView.layer.shadowRadius = 4.0f;
         self.searchUserView.alpha = 0.0f;
         [self addSubview:self.searchUserView];
 
-        _userImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 52.0f) / 2.0f, 8.0f, 52.0f, 52.0f)];
+        _userImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 64.0f) / 2.0f, 16.0f, 64.0f, 64.0f)];
         self.userImageView.clipsToBounds = YES;
         self.userImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.userImageView.layer.cornerRadius = CGRectGetHeight(self.userImageView.frame) / 2.0f;
         [self.searchUserView addSubview:self.userImageView];
         
-        _userFullNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.userImageView.frame) + 9.0f, CGRectGetWidth(self.searchUserView.frame) - 16.0f, 20.0f)];
-        self.userFullNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        _userFullNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.userImageView.frame) + 8.0f, CGRectGetWidth(self.searchUserView.frame) - 16.0f, 25.0f)];
+        self.userFullNameLabel.font = nameLabelFont;
         self.userFullNameLabel.textAlignment = NSTextAlignmentCenter;
-        self.userFullNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.userFullNameLabel.textColor = nameLabelColor;
         [self.searchUserView addSubview:self.userFullNameLabel];
         
         _userUsernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.userFullNameLabel.frame), CGRectGetMaxY(self.userFullNameLabel.frame), CGRectGetWidth(self.userFullNameLabel.frame), 20.0f)];
-        self.userUsernameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.userUsernameLabel.font = usernameLabelFont;
         self.userUsernameLabel.textAlignment = NSTextAlignmentCenter;
-        self.userUsernameLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.userUsernameLabel.textColor = usernameLabelColor;
         [self.searchUserView addSubview:self.userUsernameLabel];
         
-        _addUserToContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.userUsernameLabel.frame) + 19.0f, CGRectGetWidth(self.userFullNameLabel.frame) - 16.0f, 44.0f)];
+        _addUserToContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.userUsernameLabel.frame) + 16.0f, CGRectGetWidth(self.userFullNameLabel.frame) - 16.0f, 44.0f)];
         self.addUserToContactButtonView.alpha = 0.0f;
         self.addUserToContactButtonView.layer.borderWidth = 1.0f;
-        self.addUserToContactButtonView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        self.addUserToContactButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
         self.addUserToContactButtonView.layer.cornerRadius = 6.0f;
         
         CAGradientLayer *addUserToContactButtonViewGradient = [CAGradientLayer layer];
         addUserToContactButtonViewGradient.frame = self.addUserToContactButtonView.bounds;
-        addUserToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
+        addUserToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
         addUserToContactButtonViewGradient.startPoint = CGPointMake(0.0f, 0.0f);
         addUserToContactButtonViewGradient.endPoint = CGPointMake(0.0f, 1.0f);
         addUserToContactButtonViewGradient.cornerRadius = 6.0f;
@@ -321,8 +336,8 @@
         
         _addUserToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
         self.addUserToContactLabel.text = NSLocalizedString(@"Add to Contacts", @"");
-        self.addUserToContactLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.addUserToContactLabel.textColor = [UIColor whiteColor];
+        self.addUserToContactLabel.font = buttonLabelFont;
+        self.addUserToContactLabel.textColor = buttonLabelColor;
         self.addUserToContactLabel.textAlignment = NSTextAlignmentCenter;
         [self.addUserToContactButtonView addSubview:self.addUserToContactLabel];
         
@@ -335,12 +350,12 @@
         _userChatNowButtonView = [[UIView alloc] initWithFrame:self.addUserToContactButtonView.frame];
         self.userChatNowButtonView.alpha = 0.0f;
         self.userChatNowButtonView.layer.borderWidth = 1.0f;
-        self.userChatNowButtonView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        self.userChatNowButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
         self.userChatNowButtonView.layer.cornerRadius = 6.0f;
         
         CAGradientLayer *userChatNowGradient = [CAGradientLayer layer];
         userChatNowGradient.frame = self.userChatNowButtonView.bounds;
-        userChatNowGradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
+        userChatNowGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
         userChatNowGradient.startPoint = CGPointMake(0.0f, 0.0f);
         userChatNowGradient.endPoint = CGPointMake(0.0f, 1.0f);
         userChatNowGradient.cornerRadius = 6.0f;
@@ -349,8 +364,8 @@
         
         _userChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
         self.userChatNowLabel.text = NSLocalizedString(@"Chat Now", @"");
-        self.userChatNowLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.userChatNowLabel.textColor = [UIColor whiteColor];
+        self.userChatNowLabel.font = buttonLabelFont;
+        self.userChatNowLabel.textColor = buttonLabelColor;
         self.userChatNowLabel.textAlignment = NSTextAlignmentCenter;
         
         CGSize userChatNowLabelSize = [self.userChatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.userChatNowLabel.frame))];
@@ -360,7 +375,9 @@
         [self.userChatNowButtonView addSubview:self.userChatNowLabel];
         
         _userChatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userChatNowLabel.frame) + 8.0f, ((CGRectGetHeight(self.addUserToContactButtonView.frame) - 16.0f) / 2.0f) + 2.0f, 16.0f, 16.0f)];
-        self.userChatNowLogoImageView.image = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *userChatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        userChatNowLogoImage = [userChatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        self.userChatNowLogoImageView.image = userChatNowLogoImage;
         self.userChatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.userChatNowButtonView addSubview:self.userChatNowLogoImageView];
         
@@ -370,19 +387,19 @@
         self.userChatNowButton.userInteractionEnabled = NO;
         [self.searchUserView addSubview:self.userChatNowButton];
         
-        _searchSelfUserView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.userFullNameLabel.frame), CGRectGetMaxY(self.userUsernameLabel.frame) + 19.0f, CGRectGetWidth(self.userFullNameLabel.frame), 44.0f)];
+        _searchSelfUserView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.userFullNameLabel.frame), CGRectGetMaxY(self.userUsernameLabel.frame) + 16.0f, CGRectGetWidth(self.userFullNameLabel.frame), 44.0f)];
         self.searchSelfUserView.alpha = 0.0f;
         [self.searchUserView addSubview:self.searchSelfUserView];
         
         _searchSelfUserLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.searchSelfUserView.frame), CGRectGetHeight(self.searchSelfUserView.frame))];
         self.searchSelfUserLabel.text = NSLocalizedString(@"This is you", @"");
-        self.searchSelfUserLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.searchSelfUserLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.searchSelfUserLabel.font = clickableLabelFont;
+        self.searchSelfUserLabel.textColor = clickableLabelColor;
         self.searchSelfUserLabel.textAlignment = NSTextAlignmentCenter;
         [self.searchSelfUserView addSubview:self.searchSelfUserLabel];
         
         _emptyStateView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarView.frame) + 8.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - CGRectGetMaxY(self.searchBarView.frame))];
-        self.emptyStateView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.emptyStateView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.emptyStateView.alpha = 0.0f;
         [self addSubview:self.emptyStateView];
         
@@ -402,46 +419,56 @@
 //                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f]
 //                                      range:range];
 //        self.emptyStateLabel.attributedText = emptyAttribuetdString;
-//        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+//        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
 //        self.emptyStateLabel.numberOfLines = 2;
 //        self.emptyStateLabel.textAlignment = NSTextAlignmentCenter;
 //        [self.emptyStateView addSubview:self.emptyStateLabel];
         //END DV Note
 
+        
+        UIFont *infoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelTitle];
+        UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelTitle];
+        UIFont *bodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        
         _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 60.0f)];
         self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
-        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.emptyStateLabel.font = bodyLabelFont;
         NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //set attribute
         NSMutableAttributedString *emptyAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.emptyStateLabel.text];
         [emptyAttribuetdString addAttribute:NSFontAttributeName
-                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:24.0f]
+                                      value:infoLabelFont
                                       range:range];
         self.emptyStateLabel.attributedText = emptyAttribuetdString;
-        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.emptyStateLabel.textColor = infoLabelColor;
         self.emptyStateLabel.numberOfLines = 2;
         self.emptyStateLabel.textAlignment = NSTextAlignmentCenter;
         [self.emptyStateView addSubview:self.emptyStateLabel];
         
         _noInternetView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarView.frame) + 8.0f, CGRectGetWidth(self.frame), 68.0f)];
-        self.noInternetView.backgroundColor = [TAPUtil getColor:@"FFFDEA"];
+        self.noInternetView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchConnectionLostBackgroundColor];
         self.noInternetView.alpha = 0.0f;
         [self addSubview:self.noInternetView];
         
-        _noInternetImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 10.0f, 48.0f, 48.0f)];
+        _noInternetImageView = [[UIImageView alloc] initWithFrame:CGRectMake(18.0f, 12.0f, 44.0f, 44.0f)];
         self.noInternetImageView.image = [UIImage imageNamed:@"TAPIconConnectionLost" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.noInternetView addSubview:self.noInternetImageView];
         
-        _noInternetTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.noInternetImageView.frame) + 8.0f, 10.0f, CGRectGetWidth(self.frame) - 16.0f - (CGRectGetMaxX(self.noInternetImageView.frame) + 8.0f), 24.0f)];
+        UIFont *noInternetTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchConnectionLostTitle];
+        UIColor *noInternetTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchConnectionLostTitle];
+        UIFont *noInternetDescriptionFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchConnectionLostDescription];
+        UIColor *noInternetDescriptionColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchConnectionLostDescription];
+
+        _noInternetTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.noInternetImageView.frame) + 10.0f, 10.0f, CGRectGetWidth(self.frame) - 16.0f - (CGRectGetMaxX(self.noInternetImageView.frame) + 8.0f), 24.0f)];
         self.noInternetTitleLabel.text = @"Internet Connection Lost";
-        self.noInternetTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.noInternetTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
+        self.noInternetTitleLabel.textColor = noInternetTitleColor;
+        self.noInternetTitleLabel.font = noInternetTitleFont;
         [self.noInternetView addSubview:self.noInternetTitleLabel];
         
         _noInternetDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.noInternetTitleLabel.frame), CGRectGetMaxY(self.noInternetTitleLabel.frame), CGRectGetWidth(self.noInternetTitleLabel.frame), 24.0f)];
         self.noInternetDescriptionLabel.text = @"Please check your connection";
-        self.noInternetDescriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.noInternetDescriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+        self.noInternetDescriptionLabel.textColor = noInternetDescriptionColor;
+        self.noInternetDescriptionLabel.font = noInternetDescriptionFont;
         [self.noInternetView addSubview:self.noInternetDescriptionLabel];
         
         [self setSearchViewLayoutWithType:LayoutTypeDefault];

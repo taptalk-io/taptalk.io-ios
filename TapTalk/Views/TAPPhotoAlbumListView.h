@@ -13,6 +13,4 @@
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) UITableView *selectedItemCollectionView;
 
-- (void)setChooseItemLabelWithItemCount:(NSInteger)count;
-
 @end

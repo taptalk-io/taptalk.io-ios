@@ -2,7 +2,7 @@
 //  TAPSearchResultChatTableViewCell.h
 //  TapTalk
 //
-//  Created by Welly Kencana on 22/10/18.
+//  Created by Dominic Vedericho on 22/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 

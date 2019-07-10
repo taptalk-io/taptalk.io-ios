@@ -47,15 +47,11 @@
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self handleIncomingMessage:message shouldNotShowNotification:NO]; //DV Temp
+    [self handleIncomingMessage:message shouldShowNotification:YES];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self handleIncomingMessage:message shouldNotShowNotification:NO]; //DV Temp
-}
-
-- (void)chatManagerDidReceiveDeleteMessageOnOtherRoom:(TAPMessageModel *)message {
-    [self handleIncomingMessage:message shouldNotShowNotification:NO]; //DV Temp
+    [self handleIncomingMessage:message shouldShowNotification:NO];
 }
 
 #pragma mark - TAPCustomNotificationAlertViewController
@@ -118,10 +114,10 @@
     
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
     
-    [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldNotShowNotification:YES];
+    [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldShowNotification:NO];
 }
 
-- (void)handleIncomingMessage:(TAPMessageModel *)message shouldNotShowNotification:(BOOL)shouldNotShowNotification {
+- (void)handleIncomingMessage:(TAPMessageModel *)message shouldShowNotification:(BOOL)shouldShowNotification {
     if (message == nil) {
         return;
     }
@@ -179,7 +175,7 @@
         //Update message delivery status to API
         [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredFromPushNotificationWithMessage:message];
     }
-    else if (![message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID]) {
+    else if (![message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID] && shouldShowNotification) {
         [self showInAppNotificationWithMessage:message];
     }
     
@@ -189,9 +185,10 @@
 }
 
 - (void)showInAppNotificationWithMessage:(TAPMessageModel *)message {
-//    if ([message.type integerValue] == ChatMessageTypeNewUser || [message.type integerValue] == ChatMessageTypeUserLeave) {
-//        return;
-//    }
+    if (message.isDeleted && message.isHidden) {
+        //Do not show if message isdeleted or isHidden
+        return;
+    }
     
     if ([TAPChatManager sharedManager].activeUser.userID == nil || [[TAPChatManager sharedManager].activeUser.userID isEqualToString:@""]) {
         //Do not show if user id nil

@@ -43,11 +43,13 @@
         _firstLoadCenterIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.firstLoadImageView.frame) + 31.0f, CGRectGetMinY(self.firstLoadImageView.frame) + 31.0f, 48.0f, 48.0f)];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconNewSettingUp" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.firstLoadView addSubview:self.firstLoadCenterIconImageView];
-        
+    
+        UIFont *popupTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogTitle];
+        UIColor *popupTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogTitle];
         _titleFirstLoadLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.firstLoadImageView.frame) + 8.0f, CGRectGetWidth(self.firstLoadView.frame) - 16.0f - 16.0f, 20.0f)];
         self.titleFirstLoadLabel.text = NSLocalizedString(@"Setting up Your Chat Room", @"");
-        self.titleFirstLoadLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.titleFirstLoadLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        self.titleFirstLoadLabel.textColor = popupTitleLabelColor;
+        self.titleFirstLoadLabel.font = popupTitleLabelFont;
         NSMutableDictionary *titleFirstLoadAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat titleFirstLoadLetterSpacing = -0.4f;
         [titleFirstLoadAttributesDictionary setObject:@(titleFirstLoadLetterSpacing) forKey:NSKernAttributeName];
@@ -58,11 +60,13 @@
         self.titleFirstLoadLabel.textAlignment = NSTextAlignmentCenter;
         [self.firstLoadView addSubview:self.titleFirstLoadLabel];
     
+        UIFont *popupBodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogBody];
+        UIColor *popupBodyLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogBody];
         _descriptionFirstLoadLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleFirstLoadLabel.frame), CGRectGetMaxY(self.titleFirstLoadLabel.frame), CGRectGetWidth(self.titleFirstLoadLabel.frame), 18.0f)];
         self.descriptionFirstLoadLabel.textAlignment = NSTextAlignmentCenter;
         self.descriptionFirstLoadLabel.text = NSLocalizedString(@"Make sure you have a stable conection", @"");
-        self.descriptionFirstLoadLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.descriptionFirstLoadLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
+        self.descriptionFirstLoadLabel.textColor = popupBodyLabelColor;
+        self.descriptionFirstLoadLabel.font = popupBodyLabelFont;
         NSMutableDictionary *descriptionFirstLoadAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat descriptionFirstLoadLetterSpacing = -0.2f;
         [descriptionFirstLoadAttributesDictionary setObject:@(descriptionFirstLoadLetterSpacing) forKey:NSKernAttributeName];

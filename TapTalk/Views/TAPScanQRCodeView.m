@@ -75,26 +75,31 @@
             additionalBottomGap += [TAPUtil safeAreaBottomPadding];
         }
         
+        
+        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
         _QRCodeButton = [[UIButton alloc] initWithFrame:CGRectMake(8.0f, CGRectGetHeight(self.frame) - 45.0f - additionalBottomGap, CGRectGetWidth(self.frame) - 16.0f, 45.0f)];
         self.QRCodeButton.layer.cornerRadius = 6.0f;
         self.QRCodeButton.clipsToBounds = YES;
-        [self.QRCodeButton setTintColor:[UIColor whiteColor]];
-        self.QRCodeButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
+        [self.QRCodeButton setTintColor:buttonLabelColor];
+        self.QRCodeButton.titleLabel.font = buttonLabelFont;
         self.QRCodeButton.layer.borderWidth = 1.0f;
-        self.QRCodeButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
+        self.QRCodeButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
         [self addSubview:self.QRCodeButton];
         
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.QRCodeButton.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         gradient.cornerRadius = 6.0f;
         [self.QRCodeButton.layer insertSublayer:gradient atIndex:0];
         
+        UIFont *infoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
         _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, CGRectGetMinY(self.QRCodeButton.frame) - 20.0f - 20.0f, CGRectGetWidth(self.overlayView.frame) - 42.0f, 20.0f)];
         self.descriptionLabel.numberOfLines = 0;
-        self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+        self.descriptionLabel.font = infoLabelFont;
         self.descriptionLabel.textColor = [UIColor whiteColor];
         self.descriptionLabel.textAlignment = NSTextAlignmentCenter;
         [self.overlayView addSubview:self.descriptionLabel];
@@ -149,10 +154,11 @@
             self.leftBlackView.backgroundColor = [UIColor whiteColor];
             self.rightBlackView.backgroundColor = [UIColor whiteColor];
             
+            UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
             self.scanBoundImageView.image = nil;
             self.descriptionLabel.text = NSLocalizedString(@"To scan other's QR code, please tap the button below", @"");
             [self.QRCodeButton setTitle:NSLocalizedString(@"Scan QR Code", @"") forState:UIControlStateNormal];
-            self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+            self.descriptionLabel.textColor = infoLabelColor;
             
             //Resize description label height
             CGSize descriptionLabelSize = [self.descriptionLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), CGFLOAT_MAX)];

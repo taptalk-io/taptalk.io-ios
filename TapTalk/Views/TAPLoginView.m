@@ -28,20 +28,25 @@
         
         self.backgroundColor = [UIColor whiteColor];
         
-        _logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 100.0f, 132.0f, 22.0f)];
+        _logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 100.0f, 141.0f, 24.0f)];
         self.logoImageView.image = [UIImage imageNamed:@"TAPIconTapTalkBoxLogo" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:self.logoImageView];
         
         _welcomePlacholderLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoImageView.frame) + 64.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 46.0f)];
-        self.welcomePlacholderLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:40.0f];
-        self.welcomePlacholderLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        
+        UIFont *welcomePlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTitleLabel];
+        UIColor *welcomePlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTitleLabel];
+        self.welcomePlacholderLabel.font = welcomePlaceholderFont;
+        self.welcomePlacholderLabel.textColor = welcomePlaceholderColor;
         self.welcomePlacholderLabel.text = NSLocalizedString(@"Welcome", @"");
         [self addSubview:self.welcomePlacholderLabel];
         
+        UIFont *subtitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormLabel];
+        UIColor *subtitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormLabel];
         _subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.welcomePlacholderLabel.frame), CGRectGetMaxY(self.welcomePlacholderLabel.frame) + 8.0f, CGRectGetWidth(self.welcomePlacholderLabel.frame), 22.0f)];
-        self.subtitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:16.0f];
-        self.subtitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.subtitleLabel.font = subtitleFont;
+        self.subtitleLabel.textColor = subtitleColor;
         self.subtitleLabel.text = NSLocalizedString(@"Enter your mobile number to continue", @"");
         [self addSubview:self.subtitleLabel];
         

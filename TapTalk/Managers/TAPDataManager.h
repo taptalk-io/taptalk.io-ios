@@ -27,10 +27,22 @@
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
 + (NSNumber *)getMessageLastUpdatedWithRoomID:(NSString *)roomID;
-
++ (void)deletePhysicalFilesWithMessage:(TAPMessageModel *)message
+                               success:(void (^)(void))success
+                               failure:(void (^)(NSError *error))failure;
++ (void)deletePhysicalFilesInBackgroundWithMessage:(TAPMessageModel *)message
+                                           success:(void (^)(void))success
+                                           failure:(void (^)(NSError *error))failure;
++ (void)deletePhysicalFileAndMessageSequenceWithMessageArray:(NSArray *)messageArray
+                                                     success:(void (^)(void))success
+                                                     failure:(void (^)(NSError *error))failure;
++ (void)deleteAllMessageAndPhysicalFilesInRoomWithRoomID:(NSString *)roomID
+                                                 success:(void (^)(void))success
+                                                 failure:(void (^)(NSError *error))failure;
 //Convert from dictionary to model
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
 + (TAPCountryModel *)countryModelFromDictionary:(NSDictionary *)dictionary;
++ (TAPUserModel *)userModelFromDictionary:(NSDictionary *)dictionary;
 
 + (NSString *)escapedDatabaseStringFromString:(NSString *)string;
 + (NSString *)normalizedDatabaseStringFromString:(NSString *)string;
@@ -59,6 +71,12 @@
 + (void)getAllMessageWithRoomID:(NSString *)roomID
                    messageTypes:(NSArray *)messageTypeArray
              minimumDateCreated:(NSTimeInterval)minCreated
+                      sortByKey:(NSString *)columnName
+                      ascending:(BOOL)isAscending
+                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                        failure:(void (^)(NSError *error))failure;
++ (void)getAllMessageWithRoomID:(NSString *)roomID
+                   messageTypes:(NSArray *)messageTypeArray
                       sortByKey:(NSString *)columnName
                       ascending:(BOOL)isAscending
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
@@ -156,6 +174,11 @@
                               minCreated:(NSNumber *)minCreated
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure;
++ (void)callAPIDeleteMessageWithMessageIDs:(NSArray *)messageIDArray
+                                    roomID:(NSString *)roomID
+                      isDeletedForEveryone:(BOOL)isDeletedForEveryone
+                                   success:(void (^)(NSArray *deletedMessageIDArray))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetContactList:(void (^)(NSArray *userArray))success
                       failure:(void (^)(NSError *error))failure;
 + (void)callAPIAddContactWithUserID:(NSString *)userID
@@ -237,5 +260,41 @@
 + (void)callAPIAddContactWithPhones:(NSArray *)phoneNumbers
                             success:(void (^)(NSArray *users))success
                             failure:(void (^)(NSError *error))failure;
++ (void)callAPICreateRoomWithName:(NSString *)roomName
+                             type:(NSInteger)roomType
+                      userIDArray:(NSArray *)userIDArray
+                          success:(void (^)(TAPRoomModel *room))success
+                          failure:(void (^)(NSError *error))failure;
++ (NSURLSessionUploadTask *)callAPIUploadRoomImageWithImageData:(NSData *)imageData
+                                                         roomID:(NSString *)roomID
+                                                completionBlock:(void (^)(TAPRoomModel *room))successBlock
+                                                  progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                                                   failureBlock:(void(^)(NSError *error))failureBlock;
++ (void)callAPIUpdateRoomWithRoomID:(NSString *)roomID
+                           roomName:(NSString *)roomName
+                            success:(void (^)(TAPRoomModel *room))success
+                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetRoomWithRoomID:(NSString *)roomID
+                         success:(void (^)(TAPRoomModel *room))success
+                         failure:(void (^)(NSError *error))failure;
++ (void)callAPIAddRoomParticipantsWithRoomID:(NSString *)roomID
+                                 userIDArray:(NSArray *)userIDArray
+                                     success:(void (^)(TAPRoomModel *room))success
+                                     failure:(void (^)(NSError *error))failure;
++ (void)callAPIRemoveRoomParticipantsWithRoomID:(NSString *)roomID
+                                    userIDArray:(NSArray *)userIDArray
+                                        success:(void (^)(TAPRoomModel *room))success
+                                        failure:(void (^)(NSError *error))failure;
++ (void)callAPIPromoteRoomAdminsWithRoomID:(NSString *)roomID
+                                    userIDArray:(NSArray *)userIDArray
+                                        success:(void (^)(TAPRoomModel *room))success
+                                        failure:(void (^)(NSError *error))failure;
++ (void)callAPIDemoteRoomAdminsWithRoomID:(NSString *)roomID
+                              userIDArray:(NSArray *)userIDArray
+                                  success:(void (^)(TAPRoomModel *room))success
+                                  failure:(void (^)(NSError *error))failure;
++ (void)callAPILeaveRoomWithRoomID:(NSString *)roomID
+                           success:(void (^)(void))success
+                           failure:(void (^)(NSError *error))failure;
 
 @end

@@ -28,13 +28,16 @@
         [self.contentView addSubview:self.countryFlagImageView];
         
         CGFloat countryNameLabelWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMaxX(self.countryFlagImageView.frame) - 16.0f - 16.0f - 20.0f - 32.0f;
+        
+        UIFont *countryPickerLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontCountryPickerLabel];
+        UIColor *countryPickerLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorCountryPickerLabel];
         _countryNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryFlagImageView.frame) + 16.0f, CGRectGetMinY(self.countryFlagImageView.frame), countryNameLabelWidth, 20.0f)];
-        self.countryNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:16.0f];
-        self.countryNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.countryNameLabel.font = countryPickerLabelFont;
+        self.countryNameLabel.textColor = countryPickerLabelColor;
         [self.contentView addSubview:self.countryNameLabel];
         
         _bottomSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.countryNameLabel.frame), 44.0f - 1.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMinX(self.countryNameLabel.frame), 1.0f)];
-        self.bottomSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+        self.bottomSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.contentView addSubview:self.bottomSeparatorView];
         
         _selectedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 32.0f - 20.0f , (44.0f - 20.0f) / 2.0f, 20.0f, 20.0f)];

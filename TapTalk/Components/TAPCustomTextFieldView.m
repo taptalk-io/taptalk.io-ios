@@ -40,14 +40,17 @@
     self = [super initWithFrame:frame];
     
     if (self) {
+        
+        UIFont *formLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormLabel];
+        UIColor *formLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormLabel];
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 22.0f)];
-        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:16.0f];
-        self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.titleLabel.font = formLabelFont;
+        self.titleLabel.textColor = formLabelColor;
         [self addSubview:self.titleLabel];
         
         _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 50.0f)];
         self.containerView.backgroundColor = [UIColor whiteColor];
-        self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+        self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.containerView.layer.cornerRadius = 8.0f;
         self.containerView.layer.borderWidth = 1.0f;
         
@@ -69,7 +72,7 @@
         [self addSubview:self.phoneNumberPickerView];
         
         _containerSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.containerView.frame) - 50.0f, 0.0f, 1.0f, CGRectGetHeight(self.containerView.frame))];
-        self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+        self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive];
         [self.containerView addSubview:self.containerSeparatorView];
         
         _passwordShowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerSeparatorView.frame) + 15.0f, 15.0f, 20.0f, 20.0f)];
@@ -80,22 +83,28 @@
         [self.showPasswordButton addTarget:self action:@selector(showPasswordButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.containerView addSubview:self.showPasswordButton];
         
+        UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
+        UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
         _textField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.containerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.containerView.frame))];
         self.textField.delegate = self;
-        [self.textField setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
-        self.textField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.textField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:16.0f];
+        [self.textField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
+        self.textField.textColor = textFieldColor;
+        self.textField.font = textFieldFont;
         [self.containerView addSubview:self.textField];
         
+        UIFont *formDescriptionLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormDescriptionLabel];
+        UIColor *formDescriptionLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormDescriptionLabel];
         _infoDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 0.0f)];
-        self.infoDescriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
-        self.infoDescriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.infoDescriptionLabel.font = formDescriptionLabelBodyFont;
+        self.infoDescriptionLabel.textColor = formDescriptionLabelBodyColor;
         self.infoDescriptionLabel.numberOfLines = 0;
         [self addSubview:self.infoDescriptionLabel];
         
+        UIFont *formErrorInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormErrorInfoLabel];
+        UIColor *formErrorInfoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormErrorInfoLabel];
         _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 0.0f)];
-        self.errorInfoLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
-        self.errorInfoLabel.textColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57];
+        self.errorInfoLabel.font = formErrorInfoLabelFont;
+        self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
         [self addSubview:self.errorInfoLabel];
                 
@@ -258,10 +267,11 @@
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeEmailOptional) {
         self.titleLabel.text = NSLocalizedString(@"Email Address Optional", @"");
         
+        UIFont *formDescriptionFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormDescriptionLabel];
         NSString *optionalString = NSLocalizedString(@"Optional", @"");
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
         [attributedString addAttribute:NSFontAttributeName
-                                            value:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f]
+                                            value:formDescriptionFont
                                             range:[self.titleLabel.text rangeOfString:optionalString]];
         self.titleLabel.attributedText = attributedString;
         
@@ -277,10 +287,11 @@
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypePasswordOptional) {
         self.titleLabel.text = NSLocalizedString(@"Password Optional", @"");
         
+        UIFont *formDescriptionFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormDescriptionLabel];
         NSString *optionalString = NSLocalizedString(@"Optional", @"");
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
         [attributedString addAttribute:NSFontAttributeName
-                                 value:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f]
+                                 value:formDescriptionFont
                                  range:[self.titleLabel.text rangeOfString:optionalString]];
         self.titleLabel.attributedText = attributedString;
         
@@ -303,6 +314,16 @@
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:YES];
+    }
+    else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeGroupName) {
+        self.titleLabel.text = NSLocalizedString(@"Group Name", @"");
+        [self setInfoDescriptionText:@""];
+        [self setErrorInfoText:@""];
+        self.textField.keyboardType = UIKeyboardTypeDefault;
+        self.textField.placeholder = NSLocalizedString(@"Insert Name", @"");
+        self.containerView.alpha = 1.0f;
+        self.phoneNumberPickerView.alpha = 0.0f;
+        [self showShowPasswordButton:NO];
     }
 }
 
@@ -352,42 +373,45 @@
         if (active) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 1.0f;
-                self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-                self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
-                self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLURPLE_D7];
+                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+                self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+                self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive];
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
-                self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
-
+                self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+                self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive];
             }];
         }
     }
     else {
         if (active) {
             self.shadowView.alpha = 1.0f;
-            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-            self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
-            self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR];
+            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+            self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+            self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive];
         }
         else {
             self.shadowView.alpha = 0.0f;
-            self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
-            self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+            self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+            self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive];
         }
     }
 }
 
 - (void)setAsEnabled:(BOOL)enabled {
+    
+    UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
+    UIColor *textFieldPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
+    
     if (enabled) {
-        self.textField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.textField.textColor = textFieldColor;
         self.textField.userInteractionEnabled = YES;
     }
     else {
-        self.textField.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.textField.textColor = textFieldPlaceholderColor;
         self.textField.userInteractionEnabled = NO;
     }
 }
@@ -404,15 +428,15 @@
         if (error) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57].CGColor;
-                self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57];
+                self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderError].CGColor;
+                self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderError];
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
-                self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+                self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+                self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive];
                 
             }];
         }
@@ -420,13 +444,13 @@
     else {
         if (error) {
             self.shadowView.alpha = 0.0f;
-            self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57].CGColor;
-            self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_REDPINK_57];
+            self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderError].CGColor;
+            self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderError];
         }
         else {
             self.shadowView.alpha = 0.0f;
-            self.containerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
-            self.containerSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+            self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+            self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive];
         }
     }
 }

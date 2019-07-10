@@ -8,7 +8,7 @@
 
 #import "TAPOldDataManager.h"
 #import "TAPFileDownloadManager.h"
-
+#import "TAPDataManager.h"
 
 #define kExecuteCountdown 7*24*60*60*1000.0f //7 days in miliseconds
 #define kDeleteCountdown 30*24*60*60*1000.0f //30 days in miliseconds
@@ -20,13 +20,6 @@
 + (void)fetchSmallestCreatedUnreadMessageWithRoomID:(NSString *)roomID
                                             success:(void (^)(NSTimeInterval smallestUnreadMessageCreated))success
                                             failure:(void (^)(NSError *error))failure;
-+ (void)runDeletePhysicalFileAndMessageSequenceWithMessageArray:(NSArray *)messageArray
-                                                        success:(void (^)())success
-                                                        failure:(void (^)(NSError *error))failure;
-+ (void)deletePhysicalFilesWithMessage:(TAPMessageModel *)message
-                               success:(void (^)())success
-                               failure:(void (^)(NSError *error))failure;
-
 @end
 
 @implementation TAPOldDataManager
@@ -93,7 +86,8 @@
                                     NSLog(@"Message more than one page with room name: %@", room.name);
 #endif
                                     //get created message index number of items per page + 1
-                                    TAPMessageModel *nextPageFirstMessage = [messageArray objectAtIndex:TAP_NUMBER_OF_ITEMS_CHAT + 1];
+//                                    TAPMessageModel *nextPageFirstMessage = [messageArray objectAtIndex:TAP_NUMBER_OF_ITEMS_CHAT + 1];
+                                    TAPMessageModel *nextPageFirstMessage = [messageArray objectAtIndex:TAP_NUMBER_OF_ITEMS_CHAT];
                                     nextPageFirstMessageCreated = [nextPageFirstMessage.created doubleValue];
                                     
                                     //compare H-1 month, smallest unread message created, created first item of next page (index: number of items per page + 1)
@@ -124,7 +118,7 @@
                                     [TAPDataManager getAllMessageWithRoomID:room.roomID messageTypes:messageTypeArray minimumDateCreated:minimumCreatedData sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *messageArray) {
             
                                         //Delete message & physical data of image/video/file
-                                        [TAPOldDataManager runDeletePhysicalFileAndMessageSequenceWithMessageArray:messageArray success:^{
+                                        [TAPDataManager deletePhysicalFileAndMessageSequenceWithMessageArray:messageArray success:^{
                                             
                                             //Get all message other than media type
                                             NSNumber *minCreatedNumber = [NSNumber numberWithDouble:minimumCreatedData];
@@ -166,76 +160,6 @@
                 }];
             }
         });
-    }
-}
-
-+ (void)runDeletePhysicalFileAndMessageSequenceWithMessageArray:(NSArray *)messageArray
-                                                        success:(void (^)())success
-                                                        failure:(void (^)(NSError *error))failure {
-
-    if ([messageArray count] == 0 || messageArray == nil) {
-        success();
-    }
-    else {
-        //Delete physical file & message (type image, video, files)
-        for (TAPMessageModel *currentMessage in messageArray) {
-            //Delete physical file
-            [TAPOldDataManager deletePhysicalFilesWithMessage:currentMessage success:^{
-                //Delete message
-                [TAPDataManager deleteDatabaseMessageWithData:@[currentMessage] success:^{
-                    success();
-                } failure:^(NSError *error) {
-                    //failure delete database message
-                    failure(error);
-                }];
-            } failure:^(NSError *error) {
-                //failure delete physical file data
-                failure(error);
-            }];
-        }
-    }
-}
-
-+ (void)deletePhysicalFilesWithMessage:(TAPMessageModel *)message
-                               success:(void (^)())success
-                               failure:(void (^)(NSError *error))failure {
-    if (message.type == TAPChatMessageTypeImage) {
-        NSDictionary *dataDictionary = message.data;
-        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-        
-        //Remove image
-        [TAPImageView removeImageFromCacheWithKey:fileID];
-
-        success();
-    }
-    else if (message.type == TAPChatMessageTypeVideo) {
-        NSDictionary *dataDictionary = message.data;
-        NSString *roomID = message.room.roomID;
-        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-        
-        //Remove thumbnail image
-        [TAPImageView removeImageFromCacheWithKey:fileID];
-        
-        //Remove video
-        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
-        if (![filePath isEqualToString:@""]) {
-            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-        }
-        
-        success();
-    }
-    else if (message.type == TAPChatMessageTypeFile) {
-        NSDictionary *dataDictionary = message.data;
-        NSString *roomID = message.room.roomID;
-        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-
-        //Remove file
-        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
-        if (![filePath isEqualToString:@""]) {
-            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-        }
-        
-        success();
     }
 }
 

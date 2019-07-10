@@ -18,7 +18,6 @@
     
     //DV Note - Set message ID to string 0 because server accepted as an integer, so empty string will cause a trouble in server
     messageForReturn.messageID = @"0";
-    //END DV Temp
     
     messageForReturn.user = user;
     messageForReturn.room = room;
@@ -33,7 +32,6 @@
     messageForReturn.isDelivered = NO;
     messageForReturn.isHidden = NO;
     
-    
     //Obtain other user ID
     NSString *roomID = room.roomID;
     roomID = [TAPUtil nullToEmptyString:roomID];
@@ -42,17 +40,22 @@
     NSString *currentUserID = currentUser.userID;
     currentUserID = [TAPUtil nullToEmptyString:currentUserID];
     
-    NSString *otherUserID = @"";
-    NSArray *userIDArray = [roomID componentsSeparatedByString:@"-"];
-    
-    for (NSString *userID in userIDArray) {
-        if (![userID isEqualToString:currentUserID]) {
-            otherUserID = userID;
+    if (room.type == RoomTypePersonal) {
+        NSString *otherUserID = @"";
+        NSArray *userIDArray = [roomID componentsSeparatedByString:@"-"];
+        
+        for (NSString *userID in userIDArray) {
+            if (![userID isEqualToString:currentUserID]) {
+                otherUserID = userID;
+            }
         }
+        
+        messageForReturn.recipientID = otherUserID;
     }
-    
-    //If group, recipient ID is group ID
-    messageForReturn.recipientID = otherUserID;
+    else {
+        //If group or channel set recipientID to 0
+        messageForReturn.recipientID = @"0";
+    }
     
     return messageForReturn;
 }
@@ -84,16 +87,19 @@
     
     newModel.messageID = self.messageID;
     newModel.localID = self.localID;
+    newModel.filterID = self.filterID;
     newModel.type = self.type;
     newModel.body = self.body;
     newModel.room = self.room;
     newModel.recipientID = self.recipientID;
     newModel.created = self.created;
     newModel.updated = self.updated;
+    newModel.deleted = self.deleted;
     newModel.user = self.user;
     newModel.quote = self.quote;
     newModel.replyTo = self.replyTo;
     newModel.forwardFrom = self.forwardFrom;
+    newModel.target = self.target;
     newModel.data = self.data;
     newModel.isDeleted = self.isDeleted;
     newModel.isSending = self.isSending;

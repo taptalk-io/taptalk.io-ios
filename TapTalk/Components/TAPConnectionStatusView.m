@@ -2,7 +2,7 @@
 //  TAPConnectionStatusView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 24/9/18.
+//  Created by Dominic Vedericho on 24/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -51,11 +51,12 @@
     [self.connectionStatusView.layer insertSublayer:gradient atIndex:0];
     [self addSubview:self.connectionStatusView];
     
-    
     _connectionStatusLabelView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, CGRectGetHeight(self.connectionStatusView.frame))];
-    
     _connectionStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, CGRectGetHeight(self.connectionStatusLabelView.frame))];
-    self.connectionStatusLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
+    
+    UIFont *obtainedFont = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+    obtainedFont = [obtainedFont fontWithSize:12.0f];
+    self.connectionStatusLabel.font = obtainedFont;
     self.connectionStatusLabel.textColor = [UIColor whiteColor];
     self.connectionStatusLabel.textAlignment = NSTextAlignmentCenter;
     [self.connectionStatusLabelView addSubview:self.connectionStatusLabel];
@@ -64,6 +65,7 @@
     self.connectionStatusImageView.center = self.connectionStatusView.center;
     [self.connectionStatusLabelView addSubview:self.connectionStatusImageView];
     [self.connectionStatusView addSubview:self.connectionStatusLabelView];
+    
 }
 
 #pragma mark - Custom Method
@@ -114,7 +116,7 @@
     else if (self.type == TAPConnectionStatusTypeNetworkError) {
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.connectionStatusView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, [TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"9B9B9B"].CGColor, [TAPUtil getColor:@"9B9B9B"].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.connectionStatusView.layer replaceSublayer:[self.connectionStatusView.layer.sublayers objectAtIndex:0] with:gradient];
@@ -140,7 +142,7 @@
         if ([self.connectionStatusImageView.layer animationForKey:@"SpinAnimation"] == nil) {
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
             animation.fromValue = [NSNumber numberWithFloat:0.0f];
-            animation.toValue = [NSNumber numberWithFloat: 2*M_PI];
+            animation.toValue = [NSNumber numberWithFloat: 2 * M_PI];
             animation.duration = 1.5f;
             animation.repeatCount = INFINITY;
             animation.removedOnCompletion = NO;
@@ -180,7 +182,7 @@
     else if (self.type == TAPConnectionStatusTypeOffline) {
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.connectionStatusView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, [TAPUtil getColor:TAP_COLOR_GREY_9B].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"9B9B9B"].CGColor, [TAPUtil getColor:@"9B9B9B"].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.connectionStatusView.layer replaceSublayer:[self.connectionStatusView.layer.sublayers objectAtIndex:0] with:gradient];
@@ -206,7 +208,7 @@
         if ([self.connectionStatusImageView.layer animationForKey:@"SpinAnimation"] == nil) {
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
             animation.fromValue = [NSNumber numberWithFloat:0.0f];
-            animation.toValue = [NSNumber numberWithFloat: 2*M_PI];
+            animation.toValue = [NSNumber numberWithFloat: 2 * M_PI];
             animation.duration = 1.5f;
             animation.repeatCount = INFINITY;
             animation.removedOnCompletion = NO;

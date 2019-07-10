@@ -2,7 +2,7 @@
 //  TAPBaseRealmModel.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 25/8/18.
+//  Created by Dominic Vedericho on 25/8/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 

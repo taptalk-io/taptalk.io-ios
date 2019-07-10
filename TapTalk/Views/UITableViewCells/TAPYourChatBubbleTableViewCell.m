@@ -2,7 +2,7 @@
 //  TAPYourChatBubbleTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 1/10/18.
+//  Created by Dominic Vedericho on 1/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -26,6 +26,8 @@
 @property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
+@property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
+@property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 
@@ -50,7 +52,13 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
-@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleTopConstraint;
+
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
+
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -64,7 +72,8 @@
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID;
-- (void)setBubbleCellColor;
+- (void)setBubbleCellStyle;
+- (void)showSenderInfo:(BOOL)show;
 @end
 
 @implementation TAPYourChatBubbleTableViewCell
@@ -86,7 +95,7 @@
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
     self.fileView.layer.cornerRadius = 8.0f;
-
+    
     _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                               action:@selector(handleBubbleViewTap:)];
     [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
@@ -103,7 +112,11 @@
     self.bubbleLabel.longPressDelegate = self;
     self.bubbleLabel.longPressDuration = 0.05f;
     
-    [self setBubbleCellColor];
+    self.senderImageView.clipsToBounds = YES;
+    self.senderImageView.layer.cornerRadius = 14.0f;
+    
+    [self setBubbleCellStyle];
+    [self showSenderInfo:NO];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -117,6 +130,7 @@
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
+    [self showSenderInfo:NO];
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -212,22 +226,54 @@
 }
 
 #pragma mark - Custom Method
-- (void)setBubbleCellColor {
-    self.bubbleView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE];
-    self.quoteView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
-    self.replyInnerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
-    self.replyView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_45];
-    self.fileView.backgroundColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+- (void)setBubbleCellStyle {
+    self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleBackground];
+    self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
+    self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
+    self.replyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorQuoteLayoutDecorationBackground];
+    self.fileView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftFileButtonBackground];
     
-    self.replyNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-    self.replyMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-    self.quoteTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-    self.quoteSubtitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-    self.forwardTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-    self.forwardFromLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+    UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleQuoteTitle];
+    UIColor *quoteTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleQuoteTitle];
     
-    self.bubbleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-
+    UIFont *quoteContentFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleQuoteContent];
+    UIColor *quoteContentColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleQuoteContent];
+    
+    UIFont *bubbleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleMessageBody];
+    UIColor *bubbleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleMessageBody];
+    
+    UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
+    UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
+    
+    UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
+    UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
+    
+    self.replyNameLabel.textColor = quoteTitleColor;
+    self.replyNameLabel.font = quoteTitleFont;
+    
+    self.replyMessageLabel.textColor = quoteContentColor;
+    self.replyMessageLabel.font = quoteContentFont;
+    
+    self.quoteTitleLabel.textColor = quoteTitleColor;
+    self.quoteTitleLabel.font = quoteTitleFont;
+    
+    self.quoteSubtitleLabel.textColor = quoteContentColor;
+    self.quoteSubtitleLabel.font = quoteContentFont;
+    
+    self.forwardTitleLabel.textColor = quoteContentColor;
+    self.forwardTitleLabel.font = quoteContentFont;
+    
+    self.forwardFromLabel.textColor = quoteContentColor;
+    self.forwardFromLabel.font = quoteContentFont;
+    
+    self.bubbleLabel.textColor = bubbleLabelColor;
+    self.bubbleLabel.font = bubbleLabelFont;
+    
+    self.statusLabel.textColor = statusLabelColor;
+    self.statusLabel.font = statusLabelFont;
+    
+    self.senderNameLabel.font = senderNameLabelFont;
+    self.senderNameLabel.textColor = senderNameLabelColor;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -278,8 +324,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:TAP_COLOR_LINK_BASE_COLOR];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:TAP_COLOR_LINK_HIGHLIGHTED_COLOR];
+        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
@@ -288,14 +334,25 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:TAP_COLOR_LINK_BASE_COLOR];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:TAP_COLOR_LINK_HIGHLIGHTED_COLOR];
+        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
     }];
     self.bubbleLabel.attributedText = attributedString;
     
+    //CS NOTE - check chat room type, show sender info if group type
+    if (message.room.type == RoomTypeGroup) {
+        [self showSenderInfo:YES];
+        [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        self.senderNameLabel.text = message.user.fullname;
+    }
+    else {
+        [self showSenderInfo:NO];
+        self.senderImageView.image = nil;
+        self.senderNameLabel.text = @"";
+    }
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
@@ -423,7 +480,7 @@
         else {
             self.replyNameLabel.text = message.quote.title;
         }
-
+        
         self.replyMessageLabel.text = message.quote.content;
         self.replyViewHeightContraint.constant = 60.0f;
         self.replyViewBottomConstraint.active = YES;
@@ -477,14 +534,14 @@
         self.forwardTitleLabelHeightConstraint.constant = 16.0f;
         self.forwardFromLabelLeadingConstraint.active = YES;
         self.forwardTitleLabelLeadingConstraint.active = YES;
-
+        
     }
     else {
         self.forwardFromLabelHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelHeightConstraint.constant = 0.0f;
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
-
+        
     }
 }
 
@@ -503,8 +560,9 @@
     [[NSMutableAttributedString alloc]
      initWithAttributedString:[[NSAttributedString alloc] initWithString:self.forwardFromLabel.text]];
     
+    UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleQuoteTitle];
     [attributedText addAttribute:NSFontAttributeName
-                           value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f]
+                           value:quoteTitleFont
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
@@ -545,4 +603,18 @@
     }
 }
 
+- (void)showSenderInfo:(BOOL)show {
+    if (show) {
+        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderNameHeightConstraint.constant = 18.0f;
+        self.forwardTitleTopConstraint.constant = 4.0f;
+    }
+    else {
+        self.senderImageViewWidthConstraint.constant = 0.0f;
+        self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderNameHeightConstraint.constant = 0.0f;
+        self.forwardTitleTopConstraint.constant = 0.0f;
+    }
+}
 @end

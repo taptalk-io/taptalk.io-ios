@@ -2,7 +2,7 @@
 //  TAPRoomListTableViewCell.h
 //  TapTalk
 //
-//  Created by Welly Kencana on 6/9/18.
+//  Created by Dominic Vedericho on 6/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -16,6 +16,7 @@ typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
     TAPMessageStatusTypeDelivered = 3,
     TAPMessageStatusTypeRead = 4,
     TAPMessageStatusTypeFailed = 5,
+    TAPMessageStatusTypeDeleted = 6,
 };
 
 @interface TAPRoomListTableViewCell : TAPBaseTableViewCell
@@ -23,5 +24,6 @@ typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
 - (void)setRoomListTableViewCellWithData:(TAPRoomListModel *)roomList updateUnreadBubble:(BOOL)updateUnreadBubble;
 - (void)setAsTyping:(BOOL)typing;
 - (void)showMessageDraftWithMessage:(NSString *)draftMessage;
+- (void)setIsLastCellSeparator:(BOOL)isLastCell;
 
 @end
