@@ -28,8 +28,12 @@
         self.scrollView.showsHorizontalScrollIndicator = NO;
         [self addSubview:self.scrollView];
         
+        
+        UIFont *titleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTitleLabel];
+        UIColor *titleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTitleLabel];
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.frame) - 32.0f, 46.0f)];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:40.0f];
+        titleLabel.font = titleLabelFont;
+        titleLabel.textColor = titleLabelColor;
         titleLabel.text = NSLocalizedString(@"Register", @"");
         [self.scrollView addSubview:titleLabel];
         
@@ -45,16 +49,18 @@
         self.removeProfilePictureButton.alpha = 0.0f;
         [self.scrollView addSubview:self.removeProfilePictureButton];
         
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         UILabel *changeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame) + 8.0f, 100.0f, 22.0f)];
-        changeLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        changeLabel.font = clickableLabelFont;
         changeLabel.text = NSLocalizedString(@"Change", @"");
-        changeLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        changeLabel.textColor = clickableLabelColor;
         CGSize changeLabelSize = [changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
         changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(changeLabel.frame), changeLabelSize.width, 22.0f);
         [self.scrollView addSubview:changeLabel];
         
         UIImageView *changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(changeLabel.frame) + 4.0f, CGRectGetMinY(changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
-        changeIconImageView.image = [UIImage imageNamed:@"TAPIconEditOrange"];
+        changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
         [self.scrollView addSubview:changeIconImageView];
         
         _changeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(changeLabel.frame), CGRectGetMinY(changeLabel.frame) - 8.0f, CGRectGetWidth(changeLabel.frame) + 4.0f + CGRectGetWidth(changeIconImageView.frame), 40.0f)];
@@ -163,12 +169,5 @@
         self.removeProfilePictureButton.alpha = 1.0f;
     }
 }
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
 
 @end

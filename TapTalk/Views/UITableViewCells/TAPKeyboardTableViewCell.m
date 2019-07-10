@@ -2,7 +2,7 @@
 //  TAPKeyboardTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 10/10/18.
+//  Created by Dominic Vedericho on 10/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -20,6 +20,11 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.iconImageView.backgroundColor = [UIColor clearColor];
+    
+    UIFont *customKeyboardItemLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontCustomKeyboardItemLabel];
+    UIColor *customKeyboardItemLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorCustomKeyboardItemLabel];
+    self.stringLabel.textColor = customKeyboardItemLabelColor;
+    self.stringLabel.font = customKeyboardItemLabelFont;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

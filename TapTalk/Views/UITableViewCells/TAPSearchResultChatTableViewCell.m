@@ -2,7 +2,7 @@
 //  TAPSearchResultChatTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 22/10/18.
+//  Created by Dominic Vedericho on 22/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -50,11 +50,14 @@
         _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, 25.0f, 0.0f, 20.0f)];
         self.bubbleUnreadView.clipsToBounds = YES;
         self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
+        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         [self.bgView addSubview:self.bubbleUnreadView];
         
+        UIFont *roomListUnreadBadgeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListUnreadBadgeLabel];
+        UIColor *roomListUnreadBadgeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListUnreadBadgeLabel];
         _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
-        self.numberOfUnreadMessageLabel.textColor = [UIColor whiteColor];
-        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        self.numberOfUnreadMessageLabel.textColor = roomListUnreadBadgeLabelColor;
+        self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - rightPadding, 0.0f, 0.0f, 13.0f)];
@@ -62,27 +65,17 @@
         self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bgView addSubview:self.muteImageView];
         
+        
+        UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
+        UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
         _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 25.0f, CGRectGetMinX(self.muteImageView.frame) - 4.0f - (CGRectGetMaxX(self.profileImageView.frame) + 8.0f), 20.0f)];
-        self.roomNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.roomNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        self.roomNameLabel.textColor = roomListNameLabelColor;
+        self.roomNameLabel.font = roomListNameLabelFont;
         [self.bgView addSubview:self.roomNameLabel];
         self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
         
-        //WK Note - Not being used in this feature
-//        _onlineStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.profileImageView.frame) + 8.0f), 20.0f)];
-//        self.onlineStatusLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-//        self.onlineStatusLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-//        [self.bgView addSubview:self.onlineStatusLabel];
-//
-//        _onlineStatusView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame) + 6.0f, 8.0f, 8.0f)];
-//        self.onlineStatusView.alpha = 0.0f;
-//        self.onlineStatusView.layer.cornerRadius = CGRectGetHeight(self.onlineStatusView.frame) / 2.0f;
-//        self.onlineStatusView.backgroundColor = [TAPUtil getColor:@"19C700"];
-//        [self.bgView addSubview:self.onlineStatusView];
-        //END Note
-        
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.bgView addSubview:self.separatorView];
     }
     
@@ -92,13 +85,13 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
     self.onlineStatusView.backgroundColor = [TAPUtil getColor:@"19C700"];
-    self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+    self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
     [super setHighlighted:highlighted animated:animated];
     self.onlineStatusView.backgroundColor = [TAPUtil getColor:@"19C700"];
-    self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+    self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
 }
 
 #pragma mark - Custom Methods
@@ -109,10 +102,14 @@
     
     //DV Temp
     BOOL isExpert = NO;
-    BOOL isGroup = NO;
     BOOL isMuted = NO;
     BOOL isOnline = NO;
     //END DV Temp
+    
+    BOOL isGroup = NO;
+    if (room.type == RoomTypeGroup || room.type == RoomTypeChannel) {
+        isGroup = YES;
+    }
     
     NSString *profileImageURL = room.imageURL.fullsize;
     NSInteger numberOfUnreadMessage = [unreadMessageCount integerValue];
@@ -123,7 +120,14 @@
     roomName = [TAPUtil nullToEmptyString:roomName];
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        if (isGroup) {
+            //Group or Channel
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultGroupAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            //Personal
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+        }
     }
     else {
         [self.profileImageView setImageWithURLString:profileImageURL];
@@ -155,13 +159,6 @@
         
         self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
         self.bubbleUnreadView.alpha = 1.0f;
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = self.bubbleUnreadView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
-        gradient.startPoint = CGPointMake(0.0f, 0.0f);
-        gradient.endPoint = CGPointMake(0.0f, 1.0f);
-        gradient.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
-        [self.bubbleUnreadView.layer insertSublayer:gradient atIndex:0];
     }
     
     //MUTE IMAGE VIEW
@@ -180,9 +177,20 @@
     }
     
     if (isGroup) {
+        
         self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.expertIconImageView.alpha = 1.0f;
-        self.onlineStatusLabel.text = @"76 members";
+        
+        //DV Temp -  Adding how many people online in here for group
+        if (isOnline) {
+            self.onlineStatusView.alpha = 1.0f;
+            self.onlineStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.onlineStatusView.frame) + 3.0f, CGRectGetMinY(self.onlineStatusLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.onlineStatusView.frame) + 3.0f), CGRectGetHeight(self.onlineStatusLabel.frame));
+            self.onlineStatusLabel.text = @"Active now";
+        }
+        else {
+            self.onlineStatusView.alpha = 0.0f;
+            self.onlineStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f - (CGRectGetMaxX(self.profileImageView.frame) + 8.0f), 20.0f);
+        }
     }
     else {
         if (isExpert) {
@@ -228,9 +236,10 @@
 //    NSString *alphaNumericSearchedString = [[lowercaseSeachedString componentsSeparatedByCharactersInSet:nonAlphaNumericCharacters] componentsJoinedByString:@""]; //Remove all string that is nonAlphaNumericCharacters
 //    //End Note
     
+    UIColor *roomNameHighlightedColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListNameHighlighted];
     NSRange searchedRange = [lowercaseRoomName rangeOfString:lowercaseSeachedString];
     [roomNameAttributedString addAttribute:NSForegroundColorAttributeName
-                                     value:[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1]
+                                     value:roomNameHighlightedColor
                                      range:searchedRange];
     
     self.roomNameLabel.attributedText = roomNameAttributedString;

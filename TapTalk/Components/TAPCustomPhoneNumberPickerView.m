@@ -31,7 +31,7 @@
         _countryCodeContainerView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 0.0f, 106.0f, 50.0f)];
         self.countryCodeContainerView.layer.cornerRadius = 8.0f;
         self.countryCodeContainerView.layer.borderWidth = 1.0f;
-        self.countryCodeContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+        self.countryCodeContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.countryCodeContainerView.clipsToBounds = YES;
         self.countryCodeContainerView.backgroundColor = [UIColor whiteColor];
         [self addSubview:self.countryCodeContainerView];
@@ -40,10 +40,12 @@
         self.countryFlagImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.countryCodeContainerView addSubview:self.countryFlagImageView];
         
+        UIFont *countryCodeFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextFieldPlaceholder];
+        UIColor *countryCodeColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
         CGFloat countryCodeWidth = CGRectGetWidth(self.countryCodeContainerView.frame) - CGRectGetMaxX(self.countryFlagImageView.frame) - 10.0f - 15.0f;
         _countryCodeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryFlagImageView.frame) + 10.0f, CGRectGetMinY(self.countryFlagImageView.frame) - 1.0f, countryCodeWidth, 20.0f)];
-        self.countryCodeLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.countryCodeLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:16.0f];
+        self.countryCodeLabel.textColor = countryCodeColor;
+        self.countryCodeLabel.font = countryCodeFont;
         [self.countryCodeContainerView addSubview:self.countryCodeLabel];
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryFlagImageView.frame) + 16.0f, CGRectGetMinY(self.countryFlagImageView.frame), 20.0f, 20.0f)];
@@ -66,18 +68,20 @@
         _phoneNumberContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame) + 10.0f, CGRectGetMinY(self.countryCodeContainerView.frame), phoneNumberContainerViewWidth, 50.0f)];
         self.phoneNumberContainerView.layer.cornerRadius = 8.0f;
         self.phoneNumberContainerView.layer.borderWidth = 1.0f;
-        self.phoneNumberContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+        self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
         self.phoneNumberContainerView.clipsToBounds = YES;
         [self addSubview:self.phoneNumberContainerView];
         
+        UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
+        UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
         _phoneNumberTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame))];
         self.phoneNumberTextField.delegate = self;
         self.phoneNumberTextField.keyboardType = UIKeyboardTypePhonePad;
         self.phoneNumberTextField.placeholder = @"82212345678";
-        [self.phoneNumberTextField setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
-        self.phoneNumberTextField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.phoneNumberTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:16.0f];
+        [self.phoneNumberTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
+        self.phoneNumberTextField.textColor = textFieldColor;
+        self.phoneNumberTextField.font = textFieldFont;
         [self.phoneNumberContainerView addSubview:self.phoneNumberTextField];
         
         _keyboardAccessoryView = [[TAPNumericKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 44.0f)];
@@ -244,26 +248,26 @@
         if (active) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 1.0f;
-                self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-                self.phoneNumberContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+                self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.phoneNumberContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+                self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
             }];
         }
     }
     else {
         if (active) {
             self.shadowView.alpha = 1.0f;
-            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-            self.phoneNumberContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+            self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
         }
         else {
             self.shadowView.alpha = 0.0f;
-            self.phoneNumberContainerView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+            self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         }
     }
 }
@@ -305,17 +309,24 @@
 }
 
 - (void)setAsDisabled:(BOOL)disabled {
+    
+    UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
+    UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
+    
+    UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextFieldPlaceholder];
+    UIColor *textFieldPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
+    
     if (disabled) {
         self.pickerButton.userInteractionEnabled = NO;
         self.phoneNumberTextField.userInteractionEnabled = NO;
-        self.countryCodeLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.phoneNumberTextField.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.countryCodeLabel.textColor = textFieldPlaceholderColor;
+        self.phoneNumberTextField.textColor = textFieldPlaceholderColor;
     }
     else {
         self.pickerButton.userInteractionEnabled = YES;
         self.phoneNumberTextField.userInteractionEnabled = YES;
-        self.countryCodeLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.phoneNumberTextField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.countryCodeLabel.textColor = textFieldColor;
+        self.phoneNumberTextField.textColor = textFieldColor;
     }
 }
 

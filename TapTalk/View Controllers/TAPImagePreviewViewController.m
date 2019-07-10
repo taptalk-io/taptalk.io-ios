@@ -29,7 +29,7 @@
 @property (nonatomic) CGFloat captionTextViewHeight;
 @property (nonatomic) BOOL isScrolledFromThumbnailImageTapped;
 @property (nonatomic) BOOL showVideoPlayer;
-@property (nonatomic) BOOL *isContainExcedeedFileSizeLimit;
+@property (nonatomic) BOOL isContainExcedeedFileSizeLimit;
 
 - (void)cancelButtonDidTapped;
 - (void)morePictureButtonDidTapped;
@@ -84,13 +84,9 @@
     self.imagePreviewView.captionTextView.delegate = self;
     self.imagePreviewView.captionTextView.minimumHeight = 22.0f;
     self.imagePreviewView.captionTextView.maximumHeight = 60.0f;
-    [self.imagePreviewView.captionTextView setFont:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f]];
-    [self.imagePreviewView.captionTextView setTextColor:[UIColor whiteColor]];
-    self.imagePreviewView.captionTextView.tintColor = [UIColor whiteColor];
-    [self.imagePreviewView.captionTextView setPlaceholderColor:[UIColor whiteColor]];
     [self.imagePreviewView.captionTextView setPlaceholderText:NSLocalizedString(@"Add a caption", @"")];
     
-    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
+    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, (long)TAP_LIMIT_OF_CAPTION_CHARACTER];
     [self.imagePreviewView isShowCounterCharCount:NO];
     
     if ([self.mediaDataArray count] != 0 && [self.mediaDataArray count] > 1) {
@@ -536,8 +532,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.imagePreviewView.captionTextView setInitialText:@""];
             [self.imagePreviewView.captionTextView setInitialText:savedCaptionString];
             self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [savedCaptionString length], TAP_LIMIT_OF_CAPTION_CHARACTER];
-            
-            NSLog(@"length: %ld", [savedCaptionString length]);
             
             [self.imagePreviewView isShowCounterCharCount:YES];
         }

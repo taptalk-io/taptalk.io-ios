@@ -405,7 +405,7 @@
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
 
         //Save file path to cache
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:currentMessage.room.roomID fileID:fileID];
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
         
         //Send emit
         [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];

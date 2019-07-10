@@ -2,7 +2,7 @@
 //  TAPScanQRCodePopupViewController.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 11/3/19.
+//  Created by Dominic Vedericho on 11/3/19.
 //
 
 #import "TAPScanQRCodePopupViewController.h"

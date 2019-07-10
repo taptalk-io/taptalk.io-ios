@@ -165,6 +165,9 @@
     //Populate User Country Code
     [[TAPContactManager sharedManager] populateContactFromDatabase];
     
+    //Populate Room Model Dictionary from Preference
+    [[TAPGroupManager sharedManager] populateRoomFromPreference];
+    
     //Set Default user agent as "ios"
     [[TapTalk sharedInstance] setUserAgent:@"ios"];
 }
@@ -192,6 +195,9 @@
     
     //Send stop typing emit
     [[TAPChatManager sharedManager] stopTyping];
+    
+    //Save retrieved group model dictionary to preference
+    [[TAPGroupManager sharedManager] saveRoomToPreference];
     
     //Clear all contact dictionary in ContactCacheManager
 //    [[TAPContactCacheManager sharedManager] clearContactDictionary];
@@ -281,8 +287,6 @@
     
     NSDictionary *userInfoDictionary = response.notification.request.content.userInfo;
     NSDictionary *messageDictionary = [userInfoDictionary valueForKeyPath:@"data.message"];
-    TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
-    
     [[TAPNotificationManager sharedManager] handleTappedNotificationWithUserInfo:messageDictionary];
     
     completionHandler();
@@ -297,6 +301,9 @@
     
     //Save downloaded file path to preference
     [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToPreference];
+    
+    //Save retrieved group model dictionary to preference
+    [[TAPGroupManager sharedManager] saveRoomToPreference];
     
     _instanceState = TapTalkInstanceStateInactive;
     
@@ -501,7 +508,7 @@
 - (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
      fromNavigationController:(UINavigationController *)navigationController {
     TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
-    [[TAPChatManager sharedManager] openRoom:room];
+//    [[TAPChatManager sharedManager] openRoom:room]; //Called in ChatViewController willAppear
     
     //Save all unsent message (in case user retrieve message on another room)
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
@@ -549,7 +556,7 @@ fromNavigationController:(UINavigationController *)navigationController
 scrollToMessageWithLocalID:(NSString *)messageLocalID
 fromNavigationController:(UINavigationController *)navigationController
                 animated:(BOOL)isAnimated {
-    [[TAPChatManager sharedManager] openRoom:room];
+//    [[TAPChatManager sharedManager] openRoom:room]; //Called in ChatViewController willAppear
     
     //Save all unsent message (in case user retrieve message on another room)
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
@@ -769,9 +776,15 @@ fromNavigationController:(UINavigationController *)navigationController
 }
 
 //Other
+- (void)disconnect {
+    //Disconnect Socket
+    [[TAPChatManager sharedManager] disconnect];
+}
+
 - (void)logoutAndClearAllData {
     
     [[TapTalk sharedInstance] clearAllData];
+    [[TapTalk sharedInstance] disconnect];
     
     TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
     [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
@@ -808,11 +821,17 @@ fromNavigationController:(UINavigationController *)navigationController
     [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
     [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
-    
-    //Disconnect Socket
-    [[TAPChatManager sharedManager] disconnect];
 }
 
+- (void)getTapTalkUserWithClientUserID:(NSString *)clientUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetUserByXCUserID:clientUserID success:success failure:failure];
+}
+
+- (TAPUserModel *)getTapTalkActiveUser {
+    return [TAPDataManager getActiveUser];
+}
+
+#pragma mark - Custom Internal Usage Method
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
     
@@ -844,32 +863,10 @@ fromNavigationController:(UINavigationController *)navigationController
     }
 }
 
-- (void)profileButtonDidTapped:(UIViewController *)activeViewController otherUser:(TAPUserModel *)otherUser {
-    if ([self.delegate respondsToSelector:@selector(tapTalkProfileButtonDidTapped:otherUser:)]) {
-        [self.delegate tapTalkProfileButtonDidTapped:activeViewController otherUser:otherUser];
-    }
-    else {
-        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
-        
-        TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
-        profileViewController.room = [TAPChatManager sharedManager].activeRoom;
-        profileViewController.userID = otherUserID;
-        [activeViewController.navigationController pushViewController:profileViewController animated:YES];
-    }
-}
-
 - (void)setBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms {
     if ([self.delegate respondsToSelector:@selector(tapTalkSetBadgeWithNumberOfUnreadRooms:)]) {
         [self.delegate tapTalkSetBadgeWithNumberOfUnreadRooms:numberOfUnreadRooms];
     }
-}
-
-- (void)getTapTalkUserWithClientUserID:(NSString *)clientUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure {
-    [TAPDataManager callAPIGetUserByXCUserID:clientUserID success:success failure:failure];
-}
-
-- (TAPUserModel *)getTapTalkActiveUser {
-    return [TAPDataManager getActiveUser];
 }
 
 @end

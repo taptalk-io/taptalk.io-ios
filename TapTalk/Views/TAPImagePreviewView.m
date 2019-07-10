@@ -60,17 +60,21 @@
         self.imagePreviewCollectionView.showsHorizontalScrollIndicator = NO;
         [self addSubview:self.imagePreviewCollectionView];
         
+        UIFont *itemCountFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewItemCount];
+        UIColor *itemCountColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewItemCount];
         _numberOfImageInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 32.0f - 50.0f, (CGRectGetHeight(self.topMenuView.frame) - 21.0f) / 2.0f, 50.0f, 21.0f)];
-        self.numberOfImageInfoLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
-        self.numberOfImageInfoLabel.textColor = [UIColor whiteColor];
+        self.numberOfImageInfoLabel.font = itemCountFont;
+        self.numberOfImageInfoLabel.textColor = itemCountColor;
         self.numberOfImageInfoLabel.textAlignment = NSTextAlignmentCenter;
         [self.topMenuView addSubview:self.numberOfImageInfoLabel];
-        
+
+        UIFont *cancelButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewCancelButton];
+        UIColor *cancelButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewCancelButton];
         _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.topMenuView.frame) - 21.0f) / 2.0f, 60.0f, 21.0f)];
         [self.cancelButton setTitle:NSLocalizedString(@"Cancel", @"") forState:UIControlStateNormal];
         self.cancelButton.backgroundColor = [UIColor clearColor];
-        self.cancelButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
-        [self.cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.cancelButton.titleLabel.font = cancelButtonFont;
+        [self.cancelButton setTitleColor:cancelButtonColor forState:UIControlStateNormal];
         [self.topMenuView addSubview:self.cancelButton];
         
         _thumbnailBackgroundGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.topMenuView.frame), CGRectGetWidth(self.frame), 56.0f)];
@@ -101,11 +105,13 @@
         _morePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.morePictureImageView.frame) - 8.0f, CGRectGetMinY(self.morePictureImageView.frame) - 8.0f, CGRectGetWidth(self.morePictureImageView.frame) + 16.0f, CGRectGetHeight(self.morePictureImageView.frame) + 16.0f)];
         [self.bottomMenuView addSubview:self.morePictureButton];
         
+        UIFont *sendButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewSendButtonLabel];
+        UIColor *sendButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewSendButtonLabel];
         _sendButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bottomMenuView.frame) - 40.0f - 16.0f, (CGRectGetHeight(self.bottomMenuView.frame) - 21.0f) / 2.0f, 40.0f, 21.0f)];
         [self.sendButton setTitle:NSLocalizedString(@"Send", @"") forState:UIControlStateNormal];
         self.sendButton.backgroundColor = [UIColor clearColor];
-        self.sendButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        [self.sendButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.sendButton.titleLabel.font = sendButtonFont;
+        [self.sendButton setTitleColor:sendButtonColor forState:UIControlStateNormal];
         self.sendButton.titleLabel.textAlignment = NSTextAlignmentRight;
         [self.bottomMenuView addSubview:self.sendButton];
         
@@ -116,20 +122,29 @@
         self.captionView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
         [self addSubview:self.captionView];
         
+        UIFont *captionTextViewFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewCaption];
+        UIColor *captionTextViewColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewCaption];
+        UIColor *captionPlaceholderTextViewColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewCaptionPlaceholder];
         CGFloat wordCountLabelWidth = 50.0f;
         CGFloat captionTextViewWidth = CGRectGetWidth(self.captionView.frame) - 16.0f - 16.0f - 8.0f - wordCountLabelWidth;
         _captionTextView = [[TAPCustomGrowingTextView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, captionTextViewWidth, 22.0f)];
         [self.captionTextView setCharacterCountLimit:TAP_LIMIT_OF_CAPTION_CHARACTER];
+        [self.captionTextView setFont:captionTextViewFont];
+        [self.captionTextView setTextColor:captionTextViewColor];
+        [self.captionTextView setPlaceholderColor:captionPlaceholderTextViewColor];
+        self.captionTextView.tintColor = captionTextViewColor;
         [self.captionView addSubview:self.captionTextView];
         
         _captionSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.captionTextView.frame) + 12.0f, CGRectGetWidth(self.frame) - 32.0f, 1.0f)];
         self.captionSeparatorView.backgroundColor = [UIColor whiteColor];
         [self.captionView addSubview:self.captionSeparatorView];
         
+        UIFont *captionLetterCountFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewCaptionLetterCount];
+        UIColor *captionLetterCountColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewCaptionLetterCount];
         _wordCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - wordCountLabelWidth - 16.0f, CGRectGetMinY(self.captionSeparatorView.frame) - 15.0f - 13.0f, wordCountLabelWidth, 13.0f)];
         self.wordCountLabel.textAlignment = NSTextAlignmentRight;
-        self.wordCountLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
-        self.wordCountLabel.textColor = [UIColor whiteColor];
+        self.wordCountLabel.font = captionLetterCountFont;
+        self.wordCountLabel.textColor = captionLetterCountColor;
         [self.captionView addSubview:self.wordCountLabel];
         
         //Alert View
@@ -146,9 +161,9 @@
         [self addSubview:self.alertContainerView];
         
         _alertView = [[UIView alloc] initWithFrame:CGRectMake(10.0f, 20.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 20.0f, 62.0f)];
-        self.alertView.backgroundColor = [TAPUtil getColor:@"FDF1F2"];
+        self.alertView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorMediaPreviewWarningBackgroundColor];
         self.alertView.layer.borderWidth = 1.0f;
-        self.alertView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A].CGColor;
+        self.alertView.layer.borderColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorError].CGColor;
         self.alertView.layer.cornerRadius = 8.0f;
         [self.alertContainerView addSubview:self.alertView];
         
@@ -159,15 +174,19 @@
         self.alertImageView.layer.cornerRadius = CGRectGetHeight(self.alertImageView.frame) / 2.0f;
         [self.alertView addSubview:self.alertImageView];
         
+        UIFont *imagePreviewAlertTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewWarningTitle];
+        UIColor *imagePreviewAlertTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewWarningTitle];
         _alertTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.alertImageView.frame) + 6.0f, 12.0f, CGRectGetWidth(self.alertView.frame) - CGRectGetWidth(self.alertImageView.frame) - 6.0f - 10.0f - 10.0f, 20.0f)];
-        self.alertTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:14.0f];
-        self.alertTitleLabel.textColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
-        self.alertTitleLabel.text = [NSString stringWithFormat:@"Exceeded %ldMB upload limit", TAP_MAX_VIDEO_SIZE];
+        self.alertTitleLabel.font = imagePreviewAlertTitleFont;
+        self.alertTitleLabel.textColor = imagePreviewAlertTitleColor;
+        self.alertTitleLabel.text = [NSString stringWithFormat:@"Exceeded %ldMB upload limit", (long)TAP_MAX_VIDEO_SIZE];
         [self.alertView addSubview:self.alertTitleLabel];
-        
+
+        UIFont *imagePreviewAlertContentFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewWarningBody];
+        UIColor *imagePreviewAlertContentColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewWarningBody];
         _alertDetailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.alertTitleLabel.frame), CGRectGetMaxY(self.alertTitleLabel.frame), CGRectGetWidth(self.alertTitleLabel.frame), 16.0f)];
-        self.alertDetailLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:12.0f];
-        self.alertDetailLabel.textColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
+        self.alertDetailLabel.font = imagePreviewAlertContentFont;
+        self.alertDetailLabel.textColor = imagePreviewAlertContentColor;
         self.alertDetailLabel.text = NSLocalizedString(@"Please remove this video to continue", @"");
         [self.alertView addSubview:self.alertDetailLabel];
     }

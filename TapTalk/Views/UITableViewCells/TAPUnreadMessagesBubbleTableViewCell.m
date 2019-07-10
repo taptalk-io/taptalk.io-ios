@@ -24,10 +24,16 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
-    self.contentView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
-    self.backgroundBarView.backgroundColor = [[TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1] colorWithAlphaComponent:0.1f];
-    self.unreadMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+    
+    UIColor *backgroundViewColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadIdentifierBackground];
+    self.contentView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+    self.backgroundBarView.backgroundColor = [backgroundViewColor colorWithAlphaComponent:0.1f];
 
+    UIFont *unreadMessageLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontUnreadMessageIdentifier];
+    UIColor *unreadMessageLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorUnreadMessageIdentifier];
+    self.unreadMessageLabel.textColor = unreadMessageLabelColor;
+    self.unreadMessageLabel.font = unreadMessageLabelFont;
+    
     CGFloat gap = (CGRectGetWidth([UIScreen mainScreen].bounds) - 120.0f) / 2.0f;
     self.leftGapConstraint.constant = gap;
     self.rightGapConstraint.constant = gap;

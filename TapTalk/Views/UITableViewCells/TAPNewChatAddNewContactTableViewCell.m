@@ -2,7 +2,7 @@
 //  TAPNewChatAddNewContactTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 14/9/18.
+//  Created by Dominic Vedericho on 14/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -21,13 +21,15 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 98.0f)];
-        self.bgView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self.contentView addSubview:self.bgView];
         
+        UIFont *infoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
         _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 24.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 18.0f)];
         self.descriptionLabel.text = NSLocalizedString(@"Can’t find the contact you were looking for?", @"");
-        self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.descriptionLabel.textColor = infoLabelColor;
+        self.descriptionLabel.font = infoLabelFont;
         self.descriptionLabel.textAlignment = NSTextAlignmentCenter;
         NSMutableDictionary *descriptionAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat descriptionLetterSpacing = -0.2f;
@@ -38,10 +40,12 @@
         self.descriptionLabel.attributedText = descriptionAttributedString;
         [self.bgView addSubview:self.descriptionLabel];
         
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.descriptionLabel.frame) + 8.0f, CGRectGetWidth(self.descriptionLabel.frame), 22.0f)];
         self.titleLabel.text = NSLocalizedString(@"Add New Contact", @"");
-        self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
-        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        self.titleLabel.textColor = clickableLabelColor;
+        self.titleLabel.font = clickableLabelFont;
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         NSMutableDictionary *titleAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat titleLetterSpacing = -0.2f;

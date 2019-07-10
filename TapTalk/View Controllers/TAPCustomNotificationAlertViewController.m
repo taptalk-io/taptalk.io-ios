@@ -45,7 +45,6 @@
     [self.view addSubview:self.customNotificationAlertView];
     
     self.view.backgroundColor = [UIColor clearColor];
-//    self.view.frame = CGRectMake(0.0f, -CGRectGetHeight(self.view.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame));
     
     self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), -CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
     
@@ -69,7 +68,6 @@
 - (void)checkMessageQueue {
     if ([self.messageQueueArray count] > 0) {
         TAPMessageModel *message = [self.messageQueueArray firstObject];
-//        [self.messageQueueArray removeObject:message];
         [self.messageQueueArray removeObjectAtIndex:0];
         
         [self animateShowMessage:message];
@@ -98,8 +96,6 @@
 - (void)animateShowMessage:(TAPMessageModel *)message {
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideAfterDelay) object:nil];
-    
-//    _messageShownCounter++;
     
     if (self.view.alpha == 0.0f) {
         _messageShownCounter++;
@@ -136,7 +132,6 @@
             [UIView animateWithDuration:0.3f animations:^{
                 if (self.messageShownCounter % 2 == 1) {
                     //Odd Message, show first notification view
-//                    [self.view bringSubviewToFront:self.customNotificationAlertView.firstNotificationView];
                     self.customNotificationAlertView.firstNotificationView.layer.zPosition = 1;
                     
                     self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
@@ -145,7 +140,6 @@
                 }
                 else {
                     //Even Message, show secondary notification view
-//                    [self.view bringSubviewToFront:self.customNotificationAlertView.secondNotificationView];
                     self.customNotificationAlertView.secondNotificationView.layer.zPosition = 1;
                     
                     self.customNotificationAlertView.secondNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.secondNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.secondNotificationView.frame));
@@ -197,22 +191,11 @@
     
     TAPUserModel *user = message.user;
     NSString *profilePictureURL = user.imageURL.thumbnail;
-//    NSString *profilePictureURL = TAP_DUMMY_IMAGE_URL; //DV Temp
     NSString *nameString = message.user.fullname;
     NSString *messageString = message.body;
-    NSString *contentImageURL = @""; //DV Temp
+    NSString *contentImageURL = @""; //DV TO DO - Obtain image message
     
-    BOOL isShowProfilePicture = NO;
-    BOOL isShowContentImage = NO; //DV Temp
-    
-    if (profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
-        //Hide profile picture
-        isShowProfilePicture = NO;
-    }
-    else {
-        isShowProfilePicture = YES;
-    }
-    
+    BOOL isShowContentImage = NO;
     if (contentImageURL == nil || [contentImageURL isEqualToString:@""]) {
         //Hide content image
         isShowContentImage = NO;
@@ -221,56 +204,50 @@
         isShowContentImage = YES;
     }
     
+    if (message.type == TAPChatMessageTypeSystemMessage) {
+        
+        NSString *targetAction = message.action;
+        TAPGroupTargetModel *groupTarget = message.target;
+        NSString *targetName = groupTarget.targetName;
+        targetName = [TAPUtil nullToEmptyString:targetName];
+        
+        if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            messageString = [messageString stringByReplacingOccurrencesOfString:@"{{sender}}" withString:@"You"];
+        }
+        else {
+            messageString = [messageString stringByReplacingOccurrencesOfString:@"{{sender}}" withString:message.user.fullname];
+        }
+        
+        if (groupTarget != nil) {
+            if ([groupTarget.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                messageString = [messageString stringByReplacingOccurrencesOfString:@"{{target}}" withString:@"you"];
+                
+            }
+            else {
+                messageString = [messageString stringByReplacingOccurrencesOfString:@"{{target}}" withString:targetName];
+            }
+        }
+    }
+    
     if (self.messageShownCounter % 2 == 1) {
         //Odd message, show first notification view
         _currentFirstShownMessage = message;
         self.customNotificationAlertView.nameLabel.text = nameString;
         self.customNotificationAlertView.messageLabel.text = messageString;
-        [self showFirstAnimationWithProfileImage:isShowProfilePicture contentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
+        [self showFirstAnimationHasContentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
     }
     else {
         //Even message, show secondary notification view
         _currentSecondaryShownMessage = message;
         self.customNotificationAlertView.secondaryNameLabel.text = nameString;
         self.customNotificationAlertView.secondaryMessageLabel.text = messageString;
-        [self showSecondaryAnimationWithProfileImage:isShowProfilePicture contentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
+        [self showSecondaryAnimationHasContentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
     }
     
 }
 
-- (void)showFirstAnimationWithProfileImage:(BOOL)hasProfileImage contentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
-    if (!hasProfileImage && !hasContentImage) {
-        //Hide profile picture & content image
-        self.customNotificationAlertView.profilePictureImage.alpha = 0.0f;
-        self.customNotificationAlertView.contentImageView.alpha = 0.0f;
-        
-        CGFloat nameLabelWidth = CGRectGetWidth(self.customNotificationAlertView.contentView.frame) - 8.0f - 8.0f;
-        
-        self.customNotificationAlertView.nameLabel.frame = CGRectMake(8.0f, CGRectGetMinY(self.customNotificationAlertView.nameLabel.frame), nameLabelWidth, CGRectGetHeight(self.customNotificationAlertView.nameLabel.frame));
-        
-        self.customNotificationAlertView.messageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.nameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.nameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.nameLabel.frame), CGRectGetHeight(self.customNotificationAlertView.messageLabel.frame));
-        
-        self.customNotificationAlertView.profilePictureImage.image = nil;
-        self.customNotificationAlertView.contentImageView.image = nil;
-    }
-    else if (!hasProfileImage) {
-        //Hide profile picture
-        self.customNotificationAlertView.profilePictureImage.alpha = 0.0f;
-        self.customNotificationAlertView.contentImageView.alpha = 1.0f;
-        
-        CGFloat nameLabelRightGap = 8.0f;
-        CGFloat paddingRight = 8.0f;
-        
-        CGFloat nameLabelWidth = CGRectGetWidth(self.customNotificationAlertView.contentView.frame) - nameLabelRightGap - CGRectGetWidth(self.customNotificationAlertView.contentImageView.frame) - paddingRight;
-        
-        self.customNotificationAlertView.nameLabel.frame = CGRectMake(8.0, CGRectGetMinY(self.customNotificationAlertView.nameLabel.frame), nameLabelWidth, CGRectGetHeight(self.customNotificationAlertView.nameLabel.frame));
-        
-        self.customNotificationAlertView.messageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.nameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.nameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.nameLabel.frame), CGRectGetHeight(self.customNotificationAlertView.messageLabel.frame));
-        
-        self.customNotificationAlertView.profilePictureImage.image = nil;
-        [self.customNotificationAlertView.contentImageView setImageWithURLString:contentImageURL];
-    }
-    else if (!hasContentImage) {
+- (void)showFirstAnimationHasContentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
+    if (!hasContentImage) {
         //Hide Content Image
         self.customNotificationAlertView.contentImageView.alpha = 0.0f;
         self.customNotificationAlertView.profilePictureImage.alpha = 1.0f;
@@ -285,7 +262,13 @@
         self.customNotificationAlertView.messageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.nameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.nameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.nameLabel.frame), CGRectGetHeight(self.customNotificationAlertView.messageLabel.frame));
         
         self.customNotificationAlertView.contentImageView.image = nil;
-        [self.customNotificationAlertView.profilePictureImage setImageWithURLString:profilePictureURL];
+        
+        if (profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
+            self.customNotificationAlertView.profilePictureImage.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.customNotificationAlertView.profilePictureImage setImageWithURLString:profilePictureURL];
+        }
     }
     else {
         //Show profile picture & content image
@@ -303,44 +286,19 @@
         
         self.customNotificationAlertView.messageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.nameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.nameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.nameLabel.frame), 17.0f);
         
-        [self.customNotificationAlertView.profilePictureImage setImageWithURLString:profilePictureURL];
+        if (profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
+            self.customNotificationAlertView.profilePictureImage.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.customNotificationAlertView.profilePictureImage setImageWithURLString:profilePictureURL];
+        }
+
         [self.customNotificationAlertView.contentImageView setImageWithURLString:contentImageURL];
     }
 }
 
-- (void)showSecondaryAnimationWithProfileImage:(BOOL)hasProfileImage contentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
-    if (!hasProfileImage && !hasContentImage) {
-        //Hide profile picture & content image
-        self.customNotificationAlertView.secondaryProfilePictureImage.alpha = 0.0f;
-        self.customNotificationAlertView.secondaryContentImageView.alpha = 0.0f;
-        
-        CGFloat nameLabelWidth = CGRectGetWidth(self.customNotificationAlertView.secondaryContentView.frame) - 8.0f - 8.0f;
-        
-        self.customNotificationAlertView.secondaryNameLabel.frame = CGRectMake(8.0f, CGRectGetMinY(self.customNotificationAlertView.secondaryNameLabel.frame), nameLabelWidth, CGRectGetHeight(self.customNotificationAlertView.secondaryNameLabel.frame));
-        
-        self.customNotificationAlertView.secondaryMessageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetHeight(self.customNotificationAlertView.secondaryMessageLabel.frame));
-        
-        self.customNotificationAlertView.secondaryProfilePictureImage.image = nil;
-        self.customNotificationAlertView.secondaryContentImageView.image = nil;
-    }
-    else if (!hasProfileImage) {
-        //Hide profile picture
-        self.customNotificationAlertView.secondaryProfilePictureImage.alpha = 0.0f;
-        self.customNotificationAlertView.secondaryContentImageView.alpha = 1.0f;
-        
-        CGFloat nameLabelRightGap = 8.0f;
-        CGFloat paddingRight = 8.0f;
-        
-        CGFloat nameLabelWidth = CGRectGetWidth(self.customNotificationAlertView.secondaryContentView.frame) - nameLabelRightGap - CGRectGetWidth(self.customNotificationAlertView.secondaryContentImageView.frame) - paddingRight;
-        
-        self.customNotificationAlertView.secondaryNameLabel.frame = CGRectMake(8.0, CGRectGetMinY(self.customNotificationAlertView.secondaryNameLabel.frame), nameLabelWidth, CGRectGetHeight(self.customNotificationAlertView.secondaryNameLabel.frame));
-        
-        self.customNotificationAlertView.secondaryMessageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetHeight(self.customNotificationAlertView.secondaryMessageLabel.frame));
-        
-        self.customNotificationAlertView.secondaryProfilePictureImage.image = nil;
-        [self.customNotificationAlertView.secondaryContentImageView setImageWithURLString:contentImageURL];
-    }
-    else if (!hasContentImage) {
+- (void)showSecondaryAnimationHasContentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
+    if (!hasContentImage) {
         //Hide Content Image
         self.customNotificationAlertView.secondaryContentImageView.alpha = 0.0f;
         self.customNotificationAlertView.secondaryProfilePictureImage.alpha = 1.0f;
@@ -355,7 +313,13 @@
         self.customNotificationAlertView.secondaryMessageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetHeight(self.customNotificationAlertView.secondaryMessageLabel.frame));
         
         self.customNotificationAlertView.secondaryContentImageView.image = nil;
-        [self.customNotificationAlertView.secondaryProfilePictureImage setImageWithURLString:profilePictureURL];
+        
+        if (profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
+            self.customNotificationAlertView.secondaryProfilePictureImage.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.customNotificationAlertView.secondaryProfilePictureImage setImageWithURLString:profilePictureURL];
+        }
     }
     else {
         //Show profile picture & content image
@@ -366,7 +330,13 @@
         
         self.customNotificationAlertView.secondaryMessageLabel.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetMaxY(self.customNotificationAlertView.secondaryNameLabel.frame), CGRectGetWidth(self.customNotificationAlertView.secondaryNameLabel.frame), 17.0f);
         
-        [self.customNotificationAlertView.secondaryProfilePictureImage setImageWithURLString:profilePictureURL];
+        if (profilePictureURL == nil || [profilePictureURL isEqualToString:@""]) {
+            self.customNotificationAlertView.secondaryProfilePictureImage.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.customNotificationAlertView.secondaryProfilePictureImage setImageWithURLString:profilePictureURL];
+        }
+        
         [self.customNotificationAlertView.secondaryContentImageView setImageWithURLString:contentImageURL];
     }
 }

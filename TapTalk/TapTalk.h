@@ -44,7 +44,7 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 @protocol TapTalkDelegate <NSObject>
 
 - (void)tapTalkShouldResetAuthTicket;
-- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message fromActiveController:(UIViewController *)currentActiveController;
+- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel * _Nonnull)message fromActiveController:(UIViewController *)currentActiveController;
 
 @optional
 //User Profile
@@ -173,13 +173,13 @@ fromNavigationController:(UINavigationController *)navigationController
 - (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo;
 
 //Other
+- (void)disconnect;
 - (void)logoutAndClearAllData;
 - (void)clearAllData;
 
 //TapTalk Internal Usage Method
 - (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
 - (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption;
-- (void)profileButtonDidTapped:(UIViewController *)activeViewController otherUser:(TAPUserModel *)otherUser;
 - (void)setBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms;
 
 @end

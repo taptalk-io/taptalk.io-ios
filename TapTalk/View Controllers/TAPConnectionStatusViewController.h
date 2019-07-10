@@ -2,7 +2,7 @@
 //  TAPConnectionStatusViewController.h
 //  TapTalk
 //
-//  Created by Welly Kencana on 8/10/18.
+//  Created by Dominic Vedericho on 8/10/18.
 //
 
 #import <TapTalk/TapTalk.h>

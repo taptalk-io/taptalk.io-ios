@@ -17,7 +17,14 @@ typedef NS_ENUM(NSInteger, TAPCustomButtonViewType) {
 
 typedef NS_ENUM(NSInteger, TAPCustomButtonViewStyleType) {
     TAPCustomButtonViewStyleTypePlain = 0,
-    TAPCustomButtonViewStyleTypeWithIcon = 1
+    TAPCustomButtonViewStyleTypeWithIcon = 1,
+    TAPCustomButtonViewStyleTypeDestructivePlain = 2,
+    TAPCustomButtonViewStyleTypeDestructiveWithIcon = 3,
+};
+
+typedef NS_ENUM(NSInteger, TAPCustomButtonViewIconPosititon) {
+    TAPCustomButtonViewIconPosititonLeft = 0,
+    TAPCustomButtonViewIconPosititonRight = 1
 };
 
 @protocol TAPCustomButtonViewDelegate <NSObject>
@@ -36,7 +43,7 @@ typedef NS_ENUM(NSInteger, TAPCustomButtonViewStyleType) {
 - (void)setCustomButtonViewType:(TAPCustomButtonViewType)customButtonViewType;
 - (void)setCustomButtonViewStyleType:(TAPCustomButtonViewStyleType)customButtonViewStyleType;
 - (void)setButtonWithTitle:(NSString *)title;
-- (void)setButtonWithTitle:(NSString *)title andIcon:(NSString *)imageName;
+- (void)setButtonWithTitle:(NSString *)title andIcon:(NSString *)imageName iconPosition:(TAPCustomButtonViewIconPosititon)tapCustomButtonViewIconPosititon;
 - (void)setAsActiveState:(BOOL)active animated:(BOOL)animated;
 - (void)setAsLoading:(BOOL)loading animated:(BOOL)animated;
 

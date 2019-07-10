@@ -33,7 +33,7 @@
 - (void)loadView {
     [super loadView];
     _addNewContactView = [[TAPAddNewContactView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
-    self.addNewContactView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+    self.addNewContactView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
     [self.view addSubview:self.addNewContactView];
 }
 
@@ -185,7 +185,9 @@
     [self.addContactPopupView showPopupView:NO animated:NO];
     
     if([self.delegate respondsToSelector:@selector(addNewContactViewControllerShouldOpenNewRoomWithUser:)]) {
+#ifdef DEBUG
         NSLog(@"SEARCHED USER: %@", [self.searchedUser description]);
+#endif
         
         NSString *stringFromModel = [self.searchedUser toJSONString];
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
@@ -239,7 +241,9 @@
     [self.addContactPopupView showPopupView:NO animated:NO];
     
     if([self.delegate respondsToSelector:@selector(addNewContactViewControllerShouldOpenNewRoomWithUser:)]) {
+#ifdef DEBUG
         NSLog(@"SEARCHED USER: %@", [self.searchedUser description]);
+#endif
         
         NSString *stringFromModel = [self.searchedUser toJSONString];
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
@@ -281,22 +285,6 @@
 #endif
         }];
     }
-//    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
-//
-//        //Add user to Contact Manager
-//        self.searchedUser.isContact = YES;
-//        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
-//
-//        [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
-//        [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:YES];
-//        [self.addContactPopupView showPopupView:YES animated:YES];
-//        [self.addContactPopupView animateExpandingView];
-//        [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
-//    } failure:^(NSError *error) {
-//#ifdef DEBUG
-//        NSLog(@"%@", error);
-//#endif
-//    }];
 }
 
 - (void)reloadDataWithString {

@@ -13,6 +13,7 @@
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
 
 #import "Configs.h"
+#import "TAPStyle.h"
 #import "AFNetworkActivityIndicatorManager.h"
 #import "NSUserDefaults+MPSecureUserDefaults.h"
 #import "PodAsset.h"
@@ -35,8 +36,10 @@
 #import "TAPNetworkManager.h"
 #import "TAPNotificationManager.h"
 #import "TAPOldDataManager.h"
+#import "TAPStyleManager.h"
 #import "TAPGrowingTextView.h"
 #import "TAPImageView.h"
 #import "TAPSearchBarView.h"
+#import "UIImage+Color.h"
 
 #endif /* TapTalk_Prefix_pch */

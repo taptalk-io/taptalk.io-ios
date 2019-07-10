@@ -2,7 +2,7 @@
 //  TAPRecentSearchTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 15/10/18.
+//  Created by Dominic Vedericho on 15/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -44,6 +44,7 @@
         
         _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f, 25.0f, 0.0f, 20.0f)];
         self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
+        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListUnreadBadgeBackground];
         [self addSubview:self.bubbleUnreadView];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
@@ -51,19 +52,23 @@
         self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self addSubview:self.muteImageView];
         
+        UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
+        UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
         _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 15.0f, CGRectGetMinX(self.muteImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 20.0f)];
-        self.roomNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.roomNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        self.roomNameLabel.textColor = roomListNameLabelColor;
+        self.roomNameLabel.font = roomListNameLabelFont;
         [self addSubview:self.roomNameLabel];
         self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
         
+        UIFont *roomListUnreadBadgeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListUnreadBadgeLabel];
+        UIColor *roomListUnreadBadgeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListUnreadBadgeLabel];
         _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
-        self.numberOfUnreadMessageLabel.textColor = [UIColor whiteColor];
-        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        self.numberOfUnreadMessageLabel.textColor = roomListUnreadBadgeLabelColor;
+        self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), 70.0f - 1.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:@"E4E4E4"];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self addSubview:self.separatorView];
     }
     

@@ -38,14 +38,14 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="RFn-yn-K8a">
-                        <rect key="frame" x="252" y="152" width="17" height="10"/>
+                        <rect key="frame" x="253" y="148" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="10" id="0wd-an-jVK"/>
-                            <constraint firstAttribute="width" constant="17" id="o2E-dD-W1p"/>
+                            <constraint firstAttribute="height" constant="16" id="0wd-an-jVK"/>
+                            <constraint firstAttribute="width" constant="16" id="o2E-dD-W1p"/>
                         </constraints>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IEc-jH-68R">
-                        <rect key="frame" x="241" y="113" width="28" height="28"/>
+                        <rect key="frame" x="241" y="109" width="28" height="28"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="28" id="rSR-DF-zEb"/>
                             <constraint firstAttribute="height" constant="28" id="ths-CB-S8H"/>
@@ -87,11 +87,11 @@
                                             <constraint firstAttribute="width" constant="48" id="cgb-5y-GvN"/>
                                         </constraints>
                                     </imageView>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDocumentsWhite" translatesAutoresizingMaskIntoConstraints="NO" id="Ba6-KU-rs0">
-                                        <rect key="frame" x="12" y="12" width="24" height="24"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDocuments" translatesAutoresizingMaskIntoConstraints="NO" id="Ba6-KU-rs0">
+                                        <rect key="frame" x="8" y="8" width="32" height="32"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="24" id="Pqd-NS-3bs"/>
-                                            <constraint firstAttribute="width" constant="24" id="QqE-z8-ffX"/>
+                                            <constraint firstAttribute="height" constant="32" id="Pqd-NS-3bs"/>
+                                            <constraint firstAttribute="width" constant="32" id="QqE-z8-ffX"/>
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJr-bp-oMf">
@@ -215,11 +215,11 @@
                                             <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zfu-MM-5d1">
                                                 <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
                                                 <subviews>
-                                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryDownloadFile" translatesAutoresizingMaskIntoConstraints="NO" id="Cfp-I6-G2V">
-                                                        <rect key="frame" x="17" y="16" width="14" height="16"/>
+                                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetry" translatesAutoresizingMaskIntoConstraints="NO" id="Cfp-I6-G2V">
+                                                        <rect key="frame" x="8" y="8" width="32" height="32"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="14" id="Mhz-T6-JGa"/>
-                                                            <constraint firstAttribute="height" constant="16" id="wjy-xq-CUM"/>
+                                                            <constraint firstAttribute="width" constant="32" id="Mhz-T6-JGa"/>
+                                                            <constraint firstAttribute="height" constant="32" id="wjy-xq-CUM"/>
                                                         </constraints>
                                                     </imageView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ag0-nF-k8K">
@@ -246,10 +246,10 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
                                                 <subviews>
                                                     <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconAbort" translatesAutoresizingMaskIntoConstraints="NO" id="EaM-mz-Vm1">
-                                                        <rect key="frame" x="17" y="17" width="14" height="14"/>
+                                                        <rect key="frame" x="8" y="8" width="32" height="32"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="14" id="Ilj-Nr-2Z1"/>
-                                                            <constraint firstAttribute="height" constant="14" id="tCP-mB-B59"/>
+                                                            <constraint firstAttribute="width" constant="32" id="Ilj-Nr-2Z1"/>
+                                                            <constraint firstAttribute="height" constant="32" id="tCP-mB-B59"/>
                                                         </constraints>
                                                     </imageView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PMM-iq-sYG">
@@ -275,11 +275,11 @@
                                             <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tmo-9Z-bCc">
                                                 <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
                                                 <subviews>
-                                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownloadFile" translatesAutoresizingMaskIntoConstraints="NO" id="5W1-Er-3rC">
-                                                        <rect key="frame" x="18" y="16" width="12" height="16"/>
+                                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownload" translatesAutoresizingMaskIntoConstraints="NO" id="5W1-Er-3rC">
+                                                        <rect key="frame" x="8" y="8" width="32" height="32"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="16" id="LFB-ln-JDZ"/>
-                                                            <constraint firstAttribute="width" constant="12" id="nh2-m8-Pn9"/>
+                                                            <constraint firstAttribute="height" constant="32" id="LFB-ln-JDZ"/>
+                                                            <constraint firstAttribute="width" constant="32" id="nh2-m8-Pn9"/>
                                                         </constraints>
                                                     </imageView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d4Z-PO-KBW">
@@ -303,17 +303,17 @@
                                                 </constraints>
                                             </view>
                                             <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zif-Qj-I7n">
-                                                <rect key="frame" x="12" y="12" width="24" height="24"/>
+                                                <rect key="frame" x="8" y="8" width="32" height="32"/>
                                                 <subviews>
-                                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownloadedFile" translatesAutoresizingMaskIntoConstraints="NO" id="zO8-2g-yrr">
-                                                        <rect key="frame" x="5" y="3.5" width="14" height="17"/>
+                                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDocuments" translatesAutoresizingMaskIntoConstraints="NO" id="zO8-2g-yrr">
+                                                        <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="17" id="XzK-dB-Foc"/>
-                                                            <constraint firstAttribute="width" constant="14" id="h4Y-fv-kHh"/>
+                                                            <constraint firstAttribute="height" constant="32" id="Vpc-Xn-m8Q"/>
+                                                            <constraint firstAttribute="width" constant="32" id="jsV-DI-OKq"/>
                                                         </constraints>
                                                     </imageView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yKU-fo-lh3">
-                                                        <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
                                                         <state key="normal">
                                                             <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         </state>
@@ -324,10 +324,10 @@
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="24" id="N4I-J0-tCd"/>
+                                                    <constraint firstAttribute="height" constant="32" id="N4I-J0-tCd"/>
                                                     <constraint firstItem="yKU-fo-lh3" firstAttribute="top" secondItem="zif-Qj-I7n" secondAttribute="top" id="WhB-Kq-4Y2"/>
                                                     <constraint firstItem="zO8-2g-yrr" firstAttribute="centerX" secondItem="zif-Qj-I7n" secondAttribute="centerX" id="cas-x1-6c0"/>
-                                                    <constraint firstAttribute="width" constant="24" id="eQu-zw-L6g"/>
+                                                    <constraint firstAttribute="width" constant="32" id="eQu-zw-L6g"/>
                                                     <constraint firstAttribute="trailing" secondItem="yKU-fo-lh3" secondAttribute="trailing" id="hlw-qk-uMv"/>
                                                     <constraint firstAttribute="bottom" secondItem="yKU-fo-lh3" secondAttribute="bottom" id="koQ-s5-CzQ"/>
                                                     <constraint firstItem="zO8-2g-yrr" firstAttribute="centerY" secondItem="zif-Qj-I7n" secondAttribute="centerY" id="wwe-MR-JWM"/>
@@ -432,7 +432,7 @@
                             <constraint firstItem="Kq0-KU-pfc" firstAttribute="top" secondItem="lEj-bl-Ggt" secondAttribute="bottom" constant="8" id="zP5-Qd-Ueb"/>
                         </constraints>
                     </view>
-                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSendingChat" translatesAutoresizingMaskIntoConstraints="NO" id="Cqb-8p-hPG">
+                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="Cqb-8p-hPG">
                         <rect key="frame" x="363" y="148" width="10" height="11"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="11" id="TLJ-wX-AVY"/>
@@ -471,7 +471,7 @@
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="width" secondItem="wQr-8O-AHa" secondAttribute="width" id="cgA-R7-ntK"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="izc-Hi-fO1"/>
                     <constraint firstAttribute="bottom" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="8" id="o4a-wI-ijd"/>
-                    <constraint firstItem="mMI-m8-7pV" firstAttribute="bottom" secondItem="RFn-yn-K8a" secondAttribute="bottom" constant="2" id="pb4-AL-GW7"/>
+                    <constraint firstItem="mMI-m8-7pV" firstAttribute="bottom" secondItem="RFn-yn-K8a" secondAttribute="bottom" id="pb4-AL-GW7"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="height" secondItem="wQr-8O-AHa" secondAttribute="height" id="wvO-Kn-8s9"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="IEc-jH-68R" secondAttribute="trailing" constant="2" id="z2s-Yx-4iR"/>
                 </constraints>
@@ -548,13 +548,12 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="TAPIconAbort" width="14" height="14"/>
-        <image name="TAPIconDocumentsWhite" width="24" height="24"/>
-        <image name="TAPIconDownloadFile" width="12" height="16"/>
-        <image name="TAPIconDownloadedFile" width="14" height="17"/>
+        <image name="TAPIconAbort" width="32" height="32"/>
+        <image name="TAPIconDocuments" width="32" height="32"/>
+        <image name="TAPIconDownload" width="32" height="32"/>
         <image name="TAPIconReplyChat" width="28" height="28"/>
+        <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
-        <image name="TAPIconRetryDownloadFile" width="14" height="16"/>
-        <image name="TAPIconSendingChat" width="10" height="11"/>
+        <image name="TAPIconSending" width="20" height="20"/>
     </resources>
 </document>

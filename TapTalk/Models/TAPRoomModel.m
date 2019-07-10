@@ -44,4 +44,56 @@
     return newRoom;
 }
 
+- (instancetype)initWithDictionary:(NSDictionary *)dict error:(NSError *__autoreleasing *)err {
+    TAPRoomModel *room = [super initWithDictionary:dict error:err];
+    NSArray *participantsArray = [dict objectForKey:@"participants"];
+    NSMutableArray *participantsModelArray = [NSMutableArray array];
+    for (NSDictionary *userDictionary in participantsArray) {
+        TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:err];
+        [participantsModelArray addObject:user];
+    }
+    room.participants = participantsModelArray;
+    return room;
+}
+
+- (NSDictionary *)toDictionary {
+    NSMutableDictionary *dictionary = [[super toDictionary] mutableCopy];
+    NSMutableArray *participantsArray = [NSMutableArray array];
+    for(TAPUserModel *user in self.participants) {
+            [participantsArray addObject:[user toDictionary]];
+    }
+    [dictionary setObject:participantsArray forKey:@"participants"];
+    return dictionary;
+}
+
+//used to save model to preference
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    //Encode properties, other class variables, etc
+    [encoder encodeObject:self.roomID forKey:@"roomID"];
+    [encoder encodeObject:self.name forKey:@"name"];
+    [encoder encodeObject:self.imageURL forKey:@"imageURL"];
+    [encoder encodeInteger:self.type forKey:@"type"];
+    [encoder encodeObject:self.color forKey:@"color"];
+    [encoder encodeBool:self.isDeleted forKey:@"isDeleted"];
+    [encoder encodeObject:self.deleted forKey:@"deleted"];
+    [encoder encodeObject:self.participants forKey:@"participants"];
+    [encoder encodeObject:self.admins forKey:@"admins"];
+}
+
+- (id)initWithCoder:(NSCoder *)decoder {
+    if((self = [super init])) {
+        //decode properties, other class vars
+        self.roomID = [decoder decodeObjectForKey:@"roomID"];
+        self.name = [decoder decodeObjectForKey:@"name"];
+        self.imageURL = [decoder decodeObjectForKey:@"imageURL"];
+        self.type = [decoder decodeIntegerForKey:@"type"];
+        self.color = [decoder decodeObjectForKey:@"color"];
+        self.isDeleted = [decoder decodeBoolForKey:@"isDeleted"];
+        self.deleted = [decoder decodeObjectForKey:@"deleted"];
+        self.participants = [decoder decodeObjectForKey:@"participants"];
+        self.admins = [decoder decodeObjectForKey:@"admins"];
+    }
+    return self;
+}
+
 @end

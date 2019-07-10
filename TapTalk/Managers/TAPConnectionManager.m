@@ -10,13 +10,13 @@
 
 #import <AFNetworking/AFNetworking.h>
 
-#define kSocketURLDevelopment @"wss://hp-dev.moselo.com/connect"
-#define kSocketURLStaging @"wss://hp-staging.moselo.com/connect"
-#define kSocketURLProduction @"wss://taptalk-production.moselo.com/connect"
+#define kSocketURLDevelopment @"wss://engine-dev.taptalk.io/connect"
+#define kSocketURLStaging @"wss://engine-stg.taptalk.io/connect"
+#define kSocketURLProduction @"wss://engine.taptalk.io/connect"
 
-//#define kSocketURLDevelopment @"wss://engine-dev.taptalk.io/connect"
-//#define kSocketURLStaging @"wss://engine-staging.taptalk.io/connect"
-//#define kSocketURLProduction @"wss://engine.taptalk.io/connect"
+//#define kSocketURLDevelopment @"wss://hp-dev.moselo.com/connect"
+//#define kSocketURLStaging @"wss://hp-staging.moselo.com/connect"
+//#define kSocketURLProduction @"wss://taptalk-production.moselo.com/connect"
 
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f

@@ -2,7 +2,7 @@
 //  TAPSearchBarView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 3/10/18.
+//  Created by Dominic Vedericho on 3/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -36,10 +36,15 @@
         self.bgView.backgroundColor = [UIColor clearColor];
         [self addSubview:self.bgView];
         
+        UIFont *searchBarFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarText];
+        UIColor *searchBarColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarText];
+        UIFont *searchBarPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextPlaceholder];
+        UIColor *searchBarPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextPlaceholder];
+        
         _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
         self.searchTextField.delegate = self;
         self.searchTextField.backgroundColor = [UIColor whiteColor];
-        [self.searchTextField setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
+        [self.searchTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         self.searchTextField.clearButtonMode = YES;
         UIImageView *leftViewImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, 0.0f, 14.0, 14.0f)];
         leftViewImageView.image = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -49,17 +54,17 @@
         self.searchTextField.leftViewMode = UITextFieldViewModeAlways;
         NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(@"Search", @"")];
         [placeHolderAttributedString addAttribute:NSFontAttributeName
-                                            value:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f]
+                                            value:searchBarPlaceholderFont
                                             range:NSMakeRange(0, [NSLocalizedString(@"Search", @"") length])];
         [placeHolderAttributedString addAttribute:NSForegroundColorAttributeName
-                                            value:[TAPUtil getColor:TAP_COLOR_GREY_9B]
+                                            value:searchBarPlaceholderColor
                                             range:NSMakeRange(0, [NSLocalizedString(@"Search", @"") length])];
         self.searchTextField.attributedPlaceholder = placeHolderAttributedString;
         self.searchTextField.layer.cornerRadius = 10.0f;
         self.searchTextField.layer.borderWidth = 1.0f;
-        self.searchTextField.layer.borderColor = [TAPUtil getColor:@"E4E4E4"].CGColor;
-        self.searchTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.searchTextField.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
+        self.searchTextField.font = searchBarFont;
+        self.searchTextField.textColor = searchBarColor;
         self.searchTextField.clipsToBounds = YES;
         [self.bgView addSubview:self.searchTextField];
     }
@@ -133,26 +138,26 @@
         if (active) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 1.0f;
-                self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-                self.searchTextField.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+                self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive].CGColor;
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.searchTextField.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+                self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
             }];
         }
     }
     else {
         if (active) {
             self.shadowView.alpha = 1.0f;
-            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-            self.searchTextField.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+            self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive].CGColor;
         }
         else {
             self.shadowView.alpha = 0.0f;
-            self.searchTextField.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+            self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
         }
     }
 }
@@ -160,12 +165,14 @@
 - (void)setCustomPlaceHolderString:(NSString *)customPlaceHolderString {
     _customPlaceHolderString = customPlaceHolderString;
     
+    UIFont *searchBarPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextPlaceholder];
+    UIColor *searchBarPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextPlaceholder];
     NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(self.customPlaceHolderString, @"")];
     [placeHolderAttributedString addAttribute:NSFontAttributeName
-                                        value:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f]
+                                        value:searchBarPlaceholderFont
                                         range:NSMakeRange(0, [self.customPlaceHolderString length])];
     [placeHolderAttributedString addAttribute:NSForegroundColorAttributeName
-                                        value:[TAPUtil getColor:TAP_COLOR_GREY_9B]
+                                        value:searchBarPlaceholderColor
                                         range:NSMakeRange(0, [self.customPlaceHolderString length])];
     self.searchTextField.attributedPlaceholder = placeHolderAttributedString;
 }

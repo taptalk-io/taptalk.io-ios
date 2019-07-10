@@ -66,22 +66,16 @@
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     
-//    self.gradientView = [[TAPGradientView alloc] initWithFrame:self.bubbleView.bounds];
-//
-//    self.gradientView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-//    self.gradientView.layer.colors = @[ (__bridge id)[TAPUtil getColor:@"9954C2"].CGColor, (__bridge id)[TAPUtil getColor:TAP_COLOR_PURPLE_98].CGColor];
-//
-//    [self.bubbleView insertSubview:self.gradientView atIndex:0];
-//
-//    self.gradientView.clipsToBounds = YES;
     self.bubbleView.clipsToBounds = YES;
-    
     self.bubbleView.layer.cornerRadius = 8.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
     
     self.replyView.layer. cornerRadius = 4.0f;
+    
+    self.sendingIconImageView.image = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.sendingIconImageView.image = [self.sendingIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSending]];
 }
 
 - (void)prepareForReuse {
@@ -327,7 +321,7 @@
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.replyButton.alpha = 0.0f;
     self.replyButtonRightConstraint.constant = -28.0f;
-    self.statusIconBottomConstraint.constant = 2.0f;
+    self.statusIconBottomConstraint.constant = 0.0f;
     
     if (updateStatusIcon) {
         self.statusIconImageView.alpha = 1.0f;
@@ -343,28 +337,32 @@
         //MESSAGE IS READ BY RECIPIENT
         self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconReadChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusDelivered) {
         //MESSAGE IS DELIVERED TO RECIPIENT
         self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDeliveredChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusSent) {
         //MESSAGE IS SENT
         self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSent]];
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusSending) {
         //MESSAGE IS BEING SENT
         self.statusIconRightConstraint.constant = -17.0f;
         self.chatBubbleRightConstraint.constant = 32.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSentChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSent]];
         self.sendingIconImageView.alpha = 1.0f;
     }
 }

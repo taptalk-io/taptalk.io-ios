@@ -88,7 +88,7 @@
         _backgroundGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
         CAGradientLayer *backgroundGradientLayer = [CAGradientLayer layer];
         backgroundGradientLayer.frame = self.backgroundGradientView.bounds;
-        backgroundGradientLayer.colors = @[(id)[TAPUtil getColor:TAP_COLOR_DODGERBLUE_FF].CGColor, (id)[TAPUtil getColor:TAP_COLOR_BLURPLE_D7].CGColor];
+        backgroundGradientLayer.colors = @[(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor];
         [self.backgroundGradientView.layer insertSublayer:backgroundGradientLayer atIndex:0];
         [self addSubview:self.backgroundGradientView];
         
@@ -104,7 +104,7 @@
         _colorGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.whiteBaseView.frame) - 54.0f, CGRectGetWidth(self.whiteBaseView.frame), 54.0f)];
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.colorGradientView.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_COLOR_ORANGE_33].CGColor, (id)[TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor, nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.colorGradientView.layer insertSublayer:gradient atIndex:0];
@@ -135,23 +135,30 @@
         self.addedUserImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.whiteBaseView addSubview:self.addedUserImageView];
         
+        UIFont *headerLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchNewContactResultName];
+        UIColor *headerLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchNewContactResultName];
         _addedUserUsernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserImageView.frame) + self.profilePictureBottomGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 22.0f)];
-        self.addedUserUsernameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:20.0f];
-        self.addedUserUsernameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.addedUserUsernameLabel.font = headerLabelFont;
+        self.addedUserUsernameLabel.textColor = headerLabelColor;
         self.addedUserUsernameLabel.textAlignment = NSTextAlignmentCenter;
         self.addedUserUsernameLabel.numberOfLines = 2;
         [self.whiteBaseView addSubview:self.addedUserUsernameLabel];
         
+        UIFont *subHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchNewContactResultUsername];
+        UIColor *subHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchNewContactResultUsername];
         _addedUserFullnameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.addedUserUsernameLabel.frame), CGRectGetMaxY(self.addedUserUsernameLabel.frame) + self.addedUserUsernameLabelBottomGap, CGRectGetWidth(self.addedUserUsernameLabel.frame), 18.0f)];
-        self.addedUserFullnameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.addedUserFullnameLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.addedUserFullnameLabel.font = subHeaderLabelFont;
+        self.addedUserFullnameLabel.textColor = subHeaderLabelColor;
         self.addedUserFullnameLabel.textAlignment = NSTextAlignmentCenter;
         [self.whiteBaseView addSubview:self.addedUserFullnameLabel];
         
+ 
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _selfInformedLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserFullnameLabel.frame) + self.selfInformedLabelTopGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 18.0f)];
         self.selfInformedLabel.text = NSLocalizedString(@"This is you", @"");
-        self.selfInformedLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
-        self.selfInformedLabel.textColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00];
+        self.selfInformedLabel.font = clickableLabelFont;
+        self.selfInformedLabel.textColor = clickableLabelColor;
         self.selfInformedLabel.textAlignment = NSTextAlignmentCenter;
         self.selfInformedLabel.alpha = 0.0f;
         [self.whiteBaseView addSubview:self.selfInformedLabel];
@@ -163,10 +170,12 @@
         self.successAddContactImageView.alpha = 0.0f;
         [self.whiteBaseView addSubview:self.successAddContactImageView];
         
+        UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        UIColor *infoLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
         _successAddContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.successAddContactImageView.frame) + self.successAddUserLabelTopGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 22.0f)];
         self.successAddContactLabel.alpha = 0.0f;
-        self.successAddContactLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.successAddContactLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.successAddContactLabel.font = infoLabelBodyFont;
+        self.successAddContactLabel.textColor = infoLabelBodyColor;
         self.successAddContactLabel.numberOfLines = 0;
         self.successAddContactLabel.textAlignment = NSTextAlignmentCenter;
         [self.whiteBaseView addSubview:self.successAddContactLabel];
@@ -175,10 +184,12 @@
         _addContactView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame))];
         self.addContactView.backgroundColor = [UIColor clearColor];
         [self.colorGradientView addSubview:self.addContactView];
-        
+ 
+        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
         _addContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.addContactView.frame) - 22.0f) / 2.0f, 76.0f, 22.0f)];
-        self.addContactLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
-        self.addContactLabel.textColor = [UIColor whiteColor];
+        self.addContactLabel.font = buttonLabelFont;
+        self.addContactLabel.textColor = buttonLabelColor;
         self.addContactLabel.textAlignment = NSTextAlignmentCenter;
         self.addContactLabel.text = NSLocalizedString(@"Add To Contacts", @"");
         [self.addContactView addSubview:self.addContactLabel];
@@ -189,7 +200,10 @@
         CGFloat addContactLogoImageMinX = (CGRectGetWidth(self.addContactView.frame) - 5.0f - 10.0f - addContactDefaultLabelSize.width) / 2.0f;
         _addContactLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(addContactLogoImageMinX, (CGRectGetHeight(self.addContactView.frame) - 10.0f) / 2.0f, 10.0f, 10.0f)];
         self.addContactLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.addContactLogoImageView.image = [UIImage imageNamed:@"TAPIconPlusWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
+        UIImage *addContactLogoImage = [UIImage imageNamed:@"TAPIconPlusWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        addContactLogoImage = [addContactLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        self.addContactLogoImageView.image = addContactLogoImage;
         [self.addContactView addSubview:self.addContactLogoImageView];
         
         self.addContactLabel.frame = CGRectMake(CGRectGetMaxX(self.addContactLogoImageView.frame) + 5.0f, CGRectGetMinY(self.addContactLabel.frame), CGRectGetWidth(self.addContactLabel.frame), CGRectGetHeight(self.addContactLabel.frame));
@@ -204,8 +218,8 @@
         [self.colorGradientView addSubview:self.chatNowView];
         
         _chatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.chatNowView.frame) - 22.0f) / 2.0f, 76.0f, 22.0f)];
-        self.chatNowLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
-        self.chatNowLabel.textColor = [UIColor whiteColor];
+        self.chatNowLabel.font = buttonLabelFont;
+        self.chatNowLabel.textColor = buttonLabelColor;
         self.chatNowLabel.textAlignment = NSTextAlignmentCenter;
         self.chatNowLabel.text = NSLocalizedString(@"Chat Now", @"");
         [self.chatNowView addSubview:self.chatNowLabel];
@@ -216,7 +230,10 @@
         CGFloat chatNowLogoImageMinX = (CGRectGetWidth(self.chatNowView.frame) - 5.0f - 16.0f - chatNowDefaultLabelSize.width) / 2.0f;
         _chatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(chatNowLogoImageMinX, (CGRectGetHeight(self.chatNowView.frame) - 16.0f) / 2.0f, 16.0f, 16.0f)];
         self.chatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.chatNowLogoImageView.image = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
+        UIImage *chatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        chatNowLogoImage = [chatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        self.chatNowLogoImageView.image = chatNowLogoImage;
         [self.chatNowView addSubview:self.chatNowLogoImageView];
         
         self.chatNowLabel.frame = CGRectMake(CGRectGetMaxX(self.chatNowLogoImageView.frame) + 5.0f, CGRectGetMinY(self.chatNowLabel.frame), CGRectGetWidth(self.chatNowLabel.frame), CGRectGetHeight(self.chatNowLabel.frame));
@@ -290,6 +307,9 @@
     //    ScanQRCodePopupViewTypeAlreadyFriend = 2,
     //    ScanQRCodePopupViewTypeSelf = 3
     
+    UIColor *infoLabelBodyBoldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBodyBold];
+    UIFont *infoLabelBodyBoldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBodyBold];
+    
     [self setScanQRCodePopupViewType:type];
     
     NSString *currentUserProfileImage = [TAPDataManager getActiveUser].imageURL.thumbnail;
@@ -320,10 +340,9 @@
         
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
-        
         NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
-        [attributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f] forKey:NSFontAttributeName];
-        [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_BLACK_19] forKey:NSForegroundColorAttributeName];
+        [attributesDictionary setObject:infoLabelBodyBoldFont forKey:NSFontAttributeName];
+        [attributesDictionary setObject:infoLabelBodyBoldColor forKey:NSForegroundColorAttributeName];
         [attributesDictionary setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
         
         NSMutableAttributedString *addedUserFullnameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];
@@ -344,8 +363,8 @@
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
         
         NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
-        [attributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f] forKey:NSFontAttributeName];
-        [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_BLACK_19] forKey:NSForegroundColorAttributeName];
+        [attributesDictionary setObject:infoLabelBodyBoldFont forKey:NSFontAttributeName];
+        [attributesDictionary setObject:infoLabelBodyBoldColor forKey:NSForegroundColorAttributeName];
         [attributesDictionary setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
         
         NSMutableAttributedString *addedUserFullnameAttributedString = [[NSMutableAttributedString alloc] initWithString:self.successAddContactLabel.text];

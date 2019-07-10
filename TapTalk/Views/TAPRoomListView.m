@@ -2,7 +2,7 @@
 //  TAPRoomListView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 6/9/18.
+//  Created by Dominic Vedericho on 6/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -27,37 +27,44 @@
         CGFloat tabbarHeight = CGRectGetHeight(tabBar.frame); //this will return 0 when tabBarController is nil.
         
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - tabbarHeight)];
-        self.bgView.backgroundColor = [UIColor whiteColor];
+        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self addSubview:self.bgView];
         
         _roomListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
         self.roomListTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        self.roomListTableView.backgroundColor = [UIColor clearColor];
         [self.bgView addSubview:self.roomListTableView];
         
         _noChatsView = [[UIView alloc] initWithFrame:self.bgView.frame];
-        self.noChatsView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.noChatsView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.noChatsView.alpha = 0.0f;
         [self.bgView addSubview:self.noChatsView];
         
+        UIFont *infoLabelTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelTitle];
+        UIColor *infoLabelTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelTitle];
         _titleNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(64.0f, 159.0f, CGRectGetWidth(self.noChatsView.frame) - 64.0f - 64.0f, 30.0f)];
         self.titleNoChatsLabel.text = NSLocalizedString(@"No chats to show", @"");
-        self.titleNoChatsLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
+        self.titleNoChatsLabel.textColor = infoLabelTitleColor;
         self.titleNoChatsLabel.textAlignment = NSTextAlignmentCenter;
-        self.titleNoChatsLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:24.0f];
+        self.titleNoChatsLabel.font = infoLabelTitleFont;
         [self.noChatsView addSubview:self.titleNoChatsLabel];
         
+        UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        UIColor *infoLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
         _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 16.0f - 16.0f, 40.0f)];
         self.descriptionNoChatsLabel.text = NSLocalizedString(@"It seems like you don't have any chats to show, but don't worry! Your chat list will grow once you", @"");
-        self.descriptionNoChatsLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
-        self.descriptionNoChatsLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.descriptionNoChatsLabel.textColor = infoLabelBodyColor;
+        self.descriptionNoChatsLabel.font = infoLabelBodyFont;
         self.descriptionNoChatsLabel.numberOfLines = 2;
         self.descriptionNoChatsLabel.textAlignment = NSTextAlignmentCenter;
         [self.noChatsView addSubview:self.descriptionNoChatsLabel];
         
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _startChatNoChatsButton = [[UIButton alloc] initWithFrame:CGRectMake(64.0f, CGRectGetMaxY(self.descriptionNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 64.0f - 64.0f, 40.0f)];
         [self.startChatNoChatsButton setTitle:NSLocalizedString(@"Start a New Chat", @"") forState:UIControlStateNormal];
-        [self.startChatNoChatsButton setTitleColor:[TAPUtil getColor:TAP_COLOR_ORANGE_00] forState:UIControlStateNormal];
-        self.startChatNoChatsButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        [self.startChatNoChatsButton setTitleColor:clickableLabelColor forState:UIControlStateNormal];
+        self.startChatNoChatsButton.titleLabel.font = clickableLabelFont;
         [self.noChatsView addSubview:self.startChatNoChatsButton];
     }
     

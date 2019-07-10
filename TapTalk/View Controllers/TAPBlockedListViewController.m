@@ -2,7 +2,7 @@
 //  TAPBlockedListViewController.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 14/9/18.
+//  Created by Dominic Vedericho on 14/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -63,10 +63,10 @@
         [cell isRequireSelection:NO];
         
         if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
-            [cell showSeparatorLine:NO];
+            [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeFull];
         }
         else {
-            [cell showSeparatorLine:YES];
+            [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
         }
         
         return cell;
