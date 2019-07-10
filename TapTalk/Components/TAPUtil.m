@@ -300,20 +300,6 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return newImage;
 }
 
-+ (UIImage *)image:(UIImage *)image withTintColor:(UIColor *)color {
-    CGRect rect = CGRectMake(0.0f, 0.0f, image.size.width, image.size.height);
-    UIGraphicsBeginImageContextWithOptions(rect.size, NO, image.scale);
-    CGContextRef c = UIGraphicsGetCurrentContext();
-    [image drawInRect:rect];
-    CGContextSetFillColorWithColor(c, [color CGColor]);
-    CGContextSetBlendMode(c, kCGBlendModeSourceAtop);
-    CGContextFillRect(c, rect);
-    UIImage *tintedImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return tintedImage;
-}
-
 #pragma mark - Encoding
 + (NSString *)urlEncodeFromString:(NSString *)sourceString {
     NSMutableString *output = [NSMutableString string];

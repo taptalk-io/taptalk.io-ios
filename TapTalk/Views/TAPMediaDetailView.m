@@ -2,7 +2,7 @@
 //  TAPMediaDetailView.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 29/1/19.
+//  Created by Dominic Vedericho on 29/1/19.
 //
 
 #import "TAPMediaDetailView.h"
@@ -77,7 +77,9 @@
         CGFloat additionalTopSpacing = [TAPUtil currentDeviceStatusBarHeight];
 
         _backButton = [[UIButton alloc] initWithFrame:CGRectMake(6.0f, additionalTopSpacing + 4.0f, 40.0f, 40.0f)];
-        [self.backButton setImage:[UIImage imageNamed:@"TAPIconBackArrowWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+        UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconTransparentBackgroundBackButton]];
+        [self.backButton setImage:buttonImage forState:UIControlStateNormal];
         [self.backButton addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.headerView addSubview:self.backButton];
         
@@ -88,14 +90,18 @@
         
         CGFloat headerTitleWidth = CGRectGetWidth(self.frame) - CGRectGetMaxX(self.backButton.frame) - 10.0f - 10.0f - CGRectGetWidth(self.saveButton.frame) - 6.0f;
         
+        UIFont *mediaDetailHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontImageDetailSenderName];
+        UIColor *mediaDetailHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorImageDetailSenderName];
         _headerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.backButton.frame) + 10.0f, [TAPUtil currentDeviceStatusBarHeight] + 6.0f, headerTitleWidth, 16.0f)];
-        self.headerTitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f];
-        self.headerTitleLabel.textColor = [UIColor whiteColor];
+        self.headerTitleLabel.font = mediaDetailHeaderLabelFont;
+        self.headerTitleLabel.textColor = mediaDetailHeaderLabelColor;
         [self.headerView addSubview:self.headerTitleLabel];
         
+        UIFont *mediaDetailContentLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontImageDetailMessageStatus];
+        UIColor *mediaDetailContentLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorImageDetailMessageStatus];
         _headerSubtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.backButton.frame) + 10.0f, CGRectGetMaxY(self.headerTitleLabel.frame), headerTitleWidth, 16.0f)];
-        self.headerSubtitleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.headerSubtitleLabel.textColor = [UIColor whiteColor];
+        self.headerSubtitleLabel.font = mediaDetailContentLabelFont;
+        self.headerSubtitleLabel.textColor = mediaDetailContentLabelColor;
         [self.headerView addSubview:self.headerSubtitleLabel];
         
         _footerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.frame) - 16.0f - 16.0f - 16.0f, CGRectGetWidth(self.frame), 16.0f + 16.0f + 16.0f)];
@@ -120,19 +126,27 @@
         self.footerScrollView.showsHorizontalScrollIndicator = NO;
         [self.footerView addSubview:self.footerScrollView];
 
+        
+        UIFont *mediaDetailCaptionLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontImageDetailCaption];
+        UIColor *mediaDetailCaptionLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorImageDetailCaption];
         _footerCaptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetHeight(self.frame) - 16.0f - 16.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 16.0f)];
         self.footerCaptionLabel.numberOfLines = 0;
-        self.footerCaptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
-        self.footerCaptionLabel.textColor = [UIColor whiteColor];
+        self.footerCaptionLabel.font = mediaDetailCaptionLabelFont;
+        self.footerCaptionLabel.textColor = mediaDetailCaptionLabelColor;
         [self.footerScrollView addSubview:self.footerCaptionLabel];
         
         //Save Loading View
         _saveLoadingBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
-        self.saveLoadingBackgroundView.backgroundColor = [UIColor clearColor];
+        self.saveLoadingBackgroundView.backgroundColor = [[TAPUtil getColor:@"04040F"] colorWithAlphaComponent:0.4f];
         [self addSubview:self.saveLoadingBackgroundView];
         
-        _saveLoadingView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 128.0f) / 2.0f, (CGRectGetHeight(self.frame) - 128.0f) / 2.0f, 128.0f, 128.0f)];
+        _saveLoadingView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 150.0f) / 2.0f, (CGRectGetHeight(self.frame) - 150.0f) / 2.0f, 150.0f, 150.0f)];
         self.saveLoadingView.backgroundColor = [UIColor whiteColor];
+        self.saveLoadingView.layer.shadowRadius = 5.0f;
+        self.saveLoadingView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+        self.saveLoadingView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.saveLoadingView.layer.shadowOpacity = 1.0f;
+        self.saveLoadingView.layer.masksToBounds = NO;
         self.saveLoadingView.layer.cornerRadius = 6.0f;
         self.saveLoadingView.clipsToBounds = YES;
         [self.saveLoadingBackgroundView addSubview:self.saveLoadingView];
@@ -140,9 +154,11 @@
         _saveLoadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.saveLoadingView.frame) - 60.0f) / 2.0f, 28.0f, 60.0f, 60.0f)];
         [self.saveLoadingView addSubview:self.saveLoadingImageView];
         
+        UIFont *popupLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupLoadingLabel];
+        UIColor *popupLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupLoadingLabel];
         _saveLoadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.saveLoadingImageView.frame) + 8.0f, CGRectGetWidth(self.saveLoadingView.frame) - 8.0f - 8.0f, 20.0f)];
-        self.saveLoadingLabel.font = [UIFont fontWithName:TAP_FONT_NAME_MEDIUM size:14.0f];
-        self.saveLoadingLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+        self.saveLoadingLabel.font = popupLabelFont;
+        self.saveLoadingLabel.textColor = popupLabelColor;
         self.saveLoadingLabel.textAlignment = NSTextAlignmentCenter;
         [self.saveLoadingView addSubview:self.saveLoadingLabel];
         

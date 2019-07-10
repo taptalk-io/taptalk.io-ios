@@ -54,11 +54,13 @@
     
     self.navigationController.navigationBar.alpha = 0.0f;
     
+    UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
+    UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
     [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    [self.rightBarButton setTitleColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_CANCEL_BUTTON_COLOR] forState:UIControlStateNormal];
+    [self.rightBarButton setTitleColor:searchBarCancelColor forState:UIControlStateNormal];
     self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
-    self.rightBarButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:17.0f];
+    self.rightBarButton.titleLabel.font = searchBarCancelFont;
     [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
@@ -215,11 +217,13 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if (tableView == self.searchView.searchResultTableView) {
         UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 28.0f)];
-        headerView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        headerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
+        UIFont *sectionHeaderTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 13.0f)];
-        titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
-        titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+        titleLabel.font = sectionHeaderTitleLabelFont;
+        titleLabel.textColor = sectionHeaderTitleLabelColor;
         NSString *titleString = @"";
         if (section == 0) {
             titleString = NSLocalizedString(@"CHATS AND CONTACTS", @"");
@@ -228,6 +232,14 @@
             titleString = NSLocalizedString(@"MESSAGES", @"");
         }
         titleLabel.text = titleString;
+        
+        NSMutableAttributedString *titleLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:titleLabel.text];
+        [titleLabelAttributedString addAttribute:NSKernAttributeName
+                                           value:@1.5f
+                                           range:NSMakeRange(0, [titleLabel.text length])];
+        titleLabel.attributedText = titleLabelAttributedString;
+
+        
         [headerView addSubview:titleLabel];
         
         return headerView;
@@ -402,7 +414,7 @@
     
     self.searchBarView.searchTextField.text = @"";
     
-    UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddChat" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+    UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
     self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);

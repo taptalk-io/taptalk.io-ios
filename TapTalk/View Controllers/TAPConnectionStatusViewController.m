@@ -2,7 +2,7 @@
 //  TAPConnectionStatusViewController.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 8/10/18.
+//  Created by Dominic Vedericho on 8/10/18.
 //
 
 #import "TAPConnectionStatusViewController.h"
@@ -119,9 +119,10 @@
     [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeConnected];
     [self checkStatusHeight];
     
-    if ([[TapTalk sharedInstance] roomListViewController].isViewAppear || self.isChatViewControllerAppear) {
-        [TAPUtil tapticNotificationFeedbackGeneratorWithType:UINotificationFeedbackTypeSuccess];
-    }
+    //DV Note - Uncomment to add taptic feedback when socket connected
+//    if ([[TapTalk sharedInstance] roomListViewController].isViewAppear || self.isChatViewControllerAppear) {
+//        [TAPUtil tapticNotificationFeedbackGeneratorWithType:UINotificationFeedbackTypeSuccess];
+//    }
     
     [self performSelector:@selector(removeNetworkNotificationView) withObject:nil afterDelay:0.5f];
 }

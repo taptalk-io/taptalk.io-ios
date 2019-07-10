@@ -34,7 +34,7 @@
         
         _popupWhiteView = [[UIView alloc] initWithFrame:CGRectMake(32.0f, 0.0f, CGRectGetWidth(self.frame) - 32.0f - 32.0f, 0.0f)];
         self.popupWhiteView.layer.cornerRadius = 4.0f;
-        self.popupWhiteView.layer.shadowColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
+        self.popupWhiteView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f].CGColor;
         self.popupWhiteView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
         self.popupWhiteView.layer.shadowOpacity = 0.4f;
         self.popupWhiteView.layer.shadowRadius = 4.0f;
@@ -42,29 +42,37 @@
         self.popupWhiteView.clipsToBounds = YES;
         [self addSubview:self.popupWhiteView];
         
+        UIFont *popupTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogTitle];
+        UIColor *popupTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogTitle];
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 16.0f - 16.0f, 22.0f)];
-        self.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f];
-        self.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.titleLabel.font = popupTitleLabelFont;
+        self.titleLabel.textColor = popupTitleLabelColor;
         [self.popupWhiteView addSubview:self.titleLabel];
         
+        UIFont *popupBodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogBody];
+        UIColor *popupBodyLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogBody];
         _detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 0.0f)];
         self.detailLabel.numberOfLines = 0;
-        self.detailLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.detailLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.detailLabel.font = popupBodyLabelFont;
+        self.detailLabel.textColor = popupBodyLabelColor;
         [self.popupWhiteView addSubview:self.detailLabel];
         
+        UIFont *popupPrimaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextPrimary];
+        UIColor *popupPrimaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
         _rightButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.popupWhiteView.frame) - 85.0f - 16.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, 85.0f, 40.0f)];
-        self.rightButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
+        self.rightButton.titleLabel.font = popupPrimaryButtonFont;
         self.rightButton.layer.cornerRadius = 4.0f;
-        self.rightButton.titleLabel.textColor = [UIColor whiteColor];
-        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+        self.rightButton.titleLabel.textColor = popupPrimaryButtonColor;
+        self.rightButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonSuccessBackground];
         [self.popupWhiteView addSubview:self.rightButton];
         
+        UIFont *popupSecondaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextSecondary];
+        UIColor *popupSecondaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
         _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 6.0f - 85.0f, CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
         self.leftButton.layer.cornerRadius = 4.0f;
-        self.leftButton.titleLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
-        self.leftButton.titleLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
-        self.leftButton.backgroundColor = [UIColor whiteColor];
+        self.leftButton.titleLabel.font = popupSecondaryButtonFont;
+        self.leftButton.titleLabel.textColor = popupSecondaryButtonColor;
+        self.leftButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogSecondaryButtonBackground];
         [self.popupWhiteView addSubview:self.leftButton];
         
     }
@@ -121,23 +129,32 @@
 
 
 - (void)setPopupInfoViewThemeType:(TAPPopupInfoViewThemeType)popupInfoViewThemeType {
+    
+    UIColor *popupPrimaryButtonSuccessColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
+    UIColor *popupPrimaryButtonSuccessBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonSuccessBackground];
+    
+    UIColor *popupPrimaryButtonDestructiveColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
+    UIColor *popupPrimaryButtonDestructiveBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonErrorBackground];
+    
+    UIColor *popupSecondaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
+    UIColor *popupSecondaryBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogSecondaryButtonBackground];
+    
     _popupInfoViewThemeType = popupInfoViewThemeType;
     if (self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeDestructive) {
         //Red theme
-        [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_CORALPINK_6A];
+        [self.rightButton setTitleColor:popupPrimaryButtonDestructiveColor forState:UIControlStateNormal];
+        self.rightButton.backgroundColor = popupPrimaryButtonDestructiveBackgroundColor;
         
-        [self.leftButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREY_9B] forState:UIControlStateNormal];
-        self.leftButton.backgroundColor = [UIColor whiteColor];
+        [self.leftButton setTitleColor:popupSecondaryButtonColor forState:UIControlStateNormal];
+        self.leftButton.backgroundColor = popupSecondaryBackgroundColor;
     }
     else {
         //Default green theme
-        [self.rightButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.rightButton.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREEN_2A];
+        [self.rightButton setTitleColor:popupPrimaryButtonSuccessColor forState:UIControlStateNormal];
+        self.rightButton.backgroundColor = popupPrimaryButtonSuccessBackgroundColor;
         
-        [self.leftButton setTitleColor:[TAPUtil getColor:TAP_COLOR_GREY_9B] forState:UIControlStateNormal];
-        self.leftButton.backgroundColor = [UIColor whiteColor];
-
+        [self.leftButton setTitleColor:popupSecondaryButtonColor forState:UIControlStateNormal];
+        self.leftButton.backgroundColor = popupSecondaryBackgroundColor;
     }
 }
 

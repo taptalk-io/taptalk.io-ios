@@ -36,7 +36,6 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         
-        
         _shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.shadowView.backgroundColor = [UIColor whiteColor];
         self.shadowView.layer.cornerRadius = 8.0f;
@@ -50,7 +49,7 @@
         _searchBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.searchBarView.backgroundColor = [UIColor whiteColor];
         self.searchBarView.layer.cornerRadius = 10.0f;
-        self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_E4].CGColor;
+        self.searchBarView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
         self.searchBarView.layer.borderWidth = 1.0f;
         self.searchBarView.layer.shadowColor = [UIColor blackColor].CGColor;
         self.searchBarView.layer.shadowOffset = CGSizeMake(0.0f, 3.0f);
@@ -70,21 +69,26 @@
         [self showClearView:NO];
         [self.searchBarView addSubview:self.clearView];
         
+        UIFont *clearButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerClearButton];
+        UIColor *clearButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerClearButton];
         _clearViewLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.clearView.frame), CGRectGetHeight(self.clearView.frame))];
         self.clearViewLabel.text = NSLocalizedString(@"CLEAR", @"");
-        self.clearViewLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.clearViewLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
+        self.clearViewLabel.textColor = clearButtonColor;
+        self.clearViewLabel.font = clearButtonFont;
         [self.clearView addSubview:self.clearViewLabel];
         
         _clearViewButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.clearView.frame), CGRectGetHeight(self.clearView.frame))];
         [self.clearViewButton addTarget:self action:@selector(clearButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.clearView addSubview:self.clearViewButton];
         
+        UIFont *locationTextFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerTextField];
+        UIColor *locationTextFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerTextField];
         _searchBarTextField = [[UITextField alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.leftView.frame), 0.0f, CGRectGetMinX(self.clearView.frame) - CGRectGetMaxX(self.leftView.frame) - 8.0f, CGRectGetHeight(self.searchBarView.frame))]; //width -8.0f for gap between textfield and clear view.
         self.searchBarTextField.backgroundColor = [UIColor whiteColor];
         self.searchBarTextField.layer.cornerRadius = 4.0f;
-        self.searchBarTextField.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        [self.searchBarTextField setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
+        self.searchBarTextField.font = locationTextFieldFont;
+        self.searchBarTextField.textColor = locationTextFieldColor;
+        [self.searchBarTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         [self.searchBarView addSubview:self.searchBarTextField];
         self.searchBarTextField.delegate = self;
     }
@@ -180,7 +184,7 @@
 #pragma mark - Setter
 - (void)setPlaceholder:(NSString *)placeholder {
     _placeholder = placeholder;
-    UIColor *placeholderColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+    UIColor *placeholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerTextFieldPlaceholder];
     NSDictionary *placeholderAttributes = @{NSForegroundColorAttributeName:placeholderColor};
     NSAttributedString *attributedPlaceholder = [[NSAttributedString alloc] initWithString:self.placeholder attributes:placeholderAttributes];
     self.searchBarTextField.attributedPlaceholder = attributedPlaceholder;
@@ -260,26 +264,26 @@
         if (active) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 1.0f;
-                self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-                self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+                self.searchBarView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive].CGColor;
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_E4].CGColor;
+                self.searchBarView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
             }];
         }
     }
     else {
         if (active) {
             self.shadowView.alpha = 1.0f;
-            self.shadowView.layer.shadowColor = [[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR] colorWithAlphaComponent:0.24f].CGColor;
-            self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_TEXT_FIELD_ACTIVE_BORDER_COLOR].CGColor;
+            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+            self.searchBarView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive].CGColor;
         }
         else {
             self.shadowView.alpha = 0.0f;
-            self.searchBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_E4].CGColor;
+            self.searchBarView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
         }
     }
 }

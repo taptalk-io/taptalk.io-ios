@@ -84,8 +84,12 @@
     _isProcessingQRCode = YES;
     [TAPUtil tapticNotificationFeedbackGeneratorWithType:UINotificationFeedbackTypeSuccess];
     
+    //remove key id: or xc: to obtain userID
+    NSString *obtainedUserID = [code stringByReplacingOccurrencesOfString:@"id:" withString:@""];
+    obtainedUserID = [obtainedUserID stringByReplacingOccurrencesOfString:@"xc:" withString:@""];
+    
     TAPScanQRCodePopupViewController *scanQRCodePopupViewController = [[TAPScanQRCodePopupViewController alloc] init];
-    scanQRCodePopupViewController.code = code;
+    scanQRCodePopupViewController.code = obtainedUserID;
     scanQRCodePopupViewController.previousNavigationController = self.navigationController;
     scanQRCodePopupViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:scanQRCodePopupViewController animated:NO completion:^{
@@ -119,7 +123,7 @@
         NSString *userID = [TAPDataManager getActiveUser].userID;
         userID = [TAPUtil nullToEmptyString:userID];
         
-        NSString *qrString = [NSString stringWithFormat:@"%@", userID];
+        NSString *qrString = [NSString stringWithFormat:@"id:%@", userID];
         CIImage *image = [self createQRForString:qrString];
         
         CGAffineTransform transform = CGAffineTransformMakeScale(20.0f, 20.0f); // Scale by 20 times along both dimensions

@@ -122,11 +122,11 @@
                             <constraint firstAttribute="trailing" secondItem="6KA-ZG-Sca" secondAttribute="trailing" constant="12" id="yHM-Z9-1pi"/>
                         </constraints>
                     </view>
-                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSendingChat" translatesAutoresizingMaskIntoConstraints="NO" id="bsb-5a-RRu">
-                        <rect key="frame" x="308" y="30" width="10" height="11"/>
+                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="bsb-5a-RRu">
+                        <rect key="frame" x="308" y="25" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="10" id="YN4-TS-QaN"/>
-                            <constraint firstAttribute="height" constant="11" id="rWe-Mz-4pf"/>
+                            <constraint firstAttribute="width" constant="16" id="YN4-TS-QaN"/>
+                            <constraint firstAttribute="height" constant="16" id="rWe-Mz-4pf"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryChat" translatesAutoresizingMaskIntoConstraints="NO" id="zqH-C3-PiX">
@@ -200,7 +200,7 @@
     </objects>
     <resources>
         <image name="TAPIconReplyChat" width="28" height="28"/>
-        <image name="TAPIconRetryChat" width="16" height="16"/>
-        <image name="TAPIconSendingChat" width="10" height="11"/>
+        <image name="TAPIconRetryChat" width="22" height="22"/>
+        <image name="TAPIconSending" width="20" height="20"/>
     </resources>
 </document>

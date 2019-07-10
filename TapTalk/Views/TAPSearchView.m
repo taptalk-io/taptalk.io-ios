@@ -27,19 +27,37 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        self.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
+        UIFont *sectionHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
         _recentSearchLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, 150.0f, 13.0f)];
-        self.recentSearchLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
-        self.recentSearchLabel.text = @"RECENT SEARCHES";
-        self.recentSearchLabel.textColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
+        self.recentSearchLabel.font = sectionHeaderLabelFont;
+        self.recentSearchLabel.textColor = sectionHeaderLabelColor;
+        self.recentSearchLabel.text = NSLocalizedString(@"RECENT", @"");
+        
+        NSMutableAttributedString *recentSearchLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.recentSearchLabel.text];
+        [recentSearchLabelAttributedString addAttribute:NSKernAttributeName
+                                             value:@1.5f
+                                             range:NSMakeRange(0, [self.recentSearchLabel.text length])];
+        
+        self.recentSearchLabel.attributedText = recentSearchLabelAttributedString;
         [self addSubview:self.recentSearchLabel];
         
         _clearHistoryLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 150.0f, 8.0f, 150.0f, 13.0f)];
-        self.clearHistoryLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:13.0f];
+        self.clearHistoryLabel.font = sectionHeaderLabelFont;
         self.clearHistoryLabel.text = @"CLEAR HISTORY";
-        self.clearHistoryLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.clearHistoryLabel.textColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchClearHistoryLabel];
         self.clearHistoryLabel.textAlignment = NSTextAlignmentRight;
+        
+        NSMutableAttributedString *clearHistoryLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.clearHistoryLabel.text];
+        
+        [clearHistoryLabelAttributedString addAttribute:NSKernAttributeName
+                                                  value:@1.5f
+                                                  range:NSMakeRange(0, [self.clearHistoryLabel.text length])];
+        
+        self.clearHistoryLabel.attributedText = clearHistoryLabelAttributedString;
+
         CGSize clearHistorySize = [self.clearHistoryLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.clearHistoryLabel.frame))];
         self.clearHistoryLabel.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - clearHistorySize.width, CGRectGetMinY(self.clearHistoryLabel.frame), clearHistorySize.width, CGRectGetHeight(self.clearHistoryLabel.frame));
         [self addSubview:self.clearHistoryLabel];
@@ -48,22 +66,22 @@
         [self addSubview:self.clearHistoryButton];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.recentSearchLabel.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:@"E4E4E4"];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self addSubview:self.separatorView];
         
         _recentSearchTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight(self.frame) - CGRectGetMaxY(self.separatorView.frame))];
         self.recentSearchTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        self.recentSearchTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.recentSearchTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self addSubview:self.recentSearchTableView];
         
         _searchResultTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame)) style:UITableViewStyleGrouped];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        self.searchResultTableView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.searchResultTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.searchResultTableView.alpha = 0.0f;
         [self addSubview:self.searchResultTableView];
         
         _emptyStateView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
-        self.emptyStateView.backgroundColor = [TAPUtil getColor:TAP_COLOR_WHITE_F3];
+        self.emptyStateView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.emptyStateView.alpha = 0.0f;
         [self addSubview:self.emptyStateView];
         
@@ -83,23 +101,27 @@
         //                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:15.0f]
         //                                      range:range];
         //        self.emptyStateLabel.attributedText = emptyAttribuetdString;
-        //        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        //        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_19];
         //        self.emptyStateLabel.numberOfLines = 2;
         //        self.emptyStateLabel.textAlignment = NSTextAlignmentCenter;
         //        [self.emptyStateView addSubview:self.emptyStateLabel];
         //END DV Note
         
+        UIFont *infoLabelTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelTitle];
+        UIColor *infoLabelTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelTitle];
+        UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+
         _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 60.0f)];
         self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
-        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.emptyStateLabel.font = infoLabelBodyFont;
         NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //set attribute
         NSMutableAttributedString *emptyAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.emptyStateLabel.text];
         [emptyAttribuetdString addAttribute:NSFontAttributeName
-                                      value:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:24.0f]
+                                      value:infoLabelTitleFont
                                       range:range];
         self.emptyStateLabel.attributedText = emptyAttribuetdString;
-        self.emptyStateLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.emptyStateLabel.textColor = infoLabelTitleColor;
         self.emptyStateLabel.numberOfLines = 2;
         self.emptyStateLabel.textAlignment = NSTextAlignmentCenter;
         [self.emptyStateView addSubview:self.emptyStateLabel];

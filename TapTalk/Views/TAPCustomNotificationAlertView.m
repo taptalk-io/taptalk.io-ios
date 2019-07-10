@@ -60,14 +60,18 @@
         
         CGFloat nameLabelWidth = CGRectGetWidth(self.contentView.frame) - CGRectGetMaxX(self.profilePictureImage.frame) - profilePictureImageRightGap - nameLabelRightGap - CGRectGetWidth(self.contentImageView.frame) - paddingRight;
         
+        UIFont *customNotificationTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontCustomNotificationTitleLabel];
+        UIColor *customNotificationTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorCustomNotificationTitleLabel];
         _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profilePictureImage.frame) + profilePictureImageRightGap, 15.0f, nameLabelWidth, 18.0f)];
-        self.nameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
-        self.nameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.nameLabel.font = customNotificationTitleFont;
+        self.nameLabel.textColor = customNotificationTitleColor;
         [self.contentView addSubview:self.nameLabel];
         
+        UIFont *customNotificationContentFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontCustomNotificationContentLabel];
+        UIColor *customNotificationContentColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorCustomNotificationContentLabel];
         _messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.nameLabel.frame), CGRectGetMaxY(self.nameLabel.frame), CGRectGetWidth(self.nameLabel.frame), 18.0f)];
-        self.messageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.messageLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
+        self.messageLabel.font = customNotificationContentFont;
+        self.messageLabel.textColor = customNotificationContentColor;
         [self.contentView addSubview:self.messageLabel];
         
         _notificationButton = [[UIButton alloc] initWithFrame:self.contentView.frame];
@@ -89,7 +93,6 @@
         
         _secondaryContentView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, contentViewYPosition, CGRectGetWidth(self.frame) - 32.0f, CGRectGetHeight(self.frame) - contentViewYPosition)];
         self.secondaryContentView.backgroundColor = [UIColor whiteColor];
-//        self.secondaryContentView.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.3]; //DV Temp
         self.secondaryContentView.layer.cornerRadius = 6.0f;
         self.secondaryContentView.clipsToBounds = YES;
         [self.secondNotificationView addSubview:self.secondaryContentView];
@@ -107,13 +110,13 @@
         [self.secondaryContentView addSubview:self.secondaryContentImageView];
         
         _secondaryNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.secondaryProfilePictureImage.frame) + profilePictureImageRightGap, 15.0f, nameLabelWidth, 18.0f)];
-        self.secondaryNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
-        self.secondaryNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
+        self.secondaryNameLabel.font = customNotificationTitleFont;
+        self.secondaryNameLabel.textColor = customNotificationTitleColor;
         [self.secondaryContentView addSubview:self.secondaryNameLabel];
         
         _secondaryMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.secondaryNameLabel.frame), CGRectGetMaxY(self.secondaryNameLabel.frame), CGRectGetWidth(self.secondaryNameLabel.frame), 18.0f)];
-        self.secondaryMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.secondaryMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
+        self.secondaryMessageLabel.font = customNotificationContentFont;
+        self.secondaryMessageLabel.textColor = customNotificationContentColor;
         [self.secondaryContentView addSubview:self.secondaryMessageLabel];
         
         _secondaryNotificationButton = [[UIButton alloc] initWithFrame:self.secondaryContentView.frame];

@@ -46,7 +46,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonDidTapped)];
+    UIImage *closeImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    closeImage = [closeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
+    _leftBarButton = [[UIBarButtonItem alloc] initWithImage:closeImage style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonDidTapped)];
+    self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton];
     [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     
     self.photoAlbumListView.tableView.dataSource = self;
@@ -56,8 +59,6 @@
     _collectionArray = [[NSMutableArray alloc] init];
     _selectedMediaDataArray = [[NSMutableArray alloc] init];
     _selectedImagePositionDictionary = [[NSMutableDictionary alloc] init];
-    
-    [self.photoAlbumListView setChooseItemLabelWithItemCount:self.currentTotalImageData];
     
     [self fetchAlbumData];
 }
@@ -74,7 +75,7 @@
 #pragma mark - Data Source
 #pragma mark UITableView
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 44.0f;
+    return 70.0f;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -107,13 +108,9 @@
     
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-//    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
     
     if(indexPath.section == 0) {
         //Smart Album
-//        PHAssetCollection *collection = (PHAssetCollection *)[self.smartAlbumArray objectAtIndex:indexPath.row];
-//        PHFetchResult *assetsFetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
-        
         NSDictionary *collectionDictionary = [self.smartAlbumArray objectAtIndex:indexPath.row];
         PHAssetCollection *collection = [collectionDictionary objectForKey:@"collection"];
         PHFetchResult *assetsFetchResult = [collectionDictionary objectForKey:@"fetchResult"];
@@ -133,10 +130,6 @@
     }
     else if(indexPath.section == 1) {
         //User Collection
-//        PHAssetCollection *collection = (PHAssetCollection *)[self.collectionArray objectAtIndex:indexPath.row];
-//
-//        PHFetchResult *assetsFetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
-        
         NSDictionary *collectionDictionary = [self.collectionArray objectAtIndex:indexPath.row];
         PHAssetCollection *collection = [collectionDictionary objectForKey:@"collection"];
         PHFetchResult *assetsFetchResult = [collectionDictionary objectForKey:@"fetchResult"];
@@ -183,7 +176,7 @@
         //smart album
         TAPImageSelectViewController *imageSelectViewController = [[TAPImageSelectViewController alloc] init];
         imageSelectViewController.delegate = self;
-        imageSelectViewController.currentTotalImageData = self.currentTotalImageData;
+        imageSelectViewController.currentTotalImageData = [self.selectedMediaDataArray count];
         [imageSelectViewController setImageSelectViewControllerType:ImageSelectViewControllerTypeGalleryAlbum];
         [imageSelectViewController setImageSelectViewControllerNavigateType:ImageSelectViewControllerNavigateTypePush];
         
@@ -193,8 +186,6 @@
         else if (self.photoAlbumListViewControllerType == TAPPhotoAlbumListViewControllerTypeAddMore) {
             [imageSelectViewController setImageSelectViewControllerContinueType:ImageSelectViewControllerContinueTypeAddMore];
         }
-        
-//        imageSelectViewController.cameraRollCollection = [self.smartAlbumArray objectAtIndex:indexPath.row];
         
         NSDictionary *collectionDictionary = [self.smartAlbumArray objectAtIndex:indexPath.row];
         PHAssetCollection *collection = [collectionDictionary objectForKey:@"collection"];
@@ -211,7 +202,7 @@
         //user collection
         TAPImageSelectViewController *imageSelectViewController = [[TAPImageSelectViewController alloc] init];
         imageSelectViewController.delegate = self;
-        imageSelectViewController.currentTotalImageData = self.currentTotalImageData;
+        imageSelectViewController.currentTotalImageData = [self.selectedMediaDataArray count];
         [imageSelectViewController setImageSelectViewControllerType:ImageSelectViewControllerTypeGalleryAlbum];
         [imageSelectViewController setImageSelectViewControllerNavigateType:ImageSelectViewControllerNavigateTypePush];
         
@@ -221,7 +212,6 @@
         else if (self.photoAlbumListViewControllerType == TAPPhotoAlbumListViewControllerTypeAddMore) {
             [imageSelectViewController setImageSelectViewControllerContinueType:ImageSelectViewControllerContinueTypeAddMore];
         }
-//        imageSelectViewController.cameraRollCollection = [self.collectionArray objectAtIndex:indexPath.row];
         
         NSDictionary *collectionDictionary = [self.collectionArray objectAtIndex:indexPath.row];
         PHAssetCollection *collection = [collectionDictionary objectForKey:@"collection"];
@@ -275,7 +265,6 @@
     
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-//    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
     
     self.smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:albumOptions];
     self.userCollections = [PHCollectionList fetchTopLevelUserCollectionsWithOptions:nil];
@@ -289,24 +278,16 @@
     for (PHAssetCollection *collection in self.smartAlbums) {
         PHFetchResult *assetsFetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
         if(assetsFetchResult.count > 0 && (![[collection.localizedTitle lowercaseString] isEqualToString:@"camera roll"] && ![[collection.localizedTitle lowercaseString] isEqualToString:@"all photos"] && collection.assetCollectionSubtype != 209 && collection.assetCollectionSubtype != 1000000201)) {
-//            NSLog(@"Collection subtype %ld Album %@", collection.assetCollectionSubtype, collection.localizedTitle);
-//            [filteredSmartAlbumArray addObject:collection];
-            
             NSMutableDictionary *collectionDictionary = [NSMutableDictionary dictionary];
             [collectionDictionary setObject:assetsFetchResult forKey:@"fetchResult"];
             [collectionDictionary setObject:collection forKey:@"collection"];
-            
             [filteredSmartAlbumArray addObject:collectionDictionary];
         }
         
         if([[collection.localizedTitle lowercaseString] isEqualToString:@"camera roll"] || [[collection.localizedTitle lowercaseString] isEqualToString:@"all photos"] || collection.assetCollectionSubtype == 209) {
-//            NSLog(@"Collection subtype %ld Album %@", collection.assetCollectionSubtype, collection.localizedTitle);
-//            [filteredSmartAlbumArray insertObject:collection atIndex:0];
-            
             NSMutableDictionary *collectionDictionary = [NSMutableDictionary dictionary];
             [collectionDictionary setObject:assetsFetchResult forKey:@"fetchResult"];
             [collectionDictionary setObject:collection forKey:@"collection"];
-            
             [filteredSmartAlbumArray insertObject:collectionDictionary atIndex:0];
         }
     }
@@ -319,8 +300,6 @@
         if ([collection isKindOfClass:[PHAssetCollection class]]) {
             PHFetchResult *assetsFetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
             if(assetsFetchResult.count > 0) {
-//                [filteredCollectionArray addObject:collection];
-                
                 NSMutableDictionary *collectionDictionary = [NSMutableDictionary dictionary];
                 [collectionDictionary setObject:assetsFetchResult forKey:@"fetchResult"];
                 [collectionDictionary setObject:collection forKey:@"collection"];

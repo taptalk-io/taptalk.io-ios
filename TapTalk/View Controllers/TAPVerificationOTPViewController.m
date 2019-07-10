@@ -229,6 +229,7 @@
         if (isRegistered) {
             //Already Registered
             [[TapTalk sharedInstance] setAuthTicket:ticket success:^{
+                [self.verificationOTPView endEditing:YES];
                 [self dismissViewControllerAnimated:YES completion:nil];
                 [[TAPContactManager sharedManager] saveUserCountryCode:self.country.countryCallingCode];
             } failure:^(NSError *error) {
@@ -252,6 +253,9 @@
         }
         else {
             //Show Register Screen
+            
+            [self.verificationOTPView endEditing:YES];
+            
             TAPRegisterViewController *registerViewController = [[TAPRegisterViewController alloc] init];
             registerViewController.country = self.country;
             registerViewController.phoneNumber = self.phoneNumber;

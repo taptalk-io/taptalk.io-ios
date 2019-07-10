@@ -2,7 +2,7 @@
 //  TAPKeyboardViewController.h
 //  TapTalk
 //
-//  Created by Welly Kencana on 10/10/18.
+//  Created by Dominic Vedericho on 10/10/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 

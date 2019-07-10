@@ -12,6 +12,7 @@
 #import "TAPQuoteModel.h"
 #import "TAPReplyToModel.h"
 #import "TAPForwardFromModel.h"
+#import "TAPGroupTargetModel.h"
 #import "Configs.h"
 #import "TAPChatMessageType.h"
 
@@ -31,6 +32,8 @@
 @property (nonatomic, strong) TAPQuoteModel *quote;
 @property (nonatomic, strong) TAPReplyToModel *replyTo;
 @property (nonatomic, strong) TAPForwardFromModel *forwardFrom;
+@property (nonatomic, strong) NSString *action; //added in schema 4 migration
+@property (nonatomic, strong) TAPGroupTargetModel *target; //added in schema 4 migration
 @property (nonatomic, strong) NSDictionary *data;
 @property (nonatomic) BOOL isDeleted;
 @property (nonatomic) BOOL isSending;
@@ -40,7 +43,6 @@
 @property (nonatomic) BOOL isHidden;
 
 //If add new property, don't forget to update copyMessageModel method
-
 + (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type;
 + (instancetype)createMessageWithUser:(TAPUserModel *)user created:(NSNumber *)created room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type;
 

@@ -56,6 +56,16 @@
     self.backgroundColor = [UIColor clearColor];
     UIView *currentView = [[[TAPUtil currentBundle] loadNibNamed:[[self class] description] owner:self options:nil] lastObject];
     
+    UIFont *chatComposerPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextFieldPlaceholder];
+    UIColor *chatComposerPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextFieldPlaceholder];
+    self.placeholderLabel.textColor = chatComposerPlaceholderColor;
+    self.placeholderLabel.font = chatComposerPlaceholderFont;
+    
+    UIFont *chatComposerFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextField];
+    UIColor *chatComposerColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField];
+    self.textView.font = chatComposerFont;
+    self.textView.textColor = chatComposerColor;
+    
     //For iOS 7+ - Handle jumping text
     NSString *requiredSystemVersion = @"7.0";
     NSString *currentSystemVersion = [[UIDevice currentDevice] systemVersion];
@@ -92,7 +102,7 @@
         self.textView.keyboardAppearance = UIKeyboardAppearanceDefault;
         self.textView.returnKeyType = UIReturnKeyDefault;
         self.textView.inputView.autoresizingMask = YES;
-        [self.textView setTintColor:[TAPUtil getColor:TAP_COLOR_TEXT_FIELD_POINTER_COLOR]];
+        [self.textView setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
                 
         [currentView addSubview:self.textView];
         

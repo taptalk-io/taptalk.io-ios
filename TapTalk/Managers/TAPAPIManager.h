@@ -36,7 +36,17 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeRegister,
     TAPAPIManagerTypeAddContactByPhones,
     TAPAPIManagerTypeUploadUserPhoto,
-    TAPAPIManagerTypeUpdateUser
+    TAPAPIManagerTypeUpdateUser,
+    TAPAPIManagerTypeDeleteMessage,
+    TAPAPIManagerTypeCreateRoom,
+    TAPAPIManagerTypeUploadRoomPhoto,
+    TAPAPIManagerTypeUpdateRoom,
+    TAPAPIManagerTypeGetRoom,
+    TAPAPIManagerTypeAddRoomParticipants,
+    TAPAPIManagerTypeRemoveRoomParticipants,
+    TAPAPIManagerTypePromoteRoomAdmins,
+    TAPAPIManagerTypeDemoteRoomAdmins,
+    TAPAPIManagerTypeLeaveRoom
 };
 
 @interface TAPAPIManager : NSObject

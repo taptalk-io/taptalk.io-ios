@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0930"
+   LastUpgradeVersion = "1020"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BCE3DE68053C99B18AAD56BE1F98BD73"
+               BlueprintIdentifier = "E5B4BBC6DD552AC8943C7E22772FC1D3"
                BuildableName = "GoogleMaps"
                BlueprintName = "GoogleMaps"
                ReferencedContainer = "container:Pods.xcodeproj">

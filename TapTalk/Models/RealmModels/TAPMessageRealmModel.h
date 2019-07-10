@@ -73,4 +73,11 @@
 @property (nonatomic, strong) NSString *forwardFromMessageID;
 @property (nonatomic, strong) NSString *forwardFromLocalID;
 
+//Group Target
+@property (nonatomic, strong) NSString *action; //added in schema 4 migration
+@property (nonatomic, strong) NSString *groupTargetType; //added in schema 4 migration
+@property (strong, nonatomic) NSString *groupTargetID; //added in schema 4 migration
+@property (strong, nonatomic) NSString *groupTargetXCID; //added in schema 4 migration
+@property (strong, nonatomic) NSString *groupTargetName; //added in schema 4 migration
+
 @end

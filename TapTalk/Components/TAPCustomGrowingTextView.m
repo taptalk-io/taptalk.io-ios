@@ -74,10 +74,13 @@
         NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:self.bounds.size];
         [layoutManager addTextContainer:textContainer];
         
+        UIFont *textViewFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewCaption];
+        UIColor *textViewColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewCaption];
         _textView = [[TAPCustomTextView alloc] initWithFrame:self.bounds textContainer:textContainer];
         self.textView.delegate = self;
         self.textView.textContainer.lineFragmentPadding = 0;
-        self.textView.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+        self.textView.font = textViewFont;
+        self.textView.textColor = textViewColor;
         self.textView.backgroundColor = [UIColor clearColor];
         self.textView.showsVerticalScrollIndicator = NO;
         self.textView.showsHorizontalScrollIndicator = NO;

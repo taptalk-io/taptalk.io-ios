@@ -2,7 +2,7 @@
 //  TAPRoomListTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 6/9/18.
+//  Created by Dominic Vedericho on 6/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -27,7 +27,7 @@
 @property (strong, nonatomic) UILabel *typingLabel;
 @property (strong, nonatomic) UIView *separatorView;
 @property (nonatomic) TAPMessageStatusType messageStatusType;
-@property (nonatomic) BOOL *isShouldForceUpdateUnreadBubble;
+@property (nonatomic) BOOL isShouldForceUpdateUnreadBubble;
 
 @end
 
@@ -40,12 +40,12 @@
     if (self) {
         _isShouldForceUpdateUnreadBubble = YES;
         
-        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 70.0f)];
+        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 74.0f)];
         [self.contentView addSubview:self.bgView];
         
         CGFloat leftPadding = 16.0f;
         CGFloat rightPadding = 16.0f;
-        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 9.0f, 52.0f, 52.0f)];
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.profileImageView.backgroundColor = [UIColor clearColor];
         self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
@@ -57,50 +57,62 @@
         self.expertIconImageView.alpha = 0.0f;
         [self.bgView addSubview:self.expertIconImageView];
         
-        _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - rightPadding, CGRectGetMinY(self.profileImageView.frame), 0.0f, 16.0f)];
-        self.timeLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.timeLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:11.0f];
+        UIFont *roomListTimeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListTime];
+        UIColor *roomListTimeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListTime];
+        _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - rightPadding, CGRectGetMinY(self.profileImageView.frame) + 4.0f, 0.0f, 16.0f)];
+        self.timeLabel.textColor = roomListTimeLabelColor;
+        self.timeLabel.font = roomListTimeLabelFont;
         [self.bgView addSubview:self.timeLabel];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
         self.muteImageView.alpha = 0.0f;
         self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bgView addSubview:self.muteImageView];
-        
+
+        UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
+        UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
         _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 8.0f, CGRectGetMinX(self.muteImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 20.0f)];
-        self.roomNameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.roomNameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:16.0f];
+        self.roomNameLabel.textColor = roomListNameLabelColor;
+        self.roomNameLabel.font = roomListNameLabelFont;
         [self.bgView addSubview:self.roomNameLabel];
         self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
         
-        _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 12.0f - 24.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 24.0f, 24.0f, 24.0f)];
+        UIFont *lastSenderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGroupRoomListSenderName];
+        UIColor *lastSenderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGroupRoomListSenderName];
+        _lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.roomNameLabel.frame), 16.0f)];
+        self.lastSenderLabel.textColor = lastSenderLabelColor;
+        self.lastSenderLabel.font = lastSenderLabelFont;
+        [self.bgView addSubview:self.lastSenderLabel];
+        
+        _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 20.0f, 20.0f, 20.0f)];
+        self.messageStatusImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.messageStatusImageView.alpha = 0.0f;
         [self.bgView addSubview:self.messageStatusImageView];
         
         _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 0.0f, 20.0f)];
         self.bubbleUnreadView.clipsToBounds = YES;
+        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListUnreadBadgeBackground];
         self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
         [self.bgView addSubview:self.bubbleUnreadView];
         
+        UIFont *roomListUnreadBadgeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListUnreadBadgeLabel];
+        UIColor *roomListUnreadBadgeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListUnreadBadgeLabel];
         _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
-        self.numberOfUnreadMessageLabel.textColor = [UIColor whiteColor];
+        self.numberOfUnreadMessageLabel.textColor = roomListUnreadBadgeLabelColor;
         self.numberOfUnreadMessageLabel.textAlignment = NSTextAlignmentCenter;
-        self.numberOfUnreadMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:11.0f];
+        self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
+        UIFont *roomListMessageLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListMessage];
+        UIColor *roomListMessageLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListMessage];
         _lastMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame) - 50.0f - 4.0f, 42.0f)];
-        self.lastMessageLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.lastMessageLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f];
+        self.lastMessageLabel.textColor = roomListMessageLabelColor;
+        self.lastMessageLabel.font = roomListMessageLabelFont;
         self.lastMessageLabel.numberOfLines = 2;
         [self.bgView addSubview:self.lastMessageLabel];
         
-        self.lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 17.0f)];
-        self.lastSenderLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_2C];
-        self.lastSenderLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        [self.bgView addSubview:self.lastSenderLabel];
-        
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.bgView addSubview:self.separatorView];
         
         _typingView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame) + 2.0f, CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
@@ -117,8 +129,8 @@
         
         _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
         self.typingLabel.text = NSLocalizedString(@"typing", @"");
-        self.typingLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:13.0f];
-        self.typingLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
+        self.typingLabel.font = roomListMessageLabelFont;
+        self.typingLabel.textColor = roomListMessageLabelColor;
         [self.typingLabel sizeToFit];
         self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
         [self.typingView addSubview:self.typingLabel];
@@ -140,16 +152,31 @@
     
     //DV Temp
     BOOL isExpert = NO;
-    BOOL isGroup = NO;
-    NSString *lastSender = message.room.name; //DV Note - For Group Only
     BOOL isMuted = NO;
-    NSString *profileImageURL = message.room.imageURL.thumbnail;
-//    NSString *profileImageURL = roomList.lastMessage.user.imageURL.thumbnail;
     //END DV Temp
+
+    BOOL isGroup = NO;
+    NSString *lastSender = @"";
     
+    NSString *profileImageURL = message.room.imageURL.thumbnail;
     NSInteger numberOfUnreadMessage = roomList.numberOfUnreadMessages;
     
     TAPRoomModel *currentRoom = message.room;
+    
+    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel) {
+        //Group / Channel
+        isGroup = YES;
+    }
+    
+    if (isGroup) {
+        TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
+        if ([currentActiveUser.userID isEqualToString:message.user.userID]) {
+            lastSender = NSLocalizedString(@"You", @"");
+        }
+        else {
+            lastSender = message.user.fullname;
+        }
+    }
     
     NSString *roomName = currentRoom.name;
     roomName = [TAPUtil nullToEmptyString:roomName];
@@ -194,8 +221,6 @@
         timeString = dateString;
     }
     
-    NSString *lastMessage = message.body;
-    
     TAPMessageStatusType statusType = TAPMessageStatusTypeNone;
     NSString *currentUserID = [TAPChatManager sharedManager].activeUser.userID;
     if ([message.user.userID isEqualToString:currentUserID]) {
@@ -212,6 +237,9 @@
         else if (message.isFailedSend) {
             statusType = TAPMessageStatusTypeFailed;
         }
+        else if (message.isDeleted) {
+            statusType = TAPMessageStatusTypeDeleted;
+        }
         else {
             statusType = TAPMessageStatusTypeSent;
         }
@@ -223,7 +251,14 @@
     self.messageStatusType = statusType;
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+        if (isGroup) {
+            //Group or Channel
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultGroupAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            //Personal
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+        }
     }
     else {
         [self.profileImageView setImageWithURLString:profileImageURL];
@@ -262,11 +297,11 @@
     
     if (self.messageStatusType == TAPMessageStatusTypeNone) {
         //resize
-        self.messageStatusImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 12.0f, CGRectGetMinY(self.messageStatusImageView.frame), 0.0f, 0.0f);
+        self.messageStatusImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetMinY(self.messageStatusImageView.frame), 0.0f, 0.0f);
     }
     else {
         //resize
-        self.messageStatusImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 12.0f - 24.0f, CGRectGetMinY(self.messageStatusImageView.frame), 24.0f, 24.0f);
+        self.messageStatusImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMinY(self.messageStatusImageView.frame), 20.0f, 20.0f);
     }
     
     switch (self.messageStatusType) {
@@ -284,6 +319,7 @@
                 self.messageStatusImageView.alpha = 1.0f;
             }
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSending]];
             break;
         }
         case TAPMessageStatusTypeSent:
@@ -295,6 +331,7 @@
                 self.messageStatusImageView.alpha = 1.0f;
             }
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSent]];
             break;
         }
         case TAPMessageStatusTypeDelivered:
@@ -306,6 +343,7 @@
                 self.messageStatusImageView.alpha = 1.0f;
             }
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
             break;
         }
         case TAPMessageStatusTypeRead:
@@ -317,6 +355,7 @@
                 self.messageStatusImageView.alpha = 1.0f;
             }
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
             break;
         }
         case TAPMessageStatusTypeFailed:
@@ -328,11 +367,77 @@
                 self.messageStatusImageView.alpha = 1.0f;
             }
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageFailed]];
+            break;
+        }
+        case TAPMessageStatusTypeDeleted:
+        {
+            if (numberOfUnreadMessage > 0) {
+                self.messageStatusImageView.alpha = 0.0f;
+            }
+            else {
+                self.messageStatusImageView.alpha = 1.0f;
+            }
+            self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDeleted]];
             break;
         }
         default:
             self.messageStatusImageView.alpha = 0.0f;
             break;
+    }
+    
+    //Set body label
+    NSString *lastMessage = @"";
+    if (message.isDeleted) {
+        NSString *lastMessageUserID = message.user.userID;
+        if ([lastMessageUserID isEqualToString:currentUserID]) {
+            //last message is from ourselves
+            lastMessage = NSLocalizedString(@"You deleted this message.", @"");
+        }
+        else {
+            lastMessage = NSLocalizedString(@"This message was deleted.", @"");
+        }
+        
+        self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDeleted]];
+        
+        if (numberOfUnreadMessage > 0) {
+            self.messageStatusImageView.alpha = 0.0f;
+            self.bubbleUnreadView.alpha = 1.0f;
+        }
+        else {
+            self.bubbleUnreadView.alpha = 0.0f;
+            self.messageStatusImageView.alpha = 1.0f;
+        }
+    }
+    else {
+        
+        lastMessage = message.body;
+        
+        //handle system message
+        
+        NSString *targetAction = message.action;
+        TAPGroupTargetModel *groupTarget = message.target;
+        NSString *targetName = groupTarget.targetName;
+        targetName = [TAPUtil nullToEmptyString:targetName];
+        
+        if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            lastMessage = [lastMessage stringByReplacingOccurrencesOfString:@"{{sender}}" withString:@"You"];
+            
+        }
+        else {
+            lastMessage = [lastMessage stringByReplacingOccurrencesOfString:@"{{sender}}" withString:message.user.fullname];
+        }
+        
+        if (groupTarget != nil) {
+            if ([groupTarget.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                lastMessage = [lastMessage stringByReplacingOccurrencesOfString:@"{{target}}" withString:@"you"];
+            }
+            else {
+                lastMessage = [lastMessage stringByReplacingOccurrencesOfString:@"{{target}}" withString:targetName];
+            }
+        }
     }
     
     //Check if cell is reused, forece update unread bubble
@@ -374,13 +479,6 @@
             
             self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
             self.bubbleUnreadView.alpha = 1.0f;
-            CAGradientLayer *gradient = [CAGradientLayer layer];
-            gradient.frame = self.bubbleUnreadView.bounds;
-            gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
-            gradient.startPoint = CGPointMake(0.0f, 0.0f);
-            gradient.endPoint = CGPointMake(0.0f, 1.0f);
-            gradient.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
-            [self.bubbleUnreadView.layer insertSublayer:gradient atIndex:0];
         }
     }
     
@@ -390,7 +488,7 @@
         
         //Last Sender
         self.lastSenderLabel.alpha = 1.0f;
-        self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastSenderLabel.frame), 17.0f);
+        self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastSenderLabel.frame), 16.0f);
         self.lastSenderLabel.text = lastSender;
         
         NSMutableDictionary *lastSenderAttributesDictionary = [NSMutableDictionary dictionary];
@@ -405,14 +503,14 @@
                                             range:NSMakeRange(0, [self.lastSenderLabel.text length])];
         self.lastSenderLabel.attributedText = lastSenderAttributedString;
         if (numberOfUnreadMessage > 0) {
-            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, 17.0f);
+            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, 16.0f);
         }
         else {
-            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, 17.0f);
+            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, 16.0f);
         }
         
         //Last Message
-        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMaxY(self.lastSenderLabel.frame) + 1.0f, CGRectGetWidth(self.lastMessageLabel.frame), 17.0f);
+        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMaxY(self.lastSenderLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 20.0f);
         self.lastMessageLabel.numberOfLines = 1;
         self.lastMessageLabel.text = lastMessage;
     }
@@ -447,7 +545,7 @@
     self.lastMessageLabel.attributedText = lastMessageAttributedString;
     
     //Resize lastMessageLabel
-    CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) -16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
+    CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
     if (numberOfUnreadMessage > 0) {
         self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, newLastMessageLabelSize.height);
     }
@@ -492,9 +590,11 @@
     [lastMessageStyle setLineSpacing:2];
     [lastMessageAttributesDictionary setObject:lastMessageStyle forKey:NSParagraphStyleAttributeName];
     
+
+    UIFont *roomListMessageLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListMessage];
     NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
-    [attributesDictionary setObject:[UIFont fontWithName:TAP_FONT_NAME_REGULAR size:14.0f] forKey:NSFontAttributeName];
-    [attributesDictionary setObject:[TAPUtil getColor:TAP_COLOR_REDPINK_57] forKey:NSForegroundColorAttributeName];
+    [attributesDictionary setObject:roomListMessageLabelFont forKey:NSFontAttributeName];
+    [attributesDictionary setObject:[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorError] forKey:NSForegroundColorAttributeName];
     [attributesDictionary setObject:lastMessageStyle forKey:NSParagraphStyleAttributeName];
     
     NSMutableAttributedString *lastMessageAttributedString = [[NSMutableAttributedString alloc] initWithString:[TAPUtil nullToEmptyString:self.lastMessageLabel.text]];
@@ -511,6 +611,15 @@
     //Resize lastMessageLabel
     CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) -16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
     self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, newLastMessageLabelSize.height);
+}
+
+- (void)setIsLastCellSeparator:(BOOL)isLastCell {
+    if (isLastCell) {
+         self.separatorView.frame = CGRectMake(0.0f, CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame), 1.0f);
+    }
+    else {
+        self.separatorView.frame = CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f);
+    }
 }
 
 @end

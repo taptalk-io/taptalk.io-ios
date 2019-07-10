@@ -77,7 +77,6 @@
 + (UIImage *)makeRoundCornerImage:(UIImage*)img width:(int)cornerWidth height:(int)cornerHeight;
 + (UIImage *)resizedImage:(UIImage *)inImage frame:(CGRect)thumbRect;
 + (UIImage *)imageByScaling:(BOOL)isScaling cropping:(BOOL)isCropping sourceImage:(UIImage *)sourceImage frame:(CGRect)targetFrame;
-+ (UIImage *)image:(UIImage *)image withTintColor:(UIColor *)color;
 
 #pragma mark - Encoding
 + (NSString *)urlEncodeFromString:(NSString *)sourceString;

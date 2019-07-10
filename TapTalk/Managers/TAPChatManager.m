@@ -93,32 +93,17 @@
 #pragma mark - Delegate
 #pragma mark TAPConnectionManager
 - (void)connectionManagerDidReceiveNewEmit:(NSString *)eventName parameter:(NSDictionary *)dataDictionary {
-    if ([eventName isEqualToString:kTAPEventOpenRoom]) {
-        
-    }
-    else if ([eventName isEqualToString:kTAPEventCloseRoom]) {
-        
-    }
-    else if ([eventName isEqualToString:kTAPEventNewMessage]) {
+    if ([eventName isEqualToString:kTAPEventNewMessage]) {
         [self receiveMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
     }
     else if ([eventName isEqualToString:kTAPEventUpdateMessage]) {
         [self receiveMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
-    }
-    else if ([eventName isEqualToString:kTAPEventDeleteMessage]) {
-        [self receiveMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
-    }
-    else if ([eventName isEqualToString:kTAPEventOpenMessage]) {
-        
     }
     else if ([eventName isEqualToString:kTAPEventStartTyping]) {
         [self receiveStartTypingFromSocketWithDataDictionary:dataDictionary];
     }
     else if ([eventName isEqualToString:kTAPEventStopTyping]) {
         [self receiveStopTypingFromSocketWithDataDictionary:dataDictionary];
-    }
-    else if ([eventName isEqualToString:kTAPEventAuthentication]) {
-        
     }
     else if ([eventName isEqualToString:kTAPEventUserOnline]) {
         [self receiveOnlineStatusFromSocketWithDataDictionary:dataDictionary];
@@ -1033,11 +1018,6 @@
                         [delegate chatManagerDidReceiveUpdateMessageInActiveRoom:[decryptedMessage copyMessageModel]];
                     }
                 }
-                else if ([eventName isEqualToString:kTAPEventDeleteMessage]) {
-                    if ([delegate respondsToSelector:@selector(chatManagerDidReceiveDeleteMessageInActiveRoom:)]) {
-                        [delegate chatManagerDidReceiveDeleteMessageInActiveRoom:[decryptedMessage copyMessageModel]];
-                    }
-                }
             }
         }
         else {
@@ -1051,11 +1031,6 @@
                 else if ([eventName isEqualToString:kTAPEventUpdateMessage]) {
                     if ([delegate respondsToSelector:@selector(chatManagerDidReceiveUpdateMessageOnOtherRoom:)]) {
                         [delegate chatManagerDidReceiveUpdateMessageOnOtherRoom:[decryptedMessage copyMessageModel]];
-                    }
-                }
-                else if ([eventName isEqualToString:kTAPEventDeleteMessage]) {
-                    if ([delegate respondsToSelector:@selector(chatManagerDidReceiveDeleteMessageOnOtherRoom:)]) {
-                        [delegate chatManagerDidReceiveDeleteMessageOnOtherRoom:[decryptedMessage copyMessageModel]];
                     }
                 }
             }

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="PTRootUI-Regular.ttf">
+            <string>PTRootUI-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="302" id="5gh-mz-SpJ" customClass="TAPMyChatDeletedBubbleTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="5gh-mz-SpJ" id="oPO-rY-DCk">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="99.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wyf-0L-wCJ">
+                        <rect key="frame" x="16" y="78.5" width="343" height="13"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="13" id="5GI-vo-UwJ"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
+                        <color key="textColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wfl-OL-tvu">
+                        <rect key="frame" x="125" y="62.5" width="16" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="16" id="9c2-E0-wGG"/>
+                            <constraint firstAttribute="height" constant="16" id="IZ6-gH-8sM"/>
+                        </constraints>
+                    </imageView>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZOq-VC-kEi">
+                        <rect key="frame" x="143" y="0.0" width="216" height="78.5"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconBlock" translatesAutoresizingMaskIntoConstraints="NO" id="k9P-XN-Ti0">
+                                <rect key="frame" x="6" y="28.5" width="22" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="22" id="S0M-93-zKZ"/>
+                                    <constraint firstAttribute="height" constant="22" id="YC4-WV-Aie"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You deleted this message." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8pH-cI-SAU" customClass="ZSWTappableLabel">
+                                <rect key="frame" x="28" y="13" width="176" height="52.5"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="15"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7K0-Qh-Vwr">
+                                <rect key="frame" x="0.0" y="0.0" width="216" height="78.5"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal">
+                                    <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="chatBubbleButtonDidTapped:" destination="5gh-mz-SpJ" eventType="touchUpInside" id="mjh-uI-kCg"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="7K0-Qh-Vwr" secondAttribute="bottom" id="2gc-Lg-J6W"/>
+                            <constraint firstAttribute="trailing" secondItem="7K0-Qh-Vwr" secondAttribute="trailing" id="8Cf-oz-Ygu"/>
+                            <constraint firstAttribute="trailing" secondItem="8pH-cI-SAU" secondAttribute="trailing" constant="12" id="ANj-8x-k48"/>
+                            <constraint firstItem="k9P-XN-Ti0" firstAttribute="centerY" secondItem="ZOq-VC-kEi" secondAttribute="centerY" id="S0J-AY-Pj8"/>
+                            <constraint firstItem="7K0-Qh-Vwr" firstAttribute="leading" secondItem="ZOq-VC-kEi" secondAttribute="leading" id="VKd-E5-eXy"/>
+                            <constraint firstItem="8pH-cI-SAU" firstAttribute="top" secondItem="ZOq-VC-kEi" secondAttribute="top" constant="13" id="cGu-lP-68Z"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="45" id="cTI-cc-JRE"/>
+                            <constraint firstItem="8pH-cI-SAU" firstAttribute="leading" secondItem="k9P-XN-Ti0" secondAttribute="trailing" id="gZd-0y-usd"/>
+                            <constraint firstAttribute="bottom" secondItem="8pH-cI-SAU" secondAttribute="bottom" constant="13" id="mUF-Qy-MmJ"/>
+                            <constraint firstItem="k9P-XN-Ti0" firstAttribute="leading" secondItem="ZOq-VC-kEi" secondAttribute="leading" constant="6" id="mdf-Wl-Ujg"/>
+                            <constraint firstItem="7K0-Qh-Vwr" firstAttribute="top" secondItem="ZOq-VC-kEi" secondAttribute="top" id="oEs-qg-1i4"/>
+                        </constraints>
+                    </view>
+                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="4wh-Pn-xVV">
+                        <rect key="frame" x="363" y="62.5" width="10" height="11"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="10" id="CsG-4K-dN9"/>
+                            <constraint firstAttribute="height" constant="11" id="dRF-0L-bwB"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="ZOq-VC-kEi" secondAttribute="trailing" constant="16" id="0T2-Zt-l1t"/>
+                    <constraint firstItem="Wyf-0L-wCJ" firstAttribute="top" secondItem="ZOq-VC-kEi" secondAttribute="bottom" priority="999" id="Ham-ai-4pQ"/>
+                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="leading" secondItem="wfl-OL-tvu" secondAttribute="trailing" constant="2" id="QkI-rk-dl1"/>
+                    <constraint firstItem="Wyf-0L-wCJ" firstAttribute="leading" secondItem="oPO-rY-DCk" secondAttribute="leading" constant="16" id="UBH-46-8BW"/>
+                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="trailing" secondItem="Wyf-0L-wCJ" secondAttribute="trailing" id="Vd6-v0-KQd"/>
+                    <constraint firstItem="4wh-Pn-xVV" firstAttribute="bottom" secondItem="ZOq-VC-kEi" secondAttribute="bottom" constant="-5" id="Vfm-Ob-uua"/>
+                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="top" secondItem="oPO-rY-DCk" secondAttribute="top" id="bOJ-DZ-CVB"/>
+                    <constraint firstItem="4wh-Pn-xVV" firstAttribute="leading" secondItem="ZOq-VC-kEi" secondAttribute="trailing" constant="4" id="fQe-5V-ktF"/>
+                    <constraint firstAttribute="bottom" secondItem="Wyf-0L-wCJ" secondAttribute="bottom" constant="8" id="fkU-iL-CFW"/>
+                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="oPO-rY-DCk" secondAttribute="leading" constant="80" id="x0y-5L-fHn"/>
+                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="bottom" secondItem="wfl-OL-tvu" secondAttribute="bottom" id="zFP-Rt-Y5Q"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="bubbleLabel" destination="8pH-cI-SAU" id="zRQ-tn-MmF"/>
+                <outlet property="bubbleView" destination="ZOq-VC-kEi" id="WSQ-UN-Uo8"/>
+                <outlet property="chatBubbleButton" destination="7K0-Qh-Vwr" id="KDL-QI-7oX"/>
+                <outlet property="chatBubbleRightConstraint" destination="0T2-Zt-l1t" id="YMk-yn-eJX"/>
+                <outlet property="deletedIconImageView" destination="k9P-XN-Ti0" id="W9R-iv-Miz"/>
+                <outlet property="sendingIconBottomConstraint" destination="Vfm-Ob-uua" id="kmE-0V-N2K"/>
+                <outlet property="sendingIconImageView" destination="4wh-Pn-xVV" id="TNl-4u-Sps"/>
+                <outlet property="sendingIconLeftConstraint" destination="fQe-5V-ktF" id="6AS-zx-BBq"/>
+                <outlet property="statusIconBottomConstraint" destination="zFP-Rt-Y5Q" id="fT8-fF-he6"/>
+                <outlet property="statusIconImageView" destination="wfl-OL-tvu" id="yB1-9G-NTU"/>
+                <outlet property="statusIconRightConstraint" destination="QkI-rk-dl1" id="RoA-tT-OTd"/>
+                <outlet property="statusLabel" destination="Wyf-0L-wCJ" id="q8w-sL-E56"/>
+                <outlet property="statusLabelHeightConstraint" destination="5GI-vo-UwJ" id="0Yi-fY-llL"/>
+                <outlet property="statusLabelTopConstraint" destination="Ham-ai-4pQ" id="722-eA-1Xe"/>
+            </connections>
+            <point key="canvasLocation" x="416.80000000000001" y="219.04047976011995"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="TAPIconBlock" width="22" height="22"/>
+        <image name="TAPIconSending" width="20" height="20"/>
+    </resources>
+</document>

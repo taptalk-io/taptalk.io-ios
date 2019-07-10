@@ -2,7 +2,7 @@
 //  TAPCreateGroupSubjectViewController.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 19/9/18.
+//  Created by Dominic Vedericho on 19/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -11,9 +11,17 @@
 
 #import "TAPContactCollectionViewCell.h"
 
-@interface TAPCreateGroupSubjectViewController () <UITextFieldDelegate, UICollectionViewDelegate, UICollectionViewDataSource>
+@interface TAPCreateGroupSubjectViewController () <TAPCustomTextFieldViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate>
 
 @property (strong, nonatomic) TAPCreateGroupSubjectView *createGroupSubjectView;
+@property (strong, nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
+@property (strong, nonatomic) UIImage *selectedImage;
+
+- (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
+- (void)backButtonDidTapped;
+- (void)cancelButtonDidTapped;
+- (void)changeButtonDidTapped;
+- (void)removePictureButtonDidTapped;
 
 @end
 
@@ -21,7 +29,7 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
-    _createGroupSubjectView = [[TAPCreateGroupSubjectView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
+    _createGroupSubjectView = [[TAPCreateGroupSubjectView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.view addSubview:self.createGroupSubjectView];
 }
 
@@ -29,7 +37,14 @@
     [super viewDidLoad];
     
     self.title = NSLocalizedString(@"Group Subject", @"");
-    [self showCustomBackButton];
+    self.createGroupSubjectView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/50)", [self.selectedContactArray count]];
+    NSMutableDictionary *selectedContactsTitleAttributesDictionary = [NSMutableDictionary dictionary];
+    CGFloat selectedContactsTitleLetterSpacing = 1.5f;
+    [selectedContactsTitleAttributesDictionary setObject:@(selectedContactsTitleLetterSpacing) forKey:NSKernAttributeName];
+    NSMutableAttributedString *selectedContactsTitleAttributedString = [[NSMutableAttributedString alloc] initWithString:self.createGroupSubjectView.selectedContactsTitleLabel.text];
+    [selectedContactsTitleAttributedString addAttributes:selectedContactsTitleAttributesDictionary
+                                              range:NSMakeRange(0, [self.createGroupSubjectView.selectedContactsTitleLabel.text length])];
+    self.createGroupSubjectView.selectedContactsTitleLabel.attributedText = selectedContactsTitleAttributedString;
     
     self.createGroupSubjectView.selectedContactsCollectionView.delegate = self;
     self.createGroupSubjectView.selectedContactsCollectionView.dataSource = self;
@@ -37,30 +52,39 @@
     self.createGroupSubjectView.bgScrollView.delegate = self;
     self.createGroupSubjectView.groupNameTextField.delegate = self;
     
-    [self.createGroupSubjectView.groupPictureButton addTarget:self action:@selector(groupPictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.createGroupSubjectView.createButton addTarget:self action:@selector(createButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    
-    if (self.groupModel.groupImage != nil) {
-        [self.createGroupSubjectView setGroupPictureImageViewWithImage:[UIImage imageNamed:self.groupModel.groupImage inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    [self.createGroupSubjectView.changePictureButton addTarget:self action:@selector(changeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.createGroupSubjectView.removePictureButton addTarget:self action:@selector(removePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.createGroupSubjectView.createButtonView.button addTarget:self action:@selector(createButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+     [self.createGroupSubjectView.backButton addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.createGroupSubjectView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+
+    if (![TAPUtil isEmptyString:self.roomModel.imageURL.thumbnail]) {
+        [self.createGroupSubjectView setGroupPictureWithImageURL:self.roomModel.imageURL.thumbnail];
+        if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+            //CS TEMP - hide remove picture button as the API is not ready yet
+            self.createGroupSubjectView.removePictureButton.alpha = 0.0f;
+        }
     }
-    if (self.groupModel.groupName != nil) {
-        self.createGroupSubjectView.groupNameTextField.text = self.groupModel.groupName;
-        
-        //hide placeholder
-        self.createGroupSubjectView.placeHolderLabel.alpha = 0.0f;
-        
+    if (![TAPUtil isEmptyString:self.roomModel.name]) {
+        self.createGroupSubjectView.groupNameTextField.textField.text = self.roomModel.name;
         //enable button create
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = self.createGroupSubjectView.createButton.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"CBCBCB"].CGColor, (id)[TAPUtil getColor:@"D9D9D9"].CGColor, nil];
-        gradient.startPoint = CGPointMake(0.0f, 0.0f);
-        gradient.endPoint = CGPointMake(0.0f, 1.0f);
-        gradient.cornerRadius = 6.0f;
-        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
-        [self.createGroupSubjectView.createButton.layer replaceSublayer:[self.createGroupSubjectView.createButton.layer.sublayers objectAtIndex:0] with:gradient];
-        self.createGroupSubjectView.createButton.userInteractionEnabled = YES;
+        [self.createGroupSubjectView.createButtonView setAsActiveState:YES animated:NO];
     }
+    else {
+        //enable button create
+        [self.createGroupSubjectView.createButtonView setAsActiveState:NO animated:NO];
+    }
+    
+    _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    [self.view addGestureRecognizer:self.tapGestureRecognizer];
+    
+    [self setTapCreateGroupSubjectControllerType:self.tapCreateGroupSubjectControllerType];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
 #pragma mark - Data Source
@@ -95,7 +119,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-    return 10; //WK Temp
+    return [self.selectedContactArray count];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -105,47 +129,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [collectionView registerClass:[TAPContactCollectionViewCell class] forCellWithReuseIdentifier:cellID];
         TAPContactCollectionViewCell *cell = (TAPContactCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
         
-        //WK Temp
-        NSInteger modValue = indexPath.row % 5;
-        NSString *nameString;
-        if (indexPath.row == 0) { //Group admin
-            nameString = @"You";
-        }
-        else {
-            switch (modValue) {
-                case 0:
-                {
-                    nameString = @"Arsya";
-                    break;
-                }
-                case 1:
-                {
-                    nameString = @"Abdul";
-                    break;
-                }
-                case 2:
-                {
-                    nameString = @"Binar";
-                    break;
-                }
-                case 3:
-                {
-                    nameString = @"Adryan";
-                    break;
-                }
-                case 4:
-                {
-                    nameString = @"Cynthia ";
-                    break;
-                }
-                    
-                default:
-                    break;
-            }
-        }
-        [cell setContactCollectionViewCellWithModel:nameString];
+        TAPUserModel *user = [self.selectedContactArray objectAtIndex:indexPath.row];
+
+        [cell setContactCollectionViewCellWithModel:user];
+        
         [cell showRemoveIcon:NO];
-        //End Temp
         
         return cell;
     }
@@ -192,63 +180,319 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark UIScrollView
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    if (scrollView == self.createGroupSubjectView.bgScrollView) {
-        [self.view endEditing:YES];
+    [self.view endEditing:YES];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    
+    CGFloat scrollViewHeight = CGRectGetHeight(scrollView.frame);
+    CGFloat scrollContentSizeHeight = scrollView.contentSize.height;
+    CGFloat currentYOffset = scrollView.contentOffset.y;
+    
+    if (IS_IPHONE_X_FAMILY) {
+        if (currentYOffset + scrollViewHeight >= scrollContentSizeHeight) {
+            //Reach bottom of scrollView
+            self.createGroupSubjectView.navigationSeparatorView.alpha = 1.0f;
+            self.createGroupSubjectView.shadowView.alpha = 1.0f;
+        }
+        else {
+            CGFloat maxOffset = 120.0f;
+            
+            //Default position offset
+            if (currentYOffset <= -44.0f) {
+                self.createGroupSubjectView.navigationSeparatorView.alpha = 0.0f;
+                self.createGroupSubjectView.shadowView.alpha = 0.0f;
+                
+                CGFloat heightDifference = fabsf(currentYOffset + 44.0f);
+                self.createGroupSubjectView.additionalWhiteBounceView.frame = CGRectMake(CGRectGetMinX(self.createGroupSubjectView.additionalWhiteBounceView.frame), -heightDifference, CGRectGetWidth(self.createGroupSubjectView.additionalWhiteBounceView.frame), heightDifference);
+            }
+            else if (currentYOffset >= maxOffset) {
+                self.createGroupSubjectView.navigationSeparatorView.alpha = 1.0f;
+                self.createGroupSubjectView.shadowView.alpha = 1.0f;
+            }
+            else {
+                CGFloat percentage = (currentYOffset + 44.0f) / 164.0f;
+                self.createGroupSubjectView.navigationSeparatorView.alpha = percentage;
+                self.createGroupSubjectView.shadowView.alpha = percentage;
+            }
+        }
+    }
+    else {
+        if (currentYOffset + scrollViewHeight >= scrollContentSizeHeight) {
+            //Reach bottom of scrollView
+            self.createGroupSubjectView.navigationSeparatorView.alpha = 1.0f;
+            self.createGroupSubjectView.shadowView.alpha = 1.0f;
+        }
+        else {
+            CGFloat maxOffset = 180.0f;
+            
+            //Default position offset
+            if (currentYOffset <= -20.0f) {
+                self.createGroupSubjectView.navigationSeparatorView.alpha = 0.0f;
+                self.createGroupSubjectView.shadowView.alpha = 0.0f;
+                
+                CGFloat heightDifference = fabsf(currentYOffset + 20.0f);
+                self.createGroupSubjectView.additionalWhiteBounceView.frame = CGRectMake(CGRectGetMinX(self.createGroupSubjectView.additionalWhiteBounceView.frame), -heightDifference, CGRectGetWidth(self.createGroupSubjectView.additionalWhiteBounceView.frame), heightDifference);
+                
+            }
+            else if (currentYOffset >= maxOffset) {
+                self.createGroupSubjectView.navigationSeparatorView.alpha = 1.0f;
+                self.createGroupSubjectView.shadowView.alpha = 1.0f;
+            }
+            else {
+                CGFloat percentage = (currentYOffset + 20.0f) / 200.0f;
+                self.createGroupSubjectView.navigationSeparatorView.alpha = percentage;
+                self.createGroupSubjectView.shadowView.alpha = percentage;
+            }
+        }
     }
 }
 
-#pragma mark UITextField
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+#pragma mark - Delegate
+#pragma mark TAPCustomTextFieldView
+- (BOOL)customTextFieldViewTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    self.groupModel.groupName = newString;
+    self.roomModel.name = newString;
     
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.createGroupSubjectView.createButton.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"CBCBCB"].CGColor, (id)[TAPUtil getColor:@"D9D9D9"].CGColor, nil];
-    gradient.startPoint = CGPointMake(0.0f, 0.0f);
-    gradient.endPoint = CGPointMake(0.0f, 1.0f);
-    gradient.cornerRadius = 6.0f;
     if ([newString length] <= 0) {
-        //show placeholder
-        self.createGroupSubjectView.placeHolderLabel.alpha = 1.0f;
-        
         //disable button create
-        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"CBCBCB"].CGColor, (id)[TAPUtil getColor:@"D9D9D9"].CGColor, nil];
-        [self.createGroupSubjectView.createButton.layer replaceSublayer:[self.createGroupSubjectView.createButton.layer.sublayers objectAtIndex:0] with:gradient];
-        self.createGroupSubjectView.createButton.userInteractionEnabled = NO;
+        [self.createGroupSubjectView.createButtonView setAsActiveState:NO animated:NO];
     }
     else {
-        //hide placeholder
-        self.createGroupSubjectView.placeHolderLabel.alpha = 0.0f;
-        
         //enable button create
-        self.createGroupSubjectView.createButton.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ORANGE_00].CGColor;
-        gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_TOP_GRADIENT_COLOR].CGColor, (id)[TAPUtil getColor:TAP_BUTTON_BACKGROUND_BOTTOM_GRADIENT_COLOR].CGColor, nil];
-
-        [self.createGroupSubjectView.createButton.layer replaceSublayer:[self.createGroupSubjectView.createButton.layer.sublayers objectAtIndex:0] with:gradient];
-        self.createGroupSubjectView.createButton.userInteractionEnabled = YES;
+        [self.createGroupSubjectView.createButtonView setAsActiveState:YES animated:NO];
     }
     
     return YES;
 }
 
+- (BOOL)customTextFieldViewTextFieldShouldReturn:(UITextField *)textField {
+    [self.createGroupSubjectView.groupNameTextField.textField resignFirstResponder];
+    
+    return YES;
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldBeginEditing:(UITextField *)textField {
+    return YES;
+}
+
+- (void)customTextFieldViewTextFieldDidBeginEditing:(UITextField *)textField {
+    
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldEndEditing:(UITextField *)textField {
+    return YES;
+}
+
+- (void)customTextFieldViewTextFieldDidEndEditing:(UITextField *)textField {
+    
+}
+
+- (BOOL)customTextFieldViewTextFieldShouldClear:(UITextField *)textField {
+    return YES;
+}
+
+
+#pragma mark UIImagePickerController
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:^{
+        if ([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:@"public.image"]) {
+            //IMAGE TYPE
+            UIImage *selectedImage;
+            
+            selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+            self.selectedImage = selectedImage;
+            [self.createGroupSubjectView setGroupPictureImageViewWithImage:selectedImage];
+            if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+                //CS TEMP - hide remove picture button as the API is not ready yet
+                self.createGroupSubjectView.removePictureButton.alpha = 0.0f;
+            }
+           
+        }
+    }];
+}
+
+#pragma mark PopUpInfoViewController
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
+    
+}
+
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    //Error pop up tapped
+    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:NO];
+    if ([popupIdentifier isEqualToString:@"Error Upload Group Image"]) {
+        //group created but failed to upload image, open room
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Create Group"]) {
+        
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Update Group"]) {
+        
+    }
+}
+
 #pragma mark - Custom Method
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
-    self.createGroupSubjectView.bgScrollView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, keyboardHeight, 0.0f);
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
-    self.createGroupSubjectView.bgScrollView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-- (void)groupPictureButtonDidTapped { //WK Temp
-    self.groupModel.groupImage = @"groupPictureDummy";
-    [self.createGroupSubjectView setGroupPictureImageViewWithImage:[UIImage imageNamed:self.groupModel.groupImage inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+- (void)createButtonDidTapped {
+    [self.createGroupSubjectView.createButtonView setAsLoading:YES animated:YES];
+    self.createGroupSubjectView.createButtonView.userInteractionEnabled = NO;
+    if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeDefault) {
+        NSMutableArray *userIDArray = [NSMutableArray array];
+        for (TAPUserModel *user in self.selectedContactArray) {
+            [userIDArray addObject:user.userID];
+        }
+        [TAPDataManager callAPICreateRoomWithName:self.createGroupSubjectView.groupNameTextField.textField.text type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
+            
+            if (self.selectedImage != nil) {
+                //has image, upload image
+                NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
+                
+                [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
+                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+#ifdef DEBUG
+                    NSLog(@"Success upload image");
+#endif
+
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                    [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:self.roomListViewController.navigationController animated:YES];
+                    
+                } progressBlock:^(CGFloat progress, CGFloat total) {
+                    
+                } failureBlock:^(NSError *error) {
+                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                }];
+            }
+            else {
+                //no image, open room
+                [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                
+                [self dismissViewControllerAnimated:NO completion:nil];
+                [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:self.roomListViewController.navigationController animated:YES];
+            }
+            
+        } failure:^(NSError *error) {
+            [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+            self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    }
+    else if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+        [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:self.createGroupSubjectView.groupNameTextField.textField.text success:^(TAPRoomModel *room) {
+            if (self.selectedImage != nil) {
+                //has image, upload image
+                NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
+                
+                [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
+                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    NSLog(@"Success upload image");
+                    //image uploaded
+                    //dismiss view controller
+                    //back to room
+                    if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
+                        [self.delegate createGroupSubjectViewControllerUpdatedRoom:room];
+                    }
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                } progressBlock:^(CGFloat progress, CGFloat total) {
+                    
+                } failureBlock:^(NSError *error) {
+                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                }];
+            }
+            else {
+                //no image, dismiss view controller
+                //back to room detail
+                if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
+                    [self.delegate createGroupSubjectViewControllerUpdatedRoom:room];
+                }
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
+        } failure:^(NSError *error) {
+            [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+            self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    }
+
+    
 }
 
-- (void)createButtonDidTapped { //WK Temp
-    NSLog(@"create button did tapped");
+- (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer {
+    [self.view endEditing:YES];
+}
+
+- (void)changeButtonDidTapped {
+    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    
+    if (status == PHAuthorizationStatusAuthorized) {
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.allowsEditing = NO;
+        imagePicker.delegate = self;
+        imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        
+        [self presentViewController:imagePicker animated:YES completion:^{
+            //completion
+        }];
+    }
+    else if (status == PHAuthorizationStatusNotDetermined) {
+        //request
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self changeButtonDidTapped];
+            });
+        }];
+    }
+    else {
+        //No permission. Trying to normally request it
+        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        [alertController addAction:cancelAction];
+        
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if (IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }];
+        [alertController addAction:settingsAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)removePictureButtonDidTapped {
+    self.selectedImage = nil;
+    [self.createGroupSubjectView setGroupPictureImageViewWithImage:nil];
+}
+
+- (void)backButtonDidTapped {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)cancelButtonDidTapped {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)setTapCreateGroupSubjectControllerType:(TAPCreateGroupSubjectViewControllerType)tapCreateGroupSubjectControllerType {
+    _tapCreateGroupSubjectControllerType = tapCreateGroupSubjectControllerType;
+    if (tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+        [self.createGroupSubjectView setTapCreateGroupSubjectType:TAPCreateGroupSubjectViewTypeUpdate];
+    }
 }
 
 @end

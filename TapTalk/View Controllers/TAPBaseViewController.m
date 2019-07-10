@@ -26,6 +26,10 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
+    
+    //Set navigation bar background color
+    UIColor *navigationBarBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultNavigationBarBackground];
+    [[UINavigationBar appearance] setBarTintColor:navigationBarBackgroundColor];
 }
 
 - (void)viewDidLoad {
@@ -34,18 +38,14 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-//    [[NSNotificationCenter defaultCenter] addObserver:self
-//                                             selector:@selector(reachabilityDidChange:)
-//                                                 name:AFNetworkingReachabilityDidChangeNotification
-//                                               object:nil];
-    
+    UIFont *navigationTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarTitleLabel];
+    UIColor *navigationTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarTitleLabel];
     [self.navigationController.navigationBar setTitleTextAttributes:
-     @{NSForegroundColorAttributeName:[TAPUtil getColor:TAP_COLOR_BLACK_44],
-       NSFontAttributeName:[UIFont fontWithName:TAP_FONT_NAME_BOLD size:17.0f]}];
+     @{NSForegroundColorAttributeName:navigationTitleColor,
+       NSFontAttributeName:navigationTitleFont}];
     
-    //WK Note - To remove line under navigation bar
     self.navigationController.navigationBar.backgroundColor = [UIColor whiteColor];
-    self.navigationController.navigationBar.layer.shadowColor = [TAPUtil getColor:@"D9D9D9"].CGColor;
+    self.navigationController.navigationBar.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
     self.navigationController.navigationBar.layer.shadowOffset = CGSizeMake(0.0, 1.0f);
     self.navigationController.navigationBar.layer.shadowRadius = 1.0;
     self.navigationController.navigationBar.layer.shadowOpacity = 0.4;
@@ -53,10 +53,10 @@
     _navigationBarShadowOpacity = self.navigationController.navigationBar.layer.shadowOpacity;
     
     [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc]init] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     //End Note
     
-    //WK Note - To show line under navigation bar
+    //DV Note - To show line under navigation bar
 //    [self.navigationController.navigationBar setShadowImage:self.navigationShadowImage];
     //End Note
     
@@ -96,16 +96,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleDefault;
@@ -176,6 +166,7 @@
 
 - (void)showCustomBackButton {
     UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
@@ -192,7 +183,8 @@
     
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:button];
 
-    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrowOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
     [button setImage:buttonImage forState:UIControlStateNormal];
 
     UIBarButtonItem *positiveSeparator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
@@ -206,7 +198,8 @@
 }
 
 - (void)showCustomCloseButton {
-    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
@@ -215,8 +208,61 @@
     [self.navigationItem setRightBarButtonItem:barButtonItem];
 }
 
+- (void)showCustomCancelButton {
+    //LeftBarButton
+    
+    UIFont *leftBarButtonItemFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
+    UIColor *leftBarButtonItemColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
+    UIButton* leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
+    [leftBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    [leftBarButton setTitleColor:leftBarButtonItemColor forState:UIControlStateNormal];
+    leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+    leftBarButton.titleLabel.font = leftBarButtonItemFont;
+    [leftBarButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
+}
+
+- (void)showCustomEditButton {
+    //RightBarButton
+    UIFont *rightBarButtonItemFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
+    UIColor *rightBarButtonItemColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
+    
+    UIButton* rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
+    [rightBarButton setTitle:@"Edit" forState:UIControlStateNormal];
+    [rightBarButton setTitleColor:rightBarButtonItemColor forState:UIControlStateNormal];
+    rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    rightBarButton.titleLabel.font = rightBarButtonItemFont;
+    [rightBarButton addTarget:self action:@selector(editButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+}
+
+- (void)showCustomCancelButtonRight {
+    //RightBarButton
+    UIFont *rightBarButtonItemFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
+    UIColor *rightBarButtonItemColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
+
+    UIButton* rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
+    [rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    [rightBarButton setTitleColor:rightBarButtonItemColor forState:UIControlStateNormal];
+    rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    rightBarButton.titleLabel.font = rightBarButtonItemFont;
+    [rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+}
+
 - (void)closeButtonDidTapped {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)editButtonDidTapped {
+    
+}
+
+- (void)cancelButtonDidTapped {
+    
 }
 
 //Note

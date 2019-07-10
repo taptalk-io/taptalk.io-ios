@@ -15,6 +15,7 @@
 @property (strong, nonatomic) UILabel *selectedCountLabel;
 @property (strong, nonatomic) UIView *separatorView;
 @property (strong, nonatomic) UIView *selectedCountView;
+@property (strong, nonatomic) UIImageView *arrowImageView;
 
 @end
 
@@ -25,32 +26,45 @@
     
     if (self) {
         
-        CGFloat cellHeight = 44.0f;
+        CGFloat cellHeight = 70.0f;
         
-        _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 3.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f - 100.0f, 23.0f)];
-        self.nameLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-        self.nameLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+        CGFloat nameLabelWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 12.0f - 4.0f - 20.0f - 16.0f;
+        
+        UIFont *albumNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontAlbumNameLabel];
+        UIColor *albumNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorAlbumNameLabel];
+        _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, nameLabelWidth, 22.0f)];
+        self.nameLabel.textColor = albumNameLabelColor;
+        self.nameLabel.font = albumNameLabelFont;
         [self.contentView addSubview:self.nameLabel];
-        
-        _countLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.nameLabel.frame) - 4.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f - 100.0f, 18.0f)];
-        self.countLabel.textColor = [TAPUtil getColor:TAP_COLOR_GREY_9B];
-        self.countLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:11.0f];
+
+        UIFont *albumCountLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontAlbumCountLabel];
+        UIColor *albumCountLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorAlbumCountLabel];
+        _countLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.nameLabel.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f - 100.0f, 16.0f)];
+        self.countLabel.textColor = albumCountLabelColor;
+        self.countLabel.font = albumCountLabelFont;
         [self.contentView addSubview:self.countLabel];
         
-        _separatorView =  [[UIView alloc] initWithFrame:CGRectMake(0.0f, cellHeight - 1.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:@"E5E5E5"];
-        [self.contentView addSubview:self.separatorView];
+        _arrowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 20.0f, (cellHeight - 20.0f) / 2.0f, 20.0f, 20.0f)];
+        self.arrowImageView.image = [UIImage imageNamed:@"TAPIconRightArrowCell" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        [self.contentView addSubview:self.arrowImageView];
         
-        _selectedCountView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 15.0f - 16.0f, (cellHeight - 15.0f)/2, 15.0f, 15.0f)];
-        self.selectedCountView.backgroundColor = [TAPUtil getColor:TAP_COLOR_PRIMARY_COLOR_1];
-        self.selectedCountView.layer.cornerRadius = CGRectGetWidth(self.selectedCountView.frame)/2.0f;
+        _selectedCountView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.arrowImageView.frame) - 4.0f, (cellHeight - 20.0f) / 2.0f, 0.0f, 20.0f)];
+        self.selectedCountView.clipsToBounds = YES;
+        self.selectedCountView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
+        self.selectedCountView.layer.cornerRadius = CGRectGetHeight(self.selectedCountView.frame) / 2.0f;
         [self.contentView addSubview:self.selectedCountView];
         
-        _selectedCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 15.0f, 15.0f)];
-        self.selectedCountLabel.textColor = [UIColor whiteColor];
-        self.selectedCountLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:10.0f];
+        UIFont *selectedCountLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontUnreadBadgeLabel];
+        UIColor *selectedCountLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorUnreadBadgeLabel];
+        _selectedCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
+        self.selectedCountLabel.textColor = selectedCountLabelColor;
         self.selectedCountLabel.textAlignment = NSTextAlignmentCenter;
+        self.selectedCountLabel.font = selectedCountLabelFont;
         [self.selectedCountView addSubview:self.selectedCountLabel];
+        
+        _separatorView =  [[UIView alloc] initWithFrame:CGRectMake(0.0f, cellHeight - 1.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 1.0f)];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+        [self.contentView addSubview:self.separatorView];
     }
     
     return self;
@@ -95,6 +109,23 @@
         self.selectedCountView.alpha = 0.0f;
         self.selectedCountLabel.text = @"";
     }
+    
+    
+    CGSize selectedCountLabelSize = [self.selectedCountLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.selectedCountLabel.frame))];
+    
+    CGFloat selectedCountViewWidth = CGRectGetWidth(self.selectedCountLabel.frame) + 7.0f + 7.0f;
+    if (selectedCountViewWidth < CGRectGetHeight(self.selectedCountView.frame)) {
+        selectedCountViewWidth = CGRectGetHeight(self.selectedCountView.frame);
+    }
+    
+    CGFloat selectedCountMessageLabelXPosition = (selectedCountViewWidth - selectedCountLabelSize.width) / 2.0f;
+    self.selectedCountLabel.frame = CGRectMake(selectedCountMessageLabelXPosition, CGRectGetMinY(self.selectedCountLabel.frame), selectedCountLabelSize.width, CGRectGetHeight(self.selectedCountLabel.frame));
+    
+    self.selectedCountView.frame = CGRectMake(CGRectGetMinX(self.arrowImageView.frame) - 4.0f - selectedCountViewWidth, CGRectGetMinY(self.selectedCountView.frame), selectedCountViewWidth, CGRectGetHeight(self.selectedCountView.frame));
+    
+    CGFloat nameLabelWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 12.0f - 4.0f - 20.0f - 16.0f - CGRectGetWidth(self.selectedCountView.frame);
+    self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), CGRectGetMinY(self.nameLabel.frame), nameLabelWidth, CGRectGetHeight(self.nameLabel.frame));
+    self.countLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), CGRectGetMaxY(self.nameLabel.frame), nameLabelWidth, CGRectGetHeight(self.countLabel.frame));
 }
 
 @end

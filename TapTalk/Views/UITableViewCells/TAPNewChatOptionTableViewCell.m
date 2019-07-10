@@ -2,7 +2,7 @@
 //  TAPNewChatOptionTableViewCell.m
 //  TapTalk
 //
-//  Created by Welly Kencana on 13/9/18.
+//  Created by Dominic Vedericho on 13/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
@@ -40,7 +40,7 @@
         [self.bgView addSubview:self.descriptionLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_EA];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.bgView addSubview:self.separatorView];
     }
     return self;
@@ -65,6 +65,9 @@
     }
     
     self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+
+    UIFont *newChatMenuLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNewChatMenuLabel];
+    UIColor *newChatMenuLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNewChatMenuLabel];
     NSMutableDictionary *descriptionAttributesDictionary = [NSMutableDictionary dictionary];
     CGFloat descriptionLetterSpacing = -0.2f;
     [descriptionAttributesDictionary setObject:@(descriptionLetterSpacing) forKey:NSKernAttributeName];
@@ -75,8 +78,8 @@
     [descriptionAttributedString addAttributes:descriptionAttributesDictionary
                                          range:NSMakeRange(0, [descriptionString length])];
     self.descriptionLabel.attributedText = descriptionAttributedString;
-    self.descriptionLabel.textColor = [TAPUtil getColor:TAP_COLOR_BLACK_44];
-    self.descriptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
+    self.descriptionLabel.textColor = newChatMenuLabelColor;
+    self.descriptionLabel.font = newChatMenuLabelFont;
 }
 
 @end

@@ -56,17 +56,21 @@
     self.rightOptionButton.userInteractionEnabled = YES;
     
     self.backgroundContentView.clipsToBounds = YES;
-    self.backgroundContentView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_ED].CGColor;
+    self.backgroundContentView.layer.borderColor = [TAPUtil getColor:@"EDEDED"].CGColor;
     self.backgroundContentView.layer.borderWidth = 1.0f;
     self.backgroundContentView.layer.cornerRadius = 8.0f;
     
     if (IS_IPHONE_4_7_INCH_AND_ABOVE) {
-        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
-        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:14.0f];
+        UIFont *obtainedFont = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+        obtainedFont = [obtainedFont fontWithSize:14.0f];
+        self.leftOptionLabel.font = obtainedFont;
+        self.rightOptionLabel.font = obtainedFont;
     }
     else {
-        self.leftOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
-        self.rightOptionLabel.font = [UIFont fontWithName:TAP_FONT_NAME_BOLD size:12.0f];
+        UIFont *obtainedFont = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+        obtainedFont = [obtainedFont fontWithSize:12.0f];
+        self.leftOptionLabel.font = obtainedFont;
+        self.rightOptionLabel.font = obtainedFont;
     }
 }
 

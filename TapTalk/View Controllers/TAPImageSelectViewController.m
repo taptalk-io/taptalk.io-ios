@@ -64,11 +64,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     if(self.imageSelectViewControllerNavigateType == ImageSelectViewControllerNavigateTypePresent) {
-        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconCancelOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonDidTapped)];
+        UIImage *closeImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        closeImage = [closeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
+        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:closeImage style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonDidTapped)];
+        self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton];
         [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     }
     else if(self.imageSelectViewControllerNavigateType == ImageSelectViewControllerNavigateTypePush) {
-        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(backButtonDidTapped)];
+        UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
+        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:buttonImage style:UIBarButtonItemStylePlain target:self action:@selector(backButtonDidTapped)];
+        self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton];
         [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     }
     
@@ -84,7 +90,7 @@
     
     if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGallery) {
         _selectedMediaDataArray = [NSMutableArray array];
-
+        
         self.title = NSLocalizedString(@"Photo Gallery", @"");
         // Fetch all assets, sorted by date created.
         [self getAllPhotosFromCamera];
@@ -94,7 +100,7 @@
         if(self.cameraRollCollection != nil) {
             
             self.title = self.cameraRollCollection.localizedTitle;
-
+            
             [self getAllPhotosFromCamera];
             [self fetchFromCameraRollCollection];
         }
@@ -104,6 +110,8 @@
         self.imageSelectView.itemNumberView.alpha = 1.0f;
         self.imageSelectView.continueButton.userInteractionEnabled = YES;
         self.imageSelectView.continueButton.alpha = 1.0f;
+        
+        self.imageSelectView.itemNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)[self.selectedMediaDataArray count]];
     }
     else {
         self.imageSelectView.itemNumberView.alpha = 0.0f;
@@ -165,12 +173,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [collectionView registerClass:[TAPImageSelectCollectionViewCell class] forCellWithReuseIdentifier:cellIdentifier];
     
     TAPImageSelectCollectionViewCell *cell = (TAPImageSelectCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifier forIndexPath:indexPath];
-
+    
     UIImage *selectedImage = (UIImage *)[self.loadedImageThumbnailDictionary objectForKey:[NSString stringWithFormat:@"%ld", (long)indexPath.row]];
     PHAsset *asset = [self.galleryImageDataArray objectAtIndex:indexPath.row];
     
     [cell setCellWithImage:selectedImage andMediaAsset:asset];
-
+    
     if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGalleryAlbum) {
         
         if(self.isSelectedCleared) {
@@ -279,37 +287,17 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
- 
+    
 }
 
 #pragma mark - Delegate
-//#pragma mark ImagePreviewViewController
-//- (void)imagePreviewViewControllerDidTappedContinueButtonWithDataArray:(NSArray *)dataArray {
-//    if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGalleryAlbum) {
-//        if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedContinueButtonWithDataArray:)]) {
-//            [self.delegate imageSelectViewControllerDidTappedContinueButtonWithDataArray:dataArray];
-//        }
-//    }
-//    else {
-//        if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedContinueButtonWithDataArray:firstLoginInstagram:)]) {
-//            [self.delegate imageSelectViewControllerDidTappedContinueButtonWithDataArray:dataArray firstLoginInstagram:self.isFirstLoginInstagram];
-//        }
-//    }
-//}
-//
-//- (void)imagePreviewViewControllerDidTappedBackButton {
-//    if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidTappedBackButton)]) {
-//        [self.delegate imageSelectViewControllerDidTappedBackButton];
-//    }
-//}
-
 #pragma mark PHPhotoGalleryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-
+    
 }
 
 #pragma mark TAPImagePreviewViewController
-- (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray {    
+- (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray {
     if ([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidSendWithDataArray:)]) {
         [self.delegate imageSelectViewControllerDidSendWithDataArray:dataArray];
     }
@@ -334,19 +322,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)clearButtonDidTapped {
     dispatch_async(dispatch_get_main_queue(), ^(void){
-    _isSelectedCleared = YES;
-    _selectedMediaDataArray = [NSMutableArray array];
-    _selectedImagePositionDictionary = [NSMutableDictionary dictionary];
-
-    if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGalleryAlbum) {
-        if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidAddSelectedImage:selectedDictionary:)]) {
-            [self.delegate imageSelectViewControllerDidAddSelectedImage:[NSMutableArray array] selectedDictionary:[NSMutableDictionary dictionary]];
+        _isSelectedCleared = YES;
+        _selectedMediaDataArray = [NSMutableArray array];
+        _selectedImagePositionDictionary = [NSMutableDictionary dictionary];
+        
+        if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGalleryAlbum) {
+            if([self.delegate respondsToSelector:@selector(imageSelectViewControllerDidAddSelectedImage:selectedDictionary:)]) {
+                [self.delegate imageSelectViewControllerDidAddSelectedImage:[NSMutableArray array] selectedDictionary:[NSMutableDictionary dictionary]];
+            }
         }
-    }
-    
+        
         //Run UI Updates
         [self.imageSelectView.collectionView reloadData];
-    
+        
         NSInteger totalSelectedCount = [self.selectedMediaDataArray count];
         self.imageSelectView.itemNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)totalSelectedCount];
         
@@ -356,7 +344,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             self.imageSelectView.continueButton.alpha = 0.6f;
             self.imageSelectView.continueButton.userInteractionEnabled = NO;
         }];
-  
+        
     });
 }
 
@@ -664,13 +652,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)fetchGalleryData {
-    //We have permission. Do whatever is needed
-//    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-//    requestOptions.synchronous = NO;
-//    requestOptions.networkAccessAllowed = YES;
-//    requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
-//    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    
     PHFetchOptions *fetchOptions = [[PHFetchOptions alloc] init];
     fetchOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
     
@@ -779,7 +760,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         dispatch_async(dispatch_get_main_queue(), ^{
-        success(newImage);
+            success(newImage);
         });
     });
 }
@@ -819,33 +800,32 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     _tempGalleryImageDataArray = [NSMutableArray array];
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-//    options.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",PHAssetMediaTypeImage];
     
     _cameraRollPhotos = [PHAsset fetchAssetsInAssetCollection:self.cameraRollCollection options:options];
     for(PHAsset *asset in self.cameraRollPhotos) {
         [self.tempGalleryImageDataArray addObject:asset];
         [self.galleryImageDataArray addObject:asset];
     }
-
+    
     self.indexImageCount = 0;
     [self processCameraRollPhotos];
 }
 
 - (void)processCameraRollPhotos {
     @autoreleasepool {
-    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-    requestOptions.synchronous = NO;
-    requestOptions.networkAccessAllowed = YES;
-    requestOptions.resizeMode   = PHImageRequestOptionsResizeModeExact;
-    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    
-    PHImageManager *manager = [PHImageManager defaultManager];
-    
-    if([self.tempGalleryImageDataArray count] > 0) {
-        // assets contains PHAsset objects.
-        PHAsset *currentAsset = [self.tempGalleryImageDataArray objectAtIndex:0];
-        __block UIImage *imageResult;
-//        @autoreleasepool {
+        PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+        requestOptions.synchronous = NO;
+        requestOptions.networkAccessAllowed = YES;
+        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeExact;
+        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+        
+        PHImageManager *manager = [PHImageManager defaultManager];
+        
+        if([self.tempGalleryImageDataArray count] > 0) {
+            // assets contains PHAsset objects.
+            PHAsset *currentAsset = [self.tempGalleryImageDataArray objectAtIndex:0];
+            __block UIImage *imageResult;
+            //        @autoreleasepool {
             [manager requestImageForAsset:currentAsset targetSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds)/2, CGRectGetWidth([UIScreen mainScreen].bounds)/2) contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
@@ -874,12 +854,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 });
             }];
             
-//        }
-    }
-    
-    else {
-        [self.imageSelectView endLoadingAnimation];
-    }
+            //        }
+        }
+        
+        else {
+            [self.imageSelectView endLoadingAnimation];
+        }
     }
 }
 

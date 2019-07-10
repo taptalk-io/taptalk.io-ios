@@ -7,13 +7,14 @@
 //
 
 #import "TAPAPIManager.h"
-static NSString * const kBaseURLProduction = @"https://taptalk-production.moselo.com";
-static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com";
-static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com";
- 
-//static NSString * const kBaseURLProduction = @"https://engine.taptalk.io";
-//static NSString * const kBaseURLStaging = @"https://engine-staging.taptalk.io";
-//static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io";
+
+static NSString * const kBaseURLProduction = @"https://engine.taptalk.io";
+static NSString * const kBaseURLStaging = @"https://engine-stg.taptalk.io";
+static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io";
+
+//static NSString * const kBaseURLProduction = @"https://taptalk-production.moselo.com";
+//static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com";
+//static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com";
 
 static NSString * const kAPIVersionString = @"v1";
 
@@ -166,6 +167,46 @@ static NSString * const kAPIVersionString = @"v1";
     }
     else if (type == TAPAPIManagerTypeUploadUserPhoto) {
         NSString *apiPath = @"client/user/photo/upload";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDeleteMessage) {
+        NSString *apiPath = @"chat/message/delete";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeCreateRoom) {
+        NSString *apiPath = @"client/room/create";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUploadRoomPhoto) {
+        NSString *apiPath = @"client/room/photo/upload";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUpdateRoom) {
+        NSString *apiPath = @"client/room/update";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetRoom) {
+        NSString *apiPath = @"client/room/get";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeAddRoomParticipants) {
+        NSString *apiPath = @"client/room/participants/add";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRemoveRoomParticipants) {
+        NSString *apiPath = @"client/room/participants/remove";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypePromoteRoomAdmins) {
+        NSString *apiPath = @"client/room/admins/promote";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDemoteRoomAdmins) {
+        NSString *apiPath = @"client/room/admins/demote";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeLeaveRoom) {
+        NSString *apiPath = @"client/room/leave";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     
