@@ -87,6 +87,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [self.verificationOTPView removeLoadingSpinAnimation];
     _isNeedShowLoadingRequestingOTP = NO;
 }
 

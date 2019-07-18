@@ -52,7 +52,6 @@
         [self.gradientImageView.layer insertSublayer:gradient atIndex:0];
         [self addSubview:self.gradientImageView];
         
-        
         UIFont *chatProfileRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatProfileRoomNameLabel];
         UIColor *chatProfileRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileRoomNameLabel];
         _nameLabelHeight = 22.0f;
@@ -126,7 +125,7 @@
         self.loadingBackgroundView.alpha = 0.0;
         [self addSubview:self.loadingBackgroundView];
         
-        _loadingView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 150.0f) / 2.0f, (CGRectGetHeight(self.frame) - 150.0f) / 2.0f, 150.0f, 150.0f)];
+        _loadingView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 150.0f) / 2.0f, (CGRectGetHeight(self.frame) - 150.0f) / 2.0f, 160.0f, 160.0f)];
         self.loadingView.backgroundColor = [UIColor whiteColor];
         self.loadingView.layer.shadowRadius = 5.0f;
         self.loadingView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
@@ -142,7 +141,7 @@
         
         UIFont *popupLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupLoadingLabel];
         UIColor *popupLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupLoadingLabel];
-        _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.loadingImageView.frame) + 8.0f, CGRectGetWidth(self.loadingView.frame) - 8.0f - 8.0f, 20.0f)];
+        _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.loadingImageView.frame) + 16.0f, CGRectGetWidth(self.loadingView.frame) - 8.0f - 8.0f, 20.0f)];
         self.loadingLabel.font = popupLabelFont;
         self.loadingLabel.textColor = popupLabelColor;
         self.loadingLabel.textAlignment = NSTextAlignmentCenter;
@@ -214,7 +213,7 @@
         case TAPProfileLoadingTypeAddToContact:
         {
             loadingString = @"Adding...";
-            doneLoadingString = @"Contact Added";
+            doneLoadingString = @"Added to Contacts";
             break;
         }
         case TAPProfileLoadingTypeLeaveGroup:

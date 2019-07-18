@@ -110,7 +110,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatComposerShowKeyboard, //Chat Room
     TAPComponentColorIconChatComposerSendBackground, //Chat Room
     TAPComponentColorIconChatComposerSendBackgroundInactive, //Chat Room
-    
+    TAPComponentColorIconDeletedLeftMessageBubble, //Chat Room
+    TAPComponentColorIconDeletedRightMessageBubble, //Chat Room
 };
 
 typedef NS_ENUM(NSInteger, TAPTextColor) {

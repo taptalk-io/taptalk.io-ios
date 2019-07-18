@@ -38,6 +38,8 @@
     self.bubbleView.clipsToBounds = YES;
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
+
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
@@ -62,6 +64,7 @@
     self.sendingIconImageView.alpha = 0.0f;
     self.sendingIconLeftConstraint.constant = 4.0f;
     self.sendingIconBottomConstraint.constant = -5.0f;
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -90,8 +93,7 @@
     self.sendingIconImageView.image = sendingImage;
     
     UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    //DV Temp Icon
-    //Set TO WHITE
+    deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedRightMessageBubble]];
     self.deletedIconImageView.image = deletedImage;
 }
 
@@ -116,33 +118,15 @@
     [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon message:message];
     
     if (isShowed) {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
         self.chatBubbleButton.alpha = 1.0f;
         
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
+        self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
+        self.chatBubbleButton.userInteractionEnabled = YES;
     }
     else {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.alpha = 0.0f;
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
+        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+        self.chatBubbleButton.alpha = 0.0f;
+        self.chatBubbleButton.userInteractionEnabled = YES;
     }
 }
 

@@ -40,7 +40,7 @@
         [self.sendLocationView addSubview:self.sendIconView];
         
         _sendIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-        self.sendIconImageView.image = [UIImage imageNamed:@"TapIconSend" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.sendIconImageView.image = [UIImage imageNamed:@"TAPIconSend" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.sendIconView addSubview:self.sendIconImageView];
         
         UIFont *sendLocationLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerSendLocationButton];

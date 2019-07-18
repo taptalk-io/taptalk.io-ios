@@ -202,7 +202,7 @@
     self.captionLabel.longPressDuration = 0.05f;
     
     self.senderImageView.clipsToBounds = YES;
-    self.senderImageView.layer.cornerRadius = 14.0f;
+    self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame)/2.0f;
     
     [self setBubbleCellStyle];
     [self showSenderInfo:NO];
@@ -458,19 +458,33 @@
     else {
         [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
 
-        NSLog(@"WIDTH HEIGHT %f %f", self.cellWidth, self.cellHeight);
-
+#ifdef DEBUG
+//        NSLog(@"WIDTH HEIGHT %f %f", self.cellWidth, self.cellHeight);
+#endif
+        
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+        
+        [self layoutIfNeeded];
     }
 
     [self setThumbnailImageForVideoWithMessage:message];
     
     //CS NOTE - check chat room type, show sender info if group type
     if (message.room.type == RoomTypeGroup) {
-        [self showSenderInfo:YES];
-        [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
-        self.senderNameLabel.text = message.user.fullname;
+        [self showSenderInfo:NO];
+        //DV Note - Set sender image to show only sender image, because show sender info view yes will update quote view top constraint to 4.0f making white space in the top of the media
+        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewTrailingConstraint.constant = 4.0f;
+
+        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        }
+        
+        self.senderNameLabel.text = @"";
     }
     else {
         [self showSenderInfo:NO];
@@ -813,6 +827,7 @@
         self.replyButtonTrailingConstraint.active = NO;
         self.replyView.alpha = 0.0f;
     }
+    [self layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -833,6 +848,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+    [self layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -848,6 +864,7 @@
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
+    [self layoutIfNeeded];
 }
 
 - (void)showStatusLabel:(BOOL)show {
@@ -901,33 +918,27 @@
             self.statusLabel.text = failedStatusString;
         }
         
-        [UIView animateWithDuration:0.2f animations:^{
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            
-            if (self.message.isFailedSend) {
-                self.replyButton.alpha = 0.0f;
-            }
-            else {
-                self.replyButton.alpha = 1.0f;
-            }
-            
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
+        self.statusLabel.alpha = 1.0f;
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        
+        if (self.message.isFailedSend) {
+            self.replyButton.alpha = 0.0f;
+        }
+        else {
+            self.replyButton.alpha = 1.0f;
+        }
+        
+        [self.contentView layoutIfNeeded];
+        [self layoutIfNeeded];
     }
     else {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.statusLabel.alpha = 0.0f;
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            self.replyButton.alpha = 0.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
+        self.statusLabel.alpha = 0.0f;
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
+        self.replyButton.alpha = 0.0f;
+        [self.contentView layoutIfNeeded];
+        [self layoutIfNeeded];
     }
 }
 
@@ -1221,10 +1232,14 @@
 - (void)showSenderInfo:(BOOL)show {
     _isShowSenderInfoView = show;
     if (show) {
-        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
-        self.senderNameHeightConstraint.constant = 18.0f;
-        self.forwardTitleLabelTopConstraint.constant = 4.0f;
+        self.senderNameHeightConstraint.constant = 0.0f;
+        self.forwardTitleLabelTopConstraint.constant = 0.0f;
+        //DV Note - Uncomment this to show sender name label
+        //        self.senderNameHeightConstraint.constant = 18.0f;
+        //        self.forwardTitleLabelTopConstraint.constant = 4.0f;
+
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
@@ -1232,6 +1247,7 @@
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }
+    [self layoutIfNeeded];
 }
 
 - (void)updateSpacingConstraint {
@@ -1254,6 +1270,7 @@
         self.quoteViewTopConstraint.constant = 0.0f;
         self.forwardFromLabelTopConstraint.constant = 0.0f;
     }
+    [self layoutIfNeeded];
 }
 
 @end

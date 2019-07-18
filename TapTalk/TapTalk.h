@@ -71,6 +71,9 @@ typedef NS_ENUM(NSInteger, TapTalkEnvironment) {
 //Badge
 - (void)tapTalkSetBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms;
 
+//Notification
+- (void)tapTalkDidRequestRemoteNotification;
+
 @end
 
 @interface TapTalk : NSObject
@@ -174,7 +177,8 @@ fromNavigationController:(UINavigationController *)navigationController
 
 //Other
 - (void)disconnect;
-- (void)logoutAndClearAllData;
+- (void)logoutAndClearAllDataWithSuccess:(void (^)(void))success
+                                 failure:(void (^)(NSError *error))failure;
 - (void)clearAllData;
 
 //TapTalk Internal Usage Method

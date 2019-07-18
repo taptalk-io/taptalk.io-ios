@@ -83,6 +83,7 @@
     self.bubbleView.clipsToBounds = YES;
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
     self.statusLabel.alpha = 0.0f;
     
     self.bubbleView.clipsToBounds = YES;
@@ -113,7 +114,7 @@
     self.bubbleLabel.longPressDuration = 0.05f;
     
     self.senderImageView.clipsToBounds = YES;
-    self.senderImageView.layer.cornerRadius = 14.0f;
+    self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame)/2.0f;
     
     [self setBubbleCellStyle];
     [self showSenderInfo:NO];
@@ -129,6 +130,8 @@
     [super prepareForReuse];
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
+
     self.statusLabel.alpha = 0.0f;
     [self showSenderInfo:NO];
 }
@@ -317,6 +320,9 @@
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
     
+    UIColor *highlightedTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleMessageBodyURLHighlighted];
+    UIColor *defaultTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleMessageBodyURL];
+    
     NSString *messageText = [TAPUtil nullToEmptyString:self.bubbleLabel.text];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
     // the next line throws an exception if string is nil - make sure you check
@@ -324,8 +330,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
+        attributes[NSForegroundColorAttributeName] = defaultTextColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
@@ -334,8 +340,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:TAP_COLOR_WHITE];
+        attributes[NSForegroundColorAttributeName] = defaultTextColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
@@ -345,7 +351,14 @@
     //CS NOTE - check chat room type, show sender info if group type
     if (message.room.type == RoomTypeGroup) {
         [self showSenderInfo:YES];
-        [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        
+        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        }
+        
         self.senderNameLabel.text = message.user.fullname;
     }
     else {
@@ -507,6 +520,7 @@
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -526,6 +540,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -543,6 +558,7 @@
         self.forwardTitleLabelLeadingConstraint.active = NO;
         
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
@@ -605,7 +621,7 @@
 
 - (void)showSenderInfo:(BOOL)show {
     if (show) {
-        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
         self.senderNameHeightConstraint.constant = 18.0f;
         self.forwardTitleTopConstraint.constant = 4.0f;
@@ -616,5 +632,6 @@
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleTopConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 @end

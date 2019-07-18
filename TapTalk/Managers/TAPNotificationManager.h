@@ -25,7 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (TAPNotificationManager *)sharedManager;
 
 - (void)setPushToken:(NSString *)pushToken;
-- (NSString *)pushToken;
 - (void)handlePushNotificationWithUserInfo:(NSDictionary *)userInfo;
 - (void)handleIncomingMessage:(TAPMessageModel *)message shouldShowNotification:(BOOL)shouldShowNotification;
 - (void)handleTappedNotificationWithUserInfo:(NSDictionary *)userInfo;

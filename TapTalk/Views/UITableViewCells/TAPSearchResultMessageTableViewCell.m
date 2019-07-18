@@ -226,34 +226,64 @@
         }
         case TAPSearchResultMessageStatusTypeSending:
         {
-            self.messageStatusImageView.alpha = 1.0f;
+            if (message.type == TAPChatMessageTypeSystemMessage) {
+                self.messageStatusImageView.alpha = 0.0f;
+            }
+            else {
+                self.messageStatusImageView.alpha = 1.0f;
+            }
+            
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
         case TAPSearchResultMessageStatusTypeSent:
         {
-            self.messageStatusImageView.alpha = 1.0f;
+            if (message.type == TAPChatMessageTypeSystemMessage) {
+                self.messageStatusImageView.alpha = 0.0f;
+            }
+            else {
+                self.messageStatusImageView.alpha = 1.0f;
+            }
+            
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSent]];
             break;
         }
         case TAPSearchResultMessageStatusTypeDelivered:
         {
-            self.messageStatusImageView.alpha = 1.0f;
+            if (message.type == TAPChatMessageTypeSystemMessage) {
+                self.messageStatusImageView.alpha = 0.0f;
+            }
+            else {
+                self.messageStatusImageView.alpha = 1.0f;
+            }
+            
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
             break;
         }
         case TAPSearchResultMessageStatusTypeRead:
         {
-            self.messageStatusImageView.alpha = 1.0f;
+            if (message.type == TAPChatMessageTypeSystemMessage) {
+                self.messageStatusImageView.alpha = 0.0f;
+            }
+            else {
+                self.messageStatusImageView.alpha = 1.0f;
+            }
+            
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
             break;
         }
         case TAPSearchResultMessageStatusTypeFailed:
         {
-            self.messageStatusImageView.alpha = 1.0f;
+            if (message.type == TAPChatMessageTypeSystemMessage) {
+                self.messageStatusImageView.alpha = 0.0f;
+            }
+            else {
+                self.messageStatusImageView.alpha = 1.0f;
+            }
+            
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageFailed]];
             break;

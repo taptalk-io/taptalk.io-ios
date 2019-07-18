@@ -132,6 +132,7 @@
 + (CGFloat)safeAreaBottomPadding;
 + (CGFloat)safeAreaTopPadding;
 + (void)delayCallback:(void(^)(void))callback forTotalSeconds:(double)delayInSeconds;
++ (void)performBlock:(void (^)())block afterDelay:(NSTimeInterval)delay;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;

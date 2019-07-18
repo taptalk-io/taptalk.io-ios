@@ -31,7 +31,7 @@ typedef NS_ENUM(NSInteger, TAPChatMessageType) {
     TAPChatMessageTypeOrderCard = 3001,
     
     TAPChatMessageTypeSystemMessage = 9001,
-    TAPChatMessageTypeUnreadMessageIdentifier = 9003,
+    TAPChatMessageTypeUnreadMessageIdentifier = 9002,
     
 };
 
