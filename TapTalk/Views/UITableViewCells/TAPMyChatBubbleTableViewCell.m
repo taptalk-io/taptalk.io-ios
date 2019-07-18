@@ -87,6 +87,8 @@
     self.bubbleView.clipsToBounds = YES;
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
+
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
@@ -138,6 +140,7 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
+    [self.contentView layoutIfNeeded];
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -325,6 +328,9 @@
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
 
+    UIColor *highlightedTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURLHighlighted];
+    UIColor *defaultTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURL];
+    
     NSString *messageText = [TAPUtil nullToEmptyString:self.bubbleLabel.text];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
     // the next line throws an exception if string is nil - make sure you check
@@ -332,8 +338,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[NSForegroundColorAttributeName] = defaultTextColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
         attributes[@"NSTextCheckingResult"] = result;
 
         [attributedString addAttributes:attributes range:result.range];
@@ -342,8 +348,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[NSForegroundColorAttributeName] = defaultTextColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
@@ -471,6 +477,7 @@
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -490,6 +497,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -505,6 +513,7 @@
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {

@@ -69,12 +69,6 @@
 
 #pragma mark - Custom Method
 - (void)setPushToken:(NSString *)pushToken {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PUSH_TOKEN];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    [[NSUserDefaults standardUserDefaults] setSecureObject:pushToken forKey:TAP_PREFS_PUSH_TOKEN];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
     NSString *accessToken = [TAPDataManager getAccessToken];
     if (![accessToken isEqualToString:@""] && accessToken != nil) {
         BOOL isDebug = NO;
@@ -85,18 +79,11 @@
 #endif
         
         [TAPDataManager callAPIUpdatePushNotificationWithToken:pushToken isDebug:isDebug success:^{
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PUSH_TOKEN];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+
         } failure:^(NSError *error) {
             
         }];
     }
-}
-
-- (NSString *)pushToken {
-    NSString *pushToken = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_PUSH_TOKEN valid:nil];
-    pushToken = [TAPUtil nullToEmptyString:pushToken];
-    return pushToken;
 }
 
 - (void)handlePushNotificationWithUserInfo:(NSDictionary *)userInfo {

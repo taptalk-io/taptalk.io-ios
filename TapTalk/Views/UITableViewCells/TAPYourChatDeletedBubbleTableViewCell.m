@@ -19,8 +19,19 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
 
+@property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
+@property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
+
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
+
+
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (void)setBubbleCellStyle;
+
+- (void)showSenderInfo:(BOOL)show;
 
 @end
 
@@ -31,13 +42,19 @@
     self.bubbleView.clipsToBounds = YES;
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
+
     self.statusLabel.alpha = 0.0f;
     
     self.bubbleView.clipsToBounds = YES;
     self.bubbleView.layer.cornerRadius = 8.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
     
+    self.senderImageView.clipsToBounds = YES;
+    self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame)/2.0f;
+
     [self setBubbleCellStyle];
+    [self showSenderInfo:NO];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -49,7 +66,11 @@
     [super prepareForReuse];
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
+
     self.statusLabel.alpha = 0.0f;
+    
+    [self showSenderInfo:NO];
 }
 
 #pragma mark - Custom Method
@@ -69,12 +90,32 @@
     self.statusLabel.font = statusLabelFont;
     
     UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedLeftMessageBubble]];
     self.deletedIconImageView.image = deletedImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
     _message = message;
-    self.bubbleLabel.text = NSLocalizedString(@"You deleted this message.", @"");
+    self.bubbleLabel.text = NSLocalizedString(@"This message was deleted.", @"");
+    
+    //CS NOTE - check chat room type, show sender info if group type
+    if (message.room.type == RoomTypeGroup) {
+        [self showSenderInfo:YES];
+        
+        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        }
+        
+        self.senderNameLabel.text = message.user.fullname;
+    }
+    else {
+        [self showSenderInfo:NO];
+        self.senderImageView.image = nil;
+        self.senderNameLabel.text = @"";
+    }
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
@@ -125,43 +166,25 @@
         NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
         self.statusLabel.text = statusString;
         
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
         self.chatBubbleButton.alpha = 1.0f;
         
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.statusLabel.alpha = 1.0f;
-            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
+        self.statusLabel.alpha = 1.0f;
+        self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        [self.contentView layoutIfNeeded];
+        [self layoutIfNeeded];
+        self.chatBubbleButton.userInteractionEnabled = YES;
     }
     else {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.alpha = 0.0f;
-            self.chatBubbleButton.userInteractionEnabled = YES;
-            self.statusLabel.alpha = 0.0f;
-        }];
+        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
+        [self.contentView layoutIfNeeded];
+        [self layoutIfNeeded];
+        self.chatBubbleButton.alpha = 0.0f;
+        self.chatBubbleButton.userInteractionEnabled = YES;
+        self.statusLabel.alpha = 0.0f;
     }
 }
 
@@ -171,4 +194,17 @@
     }
 }
 
+- (void)showSenderInfo:(BOOL)show {
+    if (show) {
+        self.senderImageViewWidthConstraint.constant = 30.0f;
+        self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderNameHeightConstraint.constant = 18.0f;
+    }
+    else {
+        self.senderImageViewWidthConstraint.constant = 0.0f;
+        self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderNameHeightConstraint.constant = 0.0f;
+    }
+    [self.contentView layoutIfNeeded];
+}
 @end

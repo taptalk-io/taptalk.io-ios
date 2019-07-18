@@ -22,6 +22,8 @@
 - (void)cancelButtonDidTapped;
 - (void)changeButtonDidTapped;
 - (void)removePictureButtonDidTapped;
+- (void)openCamera;
+- (void)openGallery;
 
 @end
 
@@ -386,12 +388,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }];
     }
     else if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
-        [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:self.createGroupSubjectView.groupNameTextField.textField.text success:^(TAPRoomModel *room) {
+        if ([self.createGroupSubjectView.groupNameTextField.textField.text isEqualToString:self.roomModel.name]) {
+            //Group name not changing
             if (self.selectedImage != nil) {
                 //has image, upload image
                 NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
-                
-                [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
+                [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:self.roomModel.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                     NSLog(@"Success upload image");
@@ -414,18 +416,52 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //no image, dismiss view controller
                 //back to room detail
                 if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
-                    [self.delegate createGroupSubjectViewControllerUpdatedRoom:room];
+                    [self.delegate createGroupSubjectViewControllerUpdatedRoom:self.roomModel];
                 }
                 [self dismissViewControllerAnimated:YES completion:nil];
             }
-        } failure:^(NSError *error) {
-            [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-            self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-        }];
+        }
+        else {
+            //Group name change
+            [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:self.createGroupSubjectView.groupNameTextField.textField.text success:^(TAPRoomModel *room) {
+                if (self.selectedImage != nil) {
+                    //has image, upload image
+                    NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
+                    
+                    [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
+                        self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                        [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                        NSLog(@"Success upload image");
+                        //image uploaded
+                        //dismiss view controller
+                        //back to room
+                        if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
+                            [self.delegate createGroupSubjectViewControllerUpdatedRoom:room];
+                        }
+                        [self dismissViewControllerAnimated:YES completion:nil];
+                    } progressBlock:^(CGFloat progress, CGFloat total) {
+                        
+                    } failureBlock:^(NSError *error) {
+                        self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                        [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    }];
+                }
+                else {
+                    //no image, dismiss view controller
+                    //back to room detail
+                    if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
+                        [self.delegate createGroupSubjectViewControllerUpdatedRoom:room];
+                    }
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }
+            } failure:^(NSError *error) {
+                [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            }];
+        }
     }
-
-    
 }
 
 - (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer {
@@ -433,6 +469,118 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)changeButtonDidTapped {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *cameraAction = [UIAlertAction
+                                   actionWithTitle:@"Camera"
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * action) {
+                                       [self openCamera];
+                                   }];
+    
+    UIAlertAction *galleryAction = [UIAlertAction
+                                    actionWithTitle:@"Gallery"
+                                    style:UIAlertActionStyleDefault
+                                    handler:^(UIAlertAction * action) {
+                                        [self openGallery];
+                                    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       //Do some thing here
+                                   }];
+    
+    UIImage *cameraActionImage = [UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    cameraActionImage = [cameraActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCamera]];
+    [cameraAction setValue:[cameraActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *galleryActionImage = [UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    galleryActionImage = [galleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetGallery]];
+    [galleryAction setValue:[galleryActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
+    [galleryAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    [cameraAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [galleryAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    [alertController addAction:cameraAction];
+    [alertController addAction:galleryAction];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)removePictureButtonDidTapped {
+    self.selectedImage = nil;
+    [self.createGroupSubjectView setGroupPictureImageViewWithImage:nil];
+}
+
+- (void)backButtonDidTapped {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)cancelButtonDidTapped {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)setTapCreateGroupSubjectControllerType:(TAPCreateGroupSubjectViewControllerType)tapCreateGroupSubjectControllerType {
+    _tapCreateGroupSubjectControllerType = tapCreateGroupSubjectControllerType;
+    if (tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+        [self.createGroupSubjectView setTapCreateGroupSubjectType:TAPCreateGroupSubjectViewTypeUpdate];
+    }
+}
+
+- (void)openCamera {
+    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    if (status == AVAuthorizationStatusAuthorized) {
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.allowsEditing = NO;
+        imagePicker.delegate = self;
+        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        
+        [self presentViewController:imagePicker animated:YES completion:^{
+            //completion
+        }];
+    }
+    else if (status == AVAuthorizationStatusNotDetermined) {
+        //request
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self openCamera];
+            });
+        }];
+    }
+    else {
+        //No permission. Trying to normally request it
+        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        [alertController addAction:cancelAction];
+        
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if (IS_IOS_10_OR_ABOVE) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+            }
+            else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }];
+        [alertController addAction:settingsAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)openGallery {
+    
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
@@ -475,24 +623,5 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
 }
 
-- (void)removePictureButtonDidTapped {
-    self.selectedImage = nil;
-    [self.createGroupSubjectView setGroupPictureImageViewWithImage:nil];
-}
-
-- (void)backButtonDidTapped {
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-- (void)cancelButtonDidTapped {
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)setTapCreateGroupSubjectControllerType:(TAPCreateGroupSubjectViewControllerType)tapCreateGroupSubjectControllerType {
-    _tapCreateGroupSubjectControllerType = tapCreateGroupSubjectControllerType;
-    if (tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
-        [self.createGroupSubjectView setTapCreateGroupSubjectType:TAPCreateGroupSubjectViewTypeUpdate];
-    }
-}
 
 @end

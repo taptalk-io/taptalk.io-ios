@@ -96,6 +96,8 @@
     self.bubbleView.clipsToBounds = YES;
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
+    [self.contentView layoutIfNeeded];
+    
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;    
@@ -147,7 +149,8 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
-    
+    [self.contentView layoutIfNeeded];
+
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
 }
@@ -235,6 +238,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
@@ -255,6 +259,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self setQuote:message.quote userID:@""];
@@ -267,6 +272,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 0.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self showQuoteView:NO];
@@ -355,23 +361,14 @@
         NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
         self.statusLabel.text = statusString;
         
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButton.alpha = 1.0f;
-            self.replyButtonRightConstraint.constant = 2.0f;
-            self.statusIconImageView.alpha = 0.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
+        self.statusLabel.alpha = 1.0f;
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        self.replyButton.alpha = 1.0f;
+        self.replyButtonRightConstraint.constant = 2.0f;
+        self.statusIconImageView.alpha = 0.0f;
+        [self.contentView layoutIfNeeded];
+
     }
     else {
         if (message.isFailedSend) {
@@ -414,33 +411,19 @@
     }
     
     if (isShowed) {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
+
         self.chatBubbleButton.alpha = 1.0f;
         
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
+        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+        self.chatBubbleButton.userInteractionEnabled = YES;
     }
     else {
         CGFloat animationDuration = 0.2f;
         
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
         
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.alpha = 0.0f;
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
+        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+        self.chatBubbleButton.alpha = 0.0f;
+        self.chatBubbleButton.userInteractionEnabled = YES;
     }
 }
 
@@ -533,6 +516,7 @@
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -552,6 +536,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -571,6 +556,7 @@
         self.replyViewTopConstraint.constant = 0.0f;
         self.quoteViewTopConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {

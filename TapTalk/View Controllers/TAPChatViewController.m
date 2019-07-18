@@ -156,6 +156,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isInputAccessoryExtensionShowedFirstTimeOpen;
 @property (nonatomic) BOOL isTopFloatingIndicatorLoading;
 @property (nonatomic) BOOL isUnreadButtonShown;
+@property (nonatomic) BOOL isSwipeGestureEnded;
+@property (nonatomic) BOOL isShowingTopFloatingIdentifier;
 
 @property (nonatomic) CGFloat connectionStatusHeight;
 
@@ -502,6 +504,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
     _isViewWillAppeared = YES;
+    _isSwipeGestureEnded = NO;
     [self reloadInputViews];
     
     self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
@@ -563,6 +566,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     
     [self processVisibleMessageAsRead];
+    [self showInputAccessoryView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -628,7 +632,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (self.isLoadingOldMessageFromAPI && [self.messageArray count] > 0) {
+    if (self.isLoadingOldMessageFromAPI && [self.messageArray count] > 0 && !self.isShowingTopFloatingIdentifier) {
         return [self.messageArray count] + 1;
     }
     return [self.messageArray count];
@@ -749,6 +753,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -772,6 +777,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     [cell showStatusLabel:YES];
                     
@@ -888,6 +894,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -949,6 +956,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyLocationBubbleTableViewCell *cell = (TAPMyLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyLocationBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1022,6 +1030,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
+                [cell setMessage:message];
                 [cell showStatusLabel:NO animated:NO];
                 
                 return cell;
@@ -1037,6 +1046,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1060,6 +1070,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                    cell.message = message;
+                    
                     if (!message.isHidden) {
                         [cell setMessage:message];
                     }
@@ -1132,6 +1144,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1171,6 +1184,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourLocationBubbleTableViewCell *cell = (TAPYourLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourLocationBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1403,6 +1417,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)handleNavigationPopGesture:(UIGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
         [self performSelector:@selector(checkIfNeedCloseRoomAfterDelay) withObject:nil afterDelay:0.5f];
+        self.isSwipeGestureEnded = YES;
     }
 }
 
@@ -1478,10 +1493,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.tableView scrollsToTop];
 }
 
-- (void)chatManagerDidAddUnreadMessageIdentifier:(TAPMessageModel *)message indexPosition:(NSInteger)index {
-    //Add unread message identifier to message array and dictionary with index
-    [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:index];
-}
+//- (void)chatManagerDidAddUnreadMessageIdentifier:(TAPMessageModel *)message indexPosition:(NSInteger)index {
+//    //CS NOTE - add delay to add unread message identifier to prevent crash caused by unsynced data and ui
+//    [TAPUtil performBlock:^{
+//        [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:index];
+//        //Add unread message identifier to message array and dictionary with index
+//        NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+//        [self.tableView beginUpdates];
+//        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationMiddle];
+//        [self.tableView endUpdates];
+//    } afterDelay:0.2f];
+//}
 
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
     if (![message.room.roomID isEqualToString:self.currentRoom.roomID]) {
@@ -1869,21 +1891,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     NSInteger messageIndex = [self.messageArray indexOfObject:message];
     
     [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
-        [self.messageArray removeObjectAtIndex:messageIndex];
-        [self.messageDictionary removeObjectForKey:message.localID];
-        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-        [self.tableView beginUpdates];
-        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-        [self.tableView endUpdates];
-        
-        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:message.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView beginUpdates];
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            [self.tableView endUpdates];
             
-            NSDictionary *dataDictionary = resultMessage.data;
-            NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
-            currentCaption = [TAPUtil nullToEmptyString:currentCaption];
-            
-            [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
-        }];
+            [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                
+                NSDictionary *dataDictionary = resultMessage.data;
+                NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
+                currentCaption = [TAPUtil nullToEmptyString:currentCaption];
+                
+                [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
+            }];
     } failure:^(NSError *error) {
         
     }];
@@ -2186,6 +2208,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            //Do some thing here
+                                           [self showInputAccessoryView];
+                                           [self checkKeyboard];
                                        }];
         
         [googleMapsAction setValue:[[UIImage imageNamed:@"TAPIconGoogleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
@@ -2374,6 +2398,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
         
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
@@ -2752,8 +2777,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
         CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
-        CGRect imageRectInView = CGRectMake(16.0f, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], yourImageBubbleCell.bubbleImageViewWidthConstraint.constant, yourImageBubbleCell.bubbleImageViewHeightConstraint.constant);
         
+        //Default left gap for personal chat
+        CGFloat xPosition = 16.0f;
+        if (currentMessage.room.type == RoomTypeGroup || currentMessage.room.type == RoomTypeChannel) {
+            //left gap + image width + gap between image and bubble view
+            xPosition = 16.0f + 30.0f + 4.0f;
+        }
+        
+        CGRect imageRectInView = CGRectMake(xPosition, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], yourImageBubbleCell.bubbleImageViewWidthConstraint.constant, yourImageBubbleCell.bubbleImageViewHeightConstraint.constant);
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
         yourImageBubbleCell.bubbleImageView.alpha = 0.0f;
@@ -2911,6 +2943,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
                                    }];
     
     [googleMapsAction setValue:[[UIImage imageNamed:@"TAPIconGoogleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
@@ -3068,6 +3102,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
         AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+        
+        // Subscribe to the AVPlayerItem's DidPlayToEndTime notification.
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:item];
         
         AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
         controller.delegate = self;
@@ -3339,6 +3376,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPMediaDetailViewController
 - (void)mediaDetailViewControllerWillStartClosingAnimation {
+    //need to reload inputView after presenting another vc on top
     [self showInputAccessoryView];
 }
 
@@ -3460,9 +3498,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self isShowOnlineDotStatus:NO];
     
     //Right Bar Button
-    UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
-    _rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
-    
+    UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+    _rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
     
     NSString *profileImageURL = room.imageURL.thumbnail;
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
@@ -4187,6 +4224,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:@"Cancel"
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -4473,6 +4511,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            //Do some thing here
+                                           [self showInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
         
@@ -4546,6 +4585,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            //Do some thing here
+                                           [self showInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
         
@@ -4636,6 +4676,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
+                                       [self showInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -4709,6 +4750,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                                  // present in app web view, the app is not installed
                                                  TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
                                                  webViewController.urlString = url.absoluteString;
+                                                 //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+                                                 [self.messageTextView resignFirstResponder];
+                                                 [self.secondaryTextField resignFirstResponder];
                                                  [self.navigationController pushViewController:webViewController animated:YES];
                                              }
                                          }];
@@ -4901,6 +4945,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
+                                       [self showInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -5079,7 +5124,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #pragma mark Input Accessory View
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
-    if (self.isViewWillAppeared) {
+    
+    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapTalk sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPChatViewController class] description]] || [[[[[TapTalk sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
         if (self.isShowAccessoryView) {
             return self.inputMessageAccessoryView;
         }
@@ -5093,7 +5139,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)showInputAccessoryExtensionView:(BOOL)show {
-    
     if (show) {
         _currentInputAccessoryExtensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
         
@@ -5163,6 +5208,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)showInputAccessoryView {
     _isShowAccessoryView = YES;
     [self reloadInputViews];
+    [self becomeFirstResponder];
 }
 
 #pragma mark Chat Data Flow
@@ -5515,14 +5561,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
             else {
                 //Bottom table view visible, insert message normally
-                //CS NOTE - Add delay callback for 0.0f to prevent crash on some cases, ex: create group with photo would crash on receive multiple emit
-                    [TAPUtil delayCallback:^{
-                        [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
-                        NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                        [self.tableView beginUpdates];
-                        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                        [self.tableView endUpdates];
-                    } forTotalSeconds:0.0f];
+                [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
+                NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                [self.tableView beginUpdates];
+                [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+                [self.tableView endUpdates];
             }
         }
         [self checkEmptyState];
@@ -5577,7 +5620,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
                 //if there's tapped reply message id, check and scroll to item
                 if (![TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-                    [self scrollToMessageAndLoadDataWithLocalID:self.tappedMessageLocalID];
+                    //Add 0.5s delay to wait update table view UI  from previous update message
+                    [TAPUtil delayCallback:^{
+                        [self scrollToMessageAndLoadDataWithLocalID:self.tappedMessageLocalID];
+                    } forTotalSeconds:0.5f];
                 }
             }];
         }
@@ -5588,9 +5634,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT && !self.isFirstLoadData) {
                 [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:lastMessage.room.roomID maxCreated:lastMessage.created];
             }
-            
-        } forTotalSeconds:0.2f];
-        
+        } forTotalSeconds:0.0f];
+    
     } failure:^(NSError *error) {
         
     }];
@@ -5692,9 +5737,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         NSLog(@"numberOfUnreadMessages: %ld", (long)self.numberOfUnreadMessages);
         
-        [self sortAndFilterMessageArray];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
+//        dispatch_async(dispatch_get_main_queue(), ^{
             //Check to show unread message identifier
             if (!self.isShowingUnreadMessageIdentifier) {
                 if (checkFirstUnreadMessage) {
@@ -5708,7 +5751,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         if(NSNotFound != unreadMessageIndex) {
                             //Only run when index in found in message array
                             //Construct unread message identifier and add to view (messageIndex + 1 to add above earliest message)
-                            [[TAPChatManager sharedManager] generateUnreadMessageIdentifierWithRoom:smallestCreatedUnreadMessage.room created:smallestCreatedUnreadMessage.created indexPosition:unreadMessageIndex + 1];
+                            NSInteger createdInteger = [obtainedMessage.created integerValue];
+                            createdInteger = createdInteger - 1; //min 1 to set created earlier than the first obtained unread
+                            TAPMessageModel *generatedMessage = [[TAPChatManager sharedManager] generateUnreadMessageIdentifierWithRoom:obtainedMessage.room created:[NSNumber numberWithInteger:createdInteger] indexPosition:unreadMessageIndex + 1];
+                            [self addIncomingMessageToArrayAndDictionaryWithMessage:generatedMessage atIndex:unreadMessageIndex + 1];
                             _isShowingUnreadMessageIdentifier = YES;
                         }
                     }
@@ -5722,11 +5768,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if(NSNotFound != messageIndex) {
                         //Only run when index in found in message array
                         //Construct unread message identifier and add to view (messageIndex + 1 to add above earliest message)
-                        [[TAPChatManager sharedManager] generateUnreadMessageIdentifierWithRoom:obtainedMessage.room created:obtainedMessage.created indexPosition:messageIndex + 1];
+                        NSInteger createdInteger = [obtainedMessage.created integerValue];
+                        createdInteger = createdInteger - 1; //min 1 to set created earlier than the first obtained unread
+                        TAPMessageModel *generatedMessage = [[TAPChatManager sharedManager] generateUnreadMessageIdentifierWithRoom:obtainedMessage.room created:[NSNumber numberWithInteger:createdInteger] indexPosition:messageIndex + 1];
+                        [self addIncomingMessageToArrayAndDictionaryWithMessage:generatedMessage atIndex:messageIndex + 1];
                         _isShowingUnreadMessageIdentifier = YES;
                     }
                 }
             }
+        
+            [self sortAndFilterMessageArray];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
             
             [self.tableView reloadData];
             
@@ -6425,6 +6478,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
     TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+    [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
     
     id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
     if ([tapTalkDelegate respondsToSelector:@selector(tapTalkProfileButtonDidTapped:otherUser:)]) {
@@ -6713,7 +6769,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                numberOfUnreadMessages:(NSInteger)numberOfUnreadMessages
                              animated:(BOOL)animated {
     _topFloatingIndicatorViewType = type;
-    
+    _isShowingTopFloatingIdentifier = show;
     if (type == TopFloatingIndicatorViewTypeUnreadMessage) {
         if (numberOfUnreadMessages != 0) {
             NSString *unreadMessagesString = @"";
@@ -6905,9 +6961,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.tappedMessageLocalID = @"";
         
         if (!currentMessage.isDeleted && !currentMessage.isHidden) {
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            [TAPUtil delayCallback:^{
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            } forTotalSeconds:0.2f];
         }
-        [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
+        [TAPUtil delayCallback:^{
+             [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
+        } forTotalSeconds:0.2f];
+       
     }
     else {
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
@@ -6930,36 +6991,38 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)checkAndShowUnreadButton {
     if (!self.isUnreadButtonShown) {
         _isUnreadButtonShown = YES;
-        [TAPUtil delayCallback:^{
-            if (self.numberOfUnreadMessages != 0) {
-                //Show unread message view
-                NSString *obtainedLocalID = self.unreadLocalID;
-                TAPMessageModel *obtainedMessage = [self.messageDictionary objectForKey:obtainedLocalID];
-                NSInteger unreadMessageIndex = [self.messageArray indexOfObject:obtainedMessage];
-                if(NSNotFound != unreadMessageIndex) {
-                    NSInteger rowIndex = unreadMessageIndex + 1; // +1 because unread identifier cell is above earliest unread message
-                    BOOL isVisible = [self checkIsRowVisibleWithRowIndex:rowIndex];
-                    if (!isVisible) {
-                        //Show top floating unread identifier only if unread message bar is not visible
-                        [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:self.numberOfUnreadMessages animated:NO];
-                    }
-                }
-                else {
-                    //Unread not found
-                    _isUnreadButtonShown = NO;
-                }
+        [self performSelector:@selector(showUnreadButton) withObject:nil afterDelay:1.0f];
+    }
+}
+
+- (void)showUnreadButton {
+    if (self.numberOfUnreadMessages != 0) {
+        //Show unread message view
+        NSString *obtainedLocalID = self.unreadLocalID;
+        TAPMessageModel *obtainedMessage = [self.messageDictionary objectForKey:obtainedLocalID];
+        NSInteger unreadMessageIndex = [self.messageArray indexOfObject:obtainedMessage];
+        if(NSNotFound != unreadMessageIndex) {
+            NSInteger rowIndex = unreadMessageIndex + 1; // +1 because unread identifier cell is above earliest unread message
+            BOOL isVisible = [self checkIsRowVisibleWithRowIndex:rowIndex];
+            if (!isVisible) {
+                //Show top floating unread identifier only if unread message bar is not visible
+                [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:self.numberOfUnreadMessages animated:NO];
             }
-            else {
-                //Unread not found
-                _isUnreadButtonShown = NO;
-            }
-        } forTotalSeconds:1.0f];
+        }
+        else {
+            //Unread not found
+            _isUnreadButtonShown = NO;
+        }
+    }
+    else {
+        //Unread not found
+        _isUnreadButtonShown = NO;
     }
 }
 
 - (void)showLoadMessageCellLoading:(BOOL)show {
     if (show) {
-        if (self.isLoadingOldMessageFromAPI || [self.messageArray count] == 0) {
+        if (self.isLoadingOldMessageFromAPI || [self.messageArray count] == 0 || self.isShowingTopFloatingIdentifier) {
             return;
         }
         _lastLoadingCellRowPosition = [self.messageArray count];
@@ -6971,16 +7034,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.tableView endUpdates];
     }
     else {
-        if (!self.isLoadingOldMessageFromAPI || [self.messageArray count] == 0) {
+        if (!self.isLoadingOldMessageFromAPI || [self.messageArray count] == 0 || self.isShowingTopFloatingIdentifier) {
             return;
         }
         
         //remove cell at last row
         _isLoadingOldMessageFromAPI = NO;
         NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:self.lastLoadingCellRowPosition inSection:0];
-        [self.tableView beginUpdates];
-        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
-        [self.tableView endUpdates];
+        if (self.lastLoadingCellRowPosition > [self.messageArray count]) {
+            [self.tableView beginUpdates];
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [self.tableView endUpdates];
+        }
     }
 }
 

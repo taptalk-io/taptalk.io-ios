@@ -151,6 +151,8 @@
                                      failure:(void (^)(NSError *error))failure;
 
 //API Call
++ (void)callAPILogoutWithSuccess:(void (^)(void))success
+                         failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetAuthTicketWithUser:(TAPUserModel *)user
                              success:(void (^)(NSString *authTicket))success
                              failure:(void (^)(NSError *error))failure; //DV Temp

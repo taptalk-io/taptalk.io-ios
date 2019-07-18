@@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeGetMessageRoomListAfter,
     TAPAPIManagerTypeGetMessageRoomListBefore,
     TAPAPIManagerTypeGetPendingNewAndUpdatedMessages,
+    TAPAPIManagerTypeLogout,
     TAPAPIManagerTypeGetContactList,
     TAPAPIManagerTypeAddContact,
     TAPAPIManagerTypeRemoveContact,

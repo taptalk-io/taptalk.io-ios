@@ -167,6 +167,8 @@
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
     
+    [self.contentView layoutIfNeeded];
+    
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
     [self showForwardView:NO];
@@ -191,7 +193,7 @@
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
-    
+
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
 }
@@ -378,6 +380,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
@@ -398,6 +401,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self setQuote:message.quote userID:@""];
@@ -411,6 +415,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 0.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self showQuoteView:NO];
@@ -427,11 +432,13 @@
         if (imageTempWidth == 0.0f && imageTempHeight == 0.0f) {
             self.bubbleImageViewWidthConstraint.constant = 0.0f;
             self.bubbleImageViewHeightConstraint.constant = 0.0f;
+            [self.contentView layoutIfNeeded];
         }
         else {
             [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+            [self.contentView layoutIfNeeded];
         }
         
 #ifdef DEBUG
@@ -454,10 +461,12 @@
                 else {
                     self.bubbleImageViewWidthConstraint.constant = 0.0f;
                     self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                    [self.contentView layoutIfNeeded];
                 }
             } failureHandler:^{
                 self.bubbleImageViewWidthConstraint.constant = 0.0f;
                 self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                [self.contentView layoutIfNeeded];
             }];
         }
         else {
@@ -468,6 +477,7 @@
                 else {
                     self.bubbleImageViewWidthConstraint.constant = 0.0f;
                     self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                    [self.contentView layoutIfNeeded];
                 }
             }];
         }
@@ -482,6 +492,7 @@
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+        [self.contentView layoutIfNeeded];
     }
     
     if (self.cellWidth == 0.0f || self.cellHeight == 0.0f) {
@@ -556,38 +567,30 @@
             self.statusLabel.text = failedStatusString;
         }
         
-        [UIView animateWithDuration:0.2f animations:^{
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButtonRightConstraint.constant = 2.0f;
-            
-            if (self.message.isFailedSend) {
-                self.statusIconImageView.alpha = 0.0f;
-                self.replyButton.alpha = 0.0f;
-            }
-            else {
-                self.statusIconImageView.alpha = 1.0f;
-                self.replyButton.alpha = 1.0f;
-            }
-            
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
+        self.statusLabel.alpha = 1.0f;
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        self.replyButtonRightConstraint.constant = 2.0f;
+        
+        if (self.message.isFailedSend) {
+            self.statusIconImageView.alpha = 0.0f;
+            self.replyButton.alpha = 0.0f;
+        }
+        else {
+            self.statusIconImageView.alpha = 1.0f;
+            self.replyButton.alpha = 1.0f;
+        }
+        
+        [self.contentView layoutIfNeeded];
     }
     else {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.statusLabel.alpha = 0.0f;
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            self.replyButton.alpha = 0.0f;
-            self.replyButtonRightConstraint.constant = -28.0f;
-            self.statusIconImageView.alpha = 1.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
+        self.statusLabel.alpha = 0.0f;
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
+        self.replyButton.alpha = 0.0f;
+        self.replyButtonRightConstraint.constant = -28.0f;
+        self.statusIconImageView.alpha = 1.0f;
+        [self.contentView layoutIfNeeded];
     }
 }
 
@@ -961,6 +964,7 @@
         self.captionLabelBottomConstraint.constant = 0.0f;
         self.captionLabelHeightConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setImageCaptionWithString:(NSString *)captionString {
@@ -976,6 +980,9 @@
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
     
+    UIColor *highlightedTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURLHighlighted];
+    UIColor *defaultTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURL];
+    
     NSString *messageText = [TAPUtil nullToEmptyString:self.captionLabel.text];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
     // the next line throws an exception if string is nil - make sure you check
@@ -983,8 +990,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[NSForegroundColorAttributeName] = defaultTextColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
@@ -993,8 +1000,8 @@
         NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
         attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
         attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-        attributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
-        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [TAPUtil getColor:@"5AC8FA"];
+        attributes[NSForegroundColorAttributeName] = defaultTextColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
         attributes[@"NSTextCheckingResult"] = result;
         
         [attributedString addAttributes:attributes range:result.range];
@@ -1061,6 +1068,7 @@
         self.replyButtonTrailingConstraint.active = NO;
         self.replyView.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -1080,6 +1088,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -1095,6 +1104,7 @@
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {

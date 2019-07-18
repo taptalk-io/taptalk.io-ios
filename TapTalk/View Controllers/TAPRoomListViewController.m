@@ -225,7 +225,13 @@
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
-        [cell setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
+        
+//        [cell setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
+        
+        //DV Temp - temporary remove room when group or channel
+        if (roomList.lastMessage.room.type == RoomTypePersonal) {
+            [cell setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
+        }
         
         if (indexPath.row == [self.roomListArray count] - 1) {
             [cell setIsLastCellSeparator:YES];
@@ -711,19 +717,15 @@
                 TAPRoomListModel *oldRoomList = [oldRoomListDictionary objectForKey:newRoomList.lastMessage.room.roomID];
                 
                 if (oldRoomList == nil) {
+                    //Room list not found in old data, so this is a new room
+                    //Populate old data
+                    [oldRoomListArray insertObject:newRoomList atIndex:newIndex];
+                    [oldRoomListDictionary setObject:newRoomList forKey:newRoomList.lastMessage.room.roomID];
                     
-                    //CS NOTE - Add delay callback for 0.0f to prevent crash on some cases, ex: create group with photo would crash on receive multiple emit
-                    [TAPUtil delayCallback:^{
-                        //Room list not found in old data, so this is a new room
-                        //Populate old data
-                        [oldRoomListArray insertObject:newRoomList atIndex:newIndex];
-                        [oldRoomListDictionary setObject:newRoomList forKey:newRoomList.lastMessage.room.roomID];
-                        
-                        //Insert to table view
-                        [self.roomListView.roomListTableView beginUpdates];
-                        [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-                        [self.roomListView.roomListTableView endUpdates];
-                    } forTotalSeconds:0.0f];
+                    //Insert to table view
+                    [self.roomListView.roomListTableView beginUpdates];
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.roomListView.roomListTableView endUpdates];
                     continue;
                 }
                 
@@ -900,14 +902,11 @@
             newRoomList.numberOfUnreadMessages = 0;
         }
         
-        //CS NOTE - Add delay callback for 0.0f to prevent crash on some cases, ex: create group with photo would crash on receive multiple emit
-        [TAPUtil delayCallback:^{
-            [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
-            [self.roomListView.roomListTableView beginUpdates];
-            [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.roomListView.roomListTableView endUpdates];
-            [self.roomListView showNoChatsView:NO];
-        } forTotalSeconds:0.0f];
+        [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+        [self.roomListView.roomListTableView beginUpdates];
+        [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.roomListView.roomListTableView endUpdates];
+        [self.roomListView showNoChatsView:NO];
       
     }
 }

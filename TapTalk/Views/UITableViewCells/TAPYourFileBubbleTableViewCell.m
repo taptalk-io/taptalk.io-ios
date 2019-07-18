@@ -172,10 +172,11 @@
     [self showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeNotDownloaded];
     
     self.senderImageView.clipsToBounds = YES;
-    self.senderImageView.layer.cornerRadius = 14.0f;
+    self.senderImageView.layer.cornerRadius = CGRectGetHeight(self.senderImageView.frame)/2.0f;
     
     [self setBubbleCellStyle];
     [self showSenderInfo:NO];
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)prepareForReuse {
@@ -292,6 +293,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
@@ -312,6 +314,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self setQuote:message.quote userID:@""];
@@ -324,6 +327,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 0.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self showQuoteView:NO];
@@ -396,7 +400,14 @@
     //CS NOTE - check chat room type, show sender info if group type
     if (message.room.type == RoomTypeGroup) {
         [self showSenderInfo:YES];
-        [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        
+        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+        }
+
         self.senderNameLabel.text = message.user.fullname;
     }
     else {
@@ -457,37 +468,21 @@
         NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
         self.statusLabel.text = statusString;
         
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButton.alpha = 1.0f;
-            self.replyButtonLeftConstraint.constant = 2.0f;
-        } completion:^(BOOL finished) {
-        }];
+        self.statusLabel.alpha = 1.0f;
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        self.replyButton.alpha = 1.0f;
+        self.replyButtonLeftConstraint.constant = 2.0f;
     }
     else {
-        CGFloat animationDuration = 0.2f;
         
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            self.replyButton.alpha = 0.0f;
-            self.replyButtonLeftConstraint.constant = -28.0f;
-        } completion:^(BOOL finished) {
-            self.statusLabel.alpha = 0.0f;
-        }];
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
+        self.replyButton.alpha = 0.0f;
+        self.replyButtonLeftConstraint.constant = -28.0f;
+        self.statusLabel.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (IBAction)replyButtonDidTapped:(id)sender {
@@ -594,6 +589,7 @@
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -615,6 +611,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -630,6 +627,7 @@
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
@@ -822,7 +820,7 @@
 - (void)showSenderInfo:(BOOL)show {
     _isShowSenderInfoView = show;
     if (show) {
-        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
         self.senderNameHeightConstraint.constant = 18.0f;
         self.forwardTitleLabelTopConstraint.constant = 4.0f;
@@ -833,6 +831,7 @@
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)updateSpacingConstraint {
@@ -855,6 +854,7 @@
         self.quoteViewTopConstraint.constant = 0.0f;
         self.forwardFromLabelTopConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 @end

@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setProfilePictureWithImageURL:(NSString *)imageURL;
 - (void)setAsLoading:(BOOL)loading;
 - (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)showLogoutLoadingView:(BOOL)isShow;
+- (void)animateLogoutLoading:(BOOL)isAnimate;
 
 @end
 

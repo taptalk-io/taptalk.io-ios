@@ -73,24 +73,10 @@
     }
     
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
-        //Send Push Token to server
-        NSString *pushToken = [[TAPNotificationManager sharedManager] pushToken];
         
-        if (pushToken != nil) {
-
-            BOOL isDebug = NO;
-#ifdef DEBUG
-            isDebug = YES;
-#else
-            isDebug = NO;
-#endif
-            
-            [TAPDataManager callAPIUpdatePushNotificationWithToken:pushToken isDebug:isDebug success:^{
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PUSH_TOKEN];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-            } failure:^(NSError *error) {
-                
-            }];
+        //Check need to send push token to server
+        if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkDidRequestRemoteNotification)]) {
+            [[TapTalk sharedInstance].delegate tapTalkDidRequestRemoteNotification];
         }
         
         [[TAPChatManager sharedManager] connect];
@@ -228,6 +214,11 @@
     if ([TAPChatManager sharedManager].activeUser != nil) {
         //User active
         [[TAPConnectionManager sharedManager] connect];
+        
+        //Check is need to trigger get push token flow
+        if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkDidRequestRemoteNotification)]) {
+            [[TapTalk sharedInstance].delegate tapTalkDidRequestRemoteNotification];
+        }
     }
 
     //Start trigger timer to save new message
@@ -252,7 +243,9 @@
     pushToken = [pushToken stringByReplacingOccurrencesOfString:@">" withString:@""];
     pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
     
+#ifdef DEBUG
     NSLog(@"PUSH TOKEN: %@", pushToken);
+#endif
     
     [[TAPNotificationManager sharedManager] setPushToken:pushToken];
 }
@@ -781,13 +774,20 @@ fromNavigationController:(UINavigationController *)navigationController
     [[TAPChatManager sharedManager] disconnect];
 }
 
-- (void)logoutAndClearAllData {
-    
-    [[TapTalk sharedInstance] clearAllData];
-    [[TapTalk sharedInstance] disconnect];
-    
-    TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
-    [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
+- (void)logoutAndClearAllDataWithSuccess:(void (^)(void))success
+                                 failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPILogoutWithSuccess:^{
+        [[TapTalk sharedInstance] clearAllData];
+        [[TapTalk sharedInstance] disconnect];
+        
+        success();
+        
+        TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
+        [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
 }
 
 - (void)clearAllData {
@@ -800,7 +800,6 @@ fromNavigationController:(UINavigationController *)navigationController
     
     //Remove all preference
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACTIVE_USER];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PUSH_TOKEN];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACCESS_TOKEN];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_REFRESH_TOKEN];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_REFRESH_TOKEN_EXPIRED_TIME];

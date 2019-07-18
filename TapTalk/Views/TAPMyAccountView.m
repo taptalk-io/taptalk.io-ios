@@ -21,6 +21,12 @@
 
 @property (strong, nonatomic) UIView *halfRoundWhiteBackgroundView;
 
+@property (strong, nonatomic) UIView *logoutLoadingBackgroundView;
+@property (strong, nonatomic) UIView *logoutLoadingView;
+@property (strong, nonatomic) UIImageView *logoutLoadingImageView;
+@property (strong, nonatomic) UILabel *logoutLoadingLabel;
+@property (strong, nonatomic) UIButton *logoutLoadingButton;
+
 @property (strong, nonatomic) UIView *progressBarBackgroundView;
 @property (strong, nonatomic) UIView *progressBarView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
@@ -218,6 +224,39 @@
         [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
 //        [self.scrollView addSubview:self.continueButtonView]; //CS TEMP - hide continue button
 
+        //Logout Loading View
+        _logoutLoadingBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
+        self.logoutLoadingBackgroundView.backgroundColor = [[TAPUtil getColor:@"04040F"] colorWithAlphaComponent:0.4f];
+        self.logoutLoadingBackgroundView.alpha = 0.0;
+        [self addSubview:self.logoutLoadingBackgroundView];
+        
+        _logoutLoadingView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 150.0f) / 2.0f, (CGRectGetHeight(self.frame) - 150.0f) / 2.0f, 160.0f, 160.0f)];
+        self.logoutLoadingView.backgroundColor = [UIColor whiteColor];
+        self.logoutLoadingView.layer.shadowRadius = 5.0f;
+        self.logoutLoadingView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+        self.logoutLoadingView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.logoutLoadingView.layer.shadowOpacity = 1.0f;
+        self.logoutLoadingView.layer.masksToBounds = NO;
+        self.logoutLoadingView.layer.cornerRadius = 6.0f;
+        self.logoutLoadingView.clipsToBounds = YES;
+        [self.logoutLoadingBackgroundView addSubview:self.logoutLoadingView];
+        
+        _logoutLoadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.logoutLoadingView.frame) - 60.0f) / 2.0f, 28.0f, 60.0f, 60.0f)];
+        [self.logoutLoadingView addSubview:self.logoutLoadingImageView];
+        
+        UIFont *popupLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupLoadingLabel];
+        UIColor *popupLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupLoadingLabel];
+        _logoutLoadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, CGRectGetMaxY(self.logoutLoadingImageView.frame) + 16.0f, CGRectGetWidth(self.logoutLoadingView.frame) - 8.0f - 8.0f, 20.0f)];
+        self.logoutLoadingLabel.font = popupLabelFont;
+        self.logoutLoadingLabel.textColor = popupLabelColor;
+        self.logoutLoadingLabel.textAlignment = NSTextAlignmentCenter;
+        [self.logoutLoadingView addSubview:self.logoutLoadingLabel];
+        
+        _logoutLoadingButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.logoutLoadingBackgroundView.frame), CGRectGetHeight(self.logoutLoadingBackgroundView.frame))];
+        self.logoutLoadingButton.alpha = 0.0f;
+        self.logoutLoadingButton.userInteractionEnabled = NO;
+        [self.logoutLoadingBackgroundView addSubview:self.logoutLoadingButton];
+        
         CGFloat bottomGap = 16.0f;
         if (IS_IPHONE_X_FAMILY) {
             bottomGap = [TAPUtil safeAreaBottomPadding];
@@ -396,6 +435,42 @@
     _progressLayer = nil;
     
     self.progressBarBackgroundView.alpha = 0.0f;
+}
+
+- (void)showLogoutLoadingView:(BOOL)isShow {
+    if (isShow) {
+        [self animateLogoutLoading:YES];
+        [UIView animateWithDuration:0.2f animations:^{
+            self.logoutLoadingBackgroundView.alpha = 1.0f;
+        }];
+    }
+    else {
+        [self animateLogoutLoading:NO];
+        [UIView animateWithDuration:0.2f animations:^{
+            self.logoutLoadingBackgroundView.alpha = 0.0f;
+        }];
+    }
+}
+
+- (void)animateLogoutLoading:(BOOL)isAnimate {
+    if (isAnimate) {
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        animation.fromValue = [NSNumber numberWithFloat:0.0f];
+        animation.toValue = [NSNumber numberWithFloat: 2 * M_PI];
+        animation.duration = 1.5f;
+        animation.repeatCount = INFINITY;
+        animation.removedOnCompletion = NO;
+        [self.logoutLoadingImageView.layer addAnimation:animation forKey:@"FirstLoadSpinAnimation"];
+        
+        self.logoutLoadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaving" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.logoutLoadingLabel.text = NSLocalizedString(@"Logging out...", @"");
+        self.logoutLoadingButton.alpha = 1.0f;
+        self.logoutLoadingButton.userInteractionEnabled = YES;
+
+    }
+    else {
+        [self.logoutLoadingImageView.layer removeAnimationForKey:@"FirstLoadSpinAnimation"];
+    }
 }
 
 @end

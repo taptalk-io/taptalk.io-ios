@@ -28,14 +28,14 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="H1d-AO-jhD" customClass="TAPImageView">
-                        <rect key="frame" x="16" y="0.0" width="28" height="28"/>
+                        <rect key="frame" x="16" y="0.0" width="30" height="30"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="28" id="5h9-eW-vg8"/>
-                            <constraint firstAttribute="height" constant="28" id="mFp-2M-X2Q"/>
+                            <constraint firstAttribute="width" constant="30" id="5h9-eW-vg8"/>
+                            <constraint firstAttribute="height" constant="30" id="mFp-2M-X2Q"/>
                         </constraints>
                     </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6yA-Ee-rcg">
-                        <rect key="frame" x="48" y="0.0" width="84" height="182"/>
+                        <rect key="frame" x="50" y="0.0" width="84" height="182"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P35-4u-fgT">
                                 <rect key="frame" x="10" y="10" width="64" height="16"/>
@@ -373,9 +373,9 @@
                                 <viewLayoutGuide key="safeArea" id="mmy-cz-6Mf"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J4M-Xo-U5R">
-                                <rect key="frame" x="66" y="133" width="8" height="14"/>
+                                <rect key="frame" x="66" y="131" width="8" height="16"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="14" id="EOz-eX-0YN"/>
+                                    <constraint firstAttribute="height" constant="16" id="EOz-eX-0YN"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                 <color key="textColor" red="0.17254901959999999" green="0.17254901959999999" blue="0.17254901959999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -408,7 +408,7 @@
                             <constraint firstItem="S25-o2-HCt" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="leading" constant="10" id="8dO-E5-FfO"/>
                             <constraint firstAttribute="trailing" secondItem="iLw-Gy-lXq" secondAttribute="trailing" constant="10" id="AZ1-6D-k3w"/>
                             <constraint firstItem="9OW-SB-qa6" firstAttribute="top" secondItem="J4M-Xo-U5R" secondAttribute="bottom" id="B0T-uz-fEk"/>
-                            <constraint firstItem="J4M-Xo-U5R" firstAttribute="top" secondItem="S25-o2-HCt" secondAttribute="top" constant="9" id="BvT-JF-BJZ"/>
+                            <constraint firstItem="J4M-Xo-U5R" firstAttribute="top" secondItem="S25-o2-HCt" secondAttribute="top" constant="7" id="BvT-JF-BJZ"/>
                             <constraint firstItem="iLw-Gy-lXq" firstAttribute="top" secondItem="gRg-Mv-FjH" secondAttribute="bottom" constant="2" id="JAJ-UA-hrH"/>
                             <constraint firstItem="9OW-SB-qa6" firstAttribute="leading" secondItem="S25-o2-HCt" secondAttribute="trailing" constant="8" id="Kne-4x-Uos"/>
                             <constraint firstAttribute="trailing" secondItem="9OW-SB-qa6" secondAttribute="trailing" constant="10" id="MUp-h3-9Iz"/>
@@ -435,7 +435,7 @@
                         </constraints>
                     </view>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MjL-ub-o2J">
-                        <rect key="frame" x="134" y="152" width="28" height="28"/>
+                        <rect key="frame" x="136" y="152" width="28" height="28"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="28" id="OKh-z9-MLI"/>
                             <constraint firstAttribute="height" constant="28" id="RX7-BE-CGZ"/>
@@ -446,7 +446,7 @@
                         </connections>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u5V-oM-bLv">
-                        <rect key="frame" x="48" y="185.5" width="256" height="13"/>
+                        <rect key="frame" x="50" y="185.5" width="254" height="13"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="13" id="pyt-US-7n0"/>

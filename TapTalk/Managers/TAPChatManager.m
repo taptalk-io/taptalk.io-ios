@@ -854,13 +854,15 @@
     [[TAPFileUploadManager sharedManager] sendFileWithData:message];
 }
 
-- (void)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index {
+- (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index {
     TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser created:created room:room body:@"" type:TAPChatMessageTypeUnreadMessageIdentifier];
-    for (id delegate in self.delegatesArray) {
-        if ([delegate respondsToSelector:@selector(chatManagerDidAddUnreadMessageIdentifier:indexPosition:)]) {
-            [delegate chatManagerDidAddUnreadMessageIdentifier:message indexPosition:index];
-        }
-    }
+    
+    return message;
+//    for (id delegate in self.delegatesArray) {
+//        if ([delegate respondsToSelector:@selector(chatManagerDidAddUnreadMessageIdentifier:indexPosition:)]) {
+//            [delegate chatManagerDidAddUnreadMessageIdentifier:message indexPosition:index];
+//        }
+//    }
 }
 
 - (void)setActiveUser:(TAPUserModel *)activeUser {
@@ -977,7 +979,7 @@
     decryptedMessage.isSending = NO;
     
 #ifdef DEBUG
-    NSLog(@"Receive Message: %@", decryptedMessage.body);
+    NSLog(@"Receive Message (event: %@, localID: %@): %@", eventName, decryptedMessage.localID, decryptedMessage.body);
 #endif
     
     if ([eventName isEqualToString:kTAPEventNewMessage]) {

@@ -159,6 +159,10 @@
     NSString *lastSender = @"";
     
     NSString *profileImageURL = message.room.imageURL.thumbnail;
+    if ([[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID]) {
+        TAPRoomModel *room = [[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID];
+        profileImageURL = room.imageURL.thumbnail;
+    }
     NSInteger numberOfUnreadMessage = roomList.numberOfUnreadMessages;
     
     TAPRoomModel *currentRoom = message.room;
@@ -312,7 +316,7 @@
         }
         case TAPMessageStatusTypeSending:
         {
-            if (numberOfUnreadMessage > 0) {
+            if (numberOfUnreadMessage > 0 || message.type == TAPChatMessageTypeSystemMessage) {
                 self.messageStatusImageView.alpha = 0.0f;
             }
             else {
@@ -324,7 +328,7 @@
         }
         case TAPMessageStatusTypeSent:
         {
-            if (numberOfUnreadMessage > 0) {
+            if (numberOfUnreadMessage > 0 || message.type == TAPChatMessageTypeSystemMessage) {
                 self.messageStatusImageView.alpha = 0.0f;
             }
             else {
@@ -336,7 +340,7 @@
         }
         case TAPMessageStatusTypeDelivered:
         {
-            if (numberOfUnreadMessage > 0) {
+            if (numberOfUnreadMessage > 0 || message.type == TAPChatMessageTypeSystemMessage) {
                 self.messageStatusImageView.alpha = 0.0f;
             }
             else {
@@ -348,7 +352,7 @@
         }
         case TAPMessageStatusTypeRead:
         {
-            if (numberOfUnreadMessage > 0) {
+            if (numberOfUnreadMessage > 0 || message.type == TAPChatMessageTypeSystemMessage) {
                 self.messageStatusImageView.alpha = 0.0f;
             }
             else {
@@ -360,7 +364,7 @@
         }
         case TAPMessageStatusTypeFailed:
         {
-            if (numberOfUnreadMessage > 0) {
+            if (numberOfUnreadMessage > 0 || message.type == TAPChatMessageTypeSystemMessage) {
                 self.messageStatusImageView.alpha = 0.0f;
             }
             else {
@@ -372,7 +376,7 @@
         }
         case TAPMessageStatusTypeDeleted:
         {
-            if (numberOfUnreadMessage > 0) {
+            if (numberOfUnreadMessage > 0 || message.type == TAPChatMessageTypeSystemMessage) {
                 self.messageStatusImageView.alpha = 0.0f;
             }
             else {
@@ -416,7 +420,6 @@
         lastMessage = message.body;
         
         //handle system message
-        
         NSString *targetAction = message.action;
         TAPGroupTargetModel *groupTarget = message.target;
         NSString *targetName = groupTarget.targetName;
@@ -440,7 +443,7 @@
         }
     }
     
-    //Check if cell is reused, forece update unread bubble
+    //Check if cell is reused, force update unread bubble
     if (self.isShouldForceUpdateUnreadBubble) {
         updateUnreadBubble = YES;
         _isShouldForceUpdateUnreadBubble = NO;

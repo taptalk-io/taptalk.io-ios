@@ -174,6 +174,8 @@
     [self showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
     
     [self setBubbleCellStyle];
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)prepareForReuse {
@@ -190,6 +192,8 @@
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
+    
+    [self.contentView layoutIfNeeded];
     
     self.bubbleLabel.text = @"";
     self.statusLabel.text = @"";
@@ -294,6 +298,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
@@ -314,10 +319,11 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 11.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
-        [self setQuote:message.quote userID:@""];
         [self showQuoteView:YES];
+        [self setQuote:message.quote userID:@""];
     }
     else {
         if (self.isShowForwardView) {
@@ -326,6 +332,7 @@
         else {
             self.forwardTitleLabelTopConstraint.constant = 0.0f;
         }
+        [self.contentView layoutIfNeeded];
         
         [self showReplyView:NO withMessage:nil];
         [self showQuoteView:NO];
@@ -411,7 +418,6 @@
 
 - (void)showStatusLabel:(BOOL)show {
     if (show) {
-        [UIView animateWithDuration:0.2f animations:^{
             self.statusLabel.alpha = 1.0f;
             self.statusLabelTopConstraint.constant = 2.0f;
             self.statusLabelHeightConstraint.constant = 13.0f;
@@ -419,12 +425,8 @@
             self.replyButtonRightConstraint.constant = 2.0f;
             self.statusIconImageView.alpha = 1.0f;
             [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
     }
     else {
-        [UIView animateWithDuration:0.2f animations:^{
             self.statusLabel.alpha = 0.0f;
             self.statusLabelTopConstraint.constant = 0.0f;
             self.statusLabelHeightConstraint.constant = 0.0f;
@@ -432,9 +434,6 @@
             self.replyButtonRightConstraint.constant = -28.0f;
             self.statusIconImageView.alpha = 1.0f;
             [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-        }];
     }
 }
 
@@ -497,6 +496,7 @@
 }
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
+    NSLog(@"--SHOW REPLY-- %ld", show);
     if (show) {
         //check id message sender is equal to active user id, if yes change the title to "You"
         if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
@@ -543,9 +543,11 @@
         self.replyButtonLeadingConstraint.active = NO;
         self.replyButtonTrailingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showQuoteView:(BOOL)show {
+    NSLog(@"--SHOW QUOTE %ld", show);
     if (show) {
         self.quoteViewLeadingConstraint.active = YES;
         self.quoteViewTrailingConstraint.active = YES;
@@ -565,6 +567,7 @@
         self.replyViewBottomConstraint.active = YES;
         self.replyViewTopConstraint.active = YES;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -580,6 +583,7 @@
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
@@ -603,6 +607,7 @@
                            range:NSMakeRange(6, [self.forwardFromLabel.text length] - 6)];
     
     self.forwardFromLabel.attributedText = attributedText;
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
@@ -705,6 +710,8 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     
     self.statusIconImageView.alpha = 0.0f;
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)animateFailedDownloadFile {
@@ -860,6 +867,7 @@
         [self showStatusLabel:YES];
         self.replyButton.alpha = 0.0f;
         self.replyButtonRightConstraint.constant = -28.0f;
+        [self.contentView layoutIfNeeded];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeRetryDownload) {
         self.cancelView.alpha = 0.0f;

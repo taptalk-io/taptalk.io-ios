@@ -596,6 +596,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [[TAPContactManager sharedManager] addContactWithUserModel:self.user saveToDatabase:YES];
                         [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAddToContact];
                         
+                        //Add user to Contact Manager
+                        self.user.isContact = YES;
+                        [[TAPContactManager sharedManager] addContactWithUserModel:self.user saveToDatabase:YES];
+                        
                         [TAPUtil delayCallback:^{
                             [self.navigationController popViewControllerAnimated:YES];
                         } forTotalSeconds:1.2f];

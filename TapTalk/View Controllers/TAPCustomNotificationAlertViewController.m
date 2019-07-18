@@ -108,10 +108,14 @@
         [UIView animateWithDuration:0.3f animations:^{
             if (self.messageShownCounter % 2 == 1) {
                 //Odd Message, show first notification view
+                self.customNotificationAlertView.firstNotificationView.alpha = 1.0f;
+                self.customNotificationAlertView.secondNotificationView.alpha = 0.0f;
                 self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
             }
             else {
                 //Even Message, show secondary notification view
+                self.customNotificationAlertView.firstNotificationView.alpha = 0.0f;
+                self.customNotificationAlertView.secondNotificationView.alpha = 1.0f;
                 self.customNotificationAlertView.secondNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.secondNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.secondNotificationView.frame));
             }
         } completion:^(BOOL finished) {
@@ -134,6 +138,9 @@
                     //Odd Message, show first notification view
                     self.customNotificationAlertView.firstNotificationView.layer.zPosition = 1;
                     
+                    self.customNotificationAlertView.firstNotificationView.alpha = 1.0f;
+                    self.customNotificationAlertView.secondNotificationView.alpha = 0.0f;
+                    
                     self.customNotificationAlertView.firstNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.firstNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.firstNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.firstNotificationView.frame));
                     
                     self.customNotificationAlertView.secondNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondNotificationView.frame), -CGRectGetHeight(self.customNotificationAlertView.secondNotificationView.frame), CGRectGetWidth(self.customNotificationAlertView.secondNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.secondNotificationView.frame));
@@ -141,6 +148,9 @@
                 else {
                     //Even Message, show secondary notification view
                     self.customNotificationAlertView.secondNotificationView.layer.zPosition = 1;
+                    
+                    self.customNotificationAlertView.firstNotificationView.alpha = 0.0f;
+                    self.customNotificationAlertView.secondNotificationView.alpha = 1.0f;
                     
                     self.customNotificationAlertView.secondNotificationView.frame = CGRectMake(CGRectGetMinX(self.customNotificationAlertView.secondNotificationView.frame), 0.0f, CGRectGetWidth(self.customNotificationAlertView.secondNotificationView.frame), CGRectGetHeight(self.customNotificationAlertView.secondNotificationView.frame));
                     

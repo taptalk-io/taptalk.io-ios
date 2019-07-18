@@ -2195,15 +2195,18 @@
             return color;
             break;
         }
-            
-            
-//            TAPComponentColorIconChatComposerSend, //Chat Room
-//            TAPComponentColorIconChatComposerSendInactive, //Chat Room
-//            TAPComponentColorIconChatComposerBurgerMenu, //Chat Room
-//            TAPComponentColorIconChatComposerSendBackground, //Chat Room
-//            TAPComponentColorIconChatComposerSendBackgroundInactive, //Chat Room
-
-
+        case TAPComponentColorIconDeletedLeftMessageBubble:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconDeletedRightMessageBubble:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TAPUtil getColor:@"9B9B9B"];
