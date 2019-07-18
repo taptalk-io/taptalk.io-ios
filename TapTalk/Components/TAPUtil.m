@@ -933,6 +933,17 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     });
 }
 
++ (void)performBlock:(void (^)())block
+{
+    block();
+}
+
++ (void)performBlock:(void (^)())block afterDelay:(NSTimeInterval)delay
+{
+    void (^block_)() = [block copy]; // autorelease this if you're not using ARC
+    [self performSelector:@selector(performBlock:) withObject:block_ afterDelay:delay];
+}
+
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle {
     NSBundle *resourceBundle = [PodAsset bundleForPod:@"TapTalk"];

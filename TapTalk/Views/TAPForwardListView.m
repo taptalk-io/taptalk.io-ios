@@ -34,7 +34,7 @@
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
         self.searchBarView.backgroundColor = [UIColor whiteColor];
-        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search", @"");
+        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for chats or contacts", @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
         UIFont *sectionHeaderTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];

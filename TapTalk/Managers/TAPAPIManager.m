@@ -59,10 +59,10 @@ static NSString * const kAPIVersionString = @"v1";
 
 #pragma mark - Custom Method
 - (NSString *)urlForType:(TAPAPIManagerType)type {
+
     if (type == TAPAPIManagerTypeGetAuthTicket) {
         NSString *apiPath = @"server/auth_ticket/request";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
-        
     }
     else if (type == TAPAPIManagerTypeGetAccessToken) {
         NSString *apiPath = @"auth/access_token/request";
@@ -91,6 +91,10 @@ static NSString * const kAPIVersionString = @"v1";
     }
     else if (type == TAPAPIManagerTypeGetPendingNewAndUpdatedMessages) {
         NSString *apiPath = @"chat/message/new_and_updated";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeLogout) {
+        NSString *apiPath = @"client/logout";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     else if (type == TAPAPIManagerTypeGetContactList) {

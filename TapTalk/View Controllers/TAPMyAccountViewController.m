@@ -588,16 +588,24 @@
         //Skip Upload Image
         [self fetchUserDataWithUser:self.currentUser];
     }
+    else if ([popupIdentifier isEqualToString:@"Error Logout"]) {
+
+    }
     else if ([popupIdentifier isEqualToString:@"Logout"]) {
         //Logout
-        
+        [self.myAccountView showLogoutLoadingView:YES];
         if ([self.delegate respondsToSelector:@selector(myAccountViewControllerDidTappedLogoutButton)]) {
             [self.delegate myAccountViewControllerDidTappedLogoutButton];
         }
         
-        [self dismissViewControllerAnimated:NO completion:^{
-            [[TapTalk sharedInstance] logoutAndClearAllData];
-        }];
+            [[TapTalk sharedInstance] logoutAndClearAllDataWithSuccess:^{
+                [self dismissViewControllerAnimated:NO completion:nil];
+                [self.myAccountView showLogoutLoadingView:NO];
+            } failure:^(NSError *error) {
+                //Show alert
+                [self.myAccountView showLogoutLoadingView:NO];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Logout" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Something went wrong, please try again.", @"") leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@"OK"];
+            }];
     }
 }
 

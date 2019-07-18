@@ -76,7 +76,7 @@
         [self addSubview:self.searchBarBackgroundView];
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
-        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search by Username", @"");
+        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search by username", @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
