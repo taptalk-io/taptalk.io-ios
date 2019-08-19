@@ -8,14 +8,6 @@
 
 #import "TAPAPIManager.h"
 
-static NSString * const kBaseURLProduction = @"https://engine.taptalk.io";
-static NSString * const kBaseURLStaging = @"https://engine-stg.taptalk.io";
-static NSString * const kBaseURLDevelopment = @"https://engine-dev.taptalk.io";
-
-//static NSString * const kBaseURLProduction = @"https://taptalk-production.moselo.com";
-//static NSString * const kBaseURLStaging = @"https://hp-staging.moselo.com";
-//static NSString * const kBaseURLDevelopment = @"https://hp-dev.moselo.com";
-
 static NSString * const kAPIVersionString = @"v1";
 
 @interface TAPAPIManager ()
@@ -40,26 +32,18 @@ static NSString * const kAPIVersionString = @"v1";
     self = [super init];
     
     if (self) {
-            TapTalkEnvironment environmentType = [TapTalk sharedInstance].environment;
-
-            _APIBaseURL = [NSString string];
-            if (environmentType == TapTalkEnvironmentDevelopment) {
-                _APIBaseURL = [NSString stringWithFormat:@"%@/api", kBaseURLDevelopment];
-            }
-            else if (environmentType == TapTalkEnvironmentStaging) {
-                _APIBaseURL = [NSString stringWithFormat:@"%@/api", kBaseURLStaging];
-            }
-            else {
-                _APIBaseURL = [NSString stringWithFormat:@"%@/api", kBaseURLProduction];
-            }
+        _APIBaseURL = [NSString string];
     }
     
     return self;
 }
 
 #pragma mark - Custom Method
-- (NSString *)urlForType:(TAPAPIManagerType)type {
+- (void)setBaseAPIURLString:(NSString *)urlString {
+    _APIBaseURL = [NSString stringWithFormat:@"%@/api", urlString];
+}
 
+- (NSString *)urlForType:(TAPAPIManagerType)type {
     if (type == TAPAPIManagerTypeGetAuthTicket) {
         NSString *apiPath = @"server/auth_ticket/request";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
@@ -211,6 +195,14 @@ static NSString * const kAPIVersionString = @"v1";
     }
     else if (type == TAPAPIManagerTypeLeaveRoom) {
         NSString *apiPath = @"client/room/leave";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDeleteRoom) {
+        NSString *apiPath = @"client/room/delete";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetProjectConfigs) {
+        NSString *apiPath = @"client/project_configs";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     

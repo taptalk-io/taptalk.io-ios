@@ -30,6 +30,7 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupSubjectViewType) {
 
 @property (strong, nonatomic) TAPCustomButtonView *createButtonView;
 
+@property (strong, nonatomic) UIView *removePictureView;
 @property (strong, nonatomic) UIButton *removePictureButton;
 @property (strong, nonatomic) UIButton *changePictureButton;
 

@@ -46,6 +46,7 @@ typedef NS_ENUM(NSInteger, TAPCustomButtonViewIconPosititon) {
 - (void)setButtonWithTitle:(NSString *)title andIcon:(NSString *)imageName iconPosition:(TAPCustomButtonViewIconPosititon)tapCustomButtonViewIconPosititon;
 - (void)setAsActiveState:(BOOL)active animated:(BOOL)animated;
 - (void)setAsLoading:(BOOL)loading animated:(BOOL)animated;
+- (void)setButtonIconTintColor:(UIColor *)color;
 
 @end
 

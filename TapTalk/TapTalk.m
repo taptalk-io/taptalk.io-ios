@@ -15,23 +15,19 @@
 
 @interface TapTalk () <TAPNotificationManagerDelegate>
 
+@property (nonatomic) TapTalkImplentationType implementationType;
+@property (nonatomic) BOOL isAutoConnectDisabled;
+
 - (void)firstRunSetupWithApplication:(UIApplication *)application launchOptions:(NSDictionary *)launchOptions;
 - (void)resetPersistent;
-
-@property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
-@property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
-
-- (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray;
-- (NSArray *)convertDictionaryToProductModelWithData:(NSArray *)productDictionaryArray;
-- (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController;
 
 @end
 
 @implementation TapTalk
 
 #pragma mark - Lifecycle
-+ (TAPConnectionManager *)sharedInstance {
-    static TAPConnectionManager *sharedInstance = nil;
++ (TapTalk *)sharedInstance {
+    static TapTalk *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
@@ -44,13 +40,13 @@
     self = [super init];
     
     if (self) {
+        
+        _projectConfigsDictionary = [[NSDictionary alloc] init];
+        _customConfigsDictionary = [[NSDictionary alloc] init];
+        
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
-        
-        _roomListViewController = [[TAPRoomListViewController alloc] init];
-        _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
-        _activeWindow = [[UIWindow alloc] init];
-        
+                
         //Add notification manager delegate
         [TAPNotificationManager sharedManager].delegate = self;
         
@@ -60,41 +56,45 @@
 }
 
 #pragma mark - Authentication
-- (void)setAuthTicket:(NSString *)authTicket
-              success:(void (^)(void))success
-              failure:(void (^)(NSError *error))failure {
+- (void)authenticateWithAuthTicket:(NSString *)authTicket
+                connectWhenSuccess:(BOOL)connectWhenSuccess
+                      success:(void (^)(void))success
+                      failure:(void (^)(NSError *error))failure {
     
     if (authTicket == nil || [authTicket isEqualToString:@""]) {
         NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
-        [errorDictionary setObject:@"Invalid Auth Ticket" forKey:@"message"];
-        [errorDictionary setObject:@"401" forKey:@"code"];
-        NSError *error = [NSError errorWithDomain:@"Invalid Auth Ticket" code:401 userInfo:errorDictionary];
+        [errorDictionary setObject:@"Invalid Auth Ticket" forKey:NSLocalizedDescriptionKey];
+        NSError *error = [NSError errorWithDomain:@"io.TapTalk.framework.ErrorDomain" code:90005 userInfo:errorDictionary];
         failure(error);
     }
     
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
-        
         //Check need to send push token to server
         if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkDidRequestRemoteNotification)]) {
             [[TapTalk sharedInstance].delegate tapTalkDidRequestRemoteNotification];
         }
         
-        [[TAPChatManager sharedManager] connect];
+        if (connectWhenSuccess) {
+            [[TAPChatManager sharedManager] connect];
+        }
         
         //Refresh Contact List
         [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-            
         } failure:^(NSError *error) {
-            //        NSLog(@"%@", error);
         }];
         
-        //First chat initialization on login
-        self.roomListViewController.isShouldNotLoadFromAPI = NO;
-        [self.roomListViewController viewLoadedSequence];
+        if (self.implementationType != TapTalkImplentationTypeCore) {
+            //First chat initialization on login
+            //Only run when using TAPUI or both implementation
+            [[TapUI sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
+            [[[TapUI sharedInstance] roomListViewController] viewLoadedSequence];
+        }
         
         success();
+        
     } failure:^(NSError *error) {
-        failure(error);
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
     }];
 }
 
@@ -108,26 +108,42 @@
     return YES;
 }
 
-#pragma mark - Property
-- (TAPRoomListViewController *)roomListViewController {
-    return _roomListViewController;
-}
-
-- (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController {
-    return _customNotificationAlertViewController;
-}
-
-- (TAPLoginViewController *)loginViewController {
-    TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
+- (void)connectWithSuccess:(void (^)(void))success
+                   failure:(void (^)(NSError *error))failure {
     
-    return loginViewController;
+    BOOL authenticated = [self isAuthenticated];
+    if (!authenticated) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90002 errorMessage:@"Access token is not available, please call authenticateWithAuthTicket method before connecting"];
+        failure(localizedError);
+        return;
+    }
+    
+    //Connect Socket
+    [[TAPChatManager sharedManager] connect];
+    success();
 }
-//END RN Temp
+
+- (void)disconnectWithCompletionHandler:(void (^)(void))completion {
+    //Disconnect Socket
+    [[TAPChatManager sharedManager] disconnect];
+    completion();
+}
+
+- (void)enableAutoConnect {
+    _isAutoConnectDisabled = NO;
+}
+
+- (void)disableAutoConnect {
+    _isAutoConnectDisabled = YES;
+}
+
+- (BOOL)getAutoConnectStatus {
+    return self.isAutoConnectDisabled;
+}
 
 #pragma mark - AppDelegate Handling
-- (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions environment:(TapTalkEnvironment)environment {
+- (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    _environment = environment;
     
     [self firstRunSetupWithApplication:application launchOptions:launchOptions];
     
@@ -142,21 +158,12 @@
     //Clean database message that is more than 1 month old every 1 week.
     [TAPOldDataManager runCleaningOldDataSequence];
     
-    //Set TapTalk Environment to ConnectionManager (For define SocketURL)
-    [[TAPConnectionManager sharedManager] setSocketURLWithTapTalkEnvironment:self.environment];
-    
-    //Validate and refresh access token
-    [[TAPConnectionManager sharedManager] validateToken];
-    
     //Populate User Country Code
     [[TAPContactManager sharedManager] populateContactFromDatabase];
     
     //Populate Room Model Dictionary from Preference
     [[TAPGroupManager sharedManager] populateRoomFromPreference];
-    
-    //Set Default user agent as "ios"
-    [[TapTalk sharedInstance] setUserAgent:@"ios"];
-}
+ }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -197,9 +204,12 @@
     //Remove all read count on MessageStatusManager because the room list is reloaded from database
     [[TAPMessageStatusManager sharedManager] clearReadCountDictionary];
     
-    //Call to run room list view controller sequence
-    self.roomListViewController.isShouldNotLoadFromAPI = NO;
-    [self.roomListViewController viewLoadedSequence];
+    if (self.implementationType != TapTalkImplentationTypeCore) {
+        //Call to run room list view controller sequence
+        //Only run when using TAPUI or both implementation
+        [[TapUI sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
+        [[[TapUI sharedInstance] roomListViewController] viewLoadedSequence];
+    }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -213,7 +223,10 @@
 
     if ([TAPChatManager sharedManager].activeUser != nil) {
         //User active
-        [[TAPConnectionManager sharedManager] connect];
+        BOOL isAutoConnectDisabled = [[TapTalk sharedInstance] getAutoConnectStatus];
+        if (!isAutoConnectDisabled) {
+            [[TAPChatManager sharedManager] connect];
+        }
         
         //Check is need to trigger get push token flow
         if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkDidRequestRemoteNotification)]) {
@@ -262,8 +275,7 @@
         return;
     }
     
-    NSDictionary *userInfo = [[notification userInfo] objectForKey:@"data"];
-    
+//    NSDictionary *userInfo = [[notification userInfo] objectForKey:@"data"];
 //    [self handleOpenAppsFromNotificationWithUserInfo:userInfo];
 }
 
@@ -348,7 +360,11 @@
     //Save user to ContactManager Dictionary
     [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
     
-    UIViewController *currentActiveController = [[TapTalk sharedInstance] getCurrentTapTalkActiveViewController];
+    UIViewController *currentActiveController = nil;
+    if (self.implementationType != TapTalkImplentationTypeCore) {
+        currentActiveController = [[TapUI sharedInstance] getCurrentTapTalkActiveViewController];
+    }
+    
     if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:fromActiveController:)]) {
         [self.delegate tapTalkDidTappedNotificationWithMessage:message fromActiveController:currentActiveController];
     }
@@ -356,53 +372,29 @@
 
 #pragma mark - Custom Method
 //General Set Up
-- (void)setEnvironment:(TapTalkEnvironment)environment {
-    _environment = environment;
-    NSLog(@"ENVIRONMENT TYPE = %ld", self.environment);
+- (void)initWithAppKeyID:(NSString *)appKeyID
+            appKeySecret:(NSString *)appKeySecret
+            apiURLString:(NSString *)apiURLString
+      implementationType:(TapTalkImplentationType)tapTalkImplementationType {
     
-    //Set Socket URL Environment
-    [[TAPConnectionManager sharedManager] setSocketURLWithTapTalkEnvironment:self.environment];
-}  
-
-- (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow {
-    _activeWindow = activeWindow;
-}
-
-- (UINavigationController *)getCurrentTapTalkActiveNavigationController {
-    return [self getCurrentTapTalkActiveViewController].navigationController;
-}
-
-- (UIViewController *)getCurrentTapTalkActiveViewController {
-    return [self topViewControllerWithRootViewController:self.activeWindow.rootViewController];
-}
-
-- (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController {
-    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
-        UITabBarController* tabBarController = (UITabBarController*)rootViewController;
-        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
-    } else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
-        UINavigationController* navigationController = (UINavigationController*)rootViewController;
-        return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
-    } else if (rootViewController.presentedViewController) {
-        UIViewController* presentedViewController = rootViewController.presentedViewController;
-        return [self topViewControllerWithRootViewController:presentedViewController];
-    } else {
-        return rootViewController;
-    }
-}
-
-- (void)setUserAgent:(NSString *)userAgent {
-    [[NSUserDefaults standardUserDefaults] setSecureObject:userAgent forKey:TAP_PREFS_USER_AGENT];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)setAppKeySecret:(NSString *)appKeySecret {
+    [[NSUserDefaults standardUserDefaults] setSecureObject:appKeyID forKey:TAP_PREFS_APP_KEY_ID];
     [[NSUserDefaults standardUserDefaults] setSecureObject:appKeySecret forKey:TAP_PREFS_APP_KEY_SECRET];
     [[NSUserDefaults standardUserDefaults] synchronize];
-}
-- (void)setAppKeyID:(NSString *)appKeyID {
-    [[NSUserDefaults standardUserDefaults] setSecureObject:appKeyID forKey:TAP_PREFS_APP_KEY_ID];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [[TAPAPIManager sharedManager] setBaseAPIURLString:apiURLString];
+    [[TAPConnectionManager sharedManager] setSocketURLString:apiURLString];
+    
+    _implementationType = tapTalkImplementationType;
+    
+    //Fetch remote configs data
+    [[TapTalk sharedInstance] refreshRemoteConfigsWithSuccess:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
+    
+    //Validate and refresh access token
+    [[TAPConnectionManager sharedManager] validateToken];
 }
 
 - (void)refreshActiveUser {
@@ -427,366 +419,46 @@
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
 }
 
-//Chat
-- (void)openRoomWithXCUserID:(NSString *)XCUserID
-               prefilledText:(NSString *)prefilledText
-                  quoteTitle:(nullable NSString *)quoteTitle
-                quoteContent:(nullable NSString *)quoteContent
-         quoteImageURLString:(nullable NSString *)quoteImageURL
-                    userInfo:(nullable NSDictionary *)userInfo
-    fromNavigationController:(UINavigationController *)navigationController
-                     success:(void (^)(void))success
-                     failure:(void (^)(NSError *error))failure {
-    //Check is user exist in TapTalk database
-    [TAPDataManager getDatabaseContactByXCUserID:XCUserID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
-        if (isContact) {
-            //User is in contact
-            //Create quote model and set quote to chat
-            
-            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
-            
-            if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quoteTitle;
-                quote.content = quoteContent;
-                quote.imageURL = quoteImageURL;
-                
-                [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
-            }
-            
-            NSString *draftMessage = [TAPUtil nullToEmptyString:prefilledText];
-            if (![draftMessage isEqualToString:@""]) {
-                 [[TAPChatManager sharedManager] saveMessageToDraftWithMessage:draftMessage roomID:room.roomID];
-            }
-            
-            //Open room
-            [self openRoomWithOtherUser:obtainedUser fromNavigationController:navigationController];
-            success();
-        }
-        else {
-            //User not in contact, call API to obtain user data
-            [TAPDataManager callAPIGetUserByXCUserID:XCUserID success:^(TAPUserModel *user) {
-                //Create quote model and set quote to chat
-                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
-                
-                //Save user to ContactManager Dictionary
-                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
-                
-                if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
-                    TAPQuoteModel *quote = [TAPQuoteModel new];
-                    quote.title = quoteTitle;
-                    quote.content = quoteContent;
-                    quote.imageURL = quoteImageURL;
-                    
-                    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
-                }
-                
-                NSString *draftMessage = [TAPUtil nullToEmptyString:prefilledText];
-                if (![draftMessage isEqualToString:@""]) {
-                    [[TAPChatManager sharedManager] saveMessageToDraftWithMessage:draftMessage roomID:room.roomID];
-                }
-                
-                //Open room
-                [self openRoomWithOtherUser:user fromNavigationController:navigationController];
-                success();
-            } failure:^(NSError *error) {
-                failure(error);
-            }];
-        }
+//Other
+- (void)refreshRemoteConfigsWithSuccess:(void (^)(void))success
+                                failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetProjectConfigsWithSuccess:^(NSDictionary *projectConfigsDictionary) {
+        
+        NSDictionary *projectDictionary = [projectConfigsDictionary objectForKey:@"project"];
+        projectDictionary = [TAPUtil nullToEmptyDictionary:projectDictionary];
+        
+        NSDictionary *customDictionary = [projectConfigsDictionary objectForKey:@"custom"];
+        customDictionary = [TAPUtil nullToEmptyDictionary:customDictionary];
+        
+        _projectConfigsDictionary = projectDictionary;
+        _customConfigsDictionary = customDictionary;
+        
+        success();
     } failure:^(NSError *error) {
-        failure(error);
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
     }];
 }
 
-- (void)openRoomWithOtherUser:(TAPUserModel *)otherUser
-     fromNavigationController:(UINavigationController *)navigationController {
-    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
-//    [[TAPChatManager sharedManager] openRoom:room]; //Called in ChatViewController willAppear
-    
-    //Save all unsent message (in case user retrieve message on another room)
-    [[TAPChatManager sharedManager] saveAllUnsentMessage];
-    
-    //Save user to ContactManager Dictionary
-    [[TAPContactManager sharedManager] addContactWithUserModel:otherUser saveToDatabase:NO];
-    
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
-    chatViewController.currentRoom = room;
-    chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
-    chatViewController.hidesBottomBarWhenPushed = YES;
-    [navigationController pushViewController:chatViewController animated:YES];
-}
-
-- (void)openRoomWithRoom:(TAPRoomModel *)room
-              quoteTitle:(nullable NSString *)quoteTitle
-            quoteContent:(nullable NSString *)quoteContent
-     quoteImageURLString:(nullable NSString *)quoteImageURL
-                userInfo:(nullable NSDictionary *)userInfo
-fromNavigationController:(UINavigationController *)navigationController
-                animated:(BOOL)isAnimated {
-
-    //Create quote model and set quote to chat
-    if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
-        TAPQuoteModel *quote = [TAPQuoteModel new];
-        quote.title = quoteTitle;
-        quote.content = quoteContent;
-        quote.imageURL = quoteImageURL;
-        
-        [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
-    }
-
-    //Open room
-    [self openRoomWithRoom:room fromNavigationController:navigationController animated:isAnimated];
-}
-
-- (void)openRoomWithRoom:(TAPRoomModel *)room
-fromNavigationController:(UINavigationController *)navigationController
-                animated:(BOOL)isAnimated {
-    
-    [self openRoomWithRoom:room scrollToMessageWithLocalID:nil fromNavigationController:navigationController animated:isAnimated];
-}
-
-- (void)openRoomWithRoom:(TAPRoomModel *)room
-scrollToMessageWithLocalID:(NSString *)messageLocalID
-fromNavigationController:(UINavigationController *)navigationController
-                animated:(BOOL)isAnimated {
-//    [[TAPChatManager sharedManager] openRoom:room]; //Called in ChatViewController willAppear
-    
-    //Save all unsent message (in case user retrieve message on another room)
-    [[TAPChatManager sharedManager] saveAllUnsentMessage];
-    
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
-    chatViewController.currentRoom = room;
-    chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
-    chatViewController.hidesBottomBarWhenPushed = YES;
-    chatViewController.scrollToMessageLocalIDString = messageLocalID;
-    [navigationController pushViewController:chatViewController animated:isAnimated];
-}
-
-- (void)sendTextMessage:(NSString *)message recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
-    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];    
-    [[TAPChatManager sharedManager] sendTextMessage:message room:room];
-    success();
-}
-
-- (void)sendProductMessage:(NSArray<TAPProductModel *> *)productArray recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
-    
-    NSArray *convertedProductArray = [self convertProductModelToDictionaryWithData:productArray];
-    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:recipient room:room body:@"Product List" type:TAPChatMessageTypeProduct];
-
-    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
-    [dataDictionary setObject:convertedProductArray forKey:@"items"];
-    
-    message.data = dataDictionary;
-
-    [[TAPChatManager sharedManager] sendProductMessage:message];
-    success();
-}
-
-- (void)sendImageMessage:(UIImage *)image caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
-    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
-    
-    NSString *captionString = @"";
-    if (caption != nil) {
-        captionString = caption;
-    }
-    
-    [[TAPChatManager sharedManager] sendImageMessage:image caption:captionString room:room];
-    success();
-}
-
-- (void)sendImageMessageWithAsset:(PHAsset *)asset caption:(nullable NSString *)caption recipientUser:(TAPUserModel *)recipient success:(void (^)(void))success failure:(void (^)(NSError *error))failure {
-    TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:recipient];
-    
-    NSString *captionString = @"";
-    if (caption != nil) {
-        captionString = caption;
-    }
-    
-    [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption room:room];
-    success();
-}
-
-- (void)shouldRefreshAuthTicket {
-    [[TAPChatManager sharedManager] disconnect];
-    
-    if ([self.delegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
-        [self.delegate tapTalkShouldResetAuthTicket];
-    }
-}
-
-//Custom Keyboard
-- (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender recipient:(TAPUserModel *)recipient {
-    if([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardForSender:recipient:)]) {
-        return [self.delegate tapTalkCustomKeyboardForSender:sender recipient:recipient];
-    }
-    
-    return [NSArray array];
-}
-
-- (void)customKeyboardDidTappedWithSender:(TAPUserModel *)sender
-                                recipient:(TAPUserModel *)recipient
-                             keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
-    if ([self.delegate respondsToSelector:@selector(tapTalkCustomKeyboardDidTappedWithSender:recipient:room:keyboardItem:)]) {
-        
-        TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-        
-        [self.delegate tapTalkCustomKeyboardDidTappedWithSender:sender recipient:recipient room:room keyboardItem:keyboardItem];
-    }
-}
-
-//Custom Bubble
-- (void)addCustomBubbleDataWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate {
-    [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate];
-}
-
-//Custom Quote
-- (void)quoteDidTappedWithUserInfo:(NSDictionary *)userInfo {
-    NSLog(@"QUOTE TAPPED -- %@", userInfo);
-    if ([self.delegate respondsToSelector:@selector(tapTalkQuoteDidTappedWithUserInfo:)]) {
-        [self.delegate tapTalkQuoteDidTappedWithUserInfo:userInfo];
-    }
-}
-
-- (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productModelArray {
-    NSMutableArray *convertedProductArray = [[NSMutableArray alloc] init];
-    
-    for (TAPProductModel *product in productModelArray) {
-        NSString *productID = product.productDataID;
-        productID = [TAPUtil nullToEmptyString:productID];
-        
-        NSString *productNameString = product.productName;
-        productNameString = [TAPUtil nullToEmptyString:productNameString];
-        
-        NSString *currencyString = product.productCurrency;
-        currencyString = [TAPUtil nullToEmptyString:currencyString];
-        
-        NSString *priceString = product.productPrice;
-        priceString = [TAPUtil nullToEmptyString:priceString];
-        
-        NSString *ratingString = product.productRating;
-        ratingString = [TAPUtil nullToEmptyString:ratingString];
-        
-        NSString *weightString = product.productWeight;
-        weightString = [TAPUtil nullToEmptyString:weightString];
-        
-        NSString *productDescriptionString = product.productDescription;
-        productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
-        
-        NSString *productImageURLString = product.productImageURL;
-        productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
-        
-        NSString *leftOptionTextString = product.buttonOption1Text;
-        leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
-        
-        NSString *rightOptionTextString = product.buttonOption2Text;
-        rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
-        
-        NSString *leftOptionColorString = product.buttonOption1Color;
-        leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
-        
-        NSString *rightOptionColorString = product.buttonOption2Color;
-        rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
-        
-        NSMutableDictionary *productDictionary = [[NSMutableDictionary alloc] init];
-        [productDictionary setObject:productID forKey:@"id"];
-        [productDictionary setObject:productNameString forKey:@"name"];
-        [productDictionary setObject:currencyString forKey:@"currency"];
-        [productDictionary setObject:priceString forKey:@"price"];
-        [productDictionary setObject:ratingString forKey:@"rating"];
-        [productDictionary setObject:weightString forKey:@"weight"];
-        [productDictionary setObject:productDescriptionString forKey:@"description"];
-        [productDictionary setObject:productImageURLString forKey:@"imageURL"];
-        [productDictionary setObject:leftOptionTextString forKey:@"buttonOption1Text"];
-        [productDictionary setObject:rightOptionTextString forKey:@"buttonOption2Text"];
-        [productDictionary setObject:leftOptionColorString forKey:@"buttonOption1Color"];
-        [productDictionary setObject:rightOptionColorString forKey:@"buttonOption2Color"];
-        
-        [convertedProductArray addObject:productDictionary];
-    }
-    
-    return convertedProductArray;
-}
-
-- (NSArray *)convertDictionaryToProductModelWithData:(NSArray *)productDictionaryArray {
-    NSMutableArray *convertedProductArray = [[NSMutableArray alloc] init];
-    
-    for (NSDictionary *productDictionary in productDictionaryArray) {
-        NSString *productID = [productDictionary objectForKey:@"id"];
-        productID = [TAPUtil nullToEmptyString:productID];
-        
-        NSString *productNameString = [productDictionary objectForKey:@"name"];
-        productNameString = [TAPUtil nullToEmptyString:productNameString];
-        
-        NSString *currencyString = [productDictionary objectForKey:@"currency"];
-        currencyString = [TAPUtil nullToEmptyString:currencyString];
-        
-        NSString *priceString = [productDictionary objectForKey:@"price"];
-        priceString = [TAPUtil nullToEmptyString:priceString];
-        
-        NSString *ratingString = [productDictionary objectForKey:@"rating"];
-        ratingString = [TAPUtil nullToEmptyString:ratingString];
-        
-        NSString *weightString = [productDictionary objectForKey:@"weight"];
-        weightString = [TAPUtil nullToEmptyString:weightString];
-        
-        NSString *productDescriptionString = [productDictionary objectForKey:@"description"];
-        productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
-        
-        NSString *productImageURLString = [productDictionary objectForKey:@"imageURL"];
-        productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
-        
-        NSString *leftOptionTextString = [productDictionary objectForKey:@"buttonOption1Text"];
-        leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
-        
-        NSString *rightOptionTextString = [productDictionary objectForKey:@"buttonOption2Text"];
-        rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
-        
-        NSString *leftOptionColorString = [productDictionary objectForKey:@"buttonOption1Color"];
-        leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
-        
-        NSString *rightOptionColorString = [productDictionary objectForKey:@"buttonOption2Color"];
-        rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
-        
-        TAPProductModel *product = [TAPProductModel new];
-        product.productDataID = productID;
-        product.productName = productNameString;
-        product.productCurrency = currencyString;
-        product.productPrice = priceString;
-        product.productRating = ratingString;
-        product.productWeight = weightString;
-        product.productDescription = productDescriptionString;
-        product.productImageURL = productImageURLString;
-        product.buttonOption1Text = leftOptionTextString;
-        product.buttonOption2Text = rightOptionTextString;
-        product.buttonOption1Color = leftOptionColorString;
-        product.buttonOption2Color = rightOptionColorString;
-        
-        [convertedProductArray addObject:product];
-    }
-    
-    return convertedProductArray;
-}
-
-//Other
-- (void)disconnect {
-    //Disconnect Socket
-    [[TAPChatManager sharedManager] disconnect];
+- (TapTalkImplentationType)getTapTalkImplementationType {
+    return self.implementationType;
 }
 
 - (void)logoutAndClearAllDataWithSuccess:(void (^)(void))success
                                  failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPILogoutWithSuccess:^{
         [[TapTalk sharedInstance] clearAllData];
-        [[TapTalk sharedInstance] disconnect];
+        [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
+        }];
         
         success();
         
-        TAPLoginViewController *loginViewController = [[TapTalk sharedInstance] loginViewController];
-        [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapTalk sharedInstance] roomListViewController] force:YES];
+        TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
+        [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapUI sharedInstance] roomListViewController] force:YES];
         
     } failure:^(NSError *error) {
-        failure(error);
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
     }];
 }
 
@@ -811,6 +483,7 @@ fromNavigationController:(UINavigationController *)navigationController
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_LOGIN_PHONE_TEMP_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_COUNTRY_CODE];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //Clear Manager Data
@@ -828,44 +501,6 @@ fromNavigationController:(UINavigationController *)navigationController
 
 - (TAPUserModel *)getTapTalkActiveUser {
     return [TAPDataManager getActiveUser];
-}
-
-#pragma mark - Custom Internal Usage Method
-//TapTalk Internal Usage Method
-- (void)processingProductListLeftOrSingleOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
-    
-    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
-    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-    
-    NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
-    TAPProductModel *product = [convertedProductArray firstObject];
-    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    
-    if ([self.delegate respondsToSelector:@selector(tapTalkProductListBubbleLeftOrSingleOptionDidTappedProduct:room:recipient:isSingleOption:)]) {
-        [self.delegate tapTalkProductListBubbleLeftOrSingleOptionDidTappedProduct:product room:room recipient:otherUser isSingleOption:isSingleOption];
-    }
-}
-
-- (void)processingProductListRightOptionButtonTappedWithData:(NSArray *)dataArray isSingleOption:(BOOL)isSingleOption {
-    
-    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
-    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-    
-    NSArray *convertedProductArray = [self convertDictionaryToProductModelWithData:dataArray];
-    TAPProductModel *product = [convertedProductArray firstObject];
-    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    
-    if ([self.delegate respondsToSelector:@selector(tapTalkProductListBubbleRightOptionDidTappedWithProduct:room:recipient:isSingleOption:)]) {
-        [self.delegate tapTalkProductListBubbleRightOptionDidTappedWithProduct:product room:room recipient:otherUser isSingleOption:isSingleOption];
-    }
-}
-
-- (void)setBadgeWithNumberOfUnreadRooms:(NSInteger)numberOfUnreadRooms {
-    if ([self.delegate respondsToSelector:@selector(tapTalkSetBadgeWithNumberOfUnreadRooms:)]) {
-        [self.delegate tapTalkSetBadgeWithNumberOfUnreadRooms:numberOfUnreadRooms];
-    }
 }
 
 @end

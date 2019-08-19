@@ -14,7 +14,7 @@
 #import "TAPForwardFromModel.h"
 #import "TAPGroupTargetModel.h"
 #import "Configs.h"
-#import "TAPChatMessageType.h"
+#import "TAPTypes.h"
 
 @interface TAPMessageModel : TAPBaseModel
 

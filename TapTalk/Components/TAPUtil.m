@@ -924,21 +924,12 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return topPadding;
 }
 
-+ (void)delayCallback:(void(^)(void))callback forTotalSeconds:(double)delayInSeconds {
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        if(callback) {
-            callback();
-        }
-    });
-}
-
 + (void)performBlock:(void (^)())block
 {
     block();
 }
 
-+ (void)performBlock:(void (^)())block afterDelay:(NSTimeInterval)delay
++ (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay
 {
     void (^block_)() = [block copy]; // autorelease this if you're not using ARC
     [self performSelector:@selector(performBlock:) withObject:block_ afterDelay:delay];

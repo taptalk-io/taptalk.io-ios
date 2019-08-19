@@ -84,6 +84,8 @@
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 
+@property (strong, nonatomic) NSString *currentProfileImageURLString;
+
 @property (strong, nonatomic) UIView *syncProgressSubView;
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
 @property (nonatomic) CGFloat lastProgress;
@@ -238,18 +240,18 @@
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;
     
-    self.bubbleLabel.textColor = bubbleLabelColor;
-    self.bubbleLabel.font = bubbleLabelFont;
+    self.bubbleLabel.textColor = fileNameLabelColor;
+    self.bubbleLabel.font = fileNameLabelFont;
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
     
-    self.fileDescriptionLabel.textColor = fileNameLabelColor;
-    self.fileDescriptionLabel.font = fileNameLabelFont;
+    self.fileDescriptionLabel.textColor = fileInfoLabelColor;
+    self.fileDescriptionLabel.font = fileInfoLabelFont;
     
     self.fileDescriptionSizePlaceholderLabel.textColor = fileInfoLabelColor;
     self.fileDescriptionSizePlaceholderLabel.font = fileInfoLabelFont;
-    
+
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
     
@@ -258,10 +260,16 @@
     self.cancelImageView.image = abortImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
     self.doneDownloadImageView.image = documentsImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownload]];
     self.retryDownloadImageView.image = retryImage;
+    
+    UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownload]];
+    self.downloadImageView.image = downloadImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -405,7 +413,12 @@
             self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
+            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+                self.senderImageView.image = nil;
+            }
+            
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+            _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
 
         self.senderNameLabel.text = message.user.fullname;

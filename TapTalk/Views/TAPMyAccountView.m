@@ -106,7 +106,8 @@
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, [TAPUtil currentDeviceStatusBarHeight] + 10.0f, 24.0f, 24.0f)];
         self.loadingImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.loadingImageView.alpha = 0.0f;
         [self addSubview:self.loadingImageView];
 
@@ -142,7 +143,7 @@
 
         //CS TEMP - hide remove profilebutton temporaryly
 //        _removeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 24.0f, CGRectGetMinY(self.profileImageView.frame), 24.0f, 24.0f)];
-//        [self.removeProfilePictureButton setImage:[UIImage imageNamed: @"TAPIconRemoveRedShine"] forState:UIControlStateNormal];
+//        [self.removeProfilePictureButton setImage:[UIImage imageNamed: @"TAPIconRemoveSharedMedia"] forState:UIControlStateNormal];
 //        self.removeProfilePictureButton.alpha = 0.0f;
 //        [self.scrollView addSubview:self.removeProfilePictureButton];
         
@@ -166,6 +167,8 @@
 
         _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
         self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
+        self.changeIconImageView.image = [self.changeIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChangePicture]];
+
         [self.scrollView addSubview:self.changeIconImageView];
 
         _changeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.changeLabel.frame), CGRectGetMinY(self.changeLabel.frame) - 8.0f, CGRectGetWidth(self.changeLabel.frame) + 4.0f + CGRectGetWidth(self.changeIconImageView.frame), 40.0f)];
@@ -462,7 +465,8 @@
         animation.removedOnCompletion = NO;
         [self.logoutLoadingImageView.layer addAnimation:animation forKey:@"FirstLoadSpinAnimation"];
         
-        self.logoutLoadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaving" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.logoutLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.logoutLoadingImageView.image = [self.logoutLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.logoutLoadingLabel.text = NSLocalizedString(@"Logging out...", @"");
         self.logoutLoadingButton.alpha = 1.0f;
         self.logoutLoadingButton.userInteractionEnabled = YES;

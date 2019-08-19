@@ -16,12 +16,13 @@ typedef NS_ENUM(NSInteger, TAPProfileCollectionViewCellType) {
     profileCollectionViewCellTypeBlock = 3,
     profileCollectionViewCellTypeClearChat = 4,
     profileCollectionViewCellTypeLeaveGroup = 5,
-    profileCollectionViewCellTypeViewGroupMembers = 6,
-    profileCollectionViewCellTypeAddContacts = 7,
-    profileCollectionViewCellTypeSendMessage = 8,
-    profileCollectionViewCellTypeAppointAsAdmin = 9,
-    profileCollectionViewCellTypeRemoveMember = 10,
-    profileCollectionViewCellTypeRemoveFromAdmin = 11
+    profileCollectionViewCellTypeDeleteGroup = 6,
+    profileCollectionViewCellTypeViewGroupMembers = 7,
+    profileCollectionViewCellTypeAddContacts = 8,
+    profileCollectionViewCellTypeSendMessage = 9,
+    profileCollectionViewCellTypeAppointAsAdmin = 10,
+    profileCollectionViewCellTypeRemoveMember = 11,
+    profileCollectionViewCellTypeRemoveFromAdmin = 12
 };
 
 @interface TAPProfileCollectionViewCell : TAPBaseCollectionViewCell

@@ -16,6 +16,7 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
     TAPProfileLoadingTypeRemoveMember,
     TAPProfileLoadingTypeAddToContact,
     TAPProfileLoadingTypeLeaveGroup,
+    TAPProfileLoadingTypeDeleteGroup,
     TAPProfileLoadingTypeDoneLoading,
 };
 

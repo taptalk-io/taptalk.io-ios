@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorButtonInactiveBackgroundGradientLight,
     TAPComponentColorButtonInactiveBackgroundGradientDark,
     TAPComponentColorButtonInactiveBorder,
+    TAPComponentColorButtonDestructiveBackground,
     TAPComponentColorSwitchActiveBackground,
     TAPComponentColorSwitchInactiveBackground,
     TAPComponentColorPopupDialogPrimaryButtonSuccessBackground,
@@ -86,10 +87,22 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconMessageDelivered,
     TAPComponentColorIconMessageRead,
     TAPComponentColorIconMessageDeleted,
+    TAPComponentColorIconRemoveItem,
+    TAPComponentColorIconRemoveItemBackground,
+    TAPComponentColorIconLoadingProgressPrimary,
+    TAPComponentColorIconLoadingProgressWhite,
+    TAPComponentColorIconChevronRightPrimary,
+    TAPComponentColorIconChevronRightGray,
+    TAPComponentColorIconChecklist,
+    TAPComponentColorIconLoadingPopupSuccess,
+    TAPComponentColorIconSearchConnectionLost,
+    TAPComponentColorIconCircleSelectionActive,
+    TAPComponentColorIconCircleSelectionInactive,
     TAPComponentColorIconNavigationBarBackButton, //Navigation Bar
     TAPComponentColorIconTransparentBackgroundBackButton, //Navigation Bar
     TAPComponentColorIconNavigationBarCloseButton, //Navigation Bar
     TAPComponentColorIconClearTextButton, //Navigation Bar
+    TAPComponentColorIconSearchBarMagnifier, //Navigation Bar
     TAPComponentColorIconActionSheetDocument, //Action Sheet
     TAPComponentColorIconActionSheetCamera, //Action Sheet
     TAPComponentColorIconActionSheetGallery, //Action Sheet
@@ -102,6 +115,11 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconActionSheetReply, //Action Sheet
     TAPComponentColorIconActionSheetForward, //Action Sheet
     TAPComponentColorIconActionSheetTrash, //Action Sheet
+    TAPComponentColorIconViewPasswordActive, // Register
+    TAPComponentColorIconViewPasswordInactive, // Register
+    TAPComponentColorIconChangePicture, // Register
+    TAPComponentColorIconSelectPictureCamera, // Register
+    TAPComponentColorIconSelectPictureGallery, // Register
     TAPComponentColorIconChatRoomCancelQuote, //Chat Room
     TAPComponentColorIconCancelUploadDownload, //Chat Room
     TAPComponentColorIconChatComposerSend, //Chat Room
@@ -112,6 +130,57 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatComposerSendBackgroundInactive, //Chat Room
     TAPComponentColorIconDeletedLeftMessageBubble, //Chat Room
     TAPComponentColorIconDeletedRightMessageBubble, //Chat Room
+    TAPComponentColorIconRoomListMuted, //Room List
+    TAPComponentColorIconStartNewChatButton, //RoomList
+    TAPComponentColorIconRoomListSettingUp, //Room List Setup
+    TAPComponentColorIconRoomListSetUpSuccess, //Room List Setup
+    TAPComponentColorIconRoomListSetUpFailure, //Room List Setup
+    TAPComponentColorIconRoomListRetrySetUpButton, //Room List Setup
+    TAPComponentColorIconMenuNewContact, //New Chat Page
+    TAPComponentColorIconMenuScanQRCode, //New Chat Page
+    TAPComponentColorIconMenuNewGroup, //New Chat Page
+    TAPComponentColorIconChatProfileMenuNotificationActive, //Chat / Group Profile Page
+    TAPComponentColorIconChatProfileMenuNotificationInactive, //Chat / Group Profile Page
+    TAPComponentColorIconChatProfileMenuConversationColor, //Chat / Group Profile Page
+    TAPComponentColorIconChatProfileMenuBlockUser, //Chat / Group Profile Page
+    TAPComponentColorIconChatProfileMenuSearchChat, //Chat / Group Profile Page
+    TAPComponentColorIconChatProfileMenuClearChat, //Chat / Group Profile Page
+    TAPComponentColorIconGroupProfileMenuViewMembers, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuAddToContacts, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuSendMessage, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuRemoveMember, //Chat / Group Profile Page
+    TAPComponentColorIconMediaPreviewAdd, //Media / Image Detail Preview
+    TAPComponentColorIconMediaPreviewWarning, //Media / Image Detail Preview
+    TAPComponentColorIconMediaPreviewThumbnailWarning,//Media / Image Detail Preview
+    TAPComponentColorIconMediaPreviewThumbnailWarningBackground,//Media / Image Detail Preview
+    TAPComponentColorIconSaveImage,//Media / Image Detail Preview
+    TAPComponentColorIconMediaListVideo,//Media / Image Detail Preview
+    TAPComponentColorIconCloseScanResult, //Scan Result
+    TAPComponentColorIconCloseScanResultBackground,//Scan Result
+    TAPComponentColorIconLocationPickerMarker, //Location Picker
+    TAPComponentColorIconLocationPickerRecenter, //Location Picker
+    TAPComponentColorIconLocationPickerRecenterBackground, //Location Picker
+    TAPComponentColorIconLocationPickerSendLocation, //Location Picker
+    TAPComponentColorIconLocationPickerSendLocationBackground, //Location Picker
+    TAPComponentColorIconLocationPickerAddressActive, //Location Picker
+    TAPComponentColorIconLocationPickerAddressInactive,//Location Picker
+    TAPComponentColorIconUserStatusActive, //Chat Room Page
+    TAPComponentColorIconLocationBubbleMarker, //Chat Room Page
+    TAPComponentColorIconQuotedFileBackground, //Chat Room Page
+    TAPComponentColorIconDeletedChatRoom, //Chat Room Page
+    TAPComponentColorIconChatRoomScrollToBottomBackground, //Chat Room Page
+    TAPComponentColorIconChatRoomScrollToBottom, //Chat Room Page
+    TAPComponentColorIconChatRoomUnreadButton, //Chat Room Page
+    TAPComponentColorIconChatComposerBurgerMenuBackground, //Chat Room Page
+    TAPComponentColorIconChatComposerShowKeyboardBackground, //Chat Room Page
+    TAPComponentColorIconChatComposerAttach, //Chat Room Page
+    TAPComponentColorIconFile, //Chat Room Page
+    TAPComponentColorIconFileUploadDownload, //Chat Room Page
+    TAPComponentColorIconFileCancelUploadDownload, //Chat Room Page
+    TAPComponentColorIconFileRetryUploadDownload, //Chat Room Page
+    TAPComponentColorIconFilePlayMedia, //Chat Room Page
 };
 
 typedef NS_ENUM(NSInteger, TAPTextColor) {

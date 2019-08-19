@@ -10,14 +10,6 @@
 
 #import <AFNetworking/AFNetworking.h>
 
-#define kSocketURLDevelopment @"wss://engine-dev.taptalk.io/connect"
-#define kSocketURLStaging @"wss://engine-stg.taptalk.io/connect"
-#define kSocketURLProduction @"wss://engine.taptalk.io/connect"
-
-//#define kSocketURLDevelopment @"wss://hp-dev.moselo.com/connect"
-//#define kSocketURLStaging @"wss://hp-staging.moselo.com/connect"
-//#define kSocketURLProduction @"wss://taptalk-production.moselo.com/connect"
-
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f
 #define kSocketReconnectMaximumMultiplier 60.0f
@@ -286,7 +278,7 @@
 - (void)validateToken {
     NSString *accessToken = [TAPDataManager getAccessToken];
 
-        if (accessToken == nil || [accessToken isEqualToString:@""]) {
+    if (accessToken == nil || [accessToken isEqualToString:@""]) {
         return;
     }
     
@@ -299,16 +291,16 @@
     }];
 }
 
-- (void)setSocketURLWithTapTalkEnvironment:(TapTalkEnvironment)environment {
-    if (environment == TapTalkEnvironmentProduction) {
-        _socketURL = kSocketURLProduction;
+- (void)setSocketURLString:(NSString *)urlString {
+    NSString *formattedSocketURLString;
+    if ([urlString hasPrefix:@"https"]) {
+        formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"https" withString:@"wss"];
     }
-    else if (environment == TapTalkEnvironmentStaging) {
-        _socketURL = kSocketURLStaging;
+    else if ([urlString hasPrefix:@"http"]) {
+        formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"http" withString:@"wss"];
     }
-    else {
-        _socketURL = kSocketURLDevelopment;
-    }
+    
+    _socketURL = [NSString stringWithFormat:@"%@/connect", formattedSocketURLString];
 }
 
 - (void)addDelegate:(id)delegate {

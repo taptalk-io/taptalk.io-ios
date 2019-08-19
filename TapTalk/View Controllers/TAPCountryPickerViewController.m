@@ -413,7 +413,7 @@
 - (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
+    
     if (![trimmedNewString isEqualToString:@""]) {
         self.updatedString = newString;
         
@@ -426,7 +426,7 @@
             TAPCountryModel *currentLoopCountry = [self.countryListArray objectAtIndex:counter];
             NSString *loopedCountryName = currentLoopCountry.countryCommonName;
 
-            if ([loopedCountryName containsString:trimmedString]) {
+            if ([[loopedCountryName lowercaseString] containsString:[trimmedString lowercaseString]]) {
                 [self.searchResultCountryMutableArray addObject:currentLoopCountry];
             }
         }

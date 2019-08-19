@@ -10,6 +10,8 @@
 #import "TAPUserModel.h"
 #import "TAPRecentSearchModel.h"
 #import "TAPCountryModel.h"
+#import "TAPProjectConfigsModel.h"
+#import "TAPCoreConfigsModel.h"
 
 @import AFNetworking;
 
@@ -21,8 +23,12 @@
 + (TAPUserModel *)getActiveUser;
 + (void)setAccessToken:(NSString *)accessToken expiryDate:(NSTimeInterval)expiryDate;
 + (NSString *)getAccessToken;
++ (NSTimeInterval)getAccessTokenExpiryTime;
 + (void)setRefreshToken:(NSString *)refreshToken expiryDate:(NSTimeInterval)expiryDate;
 + (NSString *)getRefreshToken;
++ (TAPProjectConfigsModel *)getProjectConfigs;
++ (TAPCoreConfigsModel *)getCoreConfigs;
+
 + (void)updateMessageToFailedWhenClosedInDatabase;
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
@@ -39,10 +45,13 @@
 + (void)deleteAllMessageAndPhysicalFilesInRoomWithRoomID:(NSString *)roomID
                                                  success:(void (^)(void))success
                                                  failure:(void (^)(NSError *error))failure;
-//Convert from dictionary to model
+
+//Convert from dictionary to model or model to dictionary
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
 + (TAPCountryModel *)countryModelFromDictionary:(NSDictionary *)dictionary;
 + (TAPUserModel *)userModelFromDictionary:(NSDictionary *)dictionary;
++ (TAPProductModel *)productModelFromDictionary:(NSDictionary *)dictionary;
++ (NSDictionary *)dictionaryFromProductModel:(TAPProductModel *)product;
 
 + (NSString *)escapedDatabaseStringFromString:(NSString *)string;
 + (NSString *)normalizedDatabaseStringFromString:(NSString *)string;
@@ -170,10 +179,13 @@
                                       failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetMessageBeforeWithRoomID:(NSString *)roomID
                                maxCreated:(NSNumber *)maxCreated
+                            numberOfItems:(NSNumber *)numberOfItems
                                   success:(void (^)(NSArray *messageArray, BOOL hasMore))success
                                   failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetMessageAfterWithRoomID:(NSString *)roomID
                               minCreated:(NSNumber *)minCreated
+                             lastUpdated:(NSNumber *)lastUpdated
+          needToSaveLastUpdatedTimestamp:(BOOL)needToSaveLastUpdatedTimestamp
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure;
 + (void)callAPIDeleteMessageWithMessageIDs:(NSArray *)messageIDArray
@@ -184,7 +196,7 @@
 + (void)callAPIGetContactList:(void (^)(NSArray *userArray))success
                       failure:(void (^)(NSError *error))failure;
 + (void)callAPIAddContactWithUserID:(NSString *)userID
-                            success:(void (^)(NSString *message))success
+                            success:(void (^)(NSString *message, TAPUserModel *user))success
                             failure:(void (^)(NSError *error))failure;
 + (void)callAPIRemoveContactWithUserID:(NSString *)userID
                                success:(void (^)(NSString *message))success
@@ -298,5 +310,10 @@
 + (void)callAPILeaveRoomWithRoomID:(NSString *)roomID
                            success:(void (^)(void))success
                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIDeleteRoomWithRoom:(TAPRoomModel *)room
+                          success:(void (^)(void))success
+                          failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetProjectConfigsWithSuccess:(void (^)(NSDictionary *projectConfigsDictionary))success
+                                    failure:(void (^)(NSError *error))failure;
 
 @end

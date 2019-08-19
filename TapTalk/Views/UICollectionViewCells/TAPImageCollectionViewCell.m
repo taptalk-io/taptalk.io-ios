@@ -98,6 +98,8 @@
         
         _videoIndicatorImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, CGRectGetHeight(frame) - 14.0f - 5.0f, 14.0f, 14.0f)];
         self.videoIndicatorImageView.image = [UIImage imageNamed:@"TAPIconThumbnailVideo"];
+        self.videoIndicatorImageView.image = [self.videoIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaListVideo]];
+
         [self.contentView addSubview:self.videoIndicatorImageView];
         
         UIFont *mediaInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaListInfoLabel];

@@ -66,13 +66,14 @@
         _nonSelectedView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 24.0f, 16.0f, 16.0f)];
         self.nonSelectedView.layer.cornerRadius = CGRectGetHeight(self.nonSelectedView.frame) / 2.0f;
         self.nonSelectedView.layer.borderWidth = 1.0f;
-        self.nonSelectedView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+        self.nonSelectedView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCircleSelectionInactive].CGColor;
         self.nonSelectedView.clipsToBounds = YES;
         self.nonSelectedView.alpha = 0.0f;
         [self.bgView addSubview:self.nonSelectedView];
         
-        _selectedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 20.0f, 22.0f, 20.0f, 20.0f)];
-        self.selectedImageView.image = [UIImage imageNamed:@"TAPIconSelectActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        _selectedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 24.0f, 16.0f, 16.0f)];
+        self.selectedImageView.image = [UIImage imageNamed:@"TAPIconSuccessSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.selectedImageView.image = [self.selectedImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCircleSelectionActive]];
         self.selectedImageView.alpha = 0.0f;
         self.selectedImageView.center = self.nonSelectedView.center;
         [self.bgView addSubview:self.selectedImageView];

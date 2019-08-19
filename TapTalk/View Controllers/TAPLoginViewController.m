@@ -161,7 +161,7 @@
             
         } failure:^(NSError *error) {
             
-            [self.loginView setAsLoading:NO animated:YES];
+             [self.loginView setAsLoading:NO animated:YES];
             
         }];
     }

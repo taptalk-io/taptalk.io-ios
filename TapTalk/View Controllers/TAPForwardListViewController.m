@@ -225,7 +225,10 @@
         
         TAPMessageModel *currentMessage = [self.recentChatArray objectAtIndex:indexPath.row];
         currentSelectedRoomID = currentMessage.room.roomID;
-        [[TapTalk sharedInstance] openRoomWithRoom:currentMessage.room fromNavigationController:self.currentNavigationController animated:YES];
+
+        TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:currentMessage.room];
+        obtainedChatViewController.hidesBottomBarWhenPushed = YES;
+        [self.currentNavigationController pushViewController:obtainedChatViewController animated:YES];
     }
     else if (tableView == self.forwardListView.searchResultTableView) {
         //CHATS AND CONTACTS
@@ -235,7 +238,10 @@
         
         TAPRoomModel *selectedRoom = [self.searchResultChatAndContactArray objectAtIndex:indexPath.row];
         currentSelectedRoomID = selectedRoom.roomID;
-        [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.currentNavigationController animated:YES];
+        
+        TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:selectedRoom];
+        obtainedChatViewController.hidesBottomBarWhenPushed = YES;
+        [self.currentNavigationController pushViewController:obtainedChatViewController animated:YES];
     }
     
     if (self.forwardedMessage.type == TAPChatMessageTypeFile || self.forwardedMessage.type == TAPChatMessageTypeVideo) {

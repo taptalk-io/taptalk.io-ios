@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handlePushNotificationWithUserInfo:(NSDictionary *)userInfo;
 - (void)handleIncomingMessage:(TAPMessageModel *)message shouldShowNotification:(BOOL)shouldShowNotification;
 - (void)handleTappedNotificationWithUserInfo:(NSDictionary *)userInfo;
-- (void)removeReadLocalNotificationWithMessage:(TAPMessageModel *)message;
 - (void)updateApplicationBadgeCount;
 
 @end

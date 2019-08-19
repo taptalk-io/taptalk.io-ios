@@ -16,8 +16,6 @@
 #import "TAPContactCollectionViewCell.h"
 #import "TAPPlainInfoLabelTableViewCell.h"
 
-#define kMaxGroupMember 50 - 1 //1 is group admin.
-
 @interface TAPCreateGroupViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, TAPSearchBarViewDelegate, TAPCreateGroupViewControllerDelegate, TAPProfileViewControllerDelegate>
 @property (strong, nonatomic) TAPCreateGroupView *createGroupView;
 
@@ -477,7 +475,23 @@ trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     UIContextualAction *promoteAdminAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         self.currentSelectedUser = currentUser;
-       [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Promote Admin" title:NSLocalizedString(@"Promote to Admin", @"") detailInformation:NSLocalizedString(@"Are you sure you want to promote this member to admin?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"OK"];
+//       [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Promote Admin" title:NSLocalizedString(@"Promote to Admin", @"") detailInformation:NSLocalizedString(@"Are you sure you want to promote this member to admin?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"OK"];
+        [self.createGroupView showLoadingView:YES];
+        [self.createGroupView setAsLoadingState:YES withType:TAPCreateGroupLoadingTypeAppointAdmin];
+        [TAPDataManager callAPIPromoteRoomAdminsWithRoomID:self.room.roomID userIDArray:@[self.currentSelectedUser.userID] success:^(TAPRoomModel *room) {
+            _room = room;
+            _isEditMode = NO;
+            [self.selectedIndexDictionary removeAllObjects];
+            [self.selectedUserModelArray removeAllObjects];
+            [self loadContactsFromRoomModel];
+            [self showFinishLoadingStateWithType:TAPCreateGroupLoadingTypeAppointAdmin];
+            
+            [self.createGroupView showBottomActionButtonViewExtension:NO withActiveButton:0];
+            
+        } failure:^(NSError *error) {
+            [self removeLoadingView];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Promote Admin" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
     }];
     promoteAdminAction.image = [UIImage imageNamed:@"TAPSwipeActionPromote" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     promoteAdminAction.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
@@ -498,16 +512,12 @@ trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     removeAction.image = [UIImage imageNamed:@"TAPSwipeActionRemove" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     removeAction.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconDestructive];
     
-//    NSArray *rowActionArray = @[removeAction, promoteAdminAction];
-    //CS NOTE - hide remove button, uncomment upper line and delete below
-    NSArray *rowActionArray = @[promoteAdminAction];
+    NSArray *rowActionArray = @[removeAction, promoteAdminAction];
 
     BOOL currentUserIsAdmin = [self.room.admins containsObject:currentUser.userID];
 
     if (currentUserIsAdmin) {
-//        rowActionArray = @[removeAction, demoteAdminAction];
-        //CS NOTE - hide remove button, uncomment upper line and delete below
-        rowActionArray = @[demoteAdminAction];
+        rowActionArray = @[removeAction, demoteAdminAction];
     }
 
     BOOL isAdmin = [self.room.admins containsObject:[TAPDataManager getActiveUser].userID];
@@ -645,7 +655,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [contactTableViewCell isCellSelected:NO];
             }
             else {
-                if ([self.selectedUserModelArray count] == kMaxGroupMember - [self.room.participants count]) {
+                TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+                NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+                if ([self.selectedUserModelArray count] == maxGroupMember - [self.room.participants count]) {
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add More Member In Group" title:NSLocalizedString(@"Cannot add more people", @"") detailInformation:NSLocalizedString(@"The max limit number of people in one group chat has been reached",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }
                 else {
@@ -682,8 +694,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if ([self.selectedIndexDictionary count] == 1) {
                 NSArray *indexArray = [self.selectedIndexDictionary allKeys];
                 TAPUserModel *user = [self.selectedIndexDictionary objectForKey:[indexArray firstObject]];
-                //CS NOTE - hide remove button, remove below line to show later
-                [self.createGroupView showBottomActionButtonView:YES];
                 if ([self.room.admins containsObject:user.userID]) {                    //is admin
                     [self.createGroupView showBottomActionButtonViewExtension:YES withActiveButton:TAPCreateGroupActionExtensionTypeDemoteAdmin];
                 }
@@ -693,10 +703,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
             }
             else {
-                //CS NOTE - hide remove button, remove below line to show later
-                [self.createGroupView showBottomActionButtonView:NO];
-//                CS NOTE - hide remove button, uncomment to show later
-//                [self.createGroupView showBottomActionButtonViewExtension:NO withActiveButton:0];
+                [self.createGroupView showBottomActionButtonViewExtension:NO withActiveButton:0];
             }
         }
         else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeMemberList && !self.isEditMode && indexPath.row < [self.contactListArray count]) {
@@ -731,10 +738,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [contactTableViewCell isCellSelected:NO];
             }
             else {
-                if ([self.selectedUserModelArray count] == kMaxGroupMember && self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault) {
+                TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+                NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+                if ([self.selectedUserModelArray count] == maxGroupMember && self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault) {
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add More Member In Group" title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }
-                else if ([self.selectedUserModelArray count] == kMaxGroupMember - [self.room.participants count] + 1 && self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
+                else if ([self.selectedUserModelArray count] == maxGroupMember - [self.room.participants count] + 1 && self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add More Member In Group" title:NSLocalizedString(@"Failed", @"") detailInformation:NSLocalizedString(@"Exceeded number of maximum group members",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }
                 else {
@@ -1003,22 +1012,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.navigationController popViewControllerAnimated:YES];
     }
     else if ([popupIdentifier isEqualToString:@"Promote Admin"]) {
-        [self.createGroupView showLoadingView:YES];
-        [self.createGroupView setAsLoadingState:YES withType:TAPCreateGroupLoadingTypeAppointAdmin];
-        [TAPDataManager callAPIPromoteRoomAdminsWithRoomID:self.room.roomID userIDArray:@[self.currentSelectedUser.userID] success:^(TAPRoomModel *room) {
-            _room = room;
-            _isEditMode = NO;
-            [self.selectedIndexDictionary removeAllObjects];
-            [self.selectedUserModelArray removeAllObjects];
-            [self loadContactsFromRoomModel];
-            [self showFinishLoadingStateWithType:TAPCreateGroupLoadingTypeAppointAdmin];
-            
-            [self.createGroupView showBottomActionButtonViewExtension:NO withActiveButton:0];
-
-        } failure:^(NSError *error) {
-            [self removeLoadingView];
-           [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Promote Admin" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-        }];
+//        [self.createGroupView showLoadingView:YES];
+//        [self.createGroupView setAsLoadingState:YES withType:TAPCreateGroupLoadingTypeAppointAdmin];
+//        [TAPDataManager callAPIPromoteRoomAdminsWithRoomID:self.room.roomID userIDArray:@[self.currentSelectedUser.userID] success:^(TAPRoomModel *room) {
+//            _room = room;
+//            _isEditMode = NO;
+//            [self.selectedIndexDictionary removeAllObjects];
+//            [self.selectedUserModelArray removeAllObjects];
+//            [self loadContactsFromRoomModel];
+//            [self showFinishLoadingStateWithType:TAPCreateGroupLoadingTypeAppointAdmin];
+//
+//            [self.createGroupView showBottomActionButtonViewExtension:NO withActiveButton:0];
+//
+//        } failure:^(NSError *error) {
+//            [self removeLoadingView];
+//           [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Promote Admin" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+//        }];
     }
     else if ([popupIdentifier isEqualToString:@"Demote Admin"]) {
         [self.createGroupView showLoadingView:YES];
@@ -1074,29 +1083,31 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark - Custom Method
 - (void)validateselectedUserModelArray {
+    TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+    NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
     if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault || self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault) {
             if ([self.selectedUserModelArray count] > 0) {
                 [self.createGroupView showSelectedContacts:YES];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedUserModelArray count] + 1, kMaxGroupMember + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedUserModelArray count] + 1, maxGroupMember + 1];
                 
                 [self.createGroupView.selectedContactsCollectionView reloadData];
             }
             else {
                 [self.createGroupView showSelectedContacts:NO];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (1/%ld)", kMaxGroupMember + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (1/%ld)", maxGroupMember + 1];
             }
         }
         else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             if ([self.selectedUserModelArray count] > 0) {
                 [self.createGroupView showSelectedContacts:YES];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedUserModelArray count] + [self.room.participants count], kMaxGroupMember + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedUserModelArray count] + [self.room.participants count], maxGroupMember + 1];
                 
                 [self.createGroupView.selectedContactsCollectionView reloadData];
             }
             else {
                 [self.createGroupView showSelectedContacts:NO];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (0/%ld)", kMaxGroupMember - [self.room.participants count] + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (0/%ld)", maxGroupMember - [self.room.participants count] + 1];
             }
         }
         
@@ -1224,9 +1235,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.contactListArray = self.room.participants;
     [self.createGroupView.contactsTableView reloadData];
     
+    TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+    NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+    
     if ([self.room.admins containsObject:[TAPDataManager getActiveUser].userID]) {
         [self showCustomEditButton];
-        if ([self.room.participants count] >= kMaxGroupMember + 1) {
+        if ([self.room.participants count] >= maxGroupMember + 1) {
             [self.createGroupView showBottomActionButtonView:NO];
         }
         else {
@@ -1240,9 +1254,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     if ([self.room.participants count] == 1) {
         [self.navigationItem setRightBarButtonItem:nil];
     }
-    
-    //CS NOTE - hide remove button, uncomment below line to show later
-//    [self.createGroupView showBottomActionButtonView:NO];
 }
 
 - (void)setTapCreateGroupViewControllerType:(TAPCreateGroupViewControllerType)tapCreateGroupViewControllerType {
@@ -1304,18 +1315,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     _isEditMode = YES;
     [self.createGroupView.contactsTableView reloadData];
     
-    //CS TEMP - hide remove members, delete these lines to show remove members button
-    [self.createGroupView showBottomActionButtonView:NO];
-    //END CS NOTE
-    
-    //CS TEMP - hide remove button, uncomment to show later
-//    [self.createGroupView showRemoveMembersButton];
+    [self.createGroupView showRemoveMembersButton];
 }
 
 - (void)cancelButtonDidTapped {
+    TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+    NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+    
     if ([self.room.admins containsObject:[TAPDataManager getActiveUser].userID]) {
         [self showCustomEditButton];
-        if ([self.room.participants count] >= kMaxGroupMember + 1) {
+        if ([self.room.participants count] >= maxGroupMember + 1) {
             [self.createGroupView showBottomActionButtonView:NO];
         }
         else {

@@ -102,6 +102,9 @@
 @property (nonatomic) CGFloat newProgress;
 @property (nonatomic) NSInteger updateInterval;
 
+@property (strong, nonatomic) NSString *currentFileID;
+@property (strong, nonatomic) NSString *currentProfileImageURLString;
+
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)quoteViewButtonDidTapped:(id)sender;
 - (IBAction)replyViewButtonDidTapped:(id)sender;
@@ -196,7 +199,6 @@
     [super prepareForReuse];
 
     self.thumbnailBubbleImageView.image = nil;
-    self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
@@ -384,8 +386,7 @@
     [self setImageCaptionWithString:captionString];
     
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-
-    UIImage *selectedImage = nil;
+    
     if (fileID == nil || [fileID isEqualToString:@""]) {
         [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
             if (savedImage != nil) {
@@ -402,28 +403,13 @@
                 [self.contentView layoutIfNeeded];
             }
         }];
-
-//        selectedImage = [dataDictionary objectForKey:@"dummyImage"];
-//        [self getImageSizeFromImage:selectedImage];
-//
-//        self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-//        self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-//        [self.bubbleImageView setImage:selectedImage];
-//        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-//            if (savedImage != nil) {
-//                [self getImageSizeFromImage:savedImage];
-//                
-//                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-//                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-//                [self.bubbleImageView setImage:savedImage];
-//            }
-//            else {
-//                self.bubbleImageViewWidthConstraint.constant = 0.0f;
-//                self.bubbleImageViewHeightConstraint.constant = 0.0f;
-//            }
-//        }];
     }
     else {
+        if(_currentFileID == nil || ![self.currentFileID isEqualToString:fileID]) {
+            //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
+            self.bubbleImageView.image = nil;
+        }
+        
         //already called fetchImageDataWithMessage function in view controller for fetch image
         //so no need to set the image here
         //just save the height and width constraint
@@ -433,10 +419,8 @@
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-        
-        //        [TAPImageView imageFromCacheWithKey:fileID success:^(UIImage *savedImage) {
-        //            self.bubbleImageView.image = savedImage;
-        //        }];
+            
+        _currentFileID = fileID;
     }
     
     NSString *thumbnailImageString = [message.data objectForKey:@"thumbnail"];
@@ -464,7 +448,7 @@
         [self showForwardView:NO];
         _isShowForwardView = NO;
     }
-    
+
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
         
@@ -538,7 +522,12 @@
             self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
+            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+                self.senderImageView.image = nil;
+            }
+            
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+            _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
         
         self.senderNameLabel.text = @"";

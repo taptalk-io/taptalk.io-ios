@@ -20,7 +20,7 @@ typedef NS_ENUM( NSInteger, TAPProfileViewControllerType) {
 @optional
 
 - (void)profileViewControllerUpdatedRoom:(TAPRoomModel *)room;
-- (void)profileViewControllerDidTriggerLeaveGroupWithRoom:(TAPRoomModel *)room;
+- (void)profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room;
 
 @end
 
@@ -32,7 +32,7 @@ typedef NS_ENUM( NSInteger, TAPProfileViewControllerType) {
 
 @property (strong, nonatomic) TAPRoomModel *room;
 @property (strong, nonatomic) TAPUserModel *user; //used in TAPProfileViewControllerTypeGroupMemberProfile
-@property (strong, nonatomic) NSString *userID;
+@property (strong, nonatomic) NSString *otherUserID;
 
 @property (nonatomic) TAPProfileViewControllerType tapProfileViewControllerType;
 

@@ -118,7 +118,8 @@
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, [TAPUtil currentDeviceStatusBarHeight] + 10.0f, 24.0f, 24.0f)];
         self.loadingImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.loadingImageView.alpha = 0.0f;
         [self addSubview:self.loadingImageView];
         
@@ -157,10 +158,18 @@
         self.progressBarView.backgroundColor = [UIColor clearColor];
         [self.progressBarBackgroundView addSubview:self.progressBarView];
         
-        _removePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.groupPictureImageView.frame) - 24.0f, CGRectGetMinY(self.groupPictureImageView.frame), 24.0f, 24.0f)];
-        [self.removePictureButton setImage:[UIImage imageNamed: @"TAPIconRemoveRedShine"] forState:UIControlStateNormal];
-        self.removePictureButton.alpha = 0.0f;
-        [self.bgScrollView addSubview:self.removePictureButton];
+        _removePictureView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.groupPictureImageView.frame) - 24.0f, CGRectGetMinY(self.groupPictureImageView.frame), 24.0f, 24.0f)];
+        self.removePictureView.alpha = 0.0f;
+        self.removePictureView.layer.cornerRadius = CGRectGetHeight(self.removePictureView.frame) / 2.0f;
+        self.removePictureView.clipsToBounds = YES;
+        self.removePictureView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRemoveItem];
+        [self.bgScrollView addSubview:self.removePictureView];
+        
+        _removePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.removePictureView.frame), CGRectGetHeight(self.removePictureView.frame))];
+        UIImage *removeImage = [UIImage imageNamed:@"TAPIconRemoveMedia" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        removeImage = [removeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRemoveItemBackground]];
+        [self.removePictureButton setImage:removeImage forState:UIControlStateNormal];
+        [self.removePictureView addSubview:self.removePictureButton];
         
         UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
@@ -182,6 +191,8 @@
         
         _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
         self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
+        self.changeIconImageView.image = [self.changeIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChangePicture]];
+
         [self.bgScrollView addSubview:self.changeIconImageView];
         
         _changePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.changeLabel.frame), CGRectGetMinY(self.changeLabel.frame) - 8.0f, CGRectGetWidth(self.changeLabel.frame) + 4.0f + CGRectGetWidth(self.changeIconImageView.frame), 40.0f)];
@@ -267,11 +278,11 @@
 - (void)setGroupPictureImageViewWithImage:(UIImage *)image {
     if (image ==  nil) {
         self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
-        self.removePictureButton.alpha = 0.0f;
+        self.removePictureView.alpha = 0.0f;
     }
     else {
         self.groupPictureImageView.image = image;
-        self.removePictureButton.alpha = 1.0f;
+        self.removePictureView.alpha = 1.0f;
     }
 }
 
@@ -294,10 +305,10 @@
 - (void)setGroupPictureWithImageURL:(NSString *)urlString {
     if ([TAPUtil isEmptyString:urlString]) {
         self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
-        self.removePictureButton.alpha = 0.0f;
+        self.removePictureView.alpha = 0.0f;
     }
     else {
-        self.removePictureButton.alpha = 1.0f;
+        self.removePictureView.alpha = 1.0f;
         [self.groupPictureImageView setImageWithURLString:urlString];
     }
 }

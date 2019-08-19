@@ -410,10 +410,10 @@
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="Aqq-vh-MYF">
-                        <rect key="frame" x="308" y="402" width="10" height="11"/>
+                        <rect key="frame" x="308" y="397" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="10" id="UiS-5V-8f4"/>
-                            <constraint firstAttribute="height" constant="11" id="sjV-0I-RTw"/>
+                            <constraint firstAttribute="width" constant="16" id="UiS-5V-8f4"/>
+                            <constraint firstAttribute="height" constant="16" id="sjV-0I-RTw"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryChat" translatesAutoresizingMaskIntoConstraints="NO" id="idr-Ld-l85">

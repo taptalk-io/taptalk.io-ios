@@ -18,6 +18,12 @@
 #import "NSUserDefaults+MPSecureUserDefaults.h"
 #import "PodAsset.h"
 #import "TapTalk.h"
+#import "TapUI.h"
+#import "TapCoreChatRoomManager.h"
+#import "TapCoreContactManager.h"
+#import "TapCoreErrorManager.h"
+#import "TapCoreMessageManager.h"
+#import "TapCoreRoomListManager.h"
 #import "TAPUtil.h"
 #import "TAPChatManager.h"
 #import "TAPConnectionManager.h"
@@ -41,5 +47,4 @@
 #import "TAPImageView.h"
 #import "TAPSearchBarView.h"
 #import "UIImage+Color.h"
-
 #endif /* TapTalk_Prefix_pch */

@@ -98,7 +98,9 @@
         
         UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 22.0f, 30.0f)];
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 8.0f, 14.0f, 14.0f)];
-        [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoadingOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
+
         [rightView addSubview:self.loadingImageView];
         self.searchBarView.searchTextField.rightView = rightView;
         
@@ -452,6 +454,7 @@
         
         _noInternetImageView = [[UIImageView alloc] initWithFrame:CGRectMake(18.0f, 12.0f, 44.0f, 44.0f)];
         self.noInternetImageView.image = [UIImage imageNamed:@"TAPIconConnectionLost" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.noInternetImageView.image = [self.noInternetImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchConnectionLost]];
         [self.noInternetView addSubview:self.noInternetImageView];
         
         UIFont *noInternetTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchConnectionLostTitle];

@@ -19,8 +19,6 @@
 
 #import <AFNetworking/AFNetworking.h>
 
-#import "TAPLoginViewController.h" //DV Temp
-
 @interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate, TAPMyAccountViewControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
@@ -96,6 +94,8 @@
     
     //RightBarButton
     UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
+
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
@@ -124,6 +124,8 @@
     if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidLoad)]) {
         [self.lifecycleDelegate TAPRoomListViewControllerViewDidLoad];
     }
+    
+    [self.setupRoomListView.retryButton addTarget:self action:@selector(viewLoadedSequence) forControlEvents:UIControlEventTouchUpInside];
     
     //View appear sequence
     [self viewLoadedSequence];
@@ -226,13 +228,6 @@
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
         
-//        [cell setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
-        
-        //DV Temp - temporary remove room when group or channel
-        if (roomList.lastMessage.room.type == RoomTypePersonal) {
-            [cell setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
-        }
-        
         if (indexPath.row == [self.roomListArray count] - 1) {
             [cell setIsLastCellSeparator:YES];
         }
@@ -309,7 +304,7 @@
     
     TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.currentRoom = room;
-    chatViewController.delegate = [[TapTalk sharedInstance] roomListViewController];
+    chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     [chatViewController setChatViewControllerType:TAPChatViewControllerTypePeek];
     //END DV Note
     
@@ -326,11 +321,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-//        UserModel *selectedUser = [self.contactListDictionary objectForKey:selectedUsername];
     TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
     TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
     TAPRoomModel *selectedRoom = selectedMessage.room;
-    [[TapTalk sharedInstance] openRoomWithRoom:selectedRoom fromNavigationController:self.navigationController animated:YES];
+
+    TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:selectedRoom];
+    obtainedChatViewController.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:obtainedChatViewController animated:YES];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
@@ -363,11 +360,6 @@
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:typing.roomID];
     
-    //typing for group chat is not ready yet
-    if (roomList.lastMessage.room.type != RoomTypePersonal) {
-        return;
-    }
-    
     NSInteger index = [self.roomListArray indexOfObject:roomList];
     TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.roomListView.roomListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
     [cell setAsTyping:YES];
@@ -375,11 +367,6 @@
 
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:typing.roomID];
-    
-    //typing for group chat is not ready yet
-    if (roomList.lastMessage.room.type != RoomTypePersonal) {
-        return;
-    }
 
     NSInteger index = [self.roomListArray indexOfObject:roomList];
     TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.roomListView.roomListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
@@ -415,7 +402,9 @@
         UINavigationController *searchNavigationController = [[UINavigationController alloc] initWithRootViewController:searchViewController];
         searchNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         [self presentViewController:searchNavigationController animated:NO completion:^{
-            UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+            UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
+
             _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
             [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
             self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
@@ -449,18 +438,22 @@
 
 #pragma mark TAPAddNewChatViewController
 - (void)addNewChatViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user {
-    [[TapTalk sharedInstance] openRoomWithOtherUser:user fromNavigationController:self.navigationController];
+    TAPChatViewController *chatViewController = [[TapUI sharedInstance] openRoomWithOtherUser:user];
+    chatViewController.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:chatViewController animated:YES];
 }
 
-- (void)chatViewControllerDidLeaveGroupWithRoom:(TAPRoomModel *)room {
+- (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room {
     //Delete room & refresh the UI
     TAPRoomListModel *deletedRoomList = [self.roomListDictionary objectForKey:room.roomID];
-    NSInteger deletedIndex = [self.roomListArray indexOfObject:deletedRoomList];
-    [self.roomListArray removeObjectAtIndex:deletedIndex];
-    [self.roomListDictionary removeObjectForKey:room.roomID];
-    
-    NSIndexPath *deletedIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-    [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[deletedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    if (deletedRoomList) {
+        NSInteger deletedIndex = [self.roomListArray indexOfObject:deletedRoomList];
+        [self.roomListArray removeObjectAtIndex:deletedIndex];
+        [self.roomListDictionary removeObjectForKey:room.roomID];
+        
+        NSIndexPath *deletedIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
+        [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[deletedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
 }
 
 #pragma mark TAPChatViewController
@@ -486,7 +479,7 @@
     }];
 }
 
-#pragma mark - TAPMyAccountViewController
+#pragma mark TAPMyAccountViewController
 - (void)myAccountViewControllerDidTappedLogoutButton {
     [self.roomListArray removeAllObjects];
     [self.roomListDictionary removeAllObjects];
@@ -543,18 +536,21 @@
 
 - (void)viewLoadedSequence {
     //Check if should show first loading view
+    
     BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
     if (!isDoneFirstSetup) {
         [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeSettingUp];
         [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeSettingUp];
     }
     
-    NSLog(@"ACTIVE USER: %@", [[TAPChatManager sharedManager].activeUser description]);
-    NSLog(@"DATA MANAGER ACTIVE USER: %@", [[TAPDataManager getActiveUser] description]);
     if ([TAPChatManager sharedManager].activeUser == nil) {
         
-        //Refresh auth ticket
-        [[TapTalk sharedInstance] shouldRefreshAuthTicket];
+        [[TAPChatManager sharedManager] disconnect];
+        
+        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
+            [tapTalkDelegate tapTalkShouldResetAuthTicket];
+        }
         
         return; //User not logged in
     }
@@ -614,7 +610,8 @@
             [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self hideSetupViewWithDelay:0.0f];
+                [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
+                [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
             });
         }];
         
@@ -707,6 +704,11 @@
         
         if (animateReloadData && self.isViewAppear) {
             //Update UI movement changes animation
+            
+            NSMutableArray *insertIndexArray = [NSMutableArray array];
+            NSMutableArray *moveFromIndexArray = [NSMutableArray array];
+            NSMutableArray *moveToIndexArray = [NSMutableArray array];
+            
             for (NSInteger newIndex = 0; newIndex < [self.roomListArray count]; newIndex++) {
                 TAPRoomListModel *newRoomList = [self.roomListArray objectAtIndex:newIndex];
                 
@@ -722,10 +724,11 @@
                     [oldRoomListArray insertObject:newRoomList atIndex:newIndex];
                     [oldRoomListDictionary setObject:newRoomList forKey:newRoomList.lastMessage.room.roomID];
                     
+                    [insertIndexArray addObject:[NSIndexPath indexPathForRow:newIndex inSection:0]];
                     //Insert to table view
-                    [self.roomListView.roomListTableView beginUpdates];
-                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.roomListView.roomListTableView endUpdates];
+//                    [self.roomListView.roomListTableView beginUpdates];
+//                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+//                    [self.roomListView.roomListTableView endUpdates];
                     continue;
                 }
                 
@@ -742,11 +745,35 @@
                 [oldRoomListArray removeObjectAtIndex:oldIndex];
                 [oldRoomListArray insertObject:oldRoomList atIndex:newIndex];
                 
+                [moveFromIndexArray addObject:[NSString stringWithFormat:@"%ld", oldIndex]];
+                [moveToIndexArray addObject:[NSString stringWithFormat:@"%ld", newIndex]];
+                
                 //Update table view
-                [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
+//                [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
+//                [self.roomListView.roomListTableView beginUpdates];
+//                [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
+//                [self.roomListView.roomListTableView endUpdates];
+            }
+            
+            //Handle room insert
+            if([insertIndexArray count] > 0) {
                 [self.roomListView.roomListTableView beginUpdates];
-                [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
+                [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
                 [self.roomListView.roomListTableView endUpdates];
+                [self.roomListView.roomListTableView scrollsToTop];
+            }
+            
+            //Handle room move
+            if ([moveFromIndexArray count] > 0) {
+                for (int count = 0; count < [moveFromIndexArray count]; count++) {
+                    NSInteger oldIndex = [moveFromIndexArray objectAtIndex:count];
+                    NSInteger newIndex = [moveToIndexArray objectAtIndex:count];
+
+                    [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
+                    [self.roomListView.roomListTableView beginUpdates];
+                    [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
+                    [self.roomListView.roomListTableView endUpdates];
+                }
             }
             
             //Handle room deletion
@@ -928,6 +955,20 @@
     }
 }
 
+- (void)openNewChatViewController {
+    TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
+    addNewChatViewController.roomListViewController = self;
+    addNewChatViewController.delegate = self;
+    UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
+    [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
+}
+
+- (void)hideSetupViewWithDelay:(double)delayTime {
+    [TAPUtil performBlock:^{
+        [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeSuccess];
+    } afterDelay:delayTime];
+}
+
 - (void)reachabilityStatusChange:(NSNotification *)notification {
     if ([AFNetworkReachabilityManager sharedManager].reachable) {
         if (self.isNeedRefreshOnNetworkDown) {
@@ -942,20 +983,6 @@
     else {
         _isNeedRefreshOnNetworkDown = YES;
     }
-}
-
-- (void)openNewChatViewController {
-    TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
-    addNewChatViewController.roomListViewController = self;
-    addNewChatViewController.delegate = self;
-    UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
-    [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
-}
-
-- (void)hideSetupViewWithDelay:(double)delayTime {
-    [TAPUtil delayCallback:^{
-        [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeSuccess];
-    } forTotalSeconds:delayTime];
 }
 
 @end

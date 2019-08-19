@@ -42,6 +42,7 @@
         
         _selectedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 32.0f - 20.0f , (44.0f - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.selectedImageView.image = [UIImage imageNamed:@"TAPIconTick" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.selectedImageView.image = [self.selectedImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChecklist]];
         self.selectedImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.selectedImageView.alpha = 0.0f;
         [self.contentView addSubview:self.selectedImageView];

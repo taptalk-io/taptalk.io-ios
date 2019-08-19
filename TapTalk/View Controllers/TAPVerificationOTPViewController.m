@@ -156,7 +156,7 @@
         
         [self.verificationOTPView showDoneResendOTP:YES animated:YES];
         
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
 
             [self.verificationOTPView showDoneResendOTP:NO animated:NO];
             
@@ -174,7 +174,7 @@
             
             [[NSUserDefaults standardUserDefaults] setSecureObject:phoneDictionary forKey:TAP_PREFS_USER_LOGIN_PHONE_TEMP_DICTIONARY];
             [[NSUserDefaults standardUserDefaults] synchronize];
-        } forTotalSeconds:2.0f];
+        } afterDelay:2.0f];
         
     } failure:^(NSError *error) {
         [self.verificationOTPView showLoading:NO animated:NO title:@""];
@@ -229,7 +229,7 @@
 
         if (isRegistered) {
             //Already Registered
-            [[TapTalk sharedInstance] setAuthTicket:ticket success:^{
+            [[TapTalk sharedInstance] authenticateWithAuthTicket:ticket connectWhenSuccess:YES success:^{
                 [self.verificationOTPView endEditing:YES];
                 [self dismissViewControllerAnimated:YES completion:nil];
                 [[TAPContactManager sharedManager] saveUserCountryCode:self.country.countryCallingCode];

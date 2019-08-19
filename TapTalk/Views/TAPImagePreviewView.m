@@ -100,6 +100,8 @@
         _morePictureImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.bottomMenuView.frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
         self.morePictureImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.morePictureImageView.image = [UIImage imageNamed:@"TAPIconAddImage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.morePictureImageView.image = [self.morePictureImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaPreviewAdd]];
+
         [self.bottomMenuView addSubview:self.morePictureImageView];
         
         _morePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.morePictureImageView.frame) - 8.0f, CGRectGetMinY(self.morePictureImageView.frame) - 8.0f, CGRectGetWidth(self.morePictureImageView.frame) + 16.0f, CGRectGetHeight(self.morePictureImageView.frame) + 16.0f)];
@@ -169,17 +171,22 @@
         
         _alertImageView = [[UIImageView alloc] initWithFrame:CGRectMake(14.0f, 14.0f, 16.0f, 16.0f)];
         self.alertImageView.image = [UIImage imageNamed:@"TAPIconWarning" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.alertImageView.image = [self.alertImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaPreviewWarning]];
         self.alertImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.alertImageView.clipsToBounds = YES;
         self.alertImageView.layer.cornerRadius = CGRectGetHeight(self.alertImageView.frame) / 2.0f;
         [self.alertView addSubview:self.alertImageView];
+        
+        TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+        NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
+        NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
         
         UIFont *imagePreviewAlertTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewWarningTitle];
         UIColor *imagePreviewAlertTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewWarningTitle];
         _alertTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.alertImageView.frame) + 6.0f, 12.0f, CGRectGetWidth(self.alertView.frame) - CGRectGetWidth(self.alertImageView.frame) - 6.0f - 10.0f - 10.0f, 20.0f)];
         self.alertTitleLabel.font = imagePreviewAlertTitleFont;
         self.alertTitleLabel.textColor = imagePreviewAlertTitleColor;
-        self.alertTitleLabel.text = [NSString stringWithFormat:@"Exceeded %ldMB upload limit", (long)TAP_MAX_VIDEO_SIZE];
+        self.alertTitleLabel.text = [NSString stringWithFormat:@"Exceeded %ldMB upload limit", (long)maxFileSizeInMB];
         [self.alertView addSubview:self.alertTitleLabel];
 
         UIFont *imagePreviewAlertContentFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewWarningBody];

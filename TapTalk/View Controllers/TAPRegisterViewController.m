@@ -191,13 +191,13 @@
 
 #pragma mark TAPCustomButtonView
 - (void)customButtonViewDidTappedButton {
-   //CONTINUE BUTTON TAPPED
     [self.registerView.continueButtonView setAsLoading:YES animated:NO];
     [self.registerView setContentEditable:NO];
     
     [TAPDataManager callAPIRegisterWithFullName:self.registerView.fullNameTextField.textField.text countryID:self.country.countryID phone:self.phoneNumber username:self.registerView.usernameTextField.textField.text email:self.registerView.emailTextField.textField.text password:self.registerView.passwordTextField.textField.text success:^(NSString *userID, NSString *ticket) {
         //Already Registered
-        [[TapTalk sharedInstance] setAuthTicket:ticket success:^{
+        [[TapTalk sharedInstance] authenticateWithAuthTicket:ticket connectWhenSuccess:YES success:^{
+
             [[TAPContactManager sharedManager] saveUserCountryCode:self.country.countryCallingCode];
         if (self.selectedProfileImage == nil) {
          //no Image
@@ -207,7 +207,7 @@
         }
         else {
          //upload Image
-            [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+            [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
                 
                 NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
                 
@@ -452,11 +452,11 @@
                                    }];
     
     UIImage *cameraActionImage = [UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    cameraActionImage = [cameraActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCamera]];
+    cameraActionImage = [cameraActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSelectPictureCamera]];
     [cameraAction setValue:[cameraActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
     UIImage *galleryActionImage = [UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    galleryActionImage = [galleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetGallery]];
+    galleryActionImage = [galleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSelectPictureGallery]];
     [galleryAction setValue:[galleryActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
     [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
@@ -582,7 +582,7 @@
         [self.registerView.continueButtonView setAsLoading:YES animated:NO];
         [self.registerView setContentEditable:NO];
         
-        [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+        [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
             
             NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
             

@@ -38,9 +38,9 @@
         self.addressView.layer.shadowOpacity = 0.18f;
         [self addSubview:self.addressView];
         
-        _addressIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, 20.0f, 20.0f)];
+        _addressIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10.0f, 10.0f, 32.0f, 32.0f)];
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        //DV Temp Icon - 9B9B9B
+        self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressInactive]];
         [self.addressView addSubview:self.addressIconImageView];
         
         UIFont *placeholderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerAddressPlaceholder];
@@ -62,23 +62,31 @@
         [self.mapContainerView addSubview:self.mapView];
         
         _goToCurrentLocationButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(frame) - 16.0f - 56.0f, CGRectGetHeight(frame) - CGRectGetHeight(self.addressView.frame) - 16.0f - 56.0f, 56.0f, 56.0f)];
-        self.goToCurrentLocationButton.backgroundColor = [UIColor whiteColor];
+        self.goToCurrentLocationButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerRecenterBackground];
         self.goToCurrentLocationButton.layer.cornerRadius = CGRectGetHeight(self.goToCurrentLocationButton.frame) / 2.0f;
         self.goToCurrentLocationButton.layer.shadowOffset = CGSizeMake(0.0f, 6.0f);
         self.goToCurrentLocationButton.layer.shadowColor = [UIColor blackColor].CGColor;
         self.goToCurrentLocationButton.layer.shadowRadius = 6.0f;
         self.goToCurrentLocationButton.layer.shadowOpacity = 0.24f;
-        [self.goToCurrentLocationButton setImage:[UIImage imageNamed:@"TAPIconGetLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+        
+        UIImage *getLocationImage = [UIImage imageNamed:@"TAPIconGetLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        getLocationImage = [getLocationImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerRecenter]];
+
+        [self.goToCurrentLocationButton setImage:getLocationImage forState:UIControlStateNormal];
         [self addSubview:self.goToCurrentLocationButton];
         
         _searchBarView = [[TAPLocationSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(frame) - 16.0f - 16.0f, 36.0f)];
         self.searchBarView.placeholder = NSLocalizedString(@"Search Address", @"");
         self.searchBarView.leftViewImage = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.searchBarView.leftViewImage = [self.searchBarView.leftViewImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
+
         [self.searchBarView setReturnKeyType:UIReturnKeySearch];
         [self addSubview:self.searchBarView];
         
         _pinIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.mapView.frame) - 36.0f) / 2.0f, (CGRectGetHeight(self.mapView.frame) / 2.0f) - 32.0f - 5.0f, 36.0f, 57.0f)]; //32.0 is height of icon without shadow and 5.0f is top shadow of the icon. meanwhile 47 is height of icon with shadow
         self.pinIconImageView.image = [UIImage imageNamed:@"TAPIconLocationSelect" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerMarker]];
+        
         [self addSubview:self.pinIconImageView];
         
         _pinLocationView = [[TAPPinLocationView alloc] initWithFrame:CGRectMake((CGRectGetWidth(frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f)];
@@ -135,7 +143,7 @@
         self.addressLabel.frame = CGRectMake(CGRectGetMinX(self.addressLabel.frame), CGRectGetMinY(self.addressLabel.frame), CGRectGetWidth(self.addressLabel.frame), addressLabelSize.height);
         
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        //DV Temp Icon - 9B9B9B
+        self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressInactive]];
         
         [UIView animateWithDuration:0.2f animations:^{
             CGRect setLocationViewFrame = self.pinLocationView.frame;
@@ -150,8 +158,8 @@
     else {
         self.addressLabel.textColor = addressColor;
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        //DV Temp Icon - 191919
-        
+        self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressActive]];
+
         [UIView animateWithDuration:0.2f animations:^{
             self.pinLocationView.frame = CGRectMake((CGRectGetWidth(self.frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f);
             self.pinLocationView.layer.cornerRadius = 0.0f;
@@ -168,7 +176,7 @@
     UIColor *addressLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddress];
     self.addressLabel.textColor = addressLabelColor;
     self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    //DV Temp Icon - 191919
+    self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressActive]];
     
     self.addressLabel.text = addressString;
     NSMutableAttributedString *addressAttributedString = [[NSMutableAttributedString alloc] initWithString:self.addressLabel.text];

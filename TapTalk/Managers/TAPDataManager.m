@@ -18,6 +18,9 @@
 @property (strong, nonatomic) NSLock *refreshTokenLock;
 @property (nonatomic) BOOL isShouldRefreshToken;
 
++ (TAPCoreConfigsModel *)coreConfigsModelFromDictionary:(NSDictionary *)dictionary;
++ (TAPProjectConfigsModel *)projectConfigsModelFromDictionary:(NSDictionary *)dictionary;
+
 @end
 
 @implementation TAPDataManager
@@ -99,6 +102,13 @@
     
     NSInteger roomType = [[dictionary objectForKey:@"roomType"] integerValue];
     room.type = roomType;
+    
+    BOOL roomIsDeleted = [[dictionary objectForKey:@"roomIsDeleted"] boolValue];
+    room.isDeleted = roomIsDeleted;
+    
+    NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
+    room.deleted = [NSNumber numberWithInteger:roomDeleted];
+    
     message.room = room;
     
     TAPUserModel *user = [TAPUserModel new];
@@ -729,6 +739,148 @@
     return room;
 }
 
++ (TAPProductModel *)productModelFromDictionary:(NSDictionary *)dictionary {
+    NSDictionary *productDictionary = [TAPUtil nullToEmptyDictionary:dictionary];
+    
+    NSString *productID = [productDictionary objectForKey:@"id"];
+    productID = [TAPUtil nullToEmptyString:productID];
+    
+    NSString *productNameString = [productDictionary objectForKey:@"name"];
+    productNameString = [TAPUtil nullToEmptyString:productNameString];
+    
+    NSString *currencyString = [productDictionary objectForKey:@"currency"];
+    currencyString = [TAPUtil nullToEmptyString:currencyString];
+    
+    NSString *priceString = [productDictionary objectForKey:@"price"];
+    priceString = [TAPUtil nullToEmptyString:priceString];
+    
+    NSString *ratingString = [productDictionary objectForKey:@"rating"];
+    ratingString = [TAPUtil nullToEmptyString:ratingString];
+    
+    NSString *weightString = [productDictionary objectForKey:@"weight"];
+    weightString = [TAPUtil nullToEmptyString:weightString];
+    
+    NSString *productDescriptionString = [productDictionary objectForKey:@"description"];
+    productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
+    
+    NSString *productImageURLString = [productDictionary objectForKey:@"imageURL"];
+    productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
+    
+    NSString *leftOptionTextString = [productDictionary objectForKey:@"buttonOption1Text"];
+    leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
+    
+    NSString *rightOptionTextString = [productDictionary objectForKey:@"buttonOption2Text"];
+    rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
+    
+    NSString *leftOptionColorString = [productDictionary objectForKey:@"buttonOption1Color"];
+    leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
+    
+    NSString *rightOptionColorString = [productDictionary objectForKey:@"buttonOption2Color"];
+    rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
+    
+    TAPProductModel *product = [TAPProductModel new];
+    product.productDataID = productID;
+    product.productName = productNameString;
+    product.productCurrency = currencyString;
+    product.productPrice = priceString;
+    product.productRating = ratingString;
+    product.productWeight = weightString;
+    product.productDescription = productDescriptionString;
+    product.productImageURL = productImageURLString;
+    product.buttonOption1Text = leftOptionTextString;
+    product.buttonOption2Text = rightOptionTextString;
+    product.buttonOption1Color = leftOptionColorString;
+    product.buttonOption2Color = rightOptionColorString;
+
+    return product;
+}
+
++ (TAPCoreConfigsModel *)coreConfigsModelFromDictionary:(NSDictionary *)dictionary {
+    NSString *chatMediaMaxFileSizeString = [dictionary objectForKey:@"chatMediaMaxFileSize"];
+    chatMediaMaxFileSizeString = [TAPUtil nullToEmptyString:chatMediaMaxFileSizeString];
+    NSNumber *chatMediaMaxFileSizeNumber;
+    
+    if ([chatMediaMaxFileSizeString isEqualToString:@""]) {
+        //not obtain default data
+        chatMediaMaxFileSizeNumber = [NSNumber numberWithLong:TAP_DEFAULT_MAX_FILE_SIZE];
+    }
+    else {
+        chatMediaMaxFileSizeNumber = [NSNumber numberWithLong:[chatMediaMaxFileSizeString longLongValue]];
+    }
+
+    NSString *roomPhotoMaxFileSizeString = [dictionary objectForKey:@"roomPhotoMaxFileSize"];
+    roomPhotoMaxFileSizeString = [TAPUtil nullToEmptyString:roomPhotoMaxFileSizeString];
+    NSNumber *roomPhotoMaxFileSizeNumber;
+    
+    if ([roomPhotoMaxFileSizeString isEqualToString:@""]) {
+        //not obtain default data
+        roomPhotoMaxFileSizeNumber = [NSNumber numberWithLong:TAP_DEFAULT_MAX_FILE_SIZE];
+    }
+    else {
+        roomPhotoMaxFileSizeNumber = [NSNumber numberWithLong:[roomPhotoMaxFileSizeString longLongValue]];
+    }
+    
+    NSString *userPhotoMaxFileSizeString = [dictionary objectForKey:@"userPhotoMaxFileSize"];
+    userPhotoMaxFileSizeString = [TAPUtil nullToEmptyString:userPhotoMaxFileSizeString];
+    NSNumber *userPhotoMaxFileSizeNumber;
+    
+    if ([userPhotoMaxFileSizeString isEqualToString:@""]) {
+        //not obtain default data
+        userPhotoMaxFileSizeNumber = [NSNumber numberWithLong:TAP_DEFAULT_MAX_FILE_SIZE];
+    }
+    else {
+        userPhotoMaxFileSizeNumber = [NSNumber numberWithLong:[userPhotoMaxFileSizeString longLongValue]];
+    }
+    
+    NSString *groupMaxParticipantsString = [dictionary objectForKey:@"groupMaxParticipants"];
+    groupMaxParticipantsString = [TAPUtil nullToEmptyString:groupMaxParticipantsString];
+    NSNumber *groupMaxParticipantsNumber;
+    
+    if ([groupMaxParticipantsString isEqualToString:@""]) {
+        //not obtain default data
+        groupMaxParticipantsNumber = [NSNumber numberWithLong:TAP_DEFAULT_MAX_GROUP_PARTICIPANTS];
+    }
+    else {
+        groupMaxParticipantsNumber = [NSNumber numberWithLong:[groupMaxParticipantsString longLongValue]];
+    }
+    
+    NSString *channelMaxParticipantsString = [dictionary objectForKey:@"channelMaxParticipants"];
+    channelMaxParticipantsString = [TAPUtil nullToEmptyString:channelMaxParticipantsString];
+    NSNumber *channelMaxParticipantsNumber;
+    
+    if ([channelMaxParticipantsString isEqualToString:@""]) {
+        //not obtain default data
+        channelMaxParticipantsNumber = [NSNumber numberWithLong:TAP_DEFAULT_MAX_CHANNEL_PARTICIPANTS];
+    }
+    else {
+        channelMaxParticipantsNumber = [NSNumber numberWithLong:[channelMaxParticipantsString longLongValue]];
+    }
+    
+    
+    TAPCoreConfigsModel *coreConfigs = [TAPCoreConfigsModel new];
+    coreConfigs.chatMediaMaxFileSize = chatMediaMaxFileSizeNumber;
+    coreConfigs.roomPhotoMaxFileSize = roomPhotoMaxFileSizeNumber;
+    coreConfigs.userPhotoMaxFileSize = userPhotoMaxFileSizeNumber;
+    coreConfigs.groupMaxParticipants = groupMaxParticipantsNumber;
+    coreConfigs.channelMaxParticipants = channelMaxParticipantsNumber;
+    return coreConfigs;
+}
+
++ (TAPProjectConfigsModel *)projectConfigsModelFromDictionary:(NSDictionary *)dictionary {
+    NSString *usernameIgnoreCaseString = [dictionary objectForKey:@"usernameIgnoreCase"];
+    usernameIgnoreCaseString = [TAPUtil nullToEmptyString:usernameIgnoreCaseString];
+
+    BOOL usernameIgnoreCase = YES;
+    if ([usernameIgnoreCaseString isEqualToString:@"0"]) {
+        usernameIgnoreCase = NO;
+    }
+    
+    TAPProjectConfigsModel *projectConfigs = [TAPProjectConfigsModel new];
+    projectConfigs.usernameIgnoreCase = usernameIgnoreCase;
+    
+    return projectConfigs;
+}
+
 #pragma mark From Model
 + (NSDictionary *)dictionaryFromMessageModel:(TAPMessageModel *)message {
     
@@ -762,6 +914,14 @@
     NSNumber *roomType = [roomDicitonary objectForKey:@"type"];
     roomType = [TAPUtil nullToEmptyNumber:roomType];
     [messageMutableDictionary setValue:roomType forKey:@"roomType"];
+    
+    NSNumber *roomIsDeleted = [roomDicitonary objectForKey:@"isDeleted"];
+    roomIsDeleted = [TAPUtil nullToEmptyNumber:roomIsDeleted];
+    [messageMutableDictionary setValue:roomIsDeleted forKey:@"roomIsDeleted"];
+    
+    NSNumber *roomDeleted = [roomDicitonary objectForKey:@"deleted"];
+    roomDeleted = [TAPUtil nullToEmptyNumber:roomDeleted];
+    [messageMutableDictionary setValue:roomDeleted forKey:@"roomDeleted"];
     
     [messageMutableDictionary removeObjectForKey:@"room"];
     
@@ -1042,6 +1202,61 @@
     return countryDictionary;
 }
 
++ (NSDictionary *)dictionaryFromProductModel:(TAPProductModel *)product {
+    
+    NSString *productID = product.productDataID;
+    productID = [TAPUtil nullToEmptyString:productID];
+    
+    NSString *productNameString = product.productName;
+    productNameString = [TAPUtil nullToEmptyString:productNameString];
+    
+    NSString *currencyString = product.productCurrency;
+    currencyString = [TAPUtil nullToEmptyString:currencyString];
+    
+    NSString *priceString = product.productPrice;
+    priceString = [TAPUtil nullToEmptyString:priceString];
+    
+    NSString *ratingString = product.productRating;
+    ratingString = [TAPUtil nullToEmptyString:ratingString];
+    
+    NSString *weightString = product.productWeight;
+    weightString = [TAPUtil nullToEmptyString:weightString];
+    
+    NSString *productDescriptionString = product.productDescription;
+    productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
+    
+    NSString *productImageURLString = product.productImageURL;
+    productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
+    
+    NSString *leftOptionTextString = product.buttonOption1Text;
+    leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
+    
+    NSString *rightOptionTextString = product.buttonOption2Text;
+    rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
+    
+    NSString *leftOptionColorString = product.buttonOption1Color;
+    leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
+    
+    NSString *rightOptionColorString = product.buttonOption2Color;
+    rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
+    
+    NSMutableDictionary *productDictionary = [[NSMutableDictionary alloc] init];
+    [productDictionary setObject:productID forKey:@"id"];
+    [productDictionary setObject:productNameString forKey:@"name"];
+    [productDictionary setObject:currencyString forKey:@"currency"];
+    [productDictionary setObject:priceString forKey:@"price"];
+    [productDictionary setObject:ratingString forKey:@"rating"];
+    [productDictionary setObject:weightString forKey:@"weight"];
+    [productDictionary setObject:productDescriptionString forKey:@"description"];
+    [productDictionary setObject:productImageURLString forKey:@"imageURL"];
+    [productDictionary setObject:leftOptionTextString forKey:@"buttonOption1Text"];
+    [productDictionary setObject:rightOptionTextString forKey:@"buttonOption2Text"];
+    [productDictionary setObject:leftOptionColorString forKey:@"buttonOption1Color"];
+    [productDictionary setObject:rightOptionColorString forKey:@"buttonOption2Color"];
+    
+    return productDictionary;
+}
+
 #pragma mark - Custom Method
 + (void)logErrorStringFromError:(NSError *)error {
     NSString *dataString = [[NSString alloc] initWithData:[error.userInfo objectForKey:@"com.alamofire.serialization.response.error.data"] encoding:NSUTF8StringEncoding];
@@ -1126,6 +1341,11 @@
     return [TAPUtil nullToEmptyString:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_ACCESS_TOKEN valid:nil]];
 }
 
++ (NSTimeInterval)getAccessTokenExpiryTime {
+    NSTimeInterval expiryTime = [[NSUserDefaults standardUserDefaults] secureDoubleForKey:TAP_PREFS_ACCESS_TOKEN_EXPIRED_TIME valid:nil];
+    return expiryTime;
+}
+
 + (void)setRefreshToken:(NSString *)refreshToken expiryDate:(NSTimeInterval)expiryDate {
     refreshToken = [TAPUtil nullToEmptyString:refreshToken];
     
@@ -1136,6 +1356,24 @@
 
 + (NSString *)getRefreshToken {
     return [TAPUtil nullToEmptyString:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_REFRESH_TOKEN valid:nil]];
+}
+
++ (TAPProjectConfigsModel *)getProjectConfigs {
+    NSDictionary *projectConfigsDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY valid:nil];
+    NSDictionary *projectDictionary = [projectConfigsDictionary objectForKey:@"project"];
+    projectDictionary = [TAPUtil nullToEmptyDictionary:projectDictionary];
+    
+    TAPProjectConfigsModel *projectConfigs = [self projectConfigsModelFromDictionary:projectDictionary];
+    return projectConfigs;
+}
+
++ (TAPCoreConfigsModel *)getCoreConfigs {
+    NSDictionary *projectConfigsDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY valid:nil];
+    NSDictionary *coreDictionary = [projectConfigsDictionary objectForKey:@"core"];
+    coreDictionary = [TAPUtil nullToEmptyDictionary:coreDictionary];
+    
+    TAPProjectConfigsModel *coreConfigs = [self coreConfigsModelFromDictionary:coreDictionary];
+    return coreConfigs;
 }
 
 + (void)updateMessageToFailedWhenClosedInDatabase {
@@ -1355,6 +1593,17 @@
     return newString;
 }
 
++ (NSString *)generateChecksumWithRoomID:(NSString *)roomID
+                                roomType:(NSInteger)roomType
+                                  userID:(NSString *)userID
+                       accessTokenExpiry:(NSTimeInterval)accessTokenExpiry {
+    NSString *appendedString = [NSString stringWithFormat:@"%@:%ld:%@:%ld", roomID, (long)roomType, userID, (long)accessTokenExpiry];
+    NSString *md5HashString = [TAPUtil md5:appendedString];
+    md5HashString = [TAPUtil nullToEmptyString:md5HashString];
+    
+    return md5HashString;
+}
+
 #pragma mark - Database Call
 + (void)searchMessageWithString:(NSString *)searchString
                          sortBy:(NSString *)columnName
@@ -1561,7 +1810,13 @@
         subQueryTypeString = [subQueryTypeString stringByAppendingString:@")"];
     }
     
-    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && %@", roomID, subQueryTypeString];
+    NSString *queryString;
+    if ([messageTypeArray count] != 0) {
+        queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && %@", roomID, subQueryTypeString];
+    }
+    else {
+        queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@'", roomID];
+    }
     
     [TAPDatabaseManager loadAllDataFromDatabaseWithQuery:queryString tableName:kDatabaseTableMessage sortByKey:columnName ascending:isAscending success:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
@@ -2349,7 +2604,7 @@
         NSString *accessToken = [dataDictionary objectForKey:@"accessToken"];
         accessToken = [TAPUtil nullToEmptyString:accessToken];
         
-        NSTimeInterval accessTokenExpiry = [[dataDictionary objectForKey:@"accessToken"] longLongValue];
+        NSTimeInterval accessTokenExpiry = [[dataDictionary objectForKey:@"accessTokenExpiry"] longLongValue];
         
         NSTimeInterval refreshTokenExpiry = [[dataDictionary objectForKey:@"refreshTokenExpiry"] longLongValue];
         
@@ -2414,7 +2669,12 @@
                     
                     if (errorCode >= 40103 && errorCode <= 40106) {
                         //Refresh token is invalid, ask business side to refresh auth ticket
-                        [[TapTalk sharedInstance] shouldRefreshAuthTicket];
+                        [[TAPChatManager sharedManager] disconnect];
+                        
+                        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+                        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
+                            [tapTalkDelegate tapTalkShouldResetAuthTicket];
+                        }
                     }
                     
                     _isShouldRefreshToken = NO;
@@ -2445,7 +2705,7 @@
                 NSString *accessToken = [dataDictionary objectForKey:@"accessToken"];
                 accessToken = [TAPUtil nullToEmptyString:accessToken];
                 
-                NSTimeInterval accessTokenExpiry = [[dataDictionary objectForKey:@"accessToken"] longLongValue];
+                NSTimeInterval accessTokenExpiry = [[dataDictionary objectForKey:@"accessTokenExpiry"] longLongValue];
                 
                 NSTimeInterval refreshTokenExpiry = [[dataDictionary objectForKey:@"refreshTokenExpiry"] longLongValue];
                 
@@ -2727,6 +2987,8 @@
 
 + (void)callAPIGetMessageAfterWithRoomID:(NSString *)roomID
                               minCreated:(NSNumber *)minCreated
+                             lastUpdated:(NSNumber *)lastUpdated
+          needToSaveLastUpdatedTimestamp:(BOOL)needToSaveLastUpdatedTimestamp
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure {
     if(roomID == nil || [roomID isEqualToString:@""]) {
@@ -2736,9 +2998,6 @@
     }
     
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageRoomListAfter];
-    
-    //Obtain Last Updated Value
-    NSNumber *lastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:roomID forKey:@"roomID"];
@@ -2760,7 +3019,7 @@
             if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated success:success failure:failure];
+                    [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated lastUpdated:lastUpdated needToSaveLastUpdatedTimestamp:needToSaveLastUpdatedTimestamp success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error);
                 }];
@@ -2800,8 +3059,10 @@
             }
         }
         
-        //Set newest last updated to preference
-        [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:preferenceLastUpdated];
+        if (needToSaveLastUpdatedTimestamp) {
+            //Set newest last updated to preference
+            [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:preferenceLastUpdated];
+        }
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
@@ -2832,6 +3093,7 @@
 
 + (void)callAPIGetMessageBeforeWithRoomID:(NSString *)roomID
                                maxCreated:(NSNumber *)maxCreated
+                            numberOfItems:(NSNumber *)numberOfItems
                                   success:(void (^)(NSArray *messageArray, BOOL hasMore))success
                                   failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageRoomListBefore];
@@ -2839,6 +3101,7 @@
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:roomID forKey:@"roomID"];
     [parameterDictionary setObject:maxCreated forKey:@"maxCreated"];
+    [parameterDictionary setObject:numberOfItems forKey:@"limit"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -2855,7 +3118,7 @@
             if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated success:success failure:failure];
+                    [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated numberOfItems:numberOfItems  success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error);
                 }];
@@ -3167,7 +3430,7 @@
 }
 
 + (void)callAPIAddContactWithUserID:(NSString *)userID
-                            success:(void (^)(NSString *message))success
+                            success:(void (^)(NSString *message, TAPUserModel *user))success
                             failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeAddContact];
     
@@ -3208,17 +3471,122 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success(@"");
+            success(@"", [TAPUserModel new]);
             return;
         }
         
         NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        
         NSString *successString = [NSString stringWithFormat:@"%ld", [[dataDictionary objectForKey:@"success"] integerValue]];
         successString = [TAPUtil nullToEmptyString:successString];
         NSString *message = [dataDictionary objectForKey:@"message"];
         message = [TAPUtil nullToEmptyString:message];
         
-        success(message);
+        NSDictionary *userDictionary = [dataDictionary objectForKey:@"user"];
+        userDictionary = [TAPUtil nullToEmptyDictionary:userDictionary];
+        
+        TAPUserModel *user = [TAPUserModel new];
+        
+        NSString *userID = [userDictionary objectForKey:@"userID"];
+        userID = [TAPUtil nullToEmptyString:userID];
+        user.userID = userID;
+        
+        NSString *xcUserID = [userDictionary objectForKey:@"xcUserID"];
+        xcUserID = [TAPUtil nullToEmptyString:xcUserID];
+        user.xcUserID = xcUserID;
+        
+        NSString *fullname = [userDictionary objectForKey:@"fullname"];
+        fullname = [TAPUtil nullToEmptyString:fullname];
+        user.fullname = fullname;
+        
+        NSString *email = [userDictionary objectForKey:@"email"];
+        email = [TAPUtil nullToEmptyString:email];
+        user.email = email;
+        
+        NSString *phone = [userDictionary objectForKey:@"phone"];
+        phone = [TAPUtil nullToEmptyString:phone];
+        user.phone = phone;
+        
+        NSString *username = [userDictionary objectForKey:@"username"];
+        username = [TAPUtil nullToEmptyString:username];
+        user.username = username;
+        
+        NSString *phoneWithCode = [userDictionary objectForKey:@"phoneWithCode"];
+        phoneWithCode = [TAPUtil nullToEmptyString:phoneWithCode];
+        user.phoneWithCode = phoneWithCode;
+        
+        NSString *countryCallingCode = [userDictionary objectForKey:@"countryCallingCode"];
+        countryCallingCode = [TAPUtil nullToEmptyString:countryCallingCode];
+        user.countryCallingCode = countryCallingCode;
+        
+        NSString *countryID = [NSString stringWithFormat:@"%ld", [[userDictionary objectForKey:@"countryID"] integerValue]];
+        countryID = [TAPUtil nullToEmptyString:countryID];
+        user.countryID = countryID;
+        
+        NSDictionary *imageURLDictionary = [userDictionary objectForKey:@"imageURL"];
+        TAPImageURLModel *imageURL = [TAPImageURLModel new];
+        NSString *thumbnail = [imageURLDictionary objectForKey:@"thumbnail"];
+        thumbnail = [TAPUtil nullToEmptyString:thumbnail];
+        imageURL.thumbnail = thumbnail;
+        
+        NSString *fullsize = [imageURLDictionary objectForKey:@"fullsize"];
+        fullsize = [TAPUtil nullToEmptyString:fullsize];
+        imageURL.fullsize = fullsize;
+        user.imageURL = imageURL;
+        
+        NSDictionary *userRoleDictionary = [userDictionary objectForKey:@"userRole"];
+        TAPUserRoleModel *userRole = [TAPUserRoleModel new];
+        NSString *userRoleCode = [userRoleDictionary objectForKey:@"code"];
+        userRoleCode = [TAPUtil nullToEmptyString:userRoleCode];
+        userRole.code = userRoleCode;
+        
+        NSString *name = [userRoleDictionary objectForKey:@"name"];
+        name = [TAPUtil nullToEmptyString:name];
+        userRole.name = name;
+        
+        NSString *iconURL = [userRoleDictionary objectForKey:@"iconURL"];
+        iconURL = [TAPUtil nullToEmptyString:iconURL];
+        userRole.iconURL = iconURL;
+        user.userRole = userRole;
+        
+        NSNumber *lastLogin = [userDictionary objectForKey:@"lastLogin"];
+        lastLogin = [TAPUtil nullToEmptyNumber:lastLogin];
+        user.lastLogin = lastLogin;
+        
+        NSNumber *lastActivity = [userDictionary objectForKey:@"lastActivity"];
+        lastActivity = [TAPUtil nullToEmptyNumber:lastActivity];
+        user.lastActivity = lastActivity;
+        
+        NSNumber *created = [userDictionary objectForKey:@"created"];
+        created = [TAPUtil nullToEmptyNumber:created];
+        user.created = created;
+        
+        NSNumber *updated = [userDictionary objectForKey:@"updated"];
+        updated = [TAPUtil nullToEmptyNumber:updated];
+        user.updated = updated;
+        
+        NSNumber *deleted = [userDictionary objectForKey:@"deleted"];
+        deleted = [TAPUtil nullToEmptyNumber:deleted];
+        user.deleted = deleted;
+        
+        BOOL isRequestPending = [[userDictionary objectForKey:@"isRequestPending"] boolValue];
+        user.isRequestPending = isRequestPending;
+        
+        BOOL isRequestAccepted = [[userDictionary objectForKey:@"isRequestAccepted"] boolValue];
+        user.isRequestAccepted = isRequestAccepted;
+        
+        user.isContact = YES;
+        
+        //Add User to Contact Manager
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        
+        //Insert To Database
+        [TAPDataManager updateOrInsertDatabaseContactWithData:@[user] success:^{
+            success(message, user);
+            
+        } failure:^(NSError *error) {
+            
+        }];
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
@@ -3462,10 +3830,12 @@
                          success:(void (^)(TAPUserModel *user))success
                          failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetUserByUsername];
+    TAPProjectConfigsModel *projectConfigs = [self getProjectConfigs];
+    BOOL isIgnoreCase = projectConfigs.usernameIgnoreCase;
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:username forKey:@"username"];
-    [parameterDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"ignoreCase"];
+    [parameterDictionary setObject:[NSNumber numberWithBool:isIgnoreCase] forKey:@"ignoreCase"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4807,7 +5177,7 @@
                 errorCode = 999;
             }
             
-            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:errorCode userInfo:@{@"message": errorMessage}];
             failure(error);
             return;
         }
@@ -5248,9 +5618,174 @@
         }
         else {
             NSString *errorMessage = [dataDictionary objectForKey:@"message"];
-            NSError *error = [NSError errorWithDomain:errorMessage code:999 userInfo:@{@"message": errorMessage}];
+            NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:90102 userInfo:@{@"message": errorMessage}];
             failure(error);
         }
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIDeleteRoomWithRoom:(TAPRoomModel *)room
+                          success:(void (^)(void))success
+                          failure:(void (^)(NSError *error))failure {
+    
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSTimeInterval getAccessTokenExpiryTime = [TAPDataManager getAccessTokenExpiryTime];
+    NSString *generatedMD5String = [TAPDataManager generateChecksumWithRoomID:room.roomID roomType:room.type userID:currentUser.userID accessTokenExpiry:getAccessTokenExpiryTime];
+    
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDeleteRoom];
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:room.roomID forKey:@"roomID"];
+    [parameterDictionary setObject:generatedMD5String forKey:@"checksum"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIDeleteRoomWithRoom:room success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success();
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        
+        NSNumber *successNumber = [dataDictionary objectForKey:@"success"];
+        BOOL successBool = [successNumber boolValue];
+        
+        if (successBool) {
+            success();
+        }
+        else {
+            NSString *errorMessage = [dataDictionary objectForKey:@"message"];
+            NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:90101 userInfo:@{@"message": errorMessage}];
+            failure(error);
+        }
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIGetProjectConfigsWithSuccess:(void (^)(NSDictionary *projectConfigsDictionary))success
+                                    failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetProjectConfigs];
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIGetProjectConfigsWithSuccess:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success([NSDictionary dictionary]);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSDictionary *coreDictionary = [dataDictionary objectForKey:@"core"];
+        coreDictionary = [TAPUtil nullToEmptyDictionary:coreDictionary];
+        
+        NSDictionary *projectDictionary = [dataDictionary objectForKey:@"project"];
+        projectDictionary = [TAPUtil nullToEmptyDictionary:projectDictionary];
+        
+        NSDictionary *customDictionary = [dataDictionary objectForKey:@"custom"];
+        customDictionary = [TAPUtil nullToEmptyDictionary:customDictionary];
+        
+        NSMutableDictionary *projectConfigsDictionary = [NSMutableDictionary dictionary];
+        [projectConfigsDictionary setObject:coreDictionary forKey:@"core"];
+        [projectConfigsDictionary setObject:projectDictionary forKey:@"project"];
+        [projectConfigsDictionary setObject:customDictionary forKey:@"custom"];
+        
+        [[NSUserDefaults standardUserDefaults] setSecureObject:projectConfigsDictionary forKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        success(projectConfigsDictionary);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

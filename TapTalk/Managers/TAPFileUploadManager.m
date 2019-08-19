@@ -24,7 +24,6 @@
 @property (strong, nonatomic) NSMutableDictionary *pendingUploadAssetDictionary;
 
 - (void)runUploadImageWithRoomID:(NSString *)roomID;
-- (void)runUploadVideoWithRoomID:(NSString *)roomID;
 - (void)runUploadFileWithRoomID:(NSString *)roomID;
 - (void)runUploadImageAsAssetWithRoomID:(NSString *)roomID;
 - (void)runUploadVideoAsAssetWithRoomID:(NSString *)roomID;
@@ -91,10 +90,6 @@
             //Upload image
             [self runUploadImageWithRoomID:message.room.roomID];
         }
-        else if (message.type == TAPChatMessageTypeVideo) {
-            //Upload Video
-            //DV TODO
-        }
         else if (message.type == TAPChatMessageTypeFile) {
             //Upload File
             [self runUploadFileWithRoomID:message.room.roomID];
@@ -158,7 +153,7 @@
     [TAPImageView imageFromCacheWithKey:currentMessage.localID message:currentMessage success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
         
         //Resize image
-        [self resizeImage:savedImage message:resultMessage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
+        [self resizeImage:savedImage message:resultMessage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
             
 //            dataImage.dummyImage = resizedImage;
             
@@ -345,10 +340,6 @@
             
         }];
     }];
-}
-
-- (void)runUploadVideoWithRoomID:(NSString *)roomID {
-    
 }
 
 - (void)runUploadFileWithRoomID:(NSString *)roomID {
@@ -582,7 +573,7 @@
         [TAPImageView saveImageToCache:resultImage withKey:currentMessage.localID];
         
         //Resize image
-        [self resizeImage:resultImage message:currentMessage maxImageSize:TAP_MAX_IMAGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
+        [self resizeImage:resultImage message:currentMessage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
             
             __block UIImage *resultImage = resizedImage;
             

@@ -59,7 +59,8 @@
         
         _buttonLoadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.buttonContainerView.frame) - 20.0f) / 2.0f, (CGRectGetHeight(self.buttonContainerView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.buttonLoadingImageView.alpha = 0.0f;
-        [self.buttonLoadingImageView setImage:[UIImage imageNamed:@"TAPIconLoadingWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.buttonLoadingImageView setImage:[UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.buttonLoadingImageView.image = [self.buttonLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressWhite]];
         [self.buttonContainerView addSubview:self.buttonLoadingImageView];
     }
     
@@ -353,6 +354,10 @@
     if ([self.delegate respondsToSelector:@selector(customButtonViewDidTappedButton)]) {
         [self.delegate customButtonViewDidTappedButton];
     }
+}
+
+- (void)setButtonIconTintColor:(UIColor *)color {
+    self.buttonIconImageView.image = [self.buttonIconImageView.image setImageTintColor:color];
 }
 
 @end

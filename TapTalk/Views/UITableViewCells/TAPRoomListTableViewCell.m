@@ -27,7 +27,11 @@
 @property (strong, nonatomic) UILabel *typingLabel;
 @property (strong, nonatomic) UIView *separatorView;
 @property (nonatomic) TAPMessageStatusType messageStatusType;
+@property (nonatomic) RoomType roomType;
+@property (strong, nonatomic) NSString *roomID;
 @property (nonatomic) BOOL isShouldForceUpdateUnreadBubble;
+
+- (void)refreshTypingLabelState;
 
 @end
 
@@ -67,6 +71,7 @@
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
         self.muteImageView.alpha = 0.0f;
         self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.muteImageView.image = [self.muteImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMuted]];
         [self.bgView addSubview:self.muteImageView];
 
         UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
@@ -124,17 +129,15 @@
         self.typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.typingAnimationImageView.animationDuration = 0.6f;
         self.typingAnimationImageView.animationRepeatCount = 0.0f;
-        [self.typingAnimationImageView startAnimating];
         [self.typingView addSubview:self.typingAnimationImageView];
         
-        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
+        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f, 16.0f)];
         self.typingLabel.text = NSLocalizedString(@"typing", @"");
         self.typingLabel.font = roomListMessageLabelFont;
         self.typingLabel.textColor = roomListMessageLabelColor;
         [self.typingLabel sizeToFit];
         self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
         [self.typingView addSubview:self.typingLabel];
-        
     }
     
     return self;
@@ -144,12 +147,20 @@
     [super prepareForReuse];
     
     _isShouldForceUpdateUnreadBubble = YES;
+    [self.typingAnimationImageView stopAnimating];
+    if (self.roomType != RoomTypePersonal) {
+        self.lastSenderLabel.alpha = 1.0f;
+    }
+    else {
+        self.lastSenderLabel.alpha = 0.0f;
+    }
 }
 
 #pragma mark - Custom Method
 - (void)setRoomListTableViewCellWithData:(TAPRoomListModel *)roomList updateUnreadBubble:(BOOL)updateUnreadBubble {
     TAPMessageModel *message = roomList.lastMessage;
-    
+    _roomType = message.room.type;
+    _roomID = [TAPUtil nullToEmptyString:message.room.roomID];
     //DV Temp
     BOOL isExpert = NO;
     BOOL isMuted = NO;
@@ -555,19 +566,31 @@
     else {
         self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, newLastMessageLabelSize.height);
     }
+    
+    [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
+
 }
 
 - (void)setAsTyping:(BOOL)typing {
     if (typing) {
+        [self refreshTypingLabelState];
         self.typingView.alpha = 1.0f;
-        [self.typingAnimationImageView startAnimating];
         self.lastMessageLabel.alpha = 0.0f;
+        if (self.roomType != RoomTypePersonal) {
+            self.lastSenderLabel.alpha = 0.0f;
+        }
+        
+        [self.typingAnimationImageView startAnimating];
         [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
     }
     else {
         self.typingView.alpha = 0.0f;
-        [self.typingAnimationImageView stopAnimating];
         self.lastMessageLabel.alpha = 1.0f;
+        if (self.roomType != RoomTypePersonal) {
+            self.lastSenderLabel.alpha = 1.0f;
+        }
+        
+        [self.typingAnimationImageView stopAnimating];
     }
 }
 
@@ -576,6 +599,9 @@
     self.typingView.alpha = 0.0f;
     [self.typingAnimationImageView stopAnimating];
     self.lastMessageLabel.alpha = 1.0f;
+    if (self.roomType != RoomTypePersonal) {
+        self.lastSenderLabel.alpha = 1.0f;
+    }
 }
 
 - (void)showMessageDraftWithMessage:(NSString *)draftMessage {
@@ -623,6 +649,36 @@
     else {
         self.separatorView.frame = CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f);
     }
+}
+
+- (void)refreshTypingLabelState {
+    if (self.roomType == RoomTypePersonal) {
+        self.typingLabel.text = NSLocalizedString(@"typing", @"");
+    }
+    else {
+        NSDictionary *typingUserDictionary = [[TAPChatManager sharedManager] getTypingUsersWithRoomID:self.roomID];
+        if ([typingUserDictionary count] == 0) {
+            [self setAsTyping:NO];
+        }
+        else if ([typingUserDictionary count] == 1) {
+            NSArray *values = [typingUserDictionary allValues];
+            TAPUserModel *user = [values firstObject];
+            NSString *fullName = user.fullname;
+            NSArray *eachWordArray = [fullName componentsSeparatedByString:@" "];
+            NSString *firstName = [eachWordArray objectAtIndex:0];
+            self.typingLabel.text = [NSString stringWithFormat:@"%@ is typing", firstName];
+        }
+        else if ([typingUserDictionary count] > 1){
+            self.typingLabel.text = [NSString stringWithFormat:@"%ld people are typing", [typingUserDictionary count]];
+        }
+    }
+    [self.typingLabel sizeToFit];
+    CGFloat typingLabelWidth = CGRectGetWidth(self.typingLabel.frame);
+    if (typingLabelWidth > CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f - 4.0f - CGRectGetWidth(self.typingAnimationImageView.frame)) {
+        typingLabelWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f - 4.0f - CGRectGetWidth(self.typingAnimationImageView.frame);
+    }
+    
+    self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, typingLabelWidth, 16.0f);
 }
 
 @end

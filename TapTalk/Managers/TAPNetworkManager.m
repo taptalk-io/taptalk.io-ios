@@ -69,7 +69,7 @@ static const NSInteger kAPITimeOut = 60;
     
     NSString *appKeyID = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_ID valid:nil];
     NSString *appKeySecret = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_SECRET valid:nil];
-    NSString *userAgent = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_USER_AGENT valid:nil];
+    NSString *userAgent = [[NSUserDefaults standardUserDefaults] secureObjectForKey:@"ios" valid:nil];
     
     NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
     NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];

@@ -11,6 +11,7 @@
 @interface TAPImageSelectCollectionViewCell ()
 
 @property (strong, nonatomic) UIView *videoTypeView;
+@property (strong, nonatomic) UIView *checkListImageBackgroundView;
 @property (strong, nonatomic) UIImageView *videoTypeImageView;
 @property (strong, nonatomic) UILabel *videoDurationLabel;
 
@@ -37,6 +38,12 @@
         self.checklistImageView.clipsToBounds = YES;
         self.checklistImageView.layer.cornerRadius = CGRectGetHeight(self.checklistImageView.frame) / 2.0f;
         self.checklistImageView.image = [UIImage imageNamed:@"TAPIconCheckOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
+        _checkListImageBackgroundView = [[UIView alloc] initWithFrame:self.checklistImageView.frame];
+        self.checkListImageBackgroundView.layer.cornerRadius = CGRectGetHeight(self.checklistImageView.frame) / 2.0f;
+        self.checkListImageBackgroundView.backgroundColor = [UIColor whiteColor];
+        self.checkListImageBackgroundView.alpha = 0.0f;
+        [self.contentView addSubview:self.checkListImageBackgroundView];
         [self.contentView addSubview:self.checklistImageView];
         
         _videoTypeView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, widthSize - 62.0f, widthSize, 62.0f)];
@@ -55,6 +62,7 @@
         self.videoTypeImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.videoTypeImageView.clipsToBounds = YES;
         self.videoTypeImageView.image = [UIImage imageNamed:@"TAPIconThumbnailVideo" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.videoTypeImageView.image = [self.videoTypeImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaListVideo]];
         [self.videoTypeView addSubview:self.videoTypeImageView];
         
         UIFont *mediaInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaListInfoLabel];
@@ -98,14 +106,13 @@
 
 - (void)setCellAsSelected:(BOOL)isSelected {
     if(isSelected) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.checklistImageView.image = [UIImage imageNamed:@"TAPIconCheckOn" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }];
+        self.checkListImageBackgroundView.alpha = 1.0f;
+        self.checklistImageView.image = [UIImage imageNamed:@"TAPIconSuccessSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.checklistImageView.image = [self.checklistImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCircleSelectionActive]];
     }
     else {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.checklistImageView.image = [UIImage imageNamed:@"TAPIconCheckOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }];
+        self.checkListImageBackgroundView.alpha = 0.0f;
+        self.checklistImageView.image = [UIImage imageNamed:@"TAPIconCheckOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
 }
 

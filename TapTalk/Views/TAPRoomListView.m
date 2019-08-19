@@ -22,7 +22,7 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        UITabBarController *tabBarController = [[[TapTalk sharedInstance] getCurrentTapTalkActiveViewController] tabBarController];
+        UITabBarController *tabBarController = [[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] tabBarController];
         UITabBar *tabBar = tabBarController.tabBar;
         CGFloat tabbarHeight = CGRectGetHeight(tabBar.frame); //this will return 0 when tabBarController is nil.
         

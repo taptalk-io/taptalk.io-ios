@@ -249,14 +249,14 @@
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;
     
-    self.bubbleLabel.textColor = bubbleLabelColor;
-    self.bubbleLabel.font = bubbleLabelFont;
+    self.bubbleLabel.textColor = fileNameLabelColor;
+    self.bubbleLabel.font = fileNameLabelFont;
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
     
-    self.fileDescriptionLabel.textColor = fileNameLabelColor;
-    self.fileDescriptionLabel.font = fileNameLabelFont;
+    self.fileDescriptionLabel.textColor = fileInfoLabelColor;
+    self.fileDescriptionLabel.font = fileInfoLabelFont;
     
     self.fileDescriptionSizePlaceholderLabel.textColor = fileInfoLabelColor;
     self.fileDescriptionSizePlaceholderLabel.font = fileInfoLabelFont;
@@ -266,13 +266,18 @@
     self.cancelImageView.image = abortImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
     self.fileImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownload]];
     self.retryDownloadImageView.image = retryImage;
+    
+    UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownload]];
+    self.downloadImageView.image = downloadImage;
 }
-
 
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];

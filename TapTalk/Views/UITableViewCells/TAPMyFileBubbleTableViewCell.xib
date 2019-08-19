@@ -433,10 +433,10 @@
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="Cqb-8p-hPG">
-                        <rect key="frame" x="363" y="148" width="10" height="11"/>
+                        <rect key="frame" x="363" y="143" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="11" id="TLJ-wX-AVY"/>
-                            <constraint firstAttribute="width" constant="10" id="XBh-5K-fz9"/>
+                            <constraint firstAttribute="height" constant="16" id="TLJ-wX-AVY"/>
+                            <constraint firstAttribute="width" constant="16" id="XBh-5K-fz9"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryChat" translatesAutoresizingMaskIntoConstraints="NO" id="wQr-8O-AHa">

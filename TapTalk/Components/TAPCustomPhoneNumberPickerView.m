@@ -50,7 +50,8 @@
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryFlagImageView.frame) + 16.0f, CGRectGetMinY(self.countryFlagImageView.frame), 20.0f, 20.0f)];
         self.loadingImageView.alpha = 0.0f;
-        [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoadingOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         [self.countryCodeContainerView addSubview:self.loadingImageView];
         
         CGFloat phoneNumberContainerViewWidth = CGRectGetWidth(self.frame) - 16.0f - 16.0f - 10.0f - CGRectGetWidth(self.countryCodeContainerView.frame);

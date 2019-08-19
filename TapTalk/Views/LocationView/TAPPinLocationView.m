@@ -36,11 +36,12 @@
         [self addSubview:self.sendLocationView];
         
         _sendIconView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.sendLocationView.frame) - 30.0f, 0.0f, 30.0f, 30.0f)];
-        self.sendIconView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+        self.sendIconView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerSendLocationBackground];
         [self.sendLocationView addSubview:self.sendIconView];
         
         _sendIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
         self.sendIconImageView.image = [UIImage imageNamed:@"TAPIconSend" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.sendIconImageView.image = [self.sendIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerSendLocation]];
         [self.sendIconView addSubview:self.sendIconImageView];
         
         UIFont *sendLocationLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerSendLocationButton];

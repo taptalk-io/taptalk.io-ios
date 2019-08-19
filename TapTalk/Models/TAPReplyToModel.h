@@ -8,7 +8,7 @@
 
 #import "TAPBaseModel.h"
 #import "Configs.h"
-#import "TAPChatMessageType.h"
+#import "TAPTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

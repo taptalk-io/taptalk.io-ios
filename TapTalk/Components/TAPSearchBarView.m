@@ -48,6 +48,7 @@
         self.searchTextField.clearButtonMode = YES;
         UIImageView *leftViewImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, 0.0f, 14.0, 14.0f)];
         leftViewImageView.image = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        leftViewImageView.image = [leftViewImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
         UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(leftViewImageView.frame) + 8.0f + 8.0f, CGRectGetHeight(leftViewImageView.frame))];
         [leftView addSubview:leftViewImageView];
         self.searchTextField.leftView = leftView;

@@ -76,7 +76,8 @@
         [self.containerView addSubview:self.containerSeparatorView];
         
         _passwordShowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerSeparatorView.frame) + 15.0f, 15.0f, 20.0f, 20.0f)];
-        self.passwordShowImageView.image = [UIImage imageNamed:@"TAPIconShowPasswordInactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.passwordShowImageView.image = [UIImage imageNamed:@"TAPIconShowPassword" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.passwordShowImageView.image = [self.passwordShowImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconViewPasswordInactive]];
         [self.containerView addSubview:self.passwordShowImageView];
         
         _showPasswordButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerSeparatorView.frame), 0.0f, 50.0f, 50.0f)];
@@ -458,11 +459,13 @@
 - (void)showPasswordButtonDidTapped {
     if (self.textField.isSecureTextEntry) {
         self.textField.secureTextEntry = NO;
-        self.passwordShowImageView.image = [UIImage imageNamed:@"TAPIconShowPasswordActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.passwordShowImageView.image = [UIImage imageNamed:@"TAPIconShowPassword" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.passwordShowImageView.image = [self.passwordShowImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconViewPasswordActive]];
     }
     else {
         self.textField.secureTextEntry = YES;
-        self.passwordShowImageView.image = [UIImage imageNamed:@"TAPIconShowPasswordInactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.passwordShowImageView.image = [UIImage imageNamed:@"TAPIconShowPassword" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.passwordShowImageView.image = [self.passwordShowImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconViewPasswordInactive]];
     }
 }
 

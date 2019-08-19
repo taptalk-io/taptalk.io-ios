@@ -32,6 +32,8 @@
 @property (nonatomic, strong) NSString *roomColor;
 @property (nonatomic, strong) NSString *roomImage;
 @property (nonatomic) RoomType roomType;
+@property (strong, nonatomic) NSNumber<RLMBool> *roomIsDeleted; //added in schema 5 migration
+@property (strong, nonatomic) NSNumber<RLMDouble> *roomDeleted; //added in schema 5 migration
 
 //User
 @property (nonatomic, strong) NSString *userID;

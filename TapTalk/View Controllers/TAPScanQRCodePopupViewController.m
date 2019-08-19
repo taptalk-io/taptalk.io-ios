@@ -53,11 +53,7 @@
 - (void)addContactButtonDidTapped {
     [self.scanQRCodePopupView animateExpandingView];
     
-    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
-        //Add user to Contact Manager
-        self.searchedUser.isContact = YES;
-        [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
-        
+    [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {        
         //Refresh Contact List From API
         [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
         } failure:^(NSError *error) {
@@ -75,8 +71,10 @@
     [self.scanQRCodePopupView showPopupView:NO animated:NO];
     
     [self dismissViewControllerAnimated:NO completion:^{
-        [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.previousNavigationController];
-        
+        TAPChatViewController *chatViewController = [[TapUI sharedInstance] openRoomWithOtherUser:self.searchedUser];
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [self.previousNavigationController pushViewController:chatViewController animated:YES];
+
         //CS Note - Remove this VC in Navigation Stack to skip on pop
         NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.previousNavigationController.viewControllers];
         NSInteger arrayCount = [navigationArray count];

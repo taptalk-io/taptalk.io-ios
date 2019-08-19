@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSMutableDictionary *contactDictionary;
 
-- (void)shouldUpdateUserWithData:(TAPUserModel *)user;
+- (void)shouldUpdateUserWithData:(TAPUserModel *)user isTriggerDelegate:(BOOL)isTriggerDelegate;
+- (void)removeFromContactsWithUserID:(NSString *)userID;
 - (void)clearContactDictionary;
 
 #warning Do not forget to remove the delegate object, since an object can't weak retained in an array, also please remove this delegate before dealloc or the delegate will always retained
