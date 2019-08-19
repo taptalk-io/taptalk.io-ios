@@ -34,6 +34,8 @@
         
         _rightArrow = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 20.0f, (CGRectGetHeight(self.bgView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.rightArrow.image = [UIImage imageNamed:@"TAPIconRightArrowCell" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.rightArrow.image = [self.rightArrow.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChevronRightGray]];
+
         [self.bgView addSubview:self.rightArrow];
         
         _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.iconImageView.frame) + 10.0f, 0.0f, CGRectGetMinX(self.rightArrow.frame) - 8.0f - (CGRectGetMaxX(self.iconImageView.frame) + 10.0f), CGRectGetHeight(self.bgView.frame))];
@@ -54,17 +56,21 @@
     if (type == TAPNewChatOptionTableViewCellTypeNewContact) {
         imageName = @"TAPIconNewContact";
         descriptionString = @"New Contact";
+        self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMenuNewContact]];
     }
     else if (type == TAPNewChatOptionTableViewCellTypeScanQRCode) {
         imageName = @"TAPIconScanQrCode";
         descriptionString = @"Scan QR code";
+        self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMenuScanQRCode]];
     }
     else if (type == TAPNewChatOptionTableViewCellTypeNewGroup) {
         imageName = @"TAPIconNewGroup";
         descriptionString = @"New Group";
+        self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMenuNewGroup]];
     }
-    
-    self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
 
     UIFont *newChatMenuLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNewChatMenuLabel];
     UIColor *newChatMenuLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNewChatMenuLabel];

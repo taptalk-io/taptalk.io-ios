@@ -224,9 +224,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                             [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDownloading];
                             [cell animateProgressMediaWithProgress:progress total:1.0f];
                             if (progress == 1.0f) {
-                                [TAPUtil delayCallback:^{
+                                [TAPUtil performBlock:^{
                                     [cell animateFinishedDownload];
-                                } forTotalSeconds:0.3f];
+                                } afterDelay:0.3f];
                             }
                         } resultHandler:^(UIImage * _Nonnull resultImage) {
                             mediaPreview.image = resultImage;
@@ -634,9 +634,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         [cell animateProgressMediaWithProgress:progress total:1.0f];
         if (progress == 1.0f) {
-            [TAPUtil delayCallback:^{
+            [TAPUtil performBlock:^{
                 [cell animateFinishedDownload];
-            } forTotalSeconds:0.3f];
+            } afterDelay:0.3f];
         }
         
     } resultHandler:^(AVAsset * _Nonnull resultVideoAsset) {
@@ -657,12 +657,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [player play];
         }
         
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
             [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
             [cell showProgressView:NO animated:NO];
             [cell showPlayButton:YES animated:NO];
             _showVideoPlayer = NO;
-        } forTotalSeconds:0.5f];
+        } afterDelay:0.5f];
     } failureHandler:^{
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Cannot play video at the moment, please check your connection and try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
@@ -809,7 +809,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     if (self.isContainExcedeedFileSizeLimit) {
         //Show popup warning
         
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedString(@"Some files may not send", @"") detailInformation:[NSString stringWithFormat:@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the %ldMB upload limit and won’t be sent.", TAP_MAX_VIDEO_SIZE] leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Continue"];
+        TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+        NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
+        NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
+        
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedString(@"Some files may not send", @"") detailInformation:[NSString stringWithFormat:@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the %ldMB upload limit and won’t be sent.", (long)maxFileSizeInMB] leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Continue"];
     }
     else {
         if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
@@ -873,9 +877,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 NSArray *assetResourceArray = [PHAssetResource assetResourcesForAsset:asset];
                 PHAssetResource *assetResource = [assetResourceArray firstObject];
                 double fileSize = [[assetResource valueForKey:@"fileSize"] doubleValue];
-                double filesizeInMB = fileSize / 1000000; //convert to MB
                 
-                if (filesizeInMB > TAP_MAX_VIDEO_SIZE && asset.mediaType == PHAssetMediaTypeVideo) {
+                TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+                NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
+                
+                if (fileSize > [maxFileSize doubleValue] && asset.mediaType == PHAssetMediaTypeVideo) {
                     mediaPreview.fileSizeLimitStatus = 1; // exceeded limit
                     //    NSString *generatedAssetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:asset];
                     NSString *generatedAssetKey = asset.localIdentifier;

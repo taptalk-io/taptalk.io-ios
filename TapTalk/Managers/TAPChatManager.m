@@ -150,7 +150,11 @@
 }
 
 - (void)startTyping {
-    
+    NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
+    [self startTypingWithRoomID:roomID];
+}
+
+- (void)startTypingWithRoomID:(NSString *)roomID {
     if (!self.isWaitingSendTyping) {
         _isTyping = NO;
     }
@@ -161,7 +165,6 @@
     
     _isTyping = YES;
     
-    NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
     NSDictionary *parameterDictionary = @{@"roomID" : roomID};
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStartTyping parameters:parameterDictionary];
     _isWaitingSendTyping = YES;
@@ -169,6 +172,11 @@
 }
 
 - (void)stopTyping {
+    NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
+    [self stopTypingWithRoomID:roomID];
+}
+
+- (void)stopTypingWithRoomID:(NSString *)roomID {
     if(!self.isTyping) {
         return;
     }
@@ -176,9 +184,9 @@
     _isTyping = NO;
     _isWaitingSendTyping = NO;
     
-    NSString *roomID = [TAPUtil nullToEmptyString:self.activeRoom.roomID];
     NSDictionary *parameterDictionary = @{@"roomID" : roomID};
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStopTyping parameters:parameterDictionary];
+    NSLog(@"--Stop Typing %@", roomID);
 }
 
 - (void)sendMessage:(TAPMessageModel *)message notifyDelegate:(BOOL)notifyDelegate {
@@ -230,6 +238,13 @@
         [parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
         
         [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:parameterDictionary];
+        
+        //Send event to TAPCoreMessageManager
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidFinishSendEmitMessage:)]) {
+                [delegate chatManagerDidFinishSendEmitMessage:message];
+            }
+        }
     }
 }
 
@@ -238,16 +253,17 @@
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:message.room.roomID];
 }
 
-- (void)sendTextMessage:(NSString *)textMessage {
-    [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom];
-}
-
 - (void)sendProductMessage:(TAPMessageModel *)message {
     [self sendMessage:message notifyDelegate:YES];
 }
 
-- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room {
-    
+- (void)sendTextMessage:(NSString *)textMessage {
+    [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom successGenerateMessage:^(TAPMessageModel *message) {
+    }];
+}
+
+- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
@@ -317,6 +333,9 @@
                 message.data = dataDictionary;
             }
             
+            //Call block in TAPCoreMessageManager to handle things in TAPCore
+            successGenerateMessage(message);
+            
             [self sendMessage:message notifyDelegate:YES];
             
             [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
@@ -375,13 +394,25 @@
             message.data = dataDictionary;
         }
         
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        successGenerateMessage(message);
+        
         [self sendMessage:message notifyDelegate:YES];
         
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
     }
 }
 
-- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room {
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessage:image caption:caption room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
+}
+
+- (void)sendImageMessage:(UIImage *)image
+                 caption:(NSString *)caption
+                    room:(TAPRoomModel *)room
+  successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -463,6 +494,9 @@
         }
     }
     
+    //Call block in TAPCoreMessageManager to handle things in TAPCore
+    successGenerateMessage(message);
+    
     //Save image to cache with localID key
     [TAPImageView saveImageToCache:image withKey:message.localID];
     
@@ -473,12 +507,14 @@
     [[TAPFileUploadManager sharedManager] sendFileWithData:message];
 }
 
-- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendImageMessage:image caption:caption room:room];
+    [self sendImageMessageWithPHAsset:asset caption:caption room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
 }
 
-- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room {
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
@@ -499,10 +535,6 @@
     if (dataDictionary == nil) {
         dataDictionary = [[NSMutableDictionary alloc] init];
     }
-//#ifdef DEBUG
-//    NSLog(@"IMAGE BEFORE CACHE SIZE HEIGHT: %f, WIDTH: %f", image.size.height, image.size.width);
-//#endif
-//
     
     CGFloat imageWidthFloat = (CGFloat)asset.pixelWidth;
     CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
@@ -517,7 +549,6 @@
     
     [dataDictionary setObject:imageHeight forKey:@"height"];
     [dataDictionary setObject:imageWidth forKey:@"width"];
-//    [dataDictionary setObject:asset forKey:@"asset"];
     [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
     [dataDictionary setObject:caption forKey:@"caption"];
     
@@ -565,6 +596,9 @@
         }
     }
     
+    //Call block in TAPCoreMessageManager to handle things in TAPCore
+    successGenerateMessage(message);
+    
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
 
@@ -572,12 +606,13 @@
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
 
-- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption {
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendImageMessageWithPHAsset:asset caption:caption room:room];
+    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
 }
 
-- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room {
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
@@ -680,6 +715,8 @@
         }
     }
     
+    successGenerateMessage(message);
+    
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     
@@ -687,17 +724,13 @@
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
 
-- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
-    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData room:room];
-}
-
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendLocationMessage:latitude longitude:longitude address:address room:room];
+    [self sendLocationMessage:latitude longitude:longitude address:address room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
 }
     
-- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room {
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -763,6 +796,9 @@
         }
     }
     
+    //Call block in TAPCoreMessageManager to handle things in TAPCore
+    successGenerateMessage(message);
+    
     [self sendMessage:message notifyDelegate:YES];
     
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
@@ -770,10 +806,15 @@
 
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sentFileMessage:dataFile filePath:filePath room:room];
+    [self sentFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
 }
 
-- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room {
+- (void)sentFileMessage:(TAPDataFileModel *)dataFile
+               filePath:(NSString *)filePath
+                   room:(TAPRoomModel *)room
+ successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
@@ -788,7 +829,7 @@
     NSString *messageBodyString = [NSString stringWithFormat:@"📎 %@", fileName];
     
     TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeFile];
-        
+    
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
         dataDictionary = [[NSMutableDictionary alloc] init];
@@ -847,6 +888,9 @@
         }
     }
     
+    //Call block in TAPCoreMessageManager to handle things in TAPCore
+    successGenerateMessage(message);
+    
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     
@@ -858,11 +902,6 @@
     TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser created:created room:room body:@"" type:TAPChatMessageTypeUnreadMessageIdentifier];
     
     return message;
-//    for (id delegate in self.delegatesArray) {
-//        if ([delegate respondsToSelector:@selector(chatManagerDidAddUnreadMessageIdentifier:indexPosition:)]) {
-//            [delegate chatManagerDidAddUnreadMessageIdentifier:message indexPosition:index];
-//        }
-//    }
 }
 
 - (void)setActiveUser:(TAPUserModel *)activeUser {
@@ -1047,7 +1086,7 @@
 
 - (void)receiveContactUpdatedFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:dataDictionary error:nil];
-    [[TAPContactCacheManager sharedManager] shouldUpdateUserWithData:user];
+    [[TAPContactCacheManager sharedManager] shouldUpdateUserWithData:user isTriggerDelegate:YES];
 }
 
 - (void)receiveOnlineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
@@ -1064,7 +1103,13 @@
 - (void)receiveStartTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     
     TAPTypingModel *typing = [[TAPTypingModel alloc] initWithDictionary:dataDictionary error:nil];
-    [self.typingDictionary setObject:typing forKey:typing.roomID];
+    NSMutableDictionary *typingUserDictionary = [NSMutableDictionary dictionary];
+    if ([self.typingDictionary objectForKey:typing.roomID]) {
+        typingUserDictionary = [self.typingDictionary objectForKey:typing.roomID];
+    }
+    [typingUserDictionary setObject:typing.user forKey:typing.user.userID];
+    
+    [self.typingDictionary setObject:typingUserDictionary forKey:typing.roomID];
     
     for (id delegate in self.delegatesArray) {
         if ([delegate respondsToSelector:@selector(chatManagerDidReceiveStartTyping:)]) {
@@ -1075,7 +1120,16 @@
 
 - (void)receiveStopTypingFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     TAPTypingModel *typing = [[TAPTypingModel alloc] initWithDictionary:dataDictionary error:nil];
-    [self.typingDictionary removeObjectForKey:typing.roomID];
+    
+    if ([[self.typingDictionary objectForKey:typing.roomID] count] == 1) {
+        [self.typingDictionary removeObjectForKey:typing.roomID];
+    }
+    else if ([[self.typingDictionary objectForKey:typing.roomID] count] > 1){
+        NSMutableDictionary *typingUserDictionary = [NSMutableDictionary dictionary];
+        typingUserDictionary = [self.typingDictionary objectForKey:typing.roomID];
+        [typingUserDictionary removeObjectForKey:typing.user.userID];
+        [self.typingDictionary setObject:typingUserDictionary forKey:typing.roomID];
+    }
     
     for (id delegate in self.delegatesArray) {
         if ([delegate respondsToSelector:@selector(chatManagerDidReceiveStopTyping:)]) {
@@ -1291,6 +1345,10 @@
         return YES;
     }
     return NO;
+}
+
+- (NSDictionary *)getTypingUsersWithRoomID:(NSString *)roomID {
+    return [TAPUtil nullToEmptyDictionary:[self.typingDictionary objectForKey:roomID]];
 }
 
 - (void)setIsWaitingTypingNo {

@@ -332,10 +332,10 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="vpz-Pu-2L3">
-                        <rect key="frame" x="308" y="402" width="10" height="11"/>
+                        <rect key="frame" x="308" y="397" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="10" id="mO2-Xe-Zqv"/>
-                            <constraint firstAttribute="height" constant="11" id="pL7-kJ-9Db"/>
+                            <constraint firstAttribute="width" constant="16" id="mO2-Xe-Zqv"/>
+                            <constraint firstAttribute="height" constant="16" id="pL7-kJ-9Db"/>
                         </constraints>
                     </imageView>
                 </subviews>

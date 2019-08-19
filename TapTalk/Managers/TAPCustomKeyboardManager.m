@@ -33,15 +33,20 @@
     return self;
 }
 
-- (void)customKeyboardTappedWithSender:(TAPUserModel *)sender
-                             recipient:(TAPUserModel *)recipient
-                          keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
-    [[TapTalk sharedInstance] customKeyboardDidTappedWithSender:sender recipient:recipient keyboardItem:keyboardItem];
+- (void)customKeyboardDidTappedWithSender:(TAPUserModel *)sender
+                                recipient:(TAPUserModel *)recipient
+                             keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem {
+    if ([self.delegate respondsToSelector:@selector(customKeyboardItemTappedWithSender:recipient:keyboardItem:)]) {
+        [self.delegate customKeyboardItemTappedWithSender:sender recipient:recipient keyboardItem:keyboardItem];
+    }
 }
 
-- (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender
-                               recipient:(TAPUserModel *)recipient {
-    return [[TapTalk sharedInstance] getCustomKeyboardWithSender:sender recipient:recipient];
+- (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender recipient:(TAPUserModel *)recipient {
+    if([self.delegate respondsToSelector:@selector(setCustomKeyboardItemsForSender:recipient:)]) {
+        return [self.delegate setCustomKeyboardItemsForSender:sender recipient:recipient];
+    }
+    
+    return [NSArray array];
 }
 
 @end

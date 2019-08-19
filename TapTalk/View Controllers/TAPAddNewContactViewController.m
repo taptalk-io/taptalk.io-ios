@@ -193,7 +193,7 @@
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
     }
     
-//    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+//    [[TapUI sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
 //
 //    //CS NOTE - Remove this VC in Navigation Stack to skip on pop
 //    NSMutableArray *navigationArray = [[NSMutableArray alloc] initWithArray: self.navigationController.viewControllers];
@@ -212,16 +212,13 @@
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
-        [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+        
+        [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {
             [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
-            [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:NO];
+            [self.addContactPopupView setPopupInfoWithUserData:user isContact:NO];
             [self.addContactPopupView showPopupView:YES animated:YES];
             [self.addContactPopupView animateExpandingView];
             [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
-            
-            //Add user to Contact Manager
-            self.searchedUser.isContact = YES;
-            [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
             
             //Refresh Contact List From API
             [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
@@ -249,7 +246,7 @@
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
     }
     
-//    [[TapTalk sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
+//    [[TapUI sharedInstance] openRoomWithOtherUser:self.searchedUser fromNavigationController:self.navigationController];
 }
 
 - (void)addExpertToContactButtonDidTapped {
@@ -263,17 +260,13 @@
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add Expert To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
-        [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message) {
+        [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {
             [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
-            [self.addContactPopupView setPopupInfoWithUserData:self.searchedUser isContact:NO];
+            [self.addContactPopupView setPopupInfoWithUserData:user isContact:NO];
             [self.addContactPopupView showPopupView:YES animated:YES];
             [self.addContactPopupView animateExpandingView];
             [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
-            
-            //Add user to Contact Manager
-            self.searchedUser.isContact = YES;
-            [[TAPContactManager sharedManager] addContactWithUserModel:self.searchedUser saveToDatabase:YES];
-            
+        
             //Refresh Contact List From API
             [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
             } failure:^(NSError *error) {

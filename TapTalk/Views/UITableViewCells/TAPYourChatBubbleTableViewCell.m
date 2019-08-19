@@ -59,6 +59,7 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
+@property (strong, nonatomic) NSString *currentProfileImageURLString;
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -356,7 +357,13 @@
             self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
+            
+            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+                self.senderImageView.image = nil;
+            }
+            
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+            _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
         
         self.senderNameLabel.text = message.user.fullname;
@@ -624,7 +631,7 @@
         self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
         self.senderNameHeightConstraint.constant = 18.0f;
-        self.forwardTitleTopConstraint.constant = 4.0f;
+        self.forwardTitleTopConstraint.constant = 0.0f;
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;

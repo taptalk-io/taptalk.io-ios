@@ -12,6 +12,11 @@
 
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIView *removeView;
+
+@property (strong, nonatomic) UIView *removeGrayImageContainerView;
+@property (strong, nonatomic) UIView *removeRedImageContainerView;
+@property (strong, nonatomic) UIView *alertImageContainerView;
+
 @property (strong, nonatomic) UIImageView *removeImageView;
 @property (strong, nonatomic) UIImageView *removeRedImageView;
 @property (strong, nonatomic) UIImageView *alertImageView;
@@ -36,19 +41,40 @@
         self.removeView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
         [self.contentView addSubview:self.removeView];
         
-        _removeImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.removeView.frame) - 22.0f) / 2.0f, (CGRectGetHeight(self.removeView.frame) - 22.0f) / 2.0f, 22.0f, 22.0f)];
-        self.removeImageView.image = [UIImage imageNamed:@"TAPIconRemoveGray" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        [self.removeView addSubview:self.removeImageView];
+        _removeGrayImageContainerView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.removeView.frame) - 22.0f) / 2.0f, (CGRectGetHeight(self.removeView.frame) - 22.0f) / 2.0f, 22.0f, 22.0f)];
+        self.removeGrayImageContainerView.layer.cornerRadius = CGRectGetHeight(self.removeGrayImageContainerView.frame) / 2.0f;
+        self.removeGrayImageContainerView.clipsToBounds = YES;
+        self.removeGrayImageContainerView.backgroundColor = [[TAPUtil getColor:@"040404"] colorWithAlphaComponent:0.5f];
+        self.removeGrayImageContainerView.alpha = 0.0f;
+        [self.removeView addSubview:self.removeGrayImageContainerView];
         
-        _removeRedImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.removeView.frame) - 22.0f) / 2.0f, (CGRectGetHeight(self.removeView.frame) - 22.0f) / 2.0f, 22.0f, 22.0f)];
-        self.removeRedImageView.alpha = 0.0f;
-        self.removeRedImageView.image = [UIImage imageNamed:@"TAPIconRemoveRed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        [self.removeView addSubview:self.removeRedImageView];
+        _removeImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.removeGrayImageContainerView.frame) - 8.0f) / 2.0f, (CGRectGetHeight(self.removeGrayImageContainerView.frame) - 8.0f) / 2.0f, 8.0f, 8.0f)];
+        self.removeImageView.image = [UIImage imageNamed:@"TAPIconCancel" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        [self.removeGrayImageContainerView addSubview:self.removeImageView];
         
-        _alertImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.imageView.frame) - 22.0f) / 2.0f, (CGRectGetHeight(self.imageView.frame) - 22.0f) / 2.0f, 22.0f, 22.0f)];
-        self.alertImageView.alpha = 0.0f;
+        _removeRedImageContainerView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.removeView.frame) - 22.0f) / 2.0f, (CGRectGetHeight(self.removeView.frame) - 22.0f) / 2.0f, 22.0f, 22.0f)];
+        self.removeRedImageContainerView.layer.cornerRadius = CGRectGetHeight(self.removeRedImageContainerView.frame) / 2.0f;
+        self.removeRedImageContainerView.clipsToBounds = YES;
+        self.removeRedImageContainerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRemoveItem];
+        self.removeRedImageContainerView.alpha = 0.0f;
+        [self.removeView addSubview:self.removeRedImageContainerView];
+        
+        _removeRedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 22.0f, 22.0f)];
+        self.removeRedImageView.image = [UIImage imageNamed:@"TAPIconRemoveMedia" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.removeRedImageView.image = [self.removeRedImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRemoveItemBackground]];
+        [self.removeRedImageContainerView addSubview:self.removeRedImageView];
+        
+        _alertImageContainerView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.imageView.frame) - 22.0f) / 2.0f, (CGRectGetHeight(self.imageView.frame) - 22.0f) / 2.0f, 22.0f, 22.0f)];
+        self.alertImageContainerView.layer.cornerRadius = CGRectGetHeight(self.removeRedImageContainerView.frame) / 2.0f;
+        self.alertImageContainerView.clipsToBounds = YES;
+        self.alertImageContainerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaPreviewThumbnailWarning];
+        self.alertImageContainerView.alpha = 0.0f;
+        [self.contentView addSubview:self.alertImageContainerView];
+        
+        _alertImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 22.0f, 22.0f)];
         self.alertImageView.image = [UIImage imageNamed:@"TAPIconWarning" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        [self.contentView addSubview:self.alertImageView];
+        self.alertImageView.image = [self.alertImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaPreviewThumbnailWarningBackground]];
+        [self.alertImageContainerView addSubview:self.alertImageView];
     }
     
     return self;
@@ -77,12 +103,12 @@
             self.removeView.alpha = 1.0f;
             
             if (self.isExceededMaxFileSize) {
-                self.removeRedImageView.alpha = 1.0f;
-                self.removeImageView.alpha = 0.0f;
+                self.removeRedImageContainerView.alpha = 1.0f;
+                self.removeGrayImageContainerView.alpha = 0.0f;
             }
             else {
-                self.removeRedImageView.alpha = 0.0f;
-                self.removeImageView.alpha = 1.0f;
+                self.removeRedImageContainerView.alpha = 0.0f;
+                self.removeGrayImageContainerView.alpha = 1.0f;
             }
         }];
     }
@@ -106,21 +132,21 @@
     if (animated) {
         if (isShow) {
             [UIView animateWithDuration:0.2f animations:^{
-                self.alertImageView.alpha = 1.0f;
+                self.alertImageContainerView.alpha = 1.0f;
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
-                self.alertImageView.alpha = 0.0f;
+                self.alertImageContainerView.alpha = 0.0f;
             }];
         }
     }
     else {
         if (isShow) {
-            self.alertImageView.alpha = 1.0f;
+            self.alertImageContainerView.alpha = 1.0f;
         }
         else {
-            self.alertImageView.alpha = 0.0f;
+            self.alertImageContainerView.alpha = 0.0f;
         }
     }
 }
@@ -140,10 +166,10 @@
 //    }
 //    else {
         if (isExceeded) {
-            self.alertImageView.alpha = 1.0f;
+            self.alertImageContainerView.alpha = 1.0f;
         }
         else {
-            self.alertImageView.alpha = 0.0f;
+            self.alertImageContainerView.alpha = 0.0f;
         }
 //    }
 }

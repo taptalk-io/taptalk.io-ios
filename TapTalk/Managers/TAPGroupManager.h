@@ -2,7 +2,7 @@
 //  TAPGroupManager.h
 //  TapTalk
 //
-//  Created by Cundy Sunardy on 09/07/19.
+//  Created by Cundy Sunardy on 09/07/19.  
 //  Copyright © 2019 Moselo. All rights reserved.
 //
 
@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (TAPRoomModel *)getRoomWithRoomID:(NSString *)roomID;
 - (void)setRoomWithRoomID:(NSString *)roomID room:(TAPRoomModel *)room;
+- (void)removeRoomWithRoomID:(NSString *)roomID;
 - (void)populateRoomFromPreference;
 - (void)saveRoomToPreference;
 

@@ -102,6 +102,7 @@
         [self.syncButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.syncButton setCustomButtonViewType:TAPCustomButtonViewTypeActive];
         [self.syncButton setButtonWithTitle:NSLocalizedString(@"Sync Contacts Now", @"") andIcon:@"TAPIconSync" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.syncButton setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         [self.syncContactButtonView addSubview:self.syncButton];
         
         _searchResultTableView = [[UITableView alloc] initWithFrame:self.contactsTableView.frame];
@@ -208,7 +209,8 @@
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.syncedContactNotificationView.layer replaceSublayer:[self.syncedContactNotificationView.layer.sublayers objectAtIndex:0] with:gradient];
-        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconLoadingWhite"];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress"];
+        self.syncedContactNotificationCheckMarkImageView.image = [self.syncedContactNotificationCheckMarkImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressWhite]];
         [self showNotificationLoading:YES];
     }
     else if (type == TAPSyncNotificationViewTypeSynced) {

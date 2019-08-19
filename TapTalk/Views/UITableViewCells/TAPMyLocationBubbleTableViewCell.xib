@@ -259,10 +259,10 @@
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="QLT-aC-en2">
-                        <rect key="frame" x="363" y="287" width="10" height="11"/>
+                        <rect key="frame" x="363" y="282" width="16" height="16"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="10" id="VCh-8C-8tQ"/>
-                            <constraint firstAttribute="height" constant="11" id="uVH-pS-fX1"/>
+                            <constraint firstAttribute="width" constant="16" id="VCh-8C-8tQ"/>
+                            <constraint firstAttribute="height" constant="16" id="uVH-pS-fX1"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryChat" translatesAutoresizingMaskIntoConstraints="NO" id="dUK-q7-mCR">

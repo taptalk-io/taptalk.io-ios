@@ -100,6 +100,8 @@
 @property (nonatomic) CGFloat pathWidth;
 @property (nonatomic) NSInteger updateInterval;
 
+@property (strong, nonatomic) NSString *currentFileID;
+
 - (void)getImageSizeFromImage:(UIImage *)image;
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width;
 - (void)showImageCaption:(BOOL)show;
@@ -189,7 +191,6 @@
     [super prepareForReuse];
     
     self.thumbnailBubbleImageView.image = nil;
-    self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
@@ -341,10 +342,16 @@
     self.sendingIconImageView.image = sendingImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
     self.fileImageView.image = documentsImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownload]];
     self.retryImageView.image = retryImage;
+    
+    UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownload]];
+    self.downloadImageView.image = downloadImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -424,7 +431,8 @@
     UIImage *selectedImage = nil;
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     if (fileID == nil || [fileID isEqualToString:@""]) {
-//        selectedImage = [dataDictionary objectForKey:@"dummyImage"];
+        
+        _currentFileID = nil;
         
         CGFloat imageTempHeight = [[dataDictionary objectForKey:@"height"] floatValue];
         CGFloat imageTempWidth = [[dataDictionary objectForKey:@"width"] floatValue];
@@ -487,21 +495,24 @@
         //so no need to set the image here
         //just save the height and width constraint
         
+        if(![self.currentFileID isEqualToString:fileID] && self.currentFileID != nil) {
+            //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
+            self.bubbleImageView.image = nil;
+        }
+        
         CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
         CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
         [self.contentView layoutIfNeeded];
+        
+        _currentFileID = fileID;
     }
     
     if (self.cellWidth == 0.0f || self.cellHeight == 0.0f) {
         [self showStatusLabel:NO];
     }
-//    if (!self.isDownloaded) {
-//        self.blurView.frame = CGRectMake(CGRectGetMinX(self.blurView.frame), CGRectGetMinY(self.blurView.frame), self.bubbleImageViewWidthConstraint.constant, self.bubbleImageViewHeightConstraint.constant);
-//        [self.bubbleImageView insertSubview:self.blurView atIndex:0];
-//    }
 }
 
 - (void)receiveSentEvent {

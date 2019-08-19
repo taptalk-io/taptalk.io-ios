@@ -15,6 +15,7 @@
 @property (strong, nonatomic) UIView *backgroundGradientView;
 @property (strong, nonatomic) UIView *whiteBaseView;
 @property (strong, nonatomic) UIView *colorGradientView;
+@property (strong, nonatomic) UIView *closePopupView;
 @property (strong, nonatomic) UIImageView *closePopupImageView;
 @property (strong, nonatomic) TAPImageView *addedUserImageView;
 @property (strong, nonatomic) UILabel *addedUserUsernameLabel;
@@ -110,9 +111,15 @@
         [self.colorGradientView.layer insertSublayer:gradient atIndex:0];
         [self.whiteBaseView addSubview:self.colorGradientView];
         
-        _closePopupImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 28.0f, 24.0f, 28.0f, 28.0f)];
+        _closePopupView= [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 28.0f, 24.0f, 28.0f, 28.0f)];
+        self.closePopupView.layer.cornerRadius = 14.0f;
+        self.closePopupView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCloseScanResultBackground];
+        [self.whiteBaseView addSubview:self.closePopupView];
+        
+        _closePopupImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 26.0f, 26.0f, 24.0f, 24.0f)];
         self.closePopupImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.closePopupImageView.image = [UIImage imageNamed:@"TAPIconCloseGray" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.closePopupImageView.image = [UIImage imageNamed:@"TAPIconCloseSharpEdge" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.closePopupImageView.image = [self.closePopupImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCloseScanResult]];
         [self.whiteBaseView addSubview:self.closePopupImageView];
         
         _closePopupButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.closePopupImageView.frame) - 6.0f, CGRectGetMinY(self.closePopupImageView.frame) - 6.0f, 40.0f, 40.0f)];

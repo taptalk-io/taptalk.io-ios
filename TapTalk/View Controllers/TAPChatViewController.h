@@ -20,7 +20,7 @@ typedef NS_ENUM(NSInteger, TAPChatViewControllerType) {
 @optional
 
 - (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID;
-- (void)chatViewControllerDidLeaveGroupWithRoom:(TAPRoomModel *)room;
+- (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room;
 
 @end
 

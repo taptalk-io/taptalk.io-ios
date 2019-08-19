@@ -47,12 +47,15 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeRemoveRoomParticipants,
     TAPAPIManagerTypePromoteRoomAdmins,
     TAPAPIManagerTypeDemoteRoomAdmins,
-    TAPAPIManagerTypeLeaveRoom
+    TAPAPIManagerTypeLeaveRoom,
+    TAPAPIManagerTypeDeleteRoom,
+    TAPAPIManagerTypeGetProjectConfigs,
 };
 
 @interface TAPAPIManager : NSObject
 
 + (TAPAPIManager *)sharedManager;
 - (NSString *)urlForType:(TAPAPIManagerType)type;
+- (void)setBaseAPIURLString:(NSString *)urlString;
 
 @end

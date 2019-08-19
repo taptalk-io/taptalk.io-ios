@@ -7,10 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TAPCustomKeyboardItemModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPCustomKeyboardManagerDelegate <NSObject>
+
+- (void)customKeyboardItemTappedWithSender:(TAPUserModel *)sender
+                                 recipient:(TAPUserModel *)recipient
+                              keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
+
+- (NSArray<TAPCustomKeyboardItemModel *> *)setCustomKeyboardItemsForSender:(TAPUserModel *)sender
+                                                                 recipient:(TAPUserModel *)recipient;
+
+@end
+
 @interface TAPCustomKeyboardManager : NSObject
+
+@property (weak, nonatomic) id<TAPCustomKeyboardManagerDelegate> delegate;
 
 + (TAPCustomKeyboardManager *)sharedManager;
 

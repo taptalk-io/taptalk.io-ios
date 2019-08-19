@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) TAPCustomTextFieldView *retypePasswordTextField;
 @property (strong, nonatomic) TAPCustomButtonView *continueButtonView;
 @property (strong, nonatomic) TAPImageView *profileImageView;
+@property (strong, nonatomic) UIView *removeProfilePictureView;
 @property (strong, nonatomic) UIButton *removeProfilePictureButton;
 @property (strong, nonatomic) UIButton *changeProfilePictureButton;
 

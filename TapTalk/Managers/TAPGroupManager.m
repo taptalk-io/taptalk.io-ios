@@ -42,12 +42,20 @@
 
 #pragma mark - Custom Method
 - (TAPRoomModel *)getRoomWithRoomID:(NSString *)roomID {
-    TAPRoomModel *room =  [self.roomModelDictionary objectForKey:roomID];
+    TAPRoomModel *room = [self.roomModelDictionary objectForKey:roomID];
     return room;
 }
 
 - (void)setRoomWithRoomID:(NSString *)roomID room:(TAPRoomModel *)room {
+    if (self.roomModelDictionary == nil) {
+        _roomModelDictionary = [[NSMutableDictionary alloc] init];
+    }
+    
     [self.roomModelDictionary setObject:room forKey:roomID];
+}
+
+- (void)removeRoomWithRoomID:(NSString *)roomID {
+    [self.roomModelDictionary removeObjectForKey:roomID];
 }
 
 - (void)saveRoomToPreference {
@@ -64,5 +72,6 @@
     if (roomModelDictionary != nil) {
         [self.roomModelDictionary addEntriesFromDictionary:roomModelDictionary];
     }
+    
 }
 @end

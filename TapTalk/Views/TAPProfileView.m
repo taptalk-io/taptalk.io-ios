@@ -222,6 +222,12 @@
             doneLoadingString = @"Group Removed";
             break;
         }
+        case TAPProfileLoadingTypeDeleteGroup:
+        {
+            loadingString = @"Deleting...";
+            doneLoadingString = @"Group Deleted";
+            break;
+        }
         case TAPProfileLoadingTypeDoneLoading:
         {
             loadingString = @"";
@@ -238,7 +244,8 @@
     
     if (isLoading) {
         [self animateSaveLoading:YES];
-        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaving" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.loadingLabel.text = NSLocalizedString(loadingString, @"");
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
@@ -246,6 +253,7 @@
     else {
         [self animateSaveLoading:NO];
         self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
         self.loadingLabel.text = NSLocalizedString(doneLoadingString, @"");
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;

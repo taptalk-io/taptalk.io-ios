@@ -6,11 +6,13 @@
 #define TAP_NUMBER_OF_ITEMS_CHAT 50
 #define TAP_LIMIT_OF_CAPTION_CHARACTER 100
 
-#define TAP_MAX_IMAGE_SIZE 2000.0f
+#define TAP_MAX_IMAGE_LARGE_SIZE 2000.0f
 #define TAP_MAX_THUMBNAIL_IMAGE_SIZE 20.0f
-#define TAP_MAX_FILE_SIZE 25 * 1024 * 1024 //25 MB
-#define TAP_MAX_VIDEO_SIZE 25 //in MB
+#define TAP_DEFAULT_MAX_FILE_SIZE 5 * 1024 * 1024 //5 MB
+#define TAP_DEFAULT_MAX_GROUP_PARTICIPANTS 100
+#define TAP_DEFAULT_MAX_CHANNEL_PARTICIPANTS 5000
 #define TAP_UPDATED_TIME_LIMIT 24 * 60 * 60 //1 day (in seconds)
+#define TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE 50
 
 //Prefs Key
 #define TAP_PREFS_ACTIVE_USER @"Prefs.TapTalkActiveUser"
@@ -30,9 +32,9 @@
 #define TAP_PREFS_USER_COUNTRY_CODE @"Prefs.TapTalkUserCountryCode"
 #define TAP_PREFS_CONTACT_PERMISSION_ASKED @"Prefs.TapTalkContactPermissionAsked"
 #define TAP_PREFS_ROOM_MODEL_DICTIONARY @"Prefs.TapTalkRoomModelDictionary"
+#define TAP_PREFS_PROJECT_CONFIGS_DICTIONARY @"Prefs.TapTalkProjectConfigsDictionary"
 
 //User Customized Prefs
-#define TAP_PREFS_USER_AGENT @"Prefs.TapTalkUserAgent"
 #define TAP_PREFS_APP_KEY_ID @"Prefs.TapTalkAppKeyID"
 #define TAP_PREFS_APP_KEY_SECRET @"Prefs.TapTalkAppKeySecret"
 
@@ -72,3 +74,6 @@
 #define kTAPEventStopTyping @"chat/stopTyping"
 #define kTAPEventUserOnline @"user/status"
 #define kTAPEventUserUpdated @"user/updated"
+
+//Domain
+#define TAPErrorDomain @"user/updated"

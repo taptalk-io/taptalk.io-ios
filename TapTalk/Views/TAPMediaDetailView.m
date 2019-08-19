@@ -84,7 +84,12 @@
         [self.headerView addSubview:self.backButton];
         
         _saveButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 40.0f - 6.0f, additionalTopSpacing + 4.0f, 40.0f, 40.0f)];
-        [self.saveButton setImage:[UIImage imageNamed:@"TAPIconSave" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+        
+        UIImage *saveImage = [UIImage imageNamed:@"TAPIconSaveOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        saveImage = [saveImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSaveImage]];
+        
+        [self.saveButton setImage:saveImage forState:UIControlStateNormal];
+        
         [self.saveButton addTarget:self action:@selector(saveButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.headerView addSubview:self.saveButton];
         
@@ -479,6 +484,7 @@
         //Done save image
         [self animateSaveLoading:NO];
         self.saveLoadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.saveLoadingImageView.image = [self.saveLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
         self.saveLoadingLabel.text = NSLocalizedString(@"Image Saved", @"");
         self.saveLoadingButton.alpha = 1.0f;
         self.saveLoadingButton.userInteractionEnabled = YES;
@@ -486,7 +492,8 @@
     else {
         //Saving Image
         [self animateSaveLoading:YES];
-        self.saveLoadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaving" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.saveLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.saveLoadingImageView.image = [self.saveLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.saveLoadingLabel.text = NSLocalizedString(@"Saving…", @"");
         self.saveLoadingButton.alpha = 1.0f;
         self.saveLoadingButton.userInteractionEnabled = YES;

@@ -12,11 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, TAPSetupRoomListViewType) {
     TAPSetupRoomListViewTypeSettingUp = 0,
-    TAPSetupRoomListViewTypeSuccess = 1
+    TAPSetupRoomListViewTypeSuccess = 1,
+    TAPSetupRoomListViewTypeFailed = 2
 };
 
 @interface TAPSetupRoomListView : TAPBaseView
 
+@property (strong, nonatomic) UIButton *retryButton;
 - (void)showSetupViewWithType:(TAPSetupRoomListViewType)type;
 - (void)showFirstLoadingView:(BOOL)isVisible withType:(TAPSetupRoomListViewType)type;
 

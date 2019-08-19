@@ -37,6 +37,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus;
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing;
+- (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message;
 
 @end
 
@@ -64,23 +65,25 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)closeActiveRoom;
 - (void)startTyping;
 - (void)stopTyping;
+- (void)startTypingWithRoomID:(NSString *)roomID;
+- (void)stopTypingWithRoomID:(NSString *)roomID;
 
 - (void)notifySendMessageToDelegate:(TAPMessageModel *)message;
 
 - (void)sendTextMessage:(NSString *)textMessage;
-- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room;
+- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
-- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room;
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption;
-- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room;
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData;
-- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room;
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;;
 - (void)sendEmitFileMessage:(TAPMessageModel *)message;
 - (void)sendProductMessage:(TAPMessageModel *)message;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address;
-- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room;
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
-- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room;
+- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;
@@ -102,6 +105,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)saveUnsentMessageAndDisconnect;
 - (void)triggerSaveNewMessage;
 - (BOOL)checkIsTypingWithRoomID:(NSString *)roomID;
+- (NSDictionary *)getTypingUsersWithRoomID:(NSString *)roomID;
 - (BOOL)checkShouldRefreshOnlineStatus;
 - (void)refreshShouldRefreshOnlineStatus;
 - (void)addToWaitingUploadFileMessage:(TAPMessageModel *)message;

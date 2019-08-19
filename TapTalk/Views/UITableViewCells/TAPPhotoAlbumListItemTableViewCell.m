@@ -46,6 +46,7 @@
         
         _arrowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 20.0f, (cellHeight - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.arrowImageView.image = [UIImage imageNamed:@"TAPIconRightArrowCell" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.arrowImageView.image = [self.arrowImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChevronRightGray]];
         [self.contentView addSubview:self.arrowImageView];
         
         _selectedCountView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.arrowImageView.frame) - 4.0f, (cellHeight - 20.0f) / 2.0f, 0.0f, 20.0f)];

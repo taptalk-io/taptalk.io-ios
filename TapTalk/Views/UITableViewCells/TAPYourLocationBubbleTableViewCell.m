@@ -73,6 +73,8 @@
 @property (nonatomic) BOOL isShowQuoteView;
 @property (nonatomic) BOOL isShowReplyView;
 
+@property (strong, nonatomic) NSString *currentProfileImageURLString;
+
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)quoteButtonDidTapped:(id)sender;
@@ -182,6 +184,8 @@
     
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
+    
+    self.centerMarkerLocationImageView.image = [self.centerMarkerLocationImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationBubbleMarker]];
     
     self.replyNameLabel.textColor = quoteTitleColor;
     self.replyNameLabel.font = quoteTitleFont;
@@ -310,7 +314,12 @@
             self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
+            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+                self.senderImageView.image = nil;
+            }
+            
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+            _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
         
         self.senderNameLabel.text = message.user.fullname;

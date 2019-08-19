@@ -172,7 +172,7 @@
 }
 
 - (void)showInAppNotificationWithMessage:(TAPMessageModel *)message {
-    if (message.isDeleted && message.isHidden) {
+    if (message.isDeleted || message.isHidden) {
         //Do not show if message isdeleted or isHidden
         return;
     }
@@ -182,7 +182,7 @@
         return;
     }
     
-    if ([[TapTalk sharedInstance] roomListViewController].isViewAppear) {
+    if ([[TapUI sharedInstance] roomListViewController].isViewAppear) {
         //Do not show if currently in room list
         return;
     }
@@ -191,14 +191,14 @@
         [self initCustomNotificationAlertViewController];
     }
     
-    [[TapTalk sharedInstance].customNotificationAlertViewController showWithMessage:message];
+    [[TapUI sharedInstance].customNotificationAlertViewController showWithMessage:message];
 }
 
 - (void)initCustomNotificationAlertViewController {
-    if ([TapTalk sharedInstance].activeWindow != nil) {
-        [TapTalk sharedInstance].customNotificationAlertViewController.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 66.0f + 20.0f);
-        [TapTalk sharedInstance].customNotificationAlertViewController.delegate = self;
-        [[TapTalk sharedInstance].activeWindow addSubview:[TapTalk sharedInstance].customNotificationAlertViewController.view];
+    if ([TapUI sharedInstance].activeWindow != nil) {
+        [TapUI sharedInstance].customNotificationAlertViewController.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 66.0f + 20.0f);
+        [TapUI sharedInstance].customNotificationAlertViewController.delegate = self;
+        [[TapUI sharedInstance].activeWindow addSubview:[TapUI sharedInstance].customNotificationAlertViewController.view];
         _isViewIsAddedToSubview = YES;
     }
 }
@@ -211,20 +211,36 @@
     }
 }
 
-- (void)removeReadLocalNotificationWithMessage:(TAPMessageModel *)message {
-    //Handling local push notification
+- (void)updateApplicationBadgeCount {
+    [TAPDataManager getDatabaseUnreadRoomCountWithActiveUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSInteger unreadRoomCount) {
+        if(unreadRoomCount < 0) {
+            unreadRoomCount = 0;
+        }
+        
+        //Send delegate to be used to client side
+        if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkUnreadChatRoomBadgeCountUpdated:)]) {
+            [[TapTalk sharedInstance].delegate tapTalkUnreadChatRoomBadgeCountUpdated:unreadRoomCount];
+        }
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+//- (void)removeReadLocalNotificationWithMessage:(TAPMessageModel *)message {
+//Handling local push notification
 //    if ([UNUserNotificationCenter class]) { //Check if UNUserNotifcation is supported
 //        [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
-//            
+//
 //            for (NSInteger counter = 0; counter < [notifications count]; counter++) {
 //                UNNotification *notification = [notifications objectAtIndex:counter];
 //                NSString *identifier = notification.request.identifier;
 //                NSDictionary *userInfoDictionary = notification.request.content.userInfo;
 //                NSString *notificationRoomID = [userInfoDictionary valueForKeyPath:@"room.roomID"];
-//                
+//
 //                NSString *obtainedLocalID = message.localID;
 //                NSString *obtainedRoomID = message.room.roomID;
-//                
+//
 //                if ([identifier isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
 //                    //Cancelling local notification
 //                    [[UNUserNotificationCenter currentNotificationCenter]
@@ -245,7 +261,7 @@
 //
 //            NSString *obtainedLocalID = message.localID;
 //            NSString *obtainedRoomID = message.room.roomID;
-//            
+//
 //            if ([notificationLocalID isEqualToString:obtainedLocalID] && [notificationRoomID isEqualToString:obtainedRoomID]) {
 //                    //Cancelling local notification
 //                    [[UIApplication sharedApplication] cancelLocalNotification:selectedLocalNotification];
@@ -253,20 +269,6 @@
 //            }
 //        }
 //    }
-}
-
-- (void)updateApplicationBadgeCount {
-    [TAPDataManager getDatabaseUnreadRoomCountWithActiveUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSInteger unreadRoomCount) {
-        if(unreadRoomCount < 0) {
-            unreadRoomCount = 0;
-        }
-        
-        //Send delegate to be used to client side
-        [[TapTalk sharedInstance] setBadgeWithNumberOfUnreadRooms:unreadRoomCount];
-        
-    } failure:^(NSError *error) {
-        
-    }];
-}
+//}
 
 @end

@@ -197,7 +197,8 @@
         [self.loadingView addSubview:self.loadingInfoLabel];
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.loadingInfoLabel.frame) + 8.0f, 1.0f, 20.0f, 20.0f)];
-        [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoadingOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         [self.loadingView addSubview:self.loadingImageView];
         
         _doneResendOTPView = [[UIView alloc] initWithFrame:CGRectMake(16.0f,CGRectGetMaxY(self.verificationInformationLabel.frame) + 22.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 22.0f)];

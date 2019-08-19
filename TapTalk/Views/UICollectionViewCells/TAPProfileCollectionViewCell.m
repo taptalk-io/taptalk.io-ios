@@ -33,6 +33,8 @@
         _rightIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 24.0f - 16.0f, (CGRectGetHeight(frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
         self.rightIconImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.rightIconImageView setImage:[UIImage imageNamed:@"TAPIconRightArrowCell" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.rightIconImageView.image = [self.rightIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChevronRightGray]];
+
         [self.contentView addSubview:self.rightIconImageView];
         
         CGFloat rightPadding = 16.0f;
@@ -75,7 +77,7 @@
 }
 
 - (void)setProfileCollectionViewCellType:(TAPProfileCollectionViewCellType)type {
-    //WK Temp
+    //DV Temp
     BOOL isMute = NO;
     BOOL isBlocked = YES;
     //End Temp
@@ -94,18 +96,22 @@
             self.switchButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSwitchInactiveBackground].CGColor;
             
             [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+            self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuNotificationActive]];
+
         }
         else {
             [self.switchButton setOn:YES];
             self.switchButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSwitchActiveBackground].CGColor;
             
             [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+            self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuNotificationInactive]];
         }
         
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeBlock) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuBlockUser]];
         
         self.titleLabel.textColor = titleLabelColor;
         
@@ -122,6 +128,8 @@
     }
     else if (type == profileCollectionViewCellTypeConversationColor) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconConversationColor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuConversationColor]];
+
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"Conversation Color", @"");
         
@@ -131,6 +139,8 @@
     }
     else if (type == profileCollectionViewCellTypeClearChat) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuClearChat]];
+
         self.titleLabel.textColor = titleLabelDestructiveColor;
         self.titleLabel.text = NSLocalizedString(@"Clear Chat", @"");
         
@@ -139,6 +149,7 @@
     }
     else if (type == profileCollectionViewCellTypeLeaveGroup) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuClearChat]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
         self.titleLabel.text = NSLocalizedString(@"Leave Group", @"");
@@ -146,9 +157,20 @@
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
     }
+    else if (type == profileCollectionViewCellTypeDeleteGroup) {
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        
+        self.titleLabel.textColor = titleLabelDestructiveColor;
+        self.titleLabel.text = NSLocalizedString(@"Delete Group", @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 0.0f;
+    }
     else if (type == profileCollectionViewCellTypeViewGroupMembers) {
         
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconGroupMembers" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupProfileMenuViewMembers]];
+
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"View Group Members", @"");
         
@@ -158,14 +180,18 @@
     else if (type == profileCollectionViewCellTypeRemoveMember) {
         
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuRemoveMember]];
+        
         self.titleLabel.textColor = titleLabelDestructiveColor;
-        self.titleLabel.text = NSLocalizedString(@"Remove Members", @"");
+        self.titleLabel.text = NSLocalizedString(@"Remove Member", @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeAppointAsAdmin) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAppointAdmin" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin]];
+
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"Promote to Admin", @"");
         
@@ -174,6 +200,8 @@
     }
     else if (type == profileCollectionViewCellTypeRemoveFromAdmin) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconDemote" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin]];
+
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"Demote from Admin", @"");
         
@@ -182,6 +210,8 @@
     }
     else if (type == profileCollectionViewCellTypeSendMessage) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconMessage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuSendMessage]];
+
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"Send Message", @"");
         
@@ -190,6 +220,8 @@
     }
     else if (type == profileCollectionViewCellTypeAddContacts) {
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAddGrey" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
+
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedString(@"Add to Contacts", @"");
         
@@ -203,11 +235,13 @@
         //CHANGED TO ON
         self.switchButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSwitchActiveBackground].CGColor;
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuNotificationActive]];
     }
     else {
         //CHANGED TO OFF
         self.switchButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSwitchInactiveBackground].CGColor;
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuNotificationInactive]];
     }
 }
 

@@ -112,6 +112,8 @@
 @property (nonatomic) CGFloat newProgress;
 @property (nonatomic) NSInteger updateInterval;
 
+@property (strong, nonatomic) NSString *currentProfileImageURLString;
+
 - (void)getImageSizeFromImage:(UIImage *)image;
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width;
 - (void)showVideoCaption:(BOOL)show;
@@ -373,7 +375,16 @@
     self.cancelImageView.image = abortImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownload]];
     self.retryDownloadImageView.image = retryImage;
+    
+    UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownload]];
+    self.downloadImageView.image = downloadImage;
+    
+    UIImage *doneDownloadImage = [UIImage imageNamed:@"TAPIconPlayWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    doneDownloadImage = [doneDownloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePlayMedia]];
+    self.doneDownloadImageView.image = doneDownloadImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -481,7 +492,12 @@
             self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
         else {
+            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+                self.senderImageView.image = nil;
+            }
+            
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
+            _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
         
         self.senderNameLabel.text = @"";

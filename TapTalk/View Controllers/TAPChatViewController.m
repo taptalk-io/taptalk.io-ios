@@ -14,6 +14,7 @@
 
 #import "TAPCustomAccessoryView.h"
 #import "TAPGradientView.h"
+#import "TAPCustomButtonView.h"
 
 #import "TAPConnectionStatusViewController.h"
 #import "TAPKeyboardViewController.h"
@@ -88,7 +89,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UILabel *emptyDescriptionLabel;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *recipientImageView;
-@property (strong, nonatomic) IBOutlet TAPImageView *rightBarImageView;
 @property (strong, nonatomic) IBOutlet TAPCustomAccessoryView *inputMessageAccessoryView;
 @property (strong, nonatomic) IBOutlet UIImageView *inputMessageAccessoryCloseImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *inputMessageAccessoryDocumentsImageView;
@@ -109,6 +109,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIButton *topFloatingIndicatorButton;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *topFloatingIndicatorWidthConstraint;
 
+@property (strong, nonatomic) IBOutlet UIImageView *chatAnchorImageView;
+
+@property (strong, nonatomic) IBOutlet UIButton *attachmentButton;
+
 @property (nonatomic) TopFloatingIndicatorViewType topFloatingIndicatorViewType;
 
 @property (strong, nonatomic) UIView *titleView;
@@ -118,6 +122,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) UILabel *userStatusLabel;
 @property (strong, nonatomic) NSTimer *lastSeenTimer;
 @property (strong, nonatomic) UIView *userTypingView;
+@property (strong, nonatomic) UILabel *typingLabel;
+@property (strong, nonatomic) TAPImageView *rightBarImageView;
 
 @property (strong, nonatomic) TAPConnectionStatusViewController *connectionStatusViewController;
 @property (strong, nonatomic) TAPKeyboardViewController *keyboardViewController;
@@ -192,14 +198,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIView *deletedRoomView;
 @property (strong, nonatomic) IBOutlet UILabel *deletedRoomTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *deletedRoomContentLabel;
+@property (strong, nonatomic) IBOutlet UIView *deleteRoomButtonContainerView;
 @property (strong, nonatomic) IBOutlet UIImageView *deletedRoomIconImageView;
+@property (strong, nonatomic) IBOutlet UIView *deleteRoomButtonView;
+@property (strong, nonatomic) IBOutlet UILabel *deleteRoomButtonLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *deleteRoomButtonIconImageView;
+@property (strong, nonatomic) IBOutlet UIButton *deleteRoomButton;
+@property (strong, nonatomic) IBOutlet UIImageView *deleteRoomButtonLoadingImageView;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewBottomConstraint;
 
 //Kicked or Removed Group Room View
 @property (strong, nonatomic) IBOutlet UIView *kickedGroupRoomBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *kickedGroupRoomInfoView;
 @property (strong, nonatomic) IBOutlet UILabel *kickedGroupRoomInfoLabel;
 
-@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedRoomViewHeightConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedRoomViewHeightConstraint;
 
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
@@ -225,6 +238,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setupNavigationViewData;
 - (void)setupInputAccessoryView;
 - (void)setupDeletedRoomView;
+- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup withDeleteButton:(BOOL)withDeleteButton;
+- (void)setDeleteRoomButtonAsLoading:(BOOL)loading animated:(BOOL)animated;
 - (void)setupKickedGroupView;
 - (void)checkIsContainQuoteMessage;
 - (void)setSendButtonActive:(BOOL)isActive;
@@ -233,10 +248,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)chatAnchorButtonDidTapped:(id)sender;
 - (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender;
 - (IBAction)topFloatingIndicatorButtonDidTapped:(id)sender;
+- (IBAction)deleteGroupButtonDidTapped:(id)sender;
 - (void)backButtonDidTapped;
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index;
 - (void)removeMessageFromArrayAndDictionaryWithLocalID:(NSString *)localID;
-- (void)handleMessageFromSocket:(TAPMessageModel *)message;
+- (void)handleMessageFromSocket:(TAPMessageModel *)message isUpdatedMessage:(BOOL)isUpdated;
 - (void)destroySequence;
 - (void)firstLoadData;
 - (void)fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:(NSString *)roomID maxCreated:(NSNumber *)maxCreated;
@@ -307,6 +323,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)applicationDidBecomeActiveNotification:(NSNotification *)notification;
 
 - (void)refreshRoomStatusUIInfo;
+- (void)refreshTypingLabelState;
+
+- (void)setRoomNotAvailable;
 
 @end
 
@@ -457,7 +476,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _lastSeenTimer = [NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(timerRefreshLastSeen) userInfo:nil repeats:YES];
     
     [self setupNavigationViewData];
-    [self firstLoadData];
+
+    [self setupInputAccessoryView];
+    [self setupDeletedRoomView];
+    [self setupKickedGroupView];
+    
+    if (!self.currentRoom.isDeleted) {
+        //load data
+        [self firstLoadData];
+    }
+    else {
+        //set not available and delete room data
+        [self setRoomNotAvailable];
+        return;
+    }
     
     [[TAPChatManager sharedManager] refreshShouldRefreshOnlineStatus];
     
@@ -487,9 +519,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
     }
     
-    [self setupInputAccessoryView];
-    [self setupDeletedRoomView];
-    [self setupKickedGroupView];
+    self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -503,16 +533,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
-    _isViewWillAppeared = YES;
-    _isSwipeGestureEnded = NO;
-    [self reloadInputViews];
-    
     self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
-    
     self.connectionStatusViewController.view.frame = CGRectMake(CGRectGetMinX(self.connectionStatusViewController.view.frame), CGRectGetMinY(self.connectionStatusViewController.view.frame), CGRectGetWidth(self.connectionStatusViewController.view.frame), self.connectionStatusHeight);
     if (IS_IOS_11_OR_ABOVE) {
         [self.tableView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
     }
+    
+    if (self.currentRoom.isDeleted) {
+        return;
+    }
+    
+    _isViewWillAppeared = YES;
+    _isSwipeGestureEnded = NO;
+    [self reloadInputViews];
     
     //Check chat room contains mesage draft or not
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
@@ -784,7 +817,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if (!message.isHidden) {
                         [cell setMessage:message];
                     }
-                    
                     
                     if (message.isFailedSend) {
                         //Update view to failed send
@@ -1315,9 +1347,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //Hide unread message indicator top view
     if (self.topFloatingIndicatorViewType == TopFloatingIndicatorViewTypeUnreadMessage && self.topFloatingIndicatorView.alpha == 1.0f) {
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
             [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-        } forTotalSeconds:1.0f];
+        } afterDelay:1.0f];
     }
 }
 
@@ -1444,9 +1476,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             return;
         } else {
             
-            if ([fileSize doubleValue] > TAP_MAX_FILE_SIZE) {
+            TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+            NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
+            NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
+            if ([fileSize doubleValue] > [maxFileSize doubleValue]) {
                 //File size is larger than max file size
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error File Size Excedeed"  title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Maximum file size is 25 MB.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                NSString *errorMessage = [NSString stringWithFormat:@"Maximum file size is %ld MB.", (long)maxFileSizeInMB];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error File Size Excedeed" title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(errorMessage, @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 return;
             }
             
@@ -1470,11 +1506,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #endif
             [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath];
             
-            [TAPUtil delayCallback:^{
+            [TAPUtil performBlock:^{
                 if ([self.messageArray count] != 0) {
                     [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
                 }
-            } forTotalSeconds:0.2f];
+            } afterDelay:0.2f];
         }
     }];
 }
@@ -1510,7 +1546,32 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //If message don't have the same room id, reject message
         return;
     }
-    [self handleMessageFromSocket:message];
+    
+    [self handleMessageFromSocket:message isUpdatedMessage:NO];
+    
+    //Check if user remove us from the group while we are inside the chat room, handle the case
+    if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/removeParticipant"]) {
+        if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            //Check if system message with action remove participant and target user is current user
+            //show deleted chat room view
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+        }
+        //refresh room members by API
+        [self checkAndRefreshOnlineStatus];
+    }
+    else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/addParticipant"]) {
+        if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:NO isGroup:YES withDeleteButton:YES];
+        }
+        //refresh room members by API
+        [self checkAndRefreshOnlineStatus];
+    }
+    else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/delete"]) {
+        [self.view endEditing:YES];
+        [self setRoomNotAvailable];
+    }
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
@@ -1519,7 +1580,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         return;
     }
     
-    [self handleMessageFromSocket:message];
+    [self handleMessageFromSocket:message isUpdatedMessage:YES];
 }
 
 - (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus {
@@ -1536,9 +1597,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     typingRoomID = [TAPUtil nullToEmptyString:typingRoomID];
     
     if ([typingRoomID isEqualToString:currentRoomID]) {
-        if (self.currentRoom.type == RoomTypePersonal) {
-            [self setAsTyping:YES];
-        }
+        [self setAsTyping:YES];
     }
 }
 
@@ -1552,6 +1611,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if ([typingRoomID isEqualToString:currentRoomID]) {
         if (self.currentRoom.type == RoomTypePersonal) {
             [self setAsTyping:NO];
+        }
+        else {
+            [self refreshTypingLabelState];
         }
     }
 }
@@ -1704,7 +1766,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -1882,7 +1948,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
         if(message.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -1991,7 +2061,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -2244,7 +2318,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -2295,7 +2373,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
         if(message.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -2548,6 +2630,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         return;
     }
     
+    [self showInputAccessoryView];
+    
     //set selected message to chat field
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
@@ -2589,7 +2673,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -2739,7 +2827,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
         if(message.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -2836,7 +2928,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -2981,7 +3077,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
         //quote exists
         if(tappedMessage.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -3032,7 +3132,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
         if(message.data) {
-            [[TapTalk sharedInstance] quoteDidTappedWithUserInfo:[TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]]];
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
+            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
         }
     }
 }
@@ -3103,9 +3207,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
         AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
         
-        // Subscribe to the AVPlayerItem's DidPlayToEndTime notification.
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itemDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:item];
-        
         AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
         controller.delegate = self;
         controller.showsPlaybackControls = YES;
@@ -3162,11 +3263,32 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPProductListBubbleTableViewCell
 - (void)productListBubbleDidTappedLeftOrSingleOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption {
-    [[TapTalk sharedInstance] processingProductListLeftOrSingleOptionButtonTappedWithData:@[productDictionary] isSingleOption:isSingleOption];
+   
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+
+    TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+
+    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftButtonTapped:room:recipient:isSingleOption:)]) {
+        [tapUIDelegate tapTalkProductListBubbleLeftButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+    }
 }
 
 - (void)productListBubbleDidTappedRightOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption {
-    [[TapTalk sharedInstance] processingProductListRightOptionButtonTappedWithData:@[productDictionary] isSingleOption:isSingleOption];
+    TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    
+    TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
+        [tapUIDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+    }
 }
 
 #pragma mark TAPGrowingTextView
@@ -3289,11 +3411,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    [TAPUtil delayCallback:^{
+    [TAPUtil performBlock:^{
         if ([self.messageArray count] != 0) {
             [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
         }
-    } forTotalSeconds:0.2f];
+    } afterDelay:0.2f];
     
     //check if keyboard was showed
     //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
@@ -3328,7 +3450,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)photoAlbumListViewControllerDidFinishAndSendImageWithDataArray:(NSArray *)dataArray {
     //Handle send image from gallery
-    
     if(self.currentInputAccessoryExtensionHeight > 0.0f) {
         [self showInputAccessoryExtensionView:NO];
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
@@ -3363,11 +3484,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    [TAPUtil delayCallback:^{
+    [TAPUtil performBlock:^{
         if ([self.messageArray count] != 0) {
             [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
         }
-    } forTotalSeconds:0.2f];
+    } afterDelay:0.2f];
     
     //check if keyboard was showed
     //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
@@ -3407,11 +3528,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     }
     
-    [TAPUtil delayCallback:^{
+    [TAPUtil performBlock:^{
         if ([self.messageArray count] != 0) {
             [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
         }
-    } forTotalSeconds:0.2f];
+    } afterDelay:0.2f];
 }
 
 #pragma mark QLPreviewController
@@ -3424,9 +3545,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 #pragma mark TAPProfileViewController
-- (void)profileViewControllerDidTriggerLeaveGroupWithRoom:(TAPRoomModel *)room {
-    if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveGroupWithRoom:)]) {
-        [self.delegate chatViewControllerDidLeaveGroupWithRoom:room];
+- (void)profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room {
+    if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
+        [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:room];
     }
 }
 
@@ -3450,7 +3571,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.titleView addSubview:self.nameLabel];
     
     _userStatusView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f)];
-    self.userStatusView.backgroundColor = [TAPUtil getColor:@"19C700"];
+    self.userStatusView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconUserStatusActive];
     self.userStatusView.layer.cornerRadius = CGRectGetHeight(self.userStatusView.frame) / 2.0f;
     self.userStatusView.alpha = 0.0f;
     self.userStatusView.clipsToBounds = YES;
@@ -3483,15 +3604,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [typingAnimationImageView startAnimating];
     [self.userTypingView addSubview:typingAnimationImageView];
     
-    UILabel *typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
-    typingLabel.text = NSLocalizedString(@"typing", @"");
-    typingLabel.font = chatRoomStatusLabelFont;
-    typingLabel.textColor = chatRoomStatusLabelColor;
-    [typingLabel sizeToFit];
-    typingLabel.frame = CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(typingLabel.frame), 16.0f);
-    [self.userTypingView addSubview:typingLabel];
+    _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
+    self.typingLabel.font = chatRoomStatusLabelFont;
+    self.typingLabel.textColor = chatRoomStatusLabelColor;
+    self.typingLabel.text = NSLocalizedString(@"typing", @"");
+    [self.typingLabel sizeToFit];
+    self.typingLabel.frame = CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
+    [self.userTypingView addSubview:self.typingLabel];
     
-    self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
+    self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(self.typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
     self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
     
     [self setAsTyping:NO];
@@ -3530,6 +3651,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //Left Bar Button
     [self showCustomBackButton];
+    
+    self.quoteFileView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconQuotedFileBackground];
+    
+    self.deletedRoomIconImageView.image = [self.deletedRoomIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedChatRoom]];
+    
+    self.chatAnchorBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottomBackground];
+    self.chatAnchorImageView.image = [self.chatAnchorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottom]];
+    
+    self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomUnreadButton]];
+    
+    self.attachmentButton.imageView.image = [self.attachmentButton.imageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerAttach]];
+
 }
 
 - (void)checkIsContainQuoteMessage {
@@ -3594,6 +3727,24 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)setupDeletedRoomView {
     //Setup Deleted Room View
+
+    self.deleteRoomButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonDestructiveBackground];
+    self.deleteRoomButtonView.layer.cornerRadius = 8.0f;
+    self.deletedRoomView.clipsToBounds = YES;
+    
+    UIFont *buttonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+    UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+    self.deleteRoomButtonLabel.text = NSLocalizedString(@"Delete Chat", @"");
+    self.deleteRoomButtonLabel.textAlignment = NSTextAlignmentCenter;
+    self.deleteRoomButtonLabel.font = buttonFont;
+    self.deleteRoomButtonLabel.textColor = buttonColor;
+
+    self.deleteRoomButtonIconImageView.image = [UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.deleteRoomButtonIconImageView.image = [self.deleteRoomButtonIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+    
+    self.deleteRoomButtonLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.deleteRoomButtonLoadingImageView.image = [self.deleteRoomButtonLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+    
     UIFont *deletedChatRoomTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeletedChatRoomInfoTitleLabel];
     UIColor *deletedChatRoomTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorDeletedChatRoomInfoTitleLabel];
     UIFont *deletedChatRoomContentLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeletedChatRoomInfoContentLabel];
@@ -3607,7 +3758,44 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.deletedRoomContentLabel.font = deletedChatRoomContentLabelFont;
     //    [self.deletedRoomIconImageView setImageTintColor:@"deletedChatRoomIconColor"]; //DV ICON
     
-    self.deletedRoomViewHeightConstrait.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
+    self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
+}
+
+- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup withDeleteButton:(BOOL)withDeleteButton {
+    
+    [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
+    
+    if (isGroup) {
+        self.deletedRoomContentLabel.text = NSLocalizedString(@"You are no longer a participant in this group", @"");
+    }
+    else {
+        self.deletedRoomContentLabel.text = NSLocalizedString(@"This user is no longer available", @"");
+    }
+    
+    //Delete button used to delete room
+    if (show) {
+        
+        _isShowAccessoryView = NO;
+        [self reloadInputViews];
+        
+        if (withDeleteButton) {
+            //74 is button height and padding
+            self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight + 74.0f;
+            self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
+        }
+        else {
+            self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
+            self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+        }
+        
+        self.deletedRoomView.alpha = 1.0f;
+    }
+    else {
+        self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+        self.deletedRoomView.alpha = 0.0f;
+        [self showInputAccessoryView];
+    }
 }
 
 - (void)setupKickedGroupView {
@@ -3626,7 +3814,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIColor *systemMessageColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSystemMessageBody];
     self.kickedGroupRoomInfoLabel.textColor = systemMessageColor;
     self.kickedGroupRoomInfoLabel.font = systemMessageFont;
-    
 }
 
 - (void)setSendButtonActive:(BOOL)isActive {
@@ -3740,7 +3927,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     NSString *roomID = obtainedMessage.room.roomID;
     roomID = [TAPUtil nullToEmptyString:roomID];
     
-//    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
     NSString *currentActiveRoomID = self.currentRoom.roomID;
     currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
     
@@ -3754,12 +3940,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
     NSArray *messageArray = [self.messageArray copy];
     NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-    
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         [cell animateFinishedUploadingImage];
-    }
+      }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         [self.tableView beginUpdates];
@@ -4185,9 +4370,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //Hide unread message indicator top view
     if (self.topFloatingIndicatorViewType == TopFloatingIndicatorViewTypeUnreadMessage && self.topFloatingIndicatorView.alpha == 1.0f) {
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
             [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-        } forTotalSeconds:1.0f];
+        } afterDelay:1.0f];
     }
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
@@ -4488,6 +4673,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                         actionWithTitle:@"Compose"
                                         style:UIAlertActionStyleDefault
                                         handler:^(UIAlertAction * action) {
+                                            [self showInputAccessoryView];
                                             if([[UIApplication sharedApplication] canOpenURL:url]) {
                                                 if(IS_IOS_10_OR_ABOVE) {
                                                     [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
@@ -4502,6 +4688,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      actionWithTitle:@"Copy"
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
+                                         [self showInputAccessoryView];
                                          UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                          [pasteboard setString:originalString];
                                      }];
@@ -4562,6 +4749,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          //CS TEMP - temporary open safari
+                                         [self showInputAccessoryView];
                                          if([[UIApplication sharedApplication] canOpenURL:url]) {
                                              if(IS_IOS_10_OR_ABOVE) {
                                                  [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
@@ -4576,6 +4764,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      actionWithTitle:@"Copy"
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
+                                         [self showInputAccessoryView];
                                          UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                          [pasteboard setString:originalString];
                                      }];
@@ -4637,6 +4826,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:@"Call Number"
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
                                      NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
                                      if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
                                          if(IS_IOS_10_OR_ABOVE) {
@@ -4652,6 +4842,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                 actionWithTitle:@"SMS Number"
                                 style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction * action) {
+                                    [self showInputAccessoryView];
                                     NSString *stringURL = [NSString stringWithFormat:@"sms:%@", phoneNumber];
                                     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
                                         if(IS_IOS_10_OR_ABOVE) {
@@ -4667,6 +4858,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:@"Copy"
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:phoneNumber];
                                  }];
@@ -4790,6 +4982,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                   style:UIAlertActionStyleDefault
                                   handler:^(UIAlertAction * action) {
                                       //Reply Action Here
+                                      
+                                      [self showInputAccessoryView];
+                                      
                                       if (message.type == TAPChatMessageTypeText) {
                                           [self showInputAccessoryExtensionView:NO];
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -4885,6 +5080,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                     actionWithTitle:@"Forward"
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
+                                        [self showInputAccessoryView];
                                         //Forward Action Here
                                         TAPForwardListViewController *forwardListViewController = [[TAPForwardListViewController alloc] init];
                                         forwardListViewController.currentNavigationController = self.navigationController;
@@ -4897,6 +5093,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:@"Copy"
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      if (message.type == TAPChatMessageTypeText) {
                                          [pasteboard setString:message.body];
@@ -4907,6 +5104,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           actionWithTitle:@"Save"
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
+                                              [self showInputAccessoryView];
                                               //Save to gallery Action Here
                                               if (message.type == TAPChatMessageTypeImage) {
                                                   //Save image to gallery
@@ -4937,6 +5135,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           actionWithTitle:@"Delete"
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
+                                              [self showInputAccessoryView];
                                               [self showDeleteMessageActionWithMessageArray:@[message.messageID]];
                                           }];
     
@@ -5125,7 +5324,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
     
-    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapTalk sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPChatViewController class] description]] || [[[[[TapTalk sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
+    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPChatViewController class] description]] || [[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
         if (self.isShowAccessoryView) {
             return self.inputMessageAccessoryView;
         }
@@ -5249,7 +5448,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 //Has existing chat
                 [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
                     TAPMessageModel *earliestMessage = [messageArray objectAtIndex:[messageArray count] - 1];
-                    NSNumber *minCreated = earliestMessage.created;
+                    NSNumber *minCreated = earliestMessage.created;  
                     _minCreatedMessage = minCreated;
                     
                     TAPMessageModel *latestMessage = [messageArray objectAtIndex:0];
@@ -5262,7 +5461,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
                     
                     //Call API Get After Message
-                    [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated success:^(NSArray *messageArray) {
+                    //Obtain Last Updated Value
+                    NSNumber *lastUpdatedFromPreference = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
+                    [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated lastUpdated:lastUpdatedFromPreference needToSaveLastUpdatedTimestamp:YES success:^(NSArray *messageArray) {
                         
                         //Delete physical files when isDeleted = 1 (message is deleted)
                         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -5297,11 +5498,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             }
                             
                             [self processAllPreviousMessageAsRead];
+                            
+                            //check if last message is deleted room
+                            TAPMessageModel *lastMessage = [self.messageArray firstObject];
+                            if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                                //Check if system message with action remove participant and target user is current user
+                                //show deleted chat room view
+                                [self.view endEditing:YES];
+                                [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+                            }
+                            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
+                                [self.view endEditing:YES];
+                                [self setRoomNotAvailable];
+                            }
+                            
                         }];
                     } failure:^(NSError *error) {
                         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
                         
                         _isFirstLoadData = NO;
+                        
+                        //check if last message is deleted room
+                        TAPMessageModel *lastMessage = [self.messageArray firstObject];
+                        if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                            //Check if system message with action remove participant and target user is current user
+                            //show deleted chat room view
+                            [self.view endEditing:YES];
+                            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+                        }
 #ifdef DEBUG
                         //Note - this alert only shown at debug
                         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
@@ -5342,7 +5566,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.messageArray removeObject:currentRemovedMessage];
 }
 
-- (void)handleMessageFromSocket:(TAPMessageModel *)message {
+- (void)handleMessageFromSocket:(TAPMessageModel *)message isUpdatedMessage:(BOOL)isUpdated {
     dispatch_async(dispatch_get_main_queue(), ^{
         //Check if message exist in Message Pointer Dictionary
         TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
@@ -5550,22 +5774,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
         else {
             //Message not exist in dictionary
-            if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
-                //Bottom table view not seen, put message to holder array and insert the message when user scroll to bottom
-                [self.scrolledPendingMessageArray insertObject:message atIndex:0];
-                
-                //Add message to messageDictionary first to lower load time (pending message will be inserted to messageArray at scrollViewDidScroll and chatAnchorButtonDidTapped)
-                [self.messageDictionary setObject:message forKey:message.localID];
-                
-                [self addMessageToAnchorUnreadArray:message];
-            }
-            else {
-                //Bottom table view visible, insert message normally
-                [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
-                NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                [self.tableView beginUpdates];
-                [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                [self.tableView endUpdates];
+            if (!isUpdated) {
+                //Only run when message is new message
+                if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
+                    //Bottom table view not seen, put message to holder array and insert the message when user scroll to bottom
+                    [self.scrolledPendingMessageArray insertObject:message atIndex:0];
+                    
+                    //Add message to messageDictionary first to lower load time (pending message will be inserted to messageArray at scrollViewDidScroll and chatAnchorButtonDidTapped)
+                    [self.messageDictionary setObject:message forKey:message.localID];
+                    
+                    [self addMessageToAnchorUnreadArray:message];
+                }
+                else {
+                    //Bottom table view visible, insert message normally
+                    [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
+                    NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                    [self.tableView beginUpdates];
+                    [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+                    [self.tableView endUpdates];
+                }
             }
         }
         [self checkEmptyState];
@@ -5579,12 +5806,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //Update badge count
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
     
+    [[TAPChatManager sharedManager] stopTyping];
+    
     [[TAPChatManager sharedManager] closeActiveRoom];
     
     //Remove ChatManager Delegate
     [[TAPChatManager sharedManager] removeDelegate:self];
 }
-
 
 - (void)addMessageToAnchorUnreadArray:(TAPMessageModel *)message {
     if (![self.anchorUnreadMessageArray containsObject:message]) {
@@ -5617,24 +5845,24 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [TAPDataManager getMessageWithRoomID:lastMessage.room.roomID lastMessageTimeStamp:lastMessage.created limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *messageArray) {
         if ([messageArray count] > 0) {
-            [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
+            [self updateMessageDataAndUIFromBeforeWithMessages:messageArray withCompletionHandler:^{
                 //if there's tapped reply message id, check and scroll to item
                 if (![TAPUtil isEmptyString:self.tappedMessageLocalID]) {
                     //Add 0.5s delay to wait update table view UI  from previous update message
-                    [TAPUtil delayCallback:^{
+                    [TAPUtil performBlock:^{
                         [self scrollToMessageAndLoadDataWithLocalID:self.tappedMessageLocalID];
-                    } forTotalSeconds:0.5f];
+                    } afterDelay:0.5f];
                 }
             }];
         }
         
         //Call API Before when message array less than limit (50)
-        [TAPUtil delayCallback:^{
-            //Add 0.2s delay to wait update table view UI  from previous update message
+        [TAPUtil performBlock:^{
+            //Add 0.2s delay to wait update table view UI from previous update message
             if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT && !self.isFirstLoadData) {
                 [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:lastMessage.room.roomID maxCreated:lastMessage.created];
             }
-        } forTotalSeconds:0.0f];
+        } afterDelay:0.2f];
     
     } failure:^(NSError *error) {
         
@@ -5646,29 +5874,27 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if ([self.loadedMaxCreated longLongValue] != [maxCreated longLongValue]) {
         _loadedMaxCreated = maxCreated;
         [self showLoadMessageCellLoading:YES];
-        [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated success:^(NSArray *messageArray, BOOL hasMore) {
+        [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated numberOfItems:[NSNumber numberWithInteger:TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE] success:^(NSArray *messageArray, BOOL hasMore) {
             if ([messageArray count] != 0) {
                 
                 _isLastPage = !hasMore;
                 
                 [self showLoadMessageCellLoading:NO];
                 
-                //                [TAPUtil delayCallback:^{
                 //Update View
-                [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
-                    
+                [self updateMessageDataAndUIFromBeforeWithMessages:messageArray withCompletionHandler:^{
                     //if there's tapped reply message id, check and scroll to item
                     if (![TAPUtil isEmptyString:self.tappedMessageLocalID]) {
                         [self scrollToMessageAndLoadDataWithLocalID:self.tappedMessageLocalID];
                     }
-                    
                 }];
-                //                } forTotalSeconds:1.0f];
-                
+            }
+            else if ([messageArray count] == 0 && !hasMore) {
+                [self showLoadMessageCellLoading:NO];
             }
             _isFirstLoadData = NO;
         } failure:^(NSError *error) {
-//            [self showLoadMessageCellLoading:NO];
+            [self showLoadMessageCellLoading:NO];
             _isFirstLoadData = NO;
 #ifdef DEBUG
             //Note - this alert only shown at debug
@@ -5706,7 +5932,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 if (!toTop) {
                     index = [self.messageArray count];
                 }
-                
                 [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:index];
                 if (checkFirstUnreadMessage && message.isRead == 0) {
                     //For checking unread message from API After
@@ -5776,7 +6001,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
                 }
             }
-        
+    
             [self sortAndFilterMessageArray];
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -5793,6 +6018,62 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             [self checkEmptyState];
             
+            completionHandler();
+        });
+    });
+}
+
+- (void)updateMessageDataAndUIFromBeforeWithMessages:(NSArray *)messageArray
+                               withCompletionHandler:(void(^)())completionHandler {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+    
+        NSInteger earliestUnreadMessageIndex = -1;
+        long minCreatedUnreadMessage;
+        
+        NSMutableArray *currentAddedMessageArray = [NSMutableArray array];
+        NSMutableDictionary *currentAddedMessageDictionary = [NSMutableDictionary dictionary];
+
+        NSInteger index = 0;
+        index = [self.messageArray count];
+        
+        for (NSInteger counter = 0; counter < [messageArray count]; counter++) {
+            
+            TAPMessageModel *message = [messageArray objectAtIndex:counter];
+            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
+            if (currentMessage != nil) {
+                //Message exist in dictionary
+                [self updateMessageModelValueWithMessage:message];
+            }
+            else {
+                //Message not exist in dictionary
+                [currentAddedMessageArray addObject:[NSString stringWithFormat:@"%ld", index]];
+                [currentAddedMessageDictionary setObject:message forKey:[NSString stringWithFormat:@"%ld", index]];
+                index++;
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+    
+            for (NSString *key in currentAddedMessageArray) {
+                TAPMessageModel *currentMessage = [currentAddedMessageDictionary objectForKey:key];
+                [self addIncomingMessageToArrayAndDictionaryWithMessage:currentMessage atIndex:[key integerValue]];
+            }
+            
+            NSMutableArray *indexPaths = [NSMutableArray array];
+            NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count]
+            ;
+            for (int count = currentCount; count < [self.messageArray count]; count++) {
+                [indexPaths addObject:[NSIndexPath indexPathForRow:count inSection:0]];
+            }
+    
+        if([indexPaths count] > 0) {
+            [self.tableView beginUpdates];
+            [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView endUpdates];
+            [self.tableView scrollsToTop];
+        }
+    
             completionHandler();
         });
     });
@@ -5822,7 +6103,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
     
-    [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:self.minCreatedMessage success:^(NSArray *messageArray) {
+    //Obtain Last Updated Value
+    NSNumber *lastUpdatedFromPreference = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
+    [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:self.minCreatedMessage lastUpdated:lastUpdatedFromPreference needToSaveLastUpdatedTimestamp:YES success:^(NSArray *messageArray) {
         
         //Delete physical files when isDeleted = 1 (message is deleted)
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -5847,8 +6130,28 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }];
         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
         
+        //check if last message is deleted room
+        TAPMessageModel *lastMessage = [self.messageArray firstObject];
+        if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            //Check if system message with action remove participant and target user is current user
+            //show deleted chat room view
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+        }
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
+            [self.view endEditing:YES];
+            [self setRoomNotAvailable];
+        }
     } failure:^(NSError *error) {
         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
+        //check if last message is deleted room
+        TAPMessageModel *lastMessage = [self.messageArray firstObject];
+        if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            //Check if system message with action remove participant and target user is current user
+            //show deleted chat room view
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+        }
     }];
 }
 
@@ -5915,9 +6218,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //Call Message Status Manager mark as read call API
     [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
-    
-    //Call Notification Manager remove local notification
-    [[TAPNotificationManager sharedManager] removeReadLocalNotificationWithMessage:message];
 }
 
 - (void)processVisibleMessageAsRead {
@@ -6149,7 +6449,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setKeyboardStateDefault {
     _keyboardState = keyboardStateDefault;
     
-    self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackground];
+    self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenuBackground];
     UIImage *hamburgerIconImage = [UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.keyboardOptionButtonImageView.image = [self.keyboardOptionButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenu]];
     [self.keyboardOptionButton setImage:hamburgerIconImage forState:UIControlStateNormal];
@@ -6158,7 +6458,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setKeyboardStateOption {
     _keyboardState = keyboardStateOptions;
 
-    self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackground];
+    self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboardBackground];
     UIImage *keyboardIconImage = [UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.keyboardOptionButtonImageView.image = [self.keyboardOptionButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboard]];
     [self.keyboardOptionButton setImage:keyboardIconImage forState:UIControlStateNormal];
@@ -6170,9 +6470,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //Hide unread message indicator top view
     if (self.topFloatingIndicatorViewType == TopFloatingIndicatorViewTypeUnreadMessage && self.topFloatingIndicatorView.alpha == 1.0f) {
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
             [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-        } forTotalSeconds:1.0f];
+        } afterDelay:1.0f];
     }
     
     if (self.keyboardState == keyboardStateDefault) {
@@ -6374,16 +6674,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
     
     if ([popupIdentifier isEqualToString:@"Error File Size Excedeed"]) {
-        
+        [self showInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"Error Delete Message"]) {
-        
+        [self showInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"Long Press Save Image"]) {
         //Do nothing because hide popup handled when we press the button
+        [self showInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"Long Press Save Video"]) {
         //Do nothing because hide popup handled when we press the button
+        [self showInputAccessoryView];
+    }
+    else if ([popupIdentifier isEqualToString:@"Error Delete Group Manually"]) {
+
     }
 }
 
@@ -6393,15 +6698,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     
     //Remove unread button
-    [TAPUtil delayCallback:^{
+    [TAPUtil performBlock:^{
         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-    } forTotalSeconds:1.0f];
+    } afterDelay:1.0f];
     
     //Hide unread message indicator top view
     if (self.topFloatingIndicatorViewType == TopFloatingIndicatorViewTypeUnreadMessage && self.topFloatingIndicatorView.alpha == 1.0f) {
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
             [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-        } forTotalSeconds:1.0f];
+        } afterDelay:1.0f];
     }
     
     //Remove highlighted message.
@@ -6470,9 +6775,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)profileImageDidTapped {
     
-    [TAPUtil delayCallback:^{
+    //reject if deletedRoomView exist
+    if (self.deletedRoomView.alpha == 1.0f || self.kickedGroupRoomBackgroundView.alpha == 1.0f) {
+        return;
+    }
+    
+    [TAPUtil performBlock:^{
         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-    } forTotalSeconds:1.0f];
+    } afterDelay:1.0f];
     
     [self setKeyboardStateDefault];
     
@@ -6482,14 +6792,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
     
-    id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-    if ([tapTalkDelegate respondsToSelector:@selector(tapTalkProfileButtonDidTapped:otherUser:)]) {
-        [tapTalkDelegate tapTalkProfileButtonDidTapped:self otherUser:otherUser];
+    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+    if ([tapUIDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:)]) {
+        [tapUIDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser];
     }
     else {
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
         profileViewController.room = [TAPChatManager sharedManager].activeRoom;
-        profileViewController.userID = otherUserID;
+        profileViewController.otherUserID = otherUserID;
         profileViewController.delegate = self;
         [self.navigationController pushViewController:profileViewController animated:YES];
     }
@@ -6686,6 +6996,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)setAsTyping:(BOOL)typing {
     if(typing) {
+        [self refreshTypingLabelState];
         self.userTypingView.alpha = 1.0f;
         self.userDescriptionView.alpha = 0.0f;
         [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
@@ -6897,13 +7208,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //user not found
                     //hide textview
                     self.inputMessageAccessoryView.alpha = 0.0f;
-                    self.deletedRoomView.alpha = 1.0f;
+                    [self showDeletedRoomView:YES isGroup:NO withDeleteButton:NO];
                 }
             }];
         }
         else {
-            //DV TODO - Handle for group chat or channel
-            [self setAsTyping:NO];
+            BOOL isTyping = [[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID];
+            [self setAsTyping:isTyping];
             
             TAPRoomModel *room = [[TAPGroupManager sharedManager] getRoomWithRoomID:self.currentRoom.roomID];
             if (room != nil) {
@@ -6919,7 +7230,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //user not found
                     //hide textview
                     self.inputMessageAccessoryView.alpha = 0.0f;
-                    self.deletedRoomView.alpha = 1.0f;
+                    [self showDeletedRoomView:YES isGroup:YES withDeleteButton:NO];
                 }
             }];
         }
@@ -6961,13 +7272,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.tappedMessageLocalID = @"";
         
         if (!currentMessage.isDeleted && !currentMessage.isHidden) {
-            [TAPUtil delayCallback:^{
+            [TAPUtil performBlock:^{
                 [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-            } forTotalSeconds:0.2f];
+            } afterDelay:0.2f];
         }
-        [TAPUtil delayCallback:^{
+        [TAPUtil performBlock:^{
              [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
-        } forTotalSeconds:0.2f];
+        } afterDelay:0.2f];
        
     }
     else {
@@ -7037,11 +7348,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         if (!self.isLoadingOldMessageFromAPI || [self.messageArray count] == 0 || self.isShowingTopFloatingIdentifier) {
             return;
         }
-        
         //remove cell at last row
         _isLoadingOldMessageFromAPI = NO;
         NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:self.lastLoadingCellRowPosition inSection:0];
-        if (self.lastLoadingCellRowPosition > [self.messageArray count]) {
+        if (self.lastLoadingCellRowPosition >= [self.messageArray count]) {
             [self.tableView beginUpdates];
             [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
             [self.tableView endUpdates];
@@ -7060,7 +7370,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)showDeleteMessageActionWithMessageArray:(NSString *)deletedMessageIDArray {
-    
+
+    [self showInputAccessoryView];
     //Temporary delete for everyone
     //Delete For Everyone
     [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
@@ -7319,12 +7630,175 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.rightBarImageView setImageWithURLString:profileImageURL];
     }
     
-    self.userStatusLabel.text = [NSString stringWithFormat:@"%ld Members", [self.currentRoom.participants count]];;
+    self.userStatusLabel.text = [NSString stringWithFormat:@"%ld Members", [self.currentRoom.participants count]];
+    if ([self.currentRoom.participants count] == 0) {
+        self.userStatusLabel.text = @"";
+    }
     [self.userStatusLabel sizeToFit];
     self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
     CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;
     self.userDescriptionView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), userStatusViewWidth, 16.0f);
     self.userDescriptionView.center = CGPointMake(self.nameLabel.center.x, self.userDescriptionView.center.y);
+}
+
+- (void)refreshTypingLabelState {
+    if (self.currentRoom.type == RoomTypePersonal) {
+        self.typingLabel.text = NSLocalizedString(@"typing", @"");
+    }
+    else {
+        NSDictionary *typingUserDictionary = [[TAPChatManager sharedManager] getTypingUsersWithRoomID:self.currentRoom.roomID];
+        if ([typingUserDictionary count] == 0) {
+            [self setAsTyping:NO];
+        }
+        else if ([typingUserDictionary count] == 1) {
+            NSArray *values = [typingUserDictionary allValues];
+            TAPUserModel *user = [values firstObject];
+            NSString *fullName = user.fullname;
+            NSArray *eachWordArray = [fullName componentsSeparatedByString:@" "];
+            NSString *firstName = [eachWordArray objectAtIndex:0];
+            self.typingLabel.text = [NSString stringWithFormat:@"%@ is typing", firstName];
+        }
+        else if ([typingUserDictionary count] > 1){
+            self.typingLabel.text = [NSString stringWithFormat:@"%ld people are typing", [typingUserDictionary count]];
+        }
+    }
+    [self.typingLabel sizeToFit];
+    CGFloat typingLabelWidth = CGRectGetWidth(self.typingLabel.frame);
+    if (typingLabelWidth > CGRectGetWidth([UIScreen mainScreen].bounds) - 64.0f - 64.0f) {
+        typingLabelWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 64.0f - 64.0f;
+    }
+    self.typingLabel.frame = CGRectMake(20.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
+    
+    self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(self.typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
+    self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
+}
+
+- (void)setDeleteRoomButtonAsLoading:(BOOL)loading animated:(BOOL)animated {
+    if (loading) {
+        
+        self.navigationItem.leftBarButtonItem.enabled = NO;
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+        
+        if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+            self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+        }
+        
+        if (animated) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.deleteRoomButtonLabel.alpha = 0.0f;
+                self.deleteRoomButtonIconImageView.alpha = 0.0f;
+                self.deleteRoomButton.userInteractionEnabled = NO;
+                
+                self.deleteRoomButtonLoadingImageView.alpha = 1.0f;
+            }];
+            
+            //ADD ANIMATION
+            if ([self.deleteRoomButtonLoadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+                CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+                animation.fromValue = [NSNumber numberWithFloat:0.0f];
+                animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
+                animation.duration = 1.5f;
+                animation.repeatCount = INFINITY;
+                animation.cumulative = YES;
+                animation.removedOnCompletion = NO;
+                [self.deleteRoomButtonLoadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+            }
+        }
+        else {
+            self.deleteRoomButtonLabel.alpha = 0.0f;
+            self.deleteRoomButtonIconImageView.alpha = 0.0f;
+            self.deleteRoomButton.userInteractionEnabled = NO;
+            
+            self.deleteRoomButtonLoadingImageView.alpha = 1.0f;
+            
+            //ADD ANIMATION
+            if ([self.deleteRoomButtonLoadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+                CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+                animation.fromValue = [NSNumber numberWithFloat:0.0f];
+                animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
+                animation.duration = 1.5f;
+                animation.repeatCount = INFINITY;
+                animation.cumulative = YES;
+                animation.removedOnCompletion = NO;
+                [self.deleteRoomButtonLoadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+            }
+        }
+    }
+    else {
+        
+        self.navigationItem.leftBarButtonItem.enabled = YES;
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+        
+        if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+            self.navigationController.interactivePopGestureRecognizer.enabled = YES;
+        }
+        
+        if (animated) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.deleteRoomButtonLabel.alpha = 1.0f;
+                self.deleteRoomButtonIconImageView.alpha = 1.0f;
+                self.deleteRoomButton.userInteractionEnabled = YES;
+                
+                self.deleteRoomButtonLoadingImageView.alpha = 0.0f;
+            }];
+            
+            //REMOVE ANIMATION
+            if ([self.deleteRoomButtonLoadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+                [self.deleteRoomButtonLoadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
+            }
+        }
+        else {
+            self.deleteRoomButtonLabel.alpha = 1.0f;
+            self.deleteRoomButtonIconImageView.alpha = 1.0f;
+            self.deleteRoomButton.userInteractionEnabled = YES;
+            
+            self.deleteRoomButtonLoadingImageView.alpha = 0.0f;
+            
+            //REMOVE ANIMATION
+            if ([self.deleteRoomButtonLoadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+                [self.deleteRoomButtonLoadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
+            }
+        }
+    }
+}
+
+- (IBAction)deleteGroupButtonDidTapped:(id)sender {
+    //add sequence to delete message and physical files
+    [self setDeleteRoomButtonAsLoading:YES animated:YES];
+    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.currentRoom.roomID success:^{
+        
+        if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
+            [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:self.currentRoom];
+        }
+        
+        //Throw view to room list
+        [TAPUtil performBlock:^{
+            [self setDeleteRoomButtonAsLoading:NO animated:YES];
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        } afterDelay:1.2f];
+        
+    } failure:^(NSError *error) {
+        [self setDeleteRoomButtonAsLoading:NO animated:YES];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+}
+
+- (void)setRoomNotAvailable {
+    [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
+    _isShowAccessoryView = NO;
+    [self reloadInputViews];
+    self.kickedGroupRoomBackgroundView.alpha = 1.0f;
+    
+    //delete room
+    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.currentRoom.roomID success:^{
+        if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
+            [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:self.currentRoom];
+        }
+    } failure:^(NSError *error) {
+    
+    }];
+    
 }
 
 @end

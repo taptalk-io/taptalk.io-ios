@@ -132,13 +132,15 @@
         [self.addMembersButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.addMembersButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
         [self.addMembersButtonView setButtonWithTitle:NSLocalizedString(@"Add Members", @"") andIcon:@"TAPIconAddMembers" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.addMembersButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.addMembersButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.addMembersButtonView];
         
         _removeMembersButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
         [self.removeMembersButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeDestructiveWithIcon];
         [self.removeMembersButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.removeMembersButtonView setButtonWithTitle:NSLocalizedString(@"Remove Members", @"") andIcon:@"TAPIconRemoveMemberRed" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.removeMembersButtonView setButtonWithTitle:NSLocalizedString(@"Remove Member", @"") andIcon:@"TAPIconRemoveMemberRed" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.removeMembersButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconDestructive]];
         self.removeMembersButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.removeMembersButtonView];
         
@@ -153,6 +155,7 @@
         [self.demoteAdminButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.demoteAdminButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
         [self.demoteAdminButtonView setButtonWithTitle:NSLocalizedString(@"Demote from Admin", @"") andIcon:@"TAPIconDemoteWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.demoteAdminButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.demoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.demoteAdminButtonView];
         
@@ -200,8 +203,8 @@
         [self.loadingMembersView addSubview:self.loadingMembersBackgroundView];
         
         _loadingMemberImageView = [[UIImageView alloc] initWithFrame:CGRectMake(110.0f, 183.0f, 20.0f, 20.0f)];
-        self.loadingMemberImageView.image = [UIImage imageNamed:@"TAPIconImageSaving" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        //DV TEMP ICON - changing color
+        self.loadingMemberImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingMemberImageView.image = [self.loadingMemberImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         [self.loadingMembersBackgroundView addSubview:self.loadingMemberImageView];
 
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
@@ -326,15 +329,13 @@
     self.removeMembersButtonView.alpha = 0.0f;
     self.demoteAdminButtonView.alpha = 0.0f;
     self.promoteAdminButtonView.alpha = 0.0f;
-    //CS TEMP - hide remove button, uncomment to show later
-//    [self showBottomActionButtonViewExtension:NO withActiveButton:0];
+    [self showBottomActionButtonViewExtension:NO withActiveButton:0];
 }
 
 - (void)showRemoveMembersButton {
     self.addMembersButtonView.alpha = 0.0f;
     self.removeMembersButtonView.alpha = 1.0f;
-    //CS TEMP - hide remove button, uncomment to show later
-//    [self showBottomActionButtonViewExtension:NO withActiveButton:0];
+    [self showBottomActionButtonViewExtension:NO withActiveButton:0];
 }
 
 - (void)showBottomActionButtonView:(BOOL)isVisible {
@@ -437,7 +438,8 @@
     
     if (isLoading) {
         [self animateSaveLoading:YES];
-        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaving" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.loadingLabel.text = NSLocalizedString(loadingString, @"");
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
@@ -445,6 +447,7 @@
     else {
         [self animateSaveLoading:NO];
         self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
         self.loadingLabel.text = NSLocalizedString(doneLoadingString, @"");
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
@@ -462,32 +465,30 @@
             self.promoteAdminButtonView.alpha = 0.0f;
         }
         
-        //CS TEMP - hide remove button, uncomment to show later
-//        self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 128.0f + [TAPUtil safeAreaBottomPadding], 0.0f);
-//
-//        CGRect bottomActionViewFrame = self.bottomActionView.frame;
-//        bottomActionViewFrame.origin.y = CGRectGetMaxY(self.contactsTableView.frame) - 128.0f - [TAPUtil safeAreaBottomPadding];
-//        bottomActionViewFrame.size.height = 128.0f + [TAPUtil safeAreaBottomPadding];
-//        [UIView animateWithDuration:0.2f animations:^{
-//            self.bottomActionView.frame = bottomActionViewFrame;
-//            self.bottomActionShadowView.frame = bottomActionViewFrame;
-//            self.removeMembersButtonView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.promoteAdminButtonView.frame) + 10.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f);
-//
-//        }];
+        self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 128.0f + [TAPUtil safeAreaBottomPadding], 0.0f);
+
+        CGRect bottomActionViewFrame = self.bottomActionView.frame;
+        bottomActionViewFrame.origin.y = CGRectGetMaxY(self.contactsTableView.frame) - 128.0f - [TAPUtil safeAreaBottomPadding];
+        bottomActionViewFrame.size.height = 128.0f + [TAPUtil safeAreaBottomPadding];
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bottomActionView.frame = bottomActionViewFrame;
+            self.bottomActionShadowView.frame = bottomActionViewFrame;
+            self.removeMembersButtonView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.promoteAdminButtonView.frame) + 10.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f);
+
+        }];
         
     }
     else {
-        //CS TEMP - hide remove button, uncomment to show later
-//        self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 74.0f + [TAPUtil safeAreaBottomPadding], 0.0f);
-//
-//        CGRect bottomActionViewFrame = self.bottomActionView.frame;
-//        bottomActionViewFrame.origin.y = CGRectGetMaxY(self.contactsTableView.frame) - 74.0f - [TAPUtil safeAreaBottomPadding];
-//        bottomActionViewFrame.size.height = 74.0f + [TAPUtil safeAreaBottomPadding];
-//        [UIView animateWithDuration:0.2f animations:^{
-//            self.bottomActionView.frame = bottomActionViewFrame;
-//            self.bottomActionShadowView.frame = bottomActionViewFrame;
-//            self.removeMembersButtonView.frame = CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f);
-//        }];
+        self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 74.0f + [TAPUtil safeAreaBottomPadding], 0.0f);
+
+        CGRect bottomActionViewFrame = self.bottomActionView.frame;
+        bottomActionViewFrame.origin.y = CGRectGetMaxY(self.contactsTableView.frame) - 74.0f - [TAPUtil safeAreaBottomPadding];
+        bottomActionViewFrame.size.height = 74.0f + [TAPUtil safeAreaBottomPadding];
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bottomActionView.frame = bottomActionViewFrame;
+            self.bottomActionShadowView.frame = bottomActionViewFrame;
+            self.removeMembersButtonView.frame = CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f);
+        }];
         
         self.demoteAdminButtonView.alpha = 0.0f;
         self.promoteAdminButtonView.alpha = 0.0f;

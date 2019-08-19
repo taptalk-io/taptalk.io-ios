@@ -83,6 +83,37 @@
     }
 }
 
+- (void)addContactWithUserArray:(NSArray <TAPUserModel *> *)userArray saveToDatabase:(BOOL)save {
+    
+    NSMutableArray *userDataArray = [NSMutableArray array];
+    for (TAPUserModel *user in userArray) {
+        TAPUserModel *savedUser = [self.contactUserDictionary objectForKey:user.userID];
+        if(savedUser != nil && savedUser.isContact) {
+            user.isContact = YES;
+        }
+        
+        TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+        if(user.userID != activeUser.userID && user.userID != nil) {
+            //if user != self set to Dictionary
+            [self.contactUserDictionary setObject:user forKey:user.userID];
+            [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
+            
+            if (save) {
+                [userDataArray addObject:user];
+            }
+        }
+    }
+    
+    if(save) {
+        //save user to database directly
+        [TAPDataManager updateOrInsertDatabaseContactWithData:userDataArray success:^{
+            
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+}
+
 - (TAPUserModel *)getUserWithUserID:(NSString *)userID {
     TAPUserModel *user = [self.contactUserDictionary objectForKey:userID];
     return user;

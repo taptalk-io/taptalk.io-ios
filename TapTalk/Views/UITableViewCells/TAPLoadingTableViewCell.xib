@@ -19,7 +19,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconLoadingOrange" translatesAutoresizingMaskIntoConstraints="NO" id="oV1-8K-T2s">
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconLoaderProgress" translatesAutoresizingMaskIntoConstraints="NO" id="oV1-8K-T2s">
                         <rect key="frame" x="150" y="8" width="20" height="20"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="20" id="BWs-ou-7i1"/>
@@ -40,6 +40,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="TAPIconLoadingOrange" width="20" height="20"/>
+        <image name="TAPIconLoaderProgress" width="110" height="110"/>
     </resources>
 </document>

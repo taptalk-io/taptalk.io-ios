@@ -67,7 +67,7 @@
 - (void)getUpdatedContactDataWithUserID:(NSString *)userID {
     userID = [TAPUtil nullToEmptyString:userID];
     [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
-        [self shouldUpdateUserWithData:user];
+        [self shouldUpdateUserWithData:user isTriggerDelegate:YES];
     } failure:^(NSError *error) {
         
     }];
@@ -82,14 +82,16 @@
     }];
 }
 
-- (void)shouldUpdateUserWithData:(TAPUserModel *)user {
+- (void)shouldUpdateUserWithData:(TAPUserModel *)user isTriggerDelegate:(BOOL)isTriggerDelegate {
     NSArray *contactArray = @[user];
     //Add to contact dictionary
     [self insertToContactDictionaryWithDataArray:contactArray];
     //Add to database
     [self insertContactToDatabaseWithUserData:contactArray];
     //Call delegate update contact
-    [self updateContactWithUser:user];
+    if (isTriggerDelegate) {
+        [self updateContactWithUser:user];
+    }
 }
 
 - (void)clearContactDictionary {
@@ -102,6 +104,16 @@
             [delegate contactCacheManagerDidUpdateContactWithData:user];
         }
     }
+}
+
+- (void)removeFromContactsWithUserID:(NSString *)userID {
+    TAPUserModel *user = [self.contactDictionary objectForKey:userID];
+    //Set isContact to NO
+    user.isContact = NO;
+    //Update dictionary
+    [self.contactDictionary setObject:user forKey:userID];
+    //Update database
+    [self insertContactToDatabaseWithUserData:@[user]];
 }
 
 @end

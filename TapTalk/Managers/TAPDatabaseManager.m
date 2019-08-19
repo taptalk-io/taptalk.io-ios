@@ -655,7 +655,7 @@
     
     // Set the new schema version. This must be greater than the previously used
     // version (if you've never set a schema version before, the version is 0).
-    configuration.schemaVersion = 4;
+    configuration.schemaVersion = 5;
     
     //NOTES - CHANGES
     //SCHEMA VERSION - 1
@@ -667,12 +667,14 @@
     //Add userDeleted in TAPMessageRealmModel
     //SCHEMA VERSION - 4 - 9 July 2019
     //Add action, groupTargetType, groupTargetID, groupTargetXCID, groupTargetName  in TAPMessageRealmModel
+    //SCHEMA VERSION - 5 - 25 July 2019
+    //Add roomIsDeleted, roomDeleted  in TAPMessageRealmModel
 
     // Set the block which will be called automatically when opening a Realm with a
     // schema version lower than the one set above
     configuration.migrationBlock = ^(RLMMigration *migration, uint64_t oldSchemaVersion) {
-        // We haven’t migrated anything yet, so oldSchemaVersion == 4
-        if (oldSchemaVersion < 4) {
+        // We haven’t migrated anything yet, so oldSchemaVersion == 5
+        if (oldSchemaVersion < 5) {
             // Nothing to do!
             // Realm will automatically detect new properties and removed properties
             // And will update the schema on disk automatically

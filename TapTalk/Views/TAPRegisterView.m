@@ -39,15 +39,23 @@
         
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2, CGRectGetMaxY(titleLabel.frame) + 32.0f, 96.0f, 96.0f)];
         self.profileImageView.layer.cornerRadius = CGRectGetWidth(self.profileImageView.frame) / 2.0f;
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.profileImageView.layer.masksToBounds = YES;
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.scrollView addSubview:self.profileImageView];
         
-        _removeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 24.0f, CGRectGetMinY(self.profileImageView.frame), 24.0f, 24.0f)];
-        [self.removeProfilePictureButton setImage:[UIImage imageNamed: @"TAPIconRemoveRedShine"] forState:UIControlStateNormal];
-        self.removeProfilePictureButton.alpha = 0.0f;
-        [self.scrollView addSubview:self.removeProfilePictureButton];
+        _removeProfilePictureView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 24.0f, CGRectGetMinY(self.profileImageView.frame), 24.0f, 24.0f)];
+        self.removeProfilePictureView.alpha = 0.0f;
+        self.removeProfilePictureView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRemoveItem];
+        self.removeProfilePictureView.layer.cornerRadius = CGRectGetHeight(self.removeProfilePictureView.frame) / 2.0f;
+        self.removeProfilePictureView.clipsToBounds = YES;
+        [self.scrollView addSubview:self.removeProfilePictureView];
+        
+        _removeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.removeProfilePictureView.frame), CGRectGetHeight(self.removeProfilePictureView.frame))];
+        UIImage *removeImage = [UIImage imageNamed:@"TAPIconRemoveMedia" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        removeImage = [removeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRemoveItemBackground]];
+        [self.removeProfilePictureButton setImage:removeImage forState:UIControlStateNormal];
+        [self.removeProfilePictureView addSubview:self.removeProfilePictureButton];
         
         UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
@@ -60,7 +68,8 @@
         [self.scrollView addSubview:changeLabel];
         
         UIImageView *changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(changeLabel.frame) + 4.0f, CGRectGetMinY(changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
-        changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
+        changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        changeIconImageView.image = [changeIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChangePicture]];
         [self.scrollView addSubview:changeIconImageView];
         
         _changeProfilePictureButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(changeLabel.frame), CGRectGetMinY(changeLabel.frame) - 8.0f, CGRectGetWidth(changeLabel.frame) + 4.0f + CGRectGetWidth(changeIconImageView.frame), 40.0f)];
@@ -162,11 +171,11 @@
 - (void)setProfilePictureWithImage:(UIImage *)image {
     if (image ==  nil) {
         self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
-        self.removeProfilePictureButton.alpha = 0.0f;
+        self.removeProfilePictureView.alpha = 0.0f;
     }
     else {
         self.profileImageView.image = image;
-        self.removeProfilePictureButton.alpha = 1.0f;
+        self.removeProfilePictureView.alpha = 1.0f;
     }
 }
 

@@ -25,6 +25,8 @@
 @property (nonatomic) BOOL isFullNameChanged;
 @property (nonatomic) BOOL isUserProfileURLChanged;
 @property (nonatomic) BOOL isMediaLastPage;
+@property (nonatomic) BOOL isCurrentActiveUserIsAdmin;
+@property (nonatomic) BOOL isLeaveFromGroupProfilePage;
 
 @property (weak, nonatomic) id openedBubbleCell;
 
@@ -58,8 +60,20 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
     [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    for (NSString *adminUserID in self.room.admins) {
+        if ([adminUserID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            self.isCurrentActiveUserIsAdmin = YES;
+        }
+    }
+
+    if (self.isLeaveFromGroupProfilePage && self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+        [self getRoomDataWithRoomID:self.room.roomID];
+        NSRange range = NSMakeRange(0, 1);
+        NSIndexSet *section = [NSIndexSet indexSetWithIndexesInRange:range];
+        [self.profileView.collectionView reloadSections:section];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -101,7 +115,7 @@
         if (self.room.type == RoomTypePersonal) {
             //type personal
             self.profileView.editButton.alpha = 0.0f;
-            [self getUserProfileDataWithUserID:self.userID];
+            [self getUserProfileDataWithUserID:self.otherUserID];
         }
         else {
             //type group or channel
@@ -195,16 +209,6 @@
                 }
             }
         }
-        //DV Temp - temporary hide when only 1 participant left, wait for implement delete group
-        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
-            if (self.room.type == RoomTypeGroup) {
-                if (indexPath.row == 1 && [self.room.participants count] == 1) {
-                    //clear and exit group
-                     height = 0.0f;
-                }
-            }
-        }
-        //END DV Temp
         
         CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), height);
         return cellSize;
@@ -273,13 +277,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 return 2;
             }
         }
-        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile){
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
             return 4; //add to contact, send message, appoint as admin, remove member
         }
         return 0;
     }
     else if (section == 1) {
-        return [self.mediaMessageDataArray count]; //DV Temp
+        return [self.mediaMessageDataArray count];
     }
     
     return 0;
@@ -324,7 +328,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [cell showSeparatorView:YES];
                 }
                 else if (indexPath.item == 1) {
-                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeLeaveGroup];
+                    if (self.isCurrentActiveUserIsAdmin && [self.room.participants count] == 1) {
+                        //only 1 participant left, show delete group
+                        [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeDeleteGroup];
+                    }
+                    else {
+                        [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeLeaveGroup];
+                    }
+                    
                     [cell showSeparatorView:YES];
                 }
                 
@@ -348,7 +359,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             else if (indexPath.item == 2) {
                 //appoint as admin
-                
                 if (![self.room.admins containsObject:self.user.userID]) {
                     [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeAppointAsAdmin];
                 }
@@ -566,6 +576,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if (self.room.type == RoomTypeGroup) {
                 if (indexPath.row == 0) {
                     //view group members
+                    _isLeaveFromGroupProfilePage = YES;
                     TAPCreateGroupViewController *createGroupViewController = [[TAPCreateGroupViewController alloc] init]; //createGroupViewController
                     createGroupViewController.tapCreateGroupViewControllerType = TAPCreateGroupViewControllerTypeMemberList;
                     createGroupViewController.room = self.room;
@@ -573,8 +584,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
                 else if (indexPath.row == 1) {
                     //clear and exit group
-                    //leave group
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedString(@"Exit and Clear Chat", @"") detailInformation:NSLocalizedString(@"Are you sure to leave this chat?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"OK"];
+                    
+                    if (self.isCurrentActiveUserIsAdmin && [self.room.participants count] == 1) {
+                        //delete group
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Delete Group" title:NSLocalizedString(@"Delete Group", @"") detailInformation:NSLocalizedString(@"All data & participants in the group will be removed. This action is irreversible.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Delete"];
+                    }
+                    else {
+                        //leave group
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedString(@"Leave Group", @"") detailInformation:NSLocalizedString(@"You will no longer be a participant and will lose access to all the data shared within the group.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Leave"];
+                    }
                 }
             }
         }
@@ -592,17 +610,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }
                 else {
-                    [TAPDataManager callAPIAddContactWithUserID:self.user.userID success:^(NSString *message) {
-                        [[TAPContactManager sharedManager] addContactWithUserModel:self.user saveToDatabase:YES];
+                    [TAPDataManager callAPIAddContactWithUserID:self.user.userID success:^(NSString *message, TAPUserModel *user) {
+                        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
                         [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAddToContact];
                         
-                        //Add user to Contact Manager
-                        self.user.isContact = YES;
-                        [[TAPContactManager sharedManager] addContactWithUserModel:self.user saveToDatabase:YES];
-                        
-                        [TAPUtil delayCallback:^{
+                        [TAPUtil performBlock:^{
                             [self.navigationController popViewControllerAnimated:YES];
-                        } forTotalSeconds:1.2f];
+                        } afterDelay:1.2f];
                         
                     } failure:^(NSError *error) {
 #ifdef DEBUG
@@ -616,7 +630,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else if (indexPath.row == 1) {
                 //send message
                 [self.navigationController popToRootViewControllerAnimated:NO];
-                [[TapTalk sharedInstance] openRoomWithOtherUser:self.user fromNavigationController:[[TapTalk sharedInstance] roomListViewController].navigationController];
+                
+                TAPChatViewController *chatViewController = [[TapUI sharedInstance] openRoomWithOtherUser:self.user];
+                chatViewController.hidesBottomBarWhenPushed = YES;
+                [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
             }
             else if (indexPath.row == 2) {
                 //appoint & remove admin
@@ -636,9 +653,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         
                         [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAppointAdmin];
                         
-                        [TAPUtil delayCallback:^{
+                        [TAPUtil performBlock:^{
                             [self.navigationController popViewControllerAnimated:YES];
-                        } forTotalSeconds:1.2f];
+                        } afterDelay:1.2f];
                         
                     } failure:^(NSError *error) {
                         [self removeLoadingView];
@@ -795,7 +812,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.profileView.navigationBackButton.alpha = scrollProgress;
 
     self.profileView.backButton.alpha = 1 - scrollProgress;
-    if (self.room.type == RoomTypeGroup && [self.room.admins containsObject:self.userID]) {
+    if (self.room.type == RoomTypeGroup && [self.room.admins containsObject:self.otherUserID]) {
         self.profileView.navigationEditButton.alpha = scrollProgress;
         self.profileView.editButton.alpha = 1 - scrollProgress;
     }
@@ -885,6 +902,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else if ([popupIdentifier isEqualToString:@"Error Leave Group"]) {
         
     }
+    else if ([popupIdentifier isEqualToString:@"Error Delete Group"]) {
+        
+    }
     else if ([popupIdentifier isEqualToString:@"Demote Admin"]) {
         //remove from admin
         [self.profileView showLoadingView:YES];
@@ -898,9 +918,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             [self showFinishLoadingStateWithType:TAPProfileLoadingTypeRemoveAdmin];
             
-            [TAPUtil delayCallback:^{
+            [TAPUtil performBlock:^{
                 [self.navigationController popViewControllerAnimated:YES];
-            } forTotalSeconds:1.2f];
+            } afterDelay:1.2f];
             
         } failure:^(NSError *error) {
             [self removeLoadingView];
@@ -920,9 +940,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             [self showFinishLoadingStateWithType:TAPProfileLoadingTypeRemoveMember];
             
-            [TAPUtil delayCallback:^{
+            [TAPUtil performBlock:^{
                 [self.navigationController popViewControllerAnimated:YES];
-            } forTotalSeconds:1.2f];
+            } afterDelay:1.2f];
             
         } failure:^(NSError *error) {
             [self removeLoadingView];
@@ -934,27 +954,64 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.profileView showLoadingView:YES];
         [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeLeaveGroup];
         [TAPDataManager callAPILeaveRoomWithRoomID:self.room.roomID success:^{
-            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeLeaveGroup];
+            
+            //Remove from group preference
+            [[TAPGroupManager sharedManager] removeRoomWithRoomID:self.room.roomID];
             
             //add sequence to delete message and physical files
-//            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
-            
-                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveGroupWithRoom:)]) {
-                    [self.delegate profileViewControllerDidTriggerLeaveGroupWithRoom:self.room];
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
+
+                [self showFinishLoadingStateWithType:TAPProfileLoadingTypeLeaveGroup];
+
+                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
+                    [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
                 }
                 
                 //Throw view to room list
-                [TAPUtil delayCallback:^{
+                [TAPUtil performBlock:^{
                     [self.navigationController popToRootViewControllerAnimated:YES];
-                } forTotalSeconds:1.2f];
+                } afterDelay:1.2f];
                 
-//            } failure:^(NSError *error) {
-//                [self removeLoadingView];
-//                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-//            }];
+            } failure:^(NSError *error) {
+                [self removeLoadingView];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            }];
         } failure:^(NSError *error) {
             [self removeLoadingView];
             [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    }
+    else if ([popupIdentifier isEqualToString:@"Delete Group"]) {
+        [self.profileView showLoadingView:YES];
+        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDeleteGroup];
+        
+        [TAPDataManager callAPIDeleteRoomWithRoom:self.room success:^{
+            
+            //Remove from group preference
+            [[TAPGroupManager sharedManager] removeRoomWithRoomID:self.room.roomID];
+            
+            //add sequence to delete message and physical files
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
+                
+                [self showFinishLoadingStateWithType:TAPProfileLoadingTypeDeleteGroup];
+                
+                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
+                    [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
+                }
+                
+                //Throw view to room list
+                [TAPUtil performBlock:^{
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                } afterDelay:1.2f];
+                
+            } failure:^(NSError *error) {
+                [self removeLoadingView];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            }];
+            
+        } failure:^(NSError *error) {
+            [self removeLoadingView];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
 }

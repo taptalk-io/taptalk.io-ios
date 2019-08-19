@@ -47,6 +47,8 @@
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
 
+@property (nonatomic) NSInteger myBubbleStatus;
+
 - (void)hideStatusLabelConstraintUpdateStatusIcon:(BOOL)updateStatusIcon;
 - (void)hideStatusLabelAlpha;
 - (void)setStatusIconUIWithStatus:(TAPBaseMyBubbleStatus)status;
@@ -147,6 +149,11 @@
 
 - (void)receiveSentEvent {
     [super receiveSentEvent];
+    
+    if (self.myBubbleStatus > TAPBaseMyBubbleStatusSent) {
+        return;
+    }
+    
     _isOnSendingAnimation = YES;
     
     self.chatBubbleRightConstraint.constant = 32.0f;
@@ -169,6 +176,8 @@
             self.sendingIconLeftConstraint.constant = 4.0f;
             self.sendingIconImageView.alpha = 0.0f;
             [self setMessage:self.message];
+            
+            NSLog(@"MESSAGEEE: %@", [self.message description]);
         }];
     }];
     
@@ -197,6 +206,10 @@
 
 - (void)receiveDeliveredEvent {
     [super receiveDeliveredEvent];
+    
+    if (self.myBubbleStatus > TAPBaseMyBubbleStatusDelivered) {
+        return;
+    }
     
     if(self.isOnSendingAnimation) {
         //Don't change status if cell is animate sending, change when animation done
@@ -333,6 +346,8 @@
 }
 
 - (void)setStatusIconUIWithStatus:(TAPBaseMyBubbleStatus)status {
+    _myBubbleStatus = status;
+    
     if (status == TAPBaseMyBubbleStatusRead) {
         //MESSAGE IS READ BY RECIPIENT
         self.statusIconRightConstraint.constant = 2.0f;

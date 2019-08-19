@@ -84,7 +84,7 @@
 
 - (TAPMessageModel *)copyMessageModel {
     TAPMessageModel *newModel = [TAPMessageModel new];
-    
+       
     newModel.messageID = self.messageID;
     newModel.localID = self.localID;
     newModel.filterID = self.filterID;
@@ -99,6 +99,7 @@
     newModel.quote = self.quote;
     newModel.replyTo = self.replyTo;
     newModel.forwardFrom = self.forwardFrom;
+    newModel.action = self.action;
     newModel.target = self.target;
     newModel.data = self.data;
     newModel.isDeleted = self.isDeleted;

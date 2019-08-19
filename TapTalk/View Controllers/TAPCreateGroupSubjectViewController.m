@@ -39,7 +39,9 @@
     [super viewDidLoad];
     
     self.title = NSLocalizedString(@"Group Subject", @"");
-    self.createGroupSubjectView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/50)", [self.selectedContactArray count]];
+    TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+    NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+    self.createGroupSubjectView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedContactArray count], (long)maxGroupMember];
     NSMutableDictionary *selectedContactsTitleAttributesDictionary = [NSMutableDictionary dictionary];
     CGFloat selectedContactsTitleLetterSpacing = 1.5f;
     [selectedContactsTitleAttributesDictionary setObject:@(selectedContactsTitleLetterSpacing) forKey:NSKernAttributeName];
@@ -348,6 +350,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         for (TAPUserModel *user in self.selectedContactArray) {
             [userIDArray addObject:user.userID];
         }
+        
         [TAPDataManager callAPICreateRoomWithName:self.createGroupSubjectView.groupNameTextField.textField.text type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
             
             if (self.selectedImage != nil) {
@@ -360,9 +363,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #ifdef DEBUG
                     NSLog(@"Success upload image");
 #endif
+                    //Update to group cache
+                    TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
+                    existingRoom.name = room.name;
+                    existingRoom.color = room.color;
+                    existingRoom.isDeleted = room.isDeleted;
+                    existingRoom.deleted = room.deleted;
+                    existingRoom.imageURL = room.imageURL;
+                    
+                    if (existingRoom != nil) {
+                        [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
+                    }
 
                     [self dismissViewControllerAnimated:NO completion:nil];
-                    [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:self.roomListViewController.navigationController animated:YES];
+                    
+                    TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:room];
+                    obtainedChatViewController.hidesBottomBarWhenPushed = YES;
+                    [self.roomListViewController.navigationController pushViewController:obtainedChatViewController animated:YES];
                     
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     
@@ -377,8 +394,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                 
+                //Save to group preference
+                [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
+                
                 [self dismissViewControllerAnimated:NO completion:nil];
-                [[TapTalk sharedInstance] openRoomWithRoom:room fromNavigationController:self.roomListViewController.navigationController animated:YES];
+                TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:room];
+                obtainedChatViewController.hidesBottomBarWhenPushed = YES;
+                [self.roomListViewController.navigationController pushViewController:obtainedChatViewController animated:YES];
             }
             
         } failure:^(NSError *error) {
@@ -396,7 +418,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:self.roomModel.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                    NSLog(@"Success upload image");
+
+                    //Save to group preference
+                    TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
+                    existingRoom.name = room.name;
+                    existingRoom.color = room.color;
+                    existingRoom.isDeleted = room.isDeleted;
+                    existingRoom.deleted = room.deleted;
+                    existingRoom.imageURL = room.imageURL;
+                    
+                    if (existingRoom != nil) {
+                        [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
+                    }
+                    
                     //image uploaded
                     //dismiss view controller
                     //back to room
@@ -431,7 +465,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                        NSLog(@"Success upload image");
+
+                        //Save to group preference
+                        TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
+                        existingRoom.name = room.name;
+                        existingRoom.color = room.color;
+                        existingRoom.isDeleted = room.isDeleted;
+                        existingRoom.deleted = room.deleted;
+                        existingRoom.imageURL = room.imageURL;
+                        
+                        if (existingRoom != nil) {
+                            [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
+                        }
+                        
                         //image uploaded
                         //dismiss view controller
                         //back to room
@@ -449,6 +495,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
                 else {
                     //no image, dismiss view controller
+                    
+                    //Save to group preference
+                    TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
+                    existingRoom.name = room.name;
+                    existingRoom.color = room.color;
+                    existingRoom.isDeleted = room.isDeleted;
+                    existingRoom.deleted = room.deleted;
+                    existingRoom.imageURL = room.imageURL;
+                    
+                    if (existingRoom != nil) {
+                        [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
+                    }
+                    
                     //back to room detail
                     if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
                         [self.delegate createGroupSubjectViewControllerUpdatedRoom:room];
@@ -493,11 +552,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                                    }];
     
     UIImage *cameraActionImage = [UIImage imageNamed:@"TAPIconPhoto" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    cameraActionImage = [cameraActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCamera]];
+    cameraActionImage = [cameraActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSelectPictureCamera]];
     [cameraAction setValue:[cameraActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
     UIImage *galleryActionImage = [UIImage imageNamed:@"TAPIconGallery" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    galleryActionImage = [galleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetGallery]];
+    galleryActionImage = [galleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSelectPictureGallery]];
     [galleryAction setValue:[galleryActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
     [cameraAction setValue:@0 forKey:@"titleTextAlignment"];
