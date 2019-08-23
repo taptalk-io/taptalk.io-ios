@@ -1638,7 +1638,7 @@
 + (void)getMessageWithRoomID:(NSString *)roomID
         lastMessageTimeStamp:(NSNumber *)timeStamp
                    limitData:(NSInteger)limit
-                     success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                     success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
                      failure:(void (^)(NSError *error))failure {
     NSString *predicateString = [NSString stringWithFormat:@"created < %lf", [timeStamp doubleValue]];
     [TAPDatabaseManager loadMessageWithRoomID:roomID predicateString:predicateString numberOfItems:limit success:^(NSArray *resultArray) {
@@ -2672,8 +2672,8 @@
                         [[TAPChatManager sharedManager] disconnect];
                         
                         id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-                        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
-                            [tapTalkDelegate tapTalkShouldResetAuthTicket];
+                        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
+                            [tapTalkDelegate tapTalkRefreshTokenExpired];
                         }
                     }
                     

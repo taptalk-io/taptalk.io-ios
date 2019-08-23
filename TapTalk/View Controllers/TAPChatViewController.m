@@ -3271,10 +3271,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
 
-    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftButtonTapped:room:recipient:isSingleOption:)]) {
-        [tapUIDelegate tapTalkProductListBubbleLeftButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
-    }
+//    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+//    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftButtonTapped:room:recipient:isSingleOption:)]) {
+//        [tapUIDelegate tapTalkProductListBubbleLeftButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+//    }
 }
 
 - (void)productListBubbleDidTappedRightOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption {
@@ -3285,10 +3285,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
-        [tapUIDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
-    }
+//    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+//    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
+//        [tapUIDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+//    }
 }
 
 #pragma mark TAPGrowingTextView
@@ -5430,8 +5430,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             _numberOfUnreadMessages = [unreadMessages count];
         }
         
-        [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[NSNumber numberWithDouble:createdDate] limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *messageArray) {
-            if ([messageArray count] == 0) {
+        [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[NSNumber numberWithDouble:createdDate] limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+            if ([obtainedMessageArray count] == 0) {
                 //No chat history, first time chat
                 [self checkEmptyState];
                 
@@ -5446,12 +5446,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
             else {
                 //Has existing chat
-                [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
-                    TAPMessageModel *earliestMessage = [messageArray objectAtIndex:[messageArray count] - 1];
+                [self updateMessageDataAndUIWithMessages:obtainedMessageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
+                    TAPMessageModel *earliestMessage = [obtainedMessageArray objectAtIndex:[obtainedMessageArray count] - 1];
                     NSNumber *minCreated = earliestMessage.created;  
                     _minCreatedMessage = minCreated;
                     
-                    TAPMessageModel *latestMessage = [messageArray objectAtIndex:0];
+                    TAPMessageModel *latestMessage = [obtainedMessageArray objectAtIndex:0];
                     NSNumber *maxCreated = latestMessage.created;
                     
                     NSNumber *lastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
@@ -5489,7 +5489,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             }
                             
                             //Call API Before Message if count < 50
-                            if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
+                            if ([self.messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT) {
                                 [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:roomID maxCreated:minCreated];
                             }
                             else {
@@ -5843,9 +5843,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     _apiBeforeLastCreated = [lastMessage.created longLongValue];
     
-    [TAPDataManager getMessageWithRoomID:lastMessage.room.roomID lastMessageTimeStamp:lastMessage.created limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *messageArray) {
-        if ([messageArray count] > 0) {
-            [self updateMessageDataAndUIFromBeforeWithMessages:messageArray withCompletionHandler:^{
+    [TAPDataManager getMessageWithRoomID:lastMessage.room.roomID lastMessageTimeStamp:lastMessage.created limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+        if ([obtainedMessageArray count] > 0) {
+            [self updateMessageDataAndUIFromBeforeWithMessages:obtainedMessageArray withCompletionHandler:^{
                 //if there's tapped reply message id, check and scroll to item
                 if (![TAPUtil isEmptyString:self.tappedMessageLocalID]) {
                     //Add 0.5s delay to wait update table view UI  from previous update message
@@ -5859,7 +5859,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Call API Before when message array less than limit (50)
         [TAPUtil performBlock:^{
             //Add 0.2s delay to wait update table view UI from previous update message
-            if ([messageArray count] < TAP_NUMBER_OF_ITEMS_CHAT && !self.isFirstLoadData) {
+            if ([obtainedMessageArray count] < TAP_NUMBER_OF_ITEMS_CHAT && !self.isFirstLoadData) {
                 [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:lastMessage.room.roomID maxCreated:lastMessage.created];
             }
         } afterDelay:0.2f];

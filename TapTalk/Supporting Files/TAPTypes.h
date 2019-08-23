@@ -9,17 +9,29 @@
 #ifndef TAPTypes_h
 #define TAPTypes_h
 
+/*
+ enum TapTalkInstanceState
+ used to check the state of application
+ */
 typedef NS_ENUM(NSInteger, TapTalkInstanceState) {
     TapTalkInstanceStateActive, //Active state triggered when application enter foreground
     TapTalkInstanceStateInactive //Inactive state triggered when application terminated by os, or crash, or when in background and have finished background sequence
 };
 
+/*
+ enum TapTalkImplementationType
+ used to detect implementation type used by user
+ */
 typedef NS_ENUM(NSInteger, TapTalkImplentationType) {
     TapTalkImplentationTypeUI,
     TapTalkImplentationTypeCore,
     TapTalkImplentationTypeCombine
 };
 
+/*
+ enum TAPChatMessageType
+ used to set different type of chat message
+ */
 typedef NS_ENUM(NSInteger, TAPChatMessageType) {
     //First Digit
     //1 for Standard Chat Bubble
@@ -39,11 +51,10 @@ typedef NS_ENUM(NSInteger, TAPChatMessageType) {
     TAPChatMessageTypeCategory = 2002,
     TAPChatMessageTypePaymentConfirmation = 2004,
     
-    TAPChatMessageTypeOrderCard = 3001,
+//    TAPChatMessageTypeOrderCard = 3001,
     
     TAPChatMessageTypeSystemMessage = 9001,
     TAPChatMessageTypeUnreadMessageIdentifier = 9002,
-    
 };
 
 #endif /* TAPTypes_h */

@@ -18,6 +18,10 @@
 @property (nonatomic) TapTalkImplentationType implementationType;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 
+@property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
+@property (strong, nonatomic) NSDictionary * _Nullable coreConfigsDictionary;
+@property (strong, nonatomic) NSDictionary * _Nullable customConfigsDictionary;
+
 - (void)firstRunSetupWithApplication:(UIApplication *)application launchOptions:(NSDictionary *)launchOptions;
 - (void)resetPersistent;
 
@@ -42,6 +46,7 @@
     if (self) {
         
         _projectConfigsDictionary = [[NSDictionary alloc] init];
+        _coreConfigsDictionary = [[NSDictionary alloc] init];
         _customConfigsDictionary = [[NSDictionary alloc] init];
         
         //Set secret for NSSecureUserDefaults
@@ -56,10 +61,10 @@
 }
 
 #pragma mark - Authentication
-- (void)authenticateWithAuthTicket:(NSString *)authTicket
+- (void)authenticateWithAuthTicket:(NSString *_Nonnull)authTicket
                 connectWhenSuccess:(BOOL)connectWhenSuccess
-                      success:(void (^)(void))success
-                      failure:(void (^)(NSError *error))failure {
+                           success:(void (^_Nonnull)(void))success
+                           failure:(void (^_Nonnull)(NSError * _Nonnull error))failure { 
     
     if (authTicket == nil || [authTicket isEqualToString:@""]) {
         NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
@@ -108,12 +113,29 @@
     return YES;
 }
 
-- (void)connectWithSuccess:(void (^)(void))success
-                   failure:(void (^)(NSError *error))failure {
+- (BOOL)isConnected {
+    TAPConnectionManagerStatusType statusType = [TAPConnectionManager sharedManager].tapConnectionStatus;
+    
+    if (statusType == TAPConnectionManagerStatusTypeConnected) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (void)connectWithSuccess:(void (^_Nonnull)(void))success
+                   failure:(void (^_Nonnull)(NSError *_Nonnull error))failure {
     
     BOOL authenticated = [self isAuthenticated];
     if (!authenticated) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90002 errorMessage:@"Access token is not available, please call authenticateWithAuthTicket method before connecting"];
+        failure(localizedError);
+        return;
+    }
+    
+    TAPConnectionManagerStatusType statusType = [TAPConnectionManager sharedManager].tapConnectionStatus;
+    if (statusType == TAPConnectionManagerStatusTypeConnected || statusType == TAPConnectionManagerStatusTypeConnecting) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90003 errorMessage:@"Already connected"];
         failure(localizedError);
         return;
     }
@@ -123,7 +145,7 @@
     success();
 }
 
-- (void)disconnectWithCompletionHandler:(void (^)(void))completion {
+- (void)disconnectWithCompletionHandler:(void (^_Nonnull)(void))completion {
     //Disconnect Socket
     [[TAPChatManager sharedManager] disconnect];
     completion();
@@ -137,12 +159,12 @@
     _isAutoConnectDisabled = YES;
 }
 
-- (BOOL)getAutoConnectStatus {
-    return self.isAutoConnectDisabled;
+- (BOOL)isAutoConnectEnabled {
+    return !self.isAutoConnectDisabled;
 }
 
 #pragma mark - AppDelegate Handling
-- (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nonnull)launchOptions {
     // Override point for customization after application launch.
     
     [self firstRunSetupWithApplication:application launchOptions:launchOptions];
@@ -165,7 +187,7 @@
     [[TAPGroupManager sharedManager] populateRoomFromPreference];
  }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
+- (void)applicationWillResignActive:(UIApplication *_Nonnull)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     
@@ -177,7 +199,7 @@
     
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
+- (void)applicationDidEnterBackground:(UIApplication *_Nonnull)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     
@@ -196,7 +218,7 @@
 //    [[TAPContactCacheManager sharedManager] clearContactDictionary];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
+- (void)applicationWillEnterForeground:(UIApplication *_Nonnull)application {
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:application];
@@ -212,7 +234,7 @@
     }
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
+- (void)applicationDidBecomeActive:(UIApplication *_Nonnull)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:application];
@@ -223,8 +245,8 @@
 
     if ([TAPChatManager sharedManager].activeUser != nil) {
         //User active
-        BOOL isAutoConnectDisabled = [[TapTalk sharedInstance] getAutoConnectStatus];
-        if (!isAutoConnectDisabled) {
+        BOOL isAutoConnectEnabled = [[TapTalk sharedInstance] isAutoConnectEnabled];
+        if (isAutoConnectEnabled) {
             [[TAPChatManager sharedManager] connect];
         }
         
@@ -241,7 +263,7 @@
     [[TAPFileDownloadManager sharedManager] fetchDownloadedFilePathFromPreference];
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application {
+- (void)applicationWillTerminate:(UIApplication *_Nonnull)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_WILL_TERMINATE object:application];
@@ -250,20 +272,16 @@
     _instanceState = TapTalkInstanceStateInactive;
 }
 
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+- (void)application:(UIApplication *_Nonnull)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *_Nonnull)deviceToken {
     NSString *pushToken = [deviceToken description];
     pushToken = [pushToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
     pushToken = [pushToken stringByReplacingOccurrencesOfString:@">" withString:@""];
     pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
     
-#ifdef DEBUG
-    NSLog(@"PUSH TOKEN: %@", pushToken);
-#endif
-    
     [[TAPNotificationManager sharedManager] setPushToken:pushToken];
 }
 
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
+- (void)application:(UIApplication *_Nonnull)application didReceiveRemoteNotification:(NSDictionary *_Nonnull)userInfo fetchCompletionHandler:(void (^_Nonnull)(UIBackgroundFetchResult result))completionHandler {
     
     [[TAPNotificationManager sharedManager] handlePushNotificationWithUserInfo:userInfo];
     
@@ -280,14 +298,14 @@
 }
 
 #pragma mark - Push Notification
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+- (void)userNotificationCenter:(UNUserNotificationCenter *_Nonnull)center willPresentNotification:(UNNotification *_Nonnull)notification withCompletionHandler:(void (^_Nonnull)(UNNotificationPresentationOptions options))completionHandler {
     //Called when a notification is delivered to a foreground app.
     NSLog(@"User Info : %@",notification.request.content.userInfo);
     completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
 }
 
 //Called to let your app know which action was selected by the user for a given notification.
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)())completionHandler {
+- (void)userNotificationCenter:(UNUserNotificationCenter *_Nonnull)center didReceiveNotificationResponse:(UNNotificationResponse *_Nonnull)response withCompletionHandler:(void(^_Nonnull)(void))completionHandler {
     //Called when a notification is delivered to a foreground app.
     
     NSDictionary *userInfoDictionary = response.notification.request.content.userInfo;
@@ -298,7 +316,7 @@
 }
 
 #pragma mark - Exception Handling
-- (void)handleException:(NSException *)exception {
+- (void)handleException:(NSException * _Nonnull)exception {
     [[TAPChatManager sharedManager] saveUnsentMessageAndDisconnect];
     
     //Save all retrieved contact to database
@@ -342,10 +360,6 @@
     //Other initialization
     [TAPNetworkManager sharedManager];
     [[AFNetworkReachabilityManager sharedManager] startMonitoring];
-    
-    //Google API Key
-    [GMSPlacesClient provideAPIKey:@"AIzaSyC6PNBIZsFfQZ5OQm4MFElW98hk8JIjaYk"];
-    [GMSServices provideAPIKey:@"AIzaSyC6PNBIZsFfQZ5OQm4MFElW98hk8JIjaYk"];
 }
 
 - (void)resetPersistent {
@@ -372,9 +386,9 @@
 
 #pragma mark - Custom Method
 //General Set Up
-- (void)initWithAppKeyID:(NSString *)appKeyID
-            appKeySecret:(NSString *)appKeySecret
-            apiURLString:(NSString *)apiURLString
+- (void)initWithAppKeyID:(NSString *_Nonnull)appKeyID
+            appKeySecret:(NSString *_Nonnull)appKeySecret
+            apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType {
     
     [[NSUserDefaults standardUserDefaults] setSecureObject:appKeyID forKey:TAP_PREFS_APP_KEY_ID];
@@ -395,6 +409,12 @@
     
     //Validate and refresh access token
     [[TAPConnectionManager sharedManager] validateToken];
+}
+
+- (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
+    //Google API Key
+    [GMSPlacesClient provideAPIKey:apiKey];
+    [GMSServices provideAPIKey:apiKey];
 }
 
 - (void)refreshActiveUser {
@@ -424,6 +444,9 @@
                                 failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIGetProjectConfigsWithSuccess:^(NSDictionary *projectConfigsDictionary) {
         
+        NSDictionary *coreDictionary = [projectConfigsDictionary objectForKey:@"core"];
+        coreDictionary = [TAPUtil nullToEmptyDictionary:coreDictionary];
+        
         NSDictionary *projectDictionary = [projectConfigsDictionary objectForKey:@"project"];
         projectDictionary = [TAPUtil nullToEmptyDictionary:projectDictionary];
         
@@ -431,6 +454,7 @@
         customDictionary = [TAPUtil nullToEmptyDictionary:customDictionary];
         
         _projectConfigsDictionary = projectDictionary;
+        _coreConfigsDictionary = coreDictionary;
         _customConfigsDictionary = customDictionary;
         
         success();
@@ -440,29 +464,43 @@
     }];
 }
 
+- (NSDictionary *)getCoreConfigs {
+    NSMutableDictionary *coreDictionary = [NSMutableDictionary dictionary];
+    coreDictionary = [self.coreConfigsDictionary mutableCopy];
+    return [coreDictionary copy];
+}
+
+- (NSDictionary *)getProjectConfigs {
+    NSMutableDictionary *projectDictionary = [NSMutableDictionary dictionary];
+    projectDictionary = [self.projectConfigsDictionary mutableCopy];
+    return [projectDictionary copy];
+}
+
+- (NSDictionary *)getCustomConfigs {
+    NSMutableDictionary *customDictionary = [NSMutableDictionary dictionary];
+    customDictionary = [self.customConfigsDictionary mutableCopy];
+    return [customDictionary copy];
+}
+
 - (TapTalkImplentationType)getTapTalkImplementationType {
     return self.implementationType;
 }
 
-- (void)logoutAndClearAllDataWithSuccess:(void (^)(void))success
-                                 failure:(void (^)(NSError *error))failure {
+- (void)logoutAndClearAllTapTalkDataWithSuccess:(void (^_Nonnull)(void))success
+                                        failure:(void (^_Nonnull)(NSError *_Nonnull error))failure {
     [TAPDataManager callAPILogoutWithSuccess:^{
-        [[TapTalk sharedInstance] clearAllData];
+        [[TapTalk sharedInstance] clearAllTapTalkData];
         [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
         }];
         
         success();
-        
-        TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
-        [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapUI sharedInstance] roomListViewController] force:YES];
-        
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
     }];
 }
 
-- (void)clearAllData {
+- (void)clearAllTapTalkData {
     //Delete all data in database
     [TAPDatabaseManager deleteAllDataInDatabaseWithSuccess:^{
         
@@ -495,11 +533,7 @@
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
 }
 
-- (void)getTapTalkUserWithClientUserID:(NSString *)clientUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure {
-    [TAPDataManager callAPIGetUserByXCUserID:clientUserID success:success failure:failure];
-}
-
-- (TAPUserModel *)getTapTalkActiveUser {
+- (TAPUserModel *_Nonnull)getTapTalkActiveUser {
     return [TAPDataManager getActiveUser];
 }
 

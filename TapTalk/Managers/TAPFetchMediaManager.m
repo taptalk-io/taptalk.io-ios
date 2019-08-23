@@ -160,7 +160,7 @@
 - (void)fetchImageDataForAsset:(PHAsset *)asset
                progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary))progressHandler
                  resultHandler:(void(^)(UIImage *image))resultHandler
-                failureHandler:(nonnull void (^)())failureHandler {
+                failureHandler:(nonnull void (^)(void))failureHandler {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         //    NSString *assetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:asset];
@@ -198,7 +198,7 @@
 - (void)fetchVideoDataForAsset:(PHAsset *)asset
                progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *dictionary))progressHandler
                  resultHandler:(void (^)(AVAsset *resultVideoAsset))resultHandler
-                failureHandler:(void (^)())failureHandler {
+                failureHandler:(void (^)(void))failureHandler {
     
     //    NSString *assetKey = [[TAPFetchMediaManager sharedManager] getDictionaryKeyForAsset:asset];
     NSString *assetKey = asset.localIdentifier;

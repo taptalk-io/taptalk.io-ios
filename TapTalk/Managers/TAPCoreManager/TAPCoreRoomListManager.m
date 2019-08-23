@@ -11,6 +11,9 @@
 
 @interface TAPCoreRoomListManager ()
 
+- (void)fetchNewMessagesWithSuccess:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                            failure:(void (^)(NSError *error))failure;
+
 @end
 
 @implementation TAPCoreRoomListManager

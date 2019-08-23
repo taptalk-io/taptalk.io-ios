@@ -2457,7 +2457,12 @@
             return color;
             break;
         }
-
+        case TAPComponentColorIconMenuNewGroup:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
     //Chat / Group Profile
         case TAPComponentColorIconChatProfileMenuNotificationActive:
         {

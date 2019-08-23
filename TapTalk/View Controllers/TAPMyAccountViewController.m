@@ -81,7 +81,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-}
+ }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -598,9 +598,12 @@
             [self.delegate myAccountViewControllerDidTappedLogoutButton];
         }
         
-            [[TapTalk sharedInstance] logoutAndClearAllDataWithSuccess:^{
+            [[TapTalk sharedInstance] logoutAndClearAllTapTalkDataWithSuccess:^{
                 [self dismissViewControllerAnimated:NO completion:nil];
                 [self.myAccountView showLogoutLoadingView:NO];
+                
+                TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
+                [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapUI sharedInstance] roomListViewController] force:YES];
             } failure:^(NSError *error) {
                 //Show alert
                 [self.myAccountView showLogoutLoadingView:NO];
