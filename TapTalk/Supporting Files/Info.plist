@@ -15,19 +15,19 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.0.5</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs to request access to your camera to take profile picture and to send image chat, for our expert, we also need camera access to upload portfolio and services</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs to request access to your location to send location chat</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs to request access to your camera to take profile picture and to send image chat, for our expert, we also need camera access to upload portfolio and services</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs to request access to your location to send location chat</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>PTRootUI-Bold.ttf</string>
