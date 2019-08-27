@@ -91,24 +91,6 @@
     }
 }
 
-- (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveOnlineStatus:)]) {
-        [self.delegate tapTalkDidReceiveOnlineStatus:onlineStatus];
-    }
-}
-
-- (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidStartTyping:)]) {
-        [self.delegate tapTalkDidStartTyping:typing];
-    }
-}
-
-- (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidStopTyping:)]) {
-        [self.delegate tapTalkDidStopTyping:typing];
-    }
-}
-
 - (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message {
     if ([self.blockDictionary objectForKey:message.localID]) {
         NSDictionary *blockTypeDictionary = [self.blockDictionary objectForKey:message.localID];

@@ -10,7 +10,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TAPCoreChatRoomManagerDelegate <NSObject>
+
+- (void)tapTalkDidStartTypingWithUser:(TAPUserModel *)user roomID:(NSString *)roomID;
+- (void)tapTalkDidStopTypingWithUser:(TAPUserModel *)user roomID:(NSString *)roomID;
+- (void)tapTalkDidReceiveOnlineStatusWithUser:(TAPUserModel *)user onlineStatus:(BOOL)isOnline lastActive:(NSNumber *)lastActive;
+
+@end
+
 @interface TAPCoreChatRoomManager : NSObject
+
+@property (weak, nonatomic) id<TAPCoreChatRoomManagerDelegate> delegate;
 
 + (TAPCoreChatRoomManager *)sharedManager;
 

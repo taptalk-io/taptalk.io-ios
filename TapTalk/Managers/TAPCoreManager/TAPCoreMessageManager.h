@@ -16,9 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tapTalkDidReceiveNewMessageInOtherRoom:(TAPMessageModel *)message;
 - (void)tapTalkDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message;
 - (void)tapTalkDidReceiveUpdateMessageInOtherRoom:(TAPMessageModel *)message;
-- (void)tapTalkDidStartTyping:(TAPTypingModel *)typing;
-- (void)tapTalkDidStopTyping:(TAPTypingModel *)typing;
-- (void)tapTalkDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus;
 
 @end
 

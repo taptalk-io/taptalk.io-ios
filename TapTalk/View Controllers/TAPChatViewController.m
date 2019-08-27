@@ -456,10 +456,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    NSArray *keyboardArray = [[TAPCustomKeyboardManager sharedManager] getCustomKeyboardWithSender:currentUser recipient:self.otherUser];
+    NSArray *keyboardArray = [NSArray array];
+    id<TAPCustomKeyboardManagerDelegate> customKeyboardManagerDelegate = [TAPCustomKeyboardManager sharedManager].delegate;
+    if ([customKeyboardManagerDelegate respondsToSelector:@selector(setCustomKeyboardItemsForRoom:sender:recipient:)]) {
+        keyboardArray = [customKeyboardManagerDelegate setCustomKeyboardItemsForRoom:self.currentRoom sender:currentUser recipient:self.otherUser];
+    }
+    
     if([keyboardArray count] > 0) {
         //There's custom keyboard for this type
-        [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:self.otherUser];
+        [self.keyboardViewController setCustomKeyboardArray:keyboardArray sender:currentUser recipient:self.otherUser room:self.currentRoom];
         _isCustomKeyboardAvailable = YES;
     }
     else {
@@ -6793,8 +6798,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.secondaryTextField resignFirstResponder];
     
     id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-    if ([tapUIDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:)]) {
-        [tapUIDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser];
+    if ([tapUIDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:currentShownNavigationController:)]) {
+        [tapUIDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser currentShownNavigationController:self.navigationController];
     }
     else {
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];

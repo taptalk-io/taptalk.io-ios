@@ -25,9 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param viewController (UIViewController) view controller that will be shown
  @param otherUser (TapUserModel *) user data that will be shown
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+
  */
 - (void)tapTalkChatRoomProfileButtonTapped:(UIViewController *)viewController
-                                 otherUser:(TAPUserModel *)otherUser;
+                                 otherUser:(TAPUserModel *)otherUser
+          currentShownNavigationController:(UINavigationController *)currentNavigationController;
 
 //Message Quote
 /**

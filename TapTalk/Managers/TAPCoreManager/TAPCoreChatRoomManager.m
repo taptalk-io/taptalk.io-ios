@@ -9,7 +9,7 @@
 #import "TAPCoreChatRoomManager.h"
 #import "TAPCoreContactManager.h"
 
-@interface TAPCoreChatRoomManager ()
+@interface TAPCoreChatRoomManager () <TAPChatManagerDelegate>
 
 @end
 
@@ -35,14 +35,37 @@
     self = [super init];
     
     if (self) {
-        
+        //Add chat manager delegate
+        [[TAPChatManager sharedManager] addDelegate:self];
+
     }
     
     return self;
 }
 
 - (void)dealloc {
-    
+    //Remove chat manager delegate
+    [[TAPChatManager sharedManager] removeDelegate:self];
+}
+
+#pragma mark - Delegate
+#pragma mark TAPChatManager
+- (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveOnlineStatusWithUser:onlineStatus:lastActive:)]) {
+        [self.delegate tapTalkDidReceiveOnlineStatusWithUser:onlineStatus.user onlineStatus:onlineStatus.isOnline lastActive:onlineStatus.lastActive];
+    }
+}
+
+- (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidStartTypingWithUser:roomID:)]) {
+        [self.delegate tapTalkDidStartTypingWithUser:typing.user roomID:typing.roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidStopTypingWithUser:roomID:)]) {
+        [self.delegate tapTalkDidStopTypingWithUser:typing.user roomID:typing.roomID];
+    }
 }
 
 #pragma mark - Custom Method
