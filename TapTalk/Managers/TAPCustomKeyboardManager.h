@@ -13,12 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPCustomKeyboardManagerDelegate <NSObject>
 
-- (void)customKeyboardItemTappedWithSender:(TAPUserModel *)sender
-                                 recipient:(TAPUserModel *)recipient
-                              keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
+- (void)customKeyboardItemTappedWithRoom:(TAPRoomModel * _Nonnull)room
+                                  sender:(TAPUserModel * _Nonnull)sender
+                               recipient:(TAPUserModel * _Nullable)recipient
+                            keyboardItem:(TAPCustomKeyboardItemModel * _Nonnull)keyboardItem;
 
-- (NSArray<TAPCustomKeyboardItemModel *> *)setCustomKeyboardItemsForSender:(TAPUserModel *)sender
-                                                                 recipient:(TAPUserModel *)recipient;
+- (NSArray<TAPCustomKeyboardItemModel *> *)setCustomKeyboardItemsForRoom:(TAPRoomModel * _Nonnull)room
+                                                                  sender:(TAPUserModel * _Nonnull)sender
+                                                               recipient:(TAPUserModel * _Nullable)recipient;
 
 @end
 
@@ -27,13 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id<TAPCustomKeyboardManagerDelegate> delegate;
 
 + (TAPCustomKeyboardManager *)sharedManager;
-
-- (void)customKeyboardTappedWithSender:(TAPUserModel *)sender
-                             recipient:(TAPUserModel *)recipient
-                          keyboardItem:(TAPCustomKeyboardItemModel *)keyboardItem;
-
-- (NSArray *)getCustomKeyboardWithSender:(TAPUserModel *)sender
-                               recipient:(TAPUserModel *)recipient;
 
 @end
 

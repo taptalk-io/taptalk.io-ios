@@ -31,77 +31,217 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 @protocol TapTalkDelegate <NSObject>
 
 //Authentication
-- (void)tapTalkShouldResetAuthTicket;
+- (void)tapTalkRefreshTokenExpired;
 
 //Badge
 - (void)tapTalkUnreadChatRoomBadgeCountUpdated:(NSInteger)numberOfUnreadRooms;
 
 //Notification
 - (void)tapTalkDidRequestRemoteNotification;
-- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message;
-- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *)message fromActiveController:(UIViewController *)currentActiveController;
+- (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *_Nonnull)message fromActiveController:(nullable UIViewController *)currentActiveController;
 
 @end
 
 @interface TapTalk : NSObject
 
-@property (weak, nonatomic) id<TapTalkDelegate> delegate;
+@property (weak, nonatomic) id<TapTalkDelegate> _Nullable delegate;
 @property (nonatomic) TapTalkInstanceState instanceState;
-@property (strong, nonatomic) NSDictionary *projectConfigsDictionary;
-@property (strong, nonatomic) NSDictionary *customConfigsDictionary;
 
 //Initalization
-+ (TapTalk *)sharedInstance;
++ (TapTalk *_Nonnull)sharedInstance;
 
-//Authentication
-- (void)authenticateWithAuthTicket:(NSString *)authTicket
+//==========================================================
+//                     Authentication
+//==========================================================
+/**
+ Authenticate user to TapTalk.io server by providing the auth ticket
+ set connectWhenSuccess to YES if you want to connect to TapTalk.io automatically after authentication
+ */
+- (void)authenticateWithAuthTicket:(NSString *_Nonnull)authTicket
                 connectWhenSuccess:(BOOL)connectWhenSuccess
-                           success:(void (^)(void))success
-                           failure:(void (^)(NSError *error))failure;
-- (BOOL)isAuthenticated;
-- (void)connectWithSuccess:(void (^)(void))success
-                   failure:(void (^)(NSError *error))failure;
-- (void)disconnectWithCompletionHandler:(void (^)(void))completion;
-- (void)enableAutoConnect;
-- (void)disableAutoConnect;
-- (BOOL)getAutoConnectStatus;
+                           success:(void (^_Nonnull)(void))success
+                           failure:(void (^_Nonnull)(NSError * _Nonnull error))failure;
 
-//AppDelegate Handling
-- (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
-- (void)applicationWillResignActive:(UIApplication *)application;
-- (void)applicationDidEnterBackground:(UIApplication *)application;
-- (void)applicationWillEnterForeground:(UIApplication *)application;
-- (void)applicationDidBecomeActive:(UIApplication *)application;
-- (void)applicationWillTerminate:(UIApplication *)application;
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken;
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler;
-- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification;
+/**
+ To check if user authenticated to TapTalk.io server or not
+ return YES if the user is authenticated to TapTalk.io server
+ */
+- (BOOL)isAuthenticated;
+
+/**
+ Logout from TapTalk.io and clear all local cached data
+ */
+- (void)logoutAndClearAllTapTalkDataWithSuccess:(void (^_Nonnull)(void))success
+                                        failure:(void (^_Nonnull)(NSError *_Nonnull error))failure;
+
+/**
+ Clear all local cached data
+ */
+- (void)clearAllTapTalkData;
+
+//==========================================================
+//                       Connection
+//==========================================================
+/**
+ To enable auto connect to TapTalk.io server
+ TapTalk will automatically connect to server everytime user open the app
+ */
+- (void)connectWithSuccess:(void (^_Nonnull)(void))success
+                   failure:(void (^_Nonnull)(NSError *_Nonnull error))failure;
+
+/**
+ To enable auto connect to TapTalk.io server
+ TapTalk will automatically connect to server everytime user open the app
+ */
+- (void)disconnectWithCompletionHandler:(void (^_Nonnull)(void))completion;
+
+/**
+ To enable auto connect to TapTalk.io server
+ TapTalk will automatically connect to server everytime user open the app
+ */
+- (void)enableAutoConnect;
+
+/**
+ To disable auto connect to TapTalk.io server
+ */
+- (void)disableAutoConnect;
+
+/**
+ To obtain auto connect status
+ return YES if auto connect status is enabled
+ */
+- (BOOL)isAutoConnectEnabled;
+
+/**
+ To check if user connected to TapTalk.io server or not
+ return YES if the user is connected to TapTalk.io server
+ */
+- (BOOL)isConnected;
+
+//==========================================================
+//            UIApplicationDelegate Handling
+//==========================================================
+/**
+ Tells the delegate that the launch process is almost done and the app is almost ready to run.
+ */
+- (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nonnull)launchOptions;
+
+/**
+ Tells the delegate that the app is about to become inactive.
+ */
+- (void)applicationWillResignActive:(UIApplication *_Nonnull)application;
+
+/**
+ Tells the delegate that the app is now in the background.
+ */
+- (void)applicationDidEnterBackground:(UIApplication *_Nonnull)application;
+
+/**
+ Tells the delegate that the app is about to enter the foreground.
+ */
+- (void)applicationWillEnterForeground:(UIApplication *_Nonnull)application;
+
+/**
+ Tells the delegate that the app has become active.
+ */
+- (void)applicationDidBecomeActive:(UIApplication *_Nonnull)application;
+
+/**
+ Tells the delegate when the app is about to terminate.
+ */
+- (void)applicationWillTerminate:(UIApplication *_Nonnull)application;
+
+/**
+ Tells the delegate that the app successfully registered with Apple Push Notification service (APNs).
+ */
+- (void)application:(UIApplication *_Nonnull)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *_Nonnull)deviceToken;
+
+/**
+ Tells the app that a remote notification arrived that indicates there is data to be fetched.
+ */
+- (void)application:(UIApplication *_Nonnull)application didReceiveRemoteNotification:(NSDictionary *_Nonnull)userInfo fetchCompletionHandler:(void (^_Nonnull)(UIBackgroundFetchResult result))completionHandler;
 
 //Push Notification
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler;
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)())completionHandler;
+/**
+ Asks the delegate how to handle a notification that arrived while the app was running in the foreground.
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *_Nonnull)center willPresentNotification:(UNNotification *_Nonnull)notification withCompletionHandler:(void (^_Nonnull)(UNNotificationPresentationOptions options))completionHandler;
+
+/**
+ Asks the delegate to process the user's response to a delivered notification.
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *_Nonnull)center didReceiveNotificationResponse:(UNNotificationResponse *_Nonnull)response withCompletionHandler:(void(^_Nonnull)(void))completionHandler;
 
 //Exception Handling
-- (void)handleException:(NSException *)exception;
+/**
+ Called when the application throws the exception
+ */
+- (void)handleException:(NSException * _Nonnull)exception;
 
-//Custom Method
-//General Set Up
-- (void)initWithAppKeyID:(NSString *)appKeyID
-            appKeySecret:(NSString *)appKeySecret
-            apiURLString:(NSString *)apiURLString
+
+//==========================================================
+//                  General Setup & Methods
+//==========================================================
+/**
+ Initialize app to TapTalk.io by providing app key credentials, url, and implementation type
+ */
+- (void)initWithAppKeyID:(NSString *_Nonnull)appKeyID
+            appKeySecret:(NSString *_Nonnull)appKeySecret
+            apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType;
-- (void)refreshActiveUser;
-- (void)updateUnreadBadgeCount;
-- (TAPUserModel *)getTapTalkActiveUser;
 
-//Chat
-- (void)getTapTalkUserWithClientUserID:(NSString *)clientUserID success:(void (^)(TAPUserModel *tapTalkUser))success failure:(void (^)(NSError *error))failure;
-
-//Other
-- (void)refreshRemoteConfigs;
+/**
+ Obtain the implementation type of TapTalk.io set by user
+ 
+ enum TapTalkImplentationType:
+ TapTalkImplentationTypeUI,
+ TapTalkImplentationTypeCore,
+ TapTalkImplentationTypeCombine
+ */
 - (TapTalkImplentationType)getTapTalkImplementationType;
-- (void)logoutAndClearAllDataWithSuccess:(void (^)(void))success
-                                 failure:(void (^)(NSError *error))failure;
-- (void)clearAllData;
+
+/**
+ Fetch latest unread badge count and called tapTalkUnreadChatRoomBadgeCountUpdated: method in TapTalk delegate
+ */
+- (void)updateUnreadBadgeCount;
+
+/**
+ Fetch latest remote configs data
+ */
+- (void)refreshRemoteConfigs;
+
+/**
+ Get core configs data
+ */
+- (NSDictionary *)getCoreConfigs;
+
+/**
+ Get project configs data
+ */
+- (NSDictionary *)getProjectConfigs;
+
+/**
+ Get custom configs data
+ */
+- (NSDictionary *)getCustomConfigs;
+
+/**
+ Set Google Places API Key to pick and obtain location when send location chat
+ */
+- (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey;
+
+//==========================================================
+//                          User
+//==========================================================
+/**
+ Refresh latest active user data from the server
+ */
+- (void)refreshActiveUser;
+
+/**
+ Obtain active user data
+ return nil if active user data is not found
+ */
+- (TAPUserModel *_Nonnull)getTapTalkActiveUser;
 
 @end

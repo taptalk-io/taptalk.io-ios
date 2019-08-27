@@ -76,8 +76,6 @@
     
     [self.roomListView.startChatNoChatsButton addTarget:self action:@selector(openNewChatViewController) forControlEvents:UIControlEventTouchDown];
     
-    self.title = NSLocalizedString(@"Chats", @"");
-    
     //LeftBarButton
     _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     
@@ -548,8 +546,8 @@
         [[TAPChatManager sharedManager] disconnect];
         
         id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkShouldResetAuthTicket)]) {
-            [tapTalkDelegate tapTalkShouldResetAuthTicket];
+        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
+            [tapTalkDelegate tapTalkRefreshTokenExpired];
         }
         
         return; //User not logged in

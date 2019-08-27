@@ -64,7 +64,7 @@
 + (void)getMessageWithRoomID:(NSString *)roomID
         lastMessageTimeStamp:(NSNumber *)timeStamp
                    limitData:(NSInteger)limit
-                     success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                     success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
                      failure:(void (^)(NSError *error))failure;
 + (void)getAllMessageWithRoomID:(NSString *)roomID
                       sortByKey:(NSString *)columnName

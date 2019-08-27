@@ -105,11 +105,83 @@
     return chatViewController;
 }
 
+- (void)openRoomWithUserID:(NSString *)userID
+             prefilledText:(NSString *)prefilledText
+          customQuoteTitle:(nullable NSString *)customQuoteTitle
+        customQuoteContent:(nullable NSString *)customQuoteContent
+ customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                  userInfo:(nullable NSDictionary *)userInfo
+                   success:(void (^)(TAPChatViewController *chatViewController))success
+                   failure:(void (^)(NSError *error))failure {
+    //Check is user exist in TapTalk database
+    [TAPDataManager getDatabaseContactByUserID:userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
+        if (isContact) {
+            //User is in contact
+            //Create quote model and set quote to chat
+            
+            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
+            
+            if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
+                TAPQuoteModel *quote = [TAPQuoteModel new];
+                quote.title = customQuoteTitle;
+                quote.content = customQuoteContent;
+                quote.imageURL = customQuoteImageURL;
+                
+                [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+            }
+            
+            NSString *draftMessage = [TAPUtil nullToEmptyString:prefilledText];
+            if (![draftMessage isEqualToString:@""]) {
+                [[TAPChatManager sharedManager] saveMessageToDraftWithMessage:draftMessage roomID:room.roomID];
+            }
+            
+            //Open room
+            TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:obtainedUser];
+            success(obtainedChatViewController);
+        }
+        else {
+            //User not in contact, call API to obtain user data
+            [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
+                //Create quote model and set quote to chat
+                TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+                
+                //Save user to ContactManager Dictionary
+                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+                
+                if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
+                    TAPQuoteModel *quote = [TAPQuoteModel new];
+                    quote.title = customQuoteTitle;
+                    quote.content = customQuoteContent;
+                    quote.imageURL = customQuoteImageURL;
+                    
+                    [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
+                }
+                
+                NSString *draftMessage = [TAPUtil nullToEmptyString:prefilledText];
+                if (![draftMessage isEqualToString:@""]) {
+                    [[TAPChatManager sharedManager] saveMessageToDraftWithMessage:draftMessage roomID:room.roomID];
+                }
+                
+                //Open room
+                TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:user];
+                success(obtainedChatViewController);
+                
+            } failure:^(NSError *error) {
+                NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+                failure(localizedError);
+            }];
+        }
+    } failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
 - (void)openRoomWithXCUserID:(NSString *)XCUserID
                prefilledText:(NSString *)prefilledText
-                  quoteTitle:(nullable NSString *)quoteTitle
-                quoteContent:(nullable NSString *)quoteContent
-         quoteImageURLString:(nullable NSString *)quoteImageURL
+            customQuoteTitle:(nullable NSString *)customQuoteTitle
+          customQuoteContent:(nullable NSString *)customQuoteContent
+   customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
                     userInfo:(nullable NSDictionary *)userInfo
                      success:(void (^)(TAPChatViewController *chatViewController))success
                      failure:(void (^)(NSError *error))failure {
@@ -121,11 +193,11 @@
             
             TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:obtainedUser];
             
-            if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
+            if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
                 TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quoteTitle;
-                quote.content = quoteContent;
-                quote.imageURL = quoteImageURL;
+                quote.title = customQuoteTitle;
+                quote.content = customQuoteContent;
+                quote.imageURL = customQuoteImageURL;
                 
                 [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
             }
@@ -148,11 +220,11 @@
                 //Save user to ContactManager Dictionary
                 [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
                 
-                if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
+                if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
                     TAPQuoteModel *quote = [TAPQuoteModel new];
-                    quote.title = quoteTitle;
-                    quote.content = quoteContent;
-                    quote.imageURL = quoteImageURL;
+                    quote.title = customQuoteTitle;
+                    quote.content = customQuoteContent;
+                    quote.imageURL = customQuoteImageURL;
                     
                     [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
                 }
@@ -178,17 +250,17 @@
 }
 
 - (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room
-                                 quoteTitle:(nullable NSString *)quoteTitle
-                               quoteContent:(nullable NSString *)quoteContent
-                        quoteImageURLString:(nullable NSString *)quoteImageURL
+                           customQuoteTitle:(nullable NSString *)customQuoteTitle
+                         customQuoteContent:(nullable NSString *)customQuoteContent
+                  customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
                                    userInfo:(nullable NSDictionary *)userInfo {
     
     //Create quote model and set quote to chat
-    if (![quoteTitle isEqualToString:@""] && quoteTitle != nil) {
+    if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
         TAPQuoteModel *quote = [TAPQuoteModel new];
-        quote.title = quoteTitle;
-        quote.content = quoteContent;
-        quote.imageURL = quoteImageURL;
+        quote.title = customQuoteTitle;
+        quote.content = customQuoteContent;
+        quote.imageURL = customQuoteImageURL;
         
         [[TAPChatManager sharedManager] saveToQuotedMessage:quote userInfo:userInfo roomID:room.roomID];
     }

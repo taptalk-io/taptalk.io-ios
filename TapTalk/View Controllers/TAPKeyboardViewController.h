@@ -16,12 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray *customKeyboardArray;
 @property (strong, nonatomic) TAPUserModel *sender;
 @property (strong, nonatomic) TAPUserModel *recipient;
+@property (strong, nonatomic) TAPRoomModel *room;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *customInputViewHeightConstraint;
 
 - (void)setCustomKeyboardArray:(NSArray *)customKeyboardArray
                         sender:(TAPUserModel *)sender
-                     recipient:(TAPUserModel *)recipient;
+                     recipient:(TAPUserModel *)recipient
+                          room:(TAPRoomModel *)room;
 
 @end
 

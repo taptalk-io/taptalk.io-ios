@@ -15,8 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPCoreRoomListManager *)sharedManager;
 
-- (void)fetchNewMessagesWithSuccess:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
-                            failure:(void (^)(NSError *error))failure;
 - (void)getRoomListFromCacheWithSuccess:(void (^)(NSArray <TAPRoomListModel *> *roomListResultArray))success
                                 failure:(void (^)(NSError *error))failure;
 - (void)getUpdatedRoomListWithSuccess:(void (^)(NSArray <TAPRoomListModel *> *roomListArray))success

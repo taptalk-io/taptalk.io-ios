@@ -92,7 +92,11 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     TAPCustomKeyboardItemModel *keyboardItem = [self.customKeyboardArray objectAtIndex:indexPath.row];
-    [[TAPCustomKeyboardManager sharedManager] customKeyboardTappedWithSender:self.sender recipient:self.recipient keyboardItem:keyboardItem];
+    
+    id<TAPCustomKeyboardManagerDelegate> customKeyboardManagerDelegate = [TAPCustomKeyboardManager sharedManager].delegate;
+    if ([customKeyboardManagerDelegate respondsToSelector:@selector(customKeyboardItemTappedWithRoom:sender:recipient:keyboardItem:)]) {
+        [customKeyboardManagerDelegate customKeyboardItemTappedWithRoom:self.room sender:self.sender recipient:self.recipient keyboardItem:keyboardItem];
+    }
 }
 
 #pragma mark - Custom Method
@@ -103,10 +107,12 @@
 
 - (void)setCustomKeyboardArray:(NSArray *)customKeyboardArray
                         sender:(TAPUserModel *)sender
-                     recipient:(TAPUserModel *)recipient {
+                     recipient:(TAPUserModel *)recipient
+                          room:(TAPRoomModel *)room {
     _customKeyboardArray = customKeyboardArray;
     _sender = sender;
     _recipient = recipient;
+    _room = room;
     [self.tableView reloadData];
 }
 

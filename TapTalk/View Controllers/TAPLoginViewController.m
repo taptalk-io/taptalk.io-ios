@@ -274,7 +274,7 @@
     if (![[TapTalk sharedInstance] isAuthenticated] || force) {
         
         //Prevention to clear existing data
-        [[TapTalk sharedInstance] clearAllData];
+        [[TapTalk sharedInstance] clearAllTapTalkData];
         
         [viewController presentViewController:loginNavigationController animated:YES completion:nil];
     }
