@@ -15,9 +15,9 @@ Pod::Spec.new do |s|
   #  summary should be tweet-length, and the description more in depth.
   #
 
-  s.name         = "TapTalk"
+  s.name         = "TapTalk.io"
   s.version      = "1.0.5"
-  s.summary      = "Powerful Chat Engine"
+  s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = "A powerful chat engine."
 
-  s.homepage     = "https://www.moselo.com"
+  s.homepage     = "https://taptalk.io"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
