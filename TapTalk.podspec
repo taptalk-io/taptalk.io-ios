@@ -78,7 +78,7 @@ Pod::Spec.new do |s|
   #
 
 #   s.source       = { :path => '.' }
-    s.source       = { :git => 'git@github.com:taptalk-io/taptalk.io-ios.git', :tag => '1.0.5' }
+    s.source       = { :git => 'https://github.com/taptalk-io/taptalk.io-ios.git', :tag => '1.0.5' }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
