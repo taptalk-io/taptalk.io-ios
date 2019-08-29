@@ -8,6 +8,7 @@
 
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
+#import <CoreText/CoreText.h>
 
 @import AFNetworking;
 @import GooglePlaces;
@@ -24,6 +25,7 @@
 
 - (void)firstRunSetupWithApplication:(UIApplication *)application launchOptions:(NSDictionary *)launchOptions;
 - (void)resetPersistent;
+- (void)loadCustomFontData;
 
 @end
 
@@ -170,6 +172,9 @@
     [self firstRunSetupWithApplication:application launchOptions:launchOptions];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_DID_FINISH_LAUNCHING object:application];
+    
+    //Load custom font data
+    [self loadCustomFontData];
     
     //Update to isFailedSend = 1
     [[TAPChatManager sharedManager] updateSendingMessageToFailed];
@@ -534,6 +539,24 @@
 
 - (TAPUserModel *_Nonnull)getTapTalkActiveUser {
     return [TAPDataManager getActiveUser];
+}
+
+- (void)loadCustomFontData {
+    NSArray *fontArray = @[@"DMSans-Italic", @"PTRootUI-Regular", @"PTRootUI-Medium", @"PTRootUI-Bold"];
+    
+    for (NSString *fontName in fontArray) {
+        NSString *fontPath = [[TAPUtil currentBundle] pathForResource:fontName ofType:@"ttf"];
+        NSData *inData = [NSData dataWithContentsOfFile:fontPath];
+        CFErrorRef error;
+        CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)inData);
+        CGFontRef font = CGFontCreateWithDataProvider(provider);
+        if (! CTFontManagerRegisterGraphicsFont(font, &error)) {
+            CFStringRef errorDescription = CFErrorCopyDescription(error);
+            CFRelease(errorDescription);
+        }
+        CFRelease(font);
+        CFRelease(provider);
+    }
 }
 
 @end
