@@ -220,22 +220,22 @@
     if (result) {
         switch (result.resultType) {
             case NSTextCheckingTypeAddress:
-                NSLog(@"Address components: %@", result.addressComponents);
+//                NSLog(@"Address components: %@", result.addressComponents);
                 break;
                 
             case NSTextCheckingTypePhoneNumber:
-                NSLog(@"Phone number: %@", result.phoneNumber);
+//                NSLog(@"Phone number: %@", result.phoneNumber);
                 if([self.delegate respondsToSelector:@selector(myImageDidTappedPhoneNumber:originalString:)]) {
                     [self.delegate myImageDidTappedPhoneNumber:result.phoneNumber originalString:selectedWord];
                 }
                 break;
                 
             case NSTextCheckingTypeDate:
-                NSLog(@"Date: %@", result.date);
+//                NSLog(@"Date: %@", result.date);
                 break;
                 
             case NSTextCheckingTypeLink:
-                NSLog(@"Link: %@", result.URL);
+//                NSLog(@"Link: %@", result.URL);
                 if([self.delegate respondsToSelector:@selector(myImageDidTappedUrl:originalString:)]) {
                     [self.delegate myImageDidTappedUrl:result.URL originalString:selectedWord];
                 }
@@ -264,22 +264,22 @@
     if (result) {
         switch (result.resultType) {
             case NSTextCheckingTypeAddress:
-                NSLog(@"Address components: %@", result.addressComponents);
+//                NSLog(@"Address components: %@", result.addressComponents);
                 break;
                 
             case NSTextCheckingTypePhoneNumber:
-                NSLog(@"Phone number: %@", result.phoneNumber);
+//                NSLog(@"Phone number: %@", result.phoneNumber);
                 if([self.delegate respondsToSelector:@selector(myImageLongPressedPhoneNumber:originalString:)]) {
                     [self.delegate myImageLongPressedPhoneNumber:result.phoneNumber originalString:selectedWord];
                 }
                 break;
                 
             case NSTextCheckingTypeDate:
-                NSLog(@"Date: %@", result.date);
+//                NSLog(@"Date: %@", result.date);
                 break;
                 
             case NSTextCheckingTypeLink:
-                NSLog(@"Link: %@", result.URL);
+//                NSLog(@"Link: %@", result.URL);
                 if([self.delegate respondsToSelector:@selector(myImageLongPressedUrl:originalString:)]) {
                     [self.delegate myImageLongPressedUrl:result.URL originalString:selectedWord];
                 }
@@ -448,11 +448,6 @@
             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
             [self.contentView layoutIfNeeded];
         }
-        
-#ifdef DEBUG
-        NSLog(@"CELL WIDTH %f CELL HEIGHT %f", self.cellWidth, self.cellHeight);
-#endif
-        
         NSDictionary *dataDictionary = message.data;
 //        PHAsset *asset = nil;
 //        asset = [dataDictionary objectForKey:@"asset"];
@@ -853,7 +848,6 @@
     _newProgress = progress/total;
 
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
 
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];

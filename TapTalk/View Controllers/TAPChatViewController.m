@@ -7380,9 +7380,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //Temporary delete for everyone
     //Delete For Everyone
     [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
-#ifdef DEBUG
-        NSLog(@"DELETE MESSAGE ID ARRAY: %@", [deletedMessageIDArray description]);
-#endif
+        
     } failure:^(NSError *error) {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Failed to delete message, please try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];

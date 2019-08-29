@@ -78,9 +78,7 @@
                             
                             //Get All message of selected room
                             [TAPDataManager getAllMessageWithRoomID:room.roomID sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *messageArray) {
-#ifdef DEBUG
-                                NSLog(@"MESSAGE COUNT: %ld ROOM NAME: %@", [messageArray count], room.name);
-#endif
+                                
                                 if ([messageArray count] > TAP_NUMBER_OF_ITEMS_CHAT) {
 #ifdef DEBUG
                                     NSLog(@"Message more than one page with room name: %@", room.name);

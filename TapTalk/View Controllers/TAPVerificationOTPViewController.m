@@ -119,8 +119,6 @@
     
     [self.verificationOTPView inputCodeWithUserInputData:newString];
     
-    NSLog(@"LENGTH %ld", newString.length);
-    
     if(newString.length == 6) {
         //Done input code, verify code
         [self.verificationOTPView showInputCodeAsFilled];

@@ -444,14 +444,7 @@
     }
 }
 
-- (void)setLocationButtonDidTapped {
-#ifdef DEBUG
-    NSLog(@"===== PICK LOCATION =====");
-    NSLog(@"===== lat: %lf, long: %lf =====", self.selectedLocationCoordinate.latitude, self.selectedLocationCoordinate.longitude);
-    NSLog(@"===== address: %@ =====", self.selectedLocationAddress);
-    NSLog(@"===== postal code: %@ =====", self.selectedPostalCode);
-#endif
-    
+- (void)setLocationButtonDidTapped {    
     if ([self.delegate respondsToSelector:@selector(pickLocationViewControllerSetLocationWithLatitude:longitude:address:postalCode:)]) {
         [self.delegate pickLocationViewControllerSetLocationWithLatitude:self.selectedLocationCoordinate.latitude longitude:self.selectedLocationCoordinate.longitude address:self.selectedLocationAddress postalCode:self.selectedPostalCode];
     }
