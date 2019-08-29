@@ -8,6 +8,7 @@
 
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
+#import <CoreText/CoreText.h>
 
 @import AFNetworking;
 @import GooglePlaces;
@@ -24,6 +25,7 @@
 
 - (void)firstRunSetupWithApplication:(UIApplication *)application launchOptions:(NSDictionary *)launchOptions;
 - (void)resetPersistent;
+- (void)loadCustomFontData;
 
 @end
 
@@ -171,6 +173,9 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_APPLICATION_DID_FINISH_LAUNCHING object:application];
     
+    //Load custom font data
+    [self loadCustomFontData];
+    
     //Update to isFailedSend = 1
     [[TAPChatManager sharedManager] updateSendingMessageToFailed];
     
@@ -300,7 +305,6 @@
 #pragma mark - Push Notification
 - (void)userNotificationCenter:(UNUserNotificationCenter *_Nonnull)center willPresentNotification:(UNNotification *_Nonnull)notification withCompletionHandler:(void (^_Nonnull)(UNNotificationPresentationOptions options))completionHandler {
     //Called when a notification is delivered to a foreground app.
-    NSLog(@"User Info : %@",notification.request.content.userInfo);
     completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
 }
 
@@ -535,6 +539,24 @@
 
 - (TAPUserModel *_Nonnull)getTapTalkActiveUser {
     return [TAPDataManager getActiveUser];
+}
+
+- (void)loadCustomFontData {
+    NSArray *fontArray = @[@"DMSans-Italic", @"PTRootUI-Regular", @"PTRootUI-Medium", @"PTRootUI-Bold"];
+    
+    for (NSString *fontName in fontArray) {
+        NSString *fontPath = [[TAPUtil currentBundle] pathForResource:fontName ofType:@"ttf"];
+        NSData *inData = [NSData dataWithContentsOfFile:fontPath];
+        CFErrorRef error;
+        CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)inData);
+        CGFontRef font = CGFontCreateWithDataProvider(provider);
+        if (! CTFontManagerRegisterGraphicsFont(font, &error)) {
+            CFStringRef errorDescription = CFErrorCopyDescription(error);
+            CFRelease(errorDescription);
+        }
+        CFRelease(font);
+        CFRelease(provider);
+    }
 }
 
 @end

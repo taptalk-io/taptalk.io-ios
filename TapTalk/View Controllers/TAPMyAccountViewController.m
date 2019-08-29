@@ -372,7 +372,6 @@
             [self refreshButtonState];
         }
     } failure:^(NSError *error) {
-        //        NSLog(@"ERROR - %@", error);
         _isUsernameValid = NO;
         [self.myAccountView.usernameTextField setAsError:YES animated:YES];
         if (error.code == 999) {

@@ -628,10 +628,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     _showVideoPlayer = YES;
     [[TAPFetchMediaManager sharedManager] fetchVideoDataForAsset:mediaPreview.asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
         
-#ifdef DEBUG
-        NSLog(@"====== PROGRESS DOWNLOAD VIDEO %f", progress);
-#endif
-        
         [cell animateProgressMediaWithProgress:progress total:1.0f];
         if (progress == 1.0f) {
             [TAPUtil performBlock:^{

@@ -751,7 +751,6 @@
     _newProgress = progress/total;
     
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
     
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];

@@ -157,9 +157,7 @@
     CGFloat lastProgress = self.lastProgress;
     _newProgress = progress/total;
     
-    NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
-    
+    NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));    
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
     [self.progressLayer setFrame:self.progressBarView.bounds];

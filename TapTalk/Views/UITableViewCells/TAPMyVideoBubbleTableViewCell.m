@@ -251,22 +251,22 @@
     if (result) {
         switch (result.resultType) {
             case NSTextCheckingTypeAddress:
-                NSLog(@"Address components: %@", result.addressComponents);
+//                NSLog(@"Address components: %@", result.addressComponents);
                 break;
                 
             case NSTextCheckingTypePhoneNumber:
-                NSLog(@"Phone number: %@", result.phoneNumber);
+//                NSLog(@"Phone number: %@", result.phoneNumber);
                 if([self.delegate respondsToSelector:@selector(myVideoDidTappedPhoneNumber:originalString:)]) {
                     [self.delegate myVideoDidTappedPhoneNumber:result.phoneNumber originalString:selectedWord];
                 }
                 break;
                 
             case NSTextCheckingTypeDate:
-                NSLog(@"Date: %@", result.date);
+//                NSLog(@"Date: %@", result.date);
                 break;
                 
             case NSTextCheckingTypeLink:
-                NSLog(@"Link: %@", result.URL);
+//                NSLog(@"Link: %@", result.URL);
                 if([self.delegate respondsToSelector:@selector(myVideoDidTappedUrl:originalString:)]) {
                     [self.delegate myVideoDidTappedUrl:result.URL originalString:selectedWord];
                 }
@@ -295,22 +295,22 @@
     if (result) {
         switch (result.resultType) {
             case NSTextCheckingTypeAddress:
-                NSLog(@"Address components: %@", result.addressComponents);
+//                NSLog(@"Address components: %@", result.addressComponents);
                 break;
                 
             case NSTextCheckingTypePhoneNumber:
-                NSLog(@"Phone number: %@", result.phoneNumber);
+//                NSLog(@"Phone number: %@", result.phoneNumber);
                 if([self.delegate respondsToSelector:@selector(myVideoLongPressedPhoneNumber:originalString:)]) {
                     [self.delegate myVideoLongPressedPhoneNumber:result.phoneNumber originalString:selectedWord];
                 }
                 break;
                 
             case NSTextCheckingTypeDate:
-                NSLog(@"Date: %@", result.date);
+//                NSLog(@"Date: %@", result.date);
                 break;
                 
             case NSTextCheckingTypeLink:
-                NSLog(@"Link: %@", result.URL);
+//                NSLog(@"Link: %@", result.URL);
                 if([self.delegate respondsToSelector:@selector(myVideoLongPressedUrl:originalString:)]) {
                     [self.delegate myVideoLongPressedUrl:result.URL originalString:selectedWord];
                 }
@@ -468,8 +468,6 @@
     }
     else {
         [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
-        
-//        NSLog(@"WIDTH HEIGHT %f %f", self.cellWidth, self.cellHeight);
         
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
@@ -1093,7 +1091,6 @@
     _newProgress = progress/total;
     
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
     
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
@@ -1127,7 +1124,6 @@
     _newProgress = progress/total;
     
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-    //    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
     
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];

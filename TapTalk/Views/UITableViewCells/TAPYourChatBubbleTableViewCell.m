@@ -158,22 +158,22 @@
     if (result) {
         switch (result.resultType) {
             case NSTextCheckingTypeAddress:
-                NSLog(@"Address components: %@", result.addressComponents);
+//                NSLog(@"Address components: %@", result.addressComponents);
                 break;
                 
             case NSTextCheckingTypePhoneNumber:
-                NSLog(@"Phone number: %@", result.phoneNumber);
+//                NSLog(@"Phone number: %@", result.phoneNumber);
                 if([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedPhoneNumber:originalString:)]) {
                     [self.delegate yourChatBubbleDidTappedPhoneNumber:result.phoneNumber originalString:selectedWord];
                 }
                 break;
                 
             case NSTextCheckingTypeDate:
-                NSLog(@"Date: %@", result.date);
+//                NSLog(@"Date: %@", result.date);
                 break;
                 
             case NSTextCheckingTypeLink:
-                NSLog(@"Link: %@", result.URL);
+//                NSLog(@"Link: %@", result.URL);
                 if([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedUrl:originalString:)]) {
                     [self.delegate yourChatBubbleDidTappedUrl:result.URL originalString:selectedWord];
                 }
@@ -202,22 +202,22 @@
     if (result) {
         switch (result.resultType) {
             case NSTextCheckingTypeAddress:
-                NSLog(@"Address components: %@", result.addressComponents);
+//                NSLog(@"Address components: %@", result.addressComponents);
                 break;
                 
             case NSTextCheckingTypePhoneNumber:
-                NSLog(@"Phone number: %@", result.phoneNumber);
+//                NSLog(@"Phone number: %@", result.phoneNumber);
                 if([self.delegate respondsToSelector:@selector(yourChatBubbleLongPressedPhoneNumber:originalString:)]) {
                     [self.delegate yourChatBubbleLongPressedPhoneNumber:result.phoneNumber originalString:selectedWord];
                 }
                 break;
                 
             case NSTextCheckingTypeDate:
-                NSLog(@"Date: %@", result.date);
+//                NSLog(@"Date: %@", result.date);
                 break;
                 
             case NSTextCheckingTypeLink:
-                NSLog(@"Link: %@", result.URL);
+//                NSLog(@"Link: %@", result.URL);
                 if([self.delegate respondsToSelector:@selector(yourChatBubbleLongPressedUrl:originalString:)]) {
                     [self.delegate yourChatBubbleLongPressedUrl:result.URL originalString:selectedWord];
                 }

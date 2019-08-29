@@ -147,9 +147,7 @@
         @try {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reloadDataWithString) object:nil];
         } @catch (NSException *exception) {
-#ifdef DEBUG
-            NSLog(@"FAILED TO CANCEL PREVIOUS REQUEST");
-#endif
+
         } @finally {
             
         }
@@ -185,10 +183,6 @@
     [self.addContactPopupView showPopupView:NO animated:NO];
     
     if([self.delegate respondsToSelector:@selector(addNewContactViewControllerShouldOpenNewRoomWithUser:)]) {
-#ifdef DEBUG
-        NSLog(@"SEARCHED USER: %@", [self.searchedUser description]);
-#endif
-        
         NSString *stringFromModel = [self.searchedUser toJSONString];
         [self.delegate addNewContactViewControllerShouldOpenNewRoomWithUser:[[TAPUserModel alloc] initWithString:stringFromModel error:nil]];
     }

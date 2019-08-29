@@ -501,7 +501,6 @@
 }
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
-    NSLog(@"--SHOW REPLY-- %ld", show);
     if (show) {
         //check id message sender is equal to active user id, if yes change the title to "You"
         if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
@@ -552,7 +551,6 @@
 }
 
 - (void)showQuoteView:(BOOL)show {
-    NSLog(@"--SHOW QUOTE %ld", show);
     if (show) {
         self.quoteViewLeadingConstraint.active = YES;
         self.quoteViewTrailingConstraint.active = YES;
@@ -736,7 +734,6 @@
     _newProgress = progress/total;
     
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
     
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
@@ -770,8 +767,6 @@
     _newProgress = progress/total;
     
     NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
-//    NSLog(@"PERCENT %@",[NSString stringWithFormat:@"%ld%%", (long)lastPercentage]);
-    
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
     [self.progressLayer setFrame:self.progressBarView.bounds];

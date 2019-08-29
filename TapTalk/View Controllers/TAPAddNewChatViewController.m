@@ -73,7 +73,6 @@
     [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
         [self loadContactListFromDatabase];
     } failure:^(NSError *error) {
-//        NSLog(@"%@", error);
     }];
     
     _searchResultUserMutableArray = [NSMutableArray array];

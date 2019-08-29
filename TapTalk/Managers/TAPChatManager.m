@@ -186,7 +186,6 @@
     
     NSDictionary *parameterDictionary = @{@"roomID" : roomID};
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStopTyping parameters:parameterDictionary];
-    NSLog(@"--Stop Typing %@", roomID);
 }
 
 - (void)sendMessage:(TAPMessageModel *)message notifyDelegate:(BOOL)notifyDelegate {
@@ -434,9 +433,6 @@
     if (dataDictionary == nil) {
         dataDictionary = [[NSMutableDictionary alloc] init];
     }
-#ifdef DEBUG
-    NSLog(@"IMAGE BEFORE CACHE SIZE HEIGHT: %f, WIDTH: %f", image.size.height, image.size.width);
-#endif
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:image.size.height];
     NSNumber *imageWidth = [NSNumber numberWithFloat:image.size.width];
@@ -1016,10 +1012,6 @@
     [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
     
     decryptedMessage.isSending = NO;
-    
-#ifdef DEBUG
-    NSLog(@"Receive Message (event: %@, localID: %@): %@", eventName, decryptedMessage.localID, decryptedMessage.body);
-#endif
     
     if ([eventName isEqualToString:kTAPEventNewMessage]) {
         //Remove message from waiting response dictionary
