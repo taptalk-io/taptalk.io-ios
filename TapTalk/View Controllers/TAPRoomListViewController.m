@@ -545,9 +545,11 @@
         
         [[TAPChatManager sharedManager] disconnect];
         
-        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-        if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
-            [tapTalkDelegate tapTalkRefreshTokenExpired];
+        if([TapTalk sharedInstance].isAuthenticated) {
+            id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+            if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
+                [tapTalkDelegate tapTalkRefreshTokenExpired];
+            }
         }
         
         return; //User not logged in
