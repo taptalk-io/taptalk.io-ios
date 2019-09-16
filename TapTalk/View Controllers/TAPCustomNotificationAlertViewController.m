@@ -201,12 +201,26 @@
     
     TAPUserModel *user = message.user;
     NSString *profilePictureURL = user.imageURL.thumbnail;
-    NSString *nameString = message.user.fullname;
+    NSString *nameString;
     NSString *messageString = message.body;
-    NSString *contentImageURL = @""; //DV TO DO - Obtain image message
+    UIImage *thumbnailImage = nil;
+    
+    if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+        NSString *thumbnailString = [message.data objectForKey:@"thumbnail"];
+        NSData *thumbnailImageData = [[NSData alloc]
+                                      initWithBase64EncodedString:thumbnailString options:0];
+        thumbnailImage = [UIImage imageWithData:thumbnailImageData];
+    }
+    
+    if (message.room.type == RoomTypeGroup) {
+        nameString = message.room.name;
+    }
+    else {
+        nameString = message.user.fullname;
+    }
     
     BOOL isShowContentImage = NO;
-    if (contentImageURL == nil || [contentImageURL isEqualToString:@""]) {
+    if (thumbnailImage == nil) {
         //Hide content image
         isShowContentImage = NO;
     }
@@ -215,7 +229,6 @@
     }
     
     if (message.type == TAPChatMessageTypeSystemMessage) {
-        
         NSString *targetAction = message.action;
         TAPGroupTargetModel *groupTarget = message.target;
         NSString *targetName = groupTarget.targetName;
@@ -244,19 +257,18 @@
         _currentFirstShownMessage = message;
         self.customNotificationAlertView.nameLabel.text = nameString;
         self.customNotificationAlertView.messageLabel.text = messageString;
-        [self showFirstAnimationHasContentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
+        [self showFirstAnimationHasContentImage:isShowContentImage profilePictureURL:profilePictureURL contentImage:thumbnailImage];
     }
     else {
         //Even message, show secondary notification view
         _currentSecondaryShownMessage = message;
         self.customNotificationAlertView.secondaryNameLabel.text = nameString;
         self.customNotificationAlertView.secondaryMessageLabel.text = messageString;
-        [self showSecondaryAnimationHasContentImage:isShowContentImage profilePictureURL:profilePictureURL contentImageURL:contentImageURL];
+        [self showSecondaryAnimationHasContentImage:isShowContentImage profilePictureURL:profilePictureURL contentImage:thumbnailImage];
     }
-    
 }
 
-- (void)showFirstAnimationHasContentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
+- (void)showFirstAnimationHasContentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImage:(UIImage *)contentImage {
     if (!hasContentImage) {
         //Hide Content Image
         self.customNotificationAlertView.contentImageView.alpha = 0.0f;
@@ -303,11 +315,11 @@
             [self.customNotificationAlertView.profilePictureImage setImageWithURLString:profilePictureURL];
         }
 
-        [self.customNotificationAlertView.contentImageView setImageWithURLString:contentImageURL];
+        [self.customNotificationAlertView.contentImageView setImage:contentImage];
     }
 }
 
-- (void)showSecondaryAnimationHasContentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImageURL:(NSString *)contentImageURL {
+- (void)showSecondaryAnimationHasContentImage:(BOOL)hasContentImage profilePictureURL:(NSString *)profilePictureURL contentImage:(UIImage *)contentImage {
     if (!hasContentImage) {
         //Hide Content Image
         self.customNotificationAlertView.secondaryContentImageView.alpha = 0.0f;
@@ -347,7 +359,7 @@
             [self.customNotificationAlertView.secondaryProfilePictureImage setImageWithURLString:profilePictureURL];
         }
         
-        [self.customNotificationAlertView.secondaryContentImageView setImageWithURLString:contentImageURL];
+        [self.customNotificationAlertView.secondaryContentImageView setImage:contentImage];
     }
 }
 

@@ -5916,9 +5916,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray checkFirstUnreadMessage:(BOOL)checkFirstUnreadMessage toTop:(BOOL)toTop withCompletionHandler:(void(^)())completionHandler {
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    dispatch_async(queue, ^{
-        
+    //DV NOTE
+    //13 Sept 2019
+    //Comment async to prevent crash when in and out to room and insert message and prevent inconsistency data
+    //END DV Note
+//    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+//    dispatch_async(queue, ^{
+    
         NSInteger earliestUnreadMessageIndex = -1;
         long minCreatedUnreadMessage;
         
@@ -5937,6 +5941,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 if (!toTop) {
                     index = [self.messageArray count];
                 }
+
                 [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:index];
                 if (checkFirstUnreadMessage && message.isRead == 0) {
                     //For checking unread message from API After
@@ -5966,7 +5971,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
         
         NSLog(@"numberOfUnreadMessages: %ld", (long)self.numberOfUnreadMessages);
-        
+
+    //DV NOTE
+    //13 Sept 2019
+    //Comment async to prevent crash when in and out to room and insert message and prevent inconsistency data
+    //END DV Note
 //        dispatch_async(dispatch_get_main_queue(), ^{
             //Check to show unread message identifier
             if (!self.isShowingUnreadMessageIdentifier) {
@@ -6008,9 +6017,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
     
             [self sortAndFilterMessageArray];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
+    
+    //DV NOTE
+    //13 Sept 2019
+    //Comment async to prevent crash when in and out to room and insert message and prevent inconsistency data
+    //END DV Note
+//        dispatch_async(dispatch_get_main_queue(), ^{
+    
             [self.tableView reloadData];
             
             //Check to show top unread button
@@ -6024,8 +6037,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self checkEmptyState];
             
             completionHandler();
-        });
-    });
+//        });
+//    });
 }
 
 - (void)updateMessageDataAndUIFromBeforeWithMessages:(NSArray *)messageArray
@@ -6066,8 +6079,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
             
             NSMutableArray *indexPaths = [NSMutableArray array];
-            NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count]
-            ;
+            NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count];
             for (int count = currentCount; count < [self.messageArray count]; count++) {
                 [indexPaths addObject:[NSIndexPath indexPathForRow:count inSection:0]];
             }
@@ -6078,7 +6090,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self.tableView endUpdates];
             [self.tableView scrollsToTop];
         }
-    
+            
             completionHandler();
         });
     });

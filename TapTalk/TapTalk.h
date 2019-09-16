@@ -213,22 +213,38 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 /**
  Get core configs data
  */
-- (NSDictionary *)getCoreConfigs;
+- (NSDictionary *_Nonnull)getCoreConfigs;
 
 /**
  Get project configs data
  */
-- (NSDictionary *)getProjectConfigs;
+- (NSDictionary *_Nonnull)getProjectConfigs;
 
 /**
  Get custom configs data
  */
-- (NSDictionary *)getCustomConfigs;
+- (NSDictionary *_Nonnull)getCustomConfigs;
 
 /**
  Set Google Places API Key to pick and obtain location when send location chat
  */
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey;
+
+/**
+ Enable TapTalk.io to sync your contact automatically
+ Default is enabled
+ */
+- (void)enableAutoContactSync;
+
+/**
+ Disable TapTalk.io to sync your contact automatically
+ */
+- (void)disableAutoContactSync;
+
+/**
+ Obtain auto contact sync status
+*/
+- (BOOL)isAutoContactSyncEnabled;
 
 //==========================================================
 //                          User

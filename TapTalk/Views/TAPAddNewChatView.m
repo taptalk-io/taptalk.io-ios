@@ -52,7 +52,7 @@
         [self.syncedContactNotificationView addSubview:self.syncedContactNotificationLabel];
         
         _syncedContactNotificationCheckMarkImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.syncedContactNotificationLabel.frame) + 4.0f, (CGRectGetHeight(self.syncedContactNotificationView.frame) - 9.0f) / 2.0f, 9.0f, 9.0f)];
-        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconConnected"];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconConnected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.syncedContactNotificationView addSubview:self.syncedContactNotificationCheckMarkImageView];
             
         _searchBarBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), 46.0f)];
@@ -209,7 +209,7 @@
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.syncedContactNotificationView.layer replaceSublayer:[self.syncedContactNotificationView.layer.sublayers objectAtIndex:0] with:gradient];
-        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress"];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.syncedContactNotificationCheckMarkImageView.image = [self.syncedContactNotificationCheckMarkImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressWhite]];
         [self showNotificationLoading:YES];
     }
@@ -220,7 +220,7 @@
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.syncedContactNotificationView.layer replaceSublayer:[self.syncedContactNotificationView.layer.sublayers objectAtIndex:0] with:gradient];
-        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconConnected"];
+        self.syncedContactNotificationCheckMarkImageView.image = [UIImage imageNamed:@"TAPIconConnected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self showNotificationLoading:NO];
     }
     

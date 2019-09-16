@@ -41,10 +41,10 @@
 @property (nonatomic) BOOL isRead;
 @property (nonatomic) BOOL isDelivered;
 @property (nonatomic) BOOL isHidden;
-
 //If add new property, don't forget to update copyMessageModel method
-+ (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type;
-+ (instancetype)createMessageWithUser:(TAPUserModel *)user created:(NSNumber *)created room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type;
+
++ (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type messageData:(NSDictionary * _Nullable)messageData;
++ (instancetype)createMessageWithUser:(TAPUserModel *)user created:(NSNumber *)created room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type messageData:(NSDictionary * _Nullable)messageData;
 
 - (TAPMessageModel *)copyMessageModel;
 

@@ -440,7 +440,7 @@
 }
 
 - (void)dismissSelf {
-    UIImage *thumbnailImage = [UIImage imageNamed:@"blank-image"];
+    UIImage *thumbnailImage = [UIImage imageNamed:@"blank-image" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     
     if(self.currentViewController != nil) {
         thumbnailImage = [self.currentViewController currentImage];

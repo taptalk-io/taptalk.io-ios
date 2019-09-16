@@ -33,10 +33,8 @@
 #define TAP_PREFS_CONTACT_PERMISSION_ASKED @"Prefs.TapTalkContactPermissionAsked"
 #define TAP_PREFS_ROOM_MODEL_DICTIONARY @"Prefs.TapTalkRoomModelDictionary"
 #define TAP_PREFS_PROJECT_CONFIGS_DICTIONARY @"Prefs.TapTalkProjectConfigsDictionary"
-
-//User Customized Prefs
-#define TAP_PREFS_APP_KEY_ID @"Prefs.TapTalkAppKeyID"
-#define TAP_PREFS_APP_KEY_SECRET @"Prefs.TapTalkAppKeySecret"
+#define TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED @"Prefs.TapTalkAutoSyncContactDisabled"
+#define TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT @"Prefs.TapTalkDoneFirstTimeAutoSyncContact"
 
 //Color
 #define TAP_COLOR_WHITE @"FFFFFF"

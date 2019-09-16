@@ -188,7 +188,7 @@
 #pragma mark - Custom Method
 - (void)animateOpeningWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage {
     if(thumbnailImage == nil) {
-        thumbnailImage = [UIImage imageNamed:@"blank-image"];
+        thumbnailImage = [UIImage imageNamed:@"blank-image" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     
     if([self.delegate respondsToSelector:@selector(mediaDetailViewWillStartOpeningAnimation)]) {
@@ -258,7 +258,7 @@
 
 - (void)animateClosingWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage {
     if(thumbnailImage == nil) {
-        thumbnailImage = [UIImage imageNamed:@"blank-image"];
+        thumbnailImage = [UIImage imageNamed:@"blank-image" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     
     if([self.delegate respondsToSelector:@selector(mediaDetailViewWillStartClosingAnimation)]) {

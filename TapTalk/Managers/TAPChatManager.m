@@ -280,7 +280,7 @@
             }
             
             NSString *substringMessage = [textMessage substringWithRange:NSMakeRange(startIndex, substringLength)];
-            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:substringMessage type:TAPChatMessageTypeText];
+            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:substringMessage type:TAPChatMessageTypeText messageData:nil];
             
             //Check if quote message available
             id quotedMessageObject = [[TAPChatManager sharedManager].quotedMessageDictionary objectForKey:room.roomID];
@@ -341,7 +341,7 @@
         }
     }
     else {
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:textMessage type:TAPChatMessageTypeText];
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:textMessage type:TAPChatMessageTypeText messageData:nil];
         
         //Check if quote message available
         id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
@@ -427,7 +427,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage messageData:nil];
     
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
@@ -525,7 +525,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage messageData:nil];
     
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
@@ -623,7 +623,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeVideo];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeVideo messageData:nil];
     
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
@@ -733,7 +733,7 @@
 
     NSString *messageBodyString = NSLocalizedString(@"📍Location", @"");
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeLocation];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeLocation messageData:nil];
     
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
@@ -824,7 +824,7 @@
     
     NSString *messageBodyString = [NSString stringWithFormat:@"📎 %@", fileName];
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeFile];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeFile messageData:nil];
     
     NSMutableDictionary *dataDictionary = message.data;
     if (dataDictionary == nil) {
@@ -894,8 +894,12 @@
     [[TAPFileUploadManager sharedManager] sendFileWithData:message];
 }
 
+- (void)sendCustomMessage:(TAPMessageModel *)customMessage {
+    [self sendMessage:customMessage notifyDelegate:YES];
+}
+
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index {
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser created:created room:room body:@"" type:TAPChatMessageTypeUnreadMessageIdentifier];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser created:created room:room body:@"" type:TAPChatMessageTypeUnreadMessageIdentifier messageData:nil];
     
     return message;
 }
@@ -1388,7 +1392,7 @@
     TAPMessageModel *existingMessage = [self.quotedMessageDictionary objectForKey:room.roomID];
     
     if (type == TAPChatManagerQuoteActionTypeForward) {
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:existingMessage.body type:existingMessage.type];
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:existingMessage.body type:existingMessage.type messageData:nil];
         
         message.data = existingMessage.data;
         message.quote = existingMessage.quote;

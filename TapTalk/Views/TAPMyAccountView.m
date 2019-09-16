@@ -126,7 +126,7 @@
         
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
         self.profileImageView.layer.cornerRadius = CGRectGetWidth(self.profileImageView.frame) / 2.0f;
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.profileImageView.layer.masksToBounds = YES;
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.scrollView addSubview:self.profileImageView];
@@ -166,7 +166,7 @@
         [self.scrollView addSubview:self.loadingLabel];
 
         _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
-        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
+        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.changeIconImageView.image = [self.changeIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChangePicture]];
 
         [self.scrollView addSubview:self.changeIconImageView];
@@ -333,7 +333,7 @@
 
 - (void)setProfilePictureWithImage:(UIImage *)image {
     if (image ==  nil) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.removeProfilePictureButton.alpha = 0.0f;
     }
     else {
@@ -345,7 +345,7 @@
 - (void)setProfilePictureWithImageURL:(NSString *)imageURL {
     
     if (imageURL ==  nil || [imageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.removeProfilePictureButton.alpha = 0.0f;
     }
     else {
