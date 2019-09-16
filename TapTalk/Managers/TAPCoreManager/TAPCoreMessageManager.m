@@ -442,6 +442,59 @@
     [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:room];
 }
 
+- (TAPMessageModel *)constructTapTalkMessageModelWithRoom:(TAPRoomModel *)room
+                                              messageBody:(NSString *)messageBody
+                                              messageType:(NSInteger)messageType
+                                              messageData:(NSDictionary * _Nullable)messageData {
+    TAPMessageModel *constructedMessage = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBody type:messageType messageData:messageData];
+    return constructedMessage;
+}
+
+- (TAPMessageModel *)constructTapTalkMessageModelWithRoom:(TAPRoomModel *)room
+                                            quotedMessage:(TAPMessageModel *)quotedMessage
+                                              messageBody:(NSString *)messageBody
+                                              messageType:(NSInteger)messageType
+                                              messageData:(NSDictionary * _Nullable)messageData {
+    TAPMessageModel *constructedMessage = [self constructTapTalkMessageModelWithRoom:room messageBody:messageBody messageType:messageType messageData:messageData];
+    
+    //if message quoted from message model then should construct quote and reply to model
+    NSString *quoteImageUrl = [TAPUtil nullToEmptyString:quotedMessage.quote.imageURL];
+    NSString *quoteFileID = [TAPUtil nullToEmptyString:quotedMessage.quote.fileID];
+    
+    if (![quoteImageUrl isEqualToString:@""] || ![quoteFileID isEqualToString:@""]) {
+        constructedMessage.quote = [quotedMessage.quote copy];
+    }
+    else {
+        TAPQuoteModel *quote = [TAPQuoteModel new];
+        quote.title = quotedMessage.user.fullname;
+        quote.content = quotedMessage.body;
+        constructedMessage.quote = [quote copy];
+    }
+    
+    TAPReplyToModel *replyTo = [TAPReplyToModel new];
+    replyTo.messageID = quotedMessage.messageID;
+    replyTo.localID = quotedMessage.localID;
+    replyTo.messageType = quotedMessage.type;
+    replyTo.fullname = quotedMessage.user.fullname;
+    replyTo.xcUserID = quotedMessage.user.xcUserID;
+    replyTo.userID = quotedMessage.user.userID;
+    constructedMessage.replyTo = replyTo;
+    
+    return constructedMessage;
+}
+
+- (void)sendCustomMessageWithMessageModel:(TAPMessageModel *)customMessage
+                                    start:(void (^)(TAPMessageModel *message))start
+                                  success:(void (^)(TAPMessageModel *message))success
+                                  failure:(void (^)(NSError *error))failure {
+    [[TAPChatManager sharedManager] sendCustomMessage:customMessage];
+    void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+    [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+    [self.blockDictionary setObject:blockTypeDictionary forKey:customMessage.localID];
+    start(customMessage);
+}
+
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure {

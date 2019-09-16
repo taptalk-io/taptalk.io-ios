@@ -395,10 +395,8 @@
             apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType {
     
-    [[NSUserDefaults standardUserDefaults] setSecureObject:appKeyID forKey:TAP_PREFS_APP_KEY_ID];
-    [[NSUserDefaults standardUserDefaults] setSecureObject:appKeySecret forKey:TAP_PREFS_APP_KEY_SECRET];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
+    NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
+    [[TAPNetworkManager sharedManager] setAppKey:appKey];
     [[TAPAPIManager sharedManager] setBaseAPIURLString:apiURLString];
     [[TAPConnectionManager sharedManager] setSocketURLString:apiURLString];
     
@@ -526,6 +524,8 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_COUNTRY_CODE];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //Clear Manager Data
@@ -557,6 +557,21 @@
         CFRelease(font);
         CFRelease(provider);
     }
+}
+
+- (void)enableAutoContactSync {
+    [[NSUserDefaults standardUserDefaults] setSecureBool:NO forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)disableAutoContactSync {
+    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)isAutoContactSyncEnabled {
+    BOOL isDisabled = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED valid:nil];
+    return !isDisabled;
 }
 
 @end

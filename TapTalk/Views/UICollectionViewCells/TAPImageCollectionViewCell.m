@@ -72,7 +72,7 @@
         [self.contentView addSubview:self.downloadButtonView];
         
         UIImageView *downloadImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.downloadButtonView.frame) - 32.0f)/2, (CGRectGetWidth(self.downloadButtonView.frame) - 32.0f) / 2, 32.0f, 32.0f)];
-        downloadImageView.image = [UIImage imageNamed:@"TAPIconDownload"];
+        downloadImageView.image = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.downloadButtonView addSubview:downloadImageView];
         
         _downloadButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.downloadButtonView.bounds), CGRectGetWidth(self.downloadButtonView.bounds))];
@@ -97,7 +97,7 @@
         [self.progressView addSubview:self.cancelButton];
         
         _videoIndicatorImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, CGRectGetHeight(frame) - 14.0f - 5.0f, 14.0f, 14.0f)];
-        self.videoIndicatorImageView.image = [UIImage imageNamed:@"TAPIconThumbnailVideo"];
+        self.videoIndicatorImageView.image = [UIImage imageNamed:@"TAPIconThumbnailVideo" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.videoIndicatorImageView.image = [self.videoIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMediaListVideo]];
 
         [self.contentView addSubview:self.videoIndicatorImageView];

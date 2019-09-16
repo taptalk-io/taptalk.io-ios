@@ -84,6 +84,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendCustomMessage:(TAPMessageModel *)customMessage;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;

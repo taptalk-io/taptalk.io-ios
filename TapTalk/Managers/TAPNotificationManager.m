@@ -182,10 +182,10 @@
         return;
     }
     
-    if ([[TapUI sharedInstance] roomListViewController].isViewAppear) {
-        //Do not show if currently in room list
-        return;
-    }
+    //    if ([[TapUI sharedInstance] roomListViewController].isViewAppear) {
+    //        //Do not show if currently in room list
+    //        return;
+    //    }
     
     if (!self.isViewIsAddedToSubview) {
         [self initCustomNotificationAlertViewController];

@@ -12,6 +12,7 @@ static const NSInteger kAPITimeOut = 60;
 
 @interface TAPNetworkManager ()
 
+@property (strong, nonatomic) NSString *appKey;
 @property (strong, nonatomic) NSMutableDictionary *currentDownloadTaskDictionary;
 
 - (AFHTTPSessionManager *)defaultManager;
@@ -55,6 +56,7 @@ static const NSInteger kAPITimeOut = 60;
             }
         }];
         _currentDownloadTaskDictionary = [[NSMutableDictionary alloc] init];
+        _appKey = [NSString string];
     }
     
     return self;
@@ -66,23 +68,13 @@ static const NSInteger kAPITimeOut = 60;
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    
-    NSString *appKeyID = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_ID valid:nil];
-    NSString *appKeySecret = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_APP_KEY_SECRET valid:nil];
-    NSString *userAgent = [[NSUserDefaults standardUserDefaults] secureObjectForKey:@"ios" valid:nil];
-    
-    NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
-    NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *encodedAppKey = [base64Data base64EncodedStringWithOptions:0];
-    
-    [manager.requestSerializer setValue:encodedAppKey forHTTPHeaderField:@"App-Key"];
+    [manager.requestSerializer setValue:self.appKey forHTTPHeaderField:@"App-Key"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
     [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
-    [manager.requestSerializer setValue:userAgent forHTTPHeaderField:@"User-Agent"];
-    [manager.requestSerializer setValue:@"MTlkYzhjMjc0YmNjOGM0NjQ2MmI2ODM4NTpNR1kyT0Raa01ETmlZVFJqTlRFdU1TNHgvWkRka05tTTBNelkvWm1JNE5UUTRaV1E0WmpJNS9Oems0TVdaa1pUZGhaVGsw" forHTTPHeaderField:@"Server-Key"]; //DV Temp - Temporary set server key, needs to be deleted when integrated to Moselo
+    [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"User-Agent"];
     
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];
     
@@ -92,7 +84,7 @@ static const NSInteger kAPITimeOut = 60;
     }
     
 #ifdef DEBUG
-    NSLog(@"App Key: %@", encodedAppKey);
+    NSLog(@"App Key: %@", self.appKey);
     NSLog(@"Device Identifier: %@", [[UIDevice currentDevice] identifierForVendor].UUIDString);
     NSLog(@"Device Model: %@", [[UIDevice currentDevice] model]);
     NSLog(@"Device-OS-Version: %@", [[UIDevice currentDevice] systemVersion]);
@@ -620,6 +612,16 @@ refreshToken:(NSString *)refreshToken
     NSURLSessionDownloadTask *downloadTask = [self.currentDownloadTaskDictionary objectForKey:fileID];
     [downloadTask cancel];
     [self.currentDownloadTaskDictionary removeObjectForKey:fileID];
+}
+
+- (void)setAppKey:(NSString *)appKey {
+    NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *encodedAppKey = [base64Data base64EncodedStringWithOptions:0];
+    _appKey = encodedAppKey;
+}
+
+- (NSString *)getAppKey {
+    return self.appKey;
 }
 
 @end

@@ -143,7 +143,7 @@
         
         _groupPictureImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
         self.groupPictureImageView.layer.cornerRadius = CGRectGetWidth(self.groupPictureImageView.frame) / 2.0f;
-        self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.groupPictureImageView.layer.masksToBounds = YES;
         self.groupPictureImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.bgScrollView addSubview:self.groupPictureImageView];
@@ -190,7 +190,7 @@
         [self.bgScrollView addSubview:self.loadingLabel];
         
         _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
-        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem"];
+        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.changeIconImageView.image = [self.changeIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChangePicture]];
 
         [self.bgScrollView addSubview:self.changeIconImageView];
@@ -277,7 +277,7 @@
 #pragma mark - Custom Method
 - (void)setGroupPictureImageViewWithImage:(UIImage *)image {
     if (image ==  nil) {
-        self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.removePictureView.alpha = 0.0f;
     }
     else {
@@ -304,7 +304,7 @@
 
 - (void)setGroupPictureWithImageURL:(NSString *)urlString {
     if ([TAPUtil isEmptyString:urlString]) {
-        self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.groupPictureImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.removePictureView.alpha = 0.0f;
     }
     else {

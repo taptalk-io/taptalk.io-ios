@@ -170,7 +170,7 @@
 
 - (void)setProfilePictureWithImage:(UIImage *)image {
     if (image ==  nil) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar"];
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.removeProfilePictureView.alpha = 0.0f;
     }
     else {

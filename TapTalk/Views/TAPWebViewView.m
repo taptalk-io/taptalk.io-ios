@@ -42,7 +42,7 @@
         [self.customNavigationView addSubview:self.doneButton];
         
         _refreshImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 24.0f - 13.0f, (CGRectGetHeight(self.customNavigationView.frame) - 24.0f)/2, 24.0f, 24.0f)];
-        self.refreshImageView.image = [UIImage imageNamed:@"TAPIconWebRefresh"];
+        self.refreshImageView.image = [UIImage imageNamed:@"TAPIconWebRefresh" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.customNavigationView addSubview:self.refreshImageView];
         
         _refreshButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.refreshImageView.frame) - ((40.0f - CGRectGetWidth(self.refreshImageView.frame))/2), CGRectGetMinY(self.refreshImageView.frame) - ((40.0f - CGRectGetWidth(self.refreshImageView.frame))/2), 40.0f, 40.0f)];
@@ -69,7 +69,7 @@
         [self.bottomBarView addSubview:bottomBarSeparatorView];
         
         _backImageView = [[UIImageView alloc] initWithFrame:CGRectMake(13.0f, 10.0f, 24.0f, 24.0f)];
-        self.backImageView.image = [UIImage imageNamed:@"TAPIconWebBackOff"];
+        self.backImageView.image = [UIImage imageNamed:@"TAPIconWebBackOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bottomBarView addSubview:self.backImageView];
         
         CGFloat iconSpacing = (CGRectGetWidth(self.frame) - 26.0f - 24.0f*4)/3;
@@ -78,21 +78,21 @@
         [self.bottomBarView addSubview:self.backButton];
         
         _forwardImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.backImageView.frame) + iconSpacing, 10.0f, 24.0f, 24.0f)];
-        self.forwardImageView.image = [UIImage imageNamed:@"TAPIconWebForwardOff"];
+        self.forwardImageView.image = [UIImage imageNamed:@"TAPIconWebForwardOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bottomBarView addSubview:self.forwardImageView];
         
         _forwardButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.forwardImageView.frame) - ((40.0f - CGRectGetWidth(self.forwardImageView.frame))/2), CGRectGetMinY(self.forwardImageView.frame) - ((40.0f - CGRectGetWidth(self.forwardImageView.frame))/2), 40.0f, 40.0f)];
         [self.bottomBarView addSubview:self.forwardButton];
         
         _shareImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.forwardImageView.frame) + iconSpacing, 10.0f, 24.0f, 24.0f)];
-        self.shareImageView.image = [UIImage imageNamed:@"TAPIconWebShare"];
+        self.shareImageView.image = [UIImage imageNamed:@"TAPIconWebShare" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bottomBarView addSubview:self.shareImageView];
         
         _shareButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.shareImageView.frame) - ((40.0f - CGRectGetWidth(self.shareImageView.frame))/2), CGRectGetMinY(self.shareImageView.frame) - ((40.0f - CGRectGetWidth(self.shareImageView.frame))/2), 40.0f, 40.0f)];
         [self.bottomBarView addSubview:self.shareButton];
         
         _safariImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.shareImageView.frame) + iconSpacing, 10.0f, 24.0f, 24.0f)];
-        self.safariImageView.image = [UIImage imageNamed:@"TAPIconWebSafari"];
+        self.safariImageView.image = [UIImage imageNamed:@"TAPIconWebSafari" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.bottomBarView addSubview:self.safariImageView];
         
         _safariButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.safariImageView.frame) - ((40.0f - CGRectGetWidth(self.safariImageView.frame))/2), CGRectGetMinY(self.safariImageView.frame) - ((40.0f - CGRectGetWidth(self.safariImageView.frame))/2), 40.0f, 40.0f)];
@@ -126,22 +126,22 @@
 
 - (void)setBackButtonEnabled:(BOOL)enable {
     if (enable) {
-        self.backImageView.image = [UIImage imageNamed:@"TAPIconWebBackOn"];
+        self.backImageView.image = [UIImage imageNamed:@"TAPIconWebBackOn" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.backButton.enabled = YES;
     }
     else {
-        self.backImageView.image = [UIImage imageNamed:@"TAPIconWebBackOff"];
+        self.backImageView.image = [UIImage imageNamed:@"TAPIconWebBackOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.backButton.enabled = NO;
     }
 }
 
 - (void)setForwardButtonEnabled:(BOOL)enable {
     if (enable) {
-        self.forwardImageView.image = [UIImage imageNamed:@"TAPIconWebForwardOn"];
+        self.forwardImageView.image = [UIImage imageNamed:@"TAPIconWebForwardOn" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.forwardButton.enabled = YES;
     }
     else {
-        self.forwardImageView.image = [UIImage imageNamed:@"TAPIconWebForwardOff"];
+        self.forwardImageView.image = [UIImage imageNamed:@"TAPIconWebForwardOff" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.forwardButton.enabled = NO;
     }
 }

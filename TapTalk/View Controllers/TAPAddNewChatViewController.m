@@ -38,6 +38,8 @@
 
 @property (strong, nonatomic) NSString *updatedString;
 
+@property (nonatomic) BOOL skipCheckContactSync;
+
 - (void)loadContactListFromDatabase;
 - (void)syncContactWithLoading:(BOOL)loading;
 - (void)requestAccessAndCheckNewContact;
@@ -83,7 +85,6 @@
     [self.addNewChatView showSyncContactButtonView:NO];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification:) name:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:nil];
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -571,7 +572,9 @@
 #pragma mark TAPCustomButtonView
 - (void)customButtonViewDidTappedButton {
     //Sync Button Tapped
-    [self syncContactWithLoading:YES];
+//    [self syncContactWithLoading:YES];
+    
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Sync Contact Manually" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
 }
 
 #pragma mark TAPAddNewContactViewController
@@ -786,28 +789,98 @@
 }
 
 - (void)requestAccessAndCheckNewContact {
-    CNContactStore *store = [[CNContactStore alloc] init];
-    [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (granted && [[TAPContactManager sharedManager] isContactPermissionAsked]) {
-                //2nd time sync contact and so on, no loading
-                [self syncContactWithLoading:NO];
-            }
-            else if (granted) {
-                //1st time sync contact, show loading
-                [self syncContactWithLoading:YES];
-            }
-            else {
-                //not granted, show sync button view
-                [self.addNewChatView showSyncContactButtonView:YES];
-            }
-            [[TAPContactManager sharedManager] setContactPermissionAsked];
-        });
-    }];
+    BOOL isAutoSyncEnabled = [[TapTalk sharedInstance] isAutoContactSyncEnabled];
+    BOOL isDoneFirstTimeAutoSync = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT valid:nil];
+    if (!isAutoSyncEnabled) {
+        //Auto sync contact disabled
+        return;
+    }
+    
+    if (isDoneFirstTimeAutoSync) {
+        //Allow Access
+        CNContactStore *store = [[CNContactStore alloc] init];
+        [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (granted && [[TAPContactManager sharedManager] isContactPermissionAsked]) {
+                    //2nd time sync contact and so on, no loading
+                    [self syncContactWithLoading:NO];
+                }
+                else if (granted) {
+                    //1st time sync contact, show loading
+                    [self syncContactWithLoading:YES];
+                    
+                    //Save done auto sync contact
+                    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                }
+                else {
+                    //not granted, show sync button view
+                    [self.addNewChatView showSyncContactButtonView:YES];
+                }
+                [[TAPContactManager sharedManager] setContactPermissionAsked];
+            });
+        }];
+    }
+    else {
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Contact Access" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
+    }
 }
 
 - (void)applicationDidBecomeActiveNotification:(NSNotification *)notification {
-    [self requestAccessAndCheckNewContact];
+    if(!self.skipCheckContactSync) {
+        [self requestAccessAndCheckNewContact];
+    }
+}
+
+#pragma mark PopUpInfoViewController
+- (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoDidTappedLeftButtonWithIdentifier:popupIdentifier];
+    if ([popupIdentifier isEqualToString:@"Contact Access"]) {
+        //Decline Access
+        //not granted, show sync button view
+        [self.addNewChatView showSyncContactButtonView:YES];
+    }
+    else if ([popupIdentifier isEqualToString:@"Sync Contact Manually"]) {
+        //Decline
+    }
+}
+
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+    if ([popupIdentifier isEqualToString:@"Contact Access"]) {
+        //Allow Access
+        CNContactStore *store = [[CNContactStore alloc] init];
+        [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (granted && [[TAPContactManager sharedManager] isContactPermissionAsked]) {
+                    //2nd time sync contact and so on, no loading
+                    [self syncContactWithLoading:NO];
+                }
+                else if (granted) {
+                    //1st time sync contact, show loading
+                    [self syncContactWithLoading:YES];
+                    
+                    //Save done auto sync contact
+                    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                }
+                else {
+                    //not granted, show sync button view
+                    [self.addNewChatView showSyncContactButtonView:YES];
+                    _skipCheckContactSync = YES;
+                }
+                [[TAPContactManager sharedManager] setContactPermissionAsked];
+            });
+        }];
+    }
+    else if ([popupIdentifier isEqualToString:@"Sync Contact Manually"]) {
+        [self.addNewChatView showSyncContactButtonView:NO];
+        [self syncContactWithLoading:YES];
+        
+        //Save done auto sync contact
+        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 @end
