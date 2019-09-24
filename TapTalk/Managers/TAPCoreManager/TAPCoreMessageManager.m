@@ -503,32 +503,46 @@
     return constructedMessage;
 }
 
-- (TAPProductModel *)constructTapTalkProductModelWithProductID:(NSString *)productID
-                                                   productName:(NSString *)productName
-                                               productCurrency:(NSString *)productCurrency
-                                                  productPrice:(NSString *)productPrice
-                                                 productRating:(NSString *)productRating
-                                                 productWeight:(NSString *)productWeight
-                                            productDescription:(NSString *)productDescription
-                                               productImageURL:(NSString *)productImageURL
-                                             buttonOption1Text:(NSString *)buttonOption1Text
-                                             buttonOption2Text:(NSString *)buttonOption2Text
-                                            buttonOption1Color:(NSString *)buttonOption1Color
-                                            buttonOption2Color:(NSString *)buttonOption2Color {
-    TAPProductModel *product = [TAPProductModel new];
-    product.productDataID = productID;
-    product.productName = productName;
-    product.productCurrency = productCurrency;
-    product.productPrice = productPrice;
-    product.productRating = productRating;
-    product.productWeight = productWeight;
-    product.productDescription = productDescription;
-    product.productImageURL = productImageURL;
-    product.buttonOption1Text = buttonOption1Text;
-    product.buttonOption2Text = buttonOption2Text;
-    product.buttonOption1Color = buttonOption1Color;
-    product.buttonOption2Color = buttonOption2Color;
-    return product;
+- (NSDictionary *)constructTapTalkProductModelWithProductID:(NSString *)productID
+                                                productName:(NSString *)productName
+                                            productCurrency:(NSString *)productCurrency
+                                               productPrice:(NSString *)productPrice
+                                              productRating:(NSString *)productRating
+                                              productWeight:(NSString *)productWeight
+                                         productDescription:(NSString *)productDescription
+                                            productImageURL:(NSString *)productImageURL
+                               leftOrSingleButtonOptionText:(NSString *)leftOrSingleButtonOptionText
+                                      rightButtonOptionText:(NSString *)rightButtonOptionText
+                              leftOrSingleButtonOptionColor:(NSString *)leftOrSingleButtonOptionColor
+                                     rightButtonOptionColor:(NSString *)rightButtonOptionColor {
+    
+    productID = [TAPUtil nullToEmptyString:productID];
+    productName = [TAPUtil nullToEmptyString:productName];
+    productCurrency = [TAPUtil nullToEmptyString:productCurrency];
+    productPrice = [TAPUtil nullToEmptyString:productPrice];
+    productRating = [TAPUtil nullToEmptyString:productRating];
+    productWeight = [TAPUtil nullToEmptyString:productWeight];
+    productDescription = [TAPUtil nullToEmptyString:productDescription];
+    productImageURL = [TAPUtil nullToEmptyString:productImageURL];
+    leftOrSingleButtonOptionText = [TAPUtil nullToEmptyString:leftOrSingleButtonOptionText];
+    rightButtonOptionText = [TAPUtil nullToEmptyString:rightButtonOptionText];
+    leftOrSingleButtonOptionColor = [TAPUtil nullToEmptyString:leftOrSingleButtonOptionColor];
+    rightButtonOptionColor = [TAPUtil nullToEmptyString:rightButtonOptionColor];
+    
+    NSMutableDictionary *productDictionary = [NSMutableDictionary dictionary];
+    [productDictionary setObject:productID forKey:@"id"];
+    [productDictionary setObject:productName forKey:@"name"];
+    [productDictionary setObject:productCurrency forKey:@"currency"];
+    [productDictionary setObject:productPrice forKey:@"price"];
+    [productDictionary setObject:productRating forKey:@"rating"];
+    [productDictionary setObject:productWeight forKey:@"weight"];
+    [productDictionary setObject:productDescription forKey:@"description"];
+    [productDictionary setObject:productImageURL forKey:@"imageURL"];
+    [productDictionary setObject:leftOrSingleButtonOptionText forKey:@"buttonOption1Text"];
+    [productDictionary setObject:rightButtonOptionText forKey:@"buttonOption2Text"];
+    [productDictionary setObject:leftOrSingleButtonOptionColor forKey:@"buttonOption1Color"];
+    [productDictionary setObject:rightButtonOptionColor forKey:@"buttonOption2Color"];
+    return [productDictionary copy];
 }
 
 - (void)sendCustomMessageWithMessageModel:(TAPMessageModel *)customMessage
@@ -543,8 +557,8 @@
     start(customMessage);
 }
 
-- (void)sendProductMessageWithProductArray:(NSArray <TAPProductModel*> *)productArray
-                                      room:(NSString *)room
+- (void)sendProductMessageWithProductArray:(NSArray <NSDictionary*> *)productArray
+                                      room:(TAPRoomModel *)room
                                      start:(void (^)(TAPMessageModel *message))start
                                    success:(void (^)(TAPMessageModel *message))success
                                    failure:(void (^)(NSError *error))failure {

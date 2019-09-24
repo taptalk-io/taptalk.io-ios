@@ -139,13 +139,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)setProductListBubbleCellWithData:(NSArray *)productDataArray {
     //Convert array of product data dictionary into array of product data model
     if ([productDataArray count] != 0) {
-        if ([[productDataArray firstObject] isKindOfClass:[TAPProductModel class]]) {
-            NSArray *convertedDataArray = [self convertProductModelToDictionaryWithData:productDataArray];
-            _productDataArray = convertedDataArray;
-        }
-        else {
-            _productDataArray = productDataArray;
-        }
+        _productDataArray = productDataArray;
     }
     else {
         _productDataArray = [NSMutableArray array];

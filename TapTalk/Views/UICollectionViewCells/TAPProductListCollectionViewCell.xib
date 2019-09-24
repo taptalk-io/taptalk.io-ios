@@ -237,7 +237,7 @@
                             <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tjq-gV-MWY">
                                 <rect key="frame" x="0.0" y="307" width="230" height="40"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Details" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rn7-IW-JsW">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rn7-IW-JsW">
                                         <rect key="frame" x="0.0" y="0.0" width="230" height="40"/>
                                         <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="12"/>
                                         <color key="textColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="1" colorSpace="calibratedRGB"/>
@@ -351,6 +351,7 @@
                 <outlet property="rightOptionLabel" destination="W5N-rD-eJn" id="uUO-2q-eeS"/>
                 <outlet property="rightOptionView" destination="6JA-9P-eKb" id="ZoS-Gt-zb6"/>
                 <outlet property="singleOptionButton" destination="aV9-DX-k7u" id="WHT-yT-Mgw"/>
+                <outlet property="singleOptionLabel" destination="rn7-IW-JsW" id="8ZG-qB-xEL"/>
                 <outlet property="singleOptionView" destination="tjq-gV-MWY" id="kdI-DV-dcs"/>
                 <outlet property="starRatingImageView" destination="Gae-K1-59p" id="OPa-rk-a4f"/>
             </connections>
