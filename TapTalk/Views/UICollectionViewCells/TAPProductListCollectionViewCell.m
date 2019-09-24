@@ -28,6 +28,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *leftOptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *rightOptionLabel;
 @property (strong, nonatomic) IBOutlet UIView *singleOptionView;
+@property (strong, nonatomic) IBOutlet UILabel *singleOptionLabel;
 
 - (IBAction)leftOptionButtonDidTapped:(id)sender;
 - (IBAction)rightOptionButtonDidTapped:(id)sender;
@@ -65,12 +66,14 @@
         obtainedFont = [obtainedFont fontWithSize:14.0f];
         self.leftOptionLabel.font = obtainedFont;
         self.rightOptionLabel.font = obtainedFont;
+        self.singleOptionLabel.font = obtainedFont;
     }
     else {
         UIFont *obtainedFont = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
         obtainedFont = [obtainedFont fontWithSize:12.0f];
         self.leftOptionLabel.font = obtainedFont;
         self.rightOptionLabel.font = obtainedFont;
+        self.singleOptionLabel.font = obtainedFont;
     }
 }
 
@@ -86,6 +89,7 @@
     self.productDescriptionLabel.text = @"";
     self.leftOptionLabel.text = @"";
     self.rightOptionLabel.text = @"";
+    self.singleOptionLabel.text = @"";
 }
 
 #pragma mark - Custom Method
@@ -148,6 +152,8 @@
     self.productDescriptionLabel.text = productDescriptionString;
     self.leftOptionLabel.text = leftOptionTextString;
     self.leftOptionLabel.textColor = [TAPUtil getColor:leftOptionColorString];
+    self.singleOptionLabel.text = leftOptionTextString;
+    self.singleOptionLabel.textColor = [TAPUtil getColor:leftOptionColorString];
     self.rightOptionLabel.text = rightOptionTextString;
     self.rightOptionLabel.textColor = [TAPUtil getColor:rightOptionColorString];
 }
