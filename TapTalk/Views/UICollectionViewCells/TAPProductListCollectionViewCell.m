@@ -89,39 +89,41 @@
 }
 
 #pragma mark - Custom Method
-- (void)setProductCellWithData:(NSDictionary *)product {
-    
-    NSString *productIDString = [product objectForKey:@"id"];
+- (void)setProductCellWithData:(NSDictionary *)dataDictionary {
+    NSString *productIDString = [dataDictionary objectForKey:@"id"];
     productIDString = [TAPUtil nullToEmptyString:productIDString];
     
-    NSString *productNameString = [product objectForKey:@"name"];
+    NSString *productNameString = [dataDictionary objectForKey:@"name"];
     productNameString = [TAPUtil nullToEmptyString:productNameString];
     
-    NSString *currencyString = [product objectForKey:@"currency"];
+    NSString *currencyString = [dataDictionary objectForKey:@"currency"];
     currencyString = [TAPUtil nullToEmptyString:currencyString];
     
-    NSString *priceString = [product objectForKey:@"price"];
+    NSString *priceString = [dataDictionary objectForKey:@"price"];
     priceString = [TAPUtil nullToEmptyString:priceString];
     
-    NSString *ratingString = [product objectForKey:@"rating"];
+    NSString *ratingString = [dataDictionary objectForKey:@"rating"];
     ratingString = [TAPUtil nullToEmptyString:ratingString];
     
-    NSString *productDescriptionString = [product objectForKey:@"description"];
+    NSString *weightString = [dataDictionary objectForKey:@"weight"];
+    weightString = [TAPUtil nullToEmptyString:weightString];
+    
+    NSString *productDescriptionString = [dataDictionary objectForKey:@"description"];
     productDescriptionString = [TAPUtil nullToEmptyString:productDescriptionString];
     
-    NSString *productImageURLString = [product objectForKey:@"imageURL"];
+    NSString *productImageURLString = [dataDictionary objectForKey:@"imageURL"];
     productImageURLString = [TAPUtil nullToEmptyString:productImageURLString];
     
-    NSString *leftOptionTextString = [product objectForKey:@"buttonOption1Text"];
+    NSString *leftOptionTextString = [dataDictionary objectForKey:@"buttonOption1Text"];
     leftOptionTextString = [TAPUtil nullToEmptyString:leftOptionTextString];
     
-    NSString *rightOptionTextString = [product objectForKey:@"buttonOption2Text"];
+    NSString *rightOptionTextString = [dataDictionary objectForKey:@"buttonOption2Text"];
     rightOptionTextString = [TAPUtil nullToEmptyString:rightOptionTextString];
     
-    NSString *leftOptionColorString = [product objectForKey:@"buttonOption1Color"];
+    NSString *leftOptionColorString = [dataDictionary objectForKey:@"buttonOption1Color"];
     leftOptionColorString = [TAPUtil nullToEmptyString:leftOptionColorString];
     
-    NSString *rightOptionColorString = [product objectForKey:@"buttonOption2Color"];
+    NSString *rightOptionColorString = [dataDictionary objectForKey:@"buttonOption2Color"];
     rightOptionColorString = [TAPUtil nullToEmptyString:rightOptionColorString];
     
     if ([productDescriptionString isEqualToString:@""]) {

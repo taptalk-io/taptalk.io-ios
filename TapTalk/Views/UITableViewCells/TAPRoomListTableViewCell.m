@@ -482,16 +482,14 @@
             //Bubble Number
             CGSize newNumberOfUnreadMessageLabelSize = [self.numberOfUnreadMessageLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame))];
             
-            //Bubble View
-            CGFloat bubbleUnreadViewWidth = CGRectGetWidth(self.numberOfUnreadMessageLabel.frame) + 7.0f + 7.0f;
-            if (bubbleUnreadViewWidth < CGRectGetHeight(self.bubbleUnreadView.frame)) {
-                bubbleUnreadViewWidth = CGRectGetHeight(self.bubbleUnreadView.frame);
-            }
+            //Bubble View            
+            CGFloat bubbleUnreadViewWidth = newNumberOfUnreadMessageLabelSize.width + 7.0f + 7.0f;
+            CGFloat numberOfUnreadMessageLabelXPosition = 7.0f;
             
-            CGFloat numberOfUnreadMessageLabelXPosition = (bubbleUnreadViewWidth - newNumberOfUnreadMessageLabelSize.width) / 2.0f;
             self.numberOfUnreadMessageLabel.frame = CGRectMake(numberOfUnreadMessageLabelXPosition, CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
             
             self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
+            
             self.bubbleUnreadView.alpha = 1.0f;
         }
     }

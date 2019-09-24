@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSIndexPath *selectedIndexPath;
 @property (nonatomic) BOOL isSetAsSingleButtonView;
 
-- (void)setProductCellWithData:(NSDictionary *)product;
+- (void)setProductCellWithData:(NSDictionary *)dataDictionary;
 - (void)setAsSingleButtonView:(BOOL)isSetAsSingleButtonView;
 - (void)setCellCornerRadiusPositionWithCurrentActiveUserProduct:(BOOL)isCurrentActiveUserProduct;
 @end

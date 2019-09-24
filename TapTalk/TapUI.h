@@ -39,6 +39,28 @@ NS_ASSUME_NONNULL_BEGIN
  @param userInfo (NSDictionary *) other data or details of custom quote
  */
 - (void)tapTalkMessageQuoteTappedWithUserInfo:(NSDictionary *)userInfo;
+
+//Product List Bubble Cell
+/**
+ Called when user click product bubble cell left option or single option button
+ 
+ @param product (TAPProductModel *) selected product data
+ @param room (TAPRoomModel *) selected room when user click the product
+ @param recipient (TAPUserModel *) recipient user data
+ @param isSingleOption (BOOL) indicating whether the option is single or double
+ */
+- (void)tapTalkProductListBubbleLeftOrSingleButtonTapped:(TAPProductModel *)product room:(TAPRoomModel *)room recipient:(TAPUserModel *)recipient isSingleOption:(BOOL)isSingleOption;
+
+/**
+ Called when user click product bubble cell right option
+ 
+ @param product (TAPProductModel *) selected product data
+ @param room (TAPRoomModel *) selected room when user click the product
+ @param recipient (TAPUserModel *) recipient user data
+ @param isSingleOption (BOOL) indicating whether the option is single or double
+ */
+- (void)tapTalkProductListBubbleRightButtonTapped:(TAPProductModel *)product room:(TAPRoomModel *)room recipient:(TAPUserModel *)recipient isSingleOption:(BOOL)isSingleOption;
+
 @end
 
 @interface TapUI : NSObject

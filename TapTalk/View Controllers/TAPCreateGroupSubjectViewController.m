@@ -386,7 +386,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 } failureBlock:^(NSError *error) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+                    errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }];
             }
             else {
@@ -406,7 +408,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         } failure:^(NSError *error) {
             [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
             self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
     else if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
@@ -443,7 +447,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 } failureBlock:^(NSError *error) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+                    errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }];
             }
             else {
@@ -490,7 +496,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     } failureBlock:^(NSError *error) {
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+                        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                     }];
                 }
                 else {
@@ -517,7 +525,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             } failure:^(NSError *error) {
                 [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+                errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
             }];
         }
     }

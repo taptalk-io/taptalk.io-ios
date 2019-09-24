@@ -124,10 +124,28 @@ NS_ASSUME_NONNULL_BEGIN
                                               messageBody:(NSString *)messageBody
                                               messageType:(NSInteger)messageType
                                               messageData:(NSDictionary * _Nullable)messageData;
+- (TAPProductModel *)constructTapTalkProductModelWithProductID:(NSString *)productID
+                                                   productName:(NSString *)productName
+                                               productCurrency:(NSString *)productCurrency
+                                                   productName:(NSString *)productName
+                                                  productPrice:(NSString *)productPrice
+                                                 productRating:(NSString *)productRating
+                                                 productWeight:(NSString *)productWeight
+                                            productDescription:(NSString *)productDescription
+                                               productImageURL:(NSString *)productImageURL
+                                             buttonOption1Text:(NSString *)buttonOption1Text
+                                             buttonOption2Text:(NSString *)buttonOption2Text
+                                            buttonOption1Color:(NSString *)buttonOption1Color
+                                            buttonOption2Color:(NSString *)buttonOption2Color;
 - (void)sendCustomMessageWithMessageModel:(TAPMessageModel *)customMessage
                                     start:(void (^)(TAPMessageModel *message))start
                                   success:(void (^)(TAPMessageModel *message))success
                                   failure:(void (^)(NSError *error))failure;
+- (void)sendProductMessageWithProductArray:(NSArray <TAPProductModel*> *)productArray
+                                      room:(NSString *)room
+                                     start:(void (^)(TAPMessageModel *message))start
+                                   success:(void (^)(TAPMessageModel *message))success
+                                   failure:(void (^)(NSError *error))failure;
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID
               success:(void (^)(void))success
               failure:(void (^)(NSError *error))failure;

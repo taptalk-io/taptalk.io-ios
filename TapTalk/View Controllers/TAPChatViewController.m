@@ -3276,10 +3276,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
 
-//    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-//    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftButtonTapped:room:recipient:isSingleOption:)]) {
-//        [tapUIDelegate tapTalkProductListBubbleLeftButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
-//    }
+    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftOrSingleButtonTapped:room:recipient:isSingleOption:)]) {
+        [tapUIDelegate tapTalkProductListBubbleLeftOrSingleButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+    }
 }
 
 - (void)productListBubbleDidTappedRightOptionWithData:(NSDictionary *)productDictionary isSingleOptionView:(BOOL)isSingleOption {
@@ -3290,10 +3290,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-//    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-//    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
-//        [tapUIDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
-//    }
+    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
+    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
+        [tapUIDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+    }
 }
 
 #pragma mark TAPGrowingTextView
@@ -3710,7 +3710,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setupInputAccessoryView {
     //Input Accessory Extension View
     
-    self.keyboardOptionButtonView.layer.cornerRadius = CGRectGetHeight(self.sendButtonView.frame) / 2.0f;
+    self.keyboardOptionButtonView.layer.cornerRadius = CGRectGetHeight(self.keyboardOptionButtonView.frame) / 2.0f;
     self.keyboardOptionButtonView.clipsToBounds = YES;
     
     self.sendButtonView.layer.cornerRadius = CGRectGetHeight(self.sendButtonView.frame) / 2.0f;
@@ -4702,7 +4702,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        actionWithTitle:@"Cancel"
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
-                                           //Do some thing here
                                            [self showInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
@@ -4778,7 +4777,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        actionWithTitle:@"Cancel"
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
-                                           //Do some thing here
                                            [self showInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
@@ -5533,7 +5531,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         }
 #ifdef DEBUG
                         //Note - this alert only shown at debug
-                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
+                        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+                        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
                         
                         UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                         }];
@@ -5903,7 +5903,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             _isFirstLoadData = NO;
 #ifdef DEBUG
             //Note - this alert only shown at debug
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             }];
@@ -6464,8 +6466,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)setKeyboardStateDefault {
-    _keyboardState = keyboardStateDefault;
-    
+    _keyboardState = keyboardStateDefault;    
     self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenuBackground];
     UIImage *hamburgerIconImage = [UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.keyboardOptionButtonImageView.image = [self.keyboardOptionButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenu]];
@@ -7794,7 +7795,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
     } failure:^(NSError *error) {
         [self setDeleteRoomButtonAsLoading:NO animated:YES];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedString(@"Failed", @"") detailInformation:error.domain leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
 }
 

@@ -14,6 +14,8 @@
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic) NSMutableArray *productDataArray;
 
+- (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productArray;
+
 @end
 
 @implementation TAPProductListBubbleTableViewCell
@@ -135,12 +137,34 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark - Custom Method
 - (void)setProductListBubbleCellWithData:(NSArray *)productDataArray {
-    _productDataArray = productDataArray;
+    //Convert array of product data dictionary into array of product data model
+    if ([productDataArray count] != 0) {
+        if ([[productDataArray firstObject] isKindOfClass:[TAPProductModel class]]) {
+            NSArray *convertedDataArray = [self convertProductModelToDictionaryWithData:productDataArray];
+            _productDataArray = convertedDataArray;
+        }
+        else {
+            _productDataArray = productDataArray;
+        }
+    }
+    else {
+        _productDataArray = [NSMutableArray array];
+    }
+    
     [self.collectionView reloadData];
 }
 
 - (void)setProductListBubbleTableViewCellType:(TAPProductListBubbleTableViewCellType)productListBubbleTableViewCellType {
     _productListBubbleTableViewCellType = productListBubbleTableViewCellType;
+}
+
+- (NSArray *)convertProductModelToDictionaryWithData:(NSArray *)productArray {
+    NSMutableArray *convertedArray = [NSMutableArray array];
+    for (TAPProductModel *productModel in productArray) {
+        NSDictionary *productDataDictionary = [TAPDataManager dictionaryFromProductModel:productModel];
+        [convertedArray addObject:productDataDictionary];
+    }
+    return convertedArray;
 }
 
 @end
