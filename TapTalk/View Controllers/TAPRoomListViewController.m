@@ -778,7 +778,6 @@
             
             //Handle room deletion
             NSArray *loopedRoomListArray = [NSArray arrayWithArray:oldRoomListArray];
-            
             for (NSInteger index = 0; index < [loopedRoomListArray count]; index++) {
                 TAPRoomListModel *oldRoomList = [oldRoomListArray objectAtIndex:index];
                 

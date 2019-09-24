@@ -94,6 +94,11 @@
 - (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message {
     if ([self.blockDictionary objectForKey:message.localID]) {
         NSDictionary *blockTypeDictionary = [self.blockDictionary objectForKey:message.localID];
+        
+         if (blockTypeDictionary == nil || [blockTypeDictionary count] == 0) {
+            return;
+        }
+        
         void (^handler)(TAPMessageModel *) = [blockTypeDictionary objectForKey:@"successBlock"];
         handler(message);
     }
@@ -111,6 +116,10 @@
     CGFloat total = [totalString floatValue];
     
     NSDictionary *blockTypeDictionary = [self.blockDictionary objectForKey:obtainedMessage.localID];
+    if (blockTypeDictionary == nil || [blockTypeDictionary count] == 0) {
+        return;
+    }
+    
     void (^handler)(CGFloat, CGFloat) = [blockTypeDictionary objectForKey:@"progressBlock"];
     handler(progress, total);
 }
@@ -123,17 +132,28 @@
     NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:obtainedError];
     
     NSDictionary *blockTypeDictionary = [self.blockDictionary objectForKey:obtainedMessage.localID];
+    if (blockTypeDictionary == nil || [blockTypeDictionary count] == 0) {
+        return;
+    }
     void (^handler)(NSError *) = [blockTypeDictionary objectForKey:@"failureBlock"];
     handler(localizedError);
 }
 
 - (void)fileUploadManagerStartNotification:(NSNotification *)notification {
     NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+    if (notificationParameterDictionary == nil || [notificationParameterDictionary count] == 0) {
+        return;
+    }
+    
     TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
 }
 
 - (void)fileUploadManagerFinishNotification:(NSNotification *)notification {
     NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+    if (notificationParameterDictionary == nil || [notificationParameterDictionary count] == 0) {
+        return;
+    }
+    
     TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
 }
 
@@ -483,6 +503,34 @@
     return constructedMessage;
 }
 
+- (TAPProductModel *)constructTapTalkProductModelWithProductID:(NSString *)productID
+                                                   productName:(NSString *)productName
+                                               productCurrency:(NSString *)productCurrency
+                                                  productPrice:(NSString *)productPrice
+                                                 productRating:(NSString *)productRating
+                                                 productWeight:(NSString *)productWeight
+                                            productDescription:(NSString *)productDescription
+                                               productImageURL:(NSString *)productImageURL
+                                             buttonOption1Text:(NSString *)buttonOption1Text
+                                             buttonOption2Text:(NSString *)buttonOption2Text
+                                            buttonOption1Color:(NSString *)buttonOption1Color
+                                            buttonOption2Color:(NSString *)buttonOption2Color {
+    TAPProductModel *product = [TAPProductModel new];
+    product.productDataID = productID;
+    product.productName = productName;
+    product.productCurrency = productCurrency;
+    product.productPrice = productPrice;
+    product.productRating = productRating;
+    product.productWeight = productWeight;
+    product.productDescription = productDescription;
+    product.productImageURL = productImageURL;
+    product.buttonOption1Text = buttonOption1Text;
+    product.buttonOption2Text = buttonOption2Text;
+    product.buttonOption1Color = buttonOption1Color;
+    product.buttonOption2Color = buttonOption2Color;
+    return product;
+}
+
 - (void)sendCustomMessageWithMessageModel:(TAPMessageModel *)customMessage
                                     start:(void (^)(TAPMessageModel *message))start
                                   success:(void (^)(TAPMessageModel *message))success
@@ -493,6 +541,24 @@
     [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
     [self.blockDictionary setObject:blockTypeDictionary forKey:customMessage.localID];
     start(customMessage);
+}
+
+- (void)sendProductMessageWithProductArray:(NSArray <TAPProductModel*> *)productArray
+                                      room:(NSString *)room
+                                     start:(void (^)(TAPMessageModel *message))start
+                                   success:(void (^)(TAPMessageModel *message))success
+                                   failure:(void (^)(NSError *error))failure {
+    NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
+    [dataDictionary setObject:productArray forKey:@"items"];
+    
+    TAPMessageModel *constructedMessage = [self constructTapTalkMessageModelWithRoom:room messageBody:@"Product List" messageType:TAPChatMessageTypeProduct messageData:dataDictionary];
+    
+    [[TAPChatManager sharedManager] sendProductMessage:constructedMessage];
+    void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+    [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+    [self.blockDictionary setObject:blockTypeDictionary forKey:constructedMessage.localID];
+    start(constructedMessage);
 }
 
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID

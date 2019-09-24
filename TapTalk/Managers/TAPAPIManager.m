@@ -40,7 +40,7 @@ static NSString * const kAPIVersionString = @"v1";
 
 #pragma mark - Custom Method
 - (void)setBaseAPIURLString:(NSString *)urlString {
-    _APIBaseURL = [NSString stringWithFormat:@"%@/api", urlString];
+    _APIBaseURL = urlString;
 }
 
 - (NSString *)urlForType:(TAPAPIManagerType)type {

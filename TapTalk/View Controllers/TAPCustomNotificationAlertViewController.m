@@ -251,6 +251,11 @@
             }
         }
     }
+    else {
+        if (message.room.type == RoomTypeGroup) {
+            messageString = [NSString stringWithFormat:@"%@: %@",message.user.fullname, messageString];
+        }
+    }
     
     if (self.messageShownCounter % 2 == 1) {
         //Odd message, show first notification view

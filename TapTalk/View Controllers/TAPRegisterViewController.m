@@ -237,7 +237,9 @@
             //        }
             //END DV Temp
             
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:error.domain preferredStyle:UIAlertControllerStyleAlert];
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             }];
@@ -247,7 +249,9 @@
         }];
     } failure:^(NSError *error) {
         [self.registerView.continueButtonView setAsLoading:NO animated:YES];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Register" title:NSLocalizedString(@"Error", @"") detailInformation:error.domain leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@""];
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Register" title:NSLocalizedString(@"Error", @"") detailInformation:errorMessage leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@""];
         [self.registerView setContentEditable:YES];
     }];
 }
@@ -396,7 +400,9 @@
             [self.registerView.usernameTextField setErrorInfoText:@"Unable to verify username, please check your connection and try again"];
         }
         else {
-            [self.registerView.usernameTextField setErrorInfoText:error.domain];
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self.registerView.usernameTextField setErrorInfoText:errorMessage];
         }
         
         [self.registerView refreshViewPosition];

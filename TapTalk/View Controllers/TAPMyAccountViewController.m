@@ -378,7 +378,9 @@
             [self.myAccountView.usernameTextField setErrorInfoText:@"Unable to verify username, please check your connection and try again"];
         }
         else {
-            [self.myAccountView.usernameTextField setErrorInfoText:error.domain];
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self.myAccountView.usernameTextField setErrorInfoText:errorMessage];
         }
         
         [self.myAccountView refreshViewPosition];
