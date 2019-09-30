@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.resources = "TapTalk/**/*.{png,jpeg,jpg,storyboard,xib,xcassets,ttf,otf}"
+    #s.resources = "TapTalk/**/*.{png,jpeg,jpg,storyboard,xib,xcassets,ttf,otf}"
 
   # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

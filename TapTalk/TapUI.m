@@ -257,12 +257,12 @@
     }];
 }
 
-- (TapUIChatViewController *)createRoomWithRoom:(TAPRoomModel *)room
-                             customQuoteTitle:(nullable NSString *)customQuoteTitle
-                           customQuoteContent:(nullable NSString *)customQuoteContent
-                    customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                                     userInfo:(nullable NSDictionary *)userInfo
-                                      success:(void (^)(TapUIChatViewController *chatViewController))success {
+- (void)createRoomWithRoom:(TAPRoomModel *)room
+          customQuoteTitle:(nullable NSString *)customQuoteTitle
+        customQuoteContent:(nullable NSString *)customQuoteContent
+ customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                  userInfo:(nullable NSDictionary *)userInfo
+                   success:(void (^)(TapUIChatViewController *chatViewController))success {
     
     //Create quote model and set quote to chat
     if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
