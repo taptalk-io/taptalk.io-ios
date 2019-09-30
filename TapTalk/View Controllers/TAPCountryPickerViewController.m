@@ -75,6 +75,11 @@
     _alphabetSectionTitles = [NSArray arrayWithObjects:@"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N", @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z", nil];
     
     [self fetchCountryListWithData:self.countryDataArray];
+    
+    if (IS_IOS_13_OR_ABOVE) {
+        self.countryPickerView.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil topGapPresentingViewController], 0.0f);
+        self.countryPickerView.searchResultTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil topGapPresentingViewController], 0.0f);
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {

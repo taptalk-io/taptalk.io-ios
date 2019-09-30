@@ -107,8 +107,9 @@
     
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
-    self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.bubbleView.layer.cornerRadius = 8.0f;    
+    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
+
     
     self.replyView.layer. cornerRadius = 4.0f;
     

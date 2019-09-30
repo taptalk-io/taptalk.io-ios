@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 
-#import "TAPChatViewController.h"
+#import "TapUIChatViewController.h"
 #import "TAPChatManager.h"
 #import "TAPGroupManager.h"
 #import "TAPAPIManager.h"
@@ -31,14 +31,30 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 @protocol TapTalkDelegate <NSObject>
 
 //Authentication
+/**
+ Called when user's refresh token has expired. An authentication with a new auth ticket is required.
+ */
 - (void)tapTalkRefreshTokenExpired;
 
 //Badge
+/**
+ Called when the number of unread messages in the application is updated. Returns the number of unread messages from the application.
+*/
 - (void)tapTalkUnreadChatRoomBadgeCountUpdated:(NSInteger)numberOfUnreadRooms;
 
 //Notification
+/**
+ Called when TapTalk.io needs to request for push notification, usually client needs to add [[UIApplication sharedApplication] registerForRemoteNotifications] inside the method.
+*/
 - (void)tapTalkDidRequestRemoteNotification;
+
+/**
+ Called when user tapped the notification
+*/
 - (void)tapTalkDidTappedNotificationWithMessage:(TAPMessageModel *_Nonnull)message fromActiveController:(nullable UIViewController *)currentActiveController;
+
+//Logout
+- (void)userLogout;
 
 @end
 
@@ -96,15 +112,11 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 - (void)disconnectWithCompletionHandler:(void (^_Nonnull)(void))completion;
 
 /**
- To enable auto connect to TapTalk.io server
+ To enable or disable auto connect to TapTalk.io server
  TapTalk will automatically connect to server everytime user open the app
+ Default value is enabled
  */
-- (void)enableAutoConnect;
-
-/**
- To disable auto connect to TapTalk.io server
- */
-- (void)disableAutoConnect;
+- (void)setAutoConnectEnabled:(BOOL)enabled;
 
 /**
  To obtain auto connect status
@@ -231,15 +243,10 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey;
 
 /**
- Enable TapTalk.io to sync your contact automatically
+ To enable or disable TapTalk.io to sync your contact automatically
  Default is enabled
  */
-- (void)enableAutoContactSync;
-
-/**
- Disable TapTalk.io to sync your contact automatically
- */
-- (void)disableAutoContactSync;
+- (void)setAutoContactSyncEnabled:(BOOL)enabled;
 
 /**
  Obtain auto contact sync status

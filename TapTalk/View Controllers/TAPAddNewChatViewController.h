@@ -16,7 +16,7 @@
 
 @interface TAPAddNewChatViewController : TAPBaseViewController
 
-@property (weak, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (weak, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (weak, nonatomic) id<TAPAddNewChatViewControllerDelegate> delegate;
 
 @end

@@ -33,7 +33,7 @@
 
 #pragma mark - Custom Method
 - (CGFloat)automaticHeight {
-    if (IS_IOS_8_OR_ABOVE) {
+    if (IS_IOS_10_OR_ABOVE) {
         return UITableViewAutomaticDimension;
     }
     else {

@@ -27,12 +27,14 @@
 #define IS_IPHONE_5_5_INCH ([[UIScreen mainScreen] bounds].size.height == 736)?YES:NO
 #define IS_IPHONE_X_FAMILY ([TAPUtil safeAreaBottomPadding] > 0)?YES:NO
 
-#define IS_BELOW_IOS_7 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 7)?YES:NO
-#define IS_BELOW_IOS_8 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 8)?YES:NO
-#define IS_IOS_8_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
-#define IS_BELOW_IOS_9 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 9)?YES:NO
+#define IS_BELOW_IOS_10 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 10)?YES:NO
+#define IS_BELOW_IOS_11 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 13)?YES:NO
+#define IS_BELOW_IOS_12 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 13)?YES:NO
+#define IS_BELOW_IOS_13 ([[[[UIDevice currentDevice] systemVersion] substringWithRange:NSMakeRange(0, 1)] integerValue] < 13)?YES:NO
 #define IS_IOS_10_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0"))
 #define IS_IOS_11_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0"))
+#define IS_IOS_12_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.0"))
+#define IS_IOS_13_OR_ABOVE (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"13.0"))
 
 #define SYSTEM_VERSION ([[UIDevice currentDevice] systemVersion])
 #define SYSTEM_VERSION_EQUAL_TO(version) ([[[UIDevice currentDevice] systemVersion] compare:version options:NSNumericSearch] == NSOrderedSame)
@@ -131,6 +133,7 @@
 + (NSString *)getNewFileAndCheckExistingFilePath:(NSString *)path fileNameCounterStart:(NSInteger)counter;
 + (CGFloat)safeAreaBottomPadding;
 + (CGFloat)safeAreaTopPadding;
++ (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
 
 #pragma mark - TapTalk

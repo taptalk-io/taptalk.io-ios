@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPMyAccountViewControllerDelegate <NSObject>
 
 - (void)myAccountViewControllerDidTappedLogoutButton;
+- (void)myAccountViewControllerDoneChangingImageProfile;
 
 @end
 

@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupViewControllerType) {
 
 @interface TAPCreateGroupViewController : TAPBaseViewController
 
-@property (weak, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (weak, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (weak, nonatomic) id<TAPCreateGroupViewControllerDelegate> delegate;
 @property (nonatomic) TAPCreateGroupViewControllerType tapCreateGroupViewControllerType;
 @property (strong, nonatomic) TAPRoomModel *room; //used in add members, member list

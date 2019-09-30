@@ -26,7 +26,7 @@ typedef NS_ENUM( NSInteger, TAPProfileViewControllerType) {
 
 @interface TAPProfileViewController : TAPBaseViewController
 
-@property (weak, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (weak, nonatomic) TapUIRoomListViewController *roomListViewController;
 
 @property (weak, nonatomic) id<TAPProfileViewControllerDelegate> delegate;
 

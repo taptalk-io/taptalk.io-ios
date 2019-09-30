@@ -256,6 +256,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #pragma mark TAPCustomTextFieldView
 - (BOOL)customTextFieldViewTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    newString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     self.roomModel.name = newString;
     
     if ([newString length] <= 0) {
@@ -333,6 +334,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else if ([popupIdentifier isEqualToString:@"Error Update Group"]) {
         
     }
+    else if ([popupIdentifier isEqualToString:@"Error Create Group Name"]) {
+        
+    }
 }
 
 #pragma mark - Custom Method
@@ -345,13 +349,21 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)createButtonDidTapped {
     [self.createGroupSubjectView.createButtonView setAsLoading:YES animated:YES];
     self.createGroupSubjectView.createButtonView.userInteractionEnabled = NO;
+    
+    NSString *groupName = self.createGroupSubjectView.groupNameTextField.textField.text;
+    groupName = [groupName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if ([groupName isEqualToString:@""]) {
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group Name" title:NSLocalizedString(@"Failed", @"") detailInformation:@"Group name must be filled" leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        return;
+    }
+    
     if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeDefault) {
         NSMutableArray *userIDArray = [NSMutableArray array];
         for (TAPUserModel *user in self.selectedContactArray) {
             [userIDArray addObject:user.userID];
         }
         
-        [TAPDataManager callAPICreateRoomWithName:self.createGroupSubjectView.groupNameTextField.textField.text type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
+        [TAPDataManager callAPICreateRoomWithName:groupName type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
             
             if (self.selectedImage != nil) {
                 //has image, upload image
@@ -377,9 +389,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
                     [self dismissViewControllerAnimated:NO completion:nil];
                     
-                    TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:room];
-                    obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-                    [self.roomListViewController.navigationController pushViewController:obtainedChatViewController animated:YES];
+                    [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                        chatViewController.hidesBottomBarWhenPushed = YES;
+                        [self.roomListViewController.navigationController pushViewController:chatViewController animated:YES];
+                    }];
                     
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     
@@ -400,9 +413,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
                 
                 [self dismissViewControllerAnimated:NO completion:nil];
-                TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:room];
-                obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-                [self.roomListViewController.navigationController pushViewController:obtainedChatViewController animated:YES];
+                [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    chatViewController.hidesBottomBarWhenPushed = YES;
+                    [self.roomListViewController.navigationController pushViewController:chatViewController animated:YES];
+                }];
             }
             
         } failure:^(NSError *error) {
@@ -414,7 +428,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }];
     }
     else if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
-        if ([self.createGroupSubjectView.groupNameTextField.textField.text isEqualToString:self.roomModel.name]) {
+        if ([groupName isEqualToString:self.roomModel.name]) {
             //Group name not changing
             if (self.selectedImage != nil) {
                 //has image, upload image
@@ -463,7 +477,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         else {
             //Group name change
-            [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:self.createGroupSubjectView.groupNameTextField.textField.text success:^(TAPRoomModel *room) {
+            [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:groupName success:^(TAPRoomModel *room) {
                 if (self.selectedImage != nil) {
                     //has image, upload image
                     NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);

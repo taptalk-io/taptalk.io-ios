@@ -155,7 +155,7 @@
     self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 8.0f;
-    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     
     self.replyView.layer. cornerRadius = 4.0f;
     
@@ -861,7 +861,7 @@
         self.senderNameTopConstraint.constant = 10.0f;
     }
     else {
-        self.senderNameTopConstraint.constant = 0.0f;
+        self.senderNameTopConstraint.constant = 10.0f;
         self.replyViewTopConstraint.constant = 0.0f;
         self.quoteViewTopConstraint.constant = 0.0f;
         self.forwardFromLabelTopConstraint.constant = 0.0f;

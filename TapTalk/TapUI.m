@@ -9,7 +9,7 @@
 
 @interface TapUI ()
 
-@property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (strong, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -33,7 +33,7 @@
     self = [super init];
     
     if (self) {
-        _roomListViewController = [[TAPRoomListViewController alloc] init];
+        _roomListViewController = [[TapUIRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
     }
@@ -42,16 +42,12 @@
 }
 
 #pragma mark - Property
-- (TAPRoomListViewController *)roomListViewController {
+- (TapUIRoomListViewController *)roomListViewController {
     return _roomListViewController;
 }
 
 - (TAPCustomNotificationAlertViewController *)customNotificationAlertViewController {
     return _customNotificationAlertViewController;
-}
-
-- (TAPCustomKeyboardManager *)customKeyboardManager {
-    return [TAPCustomKeyboardManager sharedManager];
 }
 
 #pragma mark - Custom Method
@@ -88,8 +84,14 @@
     [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate];
 }
 
+//Room List
+- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
+    [self.roomListViewController setMyAccountButtonInRoomListVisible:isVisible];
+}
+
 //Open Chat Room
-- (TAPChatViewController *)openRoomWithOtherUser:(TAPUserModel *)otherUser {
+- (void)createRoomWithOtherUser:(TAPUserModel *)otherUser
+                        success:(void (^)(TapUIChatViewController *chatViewController))success {
     TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
     //    [[TAPChatManager sharedManager] openRoom:room]; //Called in ChatViewController willAppear
     
@@ -99,20 +101,21 @@
     //Save user to ContactManager Dictionary
     [[TAPContactManager sharedManager] addContactWithUserModel:otherUser saveToDatabase:NO];
     
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    TapUIChatViewController *chatViewController = [[TapUIChatViewController alloc] initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
-    return chatViewController;
+    success(chatViewController);
 }
 
-- (void)openRoomWithUserID:(NSString *)userID
-             prefilledText:(NSString *)prefilledText
-          customQuoteTitle:(nullable NSString *)customQuoteTitle
-        customQuoteContent:(nullable NSString *)customQuoteContent
- customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                  userInfo:(nullable NSDictionary *)userInfo
-                   success:(void (^)(TAPChatViewController *chatViewController))success
-                   failure:(void (^)(NSError *error))failure {
+- (void)createRoomWithUserID:(NSString *)userID
+               prefilledText:(NSString *)prefilledText
+            customQuoteTitle:(nullable NSString *)customQuoteTitle
+          customQuoteContent:(nullable NSString *)customQuoteContent
+   customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                    userInfo:(nullable NSDictionary *)userInfo
+                     success:(void (^)(TapUIChatViewController *chatViewController))success
+                     failure:(void (^)(NSError *error))failure {
     //Check is user exist in TapTalk database
     [TAPDataManager getDatabaseContactByUserID:userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
         if (isContact) {
@@ -136,8 +139,9 @@
             }
             
             //Open room
-            TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:obtainedUser];
-            success(obtainedChatViewController);
+            [self createRoomWithOtherUser:obtainedUser success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                success(chatViewController);
+            }];
         }
         else {
             //User not in contact, call API to obtain user data
@@ -163,8 +167,10 @@
                 }
                 
                 //Open room
-                TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:user];
-                success(obtainedChatViewController);
+                [self createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    success(chatViewController);
+                }];
+                
                 
             } failure:^(NSError *error) {
                 NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -177,14 +183,14 @@
     }];
 }
 
-- (void)openRoomWithXCUserID:(NSString *)XCUserID
-               prefilledText:(NSString *)prefilledText
-            customQuoteTitle:(nullable NSString *)customQuoteTitle
-          customQuoteContent:(nullable NSString *)customQuoteContent
-   customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                    userInfo:(nullable NSDictionary *)userInfo
-                     success:(void (^)(TAPChatViewController *chatViewController))success
-                     failure:(void (^)(NSError *error))failure {
+- (void)createRoomWithXCUserID:(NSString *)XCUserID
+                 prefilledText:(NSString *)prefilledText
+              customQuoteTitle:(nullable NSString *)customQuoteTitle
+            customQuoteContent:(nullable NSString *)customQuoteContent
+     customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                      userInfo:(nullable NSDictionary *)userInfo
+                       success:(void (^)(TapUIChatViewController *chatViewController))success
+                       failure:(void (^)(NSError *error))failure {
     //Check is user exist in TapTalk database
     [TAPDataManager getDatabaseContactByXCUserID:XCUserID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
         if (isContact) {
@@ -208,8 +214,9 @@
             }
             
             //Open room
-            TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:obtainedUser];
-            success(obtainedChatViewController);
+            [self createRoomWithOtherUser:obtainedUser success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                success(chatViewController);
+            }];
         }
         else {
             //User not in contact, call API to obtain user data
@@ -235,8 +242,9 @@
                 }
                 
                 //Open room
-                TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:user];
-                success(obtainedChatViewController);
+                [self createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    success(chatViewController);
+                }];
 
             } failure:^(NSError *error) {
                 NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -249,11 +257,12 @@
     }];
 }
 
-- (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room
-                           customQuoteTitle:(nullable NSString *)customQuoteTitle
-                         customQuoteContent:(nullable NSString *)customQuoteContent
-                  customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                                   userInfo:(nullable NSDictionary *)userInfo {
+- (TapUIChatViewController *)createRoomWithRoom:(TAPRoomModel *)room
+                             customQuoteTitle:(nullable NSString *)customQuoteTitle
+                           customQuoteContent:(nullable NSString *)customQuoteContent
+                    customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                                     userInfo:(nullable NSDictionary *)userInfo
+                                      success:(void (^)(TapUIChatViewController *chatViewController))success {
     
     //Create quote model and set quote to chat
     if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
@@ -266,23 +275,30 @@
     }
     
     //Open room
-    return [self openRoomWithRoom:room];
+    [self createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        success(chatViewController);
+    }];
 }
 
-- (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room {
-    return [self openRoomWithRoom:room scrollToMessageWithLocalID:nil];
+- (void)createRoomWithRoom:(TAPRoomModel *)room
+                   success:(void (^)(TapUIChatViewController *chatViewController))success {
+    [self createRoomWithRoom:room scrollToMessageWithLocalID:nil success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        success(chatViewController);
+    }];
 }
 
-- (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room
-                 scrollToMessageWithLocalID:(NSString *)messageLocalID {
+- (void)createRoomWithRoom:(TAPRoomModel *)room
+scrollToMessageWithLocalID:(NSString *)messageLocalID
+                   success:(void (^)(TapUIChatViewController *chatViewController))success {
     //Save all unsent message (in case user retrieve message on another room)
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
     
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    TapUIChatViewController *chatViewController = [[TapUIChatViewController alloc] initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
-    return chatViewController;
+    success(chatViewController);
 }
 
 @end

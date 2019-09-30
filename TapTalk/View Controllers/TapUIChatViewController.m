@@ -1,12 +1,12 @@
 //
-//  TAPChatViewController.m
+//  TapUIChatViewController.m
 //  TapTalk
 //
 //  Created by Dominic Vedericho on 10/08/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
-#import "TAPChatViewController.h"
+#import "TapUIChatViewController.h"
 
 #import <AFNetworking/AFNetworking.h>
 #import <Photos/Photos.h>
@@ -73,7 +73,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TopFloatingIndicatorViewTypeLoading = 1
 };
 
-@interface TAPChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, TAPGrowingTextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, TAPProfileViewControllerDelegate>
+@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -329,9 +329,32 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @end
 
-@implementation TAPChatViewController
+@implementation TapUIChatViewController
 
 #pragma mark - Lifecycle
+- (instancetype)initWithOtherUser:(TAPUserModel *)otherUser {
+    if (self = [super initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]]) {
+        TAPRoomModel *roomData = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
+        self.currentRoom = roomData;
+    }
+    return self;
+}
+
+- (instancetype)initWithRoom:(TAPRoomModel *)room {
+    if (self = [super initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]]) {
+        self.currentRoom = room;
+    }
+    return self;
+}
+
+- (instancetype)initWithRoom:(TAPRoomModel *)room scrollToMessageWithLocalID:(NSString *)messageLocalID {
+    if (self = [super initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]]) {
+        self.currentRoom = room;
+        self.scrollToMessageLocalIDString = messageLocalID;
+    }
+    return self;
+}
+
 - (void)loadView {
     [super loadView];
     
@@ -379,6 +402,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
     self.navigationController.interactivePopGestureRecognizer.enabled = YES;
     
+    
     //Initialization Data
     _messageArray = [[NSMutableArray alloc] init];
     _messageDictionary = [[NSMutableDictionary alloc] init];
@@ -416,6 +440,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.chatAnchorBadgeView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.chatAnchorBadgeView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground].CGColor;
+    self.chatAnchorBadgeView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
     self.chatAnchorBadgeView.layer.borderWidth = 1.0f;
     self.chatAnchorBadgeView.layer.cornerRadius = CGRectGetHeight(self.chatAnchorBadgeView.frame) / 2.0f;
     self.chatAnchorBackgroundView.layer.cornerRadius = CGRectGetHeight(self.chatAnchorBackgroundView.frame) / 2.0f;
@@ -457,9 +482,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     
     NSArray *keyboardArray = [NSArray array];
-    id<TAPCustomKeyboardManagerDelegate> customKeyboardManagerDelegate = [TAPCustomKeyboardManager sharedManager].delegate;
-    if ([customKeyboardManagerDelegate respondsToSelector:@selector(setCustomKeyboardItemsForRoom:sender:recipient:)]) {
-        keyboardArray = [customKeyboardManagerDelegate setCustomKeyboardItemsForRoom:self.currentRoom sender:currentUser recipient:self.otherUser];
+    id<TapUICustomKeyboardDelegate> customKeyboardDelegate = [TapUI sharedInstance].customKeyboardDelegate;
+    if ([customKeyboardDelegate respondsToSelector:@selector(setCustomKeyboardItemsForRoom:sender:recipient:)]) {
+        keyboardArray = [customKeyboardDelegate setCustomKeyboardItemsForRoom:self.currentRoom sender:currentUser recipient:self.otherUser];
     }
     
     if([keyboardArray count] > 0) {
@@ -498,7 +523,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [[TAPChatManager sharedManager] refreshShouldRefreshOnlineStatus];
     
-    if (self.chatViewControllerType == TAPChatViewControllerTypePeek) {
+    if (self.chatViewControllerType == TapUIChatViewControllerTypePeek) {
         //Hide accessory view when peek 3D touch
         self.inputMessageAccessoryView.alpha = 0.0f;
         self.dummyNavigationBarView.alpha = 1.0f;
@@ -1772,9 +1797,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(tappedMessage.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -1954,9 +1979,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(message.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -2067,9 +2092,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(tappedMessage.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -2324,9 +2349,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(tappedMessage.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -2379,9 +2404,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(message.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -2679,9 +2704,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(tappedMessage.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -2833,9 +2858,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(message.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -2934,9 +2959,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(tappedMessage.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -3083,9 +3108,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(tappedMessage.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -3138,9 +3163,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //quote exists
         if(message.data) {
             NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-            if ([tapUIDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
             }
         }
     }
@@ -3276,9 +3301,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
 
-    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftOrSingleButtonTapped:room:recipient:isSingleOption:)]) {
-        [tapUIDelegate tapTalkProductListBubbleLeftOrSingleButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkProductListBubbleLeftOrSingleButtonTapped:room:recipient:isSingleOption:)]) {
+        [tapUIChatRoomDelegate tapTalkProductListBubbleLeftOrSingleButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
     }
 }
 
@@ -3290,9 +3315,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPProductModel *product = [TAPDataManager productModelFromDictionary:productDictionary];
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-    if ([tapUIDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
-        [tapUIDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkProductListBubbleRightButtonTapped:room:recipient:isSingleOption:)]) {
+        [tapUIChatRoomDelegate tapTalkProductListBubbleRightButtonTapped:product room:room recipient:otherUser isSingleOption:isSingleOption];
     }
 }
 
@@ -4488,6 +4513,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
         photoAlbumListViewController.delegate = self;
         UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+        photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
         [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
@@ -4566,6 +4592,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)openFiles {
     UIDocumentPickerViewController *documentPickerViewController = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.data"] inMode:UIDocumentPickerModeImport];
     documentPickerViewController.delegate = self;
+    documentPickerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:documentPickerViewController animated:YES completion:^{
         //        if (@available(iOS 11.0, *)) {
         //            documentPickerViewController.allowsMultipleSelection = YES;
@@ -4581,6 +4608,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     pickLocationViewController.delegate = self;
     pickLocationViewController.selectedLocationCoordinate = CLLocationCoordinate2DMake(-999, -999);
     UINavigationController *pickLocationNavigationController = [[UINavigationController alloc] initWithRootViewController:pickLocationViewController];
+    pickLocationNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:pickLocationNavigationController animated:YES completion:nil];
 }
 
@@ -5327,7 +5355,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
     
-    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPChatViewController class] description]] || [[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
+    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TapUIChatViewController class] description]] || [[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
         if (self.isShowAccessoryView) {
             return self.inputMessageAccessoryView;
         }
@@ -6537,10 +6565,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 #pragma mark Others
-- (void)setChatViewControllerType:(TAPChatViewControllerType)chatViewControllerType {
+- (void)setChatViewControllerType:(TapUIChatViewControllerType)chatViewControllerType {
     _chatViewControllerType = chatViewControllerType;
     
-    if (self.chatViewControllerType == TAPChatViewControllerTypePeek) {
+    if (self.chatViewControllerType == TapUIChatViewControllerTypePeek) {
         //Hide accessory view when peek 3D touch
         self.inputMessageAccessoryView.alpha = 0.0f;
         self.dummyNavigationBarView.alpha = 1.0f;
@@ -6810,9 +6838,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
     
-    id<TapUIDelegate> tapUIDelegate = [TapUI sharedInstance].delegate;
-    if ([tapUIDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:currentShownNavigationController:)]) {
-        [tapUIDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser currentShownNavigationController:self.navigationController];
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
+        [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
     }
     else {
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
@@ -7110,11 +7138,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
             self.topFloatingIndicatorLabel.text = [NSString stringWithFormat:@"%@ unread messages", unreadMessagesString];
             self.topFloatingIndicatorImageView.image = [UIImage imageNamed:@"TAPIconUnreadMessageTop" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomFloatingUnreadButton]];
         }
     }
     else if (type == TopFloatingIndicatorViewTypeLoading) {
         self.topFloatingIndicatorLabel.text = NSLocalizedString(@"Loading", @"");
-        self.topFloatingIndicatorImageView.image = [UIImage imageNamed:@"TAPIconLoadingSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.topFloatingIndicatorImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
     }
     
     CGSize labelSize = [self.topFloatingIndicatorLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 16.0f)];
@@ -7817,6 +7847,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     }];
     
+}
+
+- (void)showTapTalkMessageComposerView {
+    [self showInputAccessoryView];
 }
 
 @end

@@ -609,7 +609,7 @@
     }
     
     //check id message sender is equal to active user id, if yes change the title to "You"
-    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID] && ![quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
         self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
     }
     else {

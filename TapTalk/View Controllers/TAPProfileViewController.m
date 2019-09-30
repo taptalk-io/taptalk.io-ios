@@ -631,9 +631,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //send message
                 [self.navigationController popToRootViewControllerAnimated:NO];
                 
-                TAPChatViewController *chatViewController = [[TapUI sharedInstance] openRoomWithOtherUser:self.user];
-                chatViewController.hidesBottomBarWhenPushed = YES;
-                [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+                [[TapUI sharedInstance] createRoomWithOtherUser:self.user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    chatViewController.hidesBottomBarWhenPushed = YES;
+                    [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+                }];
             }
             else if (indexPath.row == 2) {
                 //appoint & remove admin

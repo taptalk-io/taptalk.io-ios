@@ -2358,6 +2358,12 @@
             return color;
             break;
         }
+        case TAPComponentColorIconChatRoomFloatingUnreadButton:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
         case TAPComponentColorIconChatComposerBurgerMenuBackground:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];

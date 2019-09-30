@@ -93,9 +93,9 @@
     
     TAPCustomKeyboardItemModel *keyboardItem = [self.customKeyboardArray objectAtIndex:indexPath.row];
     
-    id<TAPCustomKeyboardManagerDelegate> customKeyboardManagerDelegate = [TAPCustomKeyboardManager sharedManager].delegate;
-    if ([customKeyboardManagerDelegate respondsToSelector:@selector(customKeyboardItemTappedWithRoom:sender:recipient:keyboardItem:)]) {
-        [customKeyboardManagerDelegate customKeyboardItemTappedWithRoom:self.room sender:self.sender recipient:self.recipient keyboardItem:keyboardItem];
+    id<TapUICustomKeyboardDelegate> customKeyboardDelegate = [TapUI sharedInstance].customKeyboardDelegate;
+    if ([customKeyboardDelegate respondsToSelector:@selector(customKeyboardItemTappedWithRoom:sender:recipient:keyboardItem:)]) {
+        [customKeyboardDelegate customKeyboardItemTappedWithRoom:self.room sender:self.sender recipient:self.recipient keyboardItem:keyboardItem];
     }
 }
 

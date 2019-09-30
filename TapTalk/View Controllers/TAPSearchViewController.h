@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPSearchViewController : TAPBaseViewController
 
 @property (weak, nonatomic) id<TAPSearchViewControllerDelegate> delegate;
+@property (nonatomic) BOOL isShowMyAccountView;
 
 @end
 
