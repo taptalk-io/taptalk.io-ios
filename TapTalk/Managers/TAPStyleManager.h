@@ -173,6 +173,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatRoomScrollToBottomBackground, //Chat Room Page
     TAPComponentColorIconChatRoomScrollToBottom, //Chat Room Page
     TAPComponentColorIconChatRoomUnreadButton, //Chat Room Page
+    TAPComponentColorIconChatRoomFloatingUnreadButton, //Chat Room Page
     TAPComponentColorIconChatComposerBurgerMenuBackground, //Chat Room Page
     TAPComponentColorIconChatComposerShowKeyboardBackground, //Chat Room Page
     TAPComponentColorIconChatComposerAttach, //Chat Room Page

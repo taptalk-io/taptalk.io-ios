@@ -924,6 +924,18 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return topPadding;
 }
 
+/**
+ Used to count top height gap when presenting view controller with modal presentation automatic
+ start usage from ios 13.0, since the presentation style is changing
+ */
++ (CGFloat)topGapPresentingViewController {
+    if (IS_IPHONE_5_5_INCH_AND_ABOVE) {
+        return 26.0f;
+    }
+    
+    return 36.0f;
+}
+
 + (void)performBlock:(void (^)())block
 {
     block();

@@ -34,6 +34,8 @@
     self.unreadMessageLabel.textColor = unreadMessageLabelColor;
     self.unreadMessageLabel.font = unreadMessageLabelFont;
     
+    self.arrowImageView.image = [self.arrowImageView.image setImageTintColor:unreadMessageLabelColor];
+    
     CGFloat gap = (CGRectGetWidth([UIScreen mainScreen].bounds) - 120.0f) / 2.0f;
     self.leftGapConstraint.constant = gap;
     self.rightGapConstraint.constant = gap;

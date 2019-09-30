@@ -1,15 +1,15 @@
 //
-//  TAPRoomListViewController.m
+//  TapUIRoomListViewController.m
 //  TapTalk
 //
 //  Created by Dominic Vedericho on 6/9/18.
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
-#import "TAPRoomListViewController.h"
+#import "TapUIRoomListViewController.h"
 #import "TAPRoomListView.h"
 #import "TAPAddNewChatViewController.h"
-#import "TAPChatViewController.h"
+#import "TapUIChatViewController.h"
 #import "TAPSetupRoomListView.h"
 #import "TAPRoomListTableViewCell.h"
 #import "TAPRoomListModel.h"
@@ -19,7 +19,7 @@
 
 #import <AFNetworking/AFNetworking.h>
 
-@interface TAPRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate, TAPMyAccountViewControllerDelegate>
+@interface TapUIRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate, TAPMyAccountViewControllerDelegate, UIAdaptivePresentationControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 
 @property (strong, nonatomic) TAPRoomListView *roomListView;
@@ -34,6 +34,7 @@
 @property (strong, nonatomic) NSMutableDictionary *roomListDictionary;
 
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
+@property (nonatomic) BOOL isShowMyAccountView;
 
 - (void)mappingMessageArrayToRoomListArrayAndDictionary:(NSArray *)messageArray;
 - (void)insertRoomListToArrayAndDictionary:(TAPRoomListModel *)roomList atIndex:(NSInteger)index;
@@ -50,15 +51,15 @@
 
 @end
 
-@implementation TAPRoomListViewController
+@implementation TapUIRoomListViewController
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
     _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.roomListView];
     
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerLoadView)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerLoadView];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerLoadView)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerLoadView];
     }
 }
 
@@ -119,8 +120,8 @@
     self.connectionStatusViewController.delegate = self;
     [self.roomListView addSubview:self.connectionStatusViewController.view];
     
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidLoad)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerViewDidLoad];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewDidLoad)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerViewDidLoad];
     }
     
     [self.setupRoomListView.retryButton addTarget:self action:@selector(viewLoadedSequence) forControlEvents:UIControlEventTouchUpInside];
@@ -146,8 +147,8 @@
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
 
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillAppear)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerViewWillAppear];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewWillAppear)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerViewWillAppear];
     }
     
     [self.navigationController setNavigationBarHidden:NO animated:YES];
@@ -161,8 +162,8 @@
         [self.searchBarView.searchTextField resignFirstResponder];
     }
     
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewWillDisappear)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerViewWillDisappear];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewWillDisappear)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerViewWillDisappear];
     }
 }
 
@@ -170,29 +171,29 @@
     [[TAPChatManager sharedManager] removeDelegate:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
     
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerDealloc)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerDealloc];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerDealloc)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerDealloc];
     }
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerDidReceiveMemoryWarning)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerDidReceiveMemoryWarning];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerDidReceiveMemoryWarning)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerDidReceiveMemoryWarning];
     }
 }
     
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidAppear)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerViewDidAppear];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewDidAppear)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerViewDidAppear];
     }
 }
     
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    if ([self.lifecycleDelegate respondsToSelector:@selector(TAPRoomListViewControllerViewDidDisappear)]) {
-        [self.lifecycleDelegate TAPRoomListViewControllerViewDidDisappear];
+    if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewDidDisappear)]) {
+        [self.lifecycleDelegate TapUIRoomListViewControllerViewDidDisappear];
     }
 }
 
@@ -284,36 +285,36 @@
 
 #pragma mark - Delegate
 #pragma mark UIViewControllerPreviewing
-- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
-    NSIndexPath *indexPath = [self.roomListView.roomListTableView indexPathForRowAtPoint:location];
-    
-    TAPRoomListTableViewCell *cell = [self.roomListView.roomListTableView cellForRowAtIndexPath:indexPath];
-    
-    TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
-    TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
-    TAPRoomModel *room = selectedMessage.room;
-    
-    CGRect convertedRect = [cell convertRect:cell.bounds toView:self.roomListView.roomListTableView];
-    previewingContext.sourceRect = convertedRect;
-    
-    //DV Note - Open Room with Room method (duplicate from TapTalk Instance)
-    [[TAPChatManager sharedManager] openRoom:room];
-    [[TAPChatManager sharedManager] saveAllUnsentMessage];
-    
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
-    chatViewController.currentRoom = room;
-    chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
-    [chatViewController setChatViewControllerType:TAPChatViewControllerTypePeek];
-    //END DV Note
-    
-    return chatViewController;
-}
+//- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+//    NSIndexPath *indexPath = [self.roomListView.roomListTableView indexPathForRowAtPoint:location];
+//
+//    TAPRoomListTableViewCell *cell = [self.roomListView.roomListTableView cellForRowAtIndexPath:indexPath];
+//
+//    TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
+//    TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
+//    TAPRoomModel *room = selectedMessage.room;
+//
+//    CGRect convertedRect = [cell convertRect:cell.bounds toView:self.roomListView.roomListTableView];
+//    previewingContext.sourceRect = convertedRect;
+//
+//    //DV Note - Open Room with Room method (duplicate from TapTalk Instance)
+//    [[TAPChatManager sharedManager] openRoom:room];
+//    [[TAPChatManager sharedManager] saveAllUnsentMessage];
+//
+//    TapUIChatViewController *chatViewController = [[TapUIChatViewController alloc] initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]];
+//    chatViewController.currentRoom = room;
+//    chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
+//    [chatViewController setChatViewControllerType:TapUIChatViewControllerTypePeek];
+//    //END DV Note
+//
+//    return chatViewController;
+//}
 
-- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
-    TAPChatViewController *chatViewController = (TAPChatViewController *)viewControllerToCommit;
-    [chatViewController setChatViewControllerType:TAPChatViewControllerTypeDefault];
-    [self.navigationController showViewController:chatViewController sender:nil];
-}
+//- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+//    TapUIChatViewController *chatViewController = (TapUIChatViewController *)viewControllerToCommit;
+//    [chatViewController setChatViewControllerType:TapUIChatViewControllerTypeDefault];
+//    [self.navigationController showViewController:chatViewController sender:nil];
+//}
 
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -323,9 +324,10 @@
     TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
     TAPRoomModel *selectedRoom = selectedMessage.room;
 
-    TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:selectedRoom];
-    obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:obtainedChatViewController animated:YES];
+    [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:chatViewController animated:YES];
+    }];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
@@ -378,10 +380,10 @@
         self.leftBarButton.alpha = 0.0f;
     }];
     
-    self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+    self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
     
     [UIView animateWithDuration:0.2f animations:^{
-        self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+        self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
 
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
@@ -413,7 +415,7 @@
             UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
             [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
 
-            self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 18.0f, CGRectGetHeight(self.searchBarView.frame));
+            self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
         }];
     }];
     
@@ -436,9 +438,10 @@
 
 #pragma mark TAPAddNewChatViewController
 - (void)addNewChatViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user {
-    TAPChatViewController *chatViewController = [[TapUI sharedInstance] openRoomWithOtherUser:user];
-    chatViewController.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:chatViewController animated:YES];
+    [[TapUI sharedInstance] createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:chatViewController animated:YES];
+    }];
 }
 
 - (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room {
@@ -484,12 +487,41 @@
     [self.roomListView.roomListTableView reloadData];
 }
 
+- (void)myAccountViewControllerDoneChangingImageProfile {
+    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        [self.profileImageView setImageWithURLString:profileImageURL];
+    }
+}
+
+#pragma mark UIAdaptivePresentationController
+- (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
+    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        [self.profileImageView setImageWithURLString:profileImageURL];
+    }
+}
+
 #pragma mark - Custom Method
 - (void)leftBarButtonDidTapped {
-    TAPMyAccountViewController *myAccountViewController = [[TAPMyAccountViewController alloc] init];
-    myAccountViewController.delegate = self;
-    UINavigationController *myAccountNavigationController = [[UINavigationController alloc] initWithRootViewController:myAccountViewController];
-    [self presentViewController:myAccountNavigationController animated:YES completion:nil];
+    
+    id <TapUIRoomListDelegate> roomListDelegate = [TapUI sharedInstance].roomListDelegate;
+    if ([roomListDelegate respondsToSelector:@selector(tapTalkAccountButtonTapped:currentShownNavigationController:)]) {
+        [roomListDelegate tapTalkAccountButtonTapped:self currentShownNavigationController:self.navigationController];
+    }
+    else {
+        TAPMyAccountViewController *myAccountViewController = [[TAPMyAccountViewController alloc] init];
+        myAccountViewController.delegate = self;
+        myAccountViewController.presentationController.delegate = self;
+        UINavigationController *myAccountNavigationController = [[UINavigationController alloc] initWithRootViewController:myAccountViewController];
+        [self presentViewController:myAccountNavigationController animated:YES completion:nil];
+    }
 }
 
 - (void)rightBarButtonDidTapped {
@@ -957,8 +989,10 @@
 - (void)openNewChatViewController {
     TAPAddNewChatViewController *addNewChatViewController = [[TAPAddNewChatViewController alloc] init];
     addNewChatViewController.roomListViewController = self;
+    addNewChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     addNewChatViewController.delegate = self;
     UINavigationController *addNewChatNavigationController = [[UINavigationController alloc] initWithRootViewController:addNewChatViewController];
+    addNewChatNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:addNewChatNavigationController animated:YES completion:nil];
 }
 
@@ -982,6 +1016,10 @@
     else {
         _isNeedRefreshOnNetworkDown = YES;
     }
+}
+
+- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
+    self.isShowMyAccountView = isVisible;
 }
 
 @end

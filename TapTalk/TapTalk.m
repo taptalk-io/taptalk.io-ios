@@ -153,12 +153,8 @@
     completion();
 }
 
-- (void)enableAutoConnect {
-    _isAutoConnectDisabled = NO;
-}
-
-- (void)disableAutoConnect {
-    _isAutoConnectDisabled = YES;
+- (void)setAutoConnectEnabled:(BOOL)enabled {
+    _isAutoConnectDisabled = !enabled;
 }
 
 - (BOOL)isAutoConnectEnabled {
@@ -559,13 +555,9 @@
     }
 }
 
-- (void)enableAutoContactSync {
-    [[NSUserDefaults standardUserDefaults] setSecureBool:NO forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)disableAutoContactSync {
-    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
+- (void)setAutoContactSyncEnabled:(BOOL)enabled {
+    BOOL disabled = !enabled;
+    [[NSUserDefaults standardUserDefaults] setSecureBool:disabled forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

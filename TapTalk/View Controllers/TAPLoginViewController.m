@@ -271,6 +271,7 @@
 
 - (void)presentLoginViewControllerIfNeededFromViewController:(UIViewController *)viewController force:(BOOL)force {
     UINavigationController *loginNavigationController = [[UINavigationController alloc] initWithRootViewController:self];
+    loginNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
     if (![[TapTalk sharedInstance] isAuthenticated] || force) {
         
         //Prevention to clear existing data

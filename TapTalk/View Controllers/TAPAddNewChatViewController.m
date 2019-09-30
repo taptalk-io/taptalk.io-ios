@@ -13,7 +13,7 @@
 #import "TAPAddNewContactViewController.h"
 #import "TAPCreateGroupViewController.h"
 
-#import "TAPChatViewController.h"
+#import "TapUIChatViewController.h"
 #import <Photos/Photos.h>
 #import <Contacts/Contacts.h>
 

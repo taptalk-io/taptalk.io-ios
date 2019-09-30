@@ -228,6 +228,15 @@
         captionString = caption;                        
     }
     
+    //Check if caption is more than 100 words, failed
+    NSInteger maxCaptionCharacterLength = 100;
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(error);
+        return;
+    }
+    
     [[TAPChatManager sharedManager] sendImageMessage:image caption:captionString room:room successGenerateMessage:^(TAPMessageModel *message) {
         //Handle block to dictionary
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
@@ -271,6 +280,15 @@
         captionString = caption;
     }
     
+    //Check if caption is more than 100 words, failed
+    NSInteger maxCaptionCharacterLength = 100;
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(error);
+        return;
+    }
+    
     [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption room:room successGenerateMessage:^(TAPMessageModel *message) {
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
         
@@ -311,6 +329,15 @@
     NSString *captionString = @"";
     if (caption != nil) {
         captionString = caption;
+    }
+    
+    //Check if caption is more than 100 words, failed
+    NSInteger maxCaptionCharacterLength = 100;
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(error);
+        return;
     }
     
     PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];

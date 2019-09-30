@@ -118,7 +118,12 @@
             bottomGap = [TAPUtil safeAreaBottomPadding];
         }
         
-        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap);
+        if (IS_IOS_13_OR_ABOVE) {
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap + [TAPUtil topGapPresentingViewController]);
+        }
+        else {
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap);
+        }
     }
     
     return self;
@@ -143,7 +148,12 @@
             bottomGap = [TAPUtil safeAreaBottomPadding];
         }
         
-        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap);
+        if (IS_IOS_13_OR_ABOVE) {
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap + [TAPUtil topGapPresentingViewController]);
+        }
+        else {
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap);
+        }
     }];
 }
 

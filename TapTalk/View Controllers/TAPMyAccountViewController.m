@@ -63,7 +63,11 @@
     [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    
+    if ([TapUI sharedInstance].isLogoutButtonVisible) {
+        //Handle only when logout is visible
+        [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
     
     [self.myAccountView setContinueButtonEnabled:YES];
     
@@ -255,6 +259,11 @@
                 
                 [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
                     [self.myAccountView setAsLoading:NO];
+                    
+                    if ([self.delegate respondsToSelector:@selector(myAccountViewControllerDoneChangingImageProfile)]) {
+                        [self.delegate myAccountViewControllerDoneChangingImageProfile];
+                    }
+                    
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     [self.myAccountView animateProgressUploadingImageWithProgress:progress total:total];
                 } failureBlock:^(NSError *error) {
@@ -603,8 +612,11 @@
                 [self dismissViewControllerAnimated:NO completion:nil];
                 [self.myAccountView showLogoutLoadingView:NO];
                 
-                TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
-                [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapUI sharedInstance] roomListViewController] force:YES];
+                id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+                if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+                    [tapTalkDelegate userLogout];
+                }
+
             } failure:^(NSError *error) {
                 //Show alert
                 [self.myAccountView showLogoutLoadingView:NO];

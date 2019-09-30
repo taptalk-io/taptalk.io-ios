@@ -48,7 +48,6 @@
         _continueContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bottomView.frame) - 110.0f, 0.0f, 110.0f, CGRectGetHeight(self.bottomView.frame))];
         [self.bottomView addSubview:self.continueContainerView];
         
-        
         _itemNumberView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.continueContainerView.frame) - 22.0f) / 2.0f, 26.0f, 22.0f)];
         self.itemNumberView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         self.itemNumberView.layer.cornerRadius = CGRectGetHeight(self.itemNumberView.frame) / 2.0f;
