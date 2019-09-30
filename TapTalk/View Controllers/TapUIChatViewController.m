@@ -6838,16 +6838,31 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
     
-    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
-        [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
+    if (self.currentRoom.type == RoomTypePersonal) {
+        id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+        if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
+            [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
+        }
+        else {
+            TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+            profileViewController.room = [TAPChatManager sharedManager].activeRoom;
+            profileViewController.otherUserID = otherUserID;
+            profileViewController.delegate = self;
+            [self.navigationController pushViewController:profileViewController animated:YES];
+        }
     }
-    else {
-        TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
-        profileViewController.room = [TAPChatManager sharedManager].activeRoom;
-        profileViewController.otherUserID = otherUserID;
-        profileViewController.delegate = self;
-        [self.navigationController pushViewController:profileViewController animated:YES];
+    else if (self.currentRoom.type == RoomTypeGroup) {
+        id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+        if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkGroupChatRoomProfileButtonTapped:room:currentShownNavigationController:)]) {
+            [tapUIChatRoomDelegate tapTalkGroupChatRoomProfileButtonTapped:self room:self.currentRoom currentShownNavigationController:self.navigationController];
+        }
+        else {
+            TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+            profileViewController.room = [TAPChatManager sharedManager].activeRoom;
+            profileViewController.otherUserID = otherUserID;
+            profileViewController.delegate = self;
+            [self.navigationController pushViewController:profileViewController animated:YES];
+        }
     }
 }
 
