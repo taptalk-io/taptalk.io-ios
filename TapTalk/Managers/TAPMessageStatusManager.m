@@ -90,17 +90,20 @@
     
     //Clear read message queue
     NSArray *tempMessageArray = [self.readMessageQueueArray copy];
+    [self.readMessageQueueArray removeAllObjects];
     
-    //Update to database
-    [TAPDataManager updateMessageReadStatusToDatabaseWithData:tempMessageArray success:^{
-        [self.readMessageQueueArray removeAllObjects];
-    } failure:^(NSError *error) {
-        
-    }];
+    //DV Note - will be handled in receive emit read message
+//    //Update to database
+//    [TAPDataManager updateMessageReadStatusToDatabaseWithData:tempMessageArray success:^{
+//        [self.readMessageQueueArray removeAllObjects];
+//    } failure:^(NSError *error) {
+//
+//    }];
+    //END DV Note
     
     //Call API send read status
     _apiRequestCount++;
-    
+        
     [TAPDataManager callAPIUpdateMessageReadStatusWithArray:tempMessageArray success:^(NSArray *updatedMessageIDsArray) {
         _isProcessingUpdateReadStatus = NO;
         _apiRequestCount--;
@@ -108,10 +111,19 @@
         _isProcessingUpdateReadStatus = NO;
         _apiRequestCount--;
         
-        //Put back failed response to array
-        for(TAPMessageModel *message in messageArray) {
-            [self markMessageAsReadWithMessage:message];
-        }
+    //DV Note - will be handled in receive emit read message
+//        //Save failed to preference
+//        NSMutableArray *pendingReadDataArray = [NSMutableArray array];
+//        pendingReadDataArray = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_PENDING_UPDATE_READ_MESSAGE valid:nil];
+//        pendingReadDataArray = [TAPUtil nullToEmptyArray:pendingReadDataArray];
+//
+//        for(TAPMessageModel *message in messageArray) {
+//            NSString *messageID = message.messageID;
+//            [pendingReadDataArray addObject:messageID];
+//        }
+//
+//        [[NSUserDefaults standardUserDefaults] setSecureObject:pendingReadDataArray forKey:TAP_PREFS_PENDING_UPDATE_READ_MESSAGE];
+    //END DV Note
     }];
 }
 

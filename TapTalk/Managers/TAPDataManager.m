@@ -4069,6 +4069,11 @@
         [messageIDsArray addObject:message.messageID];
     }
     
+    NSMutableArray *pendingReadMessageArray = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_PENDING_UPDATE_READ_MESSAGE valid:nil];
+    if ([pendingReadMessageArray count] != 0) {
+        [messageIDsArray addObjectsFromArray:[pendingReadMessageArray copy]];
+    }
+    
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:messageIDsArray forKey:@"messageIDs"];
     

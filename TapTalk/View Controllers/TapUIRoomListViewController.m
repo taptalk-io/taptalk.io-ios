@@ -457,7 +457,7 @@
     }
 }
 
-#pragma mark TAPChatViewController
+#pragma mark TapUIChatViewController
 - (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID {
     NSInteger readCount = [[TAPMessageStatusManager sharedManager] getReadCountAndClearDictionaryForRoomID:roomID];
     
@@ -471,6 +471,17 @@
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+}
+
+- (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
+    //Force mark unread bubble to 0
+    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+    roomList.numberOfUnreadMessages = 0;
+        
+    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+
 }
 
 #pragma mark TAPSearchViewController
@@ -582,6 +593,16 @@
             if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
                 [tapTalkDelegate tapTalkRefreshTokenExpired];
             }
+        }
+        else {
+            //User not authenticated
+            
+            [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
+            [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
+            
+            NSLog(@"****************************************************/n/n/n");
+            NSLog(@"TapTalk.io - Could not find active user data. Please make sure the client app is authenticated.");
+            NSLog(@"/n/n/n****************************************************");
         }
         
         return; //User not logged in

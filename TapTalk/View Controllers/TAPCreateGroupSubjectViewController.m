@@ -16,6 +16,7 @@
 @property (strong, nonatomic) TAPCreateGroupSubjectView *createGroupSubjectView;
 @property (strong, nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
 @property (strong, nonatomic) UIImage *selectedImage;
+@property (nonatomic) BOOL isLoading;
 
 - (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (void)backButtonDidTapped;
@@ -347,6 +348,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)createButtonDidTapped {
+    _isLoading = YES;
     [self.createGroupSubjectView.createButtonView setAsLoading:YES animated:YES];
     self.createGroupSubjectView.createButtonView.userInteractionEnabled = NO;
     
@@ -375,6 +377,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #ifdef DEBUG
                     NSLog(@"Success upload image");
 #endif
+                    
+                    _isLoading = NO;
+                    
                     //Update to group cache
                     TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
                     existingRoom.name = room.name;
@@ -406,6 +411,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             else {
                 //no image, open room
+                
+                _isLoading = NO;
                 [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                 
@@ -420,6 +427,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             
         } failure:^(NSError *error) {
+            _isLoading = NO;
             [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
             self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -449,6 +457,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
                     }
                     
+                    _isLoading = NO;
+                    
                     //image uploaded
                     //dismiss view controller
                     //back to room
@@ -469,6 +479,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 //no image, dismiss view controller
                 //back to room detail
+                _isLoading = NO;
+                
                 if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
                     [self.delegate createGroupSubjectViewControllerUpdatedRoom:self.roomModel];
                 }
@@ -494,6 +506,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         existingRoom.deleted = room.deleted;
                         existingRoom.imageURL = room.imageURL;
                         
+                        _isLoading = NO;
+                        
                         if (existingRoom != nil) {
                             [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
                         }
@@ -508,6 +522,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     } progressBlock:^(CGFloat progress, CGFloat total) {
                         
                     } failureBlock:^(NSError *error) {
+                        _isLoading = NO;
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -517,6 +532,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
                 else {
                     //no image, dismiss view controller
+                    _isLoading = NO;
                     
                     //Save to group preference
                     TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -537,6 +553,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self dismissViewControllerAnimated:YES completion:nil];
                 }
             } failure:^(NSError *error) {
+                _isLoading = NO;
                 [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -609,6 +626,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)cancelButtonDidTapped {
+    if (self.isLoading) {
+        return;
+    }
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -649,7 +670,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -693,7 +714,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {

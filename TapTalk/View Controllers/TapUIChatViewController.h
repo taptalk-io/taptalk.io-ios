@@ -25,6 +25,11 @@ typedef NS_ENUM(NSInteger, TapUIChatViewControllerType) {
 - (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID;
 
 /**
+ Triggered to clear unread bubble in TapUIRoomListViewController
+ */
+- (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID;
+
+/**
 Triggered when user delete or leave from group and will pass the delegate to TapUIRoomListViewController
 */
 - (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room;

@@ -274,10 +274,16 @@
 }
 
 - (void)application:(UIApplication *_Nonnull)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *_Nonnull)deviceToken {
-    NSString *pushToken = [deviceToken description];
-    pushToken = [pushToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
-    pushToken = [pushToken stringByReplacingOccurrencesOfString:@">" withString:@""];
-    pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString *pushToken = [TAPUtil hexadecimalStringFromData:deviceToken];
+    if (IS_IOS_13_OR_ABOVE) {
+        pushToken = [pushToken stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    }
+    else {
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@">" withString:@""];
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    }
     
     [[TAPNotificationManager sharedManager] setPushToken:pushToken];
 }

@@ -270,7 +270,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)updateLastSeenWithTimestamp:(NSTimeInterval)timestamp;
 - (void)processMessageAsRead:(TAPMessageModel *)message forceMarkAsRead:(BOOL)force;
 - (void)processVisibleMessageAsRead;
-- (void)processAllPreviousMessageAsRead; //RN Note - Remove when implement new message offset
+- (void)processAllPreviousMessageAsRead;
 - (void)setAsTyping:(BOOL)typing;
 - (void)setAsTypingNoAfterDelay;
 - (void)showInputAccessoryExtensionView:(BOOL)show;
@@ -4533,7 +4533,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -4576,7 +4576,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -4708,7 +4708,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                         handler:^(UIAlertAction * action) {
                                             [self showInputAccessoryView];
                                             if([[UIApplication sharedApplication] canOpenURL:url]) {
-                                                if(IS_IOS_10_OR_ABOVE) {
+                                                if(IS_IOS_11_OR_ABOVE) {
                                                     [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
                                                 }
                                                 else {
@@ -4783,7 +4783,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                          //CS TEMP - temporary open safari
                                          [self showInputAccessoryView];
                                          if([[UIApplication sharedApplication] canOpenURL:url]) {
-                                             if(IS_IOS_10_OR_ABOVE) {
+                                             if(IS_IOS_11_OR_ABOVE) {
                                                  [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
                                              }
                                              else {
@@ -4860,7 +4860,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      [self showInputAccessoryView];
                                      NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
                                      if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-                                         if(IS_IOS_10_OR_ABOVE) {
+                                         if(IS_IOS_11_OR_ABOVE) {
                                              [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
                                          }
                                          else {
@@ -4876,7 +4876,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                     [self showInputAccessoryView];
                                     NSString *stringURL = [NSString stringWithFormat:@"sms:%@", phoneNumber];
                                     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-                                        if(IS_IOS_10_OR_ABOVE) {
+                                        if(IS_IOS_11_OR_ABOVE) {
                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
                                         }
                                         else {
@@ -4953,7 +4953,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //handle email address
         //open mail app
         if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_10_OR_ABOVE) {
+            if(IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -4965,7 +4965,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //handle link
         //open webview
         if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_10_OR_ABOVE) {
+            if(IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:url
                                                    options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
                                          completionHandler:^(BOOL success){
@@ -4990,7 +4990,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString {
     NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-        if(IS_IOS_10_OR_ABOVE) {
+        if(IS_IOS_11_OR_ABOVE) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
         }
         else {
@@ -5666,7 +5666,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 
                 //Update cell to deleted message
                 [self.tableView beginUpdates];
-                [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
+                [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
                 [self.tableView endUpdates];
             }
             else {
@@ -5999,8 +5999,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 }
             }
         }
-        
-        NSLog(@"numberOfUnreadMessages: %ld", (long)self.numberOfUnreadMessages);
 
     //DV NOTE
     //13 Sept 2019
@@ -6075,7 +6073,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                withCompletionHandler:(void(^)())completionHandler {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-    
         NSInteger earliestUnreadMessageIndex = -1;
         long minCreatedUnreadMessage;
         
@@ -6086,7 +6083,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         index = [self.messageArray count];
         
         for (NSInteger counter = 0; counter < [messageArray count]; counter++) {
-            
             TAPMessageModel *message = [messageArray objectAtIndex:counter];
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
             if (currentMessage != nil) {
@@ -6100,29 +6096,28 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 index++;
             }
         }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-    
-            for (NSString *key in currentAddedMessageArray) {
-                TAPMessageModel *currentMessage = [currentAddedMessageDictionary objectForKey:key];
-                [self addIncomingMessageToArrayAndDictionaryWithMessage:currentMessage atIndex:[key integerValue]];
-            }
             
-            NSMutableArray *indexPaths = [NSMutableArray array];
-            NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count];
-            for (int count = currentCount; count < [self.messageArray count]; count++) {
-                [indexPaths addObject:[NSIndexPath indexPathForRow:count inSection:0]];
-            }
-    
-        if([indexPaths count] > 0) {
-            [self.tableView beginUpdates];
-            [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
-            [self.tableView endUpdates];
-            [self.tableView scrollsToTop];
-        }
-            
-            completionHandler();
-        });
+            dispatch_async(dispatch_get_main_queue(), ^{
+                for (NSString *key in currentAddedMessageArray) {
+                    TAPMessageModel *currentMessage = [currentAddedMessageDictionary objectForKey:key];
+                    [self addIncomingMessageToArrayAndDictionaryWithMessage:currentMessage atIndex:[key integerValue]];
+                }
+                
+                NSMutableArray *indexPathArray = [NSMutableArray array];
+                NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count];
+                for (int count = currentCount; count < [self.messageArray count]; count++) {
+                    [indexPathArray addObject:[NSIndexPath indexPathForRow:count inSection:0]];
+                }
+                
+                if([indexPathArray count] > 0) {
+                    [self.tableView beginUpdates];
+                    [self.tableView insertRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.tableView endUpdates];
+                    [self.tableView scrollsToTop]; //Scroll to top untuk apa?X
+                }
+                
+                completionHandler();
+            });
     });
 }
 
@@ -6259,8 +6254,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     
     //Remove local notification and send read status to server
-    NSLog(@"READ MESSAGE: %@", message.body);
-    
     message.isRead = YES;
     
     //Call Message Status Manager mark as read call API
@@ -6284,8 +6277,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
-//RN Note - Remove when implement new message offset
 - (void)processAllPreviousMessageAsRead {
+    if ([self.delegate respondsToSelector:@selector(chatViewControllerShouldClearUnreadBubbleForRoomID:)]) {
+        [self.delegate chatViewControllerShouldClearUnreadBubbleForRoomID:self.currentRoom.roomID];
+    }
+    
     [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:[TAPChatManager sharedManager].activeRoom.roomID
                                                  activeUserID:[TAPChatManager sharedManager].activeUser.userID
                                                       success:^(NSArray *unreadMessages) {
@@ -6308,7 +6304,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                                           
                                                       }];
 }
-//END RN Note - Remove when implement new message offset
 
 #pragma mark Keyboard
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
@@ -7235,10 +7230,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
         }
     }
-}
-
-- (void)showFirstLoadMessageLoadingView {
-    
 }
 
 - (void)checkAndRefreshOnlineStatus {
