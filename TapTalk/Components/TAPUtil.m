@@ -416,6 +416,20 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return formattedCurrencyString;
 }
 
++ (NSString *)hexadecimalStringFromData:(NSData *)data {
+  NSUInteger dataLength = data.length;
+  if (dataLength == 0) {
+    return nil;
+  }
+
+  const unsigned char *dataBuffer = (const unsigned char *)data.bytes;
+  NSMutableString *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
+  for (int i = 0; i < dataLength; ++i) {
+    [hexString appendFormat:@"%02x", dataBuffer[i]];
+  }
+  return [hexString copy];
+}
+
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2 {
     CLLocation *locationA = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];

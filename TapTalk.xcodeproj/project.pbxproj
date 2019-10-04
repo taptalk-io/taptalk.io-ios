@@ -210,10 +210,8 @@
 		D77B5F5E2158BBEA00253BDC /* TAPBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5F422158BBEA00253BDC /* TAPBaseViewController.m */; };
 		D77B5F602158BBEA00253BDC /* TAPAddNewContactViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5F442158BBEA00253BDC /* TAPAddNewContactViewController.h */; };
 		D77B5F612158BBEA00253BDC /* TAPScanQRCodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5F452158BBEA00253BDC /* TAPScanQRCodeViewController.h */; };
-		D77B5F622158BBEA00253BDC /* TAPRoomListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5F462158BBEA00253BDC /* TAPRoomListViewController.h */; };
 		D77B5F632158BBEA00253BDC /* TAPAddNewContactViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5F472158BBEA00253BDC /* TAPAddNewContactViewController.m */; };
 		D77B5F642158BBEA00253BDC /* TAPBlockedListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5F482158BBEA00253BDC /* TAPBlockedListViewController.m */; };
-		D77B5F662158BBEA00253BDC /* TAPRoomListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5F4A2158BBEA00253BDC /* TAPRoomListViewController.m */; };
 		D77B5F682158BBEA00253BDC /* TAPCustomNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D77B5F4C2158BBEA00253BDC /* TAPCustomNavigationController.m */; };
 		D77B5F6B2158BBEA00253BDC /* TAPBaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5F4F2158BBEA00253BDC /* TAPBaseViewController.h */; };
 		D77B5F6D2158BBEA00253BDC /* TAPSearchViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D77B5F512158BBEA00253BDC /* TAPSearchViewController.h */; };
@@ -278,6 +276,11 @@
 		D7D3B44422FD7D7B00D1DFF7 /* TAPCoreConfigsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D3B44222FD7D7B00D1DFF7 /* TAPCoreConfigsModel.m */; };
 		D7D3B44722FD7D8D00D1DFF7 /* TAPProjectConfigsModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D3B44522FD7D8D00D1DFF7 /* TAPProjectConfigsModel.h */; };
 		D7D3B44822FD7D8D00D1DFF7 /* TAPProjectConfigsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D3B44622FD7D8D00D1DFF7 /* TAPProjectConfigsModel.m */; };
+		D7D3DBAA234785B600C7352D /* TapUIRoomListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D3DBA8234785B600C7352D /* TapUIRoomListViewController.h */; };
+		D7D3DBAB234785B600C7352D /* TapUIRoomListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D3DBA9234785B600C7352D /* TapUIRoomListViewController.m */; };
+		D7D3DBAF234785DA00C7352D /* TapUIChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D3DBAC234785DA00C7352D /* TapUIChatViewController.m */; };
+		D7D3DBB0234785DA00C7352D /* TapUIChatViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7D3DBAD234785DA00C7352D /* TapUIChatViewController.xib */; };
+		D7D3DBB1234785DA00C7352D /* TapUIChatViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D3DBAE234785DA00C7352D /* TapUIChatViewController.h */; };
 		D7E26BDB225E041600B50506 /* TAPMyVideoBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E26BD8225E041600B50506 /* TAPMyVideoBubbleTableViewCell.m */; };
 		D7E26BDC225E041600B50506 /* TAPMyVideoBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7E26BD9225E041600B50506 /* TAPMyVideoBubbleTableViewCell.h */; };
 		D7E26BDD225E041600B50506 /* TAPMyVideoBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7E26BDA225E041600B50506 /* TAPMyVideoBubbleTableViewCell.xib */; };
@@ -318,17 +321,12 @@
 		D7FF4CEB2176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7FF4CE82176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.xib */; };
 		DF133C47219C475200A0E6CC /* TAPCustomAccessoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF133C45219C475200A0E6CC /* TAPCustomAccessoryView.m */; };
 		DF133C48219C475200A0E6CC /* TAPCustomAccessoryView.h in Headers */ = {isa = PBXBuildFile; fileRef = DF133C46219C475200A0E6CC /* TAPCustomAccessoryView.h */; };
-		DF133C4C219C477500A0E6CC /* TAPChatViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF133C49219C477400A0E6CC /* TAPChatViewController.xib */; };
-		DF133C4D219C477500A0E6CC /* TAPChatViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = DF133C4A219C477400A0E6CC /* TAPChatViewController.h */; };
-		DF133C4E219C477500A0E6CC /* TAPChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF133C4B219C477400A0E6CC /* TAPChatViewController.m */; };
 		DF2513CB21E61BCB000D165A /* TAPReplyToModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DF2513C921E61BCB000D165A /* TAPReplyToModel.h */; };
 		DF2513CC21E61BCB000D165A /* TAPReplyToModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DF2513CA21E61BCB000D165A /* TAPReplyToModel.m */; };
 		DF2513CF21E61BE3000D165A /* TAPForwardFromModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DF2513CD21E61BE3000D165A /* TAPForwardFromModel.h */; };
 		DF2513D021E61BE3000D165A /* TAPForwardFromModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DF2513CE21E61BE3000D165A /* TAPForwardFromModel.m */; };
 		DF2513D321E61C3E000D165A /* TAPQuoteModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DF2513D121E61C3E000D165A /* TAPQuoteModel.h */; };
 		DF2513D421E61C3E000D165A /* TAPQuoteModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DF2513D221E61C3E000D165A /* TAPQuoteModel.m */; };
-		DF33AADF21B107BF004C2A49 /* TAPCustomKeyboardManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DF33AADD21B107BF004C2A49 /* TAPCustomKeyboardManager.h */; };
-		DF33AAE021B107BF004C2A49 /* TAPCustomKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DF33AADE21B107BF004C2A49 /* TAPCustomKeyboardManager.m */; };
 		DF343D0122F2C592004D54F5 /* TAPMediaDetailViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = DF343D0022F2C592004D54F5 /* TAPMediaDetailViewController.h */; };
 		DF343D0322F2C5FA004D54F5 /* TAPMediaDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF343D0222F2C5F9004D54F5 /* TAPMediaDetailViewController.m */; };
 		DF343D0522F2C642004D54F5 /* TAPMediaDetailView.h in Headers */ = {isa = PBXBuildFile; fileRef = DF343D0422F2C642004D54F5 /* TAPMediaDetailView.h */; };
@@ -620,10 +618,8 @@
 		D77B5F422158BBEA00253BDC /* TAPBaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPBaseViewController.m; sourceTree = "<group>"; };
 		D77B5F442158BBEA00253BDC /* TAPAddNewContactViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPAddNewContactViewController.h; sourceTree = "<group>"; };
 		D77B5F452158BBEA00253BDC /* TAPScanQRCodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPScanQRCodeViewController.h; sourceTree = "<group>"; };
-		D77B5F462158BBEA00253BDC /* TAPRoomListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPRoomListViewController.h; sourceTree = "<group>"; };
 		D77B5F472158BBEA00253BDC /* TAPAddNewContactViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPAddNewContactViewController.m; sourceTree = "<group>"; };
 		D77B5F482158BBEA00253BDC /* TAPBlockedListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPBlockedListViewController.m; sourceTree = "<group>"; };
-		D77B5F4A2158BBEA00253BDC /* TAPRoomListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPRoomListViewController.m; sourceTree = "<group>"; };
 		D77B5F4C2158BBEA00253BDC /* TAPCustomNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomNavigationController.m; sourceTree = "<group>"; };
 		D77B5F4F2158BBEA00253BDC /* TAPBaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPBaseViewController.h; sourceTree = "<group>"; };
 		D77B5F512158BBEA00253BDC /* TAPSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPSearchViewController.h; sourceTree = "<group>"; };
@@ -688,6 +684,11 @@
 		D7D3B44222FD7D7B00D1DFF7 /* TAPCoreConfigsModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCoreConfigsModel.m; sourceTree = "<group>"; };
 		D7D3B44522FD7D8D00D1DFF7 /* TAPProjectConfigsModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPProjectConfigsModel.h; sourceTree = "<group>"; };
 		D7D3B44622FD7D8D00D1DFF7 /* TAPProjectConfigsModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPProjectConfigsModel.m; sourceTree = "<group>"; };
+		D7D3DBA8234785B600C7352D /* TapUIRoomListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapUIRoomListViewController.h; sourceTree = "<group>"; };
+		D7D3DBA9234785B600C7352D /* TapUIRoomListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapUIRoomListViewController.m; sourceTree = "<group>"; };
+		D7D3DBAC234785DA00C7352D /* TapUIChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapUIChatViewController.m; sourceTree = "<group>"; };
+		D7D3DBAD234785DA00C7352D /* TapUIChatViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TapUIChatViewController.xib; sourceTree = "<group>"; };
+		D7D3DBAE234785DA00C7352D /* TapUIChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapUIChatViewController.h; sourceTree = "<group>"; };
 		D7E26BD8225E041600B50506 /* TAPMyVideoBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPMyVideoBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D7E26BD9225E041600B50506 /* TAPMyVideoBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPMyVideoBubbleTableViewCell.h; sourceTree = "<group>"; };
 		D7E26BDA225E041600B50506 /* TAPMyVideoBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPMyVideoBubbleTableViewCell.xib; sourceTree = "<group>"; };
@@ -728,17 +729,12 @@
 		D7FF4CE82176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TAPLoadMoreBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		DF133C45219C475200A0E6CC /* TAPCustomAccessoryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomAccessoryView.m; sourceTree = "<group>"; };
 		DF133C46219C475200A0E6CC /* TAPCustomAccessoryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomAccessoryView.h; sourceTree = "<group>"; };
-		DF133C49219C477400A0E6CC /* TAPChatViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPChatViewController.xib; sourceTree = "<group>"; };
-		DF133C4A219C477400A0E6CC /* TAPChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPChatViewController.h; sourceTree = "<group>"; };
-		DF133C4B219C477400A0E6CC /* TAPChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPChatViewController.m; sourceTree = "<group>"; };
 		DF2513C921E61BCB000D165A /* TAPReplyToModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPReplyToModel.h; sourceTree = "<group>"; };
 		DF2513CA21E61BCB000D165A /* TAPReplyToModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPReplyToModel.m; sourceTree = "<group>"; };
 		DF2513CD21E61BE3000D165A /* TAPForwardFromModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPForwardFromModel.h; sourceTree = "<group>"; };
 		DF2513CE21E61BE3000D165A /* TAPForwardFromModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPForwardFromModel.m; sourceTree = "<group>"; };
 		DF2513D121E61C3E000D165A /* TAPQuoteModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPQuoteModel.h; sourceTree = "<group>"; };
 		DF2513D221E61C3E000D165A /* TAPQuoteModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPQuoteModel.m; sourceTree = "<group>"; };
-		DF33AADD21B107BF004C2A49 /* TAPCustomKeyboardManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCustomKeyboardManager.h; sourceTree = "<group>"; };
-		DF33AADE21B107BF004C2A49 /* TAPCustomKeyboardManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomKeyboardManager.m; sourceTree = "<group>"; };
 		DF343D0022F2C592004D54F5 /* TAPMediaDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPMediaDetailViewController.h; sourceTree = "<group>"; };
 		DF343D0222F2C5F9004D54F5 /* TAPMediaDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPMediaDetailViewController.m; sourceTree = "<group>"; };
 		DF343D0422F2C642004D54F5 /* TAPMediaDetailView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPMediaDetailView.h; sourceTree = "<group>"; };
@@ -1014,8 +1010,6 @@
 				D7AB098F2191882B00C18BEE /* TAPOldDataManager.m */,
 				D76948B821B10D2B00AE0BE6 /* TAPCustomBubbleManager.h */,
 				D76948B921B10D2B00AE0BE6 /* TAPCustomBubbleManager.m */,
-				DF33AADD21B107BF004C2A49 /* TAPCustomKeyboardManager.h */,
-				DF33AADE21B107BF004C2A49 /* TAPCustomKeyboardManager.m */,
 				DFA5990121B7D3A30082C5F3 /* TAPContactManager.h */,
 				DFA5990221B7D3A30082C5F3 /* TAPContactManager.m */,
 				D77866BD224205C000A98F05 /* TAPFetchMediaManager.h */,
@@ -1175,9 +1169,9 @@
 				D77B5F472158BBEA00253BDC /* TAPAddNewContactViewController.m */,
 				D77B5F3A2158BBE900253BDC /* TAPBlockedListViewController.h */,
 				D77B5F482158BBEA00253BDC /* TAPBlockedListViewController.m */,
-				DF133C4A219C477400A0E6CC /* TAPChatViewController.h */,
-				DF133C4B219C477400A0E6CC /* TAPChatViewController.m */,
-				DF133C49219C477400A0E6CC /* TAPChatViewController.xib */,
+				D7D3DBAE234785DA00C7352D /* TapUIChatViewController.h */,
+				D7D3DBAC234785DA00C7352D /* TapUIChatViewController.m */,
+				D7D3DBAD234785DA00C7352D /* TapUIChatViewController.xib */,
 				D77B5F412158BBEA00253BDC /* TAPCreateGroupSubjectViewController.h */,
 				D77B5F3E2158BBE900253BDC /* TAPCreateGroupSubjectViewController.m */,
 				DF343D1222F2C6E5004D54F5 /* TAPCreateGroupViewController.m */,
@@ -1190,8 +1184,8 @@
 				D77B5F532158BBEA00253BDC /* TAPPopUpInfoViewController.m */,
 				D769A2EF22535A820059DC9B /* TAPRegisterViewController.h */,
 				D769A2F022535A820059DC9B /* TAPRegisterViewController.m */,
-				D77B5F462158BBEA00253BDC /* TAPRoomListViewController.h */,
-				D77B5F4A2158BBEA00253BDC /* TAPRoomListViewController.m */,
+				D7D3DBA8234785B600C7352D /* TapUIRoomListViewController.h */,
+				D7D3DBA9234785B600C7352D /* TapUIRoomListViewController.m */,
 				D77B5F452158BBEA00253BDC /* TAPScanQRCodeViewController.h */,
 				D77B5F3C2158BBE900253BDC /* TAPScanQRCodeViewController.m */,
 				D73F430E2237A26900E9789B /* TAPScanQRCodePopupViewController.h */,
@@ -1491,7 +1485,6 @@
 				D77B5F6B2158BBEA00253BDC /* TAPBaseViewController.h in Headers */,
 				D7E26BE1225E042200B50506 /* TAPYourVideoBubbleTableViewCell.h in Headers */,
 				D76948BA21B10D2B00AE0BE6 /* TAPCustomBubbleManager.h in Headers */,
-				D77B5F622158BBEA00253BDC /* TAPRoomListViewController.h in Headers */,
 				D754CFB42216ECC6008CE9F9 /* TAPPickLocationView.h in Headers */,
 				D71582F2217EE99700649C70 /* TAPNotificationManager.h in Headers */,
 				D774A94E22E822A6005CAD5D /* TapUI.h in Headers */,
@@ -1541,11 +1534,11 @@
 				D7FB9EE721C8D71900E26FC7 /* TAPThumbnailImagePreviewCollectionViewCell.h in Headers */,
 				DFFEFEA32227E64400017739 /* TAPWebViewView.h in Headers */,
 				D7A98E46221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.h in Headers */,
-				DF33AADF21B107BF004C2A49 /* TAPCustomKeyboardManager.h in Headers */,
 				D7683F6D22B8C458003420DB /* TAPStyle.h in Headers */,
 				DF45149721BA52FE00C1C539 /* TAPTypingModel.h in Headers */,
 				DFA5990321B7D3A30082C5F3 /* TAPContactManager.h in Headers */,
 				D7CAADF72251EB6C005493D9 /* TAPNumericKeyboardAccessoryView.h in Headers */,
+				D7D3DBAA234785B600C7352D /* TapUIRoomListViewController.h in Headers */,
 				D7E26BDC225E041600B50506 /* TAPMyVideoBubbleTableViewCell.h in Headers */,
 				D77B5F072158BB8700253BDC /* TAPNewChatBlockedContactsTableViewCell.h in Headers */,
 				F571763B216DC81300B50F3C /* TAPKeyboardViewController.h in Headers */,
@@ -1572,6 +1565,7 @@
 				D77B5ECF2158BB6E00253BDC /* TAPMessageModel.h in Headers */,
 				D77B5F032158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.h in Headers */,
 				D77B5F752158BC7A00253BDC /* Configs.h in Headers */,
+				D7D3DBB1234785DA00C7352D /* TapUIChatViewController.h in Headers */,
 				D780A08821AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.h in Headers */,
 				DFF60D5A225B44B40038FB4D /* TAPLeftCustomNavigationButton.h in Headers */,
 				D72F395F2240A14C00F4FC38 /* TAPMediaPreviewModel.h in Headers */,
@@ -1599,7 +1593,6 @@
 				D7796594215B3F1300756A38 /* TAPConnectionStatusView.h in Headers */,
 				D779658F215B3D4400756A38 /* TAPGrowingTextView.h in Headers */,
 				DF61EAB922D2040000A67364 /* TAPPlainInfoLabelTableViewCell.h in Headers */,
-				DF133C4D219C477500A0E6CC /* TAPChatViewController.h in Headers */,
 				D769A2F422535B5B0059DC9B /* TAPCustomButtonView.h in Headers */,
 				F58EF7DE2188243D00F50B24 /* TAPProfileViewController.h in Headers */,
 				D77B5EA82158BB4000253BDC /* TAPEncryptorManager.h in Headers */,
@@ -1706,12 +1699,12 @@
 				F571763D216DC81300B50F3C /* TAPKeyboardViewController.xib in Resources */,
 				D7E26BDD225E041600B50506 /* TAPMyVideoBubbleTableViewCell.xib in Resources */,
 				DF94DD7B22B0BD5B00E7E629 /* TAPSystemMessageTableViewCell.xib in Resources */,
-				DF133C4C219C477500A0E6CC /* TAPChatViewController.xib in Resources */,
 				D775E3972189D7660003A40C /* moselo-notification.caf in Resources */,
 				F56AAE5B2186EEFD00E0ECC3 /* TAPMyImageBubbleTableViewCell.xib in Resources */,
 				D7D0811A2190255B0037FA57 /* TAPProductListCollectionViewCell.xib in Resources */,
 				D776CB7922CC669D003B0D4F /* DMSans-Italic.ttf in Resources */,
 				DF86DC202224F25400D9D4A9 /* Assets.xcassets in Resources */,
+				D7D3DBB0234785DA00C7352D /* TapUIChatViewController.xib in Resources */,
 				D7FF4CE52176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.xib in Resources */,
 				D7E26BE2225E042200B50506 /* TAPYourVideoBubbleTableViewCell.xib in Resources */,
 				D7B4954C215B49F200F07BEC /* TAPGrowingTextView.xib in Resources */,
@@ -1806,7 +1799,7 @@
 				D74769FF21638F9700B196E7 /* TAPAddNewContactView.m in Sources */,
 				D77B5F052158BB8700253BDC /* TAPBaseXIBTableViewCell.m in Sources */,
 				D7158300217EFB0000649C70 /* TAPCustomNotificationAlertViewController.m in Sources */,
-				D77B5F662158BBEA00253BDC /* TAPRoomListViewController.m in Sources */,
+				D7D3DBAF234785DA00C7352D /* TapUIChatViewController.m in Sources */,
 				F51B8E9121621AB300C03479 /* TAPYourChatBubbleTableViewCell.m in Sources */,
 				D7796595215B3F1300756A38 /* TAPConnectionStatusView.m in Sources */,
 				D70DA2792225274400824E86 /* TAPForwardListView.m in Sources */,
@@ -1933,20 +1926,19 @@
 				D709F857229E2FDA00EB81C2 /* TAPYourChatDeletedBubbleTableViewCell.m in Sources */,
 				D7358CAC227AD02200C65C67 /* TAPCountryPickerView.m in Sources */,
 				D77B5EBA2158BB6300253BDC /* TAPMessageRealmModel.m in Sources */,
+				D7D3DBAB234785B600C7352D /* TapUIRoomListViewController.m in Sources */,
 				DFA5990421B7D3A30082C5F3 /* TAPContactManager.m in Sources */,
 				D798F6A72301351D0001CC16 /* TAPCoreErrorManager.m in Sources */,
 				D77B5ED92158BB6E00253BDC /* TAPBaseModel.m in Sources */,
 				DF133C47219C475200A0E6CC /* TAPCustomAccessoryView.m in Sources */,
 				D7D3B44422FD7D7B00D1DFF7 /* TAPCoreConfigsModel.m in Sources */,
 				D77B5EE42158BB7E00253BDC /* TAPContactCollectionViewCell.m in Sources */,
-				DF133C4E219C477500A0E6CC /* TAPChatViewController.m in Sources */,
 				D7F986D22251B7EE0087B652 /* TAPLoginViewController.m in Sources */,
 				D7AB09912191882B00C18BEE /* TAPOldDataManager.m in Sources */,
 				DFEFE68E21AFC79100E486F8 /* TAPCustomKeyboardItemModel.m in Sources */,
 				D77B5E702158BABB00253BDC /* TAPUtil.m in Sources */,
 				D7358CB0227AD03200C65C67 /* TAPCountryPickerViewController.m in Sources */,
 				DF45149821BA52FE00C1C539 /* TAPTypingModel.m in Sources */,
-				DF33AAE021B107BF004C2A49 /* TAPCustomKeyboardManager.m in Sources */,
 				D7796591215B3D4400756A38 /* TAPCustomTextView.m in Sources */,
 				D79A3E6C216C72C4004525CE /* TAPConnectionStatusViewController.m in Sources */,
 				D77B5EDD2158BB6E00253BDC /* TAPMessageModel.m in Sources */,
@@ -2142,11 +2134,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.11;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moselo.TapTalk;
+				MARKETING_VERSION = 1.0.12;
+				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -2176,11 +2169,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.11;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moselo.TapTalk;
+				MARKETING_VERSION = 1.0.12;
+				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

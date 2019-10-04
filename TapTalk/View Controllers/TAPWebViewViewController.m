@@ -154,7 +154,7 @@
 }
 
 - (void)safariButtonDidTapped {
-    if(IS_IOS_10_OR_ABOVE) {
+    if(IS_IOS_11_OR_ABOVE) {
         [[UIApplication sharedApplication] openURL:self.tapWebViewView.webView.URL options:[NSDictionary dictionary] completionHandler:nil];
     }
     else {
