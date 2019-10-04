@@ -30,7 +30,6 @@
 #import "TAPContactManager.h"
 #import "TAPContactCacheManager.h"
 #import "TAPCustomBubbleManager.h"
-#import "TAPCustomKeyboardManager.h"
 #import "TAPDataManager.h"
 #import "TAPDatabaseManager.h"
 #import "TAPEncryptorManager.h"
