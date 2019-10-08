@@ -295,7 +295,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)handleTappedWithURL:(NSURL *)url originalString:(NSString *)originalString;
 - (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString;
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message;
-- (void)showFirstLoadMessageLoadingView;
 - (void)openFiles;
 - (void)openCamera;
 - (void)openGallery;
@@ -3450,7 +3449,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //check if keyboard was showed
     //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
     [self performSelector:@selector(checkKeyboard) withObject:nil afterDelay:0.05f];
-    
+}
+
+- (void)imagePreviewCancelButtonDidTapped {
+    [self showInputAccessoryView];
+    [self checkKeyboard];
 }
 
 #pragma mark UIImagePickerController
@@ -4650,6 +4653,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image {
     TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+    imagePreviewViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     imagePreviewViewController.delegate = self;
     
     TAPMediaPreviewModel *imagePreview = [TAPMediaPreviewModel new];
@@ -4657,6 +4661,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [imagePreviewViewController setMediaPreviewDataWithData:imagePreview];
     UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
+    imagePreviewNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:nil];
 }
 
@@ -5448,8 +5453,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     NSDate *date = [NSDate date];
     NSTimeInterval createdDate = [date timeIntervalSince1970] * 1000.0f; //Timestamp in miliseconds
-    
-    [self performSelector:@selector(showFirstLoadMessageLoadingView) withObject:nil afterDelay:0.0000001f]; //need to perform after delay to handle jumpy table view on first load view
     
     _isFirstLoadData = YES;
     

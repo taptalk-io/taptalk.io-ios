@@ -75,6 +75,12 @@
         failure(error);
     }
     
+    //Set RoomList to loading
+    BOOL isAuthenticated = [[TapTalk sharedInstance] isAuthenticated];
+    if (!isAuthenticated) {
+        [[TapUI sharedInstance].roomListViewController showLoadingSetupView];
+    }
+    
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
         //Check need to send push token to server
         if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkDidRequestRemoteNotification)]) {

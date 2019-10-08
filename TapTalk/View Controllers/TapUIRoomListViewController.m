@@ -577,18 +577,17 @@
 
 - (void)viewLoadedSequence {
     //Check if should show first loading view
-    
-    BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
-    if (!isDoneFirstSetup) {
-        [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeSettingUp];
-        [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeSettingUp];
-    }
-    
     if ([TAPChatManager sharedManager].activeUser == nil) {
-        
         [[TAPChatManager sharedManager] disconnect];
         
         if([TapTalk sharedInstance].isAuthenticated) {
+    
+            BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
+            if (!isDoneFirstSetup) {
+                [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeSettingUp];
+                [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeSettingUp];
+            }
+            
             id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
             if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
                 [tapTalkDelegate tapTalkRefreshTokenExpired];
@@ -596,7 +595,6 @@
         }
         else {
             //User not authenticated
-            
             [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
             [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
             
@@ -1041,6 +1039,11 @@
 
 - (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
     self.isShowMyAccountView = isVisible;
+}
+
+- (void)showLoadingSetupView {
+    [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeSettingUp];
+    [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeSettingUp];
 }
 
 @end

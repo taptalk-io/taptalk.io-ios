@@ -1280,6 +1280,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         createGroupViewController.room = self.room;
         createGroupViewController.delegate = self;
         UINavigationController *createGroupNavigationController = [[UINavigationController alloc] initWithRootViewController:createGroupViewController];
+        createGroupNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         [self presentViewController:createGroupNavigationController animated:YES completion:nil];
     }
 }

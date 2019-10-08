@@ -29,5 +29,6 @@
 
 - (void)viewLoadedSequence;
 - (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible;
+- (void)showLoadingSetupView;
 
 @end
