@@ -709,7 +709,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)cancelButtonDidTapped {
     _showVideoPlayer = NO;
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        if ([self.delegate respondsToSelector:@selector(imagePreviewCancelButtonDidTapped)]) {
+            [self.delegate imagePreviewCancelButtonDidTapped];
+        }
+    }];
 }
 
 - (void)morePictureButtonDidTapped {

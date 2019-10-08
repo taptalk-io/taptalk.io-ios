@@ -1300,9 +1300,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)editButtonDidTapped {
     //CS TEMP - use this for update group view
     TAPCreateGroupSubjectViewController *createGroupSubjectViewController = [[TAPCreateGroupSubjectViewController alloc] init];
+    createGroupSubjectViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     createGroupSubjectViewController.tapCreateGroupSubjectControllerType = TAPCreateGroupSubjectViewControllerTypeUpdate;
     createGroupSubjectViewController.roomModel = self.room;
     createGroupSubjectViewController.delegate = self;
+    createGroupSubjectViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:createGroupSubjectViewController animated:YES completion:nil];
 }
 

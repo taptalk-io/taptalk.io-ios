@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPImagePreviewViewControllerDelegate <NSObject>
 
 - (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray;
+- (void)imagePreviewCancelButtonDidTapped;
 
 @end
 
