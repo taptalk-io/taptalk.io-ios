@@ -701,7 +701,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //request
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self changeButtonDidTapped];
+                [self openGallery];
             });
         }];
     }

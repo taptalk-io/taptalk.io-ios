@@ -820,7 +820,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.delegate imagePreviewDidTapSendButtonWithData:self.mediaDataArray];
         }
         
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [self dismissViewControllerAnimated:YES completion:^{
+            if ([self.delegate respondsToSelector:@selector(imagePreviewDidSendDataAndCompleteDismissView)]) {
+                [self.delegate imagePreviewDidSendDataAndCompleteDismissView];
+            }
+        }];
     }
 }
 

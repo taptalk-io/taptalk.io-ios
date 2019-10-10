@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray;
 - (void)imagePreviewCancelButtonDidTapped;
+- (void)imagePreviewDidSendDataAndCompleteDismissView;
 
 @end
 

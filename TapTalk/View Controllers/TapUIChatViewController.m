@@ -574,6 +574,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     _isViewWillAppeared = YES;
     _isSwipeGestureEnded = NO;
+    if (!self.currentRoom.isDeleted) {
+        _isShowAccessoryView = YES;
+    }
     [self reloadInputViews];
     
     //Check chat room contains mesage draft or not
@@ -3456,6 +3459,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self checkKeyboard];
 }
 
+- (void)imagePreviewDidSendDataAndCompleteDismissView {
+    [self showInputAccessoryView];
+    [self checkKeyboard];
+}
+
 #pragma mark UIImagePickerController
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
@@ -3738,6 +3746,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setupInputAccessoryView {
     //Input Accessory Extension View
     
+    //Setup font for composer textview label same as bubble chat body label size
+    UIFont *bubbleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleMessageBody];
+    self.messageTextView.textView.font = bubbleLabelFont;
+    self.messageTextView.placeholderLabel.font = bubbleLabelFont;
+
     self.keyboardOptionButtonView.layer.cornerRadius = CGRectGetHeight(self.keyboardOptionButtonView.frame) / 2.0f;
     self.keyboardOptionButtonView.clipsToBounds = YES;
     
@@ -5359,8 +5372,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #pragma mark Input Accessory View
 //Implement Input Accessory View
 - (UIView *)inputAccessoryView {
+    /*
+     //Change to this if method if there are bug showing compose keyboard view, but this method causing another problem which compose view sometimes not appear because wrong detection of active view controller
+     if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TapUIChatViewController class] description]] || [[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
+     
+    }
+     */
     
-    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)  && ([[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TapUIChatViewController class] description]] || [[[[[TapUI sharedInstance] getCurrentTapTalkActiveViewController] class] description] isEqualToString:[[TAPMediaDetailViewController class] description]])) {
+    if ((self.isViewWillAppeared || self.isSwipeGestureEnded)) {
         if (self.isShowAccessoryView) {
             return self.inputMessageAccessoryView;
         }
@@ -6076,9 +6095,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                withCompletionHandler:(void(^)())completionHandler {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        NSInteger earliestUnreadMessageIndex = -1;
-        long minCreatedUnreadMessage;
-        
         NSMutableArray *currentAddedMessageArray = [NSMutableArray array];
         NSMutableDictionary *currentAddedMessageDictionary = [NSMutableDictionary dictionary];
 
@@ -6106,18 +6122,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     [self addIncomingMessageToArrayAndDictionaryWithMessage:currentMessage atIndex:[key integerValue]];
                 }
                 
-                NSMutableArray *indexPathArray = [NSMutableArray array];
-                NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count];
-                for (int count = currentCount; count < [self.messageArray count]; count++) {
-                    [indexPathArray addObject:[NSIndexPath indexPathForRow:count inSection:0]];
-                }
+                [self.tableView reloadData]; //This logic might affect performance load when load before API, see and fix below implementation for better performance
                 
-                if([indexPathArray count] > 0) {
-                    [self.tableView beginUpdates];
-                    [self.tableView insertRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.tableView endUpdates];
-                    [self.tableView scrollsToTop]; //Scroll to top untuk apa?X
-                }
+//                //RN Notes - RN Debt - Uncommand this method to insert the message to table view without reload data, might cause crash when open room and load api before, and directly send message
+//                NSMutableArray *indexPathArray = [NSMutableArray array];
+//                NSInteger currentCount = [self.messageArray count] - [currentAddedMessageArray count];
+//                for (int count = currentCount; count < [self.messageArray count]; count++) {
+//                    [indexPathArray addObject:[NSIndexPath indexPathForRow:count inSection:0]];
+//                }
+//
+//                if([indexPathArray count] > 0) {
+//                    [self.tableView beginUpdates];
+//                    [self.tableView insertRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationAutomatic];
+//                    [self.tableView endUpdates];
+//                    [self.tableView scrollsToTop];
+//                }
                 
                 completionHandler();
             });
@@ -6769,8 +6788,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [yourChatCell showStatusLabel:NO animated:YES];
         }
         [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
     } completion:^(BOOL finished) {
         //completion
     }];
