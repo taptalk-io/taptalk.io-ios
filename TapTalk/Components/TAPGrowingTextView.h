@@ -27,6 +27,7 @@
 @property (weak, nonatomic) id<TAPGrowingTextViewDelegate> delegate;
 
 @property (strong, nonatomic) IBOutlet TAPCustomTextView *textView;
+@property (strong, nonatomic) IBOutlet UILabel *placeholderLabel;
 
 @property (strong, nonatomic) UIFont *font;
 @property (strong, nonatomic) NSString *text;
