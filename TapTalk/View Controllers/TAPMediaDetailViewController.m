@@ -440,13 +440,22 @@
 }
 
 - (void)dismissSelf {
+    //Add swipe to back gesture
+    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+        self.navigationController.interactivePopGestureRecognizer.enabled = YES;
+    }
+    
     UIImage *thumbnailImage = [UIImage imageNamed:@"blank-image" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     
     if(self.currentViewController != nil) {
         thumbnailImage = [self.currentViewController currentImage];
     }
     
-    [self.mediaDetailView animateClosingWithThumbnailFrame:self.thumbnailFrame thumbnailImage:thumbnailImage];
+    [self.mediaDetailView animateClosingWithThumbnailFrame:self.thumbnailFrame thumbnailImage:thumbnailImage completion:^{
+        [self willMoveToParentViewController:nil];
+        [self.view removeFromSuperview];
+        [self removeFromParentViewController];
+    }];
 }
 
 - (void)setActiveIndex:(NSInteger)activeIndex {

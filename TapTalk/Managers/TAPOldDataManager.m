@@ -10,8 +10,9 @@
 #import "TAPFileDownloadManager.h"
 #import "TAPDataManager.h"
 
-#define kExecuteCountdown 7*24*60*60*1000.0f //7 days in miliseconds
+//#define kExecuteCountdown 7*24*60*60*1000.0f //7 days in miliseconds
 #define kOneMonthTimeIntervalInMilliseconds 30*24*60*60*1000.0f //30 days in miliseconds
+#define kExecuteCountdown 1.0f //7 days in miliseconds //RN Temp
 
 //#define kExecuteCountdown 5*60*1000.0f //7 days in miliseconds
 //#define kOneMonthTimeIntervalInMilliseconds 5*60*1000.0f //30 days in miliseconds
@@ -46,7 +47,6 @@
 
 #pragma mark - Custom Method
 + (void)runCleaningOldDataSequence {
-    
     NSDate *currentDate = [NSDate date];
     NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970] * 1000.0f;
     NSTimeInterval oneMonthBeforeTimeInterval = currentTimeInterval - kOneMonthTimeIntervalInMilliseconds;
@@ -57,6 +57,7 @@
     if (savedTimeIntervalNumber == nil) {
         NSNumber *savedTime = [[NSNumber alloc] initWithDouble:currentTimeInterval];
         [[NSUserDefaults standardUserDefaults] setSecureObject:savedTime forKey:TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
     else {
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -72,41 +73,41 @@
                         TAPRoomModel *room = lastMessage.room;
                         
                         __block NSTimeInterval minUnreadCreated;
-                        __block NSTimeInterval nextPageFirstMessageCreated;
+                        __block NSTimeInterval nextPageFirstMessageCreated; //Tidak ada
                         //Obtain smallest created of unread messages
                         [TAPOldDataManager fetchSmallestCreatedUnreadMessageWithRoomID:room.roomID success:^(NSTimeInterval smallestUnreadMessageCreated) {
                             minUnreadCreated = smallestUnreadMessageCreated;
                             
                             //Get All message of selected room
-                            [TAPDataManager getAllMessageWithRoomID:room.roomID sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *messageArray) {
+                            [TAPDataManager getAllMessageWithRoomID:room.roomID sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *allMessageArray) {
                                 
-                                if ([messageArray count] > TAP_NUMBER_OF_ITEMS_CHAT) {
+                                if ([allMessageArray count] > TAP_NUMBER_OF_ITEMS_CHAT) {
 #ifdef DEBUG
                                     NSLog(@"Message more than one page with room name: %@", room.name);
 #endif
                                     //get created message index number of items per page + 1
 //                                    TAPMessageModel *nextPageFirstMessage = [messageArray objectAtIndex:TAP_NUMBER_OF_ITEMS_CHAT + 1];
-                                    TAPMessageModel *nextPageFirstMessage = [messageArray objectAtIndex:TAP_NUMBER_OF_ITEMS_CHAT];
+                                    TAPMessageModel *nextPageFirstMessage = [allMessageArray objectAtIndex:TAP_NUMBER_OF_ITEMS_CHAT];
                                     nextPageFirstMessageCreated = [nextPageFirstMessage.created doubleValue];
                                     
                                     //compare H-1 month, smallest unread message created, created first item of next page (index: number of items per page + 1)
-                                    NSTimeInterval minimumCreatedData;
+                                    NSTimeInterval minimumCreatedDate;
                                     if (minUnreadCreated >= 0) {
                                         //unread found
                                         if (oneMonthBeforeTimeInterval < minUnreadCreated) {
-                                            minimumCreatedData = oneMonthBeforeTimeInterval;
+                                            minimumCreatedDate = oneMonthBeforeTimeInterval;
                                         }
                                         else {
-                                            minimumCreatedData = minUnreadCreated;
+                                            minimumCreatedDate = minUnreadCreated;
                                         }
                                     }
                                     else {
                                         //unread not found
-                                        minimumCreatedData = oneMonthBeforeTimeInterval;
+                                        minimumCreatedDate = oneMonthBeforeTimeInterval;
                                     }
                                     
-                                    if (nextPageFirstMessageCreated < minimumCreatedData) {
-                                        minimumCreatedData = nextPageFirstMessageCreated;
+                                    if (nextPageFirstMessageCreated < minimumCreatedDate) {
+                                        minimumCreatedDate = nextPageFirstMessageCreated;
                                     }
                                     
                                     NSMutableArray *messageTypeArray = [NSMutableArray array];
@@ -114,18 +115,18 @@
                                     [messageTypeArray addObject:[NSNumber numberWithInteger:TAPChatMessageTypeVideo]];
                                     [messageTypeArray addObject:[NSNumber numberWithInteger:TAPChatMessageTypeFile]];
 
-                                    [TAPDataManager getAllMessageWithRoomID:room.roomID messageTypes:messageTypeArray minimumDateCreated:minimumCreatedData sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *messageArray) {
+                                    [TAPDataManager getAllMessageWithRoomID:room.roomID messageTypes:messageTypeArray minimumDateCreated:minimumCreatedDate sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *fileMessageArray) {
             
                                         //Delete message & physical data of image/video/file
-                                        [TAPDataManager deletePhysicalFileAndMessageSequenceWithMessageArray:messageArray success:^{
+                                        [TAPDataManager deletePhysicalFileAndMessageSequenceWithMessageArray:fileMessageArray success:^{
                                             
                                             //Get all message other than media type
-                                            NSNumber *minCreatedNumber = [NSNumber numberWithDouble:minimumCreatedData];
-                                            NSString *queryString = [NSString stringWithFormat:@"created < %ld", [minCreatedNumber integerValue]];
-                                            [TAPDataManager getAllMessageWithRoomID:room.roomID query:queryString sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *messageArray) {
+                                            NSNumber *minCreatedNumber = [NSNumber numberWithDouble:minimumCreatedDate];
+                                            NSString *queryString = [NSString stringWithFormat:@"roomID == '%@' && created <= %ld", room.roomID, [minCreatedNumber integerValue]];
+                                            [TAPDataManager getAllMessageWithQuery:queryString sortByKey:@"created" ascending:NO success:^(NSArray<TAPMessageModel *> *toBeDeletedMessageArray) {
                                                 
                                                 //Delete other type of message
-                                                [TAPDataManager deleteDatabaseMessageWithData:messageArray success:^{
+                                                [TAPDataManager deleteDatabaseMessageWithData:toBeDeletedMessageArray success:^{
                                                     
                                                 } failure:^(NSError *error) {
                                                     //failure delete message from database

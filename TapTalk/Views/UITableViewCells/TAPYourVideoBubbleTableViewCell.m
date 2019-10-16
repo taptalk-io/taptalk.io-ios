@@ -675,13 +675,20 @@
             
             imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
             _cellHeight = imageHeight;
+            
             if (imageHeight > self.maxHeight) {
                 imageHeight = self.maxHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
             else if (imageHeight < self.minHeight) {
                 imageHeight = self.minHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
         }
         else if (imageWidth < self.minWidth) {
@@ -690,13 +697,20 @@
             
             imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
             _cellHeight = imageHeight;
+            
             if (imageHeight > self.maxHeight) {
                 imageHeight = self.maxHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
             else if (imageHeight < self.minHeight) {
                 imageHeight = self.minHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
         }
     }
@@ -707,13 +721,20 @@
             
             imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
             _cellWidth = imageWidth;
+            
             if (imageWidth > self.maxWidth) {
                 imageWidth = self.maxWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
             else if (imageWidth < self.minWidth) {
                 imageWidth = self.minWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
         }
         else if (imageHeight < self.minHeight) {
@@ -722,13 +743,20 @@
             
             imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
             _cellWidth = imageWidth;
+            
             if (imageWidth > self.maxWidth) {
                 imageWidth = self.maxWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
             else if (imageWidth < self.minWidth) {
                 imageWidth = self.minWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
         }
     }

@@ -640,14 +640,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _isViewWillAppeared = NO;
     self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
     
+    //Save existing message to draft
+    [self saveMessageDraft];
+    
     if([self.delegate respondsToSelector:@selector(chatViewControllerShouldUpdateUnreadBubbleForRoomID:)]) {
         [self.delegate chatViewControllerShouldUpdateUnreadBubbleForRoomID:self.currentRoom.roomID];
     }
     
     _keyboardHeight = self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
-    
-    //Save existing message to draft
-    [self saveMessageDraft];
     
     [[TAPChatManager sharedManager] saveAllUnsentMessageInMainThread];
 }

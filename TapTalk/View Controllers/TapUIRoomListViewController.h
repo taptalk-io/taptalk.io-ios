@@ -30,5 +30,6 @@
 - (void)viewLoadedSequence;
 - (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible;
 - (void)showLoadingSetupView;
+- (void)clearAllData;
 
 @end

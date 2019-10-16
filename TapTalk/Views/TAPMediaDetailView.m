@@ -256,7 +256,7 @@
                      }];
 }
 
-- (void)animateClosingWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage {
+- (void)animateClosingWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage completion:(void (^)(void))completion {
     if(thumbnailImage == nil) {
         thumbnailImage = [UIImage imageNamed:@"blank-image" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
@@ -321,6 +321,8 @@
                          if([self.delegate respondsToSelector:@selector(mediaDetailViewDidFinishClosingAnimation)]) {
                              [self.delegate mediaDetailViewDidFinishClosingAnimation];
                          }
+                         
+                         completion();
                      }];
 }
 
