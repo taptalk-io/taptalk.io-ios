@@ -1046,4 +1046,10 @@
     [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeSettingUp];
 }
 
+- (void)clearAllData {
+    [self.roomListArray removeAllObjects];
+    [self.roomListDictionary removeAllObjects];
+    [self.roomListView.roomListTableView reloadData];
+}
+
 @end

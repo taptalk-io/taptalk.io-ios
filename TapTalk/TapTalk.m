@@ -518,6 +518,9 @@
         
     }];
     
+    //Clear room list data
+    [[[TapUI sharedInstance] roomListViewController] clearAllData];
+    
     //Remove all preference
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACTIVE_USER];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACCESS_TOKEN];

@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) TAPMediaDetailViewType mediaDetailViewType;
 
 - (void)animateOpeningWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage;
-- (void)animateClosingWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage;
+- (void)animateClosingWithThumbnailFrame:(CGRect)thumbnailFrame thumbnailImage:(UIImage *)thumbnailImage completion:(void (^)(void))completion;
 - (void)showHeaderAndCaptionView:(BOOL)isShow animated:(BOOL)animated;
 - (void)setSaveLoadingAsFinishedState:(BOOL)isFinished;
 - (void)showSaveLoadingView:(BOOL)isShow;

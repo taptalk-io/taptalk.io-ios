@@ -1677,19 +1677,18 @@
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
                         failure:(void (^)(NSError *error))failure {
     NSString *query = [NSString stringWithFormat:@"roomID == '%@'", roomID];
-    [TAPDataManager getAllMessageWithRoomID:roomID query:query sortByKey:columnName ascending:isAscending success:^(NSArray<TAPMessageModel *> *messageArray) {
+    [TAPDataManager getAllMessageWithQuery:query sortByKey:columnName ascending:isAscending success:^(NSArray<TAPMessageModel *> *messageArray) {
         success(messageArray);
     } failure:^(NSError *error) {
         failure(error);
     }];
 }
 
-+ (void)getAllMessageWithRoomID:(NSString *)roomID
-                          query:(NSString *)query
-                      sortByKey:(NSString *)columnName
-                      ascending:(BOOL)isAscending
-                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
-                        failure:(void (^)(NSError *error))failure {
++ (void)getAllMessageWithQuery:(NSString *)query
+                     sortByKey:(NSString *)columnName
+                     ascending:(BOOL)isAscending
+                       success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                       failure:(void (^)(NSError *error))failure {
     [TAPDatabaseManager loadAllDataFromDatabaseWithQuery:query tableName:kDatabaseTableMessage sortByKey:columnName ascending:isAscending success:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
         
@@ -1751,7 +1750,7 @@
     NSNumber *minCreatedNumber = [NSNumber numberWithDouble:minCreated];
     NSInteger minCreatedInteger = [minCreatedNumber integerValue];
     
-    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && created < %ld && %@", roomID, (long)minCreatedInteger, subQueryTypeString];
+    NSString *queryString = [NSString stringWithFormat:@"roomID LIKE '%@' && created <= %ld && %@", roomID, (long)minCreatedInteger, subQueryTypeString];
     
     [TAPDatabaseManager loadAllDataFromDatabaseWithQuery:queryString tableName:kDatabaseTableMessage sortByKey:columnName ascending:isAscending success:^(NSArray *resultArray) {
         NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];

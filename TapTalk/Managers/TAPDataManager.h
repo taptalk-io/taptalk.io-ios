@@ -71,12 +71,11 @@
                       ascending:(BOOL)isAscending
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
                         failure:(void (^)(NSError *error))failure;
-+ (void)getAllMessageWithRoomID:(NSString *)roomID
-                          query:(NSString *)query
-                      sortByKey:(NSString *)columnName
-                      ascending:(BOOL)isAscending
-                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
-                        failure:(void (^)(NSError *error))failure;
++ (void)getAllMessageWithQuery:(NSString *)query
+                     sortByKey:(NSString *)columnName
+                     ascending:(BOOL)isAscending
+                       success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                       failure:(void (^)(NSError *error))failure;
 + (void)getAllMessageWithRoomID:(NSString *)roomID
                    messageTypes:(NSArray *)messageTypeArray
              minimumDateCreated:(NSTimeInterval)minCreated
