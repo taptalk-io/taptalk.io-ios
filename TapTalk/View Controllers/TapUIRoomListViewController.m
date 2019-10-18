@@ -33,6 +33,9 @@
 @property (strong, nonatomic) NSMutableArray *roomListArray;
 @property (strong, nonatomic) NSMutableDictionary *roomListDictionary;
 
+@property (nonatomic) NSInteger firstUnreadProcessCount;
+@property (nonatomic) NSInteger firstUnreadTotalCount;
+
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
 @property (nonatomic) BOOL isShowMyAccountView;
 
@@ -48,6 +51,7 @@
 - (void)updateCellDataAtIndexPath:(NSIndexPath *)indexPath updateUnreadBubble:(BOOL)updateUnreadBubble;
 - (void)openNewChatViewController;
 - (void)hideSetupViewWithDelay:(double)delayTime;
+- (void)getAndUpdateNumberOfUnreadToDelegate;
 
 @end
 
@@ -871,6 +875,9 @@
             return;
         }
         
+        _firstUnreadProcessCount = 0;
+        _firstUnreadTotalCount = [roomListLocalArray count];
+        
         for (TAPRoomListModel *roomList in roomListLocalArray) {
             TAPMessageModel *messageData = roomList.lastMessage;
             TAPRoomModel *roomData = messageData.room;
@@ -887,7 +894,13 @@
                     roomList.numberOfUnreadMessages = 0;
                 }
                 
+                _firstUnreadProcessCount++;
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    if(self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
+                        [self getAndUpdateNumberOfUnreadToDelegate];
+                    }
+                    
                     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
                     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
                     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
@@ -919,6 +932,11 @@
         
         if (message.isHidden) {
             //Don't process last message that is hidden
+            return;
+        }
+        
+        if([roomLastMessage.created integerValue] > [message.created integerValue]) {
+            //Don't process last message, current last message is newer that the incoming one
             return;
         }
         
@@ -984,8 +1002,9 @@
         [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
         [self.roomListView.roomListTableView endUpdates];
         [self.roomListView showNoChatsView:NO];
-      
     }
+    
+    [self getAndUpdateNumberOfUnreadToDelegate];
 }
 
 - (void)updateCellDataAtIndexPath:(NSIndexPath *)indexPath updateUnreadBubble:(BOOL)updateUnreadBubble {
@@ -1050,6 +1069,26 @@
     [self.roomListArray removeAllObjects];
     [self.roomListDictionary removeAllObjects];
     [self.roomListView.roomListTableView reloadData];
+}
+
+- (void)getAndUpdateNumberOfUnreadToDelegate {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        NSInteger unreadRoomCount = 0;
+        
+        for(TAPRoomListModel *roomList in self.roomListArray) {
+            if(roomList.numberOfUnreadMessages > 0) {
+                unreadRoomCount++;
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //Send delegate to be used to client side, update to delegate after check unread database
+            if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkUnreadChatRoomBadgeCountUpdated:)]) {
+                [[TapTalk sharedInstance].delegate tapTalkUnreadChatRoomBadgeCountUpdated:unreadRoomCount];
+            }
+        });
+    });
 }
 
 @end

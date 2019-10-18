@@ -822,7 +822,15 @@
         }];
     }
     else {
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Contact Access" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
+        
+        //if already logout
+        //permission ada, muncul button
+//        if () {
+            
+//        }
+//        else {
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Contact Access" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
+//        }
     }
 }
 
