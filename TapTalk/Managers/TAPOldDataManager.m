@@ -10,12 +10,8 @@
 #import "TAPFileDownloadManager.h"
 #import "TAPDataManager.h"
 
-//#define kExecuteCountdown 7*24*60*60*1000.0f //7 days in miliseconds
+#define kExecuteCountdown 7*24*60*60*1000.0f //7 days in miliseconds
 #define kOneMonthTimeIntervalInMilliseconds 30*24*60*60*1000.0f //30 days in miliseconds
-#define kExecuteCountdown 1.0f //7 days in miliseconds //RN Temp
-
-//#define kExecuteCountdown 5*60*1000.0f //7 days in miliseconds
-//#define kOneMonthTimeIntervalInMilliseconds 5*60*1000.0f //30 days in miliseconds
 
 @interface TAPOldDataManager ()
 
