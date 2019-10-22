@@ -8,7 +8,6 @@ def tapTalk_pods
     pod 'SocketRocket'
     pod 'JSONModel', '~> 1.1'
     pod 'Realm', '3.13.1'
-    pod 'ZBarSDK', '~> 1.3'
     pod 'PodAsset'
     pod 'SDWebImage', '4.4.2'
     pod 'GooglePlaces'

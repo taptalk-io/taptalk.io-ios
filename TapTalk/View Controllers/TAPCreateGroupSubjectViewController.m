@@ -17,6 +17,7 @@
 @property (strong, nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
 @property (strong, nonatomic) UIImage *selectedImage;
 @property (nonatomic) BOOL isLoading;
+@property (strong, nonatomic) TAPRoomModel *roomModel;
 
 - (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (void)backButtonDidTapped;
@@ -68,6 +69,7 @@
         if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
             //CS TEMP - hide remove picture button as the API is not ready yet
             self.createGroupSubjectView.removePictureButton.alpha = 0.0f;
+            self.createGroupSubjectView.removePictureView.alpha = 0.0f;
         }
     }
     if (![TAPUtil isEmptyString:self.roomModel.name]) {
@@ -304,9 +306,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [picker dismissViewControllerAnimated:YES completion:^{
         if ([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:@"public.image"]) {
             //IMAGE TYPE
-            UIImage *selectedImage;
-            
-            selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+            UIImage *selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
             self.selectedImage = selectedImage;
             [self.createGroupSubjectView setGroupPictureImageViewWithImage:selectedImage];
             if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
@@ -347,6 +347,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
 }
 
+- (void)setRoomData:(TAPRoomModel *)room {
+    _roomModel = room;
+}
+
 - (void)createButtonDidTapped {
     _isLoading = YES;
     [self.createGroupSubjectView.createButtonView setAsLoading:YES animated:YES];
@@ -369,8 +373,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             if (self.selectedImage != nil) {
                 //has image, upload image
-                NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
-                
+                UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
+                NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -425,7 +429,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self.roomListViewController.navigationController pushViewController:chatViewController animated:YES];
                 }];
             }
-            
         } failure:^(NSError *error) {
             _isLoading = NO;
             [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -440,7 +443,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //Group name not changing
             if (self.selectedImage != nil) {
                 //has image, upload image
-                NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
+                UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
+                NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:self.roomModel.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -492,8 +496,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:groupName success:^(TAPRoomModel *room) {
                 if (self.selectedImage != nil) {
                     //has image, upload image
-                    NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
-                    
+                    UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
+                    NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
                     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -636,6 +640,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)setTapCreateGroupSubjectControllerType:(TAPCreateGroupSubjectViewControllerType)tapCreateGroupSubjectControllerType {
     _tapCreateGroupSubjectControllerType = tapCreateGroupSubjectControllerType;
     if (tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+        self.createGroupSubjectView.tapCreateGroupSubjectType = TAPCreateGroupSubjectViewTypeUpdate;
         [self.createGroupSubjectView setTapCreateGroupSubjectType:TAPCreateGroupSubjectViewTypeUpdate];
     }
 }
@@ -725,6 +730,28 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         [self presentViewController:alertController animated:YES completion:nil];
     }
+}
+
+- (UIImage*)rotateImage:(UIImage* )originalImage {
+    UIImageOrientation orientation = originalImage.imageOrientation;
+    UIGraphicsBeginImageContext(originalImage.size);
+    [originalImage drawAtPoint:CGPointMake(0, 0)];
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+     if (orientation == UIImageOrientationRight) {
+         CGContextRotateCTM (context, [self radians:90]);
+     } else if (orientation == UIImageOrientationLeft) {
+         CGContextRotateCTM (context, [self radians:90]);
+     } else if (orientation == UIImageOrientationDown) {
+         // NOTHING
+     } else if (orientation == UIImageOrientationUp) {
+         CGContextRotateCTM (context, [self radians:0]);
+     }
+      return UIGraphicsGetImageFromCurrentImageContext();
+}
+
+- (CGFloat)radians:(int)degree {
+    return (degree/180)*(22/7);
 }
 
 

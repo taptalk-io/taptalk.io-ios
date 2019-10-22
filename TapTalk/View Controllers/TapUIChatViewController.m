@@ -5564,6 +5564,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                 [self.view endEditing:YES];
                                 [self setRoomNotAvailable];
                             }
+                            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                                [self.view endEditing:YES];
+                                [self showDeletedRoomView:YES isGroup:NO withDeleteButton:YES];
+                            }
                             
                         }];
                     } failure:^(NSError *error) {
@@ -6205,6 +6209,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
             [self.view endEditing:YES];
             [self setRoomNotAvailable];
+        }
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:NO withDeleteButton:YES];
         }
     } failure:^(NSError *error) {
         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];

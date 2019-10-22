@@ -9,18 +9,19 @@
 #import "TAPScanQRCodeViewController.h"
 #import "TAPScanQRCodeView.h"
 #import "TAPScanQRCodePopupViewController.h"
+#import <AVFoundation/AVFoundation.h>
 
-#import "ZBarCaptureReader.h"
-#import "ZBarReaderViewController.h"
-#import "ZBarReaderView.h"
-#import "ZBarImageScanner.h"
-
-@interface TAPScanQRCodeViewController () <ZBarReaderViewDelegate>
+@interface TAPScanQRCodeViewController () <AVCaptureMetadataOutputObjectsDelegate>
 
 @property (strong, nonatomic) TAPScanQRCodeView *scanQRCodeView;
 @property (strong, nonatomic) TAPUserModel *searchedUser;
 @property (nonatomic) BOOL isProcessingQRCode;
 
+@property (nonatomic, strong) AVCaptureSession *captureSession;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
+
+- (BOOL)startReading;
+- (void)stopReading;
 - (void)handleCodeInput:(NSString *)code;
 - (void)QRCodeButtonDidTapped;
 
@@ -49,10 +50,11 @@
     
     [self.scanQRCodeView.QRCodeButton addTarget:self action:@selector(QRCodeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-    self.scanQRCodeView.readerView.readerDelegate = self;
+    _captureSession = nil;
     
     [self.scanQRCodeView setScanQRCodeViewType:ScanQRCodeViewTypeScanQRCode];
     [self.view bringSubviewToFront:self.scanQRCodeView.overlayView];
+    [self startReading];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -60,6 +62,7 @@
     
     _isProcessingQRCode = NO;
     [self.navigationController setNavigationBarHidden:NO];
+    [self startReading];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -68,11 +71,17 @@
 }
 
 #pragma mark - Delegate
-#pragma mark ZBarReaderView
-- (void)readerView:(ZBarReaderView *)readerView didReadSymbols:(ZBarSymbolSet *)symbols fromImage:(UIImage *)image {
-    for (ZBarSymbol *symbol in symbols) {
-        [self handleCodeInput:symbol.data];
-    }
+#pragma mark AVCaptureMetadataOutputObjects
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
+    if (metadataObjects != nil && [metadataObjects count] > 0) {
+        AVMetadataMachineReadableCodeObject *metadataObj = [metadataObjects objectAtIndex:0];
+        if ([[metadataObj type] isEqualToString:AVMetadataObjectTypeQRCode]) {
+            NSString *codeValue = [metadataObj stringValue];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self handleCodeInput:codeValue];
+            });
+       }
+   }
 }
 
 #pragma mark - Custom Method
@@ -117,6 +126,7 @@
     
     if (self.scanQRCodeView.QRCodeButton.selected) {
         //Display user QR Code
+        [self stopReading];
         
         self.title = NSLocalizedString(@"My QR Code", @"");
         
@@ -135,9 +145,43 @@
     }
     else {
         //Display scan QR Code menu
+        [self startReading];
         [self.scanQRCodeView setScanQRCodeViewType:ScanQRCodeViewTypeScanQRCode];
         self.title = NSLocalizedString(@"Scan QR Code", @"");
     }
+}
+
+- (BOOL)startReading {
+     NSError *error;
+     AVCaptureDevice *captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+     AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:captureDevice error:&error];
+     if (!input) {
+         NSLog(@"%@", [error localizedDescription]);
+         return NO;
+     }
+
+     _captureSession = [[AVCaptureSession alloc] init];
+     [_captureSession addInput:input];
+     AVCaptureMetadataOutput *captureMetadataOutput = [[AVCaptureMetadataOutput alloc] init];
+     [_captureSession addOutput:captureMetadataOutput];
+     
+    dispatch_queue_t dispatchQueue;
+    dispatchQueue = dispatch_queue_create("myQueue", NULL);
+    [captureMetadataOutput setMetadataObjectsDelegate:self queue:dispatchQueue];
+    [captureMetadataOutput setMetadataObjectTypes:[NSArray arrayWithObject:AVMetadataObjectTypeQRCode]];
+
+    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
+    [_videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+    [_videoPreviewLayer setFrame:self.scanQRCodeView.cameraView.layer.bounds];
+    [self.scanQRCodeView.cameraView.layer addSublayer:_videoPreviewLayer];
+    [_captureSession startRunning];
+    return YES;
+}
+
+- (void)stopReading {
+    [_captureSession stopRunning];
+    _captureSession = nil;
+    [_videoPreviewLayer removeFromSuperlayer];
 }
 
 @end

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalk"
-    s.version      = "1.0.16"
+    s.version      = "1.0.17"
     s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -43,7 +43,6 @@ Pod::Spec.new do |s|
     s.dependency "JSONModel", "~> 1.1"
     s.dependency "Realm", "3.13.1"
     s.dependency "SDWebImage", "4.4.2"
-    s.dependency "ZBarSDK", "~> 1.3"
     s.dependency "PodAsset"
     s.dependency "GooglePlaces"
     s.dependency "GooglePlacePicker"

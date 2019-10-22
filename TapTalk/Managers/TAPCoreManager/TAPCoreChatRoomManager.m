@@ -139,7 +139,8 @@
     [TAPDataManager callAPICreateRoomWithName:groupName type:RoomTypeGroup userIDArray:participantUserIDArray success:^(TAPRoomModel *room) {
         if (profilePictureImage != nil) {
             //has image, upload image
-            NSData *imageData = UIImageJPEGRepresentation(profilePictureImage, 0.6);
+            UIImage *imageToSend = [self rotateImage:profilePictureImage];
+            NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
             [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                 //Update to group cache
                 TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -199,7 +200,8 @@
               successBlock:(void (^)(TAPRoomModel *room))successBlock
              progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
               failureBlock:(void (^)(NSError *error))failureBlock {
-    NSData *imageData = UIImageJPEGRepresentation(groupPictureImage, 0.6);
+    UIImage *imageToSend = [self rotateImage:groupPictureImage];
+    NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:roomID completionBlock:^(TAPRoomModel *room) {
         //Update to group cache
         TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -301,6 +303,28 @@
 
 - (void)sendStopTypingEmitWithRoomID:(NSString *)roomID {
     [[TAPChatManager sharedManager] stopTypingWithRoomID:roomID];
+}
+
+- (UIImage*)rotateImage:(UIImage* )originalImage {
+    UIImageOrientation orientation = originalImage.imageOrientation;
+    UIGraphicsBeginImageContext(originalImage.size);
+    [originalImage drawAtPoint:CGPointMake(0, 0)];
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+     if (orientation == UIImageOrientationRight) {
+         CGContextRotateCTM (context, [self radians:90]);
+     } else if (orientation == UIImageOrientationLeft) {
+         CGContextRotateCTM (context, [self radians:90]);
+     } else if (orientation == UIImageOrientationDown) {
+         // NOTHING
+     } else if (orientation == UIImageOrientationUp) {
+         CGContextRotateCTM (context, [self radians:0]);
+     }
+      return UIGraphicsGetImageFromCurrentImageContext();
+}
+
+- (CGFloat)radians:(int)degree {
+    return (degree/180)*(22/7);
 }
 
 
