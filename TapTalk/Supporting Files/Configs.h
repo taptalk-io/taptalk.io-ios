@@ -34,7 +34,6 @@
 #define TAP_PREFS_ROOM_MODEL_DICTIONARY @"Prefs.TapTalkRoomModelDictionary"
 #define TAP_PREFS_PROJECT_CONFIGS_DICTIONARY @"Prefs.TapTalkProjectConfigsDictionary"
 #define TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED @"Prefs.TapTalkAutoSyncContactDisabled"
-#define TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT @"Prefs.TapTalkDoneFirstTimeAutoSyncContact"
 #define TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER @"Prefs.TapTalkIsContactSyncAllowedByUser"
 #define TAP_PREFS_PENDING_UPDATE_READ_MESSAGE @"Prefs.TapTalkPendingUpdateReadMessage"
 

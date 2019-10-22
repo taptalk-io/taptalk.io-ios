@@ -1302,7 +1302,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     TAPCreateGroupSubjectViewController *createGroupSubjectViewController = [[TAPCreateGroupSubjectViewController alloc] init];
     createGroupSubjectViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     createGroupSubjectViewController.tapCreateGroupSubjectControllerType = TAPCreateGroupSubjectViewControllerTypeUpdate;
-    createGroupSubjectViewController.roomModel = self.room;
+    [createGroupSubjectViewController setRoomData:self.room];
     createGroupSubjectViewController.delegate = self;
     createGroupSubjectViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:createGroupSubjectViewController animated:YES completion:nil];

@@ -536,7 +536,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //Clear Manager Data

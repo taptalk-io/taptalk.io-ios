@@ -282,7 +282,12 @@
     }
     else {
         self.groupPictureImageView.image = image;
-        self.removePictureView.alpha = 1.0f;
+        if (self.tapCreateGroupSubjectType == TAPCreateGroupSubjectViewTypeUpdate) {
+            self.removePictureView.alpha = 0.0f;
+        }
+        else {
+            self.removePictureView.alpha = 1.0f;
+        }
     }
 }
 
@@ -308,7 +313,13 @@
         self.removePictureView.alpha = 0.0f;
     }
     else {
-        self.removePictureView.alpha = 1.0f;
+        if (self.tapCreateGroupSubjectType == TAPCreateGroupSubjectViewTypeUpdate) {
+            self.removePictureView.alpha = 0.0f;
+        }
+        else {
+            self.removePictureView.alpha = 1.0f;
+        }
+        
         [self.groupPictureImageView setImageWithURLString:urlString];
     }
 }

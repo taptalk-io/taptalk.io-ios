@@ -5054,7 +5054,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUploadRoomPhoto];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    NSString *roomIDString = [TAPUtil nullToEmptyString:roomID];
+    [parameterDictionary setObject:roomIDString forKey:@"roomID"];
     
     NSURLSessionUploadTask *uploadTask = [[TAPNetworkManager sharedManager] upload:requestURL fileData:imageData parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         CGFloat progress = uploadProgress.fractionCompleted;

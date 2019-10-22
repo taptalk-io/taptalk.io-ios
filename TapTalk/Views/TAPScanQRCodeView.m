@@ -28,16 +28,10 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        
         self.backgroundColor = [UIColor clearColor];
         
-        _readerView = [ZBarReaderView new];
-        self.readerView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds));
-        self.readerView.torchMode = AVCaptureTorchModeAuto;
-        //set default rear camera used
-        AVCaptureDevice *captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        self.readerView.device = captureDevice;
-        [self addSubview:self.readerView];
+        _cameraView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds))];
+        [self addSubview:self.cameraView];
 
         _overlayView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
         self.overlayView.backgroundColor = [UIColor clearColor];
@@ -119,8 +113,6 @@
     _scanQRCodeViewType = scanQRCodeViewType;
     if (self.scanQRCodeViewType == ScanQRCodeViewTypeScanQRCode) {
         [UIView animateWithDuration:0.2f animations:^{
-            [self.readerView start];
-            
             self.whiteBackgroundView.alpha = 0.0f;
             self.userQRCodeImageView.alpha = 0.0f;
             
@@ -142,9 +134,7 @@
         }];
     }
     else if (self.scanQRCodeViewType == ScanQRCodeViewTypeDisplayQRCode) {
-        [UIView animateWithDuration:0.2f animations:^{
-            [self.readerView stop];
-            
+        [UIView animateWithDuration:0.2f animations:^{            
             self.whiteBackgroundView.alpha = 1.0f;
             self.userQRCodeImageView.alpha = 1.0f;
             

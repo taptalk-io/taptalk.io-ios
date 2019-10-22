@@ -43,7 +43,6 @@ Pod::Spec.new do |s|
     s.dependency "JSONModel", "~> 1.1"
     s.dependency "Realm", "3.13.1"
     s.dependency "SDWebImage", "4.4.2"
-    s.dependency "ZBarSDK", "~> 1.3"
     s.dependency "PodAsset"
     s.dependency "GooglePlaces"
     s.dependency "GooglePlacePicker"
