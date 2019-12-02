@@ -50,6 +50,9 @@
 @property (strong, nonatomic) IBOutlet UIView *videoDurationAndSizeView;
 @property (strong, nonatomic) IBOutlet UILabel *videoDurationAndSizeLabel;
 
+@property (strong, nonatomic) IBOutlet UIView *senderInitialView;
+@property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
+@property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 
@@ -84,6 +87,7 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
@@ -137,6 +141,7 @@
 - (IBAction)retryDownloadButtonDidTapped:(id)sender;
 - (IBAction)quoteViewButtonDidTapped:(id)sender;
 - (IBAction)replyViewButtonDidTapped:(id)sender;
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
 //- (IBAction)retryButtonDidTapped:(id)sender;
 
 @end
@@ -343,6 +348,14 @@
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
     
+    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+    
+    self.senderInitialLabel.textColor = initialNameLabelColor;
+    self.senderInitialLabel.font = initialNameLabelFont;
+    self.senderInitialView.layer.cornerRadius = CGRectGetWidth(self.senderInitialView.frame) / 2.0f;
+    self.senderInitialView.clipsToBounds = YES;
+
     self.replyNameLabel.textColor = quoteTitleColor;
     self.replyNameLabel.font = quoteTitleFont;
     
@@ -481,21 +494,30 @@
     if (message.room.type == RoomTypeGroup) {
         [self showSenderInfo:NO];
         //DV Note - Set sender image to show only sender image, because show sender info view yes will update quote view top constraint to 4.0f making white space in the top of the media
-        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
-
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
+        
         if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            //No photo found, get the initial
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 0.0f;
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:message.user.fullname];
+            self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:message.user.fullname isGroup:NO];
         }
         else {
             if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
                 self.senderImageView.image = nil;
             }
             
+            self.senderInitialView.alpha = 0.0f;
+            self.senderImageView.alpha = 1.0f;
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
             _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
         
+        //DV Note - Set sender name to empty string because image and video bubble not showing sender name
         self.senderNameLabel.text = @"";
     }
     else {
@@ -506,6 +528,12 @@
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];
+}
+
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourVideoBubbleDidTappedProfilePictureWithMessage:)]) {
+        [self.delegate yourVideoBubbleDidTappedProfilePictureWithMessage:self.message];
+    }
 }
 
 - (IBAction)downloadButtonDidTapped:(id)sender {
@@ -1273,6 +1301,8 @@
     if (show) {
         self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
         //DV Note - Uncomment this to show sender name label
@@ -1283,6 +1313,8 @@
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
         self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 0.0f;
+        self.senderProfileImageButton.userInteractionEnabled = NO;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }

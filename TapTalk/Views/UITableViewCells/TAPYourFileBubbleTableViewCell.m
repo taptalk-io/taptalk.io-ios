@@ -34,6 +34,9 @@
 @property (strong, nonatomic) IBOutlet UIView *innerBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
 
+@property (strong, nonatomic) IBOutlet UIView *senderInitialView;
+@property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
+@property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 
@@ -48,6 +51,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *cancelButton;
 @property (strong, nonatomic) IBOutlet UIButton *downloadFileButton;
 @property (strong, nonatomic) IBOutlet UIButton *doneDownloadButton;
+@property (strong, nonatomic) IBOutlet UIButton *doneDownloadTitleAndDescriptionButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryDownloadButton;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -79,6 +83,7 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
@@ -115,6 +120,7 @@
 
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)quoteButtonDidTapped:(id)sender;
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
@@ -222,6 +228,14 @@
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
     
+    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+    
+    self.senderInitialLabel.textColor = initialNameLabelColor;
+    self.senderInitialLabel.font = initialNameLabelFont;
+    self.senderInitialView.layer.cornerRadius = CGRectGetWidth(self.senderInitialView.frame) / 2.0f;
+    self.senderInitialView.clipsToBounds = YES;
+
     self.replyNameLabel.textColor = quoteTitleColor;
     self.replyNameLabel.font = quoteTitleFont;
     
@@ -408,15 +422,21 @@
     //CS NOTE - check chat room type, show sender info if group type
     if (message.room.type == RoomTypeGroup) {
         [self showSenderInfo:YES];
-        
         if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            //No photo found, get the initial
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 0.0f;
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:message.user.fullname];
+            self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:message.user.fullname isGroup:NO];
+
         }
         else {
             if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
                 self.senderImageView.image = nil;
             }
             
+            self.senderInitialView.alpha = 0.0f;
+            self.senderImageView.alpha = 1.0f;
             [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
             _currentProfileImageURLString = message.user.imageURL.thumbnail;
         }
@@ -498,6 +518,12 @@
     [self.contentView layoutIfNeeded];
 }
 
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileBubbleDidTappedProfilePictureWithMessage:)]) {
+        [self.delegate yourFileBubbleDidTappedProfilePictureWithMessage:self.message];
+    }
+}
+
 - (IBAction)replyButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourFileReplyDidTapped:)]) {
         [self.delegate yourFileReplyDidTapped:self.message];
@@ -517,6 +543,12 @@
 }
 
 - (IBAction)doneDownloadButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileOpenFileButtonDidTapped:)]) {
+        [self.delegate yourFileOpenFileButtonDidTapped:self.message];
+    }
+}
+
+- (IBAction)doneDownloadTitleAndDescriptionButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourFileOpenFileButtonDidTapped:)]) {
         [self.delegate yourFileOpenFileButtonDidTapped:self.message];
     }
@@ -834,12 +866,16 @@
     if (show) {
         self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
         self.senderNameHeightConstraint.constant = 18.0f;
         self.forwardTitleLabelTopConstraint.constant = 4.0f;
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
         self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 0.0f;
+        self.senderProfileImageButton.userInteractionEnabled = NO;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }

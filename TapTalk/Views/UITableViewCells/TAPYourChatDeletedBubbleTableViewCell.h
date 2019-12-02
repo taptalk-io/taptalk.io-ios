@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPYourChatDeletedBubbleTableViewCellDelegate <NSObject>
 
 - (void)yourChatDeletedBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)yourChatDeletedBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
 
 @end
 

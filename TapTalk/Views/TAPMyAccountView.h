@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIView *logoutView;
 @property (strong, nonatomic) UIButton *logoutButton;
 @property (strong, nonatomic) TAPCustomButtonView *continueButtonView;
+@property (strong, nonatomic) UIView *initialNameView;
+@property (strong, nonatomic) UILabel *initialNameLabel;
 @property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIButton *removeProfilePictureButton;
 @property (strong, nonatomic) UIButton *changeProfilePictureButton;
@@ -38,12 +40,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)refreshViewPosition;
 - (void)setContinueButtonEnabled:(BOOL)enable;
 - (void)setContentEditable:(BOOL)editable;
-- (void)setProfilePictureWithImage:(UIImage *)image;
-- (void)setProfilePictureWithImageURL:(NSString *)imageURL;
 - (void)setAsLoading:(BOOL)loading;
 - (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)showLogoutLoadingView:(BOOL)isShow;
 - (void)animateLogoutLoading:(BOOL)isAnimate;
+//DV Note
+//UserFullName used to show initials when image is null or not found
+//END DV Note
+- (void)setProfilePictureWithImage:(UIImage *)image userFullName:(NSString *)userFullName;
+- (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName;
+
 
 @end
 

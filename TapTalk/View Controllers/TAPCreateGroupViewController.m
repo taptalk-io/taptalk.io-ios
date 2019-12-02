@@ -12,6 +12,7 @@
 #import "TAPProfileViewController.h"
 
 #import "TAPContactTableViewCell.h"
+#import "TAPContactLoadingTableViewCell.h"
 
 #import "TAPContactCollectionViewCell.h"
 #import "TAPPlainInfoLabelTableViewCell.h"
@@ -21,6 +22,8 @@
 
 @property (strong, nonatomic) NSArray *alphabetSectionTitles;
 @property (strong, nonatomic) NSArray *contactListArray;
+@property (strong, nonatomic) NSMutableArray *globalSearchResultContactListArray;
+@property (strong, nonatomic) NSMutableArray *combinedContactListArray;
 @property (strong, nonatomic) NSMutableDictionary *indexSectionDictionary;
 @property (strong, nonatomic) NSMutableDictionary *roomParticipantsDictionary;
 
@@ -31,11 +34,17 @@
 @property (strong, nonatomic) NSMutableDictionary *selectedIndexRowSearchPositionDictionary;
 
 @property (strong, nonatomic) NSMutableArray *searchResultUserMutableArray;
+@property (strong, nonatomic) NSMutableArray *searchResultNonContactUserMutableArray;
 @property (strong, nonatomic) NSString *updatedString;
 
 @property (strong, nonatomic) TAPUserModel *currentSelectedUser; //used in remove member, promote admin/ demote admin
 
+@property (nonatomic) BOOL isCancellingPreviousPerformSelector;
+@property (nonatomic) BOOL isContactLocallyFound;
 @property (nonatomic) BOOL isEditMode;
+@property (nonatomic) BOOL isKeyboardShown;
+@property (nonatomic) BOOL isLoading;
+@property (nonatomic) CGFloat keyboardHeight;
 
 - (void)loadContactListFromDatabase;
 - (void)loadContactsFromRoomModel;
@@ -47,6 +56,7 @@
 
 - (void)showFinishLoadingStateWithType:(TAPCreateGroupLoadingType)type;
 - (void)removeLoadingView;
+- (void)triggerSearchContactWithKeyword:(NSString *)trimmedString;
 
 @end
 
@@ -84,7 +94,7 @@
         [self showCustomBackButton];
         [self.createGroupView setTapCreateGroupViewType:TAPCreateGroupViewTypeDefault];
         [self loadContactListFromDatabase];
-        self.createGroupView.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for contacts", @"");
+        self.createGroupView.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for users", @"");
 
     }
     else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewTypeAddMember) {
@@ -96,7 +106,7 @@
             [self.roomParticipantsDictionary setObject:user forKey:user.userID];
         }
         [self loadContactListFromDatabase];
-        self.createGroupView.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for contacts", @"");
+        self.createGroupView.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for users", @"");
       
     }
     else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeMemberList) {
@@ -127,9 +137,12 @@
         self.createGroupView.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for members", @"");
     }
     
+    _globalSearchResultContactListArray = [NSMutableArray array];
+    _combinedContactListArray = [NSMutableArray array];
     _selectedUserModelArray = [NSMutableArray array];
     _selectedIndexDictionary = [NSMutableDictionary dictionary];
     _searchResultUserMutableArray = [NSMutableArray array];
+    _searchResultNonContactUserMutableArray = [NSMutableArray array];
     _selectedIndexSectionRowPositionDictionary = [NSMutableDictionary dictionary];
     _selectedIndexRowSearchPositionDictionary = [NSMutableDictionary dictionary];
     _updatedString = @"";
@@ -140,10 +153,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
     [self showNavigationSeparator:NO];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -161,7 +172,12 @@
         return [self.indexSectionDictionary count];
     }
     else if (tableView == self.createGroupView.searchResultTableView) {
-        return 1;
+        if (self.isLoading) {
+            return 3;
+        }
+        else {
+            return 2;
+        }
     }
     
     return 0;
@@ -186,6 +202,13 @@
         if (section == 0) {
             return [self.searchResultUserMutableArray count];
         }
+        else if (section == 1) {
+            return [self.searchResultNonContactUserMutableArray count];
+        }
+        else if (section == 2) {
+            //For loading state
+            return 1;
+        }
     }
     
     return 0;
@@ -209,6 +232,13 @@
         if (indexPath.section == 0) {
             return 64.0f;
         }
+        else if (indexPath.section == 1) {
+            return 64.0f;
+        }
+        else if (indexPath.section == 2) {
+            //loading state
+            return 50.0f;
+        }
     }
     
     return CGFLOAT_MIN;
@@ -222,6 +252,7 @@
                 TAPContactTableViewCell *cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
                 TAPUserModel *currentUser = [self.room.participants objectAtIndex:indexPath.row];
                 [cell setContactTableViewCellWithUser:currentUser];
+                [cell setContactTableViewCellType:TAPContactTableViewCellTypeWithUsername];
                 
                 [cell isRequireSelection:self.isEditMode];
                 //if current user is self, do nothing
@@ -270,6 +301,7 @@
             if (indexPath.section <= [self.indexSectionDictionary count] - 1) {
                 static NSString *cellID = @"TAPContactTableViewCell";
                 TAPContactTableViewCell *cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
+                [cell setContactTableViewCellType:TAPContactTableViewCellTypeWithUsername];
                 
                 NSArray *keysArray = [self.indexSectionDictionary allKeys];
                 NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
@@ -296,10 +328,10 @@
                     [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
                 }
                 
-                //save section and row position to dictionary
-                if ([self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID] == nil) {
-                    [self.selectedIndexSectionRowPositionDictionary setObject:[NSString stringWithFormat:@"%ld - %ld", indexPath.section, indexPath.row] forKey:currentUser.userID];
-                }
+//                //save section and row position to dictionary
+//                if ([self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID] == nil) {
+//                    [self.selectedIndexSectionRowPositionDictionary setObject:[NSString stringWithFormat:@"%ld - %ld", indexPath.section, indexPath.row] forKey:currentUser.userID];
+//                }
                 return cell;
 
         }
@@ -307,29 +339,42 @@
         }
     }
     else if (tableView == self.createGroupView.searchResultTableView) {
-        static NSString *cellID = @"TAPContactTableViewCell";
-        TAPContactTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
-        if (cell == nil) {
-            cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
-        }
-        
-        TAPUserModel *user = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
-        [cell setContactTableViewCellWithUser:user];
-        
-        if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault || self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
-            [cell isRequireSelection:YES];
-            
-            if ([self.selectedIndexDictionary objectForKey:user.userID]) {
-                [cell isCellSelected:YES];
+        if (self.isLoading && indexPath.section == 2) {
+            static NSString *cellID = @"TAPContactLoadingTableViewCell";
+            TAPContactLoadingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
+            if (cell == nil) {
+                cell = [[TAPContactLoadingTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
             }
-            else {
-                [cell isCellSelected:NO];
-            }
+            [cell animateLoading:YES];
+            return cell;
         }
         else {
-            [cell isRequireSelection:self.isEditMode];
+            static NSString *cellID = @"TAPContactTableViewCell";
+            TAPContactTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
+            if (cell == nil) {
+                cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
+            }
             
-            if (self.isEditMode) {
+            if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeMemberList) {
+                [cell setContactTableViewCellType:TAPContactTableViewCellTypeDefault];
+            }
+            else {
+                [cell setContactTableViewCellType:TAPContactTableViewCellTypeWithUsername];
+            }
+            
+            TAPUserModel *user;
+            if (indexPath.section == 0) {
+                user = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+            }
+            else if (indexPath.section == 1) {
+                user = [self.searchResultNonContactUserMutableArray objectAtIndex:indexPath.row];
+            }
+            
+            [cell setContactTableViewCellWithUser:user];
+            
+            if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault || self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
+                [cell isRequireSelection:YES];
+                
                 if ([self.selectedIndexDictionary objectForKey:user.userID]) {
                     [cell isCellSelected:YES];
                 }
@@ -337,30 +382,42 @@
                     [cell isCellSelected:NO];
                 }
             }
+            else {
+                [cell isRequireSelection:self.isEditMode];
+                
+                if (self.isEditMode) {
+                    if ([self.selectedIndexDictionary objectForKey:user.userID]) {
+                        [cell isCellSelected:YES];
+                    }
+                    else {
+                        [cell isCellSelected:NO];
+                    }
+                }
+                
+                if ([self.room.admins containsObject:user.userID]) {
+                    //is admin
+                    [cell showAdminIndicator:YES];
+                }
+                else {
+                    //not admin
+                    [cell showAdminIndicator:NO];
+                }
+            }
             
-            if ([self.room.admins containsObject:user.userID]) {
-                //is admin
-                [cell showAdminIndicator:YES];
+            if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
+                [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeFull];
             }
             else {
-                //not admin
-                [cell showAdminIndicator:NO];
+                [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
             }
+            
+            //save section and row position to dictionary
+            if ([self.selectedIndexRowSearchPositionDictionary objectForKey:user.userID] == nil) {
+                [self.selectedIndexRowSearchPositionDictionary setObject:[NSString stringWithFormat:@"%ld", indexPath.row] forKey:user.userID];
+            }
+            
+            return cell;
         }
-        
-        if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
-            [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeFull];
-        }
-        else {
-            [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
-        }
-        
-        //save section and row position to dictionary
-        if ([self.selectedIndexRowSearchPositionDictionary objectForKey:user.userID] == nil) {
-            [self.selectedIndexRowSearchPositionDictionary setObject:[NSString stringWithFormat:@"%ld", indexPath.row] forKey:user.userID];
-        }
-        
-        return cell;
     }
     
     UITableViewCell *cell = [[UITableViewCell alloc] init];
@@ -373,6 +430,14 @@
             return CGFLOAT_MIN;
         }
         else if (section <= [self.alphabetSectionTitles count] - 1) {
+            return 34.0f;
+        }
+    }
+    else if (tableView == self.createGroupView.searchResultTableView) {
+        if (section == 0 && [self.searchResultUserMutableArray count] > 0) {
+            return 34.0f;
+        }
+        else if (section == 1 && [self.searchResultNonContactUserMutableArray count] > 0) {
             return 34.0f;
         }
     }
@@ -403,6 +468,42 @@
             
             return header;
         }
+    }
+    else if (tableView == self.createGroupView.searchResultTableView) {
+        
+        if (section == 0 && [self.searchResultUserMutableArray count] == 0) {
+            UIView *header = [[UIView alloc] init];
+            return header;
+        }
+        else if (section == 1 && [self.searchResultNonContactUserMutableArray count] == 0) {
+            UIView *header = [[UIView alloc] init];
+            return header;
+        }
+        
+        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 34.0f)];
+        header.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+        
+        UIFont *sectionHeaderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
+        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(header.frame) - 16.0f - 16.0f, 34.0f)];
+        titleLabel.textColor = sectionHeaderColor;
+        titleLabel.font = sectionHeaderFont;
+        
+        if (section == 0) {
+            titleLabel.text = NSLocalizedString(@"CONTACTS", @"");;
+        }
+        else if (section == 1) {
+            titleLabel.text = NSLocalizedString(@"GLOBAL SEARCH", @"");;
+        }
+        
+        NSMutableAttributedString *titleLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:titleLabel.text];
+        [titleLabelAttributedString addAttribute:NSKernAttributeName
+                                             value:@1.5f
+                                             range:NSMakeRange(0, [titleLabel.text length])];
+        titleLabel.attributedText = titleLabelAttributedString;
+        [header addSubview:titleLabel];
+
+        return header;
     }
     
     UIView *header = [[UIView alloc] init];
@@ -472,7 +573,12 @@ trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     }
     else {
         //search result table view
-        currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+        if (indexPath.section == 0) {
+            currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+        }
+        else if (indexPath.section == 1) {
+            currentUser = [self.searchResultNonContactUserMutableArray objectAtIndex:indexPath.row];
+        }
     }
     
     UIContextualAction *promoteAdminAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
@@ -635,6 +741,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Delegate
+#pragma mark ScrollView
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self.view endEditing:YES];
+}
+
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -698,7 +809,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if ([self.selectedIndexDictionary count] == 1) {
                 NSArray *indexArray = [self.selectedIndexDictionary allKeys];
                 TAPUserModel *user = [self.selectedIndexDictionary objectForKey:[indexArray firstObject]];
-                if ([self.room.admins containsObject:user.userID]) {                    //is admin
+                if ([self.room.admins containsObject:user.userID]) {
+                    //is admin
                     [self.createGroupView showBottomActionButtonViewExtension:YES withActiveButton:TAPCreateGroupActionExtensionTypeDemoteAdmin];
                 }
                 else {
@@ -729,7 +841,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if (tableView == self.createGroupView.searchResultTableView) {
         //Contacts
-        TAPUserModel *currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+        TAPUserModel *currentUser;
+        if (indexPath.section == 0) {
+            currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+        }
+        else if (indexPath.section == 1) {
+            currentUser = [self.searchResultNonContactUserMutableArray objectAtIndex:indexPath.row];
+        }
         
         NSString *objectString = currentUser.userID;
         
@@ -761,7 +879,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeMemberList && self.isEditMode && indexPath.row < [self.contactListArray count]) {
             
             TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:indexPath];
-            TAPUserModel *currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+            
+            TAPUserModel *currentUser;
+            if (indexPath.section == 0) {
+                currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+            }
+            else if (indexPath.section == 1) {
+                currentUser = [self.searchResultNonContactUserMutableArray objectAtIndex:indexPath.row];
+            }
+            
             if ([self.selectedIndexDictionary objectForKey:currentUser.userID]) {
                 [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
                 [contactTableViewCell isCellSelected:NO];
@@ -790,7 +916,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeMemberList && !self.isEditMode && indexPath.row < [self.contactListArray count]) {
             
-            TAPUserModel *currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+            TAPUserModel *currentUser;
+            if (indexPath.section == 0) {
+                currentUser = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
+            }
+            else if (indexPath.section == 1) {
+                currentUser = [self.searchResultNonContactUserMutableArray objectAtIndex:indexPath.row];
+            }
             
             //if current user is self, do nothing
             if ([currentUser.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
@@ -816,50 +948,67 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (indexPath.row != 0) { //WK Note : indexPath.row 0 is group admin
             
             TAPUserModel *currentUser = [self.selectedUserModelArray objectAtIndex:indexPath.row - 1];
-            
-            NSString *objectString = [self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID];
-            
-            if (![TAPUtil isEmptyString:objectString]) {
-                NSArray *objectStringSplitArray = [objectString componentsSeparatedByString:@" - "];
-                NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:[[objectStringSplitArray objectAtIndex:1] integerValue] inSection:[[objectStringSplitArray objectAtIndex:0] integerValue]];
-                
-                NSIndexPath *selectedSearchIndexPath = [NSIndexPath indexPathForItem:[[self.selectedIndexRowSearchPositionDictionary objectForKey:currentUser.userID] integerValue] inSection:0];
-
+            if (currentUser.isContact == NO) {
                 [self.selectedUserModelArray removeObjectAtIndex:indexPath.row - 1];
                 [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
                 
-                TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:selectedIndexPath];
-                [contactTableViewCell isCellSelected:NO];
+                NSInteger index = 0;
+                NSInteger counter = 0;
+                for (TAPUserModel *user in self.searchResultNonContactUserMutableArray) {
+                    if ([currentUser.userID isEqualToString:user.userID]) {
+                        index = counter;
+                    }
+                    counter++;
+                }
                 
-                TAPContactTableViewCell *contactSearchTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:selectedSearchIndexPath];
+                TAPContactTableViewCell *contactSearchTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:1]];
                 [contactSearchTableViewCell isCellSelected:NO];
             }
+            else {
+//                NSString *objectString = [self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID];
+//
+//                if (![TAPUtil isEmptyString:objectString]) {
+//                    NSArray *objectStringSplitArray = [objectString componentsSeparatedByString:@" - "];
+//                    NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:[[objectStringSplitArray objectAtIndex:1] integerValue] inSection:[[objectStringSplitArray objectAtIndex:0] integerValue]];
+//
+                    NSIndexPath *selectedSearchIndexPath = [NSIndexPath indexPathForItem:[[self.selectedIndexRowSearchPositionDictionary objectForKey:currentUser.userID] integerValue] inSection:indexPath.section];
+
+                    [self.selectedUserModelArray removeObjectAtIndex:indexPath.row - 1];
+                    [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
+                    
+//                    TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:selectedIndexPath];
+//                    [contactTableViewCell isCellSelected:NO];
+                    
+                    TAPContactTableViewCell *contactSearchTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:selectedSearchIndexPath];
+                    [contactSearchTableViewCell isCellSelected:NO];
+//                }
+            }
+
             
             [self validateselectedUserModelArray];
         }
     }
     else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             TAPUserModel *currentUser = [self.selectedUserModelArray objectAtIndex:indexPath.row];
-            
-            NSString *objectString = [self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID];
-            
-            if (![TAPUtil isEmptyString:objectString]) {
-                NSArray *objectStringSplitArray = [objectString componentsSeparatedByString:@" - "];
-                NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:[[objectStringSplitArray objectAtIndex:1] integerValue] inSection:[[objectStringSplitArray objectAtIndex:0] integerValue]];
+
+//            NSString *objectString = [self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID];
+//            if (![TAPUtil isEmptyString:objectString]) {
+//                NSArray *objectStringSplitArray = [objectString componentsSeparatedByString:@" - "];
+//                NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:[[objectStringSplitArray objectAtIndex:1] integerValue] inSection:[[objectStringSplitArray objectAtIndex:0] integerValue]];
                 
-                NSIndexPath *selectedSearchIndexPath = [NSIndexPath indexPathForItem:[[self.selectedIndexRowSearchPositionDictionary objectForKey:currentUser.userID] integerValue] inSection:0];
+                NSIndexPath *selectedSearchIndexPath = [NSIndexPath indexPathForItem:[[self.selectedIndexRowSearchPositionDictionary objectForKey:currentUser.userID] integerValue] inSection:indexPath.section];
                 
                 [self.selectedUserModelArray removeObjectAtIndex:indexPath.row];
                 [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
                 
-                TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:selectedIndexPath];
-                [contactTableViewCell isCellSelected:NO];
+//                TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:selectedIndexPath];
+//                [contactTableViewCell isCellSelected:NO];
                 
                 TAPContactTableViewCell *contactSearchTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:selectedSearchIndexPath];
                 [contactSearchTableViewCell isCellSelected:NO];
             
             [self validateselectedUserModelArray];
-        }
+//        }
     }
 }
 
@@ -880,6 +1029,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             } completion:^(BOOL finished) {
                 //completion
                 [self.searchResultUserMutableArray removeAllObjects];
+                [self.searchResultNonContactUserMutableArray removeAllObjects];
                 [self.createGroupView.searchResultTableView reloadData];
             }];
         }
@@ -889,7 +1039,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (BOOL)searchBarTextFieldShouldClear:(UITextField *)textField {
+    _isCancellingPreviousPerformSelector = YES;
     [self.searchResultUserMutableArray removeAllObjects];
+    [self.searchResultNonContactUserMutableArray removeAllObjects];
     [self.createGroupView showOverlayView:YES];
     [UIView animateWithDuration:0.2f animations:^{
         self.createGroupView.searchResultTableView.alpha = 0.0f;
@@ -897,45 +1049,31 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //completion
         [self.createGroupView.searchResultTableView reloadData];
         [self.createGroupView.contactsTableView reloadData];
+        _isCancellingPreviousPerformSelector = NO;
     }];
     return YES;
 }
 
 - (BOOL)searchBarTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    NSString *trimmedNewString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *trimmedString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    //Cancel all previous perform selector request
+    //DV Note
+    //Make sure there are no other perform selector on this page because this method is cancelling all perform selector
+    //Use cancelPreviousPerformRequestsWithTarget:selector: if want to cancel certain perform selector
+    //END DV Note
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    _isCancellingPreviousPerformSelector = YES;
     
-    if (![trimmedNewString isEqualToString:@""]) {
-        self.updatedString = newString;
-        NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (![trimmedString isEqualToString:@""]) {
+        self.updatedString = trimmedString;
         
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault || self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
-            [TAPDataManager getDatabaseContactSearchKeyword:trimmedString sortBy:@"fullname" success:^(NSArray *resultArray) {
-                self.searchResultUserMutableArray = resultArray;
-                
-                if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
-                    //filter added user in group
-                    NSMutableArray *filteredArray = [NSMutableArray array];
-                    for (TAPUserModel *user in resultArray) {
-                        if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil) {
-                            [filteredArray addObject:user];
-                        }
-                    }
-                    self.searchResultUserMutableArray = filteredArray;
-                }
-                
-                [self.selectedIndexRowSearchPositionDictionary removeAllObjects];
-                [self.createGroupView.searchResultTableView reloadData];
-                
-                [self.createGroupView showOverlayView:NO];
-                [UIView animateWithDuration:0.2f animations:^{
-                    self.createGroupView.searchResultTableView.alpha = 1.0f;
-                } completion:^(BOOL finished) {
-                    //completion
-                }];
-            } failure:^(NSError *error) {
-                
-            }];
+            
+            //Trigger search contact
+            _isCancellingPreviousPerformSelector = NO;
+            [self performSelector:@selector(triggerSearchContactWithKeyword:) withObject:trimmedString afterDelay:0.3f];
         }
         else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeMemberList) {
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fullname contains[c] %@",trimmedString];
@@ -949,19 +1087,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 self.createGroupView.searchResultTableView.alpha = 1.0f;
             } completion:^(BOOL finished) {
                 //completion
+                _isCancellingPreviousPerformSelector = NO;
             }];
         }
     }
     else {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self];
         textField.text = @"";
         [self.searchResultUserMutableArray removeAllObjects];
         [self.createGroupView showOverlayView:YES];
+        [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
         [UIView animateWithDuration:0.2f animations:^{
             self.createGroupView.searchResultTableView.alpha = 0.0f;
         } completion:^(BOOL finished) {
             //completion
             [self.createGroupView.searchResultTableView reloadData];
             [self.createGroupView.contactsTableView reloadData];
+            _isCancellingPreviousPerformSelector = NO;
         }];
         
         return NO;
@@ -1128,6 +1270,21 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [selectedContactsTitleAttributedString addAttributes:selectedContactsTitleAttributesDictionary
                                                        range:NSMakeRange(0, [self.createGroupView.selectedContactsTitleLabel.text length])];
         self.createGroupView.selectedContactsTitleLabel.attributedText = selectedContactsTitleAttributedString;
+        
+        if (self.isKeyboardShown) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.createGroupView.selectedContactsView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - 190.0f - self.keyboardHeight, CGRectGetWidth(self.createGroupView.selectedContactsView.frame), 190.0f);
+                
+                self.createGroupView.selectedContactsShadowView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsShadowView.frame), CGRectGetMinY(self.createGroupView.selectedContactsView.frame), CGRectGetWidth(self.createGroupView.selectedContactsShadowView.frame), CGRectGetHeight(self.createGroupView.selectedContactsShadowView.frame));
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.createGroupView.selectedContactsView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - 190.0f - [TAPUtil safeAreaBottomPadding], CGRectGetWidth(self.createGroupView.selectedContactsView.frame), 190.0f + [TAPUtil safeAreaBottomPadding]);
+                
+                self.createGroupView.selectedContactsShadowView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsShadowView.frame), CGRectGetMinY(self.createGroupView.selectedContactsView.frame), CGRectGetWidth(self.createGroupView.selectedContactsShadowView.frame), CGRectGetHeight(self.createGroupView.selectedContactsShadowView.frame));
+            }];
+        }
     }
     else {
         //Member List
@@ -1181,14 +1338,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)loadContactListFromDatabase {
-    
     [TAPDataManager getDatabaseAllContactSortBy:@"fullname" success:^(NSArray *resultArray) {
         _contactListArray = [NSMutableArray array];
         _indexSectionDictionary = [NSMutableDictionary dictionary];
         _contactListDictionary = [NSMutableDictionary dictionary];
         
         self.contactListArray = resultArray;
-        
+                
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             //filter added user in group
             NSMutableArray *filteredArray = [NSMutableArray array];
@@ -1361,6 +1517,284 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)removeLoadingView {
     [self.createGroupView showLoadingView:NO];
+}
+
+- (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
+    _isKeyboardShown = YES;
+    _keyboardHeight = keyboardHeight;
+    [UIView animateWithDuration:0.2f animations:^{
+        self.createGroupView.selectedContactsView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - 190.0f - keyboardHeight, CGRectGetWidth(self.createGroupView.selectedContactsView.frame), 190.0f);
+        
+        self.createGroupView.selectedContactsShadowView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsShadowView.frame), CGRectGetMinY(self.createGroupView.selectedContactsView.frame), CGRectGetWidth(self.createGroupView.selectedContactsShadowView.frame), CGRectGetHeight(self.createGroupView.selectedContactsShadowView.frame));
+    }];
+}
+
+- (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
+    _isKeyboardShown = NO;
+    _keyboardHeight = keyboardHeight;
+    [UIView animateWithDuration:0.2f animations:^{
+        self.createGroupView.selectedContactsView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO] - 190.0f - [TAPUtil safeAreaBottomPadding], CGRectGetWidth(self.createGroupView.selectedContactsView.frame), 190.0f + [TAPUtil safeAreaBottomPadding]);
+        
+        self.createGroupView.selectedContactsShadowView.frame = CGRectMake(CGRectGetMinX(self.createGroupView.selectedContactsShadowView.frame), CGRectGetMinY(self.createGroupView.selectedContactsView.frame), CGRectGetWidth(self.createGroupView.selectedContactsShadowView.frame), CGRectGetHeight(self.createGroupView.selectedContactsShadowView.frame));
+    }];
+}
+
+- (void)triggerSearchContactWithKeyword:(NSString *)trimmedString {
+    //Search contact list
+    BOOL __block isDoneSearchContactUserFromDatabase = NO;
+    BOOL __block isDoneSearchNonContactUserFromDatabase = NO;
+    
+    [TAPDataManager getDatabaseContactSearchKeyword:trimmedString sortBy:@"fullname" success:^(NSArray *resultArray) {
+        
+        if (self.isCancellingPreviousPerformSelector) {
+            _isCancellingPreviousPerformSelector = NO;
+            return;
+        }
+        
+        isDoneSearchContactUserFromDatabase = YES;
+        self.searchResultUserMutableArray = resultArray;
+        
+        if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
+            //filter added user in group
+            NSMutableArray *filteredArray = [NSMutableArray array];
+            for (TAPUserModel *user in resultArray) {
+                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil) {
+                    [filteredArray addObject:user];
+                }
+            }
+            self.searchResultUserMutableArray = filteredArray;
+        }
+        
+        [self.selectedIndexRowSearchPositionDictionary removeAllObjects];
+        
+        if (isDoneSearchContactUserFromDatabase && isDoneSearchNonContactUserFromDatabase) {
+            //Check if searched keyword is equal to contact username, no need to call API
+            NSMutableArray *temporaryCombinedArray = [NSMutableArray array];
+            [temporaryCombinedArray addObjectsFromArray:[self.searchResultUserMutableArray copy]];
+            [temporaryCombinedArray addObjectsFromArray:[self.searchResultNonContactUserMutableArray copy]];
+            for (TAPUserModel *user in temporaryCombinedArray) {
+                if ([[user.username lowercaseString] isEqualToString:[trimmedString lowercaseString]]) {
+                    _isContactLocallyFound = YES;
+                    break;
+                }
+            }
+            
+            //is done search from database
+            //check if contact is not found in database, call api get user by username
+            if (([self.searchResultUserMutableArray count] == 0 && [self.searchResultNonContactUserMutableArray count] == 0) && !self.isContactLocallyFound) {
+                //DV TODO - Add loading here
+                [self.createGroupView showOverlayView:NO];
+                self.createGroupView.searchResultTableView.alpha = 1.0f;
+                [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
+                _isLoading = YES;
+                [self.createGroupView.searchResultTableView reloadData];
+                
+                NSString *currentUsername = [TAPDataManager getActiveUser].username;
+                BOOL isAlreadyParticipant = NO;
+                for (TAPUserModel *user in [self.roomParticipantsDictionary allValues]) {
+                    if ([[user.username lowercaseString] isEqualToString:[trimmedString lowercaseString]]) {
+                        isAlreadyParticipant = YES;
+                    }
+                }
+                
+                if ([[trimmedString lowercaseString] isEqualToString:[currentUsername lowercaseString]] || isAlreadyParticipant) {
+                    [self.createGroupView.searchResultTableView reloadData];
+                    [self.createGroupView showOverlayView:NO];
+                    [UIView animateWithDuration:0.2f animations:^{
+                        self.createGroupView.searchResultTableView.alpha = 1.0f;
+                        //DV TODO - remove loading here
+                        _isLoading = NO;
+                        [self.createGroupView.searchResultTableView reloadData];
+                        [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
+                        _isContactLocallyFound = NO;
+                    } completion:^(BOOL finished) {
+                        //completion
+                    }];
+                }
+                else {
+                    [TAPDataManager callAPISearchUserByUsernameKeyword:trimmedString success:^(TAPUserModel *user, NSString *inputKeyword) {
+                        //Check if different keyword, means user has search something else, return
+                        if (![[inputKeyword lowercaseString] isEqualToString:[self.createGroupView.searchBarView.searchTextField.text lowercaseString]]) {
+                            return;
+                        }
+                        
+                        [self.searchResultNonContactUserMutableArray addObject:user];
+                        [self.createGroupView.searchResultTableView reloadData];
+                        [self.createGroupView showOverlayView:NO];
+                        [UIView animateWithDuration:0.2f animations:^{
+                            self.createGroupView.searchResultTableView.alpha = 1.0f;
+                            //DV TODO - remove loading here
+                            _isLoading = NO;
+                            [self.createGroupView.searchResultTableView reloadData];
+                            [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
+                            _isContactLocallyFound = NO;
+                        } completion:^(BOOL finished) {
+                            //completion
+                        }];
+                        
+                    } failure:^(NSError *error, NSString *inputKeyword) {
+                        //Check if different keyword, means user has search something else, return
+                        if (![[inputKeyword lowercaseString] isEqualToString:[self.createGroupView.searchBarView.searchTextField.text lowercaseString]]) {
+                            return;
+                        }
+                        
+                        [self.createGroupView.searchResultTableView reloadData];
+                        [self.createGroupView showOverlayView:NO];
+                        [UIView animateWithDuration:0.2f animations:^{
+                            self.createGroupView.searchResultTableView.alpha = 1.0f;
+                            //DV TODO - remove loading here
+                            _isLoading = NO;
+                            [self.createGroupView.searchResultTableView reloadData];
+                            [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
+                            _isContactLocallyFound = NO;
+                        } completion:^(BOOL finished) {
+                            //completion
+                        }];
+                    }];
+                }
+            }
+            else {
+                //Not neccessary to call API because contact found in local database
+                [self.createGroupView.searchResultTableView reloadData];
+                [self.createGroupView showOverlayView:NO];
+                [UIView animateWithDuration:0.2f animations:^{
+                    self.createGroupView.searchResultTableView.alpha = 1.0f;
+                    [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
+                    _isContactLocallyFound = NO;
+                } completion:^(BOOL finished) {
+                    //completion
+                }];
+            }
+        }
+    } failure:^(NSError *error) {
+        isDoneSearchContactUserFromDatabase = YES;
+    }];
+    
+    //Search non contact list
+    [TAPDataManager getDatabaseNonContactSearchKeyword:trimmedString sortBy:@"fullname" success:^(NSArray *resultArray) {
+
+        if (self.isCancellingPreviousPerformSelector) {
+            _isCancellingPreviousPerformSelector = NO;
+            return;
+        }
+        
+        isDoneSearchNonContactUserFromDatabase = YES;
+        self.searchResultNonContactUserMutableArray = resultArray;
+        
+        if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
+            //filter added user in group
+            NSMutableArray *filteredArray = [NSMutableArray array];
+            for (TAPUserModel *user in resultArray) {
+                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil) {
+                    [filteredArray addObject:user];
+                }
+            }
+            self.searchResultNonContactUserMutableArray = filteredArray;
+        }
+        
+        [self.selectedIndexRowSearchPositionDictionary removeAllObjects];
+
+        if (isDoneSearchContactUserFromDatabase && isDoneSearchNonContactUserFromDatabase) {
+            //Check if searched keyword is equal to contact username, no need to call API
+            NSMutableArray *temporaryCombinedArray = [NSMutableArray array];
+            [temporaryCombinedArray addObjectsFromArray:[self.searchResultUserMutableArray copy]];
+            [temporaryCombinedArray addObjectsFromArray:[self.searchResultNonContactUserMutableArray copy]];
+            for (TAPUserModel *user in temporaryCombinedArray) {
+                if ([[user.username lowercaseString] isEqualToString:[trimmedString lowercaseString]]) {
+                    _isContactLocallyFound = YES;
+                    break;
+                }
+            }
+            
+            //is done search from database
+            //check if contact is not found in database, call api get user by username
+            if (([self.searchResultUserMutableArray count] == 0 && [self.searchResultNonContactUserMutableArray count] == 0) && !self.isContactLocallyFound) {
+                [self.createGroupView showOverlayView:NO];
+                self.createGroupView.searchResultTableView.alpha = 1.0f;
+                [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
+                _isLoading = YES;
+                [self.createGroupView.searchResultTableView reloadData];
+                
+                NSString *currentUsername = [TAPDataManager getActiveUser].username;
+                BOOL isAlreadyParticipant = NO;
+                for (TAPUserModel *user in [self.roomParticipantsDictionary allValues]) {
+                    if ([[user.username lowercaseString] isEqualToString:[trimmedString lowercaseString]]) {
+                        isAlreadyParticipant = YES;
+                    }
+                }
+                
+                if ([[trimmedString lowercaseString] isEqualToString:[currentUsername lowercaseString]] || isAlreadyParticipant) {
+                    [self.createGroupView.searchResultTableView reloadData];
+                    [self.createGroupView showOverlayView:NO];
+                    [UIView animateWithDuration:0.2f animations:^{
+                        self.createGroupView.searchResultTableView.alpha = 1.0f;
+                        //DV TODO - remove loading here
+                        _isLoading = NO;
+                        [self.createGroupView.searchResultTableView reloadData];
+                        [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
+                        _isContactLocallyFound = NO;
+                    } completion:^(BOOL finished) {
+                        //completion
+                    }];
+                }
+                else {
+                    [TAPDataManager callAPISearchUserByUsernameKeyword:trimmedString success:^(TAPUserModel *user, NSString *inputKeyword) {
+                        //Check if different keyword, means user has search something else, return
+                        if (![[inputKeyword lowercaseString] isEqualToString:[self.createGroupView.searchBarView.searchTextField.text lowercaseString]]) {
+                            return;
+                        }
+                        
+                        [self.searchResultNonContactUserMutableArray addObject:user];
+                        [self.createGroupView.searchResultTableView reloadData];
+                        [self.createGroupView showOverlayView:NO];
+                        [UIView animateWithDuration:0.2f animations:^{
+                            self.createGroupView.searchResultTableView.alpha = 1.0f;
+                            //DV TODO - remove loading here
+                            _isLoading = NO;
+                            [self.createGroupView.searchResultTableView reloadData];
+                            [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
+                            _isContactLocallyFound = NO;
+                        } completion:^(BOOL finished) {
+                            //completion
+                        }];
+                        
+                    } failure:^(NSError *error, NSString *inputKeyword) {
+                        //Check if different keyword, means user has search something else, return
+                        if (![[inputKeyword lowercaseString] isEqualToString:[self.createGroupView.searchBarView.searchTextField.text lowercaseString]]) {
+                            return;
+                        }
+                        
+                        [self.createGroupView.searchResultTableView reloadData];
+                        [self.createGroupView showOverlayView:NO];
+                        [UIView animateWithDuration:0.2f animations:^{
+                            self.createGroupView.searchResultTableView.alpha = 1.0f;
+                            //DV TODO - remove loading here
+                            _isLoading = NO;
+                            [self.createGroupView.searchResultTableView reloadData];
+                            [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
+                            _isContactLocallyFound = NO;
+                        } completion:^(BOOL finished) {
+                            //completion
+                        }];
+                    }];
+                }
+            }
+            else {
+                //Not neccessary to call API because contact found in local database
+                [self.createGroupView.searchResultTableView reloadData];
+                [self.createGroupView showOverlayView:NO];
+                [UIView animateWithDuration:0.2f animations:^{
+                    self.createGroupView.searchResultTableView.alpha = 1.0f;
+                    [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
+                    _isContactLocallyFound = NO;
+                } completion:^(BOOL finished) {
+                    //completion
+                }];
+            }
+        }
+    } failure:^(NSError *error) {
+        isDoneSearchNonContactUserFromDatabase = YES;
+    }];
 }
 
 @end

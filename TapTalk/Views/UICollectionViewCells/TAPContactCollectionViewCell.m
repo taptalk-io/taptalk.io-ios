@@ -10,7 +10,8 @@
 
 @interface TAPContactCollectionViewCell()
 @property (strong, nonatomic) UIView *bgView;
-
+@property (strong, nonatomic) UIView *initialNameView;
+@property (strong, nonatomic) UILabel *initialNameLabel;
 @property (strong, nonatomic) TAPImageView *contactImageView;
 @property (strong, nonatomic) UIImageView *removeImageView;
 @property (strong, nonatomic) UILabel *contactNameLabel;
@@ -25,6 +26,20 @@
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
+        
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 52.0f, 52.0f)];
+        self.initialNameView.alpha = 0.0f;
+        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.bgView addSubview:self.initialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
         
         _contactImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 52.0f, 52.0f)];
         self.contactImageView.layer.cornerRadius = CGRectGetHeight(self.contactImageView.frame) / 2.0;
@@ -57,9 +72,15 @@
     }
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        self.contactImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        //No photo found, get the initial
+        self.initialNameView.alpha = 1.0f;
+        self.contactImageView.alpha = 0.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:user.fullname];
+        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:user.fullname isGroup:NO];
     }
     else {
+        self.initialNameView.alpha = 0.0f;
+        self.contactImageView.alpha = 1.0f;
         [self.contactImageView setImageWithURLString:profileImageURL];
     }
     NSMutableDictionary *contactNameAttributesDictionary = [NSMutableDictionary dictionary];

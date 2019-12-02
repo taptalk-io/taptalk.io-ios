@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yourChatBubbleLongPressedPhoneNumber:(NSString *)phoneNumber
                             originalString:(NSString*)originalString;
 - (void)yourChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)yourChatBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
 
 @end
 

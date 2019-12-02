@@ -68,26 +68,26 @@
 #pragma mark - Delegate
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessageInActiveRoom:)]) {
-        [self.delegate tapTalkDidReceiveNewMessageInActiveRoom:message];
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessage:)]) {
+        [self.delegate tapTalkDidReceiveNewMessage:message];
     }
 }
 
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessageInOtherRoom:)]) {
-        [self.delegate tapTalkDidReceiveNewMessageInOtherRoom:message];
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessage:)]) {
+        [self.delegate tapTalkDidReceiveNewMessage:message];
     }
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessageInOtherRoom:)]) {
-        [self.delegate tapTalkDidReceiveNewMessageInOtherRoom:message];
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
+        [self.delegate tapTalkDidReceiveUpdatedMessage:message];
     }
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessageInOtherRoom:)]) {
-        [self.delegate tapTalkDidReceiveNewMessageInOtherRoom:message];
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
+        [self.delegate tapTalkDidReceiveUpdatedMessage:message];
     }
 }
 

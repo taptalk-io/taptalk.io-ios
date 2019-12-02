@@ -172,6 +172,13 @@
                                             searchedString:self.updatedString
                                     numberOfUnreadMessages:[self.searchResultUnreadCountArray objectAtIndex:indexPath.row]];
             
+            if (indexPath.row == [self.searchResultChatAndContactArray count] - 1) {
+                [cell hideSeparatorView:YES];
+            }
+            else {
+                [cell hideSeparatorView:NO];
+            }
+            
             return cell;
         }
         else if (indexPath.section == 1) {

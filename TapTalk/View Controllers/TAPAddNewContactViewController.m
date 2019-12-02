@@ -206,7 +206,6 @@
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
-        
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {
             [self.addNewContactView.searchBarView.searchTextField resignFirstResponder];
             [self.addContactPopupView setPopupInfoWithUserData:user isContact:NO];

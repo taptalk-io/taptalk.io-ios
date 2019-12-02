@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yourImageLongPressedPhoneNumber:(NSString *)phoneNumber
                          originalString:(NSString*)originalString;
 - (void)yourImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)yourImageBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
 
 @end
 

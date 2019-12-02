@@ -60,6 +60,7 @@
         static NSString *cellID = @"TAPContactTableViewCell";
         TAPContactTableViewCell *cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
         [cell setContactTableViewCellWithUser:[TAPUserModel new]]; //WK Temp
+        [cell setContactTableViewCellType:TAPContactTableViewCellTypeDefault];
         [cell isRequireSelection:NO];
         
         if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {

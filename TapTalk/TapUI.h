@@ -46,6 +46,17 @@ NS_ASSUME_NONNULL_BEGIN
                currentShownNavigationController:(UINavigationController *)currentNavigationController;
 
 /**
+Called when user click the avatar in bubble chat in group room.
+
+@param room (TAPRoomModel *) room data that will be shown (group)
+@param user (TAPUserModel *) tapped user data
+@param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+*/
+- (void)tapTalkGroupMemberAvatarTappedWithRoom:(TAPRoomModel *)room
+                                          user:(TAPUserModel *)user
+              currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
  Called when user click the quote view that appears in the message chat bubble.
  
  @param userInfo (NSDictionary *) other data or details of custom quote
@@ -128,8 +139,6 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 @property (weak, nonatomic) id<TapUIChatRoomDelegate> chatRoomDelegate;
 @property (weak, nonatomic) id<TapUIRoomListDelegate> roomListDelegate;
 @property (weak, nonatomic) id<TapUICustomKeyboardDelegate> customKeyboardDelegate;
-
-@property (nonatomic) BOOL isLogoutButtonVisible;
 
 //Initalization
 + (TapUI *)sharedInstance;
@@ -255,6 +264,54 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 - (void)createRoomWithRoom:(TAPRoomModel *)room
 scrollToMessageWithLocalID:(NSString *)messageLocalID
                    success:(void (^)(TapUIChatViewController *chatViewController))success;
+
+/**
+Show or hide logout button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setLogoutButtonVisible:(BOOL)isVisible;
+
+/**
+Show or hide add new contact option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewContactMenuButtonVisible:(BOOL)isVisible;
+
+/**
+Show or hide scan QR code option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setScanQRMenuButtonVisible:(BOOL)isVisible;
+
+/**
+Show or hide new group option menu in NewChat view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewGroupMenuButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of logout button
+*/
+- (BOOL)getLogoutButtonVisibleState;
+
+/**
+Get current visibility state of add new contact menu option
+*/
+- (BOOL)getNewContactMenuButtonVisibleState;
+
+/**
+Get current visibility state of scan QR code menu option
+*/
+- (BOOL)getScanQRMenuButtonVisibleState;
+
+/**
+Get current visibility state of new group menu option
+*/
+- (BOOL)getNewGroupMenuButtonVisibleState;
 
 @end
 

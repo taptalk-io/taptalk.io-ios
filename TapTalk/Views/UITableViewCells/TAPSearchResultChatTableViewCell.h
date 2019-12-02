@@ -11,11 +11,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPSearchResultChatTableViewCell : TAPBaseTableViewCell
-
 - (void)setSearchResultChatTableViewCellWithData:(TAPRoomModel *)room
                                   searchedString:(NSString *)searchedString
                           numberOfUnreadMessages:(NSString *)unreadMessageCount;
-
+- (void)hideSeparatorView:(BOOL)isHide;
 @end
 
 NS_ASSUME_NONNULL_END
