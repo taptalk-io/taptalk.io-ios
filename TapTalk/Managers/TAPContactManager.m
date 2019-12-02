@@ -139,7 +139,9 @@
     [TAPDataManager getDatabaseAllUserSortBy:@"fullname" success:^(NSArray *resultArray) {
         for (TAPUserModel *user in resultArray) {
             [self.contactUserDictionary setObject:user forKey:user.userID];
-            [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
+            if (user.phoneWithCode != nil && ![user.phoneWithCode isEqualToString:@""]) {
+                [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
+            }
         }
     } failure:^(NSError *error) {
         

@@ -27,11 +27,14 @@
 @property (strong, nonatomic) TAPConnectionStatusViewController *connectionStatusViewController;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 @property (strong, nonatomic) TAPImageView *profileImageView;
+@property (strong, nonatomic) UIView *leftBarInitialNameView;
+@property (strong, nonatomic) UILabel *leftBarInitialNameLabel;
+@property (strong, nonatomic) UIButton *leftBarInitialNameButton;
 @property (strong, nonatomic) UIButton *leftBarButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 
-@property (strong, nonatomic) NSMutableArray *roomListArray;
-@property (strong, nonatomic) NSMutableDictionary *roomListDictionary;
+@property (strong, atomic) NSMutableArray *roomListArray;
+@property (strong, atomic) NSMutableDictionary *roomListDictionary;
 
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
@@ -84,13 +87,33 @@
     //LeftBarButton
     _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     
+    _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+    self.leftBarInitialNameView.alpha = 0.0f;
+    self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
+    self.leftBarInitialNameView.clipsToBounds = YES;
+    [self.leftBarButton addSubview:self.leftBarInitialNameView];
+    
+    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+    _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
+    self.leftBarInitialNameLabel.font = initialNameLabelFont;
+    self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
+    self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+    [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
+    
+    _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
+    self.leftBarInitialNameButton.alpha = 0.0f;
+    self.leftBarInitialNameButton.userInteractionEnabled = NO;
+    self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
+    [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
+    
     _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-    self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds)/2.0f;
+    self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
     self.profileImageView.clipsToBounds = YES;
     self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
     [self.leftBarButton addSubview:self.profileImageView];
     
-    self.leftBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 8.0f);
     [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
@@ -145,9 +168,28 @@
     
     NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
+        if (currentActiveUser.fullname == nil || [currentActiveUser.fullname isEqualToString:@""]) {
+            self.leftBarInitialNameView.alpha = 0.0f;
+            self.leftBarInitialNameButton.alpha = 0.0f;
+            self.leftBarInitialNameButton.userInteractionEnabled = NO;
+            self.profileImageView.alpha = 1.0f;
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            self.leftBarInitialNameView.alpha = 1.0f;
+            self.leftBarInitialNameButton.alpha = 1.0f;
+            self.leftBarInitialNameButton.userInteractionEnabled = YES;
+            self.profileImageView.alpha = 0.0f;
+            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:currentActiveUser.fullname];
+            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:currentActiveUser.fullname isGroup:NO];
+        }
     }
     else {
+        self.leftBarInitialNameView.alpha = 0.0f;
+        self.leftBarInitialNameButton.alpha = 0.0f;
+        self.leftBarInitialNameButton.userInteractionEnabled = NO;
+        self.profileImageView.alpha = 1.0f;
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
 
@@ -327,7 +369,7 @@
     TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
     TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
     TAPRoomModel *selectedRoom = selectedMessage.room;
-
+    
     [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
         chatViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:chatViewController animated:YES];
@@ -434,10 +476,13 @@
 
 #pragma mark TAPConnectionStatusViewController
 - (void)connectionStatusViewControllerDelegateHeightChange:(CGFloat)height {
-    [UIView animateWithDuration:0.2f animations:^{
-        //change frame
-        self.roomListView.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListView.roomListTableView.frame), height, CGRectGetWidth(self.roomListView.roomListTableView.frame), CGRectGetHeight(self.roomListView.roomListTableView.frame));
-    }];
+//DV Note - v1.0.18
+//28 Nov 2019 - Temporary comment to hide connecting, waiting for network, connected state for further changing UI flow
+//    [UIView animateWithDuration:0.2f animations:^{
+//        //change frame
+//        self.roomListView.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListView.roomListTableView.frame), height, CGRectGetWidth(self.roomListView.roomListTableView.frame), CGRectGetHeight(self.roomListView.roomListTableView.frame));
+//    }];
+//END DV Note
 }
 
 #pragma mark TAPAddNewChatViewController
@@ -485,7 +530,6 @@
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
-
 }
 
 #pragma mark TAPSearchViewController
@@ -505,9 +549,22 @@
 - (void)myAccountViewControllerDoneChangingImageProfile {
     NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        if ([TAPChatManager sharedManager].activeUser.fullname == nil || [[TAPChatManager sharedManager].activeUser.fullname isEqualToString:@""]) {
+            self.leftBarInitialNameView.alpha = 0.0f;
+            self.profileImageView.alpha = 1.0f;
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            self.leftBarInitialNameView.alpha = 1.0f;
+            self.leftBarInitialNameView.userInteractionEnabled = NO;
+            self.profileImageView.alpha = 0.0f;
+            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:[TAPChatManager sharedManager].activeUser.fullname];
+            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:[TAPChatManager sharedManager].activeUser.fullname isGroup:NO];
+        }
     }
     else {
+        self.leftBarInitialNameView.alpha = 0.0f;
+        self.profileImageView.alpha = 1.0f;
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
 }
@@ -516,15 +573,28 @@
 - (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
     NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        if ([TAPChatManager sharedManager].activeUser.fullname == nil || [[TAPChatManager sharedManager].activeUser.fullname isEqualToString:@""]) {
+            self.leftBarInitialNameView.alpha = 0.0f;
+            self.profileImageView.alpha = 1.0f;
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            self.leftBarInitialNameView.alpha = 1.0f;
+            self.profileImageView.alpha = 0.0f;
+            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:[TAPChatManager sharedManager].activeUser.fullname];
+            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:[TAPChatManager sharedManager].activeUser.fullname isGroup:NO];
+        }
     }
     else {
+        self.leftBarInitialNameView.alpha = 0.0f;
+        self.profileImageView.alpha = 1.0f;
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
 }
 
 #pragma mark - Custom Method
 - (void)leftBarButtonDidTapped {
+    NSLog(@"TAPPED");
     
     id <TapUIRoomListDelegate> roomListDelegate = [TapUI sharedInstance].roomListDelegate;
     if ([roomListDelegate respondsToSelector:@selector(tapTalkAccountButtonTapped:currentShownNavigationController:)]) {

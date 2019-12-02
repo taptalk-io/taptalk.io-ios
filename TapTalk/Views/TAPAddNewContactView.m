@@ -16,6 +16,8 @@
 @property (strong, nonatomic) UIView *searchExpertView;
 @property (strong, nonatomic) TAPImageView *coverImageView;
 @property (strong, nonatomic) UIView *expertImageContainerView;
+@property (strong, nonatomic) UIView *expertInitialView;
+@property (strong, nonatomic) UILabel *expertInitialLabel;
 @property (strong, nonatomic) TAPImageView *expertImageView;
 @property (strong, nonatomic) TAPImageView *expertVerifiedImageView;
 @property (strong, nonatomic) UILabel *expertNameLabel;
@@ -30,6 +32,8 @@
 
 @property (strong, nonatomic) UIView *searchUserView;
 @property (strong, nonatomic) UIView *searchUserShadowView;
+@property (strong, nonatomic) UIView *userInitialView;
+@property (strong, nonatomic) UILabel *userInitialLabel;
 @property (strong, nonatomic) TAPImageView *userImageView;
 @property (strong, nonatomic) UILabel *userFullNameLabel;
 @property (strong, nonatomic) UILabel *userUsernameLabel;
@@ -166,6 +170,20 @@
         self.coverImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.searchExpertView addSubview:self.coverImageView];
         
+        _expertInitialView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchExpertView.frame) - 52.0f) / 2.0f, 66.0f, 52.0f, 52.0f)];
+        self.expertInitialView.alpha = 0.0f;
+        self.expertInitialView.layer.cornerRadius = CGRectGetHeight(self.expertInitialView.frame) / 2.0f;
+        self.expertInitialView.clipsToBounds = YES;
+        [self.searchExpertView addSubview:self.expertInitialView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
+        _expertInitialLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.expertInitialView.frame), CGRectGetHeight(self.expertInitialView.frame))];
+        self.expertInitialLabel.font = initialNameLabelFont;
+        self.expertInitialLabel.textColor = initialNameLabelColor;
+        self.expertInitialLabel.textAlignment = NSTextAlignmentCenter;
+        [self.expertInitialView addSubview:self.expertInitialLabel];
+        
         _expertImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchExpertView.frame) - 52.0f) / 2.0f, 66.0f, 52.0f, 52.0f)];
         self.expertImageView.clipsToBounds = YES;
         self.expertImageView.contentMode = UIViewContentModeScaleAspectFill;
@@ -301,6 +319,18 @@
         self.searchUserView.layer.shadowRadius = 4.0f;
         self.searchUserView.alpha = 0.0f;
         [self addSubview:self.searchUserView];
+        
+        _userInitialView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 64.0f) / 2.0f, 16.0f, 64.0f, 64.0f)];
+        self.userInitialView.alpha = 0.0f;
+        self.userInitialView.layer.cornerRadius = CGRectGetHeight(self.userInitialView.frame) / 2.0f;
+        self.userInitialView.clipsToBounds = YES;
+        [self.searchUserView addSubview:self.userInitialView];
+        
+        _userInitialLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.userInitialView.frame), CGRectGetHeight(self.userInitialView.frame))];
+        self.userInitialLabel.font = initialNameLabelFont;
+        self.userInitialLabel.textColor = initialNameLabelColor;
+        self.userInitialLabel.textAlignment = NSTextAlignmentCenter;
+        [self.userInitialView addSubview:self.userInitialLabel];
 
         _userImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.searchUserView.frame) - 64.0f) / 2.0f, 16.0f, 64.0f, 64.0f)];
         self.userImageView.clipsToBounds = YES;
@@ -638,9 +668,14 @@
         self.expertNameLabel.text = fullName;
         
         if (imageURLString == nil || [imageURLString isEqualToString:@""]) {
-            self.expertImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.expertImageView.alpha = 0.0f;
+            self.expertInitialView.alpha = 1.0f;
+            self.expertInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullName];
+            self.expertInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullName isGroup:NO];
         }
         else {
+            self.expertImageView.alpha = 1.0f;
+            self.expertInitialView.alpha = 0.0f;
             [self.expertImageView setImageWithURLString:imageURLString];
         }
         
@@ -678,11 +713,15 @@
     else {
         self.userFullNameLabel.text = fullName;
         self.userUsernameLabel.text = username;
-        
         if (imageURLString == nil || [imageURLString isEqualToString:@""]) {
-            self.userImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.userImageView.alpha = 0.0f;
+            self.userInitialView.alpha = 1.0f;
+            self.userInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullName];
+            self.userInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullName isGroup:NO];
         }
         else {
+            self.userImageView.alpha = 1.0f;
+            self.userInitialView.alpha = 0.0f;
             [self.userImageView setImageWithURLString:imageURLString];
         }
         

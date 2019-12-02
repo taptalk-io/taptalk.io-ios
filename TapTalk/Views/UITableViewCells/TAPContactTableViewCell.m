@@ -9,17 +9,24 @@
 #import "TAPContactTableViewCell.h"
 #import "TAPImageView.h"
 
-@interface TAPContactTableViewCell()
+@interface TAPContactTableViewCell ()
+
 @property (strong, nonatomic) UIView *bgView;
 
+@property (strong, nonatomic) UIView *initialNameView;
+@property (strong, nonatomic) UILabel *initialNameLabel;
 @property (strong, nonatomic) TAPImageView *contactImageView;
 @property (strong, nonatomic) UIImageView *expertLogoImageView;
 @property (strong, nonatomic) UILabel *contactNameLabel;
+@property (strong, nonatomic) UILabel *usernameLabel;
 @property (strong, nonatomic) UILabel *adminIndicatorLabel;
 @property (strong, nonatomic) UIView *separatorView;
 
 @property (strong, nonatomic) UIView *nonSelectedView;
 @property (strong, nonatomic) UIImageView *selectedImageView;
+
+- (void)resizeCell;
+
 @end
 
 @implementation TAPContactTableViewCell
@@ -32,7 +39,21 @@
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
         
-        _contactImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(16.0f, 6.0f, 52.0f, 52.0f)];
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 6.0f, 52.0f, 52.0f)];
+        self.initialNameView.alpha = 0.0f;
+        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.bgView addSubview:self.initialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
+        
+        _contactImageView = [[TAPImageView alloc] initWithFrame:self.initialNameView.frame];
         self.contactImageView.backgroundColor = [UIColor clearColor];
         self.contactImageView.layer.cornerRadius = CGRectGetHeight(self.contactImageView.frame) / 2.0f;
         self.contactImageView.clipsToBounds = YES;
@@ -50,11 +71,18 @@
         self.contactNameLabel.textColor = contactNameLabelColor;
         self.contactNameLabel.font = contactNameLabelFont;
         [self.bgView addSubview:self.contactNameLabel];
+
+        UIFont *contactUsernameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontContactListUsername];
+        UIColor *contactUsernameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorContactListUsername];
+        _usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), 0.0f, CGRectGetWidth(self.contactNameLabel.frame), CGRectGetHeight(self.bgView.frame))];
+        self.usernameLabel.textColor = contactUsernameLabelColor;
+        self.usernameLabel.font = contactUsernameLabelFont;
+        [self.bgView addSubview:self.usernameLabel];
         
         _adminIndicatorLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contactImageView.frame) + 8.0f, CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetMaxX(self.contactImageView.frame) + 8.0f), 20.0f)];
         //CS NOTE TO DOM - check style
         self.adminIndicatorLabel.textColor = [TAPUtil getColor:@"9b9b9b"];
-        self.adminIndicatorLabel.font = [UIFont fontWithName:TAP_FONT_FAMILY_REGULAR     size:14.0f];
+        self.adminIndicatorLabel.font = [UIFont fontWithName:TAP_FONT_FAMILY_REGULAR size:14.0f];
         self.adminIndicatorLabel.alpha = 0.0f;
         self.adminIndicatorLabel.text = NSLocalizedString(@"Admin", @"");
         [self.bgView addSubview:self.adminIndicatorLabel];
@@ -86,24 +114,33 @@
 
 - (void)prepareForReuse {
     [super prepareForReuse];
-    
     self.contactImageView.image = nil;
     self.selectedImageView.alpha = 0.0f;
     self.nonSelectedView.alpha = 0.0f;
     [self showAdminIndicator:NO];
-
 }
 
 #pragma mark - Custom Method
 - (void)setContactTableViewCellWithUser:(TAPUserModel *)user {
     if (user.userID != nil) {
         NSString *contactName = user.fullname;
-        NSString *imageURL = user.imageURL.fullsize;
+        contactName = [TAPUtil nullToEmptyString:contactName];
         
+        NSString *usernameString = user.username;
+        usernameString = [TAPUtil nullToEmptyString:usernameString];
+        NSString *contactUsername = [NSString stringWithFormat:@"@%@", usernameString];
+
+        NSString *imageURL = user.imageURL.fullsize;
         if (imageURL == nil || [imageURL isEqualToString:@""]) {
-            self.contactImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            //No photo found, get the initial
+            self.initialNameView.alpha = 1.0f;
+            self.contactImageView.alpha = 0.0f;
+            self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:contactName];
+            self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:contactName isGroup:NO];
         }
         else {
+            self.initialNameView.alpha = 0.0f;
+            self.contactImageView.alpha = 1.0f;
             [self.contactImageView setImageWithURLString:imageURL];
         }
         
@@ -114,6 +151,32 @@
         [contactNameAttributedString addAttributes:contactNameAttributesDictionary
                                              range:NSMakeRange(0, [contactName length])];
         self.contactNameLabel.attributedText = contactNameAttributedString;
+        
+        NSMutableDictionary *contactUsernameAttributesDictionary = [NSMutableDictionary dictionary];
+        CGFloat contactUsernameLetterSpacing = -0.2f;
+        [contactUsernameAttributesDictionary setObject:@(contactUsernameLetterSpacing) forKey:NSKernAttributeName];
+        NSMutableAttributedString *contactUsernameAttributedString = [[NSMutableAttributedString alloc] initWithString:contactUsername];
+        [contactUsernameAttributedString addAttributes:contactUsernameAttributesDictionary
+                                                 range:NSMakeRange(0, [contactUsername length])];
+        self.usernameLabel.attributedText = contactUsernameAttributedString;
+    }
+    
+    if (self.contactTableViewCellType == TAPContactTableViewCellTypeWithUsername) {
+        if (user.username == nil || [user.username isEqualToString:@""]) {
+            //Set UI to cell without username because username is empty even the type is with username
+            self.usernameLabel.alpha = 0.0f;
+            self.bgView.frame = CGRectMake(CGRectGetMinX(self.bgView.frame), CGRectGetMinY(self.bgView.frame), CGRectGetWidth(self.bgView.frame), 64.0f);
+            self.contactImageView.frame = CGRectMake(CGRectGetMinX(self.contactImageView.frame), CGRectGetMinY(self.contactImageView.frame), CGRectGetWidth(self.contactImageView.frame), CGRectGetHeight(self.contactImageView.frame));
+            self.expertLogoImageView.frame = CGRectMake(CGRectGetMinX(self.expertLogoImageView.frame), CGRectGetMaxY(self.contactImageView.frame) - 22.0f, 22.0f, 22.0f);
+            self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), 15.0f, CGRectGetWidth(self.contactNameLabel.frame), 34.0f);
+            self.usernameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.usernameLabel.frame), 0.0f);
+        }
+        else {
+            self.usernameLabel.alpha = 1.0f;
+        }
+    }
+    else {
+        self.usernameLabel.alpha = 0.0f;
     }
 }
 
@@ -168,6 +231,30 @@
         self.contactNameLabel.frame = CGRectMake(CGRectGetMaxX(self.contactImageView.frame) + 8.0f, 0.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetMaxX(self.contactImageView.frame) + 8.0f), CGRectGetHeight(self.bgView.frame));
         self.adminIndicatorLabel.frame = CGRectMake(CGRectGetMaxX(self.contactImageView.frame) + 8.0f, CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetMaxX(self.contactImageView.frame) + 8.0f), 20.0f);
     }
+}
+
+- (void)resizeCell {
+    self.bgView.frame = CGRectMake(CGRectGetMinX(self.bgView.frame), CGRectGetMinY(self.bgView.frame), CGRectGetWidth(self.bgView.frame), 64.0f);
+
+    self.contactImageView.frame = CGRectMake(CGRectGetMinX(self.contactImageView.frame), CGRectGetMinY(self.contactImageView.frame), CGRectGetWidth(self.contactImageView.frame), CGRectGetHeight(self.contactImageView.frame));
+    
+    self.expertLogoImageView.frame = CGRectMake(CGRectGetMinX(self.expertLogoImageView.frame), CGRectGetMaxY(self.contactImageView.frame) - 22.0f, 22.0f, 22.0f);
+
+    if (self.contactTableViewCellType == TAPContactTableViewCellTypeWithUsername) {
+        self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), 15.0f, CGRectGetWidth(self.contactNameLabel.frame), 18.0f);
+        
+        self.usernameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.usernameLabel.frame), 16.0f);
+    }
+    else {
+        self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), 15.0f, CGRectGetWidth(self.contactNameLabel.frame), 34.0f);
+        
+        self.usernameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.usernameLabel.frame), 0.0f);
+    }
+}
+
+- (void)setContactTableViewCellType:(TAPContactTableViewCellType)contactTableViewCellType {
+    _contactTableViewCellType = contactTableViewCellType;
+    [self resizeCell];
 }
 
 @end

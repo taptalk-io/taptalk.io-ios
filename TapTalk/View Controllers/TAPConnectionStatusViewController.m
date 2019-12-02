@@ -74,30 +74,33 @@
 
 #pragma mark - Custom Method
 - (void)checkStatusHeight {
-    CGFloat viewHeight = 0.0f;
-    if ([TAPConnectionManager sharedManager].tapConnectionStatus != TAPConnectionManagerStatusTypeConnected && [TAPConnectionManager sharedManager].tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) {
-        viewHeight = 20.0f;
-    }
-    
-    if ([TAPConnectionManager sharedManager].tapConnectionStatus == TAPConnectionManagerStatusTypeConnected) {
-        [UIView animateWithDuration:0.2f delay:0.5f options:UIViewAnimationOptionTransitionNone animations:^{
-            self.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), viewHeight);
-            
-        } completion:^(BOOL finished) {
-            //do nothing
-            if ([self.delegate respondsToSelector:@selector(connectionStatusViewControllerDelegateHeightChange:)]) {
-                [self.delegate connectionStatusViewControllerDelegateHeightChange:viewHeight];
-            }
-        }];
-    }
-    else {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), viewHeight);
-            if ([self.delegate respondsToSelector:@selector(connectionStatusViewControllerDelegateHeightChange:)]) {
-                [self.delegate connectionStatusViewControllerDelegateHeightChange:viewHeight];
-            }
-        }];
-    }
+    //DV Note - v1.0.18
+    //28 Nov 2019 - Temporary comment to hide connecting, waiting for network, connected state for further changing UI flow
+//    CGFloat viewHeight = 0.0f;
+//    if ([TAPConnectionManager sharedManager].tapConnectionStatus != TAPConnectionManagerStatusTypeConnected && [TAPConnectionManager sharedManager].tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) {
+//        viewHeight = 20.0f;
+//    }
+//    
+//    if ([TAPConnectionManager sharedManager].tapConnectionStatus == TAPConnectionManagerStatusTypeConnected) {
+//        [UIView animateWithDuration:0.2f delay:0.5f options:UIViewAnimationOptionTransitionNone animations:^{
+//            self.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), viewHeight);
+//            
+//        } completion:^(BOOL finished) {
+//            //do nothing
+//            if ([self.delegate respondsToSelector:@selector(connectionStatusViewControllerDelegateHeightChange:)]) {
+//                [self.delegate connectionStatusViewControllerDelegateHeightChange:viewHeight];
+//            }
+//        }];
+//    }
+//    else {
+//        [UIView animateWithDuration:0.2f animations:^{
+//            self.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), viewHeight);
+//            if ([self.delegate respondsToSelector:@selector(connectionStatusViewControllerDelegateHeightChange:)]) {
+//                [self.delegate connectionStatusViewControllerDelegateHeightChange:viewHeight];
+//            }
+//        }];
+//    }
+    //END DV Note
 }
 
 - (void)removeNetworkNotificationView {

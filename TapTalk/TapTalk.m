@@ -417,8 +417,8 @@
         
     }];
     
-    //Validate and refresh access token
-    [[TAPConnectionManager sharedManager] validateToken];
+//    //Validate and refresh access token
+//    [[TAPConnectionManager sharedManager] validateToken];
 }
 
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
@@ -537,6 +537,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_IGNORE_ADD_CONTACT_POPUP_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //Clear Manager Data

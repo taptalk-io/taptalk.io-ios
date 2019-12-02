@@ -47,6 +47,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *cancelButton;
 @property (strong, nonatomic) IBOutlet UIButton *downloadFileButton;
 @property (strong, nonatomic) IBOutlet UIButton *doneDownloadButton;
+@property (strong, nonatomic) IBOutlet UIButton *doneDownloadTitleAndDescriptionButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryDownloadButton;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -113,6 +114,7 @@
 - (IBAction)retryUploadDownloadButtonDidTapped:(id)sender;
 - (IBAction)downloadButtonDidTapped:(id)sender;
 - (IBAction)doneDownloadButtonDidTapped:(id)sender;
+- (IBAction)doneDownloadTitleAndDescriptionButtonDidTapped:(id)sender;
 - (IBAction)cancelButtonDidTapped:(id)sender;
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
@@ -475,6 +477,12 @@
     }
 }
 
+- (IBAction)doneDownloadTitleAndDescriptionButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(myFileOpenFileButtonDidTapped:)]) {
+        [self.delegate myFileOpenFileButtonDidTapped:self.message];
+    }
+}
+
 - (IBAction)cancelButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myFileCancelButtonDidTapped:)]) {
         [self.delegate myFileCancelButtonDidTapped:self.message];
@@ -819,6 +827,8 @@
         self.cancelView.alpha = 0.0f;
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 1.0f;
+        self.doneDownloadTitleAndDescriptionButton.alpha = 1.0f;
+        self.doneDownloadTitleAndDescriptionButton.userInteractionEnabled = YES;
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
@@ -829,6 +839,8 @@
         self.cancelView.alpha = 0.0f;
         self.downloadView.alpha = 1.0f;
         self.doneDownloadView.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.userInteractionEnabled = NO;
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
@@ -839,6 +851,8 @@
         self.cancelView.alpha = 1.0f;
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.userInteractionEnabled = NO;
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
@@ -849,6 +863,8 @@
         self.cancelView.alpha = 1.0f;
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.userInteractionEnabled = NO;
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
@@ -859,6 +875,8 @@
         self.cancelView.alpha = 0.0f;
         self.downloadView.alpha = 0.0f;
         self.doneDownloadView.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.userInteractionEnabled = NO;
         self.retryDownloadView.alpha = 1.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
@@ -873,6 +891,8 @@
         self.cancelView.alpha = 0.0f;
         self.downloadView.alpha = 1.0f;
         self.doneDownloadView.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.alpha = 0.0f;
+        self.doneDownloadTitleAndDescriptionButton.userInteractionEnabled = NO;
         self.retryDownloadView.alpha = 0.0f;
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;

@@ -116,5 +116,6 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)checkAndSendForwardedMessageWithRoom:(TAPRoomModel *)room;
 - (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 - (void)clearChatManagerData;
+- (void)updateReadMessageToDatabaseQueueWithArray:(NSArray *)readMessageArray;
 
 @end

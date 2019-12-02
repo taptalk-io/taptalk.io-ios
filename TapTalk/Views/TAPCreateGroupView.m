@@ -26,6 +26,11 @@
 @property (strong, nonatomic) UILabel *loadingMemberLabel;
 @property (strong, nonatomic) UIImageView *loadingMemberImageView;
 
+@property (strong, nonatomic) UIView *emptyView;
+@property (strong, nonatomic) UILabel *emptyTitleLabel;
+@property (strong, nonatomic) UILabel *emptyDescriptionLabel;
+@property (strong, nonatomic) UIButton *emptyDescriptionButton;
+
 - (void)animateMembersLoading:(BOOL)isAnimate;
 
 @end
@@ -82,42 +87,9 @@
         [self.searchResultTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];
         self.searchResultTableView.alpha = 0.0f;
         [self.bgView addSubview:self.searchResultTableView];
-        
-        _selectedContactsShadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactsTableView.frame), CGRectGetWidth(self.bgView.frame), 190.0f)];
-        self.selectedContactsShadowView.backgroundColor = [[TAPUtil getColor:@"191919"]colorWithAlphaComponent:0.1f];
-        self.selectedContactsShadowView.layer.shadowOffset = CGSizeMake(0.0f, -1.0f);
-        self.selectedContactsShadowView.layer.shadowOpacity = 1.0f;
-        self.selectedContactsShadowView.layer.masksToBounds = NO;
-        [self.bgView addSubview:self.selectedContactsShadowView];
-
-        _selectedContactsView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.frame) - 190.0f - [TAPUtil safeAreaBottomPadding], CGRectGetWidth(self.bgView.frame), 190.0f + [TAPUtil safeAreaBottomPadding])];
-        self.selectedContactsView.alpha = 0.0f;
-        self.selectedContactsView.backgroundColor = [UIColor whiteColor];
-        [self.bgView addSubview:self.selectedContactsView];
-        
-        UIFont *sectionHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
-        UIColor *sectionHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
-        _selectedContactsTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 13.0f)];
-        self.selectedContactsTitleLabel.font = sectionHeaderLabelFont;
-        self.selectedContactsTitleLabel.textColor = sectionHeaderLabelColor;
-        [self.selectedContactsView addSubview:self.selectedContactsTitleLabel];
-        
-        UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
-        collectionLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        _selectedContactsCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsTitleLabel.frame) + 10.0f, CGRectGetWidth(self.selectedContactsView.frame), 74.0f) collectionViewLayout:collectionLayout];
-        self.selectedContactsCollectionView.backgroundColor = [UIColor whiteColor];
-        self.selectedContactsCollectionView.showsVerticalScrollIndicator = NO;
-        self.selectedContactsCollectionView.showsHorizontalScrollIndicator = NO;
-        [self.selectedContactsView addSubview:self.selectedContactsCollectionView];
-        
-        _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame), 44.0f)];
-        [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.continueButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypePlain];
-        [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
-        [self.selectedContactsView addSubview:self.continueButtonView];
-        
+                
         _bottomActionShadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.frame) - 74.0f - [TAPUtil safeAreaBottomPadding], CGRectGetWidth(self.bgView.frame), 74.0f)];
-        self.bottomActionShadowView.backgroundColor = [[TAPUtil getColor:@"191919"]colorWithAlphaComponent:0.1f];
+        self.bottomActionShadowView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.1f];
         self.bottomActionShadowView.layer.shadowOffset = CGSizeMake(0.0f, -1.0f);
         self.bottomActionShadowView.layer.shadowOpacity = 1.0f;
         self.bottomActionShadowView.layer.masksToBounds = NO;
@@ -158,6 +130,71 @@
         [self.demoteAdminButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.demoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.demoteAdminButtonView];
+        
+        _overlayView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame))];
+        self.overlayView.backgroundColor = [[TAPUtil getColor:@"04040F"] colorWithAlphaComponent:0.4f];
+        self.overlayView.alpha = 0.0f;
+        [self.bgView addSubview:self.overlayView];
+        
+        _overlayButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.overlayView.frame), CGRectGetHeight(self.overlayView.frame))];
+        self.overlayButton.backgroundColor = [UIColor clearColor];
+        [self.overlayButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.overlayView addSubview:self.overlayButton];
+
+        _emptyView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame))];
+        self.emptyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+        self.emptyView.alpha = 0.0f;
+        [self.bgView addSubview:self.emptyView];
+
+        UIFont *infoLabelSubtitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelSubtitle];
+        UIColor *infoLabelSubtitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelSubtitle];
+        _emptyTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 24.0f, CGRectGetWidth(self.emptyView.frame) - 16.0f - 16.0f, 20.0f)];
+        self.emptyTitleLabel.textColor = infoLabelSubtitleColor;
+        self.emptyTitleLabel.font = infoLabelSubtitleFont;
+        self.emptyTitleLabel.textAlignment = NSTextAlignmentCenter;
+        [self.emptyView addSubview:self.emptyTitleLabel];
+        
+        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
+        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
+        _emptyDescriptionButton = [[UIButton alloc] initWithFrame:CGRectMake(32.0f, CGRectGetMaxY(self.emptyTitleLabel.frame) + 6.0f, CGRectGetWidth(self.emptyView.frame) - 32.0f - 32.0f, 30.0f)];
+        [self.emptyDescriptionButton setTitle:NSLocalizedString(@"Try a different search", @"") forState:UIControlStateNormal];
+        [self.emptyDescriptionButton setTitleColor:clickableLabelColor forState:UIControlStateNormal];
+        self.emptyDescriptionButton.titleLabel.font = clickableLabelFont;
+        [self.emptyView addSubview:self.emptyDescriptionButton];
+        
+        _selectedContactsShadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactsTableView.frame), CGRectGetWidth(self.bgView.frame), 190.0f)];
+        self.selectedContactsShadowView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.1f];
+        self.selectedContactsShadowView.layer.shadowOffset = CGSizeMake(0.0f, -1.0f);
+        self.selectedContactsShadowView.layer.shadowOpacity = 1.0f;
+        self.selectedContactsShadowView.layer.masksToBounds = NO;
+        self.selectedContactsShadowView.alpha = 0.0f;
+        [self.bgView addSubview:self.selectedContactsShadowView];
+
+        _selectedContactsView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.frame) - 190.0f - [TAPUtil safeAreaBottomPadding], CGRectGetWidth(self.bgView.frame), 190.0f + [TAPUtil safeAreaBottomPadding])];
+        self.selectedContactsView.alpha = 0.0f;
+        self.selectedContactsView.backgroundColor = [UIColor whiteColor];
+        [self.bgView addSubview:self.selectedContactsView];
+        
+        UIFont *sectionHeaderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+        UIColor *sectionHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
+        _selectedContactsTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 13.0f)];
+        self.selectedContactsTitleLabel.font = sectionHeaderLabelFont;
+        self.selectedContactsTitleLabel.textColor = sectionHeaderLabelColor;
+        [self.selectedContactsView addSubview:self.selectedContactsTitleLabel];
+        
+        UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
+        collectionLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        _selectedContactsCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsTitleLabel.frame) + 10.0f, CGRectGetWidth(self.selectedContactsView.frame), 74.0f) collectionViewLayout:collectionLayout];
+        self.selectedContactsCollectionView.backgroundColor = [UIColor whiteColor];
+        self.selectedContactsCollectionView.showsVerticalScrollIndicator = NO;
+        self.selectedContactsCollectionView.showsHorizontalScrollIndicator = NO;
+        [self.selectedContactsView addSubview:self.selectedContactsCollectionView];
+        
+        _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame), 44.0f)];
+        [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
+        [self.continueButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypePlain];
+        [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
+        [self.selectedContactsView addSubview:self.continueButtonView];
         
         //Save Loading View
         _loadingBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds))];
@@ -206,10 +243,7 @@
         self.loadingMemberImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.loadingMemberImageView.image = [self.loadingMemberImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         [self.loadingMembersBackgroundView addSubview:self.loadingMemberImageView];
-
-        UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
-        UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
-        
+    
         _loadingMemberLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.loadingMemberImageView.frame) + 8.0f, CGRectGetMinY(self.loadingMemberImageView.frame)-1.0f, 200.0f, 22.0f)];
         self.loadingMemberLabel.font = clickableLabelFont;
         self.loadingMemberLabel.textColor = clickableLabelColor;
@@ -219,17 +253,6 @@
         CGSize loadingLabelFitSize = [self.loadingMemberLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.loadingMemberLabel.frame))];
         self.loadingMemberImageView.frame = CGRectMake((CGRectGetWidth(self.frame) - 20.0f - 8.0f - loadingLabelFitSize.width)/2, 183.0f, 20.0f, 20.0f);
         self.loadingMemberLabel.frame = CGRectMake(CGRectGetMaxX(self.loadingMemberImageView.frame) + 8.0f, CGRectGetMinY(self.loadingMemberImageView.frame)-1.0f, loadingLabelFitSize.width, 22.0f);
-        
-        //WK Note: This must be on the front
-        _overlayView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame))];
-        self.overlayView.backgroundColor = [[TAPUtil getColor:@"04040F"] colorWithAlphaComponent:0.4f];
-        self.overlayView.alpha = 0.0f;
-        [self.bgView addSubview:self.overlayView];
-        
-        _overlayButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.overlayView.frame), CGRectGetHeight(self.overlayView.frame))];
-        self.overlayButton.backgroundColor = [UIColor clearColor];
-        [self.overlayButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.overlayView addSubview:self.overlayButton];
         
         self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil safeAreaBottomPadding], 0.0f);
         
@@ -267,6 +290,7 @@
 
 - (void)showSelectedContacts:(BOOL)isVisible {
     if (isVisible) {
+        self.selectedContactsShadowView.alpha = 1.0f;
         self.selectedContactsView.alpha = 1.0f;
         [UIView animateWithDuration:0.2f animations:^{
             self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 190.0f + [TAPUtil safeAreaBottomPadding], 0.0f);
@@ -277,6 +301,7 @@
             self.selectedContactsShadowView.frame = selectedContactsViewFrame;
         } completion:^(BOOL finished) {
             //completion
+            self.selectedContactsShadowView.alpha = 1.0f;
             self.selectedContactsView.alpha = 1.0f;
         }];
     }
@@ -290,6 +315,7 @@
             self.selectedContactsShadowView.frame = selectedContactsViewFrame;
         } completion:^(BOOL finished) {
             //completion
+            self.selectedContactsShadowView.alpha = 0.0f;
             self.selectedContactsView.alpha = 0.0f;
         }];
     }
@@ -521,6 +547,28 @@
     }
     else {
         [self.loadingMemberImageView.layer removeAnimationForKey:@"FirstLoadSpinMembersAnimation"];
+    }
+}
+
+- (void)setSearchResultAsEmptyView:(BOOL)isSet withKeywordString:(NSString *)keyword {
+    if (isSet) {
+
+        NSString *constructedString = [NSString stringWithFormat:@"No results found for “%@”", keyword];
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:constructedString];
+        NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+        [paragraph setAlignment:NSTextAlignmentCenter];
+        [paragraph setLineBreakMode:NSLineBreakByTruncatingMiddle];
+        [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraph range:NSMakeRange(0, [attributedString length])];
+        self.emptyTitleLabel.attributedText = attributedString;
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            self.emptyView.alpha = 1.0f;
+        }];
+    }
+    else {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.emptyView.alpha = 0.0f;
+        }];
     }
 }
 

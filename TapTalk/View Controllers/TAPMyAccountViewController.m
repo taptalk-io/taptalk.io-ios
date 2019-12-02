@@ -64,7 +64,7 @@
     [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-    if ([TapUI sharedInstance].isLogoutButtonVisible) {
+    if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
         //Handle only when logout is visible
         [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -249,7 +249,7 @@
             }
             
             self.selectedProfileImage = selectedImage;
-            [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage];
+            [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage userFullName:self.currentUser.fullname];
             
             [self.myAccountView setAsLoading:YES];
             //upload Image
@@ -417,7 +417,7 @@
 
 - (void)removeProfilePictureButtonDidTapped {
     self.selectedProfileImage = nil;
-    [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage];
+    [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage userFullName:self.currentUser.fullname];
 }
 
 - (void)changeProfilePictureButtonDidTapped {
@@ -584,7 +584,7 @@
     [self.myAccountView.emailTextField setTextFieldWithData:email];
     
     //Set Profile Picture
-    [self.myAccountView setProfilePictureWithImageURL:imageURL];
+    [self.myAccountView setProfilePictureWithImageURL:imageURL userFullName:fullname];
 }
 
 - (void)logoutButtonDidTapped {

@@ -12,6 +12,11 @@
 @property (strong, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
+@property (nonatomic) BOOL isLogoutButtonVisible;
+@property (nonatomic) BOOL isNewContactMenuButtonHidden;
+@property (nonatomic) BOOL isScanQRMenuButtonHidden;
+@property (nonatomic) BOOL isNewGroupMenuButtonHidden;
+
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
 @end
@@ -299,6 +304,69 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
     success(chatViewController);
+}
+
+/**
+Show or hide logout button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setLogoutButtonVisible:(BOOL)isVisible {
+    _isLogoutButtonVisible = isVisible;
+}
+
+/**
+Show or hide add new contact option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewContactMenuButtonVisible:(BOOL)isVisible {
+    _isNewContactMenuButtonHidden = !isVisible;
+}
+
+/**
+Show or hide scan QR code option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setScanQRMenuButtonVisible:(BOOL)isVisible {
+    _isScanQRMenuButtonHidden = !isVisible;
+}
+/**
+Show or hide new group option menu in NewChat view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewGroupMenuButtonVisible:(BOOL)isVisible {
+    _isNewGroupMenuButtonHidden = !isVisible;
+}
+
+/**
+Get current visibility state of logout button
+*/
+- (BOOL)getLogoutButtonVisibleState {
+    return self.isLogoutButtonVisible;
+}
+
+/**
+Get current visibility state of add new contact menu option
+*/
+- (BOOL)getNewContactMenuButtonVisibleState {
+    return !self.isNewContactMenuButtonHidden;
+}
+
+/**
+Get current visibility state of scan QR code menu option
+*/
+- (BOOL)getScanQRMenuButtonVisibleState {
+    return !self.isScanQRMenuButtonHidden;
+}
+
+/**
+Get current visibility state of new group menu option
+*/
+- (BOOL)getNewGroupMenuButtonVisibleState {
+    return !self.isNewGroupMenuButtonHidden;
 }
 
 @end

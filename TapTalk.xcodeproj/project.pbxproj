@@ -63,6 +63,8 @@
 		D7358CB4227AD28400C65C67 /* TAPCountryPickerTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7358CB2227AD28400C65C67 /* TAPCountryPickerTableViewCell.m */; };
 		D73E2E8D220088550083E997 /* TAPProductModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D73E2E8B220088550083E997 /* TAPProductModel.h */; };
 		D73E2E8E220088550083E997 /* TAPProductModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D73E2E8C220088550083E997 /* TAPProductModel.m */; };
+		D73F0CE6237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D73F0CE4237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.h */; };
+		D73F0CE7237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D73F0CE5237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.m */; };
 		D73F430F2237A26900E9789B /* TAPScanQRCodePopupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D73F430D2237A26700E9789B /* TAPScanQRCodePopupViewController.m */; };
 		D73F43102237A26900E9789B /* TAPScanQRCodePopupViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D73F430E2237A26900E9789B /* TAPScanQRCodePopupViewController.h */; };
 		D74600A72163274600CE5EEC /* TAPSetupRoomListView.h in Headers */ = {isa = PBXBuildFile; fileRef = D74600A52163274600CE5EEC /* TAPSetupRoomListView.h */; };
@@ -466,6 +468,8 @@
 		D7358CB2227AD28400C65C67 /* TAPCountryPickerTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCountryPickerTableViewCell.m; sourceTree = "<group>"; };
 		D73E2E8B220088550083E997 /* TAPProductModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPProductModel.h; sourceTree = "<group>"; };
 		D73E2E8C220088550083E997 /* TAPProductModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPProductModel.m; sourceTree = "<group>"; };
+		D73F0CE4237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPContactLoadingTableViewCell.h; sourceTree = "<group>"; };
+		D73F0CE5237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPContactLoadingTableViewCell.m; sourceTree = "<group>"; };
 		D73F430D2237A26700E9789B /* TAPScanQRCodePopupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPScanQRCodePopupViewController.m; sourceTree = "<group>"; };
 		D73F430E2237A26900E9789B /* TAPScanQRCodePopupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPScanQRCodePopupViewController.h; sourceTree = "<group>"; };
 		D74600A52163274600CE5EEC /* TAPSetupRoomListView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPSetupRoomListView.h; sourceTree = "<group>"; };
@@ -1263,6 +1267,8 @@
 				D780A08721AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.m */,
 				D77B5EF32158BB8700253BDC /* TAPContactTableViewCell.h */,
 				D77B5EE62158BB8600253BDC /* TAPContactTableViewCell.m */,
+				D73F0CE4237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.h */,
+				D73F0CE5237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.m */,
 				D77B5EF02158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.h */,
 				D77B5EEA2158BB8600253BDC /* TAPNewChatAddNewContactTableViewCell.m */,
 				D77B5EF42158BB8700253BDC /* TAPNewChatBlockedContactsTableViewCell.h */,
@@ -1456,6 +1462,7 @@
 				D7244BD921D889AD000BEEEE /* TAPImageSelectViewController.h in Headers */,
 				D729550421899E5100B2AC56 /* TAPContactCacheManager.h in Headers */,
 				D7358CAF227AD03200C65C67 /* TAPCountryPickerViewController.h in Headers */,
+				D73F0CE6237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.h in Headers */,
 				D7F95BDA21CB885B00885FC6 /* TAPCustomGrowingTextView.h in Headers */,
 				D77B5EA42158BB4000253BDC /* TAPChatManager.h in Headers */,
 				D77B5F002158BB8700253BDC /* TAPBaseTableViewCell.h in Headers */,
@@ -1878,6 +1885,7 @@
 				DF2513D021E61BE3000D165A /* TAPForwardFromModel.m in Sources */,
 				D728D530217D813E00DACE7A /* TAPScanQRCodePopupView.m in Sources */,
 				D7CAADFC2251F68A005493D9 /* TAPCustomButtonView.m in Sources */,
+				D73F0CE7237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.m in Sources */,
 				D77866C0224205C000A98F05 /* TAPFetchMediaManager.m in Sources */,
 				D7FB9EE021C8C7BC00E26FC7 /* TAPImagePreviewView.m in Sources */,
 				DFA6365322D42B4900B9CB99 /* TAPGroupManager.m in Sources */,

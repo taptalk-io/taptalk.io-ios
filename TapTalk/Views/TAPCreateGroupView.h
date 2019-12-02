@@ -64,5 +64,6 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupActionExtensionType) {
 - (void)setAsLoadingState:(BOOL)isLoading withType:(TAPCreateGroupLoadingType)type;
 
 - (void)showLoadingMembersView:(BOOL)isShow;
+- (void)setSearchResultAsEmptyView:(BOOL)isSet withKeywordString:(NSString *)keyword;
 
 @end

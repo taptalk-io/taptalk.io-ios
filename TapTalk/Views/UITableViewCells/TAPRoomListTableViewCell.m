@@ -13,6 +13,8 @@
 
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *typingView;
+@property (strong, nonatomic) UIView *initialNameView;
+@property (strong, nonatomic) UILabel *initialNameLabel;
 @property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIImageView *typingAnimationImageView;
 @property (strong, nonatomic) UIImageView *expertIconImageView;
@@ -49,6 +51,20 @@
         
         CGFloat leftPadding = 16.0f;
         CGFloat rightPadding = 16.0f;
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
+        self.initialNameView.alpha = 0.0f;
+        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.bgView addSubview:self.initialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
+        
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.profileImageView.backgroundColor = [UIColor clearColor];
@@ -266,16 +282,16 @@
     self.messageStatusType = statusType;
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        if (isGroup) {
-            //Group or Channel
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultGroupAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            //Personal
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-        }
+
+        //No photo found, get the initial
+        self.initialNameView.alpha = 1.0f;
+        self.profileImageView.alpha = 0.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
+        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
     }
     else {
+        self.initialNameView.alpha = 0.0f;
+        self.profileImageView.alpha = 1.0f;
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
     

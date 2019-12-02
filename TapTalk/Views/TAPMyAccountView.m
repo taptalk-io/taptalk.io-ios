@@ -124,9 +124,23 @@
         self.navigationHeaderLabel.text = NSLocalizedString(@"My Account", @"");
         [self.navigationHeaderView addSubview:self.navigationHeaderLabel];
         
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
+        self.initialNameView.alpha = 0.0f;
+        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.scrollView addSubview:self.initialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarExtraLargeLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarExtraLargeLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
+        
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
         self.profileImageView.layer.cornerRadius = CGRectGetWidth(self.profileImageView.frame) / 2.0f;
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.profileImageView.alpha = 0.0f;
         self.profileImageView.layer.masksToBounds = YES;
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.scrollView addSubview:self.profileImageView];
@@ -194,7 +208,7 @@
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMinY(self.emailTextField.frame), CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.emailTextField];
 
-        if ([TapUI sharedInstance].isLogoutButtonVisible) {
+        if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
             _logoutView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 50.0f)];
             self.logoutView.alpha = 1.0f;
         }
@@ -299,7 +313,7 @@
         self.mobileNumberTextField.frame = CGRectMake(CGRectGetMinX(self.mobileNumberTextField.frame), CGRectGetMaxY(self.usernameTextField.frame) + 24.0f, CGRectGetWidth(self.mobileNumberTextField.frame), [self.mobileNumberTextField getTextFieldHeight]);
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.mobileNumberTextField.frame) + 24.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         
-        if ([TapUI sharedInstance].isLogoutButtonVisible) {
+        if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
             self.logoutView.frame = CGRectMake(CGRectGetMinX(self.logoutView.frame), CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame));
         }
         else {
@@ -357,24 +371,36 @@
     }
 }
 
-- (void)setProfilePictureWithImage:(UIImage *)image {
+//DV Note
+//UserFullName used to show initials when image is null or not found
+//END DV Note
+- (void)setProfilePictureWithImage:(UIImage *)image userFullName:(NSString *)userFullName{
     if (image ==  nil) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.profileImageView.alpha = 0.0f;
+        self.initialNameView.alpha = 1.0f;
         self.removeProfilePictureButton.alpha = 0.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:userFullName];
+        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:userFullName isGroup:NO];
     }
     else {
+        self.profileImageView.alpha = 1.0f;
+        self.initialNameView.alpha = 0.0f;
         self.profileImageView.image = image;
         self.removeProfilePictureButton.alpha = 1.0f;
     }
 }
 
-- (void)setProfilePictureWithImageURL:(NSString *)imageURL {
-    
+- (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName{
     if (imageURL ==  nil || [imageURL isEqualToString:@""]) {
-        self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.profileImageView.alpha = 0.0f;
+        self.initialNameView.alpha = 1.0f;
         self.removeProfilePictureButton.alpha = 0.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:userFullName];
+        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:userFullName isGroup:NO];
     }
     else {
+        self.profileImageView.alpha = 1.0f;
+        self.initialNameView.alpha = 0.0f;
         [self.profileImageView setImageWithURLString:imageURL];
         self.removeProfilePictureButton.alpha = 1.0f;
     }

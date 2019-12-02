@@ -13,7 +13,15 @@ typedef NS_ENUM(NSInteger, TAPContactTableViewCellSeparatorType) {
     TAPContactTableViewCellSeparatorTypeFull,
 };
 
+typedef NS_ENUM(NSInteger, TAPContactTableViewCellType) {
+    TAPContactTableViewCellTypeDefault, //Without username
+    TAPContactTableViewCellTypeWithUsername,
+};
+
 @interface TAPContactTableViewCell : TAPBaseTableViewCell
+
+@property (nonatomic) TAPContactTableViewCellType contactTableViewCellType;
+- (void)setContactTableViewCellType:(TAPContactTableViewCellType)contactTableViewCellType;
 
 - (void)setContactTableViewCellWithUser:(TAPUserModel *)user;
 - (void)isRequireSelection:(BOOL)isRequired;

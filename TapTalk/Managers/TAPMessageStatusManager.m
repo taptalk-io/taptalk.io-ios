@@ -103,10 +103,14 @@
     
     //Call API send read status
     _apiRequestCount++;
-        
-    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:tempMessageArray success:^(NSArray *updatedMessageIDsArray) {
+            
+    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:tempMessageArray success:^(NSArray *updatedMessageIDsArray, NSArray *originMessageArray) {
         _isProcessingUpdateReadStatus = NO;
         _apiRequestCount--;
+        
+        //Update message array that mark as read to database with 1 second timer
+        [[TAPChatManager sharedManager] updateReadMessageToDatabaseQueueWithArray:originMessageArray];
+        
     } failure:^(NSError *error, NSArray *messageArray) {
         _isProcessingUpdateReadStatus = NO;
         _apiRequestCount--;

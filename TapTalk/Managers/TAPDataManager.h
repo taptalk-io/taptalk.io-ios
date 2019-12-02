@@ -111,6 +111,10 @@
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success
                                 failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseNonContactSearchKeyword:(NSString *)keyword
+                                    sortBy:(NSString *)columnName
+                                   success:(void (^)(NSArray *resultArray))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllUserSortBy:(NSString *)columnName
                          success:(void (^)(NSArray *resultArray))success
                          failure:(void (^)(NSError *error))failure;
@@ -209,6 +213,9 @@
 + (void)callAPIGetUserByUsername:(NSString *)username
                          success:(void (^)(TAPUserModel *user))success
                          failure:(void (^)(NSError *error))failure;
++ (void)callAPISearchUserByUsernameKeyword:(NSString *)username
+                                   success:(void (^)(TAPUserModel *user, NSString *inputKeyword))success
+                                   failure:(void (^)(NSError *error, NSString *inputKeyword))failure;
 + (void)callAPIUpdatePushNotificationWithToken:(NSString *)token
                                        isDebug:(BOOL)isDebug
                                        success:(void (^)(void))success
@@ -217,8 +224,8 @@
                                         success:(void (^)(NSArray *updatedMessageIDsArray))success
                                         failure:(void (^)(NSError *error, NSArray *messageArray))failure;
 + (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
-                                       success:(void (^)(NSArray *updatedMessageIDsArray))success
-                                       failure:(void (^)(NSError *error, NSArray *messageArray))failure;
+                                        success:(void (^)(NSArray *updatedMessageIDsArray, NSArray *originMessageArray))success
+                                        failure:(void (^)(NSError *error, NSArray *messageArray))failure;
 + (NSURLSessionUploadTask *)callAPIUploadFileWithFileData:(NSData *)fileData
                                                    roomID:(NSString *)roomID
                                                  fileName:(NSString *)fileName

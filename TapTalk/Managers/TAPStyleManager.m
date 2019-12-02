@@ -423,6 +423,13 @@
             return font;
             break;
         }
+        case TAPComponentFontContactListUsername:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_CONTACT_LIST_USERNAME_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         case TAPComponentFontMediaListInfoLabel:
         {
             
@@ -1043,6 +1050,36 @@
             return font;
             break;
         }
+        case TAPComponentFontRoomAvatarSmallLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DEFAULT_ROOM_AVATAR_SMALL_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontRoomAvatarMediumLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DEFAULT_ROOM_AVATAR_MEDIUM_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontRoomAvatarLargeLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DEFAULT_ROOM_AVATAR_LARGE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontRoomAvatarExtraLargeLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DEFAULT_ROOM_AVATAR_EXTRA_LARGE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -1312,6 +1349,11 @@
             break;
         }
         case TAPTextColorContactListNameHighlighted: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TAPTextColorContactListUsername: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
@@ -1726,6 +1768,26 @@
             return color;
             break;
         }
+        case TAPTextColorRoomAvatarSmallLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPTextColorRoomAvatarMediumLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPTextColorRoomAvatarLargeLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPTextColorRoomAvatarExtraLargeLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TAPUtil getColor:@"9B9B9B"];
@@ -2009,6 +2071,12 @@
         case TAPComponentColorButtonIcon:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPComponentColorButtonIconPrimary:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
@@ -2642,6 +2710,107 @@
             break;
         }
     }
+}
+
+- (UIColor *)getRandomDefaultAvatarBackgroundColorWithName:(NSString *)name {
+    if (name == nil || [name isEqualToString:@""]) {
+        UIColor *color = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_1];
+        return color;
+    }
+    
+    char *charString = [name UTF8String];
+    NSInteger lastIndex = [name length] - 1;
+    NSInteger firstCharInt = charString[0] - '0';
+    NSInteger lastCharInt = charString[lastIndex] - '0';
+    
+    //DV Note - 8 is total number of random colors, needs to change it if added or deleted
+    NSInteger obtainedIndex = (firstCharInt + lastCharInt) % 8;
+    
+    UIColor *resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_1];
+    switch (obtainedIndex) {
+        case 0:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_1];
+            break;
+        }
+        case 1:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_2];
+            break;
+        }
+        case 2:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_3];
+            break;
+        }
+        case 3:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_4];
+            break;
+        }
+        case 4:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_5];
+            break;
+        }
+        case 5:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_6];
+            break;
+        }
+        case 6:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_7];
+            break;
+        }
+        case 7:
+        {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_8];
+            break;
+        }
+        default: {
+            resultColor = [TAPUtil getColor:TAP_AVATAR_BACKGROUND_COLOR_1];
+            break;
+        }
+    }
+    
+    return resultColor;
+}
+
+- (NSString *)getInitialsWithName:(NSString *)name isGroup:(BOOL)isGroup {
+    NSMutableString *displayString = [NSMutableString stringWithString:@""];
+    NSMutableArray *words = [[name componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] mutableCopy];
+    if ([words count]) {
+        NSString *firstWord = [words firstObject];
+        if ([firstWord length]) {
+            // Get character range to handle emoji (emojis consist of 2 characters in sequence)
+            NSRange firstLetterRange = [firstWord rangeOfComposedCharacterSequencesForRange:NSMakeRange(0, 1)];
+            [displayString appendString:[firstWord substringWithRange:firstLetterRange]];
+        }
+        
+        if (isGroup) {
+            return displayString;
+        }
+        
+        if ([words count] >= 2) {
+            NSString *lastWord = [words lastObject];
+            
+            while ([lastWord length] == 0 && [words count] >= 2) {
+                [words removeLastObject];
+                lastWord = [words lastObject];
+            }
+            
+            if ([words count] > 1) {
+                // Get character range to handle emoji (emojis consist of 2 characters in sequence)
+                NSRange lastLetterRange = [lastWord rangeOfComposedCharacterSequencesForRange:NSMakeRange(0, 1)];
+                [displayString appendString:[lastWord substringWithRange:lastLetterRange]];
+            }
+        }
+        
+        return displayString;
+    }
+    
+    return displayString;
 }
 
 @end
