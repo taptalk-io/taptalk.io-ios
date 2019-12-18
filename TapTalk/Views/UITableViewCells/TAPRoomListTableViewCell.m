@@ -185,11 +185,6 @@
     BOOL isGroup = NO;
     NSString *lastSender = @"";
     
-    NSString *profileImageURL = message.room.imageURL.thumbnail;
-    if ([[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID]) {
-        TAPRoomModel *room = [[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID];
-        profileImageURL = room.imageURL.thumbnail;
-    }
     NSInteger numberOfUnreadMessage = roomList.numberOfUnreadMessages;
     
     TAPRoomModel *currentRoom = message.room;
@@ -198,6 +193,59 @@
         //Group / Channel
         isGroup = YES;
     }
+    
+    NSString *profileImageURL = @"";
+     NSString *roomName = @"";
+     if (message.room.type == RoomTypePersonal) {
+         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:currentRoom.roomID];
+         TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+         if([message.room.deleted longValue] != 0) {
+             profileImageURL = @"";
+         }
+         else if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+             profileImageURL = obtainedUser.imageURL.thumbnail;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         else {
+             profileImageURL = message.room.imageURL.thumbnail;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         
+         if (obtainedUser != nil && obtainedUser.fullname != nil && [message.room.deleted longValue] == 0) {
+             roomName = obtainedUser.fullname;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+         else {
+             roomName = message.room.name;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+     }
+     else if (message.room.type == RoomTypeGroup) {
+         TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID];
+         NSString *groupProfileImageURL = obtainedRoom.imageURL.thumbnail;
+         groupProfileImageURL = [TAPUtil nullToEmptyString:groupProfileImageURL];
+         
+         NSString *groupRoomName = obtainedRoom.name;
+         groupRoomName = [TAPUtil nullToEmptyString:groupRoomName];
+         
+         if ([groupProfileImageURL isEqualToString:@""]) {
+             profileImageURL = message.room.imageURL.thumbnail;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         else {
+             profileImageURL = groupProfileImageURL;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         
+         if ([groupRoomName isEqualToString:@""]) {
+             roomName = message.room.name;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+         else {
+             roomName = groupRoomName;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+     }
     
     if (isGroup) {
         TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
@@ -208,9 +256,6 @@
             lastSender = message.user.fullname;
         }
     }
-    
-    NSString *roomName = currentRoom.name;
-    roomName = [TAPUtil nullToEmptyString:roomName];
     
     NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
     NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];

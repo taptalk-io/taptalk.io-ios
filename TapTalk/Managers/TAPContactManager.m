@@ -68,6 +68,12 @@
     TAPUserModel *activeUser = [TAPDataManager getActiveUser];
     if(user.userID != activeUser.userID && user.userID != nil) {
         //if user != self set to Dictionary
+        
+        TAPUserModel *currentSavedUser = [self.contactUserDictionary objectForKey:user.userID];
+        if ([user.updated longValue] < [currentSavedUser.updated longValue]) {
+            return;
+        }
+        
         [self.contactUserDictionary setObject:user forKey:user.userID];
         [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
         
@@ -79,6 +85,17 @@
             } failure:^(NSError *error) {
                 
             }];
+        }
+    }
+    else {
+        //update active user data
+        if (user.userID != nil) {
+            TAPUserModel *currentSavedUser = [self.contactUserDictionary objectForKey:user.userID];
+            if ([user.updated longValue] < [currentSavedUser.updated longValue]) {
+                return;
+            }
+            
+            [TAPDataManager setActiveUser:user];
         }
     }
 }
@@ -95,11 +112,28 @@
         TAPUserModel *activeUser = [TAPDataManager getActiveUser];
         if(user.userID != activeUser.userID && user.userID != nil) {
             //if user != self set to Dictionary
+            
+            TAPUserModel *currentSavedUser = [self.contactUserDictionary objectForKey:user.userID];
+            if ([user.updated longValue] < [currentSavedUser.updated longValue]) {
+                return;
+            }
+            
             [self.contactUserDictionary setObject:user forKey:user.userID];
             [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
             
             if (save) {
                 [userDataArray addObject:user];
+            }
+        }
+        else {
+            //update active user data
+            if (user.userID != nil) {
+                TAPUserModel *currentSavedUser = [self.contactUserDictionary objectForKey:user.userID];
+                if ([user.updated longValue] < [currentSavedUser.updated longValue]) {
+                    return;
+                }
+                
+                [TAPDataManager setActiveUser:user];
             }
         }
     }

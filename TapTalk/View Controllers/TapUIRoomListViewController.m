@@ -55,6 +55,7 @@
 - (void)openNewChatViewController;
 - (void)hideSetupViewWithDelay:(double)delayTime;
 - (void)getAndUpdateNumberOfUnreadToDelegate;
+- (void)checkUpdatedUserProfileWithMessage:(TAPMessageModel *)message;
 
 @end
 
@@ -994,6 +995,11 @@
 - (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage {
     NSString *messageRoomID = message.room.roomID;
     
+    //Check need to update user data or not
+    if (message.type == TAPChatMessageTypeSystemMessage && ([message.action isEqualToString:@"user/update"] || [message.action isEqualToString:@"room/update"])) {
+        [self checkUpdatedUserProfileWithMessage:message];
+    }
+    
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:messageRoomID];
     
     if (roomList != nil) {
@@ -1159,6 +1165,14 @@
             }
         });
     });
+}
+
+- (void)checkUpdatedUserProfileWithMessage:(TAPMessageModel *)message {
+    NSString *roomID = message.room.roomID;
+    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:NO];
 }
 
 @end

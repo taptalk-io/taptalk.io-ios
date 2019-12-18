@@ -264,7 +264,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setupNavigationViewData;
 - (void)setupInputAccessoryView;
 - (void)setupDeletedRoomView;
-- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup withDeleteButton:(BOOL)withDeleteButton;
+- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup;
 - (void)setDeleteRoomButtonAsLoading:(BOOL)loading animated:(BOOL)animated;
 - (void)setupKickedGroupView;
 - (void)checkAndSetupAddToContactsView;
@@ -284,7 +284,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)firstLoadData;
 - (void)fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:(NSString *)roomID maxCreated:(NSNumber *)maxCreated;
 - (void)retrieveExistingMessages;
-- (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray checkFirstUnreadMessage:(BOOL)checkFirstUnreadMessage toTop:(BOOL)toTop withCompletionHandler:(void(^)())completionHandler;
+- (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray checkFirstUnreadMessage:(BOOL)checkFirstUnreadMessage toTop:(BOOL)toTop updateUserDetail:(BOOL)updateUserDetail withCompletionHandler:(void(^)())completionHandler;
 - (void)sortAndFilterMessageArray;
 - (void)updateMessageModelValueWithMessage:(TAPMessageModel *)message;
 - (void)callAPIAfterAndUpdateUIAndScrollToTop:(BOOL)scrollToTop;
@@ -351,7 +351,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)refreshRoomStatusUIInfo;
 - (void)refreshTypingLabelState;
 
-- (void)setRoomNotAvailable;
 - (void)checkAndShowRoomViewState;
 
 @end
@@ -537,15 +536,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self setupDeletedRoomView];
     [self setupKickedGroupView];
     
-    if (!self.currentRoom.isDeleted) {
-        //load data
-        [self firstLoadData];
-    }
-    else {
-        //set not available and delete room data
-        [self setRoomNotAvailable];
-        return;
-    }
+    //load data
+    [self firstLoadData];
     
     [[TAPChatManager sharedManager] refreshShouldRefreshOnlineStatus];
     
@@ -661,19 +653,29 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
-    if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+        [self.view endEditing:YES];
+        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+    }
+    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         //Check if system message with action remove participant and target user is current user
         //show deleted chat room view
         [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+        [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
     }
     else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
         [self.view endEditing:YES];
-        [self setRoomNotAvailable];
+        
+        if (lastMessage.room.type == RoomTypePersonal) {
+            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
+        else if (lastMessage.room.type == RoomTypeGroup) {
+            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+        }
     }
     else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO withDeleteButton:YES];
+        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
     }
     else {
         [self showInputAccessoryView];
@@ -1628,12 +1630,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self handleMessageFromSocket:message isUpdatedMessage:NO];
     
     //Check if user remove us from the group while we are inside the chat room, handle the case
-    if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/removeParticipant"]) {
+    if (message.room.type == RoomTypePersonal && message.room.isDeleted) {
+        [self.view endEditing:YES];
+        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+    }
+    else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/removeParticipant"]) {
         if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
             //Check if system message with action remove participant and target user is current user
             //show deleted chat room view
             [self.view endEditing:YES];
-            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+            [self showDeletedRoomView:YES isGroup:YES];
         }
         //refresh room members by API
         [self checkAndRefreshOnlineStatus];
@@ -1641,14 +1647,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/addParticipant"]) {
         if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
             [self.view endEditing:YES];
-            [self showDeletedRoomView:NO isGroup:YES withDeleteButton:YES];
+            [self showDeletedRoomView:NO isGroup:YES isGroupDeleted:NO];
         }
         //refresh room members by API
         [self checkAndRefreshOnlineStatus];
     }
     else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/delete"]) {
         [self.view endEditing:YES];
-        [self setRoomNotAvailable];
+        
+        if (message.room.type == RoomTypePersonal) {
+            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
+        else if (message.room.type == RoomTypeGroup) {
+            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+        }
     }
 }
 
@@ -1660,6 +1672,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self handleMessageFromSocket:message isUpdatedMessage:YES];
 }
+
 
 - (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus {
     _onlineStatus = onlineStatus;
@@ -2181,8 +2194,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPQuoteModel *quote = [TAPQuoteModel new];
     quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
     quote.title = fileName;
-    quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];;
-    quote.fileType = [NSString stringWithFormat:@"%ld", quotedMessageModel.type];
+    quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+    
+    NSString *fileTypeString = @"";
+    if (quotedMessageModel.type == TAPChatMessageTypeImage) {
+        fileTypeString = @"image";
+    }
+    else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
+        fileTypeString = @"video";
+    }
+    else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
+        fileTypeString = @"file";
+    }
+    quote.fileType = fileTypeString;
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -3061,8 +3085,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPQuoteModel *quote = [TAPQuoteModel new];
     quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
     quote.title = fileName;
-    quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];;
-    quote.fileType = [NSString stringWithFormat:@"%ld", quotedMessageModel.type];
+    quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+    NSString *fileTypeString = @"";
+    if (quotedMessageModel.type == TAPChatMessageTypeImage) {
+        fileTypeString = @"image";
+    }
+    else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
+        fileTypeString = @"video";
+    }
+    else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
+        fileTypeString = @"file";
+    }
+    quote.fileType = fileTypeString;
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -3905,13 +3939,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
 }
 
-- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup withDeleteButton:(BOOL)withDeleteButton {
+- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup isGroupDeleted:(BOOL)isGroupDeleted {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
     
     if (isGroup) {
-        self.deletedRoomContentLabel.text = NSLocalizedString(@"You are no longer a participant in this group", @"");
+        if (isGroupDeleted) {
+            self.deletedRoomContentLabel.text = NSLocalizedString(@"Sorry, this group is unavailable", @"");
+        }
+        else {
+            self.deletedRoomContentLabel.text = NSLocalizedString(@"You are no longer a participant in this group", @"");
+        }
     }
     else {
         self.deletedRoomContentLabel.text = NSLocalizedString(@"This user is no longer available", @"");
@@ -3923,15 +3962,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         _isShowAccessoryView = NO;
         [self reloadInputViews];
         
-        if (withDeleteButton) {
-            //74 is button height and padding
-            self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight + 74.0f;
-            self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
-        }
-        else {
-            self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
-            self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
-        }
+//        if (withDeleteButton) {
+//            //74 is button height and padding
+//            self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight + 74.0f;
+//            self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
+//        }
+//        else {
+//            self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight;
+//            self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+//        }
+        
+        //74 is button height and padding
+        self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight + 74.0f;
+        self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
         
         self.deletedRoomView.alpha = 1.0f;
     }
@@ -5263,7 +5306,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
                                           quote.title = fileName;
                                           quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
-                                          quote.fileType = [NSString stringWithFormat:@"%ld", quotedMessageModel.type];
+                                              NSString *fileTypeString = @"";
+                                          if (quotedMessageModel.type == TAPChatMessageTypeImage) {
+                                              fileTypeString = @"image";
+                                          }
+                                          else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
+                                              fileTypeString = @"video";
+                                          }
+                                          else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
+                                              fileTypeString = @"file";
+                                          }
+                                          quote.fileType = fileTypeString;
                                           [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
                                           
                                           quotedMessageModel.quote = quote;
@@ -5498,7 +5551,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.quoteSubtitleLabel.text = quote.content;
     
-    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.quoteFileView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
@@ -5631,6 +5684,35 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
         
         [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[NSNumber numberWithDouble:createdDate] limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+            
+            //DV Note - check method checkAndShowRoomViewState too if wants to update code below
+            //Check if room is deleted or kicked
+            TAPMessageModel *lastMessage = [obtainedMessageArray firstObject];
+            if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+                [self.view endEditing:YES];
+                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+            }
+            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                //Check if system message with action remove participant and target user is current user
+                //show deleted chat room view
+                [self.view endEditing:YES];
+                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
+            }
+            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
+                [self.view endEditing:YES];
+                if (lastMessage.room.type == RoomTypePersonal) {
+                    [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+                }
+                else if (lastMessage.room.type == RoomTypeGroup) {
+                    [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+                }
+            }
+            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                [self.view endEditing:YES];
+                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+            }
+            //END DV Note
+            
             if ([obtainedMessageArray count] == 0) {
                 //No chat history, first time chat
                 [self checkEmptyState];
@@ -5646,7 +5728,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
             else {
                 //Has existing chat
-                [self updateMessageDataAndUIWithMessages:obtainedMessageArray checkFirstUnreadMessage:NO toTop:NO withCompletionHandler:^{
+                [self updateMessageDataAndUIWithMessages:obtainedMessageArray checkFirstUnreadMessage:NO toTop:NO updateUserDetail:NO withCompletionHandler:^{
                     TAPMessageModel *earliestMessage = [obtainedMessageArray objectAtIndex:[obtainedMessageArray count] - 1];
                     NSNumber *minCreated = earliestMessage.created;  
                     _minCreatedMessage = minCreated;
@@ -5681,7 +5763,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         
                         
                         //Update View
-                        [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:YES toTop:YES withCompletionHandler:^{
+                        [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:YES toTop:YES updateUserDetail:YES withCompletionHandler:^{
                             
                             //Update leftover message status to delivered
                             if ([messageArray count] != 0) {
@@ -5712,7 +5794,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             //Check if system message with action remove participant and target user is current user
                             //show deleted chat room view
                             [self.view endEditing:YES];
-                            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+                            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
                         }
 #ifdef DEBUG
                         //Note - this alert only shown at debug
@@ -5773,6 +5855,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             BOOL setAsRead = NO;
             BOOL setAsDeleted = NO;
             
+            
             if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
                 //My Message
                 if (currentMessage.isSending) {
@@ -5806,6 +5889,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             //Update message data
             [self updateMessageModelValueWithMessage:message];
+            
+            //Check need to update profile data or not
+            [self checkUpdatedUserProfileWithMessage:message];
             
             //Update view
             NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
@@ -6103,7 +6189,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
-- (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray checkFirstUnreadMessage:(BOOL)checkFirstUnreadMessage toTop:(BOOL)toTop withCompletionHandler:(void(^)())completionHandler {
+- (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray checkFirstUnreadMessage:(BOOL)checkFirstUnreadMessage toTop:(BOOL)toTop updateUserDetail:(BOOL)updateUserDetail withCompletionHandler:(void(^)())completionHandler {
     //RN Note - If crash happen on opening room, this async might be the cause
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
@@ -6114,6 +6200,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             TAPMessageModel *message = [messageArray objectAtIndex:counter];
             TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
+            
             if (currentMessage != nil) {
                 //Message exist in dictionary
                 [self updateMessageModelValueWithMessage:message];
@@ -6151,6 +6238,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         }
                     }
                 }
+            }
+            
+            if (updateUserDetail) {
+                //Check need to update profile data or not
+                [self checkUpdatedUserProfileWithMessage:message];
             }
         }
         
@@ -6308,7 +6400,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         });
         
         //Update View
-        [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:YES toTop:scrollToTop withCompletionHandler:^{
+        [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:YES toTop:scrollToTop updateUserDetail:YES withCompletionHandler:^{
             //Update leftover message status to delivered
             if ([messageArray count] != 0) {
                 [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
@@ -6326,7 +6418,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             //Check if system message with action remove participant and target user is current user
             //show deleted chat room view
             [self.view endEditing:YES];
-            [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
         }
     }];
 }
@@ -7466,7 +7558,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //user not found
                     //hide textview
                     self.inputMessageAccessoryView.alpha = 0.0f;
-                    [self showDeletedRoomView:YES isGroup:NO withDeleteButton:NO];
+                    [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
                 }
             }];
         }
@@ -7488,7 +7580,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //user not found
                     //hide textview
                     self.inputMessageAccessoryView.alpha = 0.0f;
-                    [self showDeletedRoomView:YES isGroup:YES withDeleteButton:NO];
+                    [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
                 }
             }];
         }
@@ -8043,24 +8135,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }];
 }
 
-- (void)setRoomNotAvailable {
-    [self.messageTextView resignFirstResponder];
-    [self.secondaryTextField resignFirstResponder];
-    _isShowAccessoryView = NO;
-    [self reloadInputViews];
-    self.kickedGroupRoomBackgroundView.alpha = 1.0f;
-    
-    //delete room
-    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.currentRoom.roomID success:^{
-        if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
-            [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:self.currentRoom];
-        }
-    } failure:^(NSError *error) {
-    
-    }];
-    
-}
-
 - (void)showTapTalkMessageComposerView {
     [self showInputAccessoryView];
 }
@@ -8068,19 +8142,28 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)checkAndShowRoomViewState {
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
-    if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+        [self.view endEditing:YES];
+        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+    }
+    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         //Check if system message with action remove participant and target user is current user
         //show deleted chat room view
         [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:YES withDeleteButton:YES];
+        [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
     }
     else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
         [self.view endEditing:YES];
-        [self setRoomNotAvailable];
+        if (lastMessage.room.type == RoomTypePersonal) {
+            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
+        else if (lastMessage.room.type == RoomTypeGroup) {
+            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+        }
     }
     else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO withDeleteButton:YES];
+        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
     }
 }
 
@@ -8119,6 +8202,36 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         self.addToContactContainerView.alpha = 0.0f;
     }];
+}
+
+- (void)checkUpdatedUserProfileWithMessage:(TAPMessageModel *)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (message.type == TAPChatMessageTypeSystemMessage && ([message.action isEqualToString:@"user/update"] || [message.action isEqualToString:@"room/update"])) {
+             TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+             NSString *updatedImageURLString = message.room.imageURL.thumbnail;
+             NSString *currentImageURLString = room.imageURL.thumbnail;
+             if (![updatedImageURLString isEqualToString:currentImageURLString]) {
+                 if (updatedImageURLString == nil || [updatedImageURLString isEqualToString:@""]) {
+                     BOOL isGroup;
+                     if (message.room.type == RoomTypeGroup) {
+                         isGroup = YES;
+                     }
+                     
+                     self.rightBarInitialNameView.alpha = 1.0f;
+                     self.rightBarImageView.alpha = 0.0f;
+                     self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:message.room.name];
+                     self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:message.room.name isGroup:isGroup];
+                 }
+                 else {
+                     self.rightBarInitialNameView.alpha = 0.0f;
+                     self.rightBarImageView.alpha = 1.0f;
+                     [self.rightBarImageView setImageWithURLString:updatedImageURLString];
+                 }
+                 
+                 self.nameLabel.text = message.room.name;
+             }
+         }
+    });
 }
 
 @end

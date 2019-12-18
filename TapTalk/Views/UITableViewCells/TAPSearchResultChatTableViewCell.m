@@ -127,14 +127,61 @@
     if (room.type == RoomTypeGroup || room.type == RoomTypeChannel) {
         isGroup = YES;
     }
-    
-    NSString *profileImageURL = room.imageURL.fullsize;
+
+    NSString *profileImageURL = @"";
+    NSString *roomName = @"";
+    if (room.type == RoomTypePersonal) {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:room.roomID];
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+        if([room.deleted longValue] != 0) {
+            profileImageURL = @"";
+        }
+        else if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+            profileImageURL = obtainedUser.imageURL.thumbnail;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        else {
+            profileImageURL = room.imageURL.thumbnail;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        
+        if (obtainedUser != nil && obtainedUser.fullname != nil && [room.deleted longValue] == 0) {
+            roomName = obtainedUser.fullname;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+        else {
+            roomName = room.name;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+    }
+    else if (room.type == RoomTypeGroup) {
+        TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
+        NSString *groupProfileImageURL = obtainedRoom.imageURL.thumbnail;
+        groupProfileImageURL = [TAPUtil nullToEmptyString:groupProfileImageURL];
+        
+        NSString *groupRoomName = obtainedRoom.name;
+        groupRoomName = [TAPUtil nullToEmptyString:groupRoomName];
+        
+        if ([groupProfileImageURL isEqualToString:@""]) {
+            profileImageURL = room.imageURL.thumbnail;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        else {
+            profileImageURL = groupProfileImageURL;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        
+        if ([groupRoomName isEqualToString:@""]) {
+            roomName = room.name;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+        else {
+            roomName = groupRoomName;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+    }
+
     NSInteger numberOfUnreadMessage = [unreadMessageCount integerValue];
-    
-    TAPRoomModel *currentRoom = room;
-    
-    NSString *roomName = currentRoom.name;
-    roomName = [TAPUtil nullToEmptyString:roomName];
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
         //No photo found, get the initial
