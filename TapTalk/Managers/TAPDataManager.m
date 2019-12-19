@@ -1864,10 +1864,9 @@
                 NSString *currentOtherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:messageModel.room.roomID];
                 [tempRecipientIDArray addObject:currentOtherUserID];
             }
-            else {
-                //Add User to Contact Manager
-                [[TAPContactManager sharedManager] addContactWithUserModel:messageModel.user saveToDatabase:NO];
-            }
+
+            //Add user to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:messageModel.user saveToDatabase:NO];
             
             NSError *error;
             
@@ -2879,10 +2878,9 @@
                 NSString *currentOtherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:decryptedMessage.room.roomID];
                 [tempRecipientIDArray addObject:currentOtherUserID];
             }
-            else {
-                //Add User to Contact Manager
-                [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
-            }
+
+            //Add user to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
             
             [messageResultArray addObject:decryptedMessage];
             
@@ -2975,11 +2973,10 @@
                 NSString *currentOtherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:decryptedMessage.room.roomID];
                 [tempRecipientIDArray addObject:currentOtherUserID];
             }
-            else {
-                //Add User to Contact Manager
-                [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
-            }
-            
+
+            //Add user to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+
             [messageResultArray addObject:decryptedMessage];
             
         }
@@ -3424,7 +3421,7 @@
             
             user.isContact = YES;
             
-            //Add User to Contact Manager
+            //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
             
             [userResultArray addObject:user];
@@ -3603,7 +3600,7 @@
         
         user.isContact = YES;
         
-        //Add User to Contact Manager
+        //Add user to Contact Manager
         [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
         
         //Insert To Database
@@ -4420,7 +4417,7 @@
         for (NSDictionary *userDictionary in userArray) {
             TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
             
-            //Add User to Contact Manager
+            //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
             
             [userModelArray addObject:user];
@@ -5050,7 +5047,7 @@
             
             user.isContact = YES;
             
-            //Add User to Contact Manager
+            //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
             
             [userResultArray addObject:user];

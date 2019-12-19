@@ -56,6 +56,7 @@
 - (void)hideSetupViewWithDelay:(double)delayTime;
 - (void)getAndUpdateNumberOfUnreadToDelegate;
 - (void)checkUpdatedUserProfileWithMessage:(TAPMessageModel *)message;
+- (void)checkAndUpdateActiveUserProfile;
 
 @end
 
@@ -167,32 +168,8 @@
     [super viewWillAppear:animated];
     _isViewAppear = YES;
     
-    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
-        if (currentActiveUser.fullname == nil || [currentActiveUser.fullname isEqualToString:@""]) {
-            self.leftBarInitialNameView.alpha = 0.0f;
-            self.leftBarInitialNameButton.alpha = 0.0f;
-            self.leftBarInitialNameButton.userInteractionEnabled = NO;
-            self.profileImageView.alpha = 1.0f;
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            self.leftBarInitialNameView.alpha = 1.0f;
-            self.leftBarInitialNameButton.alpha = 1.0f;
-            self.leftBarInitialNameButton.userInteractionEnabled = YES;
-            self.profileImageView.alpha = 0.0f;
-            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:currentActiveUser.fullname];
-            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:currentActiveUser.fullname isGroup:NO];
-        }
-    }
-    else {
-        self.leftBarInitialNameView.alpha = 0.0f;
-        self.leftBarInitialNameButton.alpha = 0.0f;
-        self.leftBarInitialNameButton.userInteractionEnabled = NO;
-        self.profileImageView.alpha = 1.0f;
-        [self.profileImageView setImageWithURLString:profileImageURL];
-    }
+    //Check and update current active user profile picture
+    [self checkAndUpdateActiveUserProfile];
 
     if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewWillAppear)]) {
         [self.lifecycleDelegate TapUIRoomListViewControllerViewWillAppear];
@@ -748,6 +725,9 @@
     [TAPDataManager callAPIGetNewAndUpdatedMessageSuccess:^(NSArray *messageArray) {
         [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
         
+        //Update self profile
+        [self checkAndUpdateActiveUserProfile];
+        
         //Update leftover message status to delivered
         if ([messageArray count] != 0) {
             [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
@@ -1169,10 +1149,51 @@
 
 - (void)checkUpdatedUserProfileWithMessage:(TAPMessageModel *)message {
     NSString *roomID = message.room.roomID;
-    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
-    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
-    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
-    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:NO];
+    
+    NSString *currentActiveUserID = [TAPChatManager sharedManager].activeUser.userID;
+    currentActiveUserID = [TAPUtil nullToEmptyString:currentActiveUserID];
+    NSString *constructedCurrentRoomID = [NSString stringWithFormat:@"%li-%li", (long)[currentActiveUserID integerValue], (long)[currentActiveUserID integerValue]];
+    
+    if ([roomID isEqualToString:constructedCurrentRoomID]) {
+        //Update self profile
+        [self checkAndUpdateActiveUserProfile];
+    }
+    else {
+        //update user profile
+        TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+        NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+        [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:NO];
+    }
+}
+
+- (void)checkAndUpdateActiveUserProfile {
+    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
+    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+        TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
+        if (currentActiveUser.fullname == nil || [currentActiveUser.fullname isEqualToString:@""]) {
+            self.leftBarInitialNameView.alpha = 0.0f;
+            self.leftBarInitialNameButton.alpha = 0.0f;
+            self.leftBarInitialNameButton.userInteractionEnabled = NO;
+            self.profileImageView.alpha = 1.0f;
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else {
+            self.leftBarInitialNameView.alpha = 1.0f;
+            self.leftBarInitialNameButton.alpha = 1.0f;
+            self.leftBarInitialNameButton.userInteractionEnabled = YES;
+            self.profileImageView.alpha = 0.0f;
+            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:currentActiveUser.fullname];
+            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:currentActiveUser.fullname isGroup:NO];
+        }
+    }
+    else {
+        self.leftBarInitialNameView.alpha = 0.0f;
+        self.leftBarInitialNameButton.alpha = 0.0f;
+        self.leftBarInitialNameButton.userInteractionEnabled = NO;
+        self.profileImageView.alpha = 1.0f;
+        [self.profileImageView setImageWithURLString:profileImageURL];
+    }
 }
 
 @end
