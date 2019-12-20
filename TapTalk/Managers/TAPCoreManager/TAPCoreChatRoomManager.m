@@ -102,7 +102,9 @@
     success(generatedRoom);
 }
 
-- (void)getGroupChatRoomWithGroupRoomID:(NSString *)groupRoomID success:(void (^)(TAPRoomModel *room))success failure:(void (^)(NSError *error))failure {
+- (void)getGroupChatRoomWithGroupRoomID:(NSString *)groupRoomID
+                                success:(void (^)(TAPRoomModel *room))success
+                                failure:(void (^)(NSError *error))failure {
     TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
     if (obtainedRoom == nil) {
         [TAPDataManager callAPIGetRoomWithRoomID:groupRoomID success:^(TAPRoomModel *room) {

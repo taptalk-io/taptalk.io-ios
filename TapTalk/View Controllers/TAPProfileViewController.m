@@ -91,9 +91,60 @@
     
     [self.profileView.navigationEditButton addTarget:self action:@selector(editButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.profileView.editButton addTarget:self action:@selector(editButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-
     
-    NSString *profileImageURL = self.room.imageURL.fullsize;
+    NSString *profileImageURL = @"";
+    NSString *roomName = @"";
+    if (self.room.type == RoomTypePersonal) {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+        if([self.room.deleted longValue] != 0) {
+            profileImageURL = @"";
+        }
+        if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+            profileImageURL = obtainedUser.imageURL.fullsize;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        else {
+            profileImageURL = self.room.imageURL.fullsize;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        
+        if (obtainedUser != nil && obtainedUser.fullname != nil && [self.room.deleted longValue] == 0) {
+            roomName = obtainedUser.fullname;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+        else {
+            roomName = self.room.name;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+    }
+    else if (self.room.type == RoomTypeGroup) {
+        TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:self.room.roomID];
+        NSString *groupProfileImageURL = obtainedRoom.imageURL.fullsize;
+        groupProfileImageURL = [TAPUtil nullToEmptyString:groupProfileImageURL];
+        
+        NSString *groupRoomName = obtainedRoom.name;
+        groupRoomName = [TAPUtil nullToEmptyString:groupRoomName];
+        
+        if ([groupProfileImageURL isEqualToString:@""]) {
+            profileImageURL = self.room.imageURL.fullsize;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        else {
+            profileImageURL = groupProfileImageURL;
+            profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+        }
+        
+        if ([groupRoomName isEqualToString:@""]) {
+            roomName = self.room.name;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+        else {
+            roomName = groupRoomName;
+            roomName = [TAPUtil nullToEmptyString:roomName];
+        }
+    }
+    
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
         if (self.room.type == RoomTypePersonal) {
             //Personal
@@ -108,8 +159,8 @@
         [self.profileView.profileImageView setImageWithURLString:profileImageURL];
     }
     
-    self.profileView.nameLabel.text = self.room.name;
-    self.profileView.navigationNameLabel.text = self.room.name;
+    self.profileView.nameLabel.text = roomName;
+    self.profileView.navigationNameLabel.text = roomName;
     
     if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
         if (self.room.type == RoomTypePersonal) {

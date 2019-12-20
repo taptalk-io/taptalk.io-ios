@@ -460,7 +460,7 @@
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
             
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
                 //TYPE FILE
                 message.quote = quotedMessage.quote;
             }
@@ -762,7 +762,7 @@
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
                 //TYPE FILE
                 message.quote = quotedMessage.quote;
             }
@@ -854,7 +854,7 @@
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
                 //TYPE FILE
                 message.quote = quotedMessage.quote;
             }
@@ -1015,7 +1015,7 @@
     TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:dataDictionary];
     
     //Add User to Contact Manager
-    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:YES];
     
     decryptedMessage.isSending = NO;
     

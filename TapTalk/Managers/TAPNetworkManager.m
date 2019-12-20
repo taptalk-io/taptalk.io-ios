@@ -73,7 +73,7 @@ static const NSInteger kAPITimeOut = 60;
     [manager.requestSerializer setValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
-    [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
+    [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"SDK-Version"];
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"User-Agent"];
     
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];

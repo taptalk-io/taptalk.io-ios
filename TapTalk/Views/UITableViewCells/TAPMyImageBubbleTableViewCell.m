@@ -1164,7 +1164,7 @@
 
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
 
-    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.fileImageView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
