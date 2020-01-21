@@ -3786,6 +3786,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //Right Bar Button
     BOOL isShowProfileButtonView = [[TapUI sharedInstance] getProfileButtonInChatRoomVisibleState];
     if (isShowProfileButtonView) {
+        //Show profile button view in right bar button
         UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
 
         _rightBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];

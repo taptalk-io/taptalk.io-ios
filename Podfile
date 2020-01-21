@@ -1,5 +1,5 @@
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '11.0'
 inhibit_all_warnings!
 use_frameworks!
 
@@ -11,7 +11,6 @@ def tapTalk_pods
     pod 'PodAsset'
     pod 'SDWebImage', '4.4.2'
     pod 'GooglePlaces'
-    pod 'GooglePlacePicker'
     pod 'GoogleMaps'
     pod 'ZSWTappableLabel', '~> 2.0'
 end
