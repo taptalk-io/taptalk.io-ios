@@ -5348,6 +5348,89 @@
     }];
 }
 
++ (void)callAPIGetRoomWithXCRoomID:(NSString *)xcRoomID
+                           success:(void (^)(TAPRoomModel *room))success
+                           failure:(void (^)(NSError *error))failure {
+        NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetXCRoom];
+        
+        NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+        [parameterDictionary setObject:xcRoomID forKey:@"xcRoomID"];
+        
+        [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+            
+        } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+            if (![self isResponseSuccess:responseObject]) {
+                NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+                NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+                errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+                
+                NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+                errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+                NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+                
+                if (errorStatusCode == 401) {
+                    //Call refresh token
+                    [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                        [TAPDataManager callAPIGetRoomWithXCRoomID:xcRoomID success:success failure:failure];
+                    } failure:^(NSError *error) {
+                        failure(error);
+                    }];
+                    return;
+                }
+                
+                NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+                
+                if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                    errorCode = 999;
+                }
+                
+                NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:errorCode userInfo:@{@"message": errorMessage}];
+                failure(error);
+                return;
+            }
+            
+            if ([self isDataEmpty:responseObject]) {
+                success([TAPRoomModel new]);
+                return;
+            }
+            
+            NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+            NSArray *participantsArray = [dataDictionary objectForKey:@"participants"];
+            NSArray *adminUserIDArray = [dataDictionary objectForKey:@"adminUserIDs"];
+            NSDictionary *roomDictionary = [dataDictionary objectForKey:@"room"];
+            
+            TAPRoomModel *room = [self roomModelFromDictionary:roomDictionary];
+            
+            NSMutableArray *participantsModelArray = [NSMutableArray array];
+            for (NSDictionary *userDictionary  in participantsArray) {
+                [participantsModelArray addObject:[self userModelFromDictionary:userDictionary]];
+            }
+            
+            room.admins = adminUserIDArray;
+            room.participants = participantsModelArray;
+            
+            [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
+            
+            success(room);
+
+        } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+            [TAPDataManager logErrorStringFromError:error];
+            
+    #ifdef DEBUG
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+    #else
+            NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+            
+            failure(localizedError);
+    #endif
+        }];
+}
+
 + (void)callAPIAddRoomParticipantsWithRoomID:(NSString *)roomID
                                  userIDArray:(NSArray *)userIDArray
                                      success:(void (^)(TAPRoomModel *room))success

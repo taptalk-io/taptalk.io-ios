@@ -75,6 +75,7 @@
     [encoder encodeInteger:self.type forKey:@"type"];
     [encoder encodeObject:self.color forKey:@"color"];
     [encoder encodeBool:self.isDeleted forKey:@"isDeleted"];
+    [encoder encodeBool:self.isDeleted forKey:@"isLocked"];
     [encoder encodeObject:self.deleted forKey:@"deleted"];
     [encoder encodeObject:self.participants forKey:@"participants"];
     [encoder encodeObject:self.admins forKey:@"admins"];
@@ -89,6 +90,7 @@
         self.type = [decoder decodeIntegerForKey:@"type"];
         self.color = [decoder decodeObjectForKey:@"color"];
         self.isDeleted = [decoder decodeBoolForKey:@"isDeleted"];
+        self.isLocked = [decoder decodeBoolForKey:@"isLocked"];
         self.deleted = [decoder decodeObjectForKey:@"deleted"];
         self.participants = [decoder decodeObjectForKey:@"participants"];
         self.admins = [decoder decodeObjectForKey:@"admins"];

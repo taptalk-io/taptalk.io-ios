@@ -89,17 +89,14 @@
     searchedString = [searchedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     TAPUserModel *user = message.user;
     
-    //DV Temp
-    BOOL isExpert = NO;
     BOOL isMuted = NO;
-    //END DV Temp
     
     TAPRoomModel *currentRoom = message.room;
     
     BOOL isGroup = NO;
     NSString *lastSender = @"";
     
-    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel) {
+    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel || currentRoom.type == RoomTypeTransaction) {
         //Group / Channel
         isGroup = YES;
     }
@@ -299,7 +296,7 @@
     if (user.userID == activeUser.userID) {
         self.lastSenderLabel.text = NSLocalizedString(@"You: ", @"");
     }
-    else if (message.room.type == RoomTypeGroup) {
+    else if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         NSString *fullName = user.fullname;
         NSArray *eachWordArray = [fullName componentsSeparatedByString:@" "];
         NSString *firstName = [eachWordArray objectAtIndex:0];

@@ -653,32 +653,37 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
-    if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
-    }
-    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        //Check if system message with action remove participant and target user is current user
-        //show deleted chat room view
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
-    }
-    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
-        [self.view endEditing:YES];
-        
-        if (lastMessage.room.type == RoomTypePersonal) {
-            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
-        }
-        else if (lastMessage.room.type == RoomTypeGroup) {
-            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
-        }
-    }
-    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+    if (lastMessage.room.isLocked) {
+        [self hideInputAccessoryView];
     }
     else {
-        [self showInputAccessoryView];
+        if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            //Check if system message with action remove participant and target user is current user
+            //show deleted chat room view
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
+        }
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
+            [self.view endEditing:YES];
+            
+            if (lastMessage.room.type == RoomTypePersonal) {
+                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+            }
+            else if (lastMessage.room.type == RoomTypeGroup || lastMessage.room.type == RoomTypeTransaction) {
+                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+            }
+        }
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
+        else {
+            [self showInputAccessoryView];
+        }
     }
 }
 
@@ -1629,37 +1634,43 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self handleMessageFromSocket:message isUpdatedMessage:NO];
     
-    //Check if user remove us from the group while we are inside the chat room, handle the case
-    if (message.room.type == RoomTypePersonal && message.room.isDeleted) {
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+    
+    if (message.room.isLocked) {
+        [self hideInputAccessoryView];
     }
-    else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/removeParticipant"]) {
-        if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-            //Check if system message with action remove participant and target user is current user
-            //show deleted chat room view
+    else {
+        //Check if user remove us from the group while we are inside the chat room, handle the case
+        if (message.room.type == RoomTypePersonal && message.room.isDeleted) {
             [self.view endEditing:YES];
-            [self showDeletedRoomView:YES isGroup:YES];
-        }
-        //refresh room members by API
-        [self checkAndRefreshOnlineStatus];
-    }
-    else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/addParticipant"]) {
-        if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-            [self.view endEditing:YES];
-            [self showDeletedRoomView:NO isGroup:YES isGroupDeleted:NO];
-        }
-        //refresh room members by API
-        [self checkAndRefreshOnlineStatus];
-    }
-    else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/delete"]) {
-        [self.view endEditing:YES];
-        
-        if (message.room.type == RoomTypePersonal) {
             [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
         }
-        else if (message.room.type == RoomTypeGroup) {
-            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+        else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/removeParticipant"]) {
+            if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                //Check if system message with action remove participant and target user is current user
+                //show deleted chat room view
+                [self.view endEditing:YES];
+                [self showDeletedRoomView:YES isGroup:YES];
+            }
+            //refresh room members by API
+            [self checkAndRefreshOnlineStatus];
+        }
+        else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/addParticipant"]) {
+            if ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                [self.view endEditing:YES];
+                [self showDeletedRoomView:NO isGroup:YES isGroupDeleted:NO];
+            }
+            //refresh room members by API
+            [self checkAndRefreshOnlineStatus];
+        }
+        else if (message.type == TAPChatMessageTypeSystemMessage && [message.action isEqualToString:@"room/delete"]) {
+            [self.view endEditing:YES];
+            
+            if (message.room.type == RoomTypePersonal) {
+                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+            }
+            else if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
+                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+            }
         }
     }
 }
@@ -2982,7 +2993,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         //Default left gap for personal chat
         CGFloat xPosition = 16.0f;
-        if (currentMessage.room.type == RoomTypeGroup || currentMessage.room.type == RoomTypeChannel) {
+        if (currentMessage.room.type == RoomTypeGroup || currentMessage.room.type == RoomTypeChannel || currentMessage.room.type == RoomTypeTransaction) {
             //left gap + image width + gap between image and bubble view
             xPosition = 16.0f + 30.0f + 4.0f;
         }
@@ -3706,11 +3717,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setupNavigationViewData {
     //This method is used to setup the title view of navigation bar, and also bar button view
     
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
     //Title View
     _titleView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 56.0f - 56.0f, 43.0f)];
     _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 2.0f, CGRectGetWidth(self.titleView.frame), 22.0f)];
-    
-    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
     UIFont *chatRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomNameLabel];
     UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
@@ -3740,7 +3751,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.userDescriptionView.center = CGPointMake(self.nameLabel.center.x, self.userDescriptionView.center.y);
     [self.userDescriptionView addSubview:self.userStatusView];
     [self.userDescriptionView addSubview:self.userStatusLabel];
-    [self.titleView addSubview:self.userDescriptionView];
+    
+    if (room.type != RoomTypeTransaction) {
+        [self.titleView addSubview:self.userDescriptionView];
+    }
+    
     [self.navigationItem setTitleView:self.titleView];
     
     _userTypingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), 100.0f, 16.0f)];
@@ -3769,52 +3784,55 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self isShowOnlineDotStatus:NO];
     
     //Right Bar Button
-    UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+    BOOL isShowProfileButtonView = [[TapUI sharedInstance] getProfileButtonInChatRoomVisibleState];
+    if (isShowProfileButtonView) {
+        UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
 
-    _rightBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-    self.rightBarInitialNameView.alpha = 0.0f;
-    self.rightBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.rightBarInitialNameView.frame) / 2.0f;
-    self.rightBarInitialNameView.clipsToBounds = YES;
-    [rightBarView addSubview:self.rightBarInitialNameView];
-    
-    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
-    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
-    _rightBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.rightBarInitialNameView.frame), CGRectGetHeight(self.rightBarInitialNameView.frame))];
-    self.rightBarInitialNameLabel.font = initialNameLabelFont;
-    self.rightBarInitialNameLabel.textColor = initialNameLabelColor;
-    self.rightBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
-    [self.rightBarInitialNameView addSubview:self.rightBarInitialNameLabel];
-    
-    _rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-    self.rightBarImageView.layer.cornerRadius = CGRectGetHeight(self.rightBarImageView.frame) / 2.0f;
-    self.rightBarImageView.clipsToBounds = YES;
-    self.rightBarImageView.contentMode = UIViewContentModeScaleAspectFill;
-    [rightBarView addSubview:self.rightBarImageView];
-    
-    NSString *profileImageURL = room.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        BOOL isGroup;
-        if (self.currentRoom.type == RoomTypeGroup) {
-            isGroup = YES;
+        _rightBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+        self.rightBarInitialNameView.alpha = 0.0f;
+        self.rightBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.rightBarInitialNameView.frame) / 2.0f;
+        self.rightBarInitialNameView.clipsToBounds = YES;
+        [rightBarView addSubview:self.rightBarInitialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+        _rightBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.rightBarInitialNameView.frame), CGRectGetHeight(self.rightBarInitialNameView.frame))];
+        self.rightBarInitialNameLabel.font = initialNameLabelFont;
+        self.rightBarInitialNameLabel.textColor = initialNameLabelColor;
+        self.rightBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.rightBarInitialNameView addSubview:self.rightBarInitialNameLabel];
+        
+        _rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+        self.rightBarImageView.layer.cornerRadius = CGRectGetHeight(self.rightBarImageView.frame) / 2.0f;
+        self.rightBarImageView.clipsToBounds = YES;
+        self.rightBarImageView.contentMode = UIViewContentModeScaleAspectFill;
+        [rightBarView addSubview:self.rightBarImageView];
+        
+        NSString *profileImageURL = room.imageURL.thumbnail;
+        if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+            BOOL isGroup = NO;
+            if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
+                isGroup = YES;
+            }
+            
+            self.rightBarInitialNameView.alpha = 1.0f;
+            self.rightBarImageView.alpha = 0.0f;
+            self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:room.name];
+            self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:room.name isGroup:isGroup];
+        }
+        else {
+            self.rightBarInitialNameView.alpha = 0.0f;
+            self.rightBarImageView.alpha = 1.0f;
+            [self.rightBarImageView setImageWithURLString:profileImageURL];
         }
         
-        self.rightBarInitialNameView.alpha = 1.0f;
-        self.rightBarImageView.alpha = 0.0f;
-        self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:room.name];
-        self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:room.name isGroup:isGroup];
+        UIButton *rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(rightBarView.frame), CGRectGetHeight(rightBarView.frame))];
+        [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [rightBarView addSubview:rightBarButton];
+        
+        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarView];
+        [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     }
-    else {
-        self.rightBarInitialNameView.alpha = 0.0f;
-        self.rightBarImageView.alpha = 1.0f;
-        [self.rightBarImageView setImageWithURLString:profileImageURL];
-    }
-    
-    UIButton *rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(rightBarView.frame), CGRectGetHeight(rightBarView.frame))];
-    [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [rightBarView addSubview:rightBarButton];
-    
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarView];
-    [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     
     //Left Bar Button
     UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -5436,7 +5454,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [alertController addAction:replyAction];
     
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) {
+    if ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) && message.room.type != RoomTypeTransaction) {
         //DV Temp
         //Show forward action for text and location only (temporary)
         [alertController addAction:forwardAction];
@@ -5665,6 +5683,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self becomeFirstResponder];
 }
 
+- (void)hideInputAccessoryView {
+    _isShowAccessoryView = NO;
+    [self reloadInputViews];
+}
+
 #pragma mark Chat Data Flow
 - (void)firstLoadData {
     TAPRoomModel *roomData = [TAPChatManager sharedManager].activeRoom;
@@ -5688,28 +5711,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             //DV Note - check method checkAndShowRoomViewState too if wants to update code below
             //Check if room is deleted or kicked
             TAPMessageModel *lastMessage = [obtainedMessageArray firstObject];
-            if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
-                [self.view endEditing:YES];
-                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+            
+            if (lastMessage.room.isLocked) {
+                [self hideInputAccessoryView];
             }
-            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                //Check if system message with action remove participant and target user is current user
-                //show deleted chat room view
-                [self.view endEditing:YES];
-                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
-            }
-            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
-                [self.view endEditing:YES];
-                if (lastMessage.room.type == RoomTypePersonal) {
+            else {
+                if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+                    [self.view endEditing:YES];
                     [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
                 }
-                else if (lastMessage.room.type == RoomTypeGroup) {
-                    [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+                else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                    //Check if system message with action remove participant and target user is current user
+                    //show deleted chat room view
+                    [self.view endEditing:YES];
+                    [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
                 }
-            }
-            else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                [self.view endEditing:YES];
-                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+                else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
+                    [self.view endEditing:YES];
+                    if (lastMessage.room.type == RoomTypePersonal) {
+                        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+                    }
+                    else if (lastMessage.room.type == RoomTypeGroup || lastMessage.room.type == RoomTypeTransaction) {
+                        [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+                    }
+                }
+                else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                    [self.view endEditing:YES];
+                    [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+                }
             }
             //END DV Note
             
@@ -6905,8 +6934,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             self.recipientInitialNameView.alpha = 1.0f;
             self.recipientImageView.alpha = 0.0f;
 
-            BOOL isGroup;
-            if (self.currentRoom.type == RoomTypeGroup) {
+            BOOL isGroup = NO;
+            if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
                 isGroup = YES;
             }
             self.recipientInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:room.name];
@@ -7965,8 +7994,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     NSString *profileImageURL = room.imageURL.thumbnail;
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        BOOL isGroup;
-        if (self.currentRoom.type == RoomTypeGroup) {
+        BOOL isGroup = NO;
+        if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
             isGroup = YES;
         }
         self.rightBarInitialNameView.alpha = 1.0f;
@@ -8142,28 +8171,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)checkAndShowRoomViewState {
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
-    if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+    
+    if (lastMessage.room.isLocked) {
+        [self hideInputAccessoryView];
     }
-    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        //Check if system message with action remove participant and target user is current user
-        //show deleted chat room view
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
-    }
-    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
-        [self.view endEditing:YES];
-        if (lastMessage.room.type == RoomTypePersonal) {
+    else {
+        if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+            [self.view endEditing:YES];
             [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
         }
-        else if (lastMessage.room.type == RoomTypeGroup) {
-            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            //Check if system message with action remove participant and target user is current user
+            //show deleted chat room view
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
         }
-    }
-    else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        [self.view endEditing:YES];
-        [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
+            [self.view endEditing:YES];
+            if (lastMessage.room.type == RoomTypePersonal) {
+                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+            }
+            else if (lastMessage.room.type == RoomTypeGroup || lastMessage.room.type == RoomTypeTransaction) {
+                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
+            }
+        }
+        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            [self.view endEditing:YES];
+            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
     }
 }
 
@@ -8212,8 +8247,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
              NSString *currentImageURLString = room.imageURL.thumbnail;
              if (![updatedImageURLString isEqualToString:currentImageURLString]) {
                  if (updatedImageURLString == nil || [updatedImageURLString isEqualToString:@""]) {
-                     BOOL isGroup;
-                     if (message.room.type == RoomTypeGroup) {
+                     BOOL isGroup = NO;
+                     if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
                          isGroup = YES;
                      }
                      

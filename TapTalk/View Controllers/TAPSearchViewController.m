@@ -439,7 +439,7 @@
 
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
     [self.rightBarButton addTarget:self action:nil forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];

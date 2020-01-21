@@ -45,7 +45,7 @@ static NSData *_deviceIdentifierData = nil;
 	if (_secretData == nil) {
 		_secretData = [secret dataUsingEncoding:NSUTF8StringEncoding];
 	} else {
-		NSAssert(NO, @"The secret has already been set.");
+//		NSAssert(NO, @"The secret has already been set.");
 	}
 }
 

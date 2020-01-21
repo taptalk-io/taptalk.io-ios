@@ -63,7 +63,7 @@ Initialize chat room with room data
 Initialize chat room with room data and scrolled to selected message
  
 @param room (TAPRoomModel *) room data
-@param scrollToMessageWithLocalID (NSString *) local ID of message that scrolled into when chat is opened
+@param messageLocalID (NSString *) local ID of message that scrolled into when chat is opened
 */
 - (instancetype)initWithRoom:(TAPRoomModel *)room scrollToMessageWithLocalID:(NSString *)messageLocalID;
 

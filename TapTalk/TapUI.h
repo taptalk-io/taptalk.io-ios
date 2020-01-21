@@ -91,12 +91,21 @@ Called when user click the avatar in bubble chat in group room.
 @protocol TapUIRoomListDelegate <NSObject>
 @optional
 /**
- Called when user click the profile button on the top right side of group chat room page.
+ Called when user click the profile button on the top left side of room list view.
  
  @param currentViewController (UIViewController *) current shown view controller
  @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
  */
 - (void)tapTalkAccountButtonTapped:(UIViewController *)currentViewController
+  currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
+ Called when user click the new chat button on the top right side of room list view.
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
 @end
 
@@ -173,14 +182,100 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
  */
 - (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate;
 
+
+//==========================================================
+//                      My Account View
+//==========================================================
+/**
+Show or hide logout button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setLogoutButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of logout button
+*/
+- (BOOL)getLogoutButtonVisibleState;
+
 //==========================================================
 //                       Room List
 //==========================================================
 /**
- Show my account on top left of room list view (near search bar)
- The default value is shown
- */
+Show or hide search bar view in the top of Room List view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setSearchBarInRoomListVisible:(BOOL)isVisible;
+
+/**
+Show or hide left bar button item view in the top of Room List view (My Account Button)
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
 - (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible;
+
+/**
+Show or hide right bar button item view in the top of Room List view (New Chat Button)
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewChatButtonInRoomListVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of search bar view in the top of Room List view
+*/
+- (BOOL)getSearchBarInRoomListVisibleState;
+
+/**
+Get current visibility state of left bar button item view in the top of Room List view (My Account Button)
+*/
+- (BOOL)getMyAccountButtonInRoomListViewVisibleState;
+
+/**
+Get current visibility state of right bar button item view in the top of Room List view (New Chat Button)
+*/
+- (BOOL)getNewChatButtonInRoomListVisibleState;
+
+//==========================================================
+//                      New Chat View
+//==========================================================
+
+/**
+Show or hide add new contact option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewContactMenuButtonVisible:(BOOL)isVisible;
+
+/**
+Show or hide scan QR code option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setScanQRMenuButtonVisible:(BOOL)isVisible;
+
+/**
+Show or hide new group option menu in NewChat view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewGroupMenuButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of add new contact menu option
+*/
+- (BOOL)getNewContactMenuButtonVisibleState;
+
+/**
+Get current visibility state of scan QR code menu option
+*/
+- (BOOL)getScanQRMenuButtonVisibleState;
+
+/**
+Get current visibility state of new group menu option
+*/
+- (BOOL)getNewGroupMenuButtonVisibleState;
 
 //==========================================================
 //                       Chat Room
@@ -266,52 +361,16 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
                    success:(void (^)(TapUIChatViewController *chatViewController))success;
 
 /**
-Show or hide logout button in MyAccount view
+Show or hide profile button view in top right navigation in chat room view
  
 @param isVisible (BOOL) boolean to indicating is visible or not
 */
-- (void)setLogoutButtonVisible:(BOOL)isVisible;
+- (void)setProfileButtonInChatRoomVisible:(BOOL)isVisible;
 
 /**
-Show or hide add new contact option menu in NewChat view
-
-@param isVisible (BOOL) boolean to indicating is visible or not
+Get current visibility state of profile button in chat room
 */
-- (void)setNewContactMenuButtonVisible:(BOOL)isVisible;
-
-/**
-Show or hide scan QR code option menu in NewChat view
-
-@param isVisible (BOOL) boolean to indicating is visible or not
-*/
-- (void)setScanQRMenuButtonVisible:(BOOL)isVisible;
-
-/**
-Show or hide new group option menu in NewChat view
- 
-@param isVisible (BOOL) boolean to indicating is visible or not
-*/
-- (void)setNewGroupMenuButtonVisible:(BOOL)isVisible;
-
-/**
-Get current visibility state of logout button
-*/
-- (BOOL)getLogoutButtonVisibleState;
-
-/**
-Get current visibility state of add new contact menu option
-*/
-- (BOOL)getNewContactMenuButtonVisibleState;
-
-/**
-Get current visibility state of scan QR code menu option
-*/
-- (BOOL)getScanQRMenuButtonVisibleState;
-
-/**
-Get current visibility state of new group menu option
-*/
-- (BOOL)getNewGroupMenuButtonVisibleState;
+- (BOOL)getProfileButtonInChatRoomVisibleState;
 
 @end
 

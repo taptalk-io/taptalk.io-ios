@@ -154,7 +154,7 @@
             roomName = [TAPUtil nullToEmptyString:roomName];
         }
     }
-    else if (room.type == RoomTypeGroup) {
+    else if (room.type == RoomTypeGroup || room.type == RoomTypeTransaction) {
         TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
         NSString *groupProfileImageURL = obtainedRoom.imageURL.thumbnail;
         groupProfileImageURL = [TAPUtil nullToEmptyString:groupProfileImageURL];
@@ -236,7 +236,7 @@
         self.muteImageView.alpha = 0.0f;
     }
     
-    if (isGroup) {
+    if (isGroup && room.type != RoomTypeTransaction) {
         
         self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.expertIconImageView.alpha = 1.0f;

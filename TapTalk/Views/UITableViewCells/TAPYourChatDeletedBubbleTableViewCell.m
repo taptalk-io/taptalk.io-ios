@@ -111,8 +111,7 @@
     self.bubbleLabel.text = NSLocalizedString(@"This message was deleted.", @"");
     
     //CS NOTE - check chat room type, show sender info if group type
-    
-    if (message.room.type == RoomTypeGroup) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         [self showSenderInfo:YES];
         
         NSString *thumbnailImageString = @"";
