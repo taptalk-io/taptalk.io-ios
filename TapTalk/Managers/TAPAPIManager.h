@@ -43,6 +43,7 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeUploadRoomPhoto,
     TAPAPIManagerTypeUpdateRoom,
     TAPAPIManagerTypeGetRoom,
+    TAPAPIManagerTypeGetXCRoom,
     TAPAPIManagerTypeAddRoomParticipants,
     TAPAPIManagerTypeRemoveRoomParticipants,
     TAPAPIManagerTypePromoteRoomAdmins,

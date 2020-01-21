@@ -20,7 +20,7 @@
 - (void)showCustomEditButton;
 - (void)showCustomCancelButtonRight;
 - (void)reachabilityChangeIsReachable:(BOOL)reachable;
-- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString * _Nonnull)popupIdentifier title:(NSString * _Nonnull)title detailInformation:(NSString * _Nonnull)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString ;
+- (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString * _Nonnull)popupIdentifier title:(NSString * _Nonnull)title detailInformation:(NSString * _Nonnull)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString;
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
 - (void)showNavigationSeparator:(BOOL)show;

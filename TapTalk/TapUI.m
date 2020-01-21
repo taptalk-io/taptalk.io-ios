@@ -13,9 +13,13 @@
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 @property (nonatomic) BOOL isLogoutButtonVisible;
+@property (nonatomic) BOOL isSearchBarRoomListViewHidden;
+@property (nonatomic) BOOL isLeftBarItemRoomListViewHidden;
+@property (nonatomic) BOOL isRightBarItemRoomListViewHidden;
 @property (nonatomic) BOOL isNewContactMenuButtonHidden;
 @property (nonatomic) BOOL isScanQRMenuButtonHidden;
 @property (nonatomic) BOOL isNewGroupMenuButtonHidden;
+@property (nonatomic) BOOL isProfileButtonInChatRoomHidden;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -90,9 +94,6 @@
 }
 
 //Room List
-- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
-    [self.roomListViewController setMyAccountButtonInRoomListVisible:isVisible];
-}
 
 //Open Chat Room
 - (void)createRoomWithOtherUser:(TAPUserModel *)otherUser
@@ -316,6 +317,33 @@ Show or hide logout button in MyAccount view
 }
 
 /**
+Show or hide search bar view in the top of Room List view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setSearchBarInRoomListVisible:(BOOL)isVisible {
+    _isSearchBarRoomListViewHidden = !isVisible;
+}
+
+/**
+Show or hide left bar button item view in the top of Room List view (My Account Button)
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
+    _isLeftBarItemRoomListViewHidden = !isVisible;
+}
+
+/**
+Show or hide right bar button item view in the top of Room List view (New Chat Button)
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewChatButtonInRoomListVisible:(BOOL)isVisible {
+    _isRightBarItemRoomListViewHidden = !isVisible;
+}
+
+/**
 Show or hide add new contact option menu in NewChat view
 
 @param isVisible (BOOL) boolean to indicating is visible or not
@@ -342,10 +370,40 @@ Show or hide new group option menu in NewChat view
 }
 
 /**
+Show or hide profile button view in top right navigation in chat room view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setProfileButtonInChatRoomVisible:(BOOL)isVisible {
+    _isProfileButtonInChatRoomHidden = !isVisible;
+}
+
+/**
 Get current visibility state of logout button
 */
 - (BOOL)getLogoutButtonVisibleState {
     return self.isLogoutButtonVisible;
+}
+
+/**
+Get current visibility state of search bar view in the top of Room List view
+*/
+- (BOOL)getSearchBarInRoomListVisibleState {
+    return !self.isSearchBarRoomListViewHidden;
+}
+
+/**
+Get current visibility state of left bar button item view in the top of Room List view (My Account Button)
+*/
+- (BOOL)getMyAccountButtonInRoomListViewVisibleState {
+    return !self.isLeftBarItemRoomListViewHidden;
+}
+
+/**
+Get current visibility state of right bar button item view in the top of Room List view (New Chat Button)
+*/
+- (BOOL)getNewChatButtonInRoomListVisibleState {
+    return !self.isRightBarItemRoomListViewHidden;
 }
 
 /**
@@ -367,6 +425,13 @@ Get current visibility state of new group menu option
 */
 - (BOOL)getNewGroupMenuButtonVisibleState {
     return !self.isNewGroupMenuButtonHidden;
+}
+
+/**
+Get current visibility state of profile button in chat room
+*/
+- (BOOL)getProfileButtonInChatRoomVisibleState {
+    return !self.isProfileButtonInChatRoomHidden;
 }
 
 @end

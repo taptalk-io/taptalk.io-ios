@@ -431,7 +431,7 @@
 
             _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
             [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-            self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+            self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
             [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
             UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
             [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
@@ -572,8 +572,6 @@
 
 #pragma mark - Custom Method
 - (void)leftBarButtonDidTapped {
-    NSLog(@"TAPPED");
-    
     id <TapUIRoomListDelegate> roomListDelegate = [TapUI sharedInstance].roomListDelegate;
     if ([roomListDelegate respondsToSelector:@selector(tapTalkAccountButtonTapped:currentShownNavigationController:)]) {
         [roomListDelegate tapTalkAccountButtonTapped:self currentShownNavigationController:self.navigationController];
@@ -588,7 +586,13 @@
 }
 
 - (void)rightBarButtonDidTapped {
-    [self openNewChatViewController];
+    id <TapUIRoomListDelegate> roomListDelegate = [TapUI sharedInstance].roomListDelegate;
+    if ([roomListDelegate respondsToSelector:@selector(tapTalkNewChatButtonTapped:currentShownNavigationController:)]) {
+        [roomListDelegate tapTalkNewChatButtonTapped:self currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [self openNewChatViewController];
+    }
 }
 
 - (void)cancelButtonDidTapped {
@@ -1110,10 +1114,6 @@
     else {
         _isNeedRefreshOnNetworkDown = YES;
     }
-}
-
-- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
-    self.isShowMyAccountView = isVisible;
 }
 
 - (void)showLoadingSetupView {

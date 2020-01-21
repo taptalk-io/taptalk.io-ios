@@ -212,7 +212,7 @@
         thumbnailImage = [UIImage imageWithData:thumbnailImageData];
     }
     
-    if (message.room.type == RoomTypeGroup) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         nameString = message.room.name;
     }
     else {
@@ -252,7 +252,7 @@
         }
     }
     else {
-        if (message.room.type == RoomTypeGroup) {
+        if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
             messageString = [NSString stringWithFormat:@"%@: %@",message.user.fullname, messageString];
         }
     }

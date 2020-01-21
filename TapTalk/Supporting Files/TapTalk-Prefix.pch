@@ -19,6 +19,8 @@
 #import "PodAsset.h"
 #import "TapTalk.h"
 #import "TapUI.h"
+#import "TapUIRoomListViewController.h"
+#import "TapUIChatViewController.h"
 #import "TapCoreChatRoomManager.h"
 #import "TapCoreContactManager.h"
 #import "TapCoreErrorManager.h"

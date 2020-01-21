@@ -28,7 +28,6 @@
 @property (weak, nonatomic) id<TapUIRoomListViewControllerLifecycleDelegate> lifecycleDelegate;
 
 - (void)viewLoadedSequence;
-- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible;
 - (void)showLoadingSetupView;
 - (void)clearAllData;
 

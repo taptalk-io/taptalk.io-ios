@@ -120,6 +120,24 @@
     }
 }
 
+- (void)getChatRoomByXCRoomID:(NSString *)xcRoomID
+                      success:(void (^)(TAPRoomModel *room))success
+                      failure:(void (^)(NSError *error))failure {
+    TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:xcRoomID];
+    if (obtainedRoom == nil) {
+        [TAPDataManager callAPIGetRoomWithXCRoomID:xcRoomID success:^(TAPRoomModel *room) {
+            [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
+            success(room);
+        } failure:^(NSError *error) {
+            NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+            failure(localizedError);
+        }];
+    }
+    else {
+        success(obtainedRoom);
+    }
+}
+
 - (void)createGroupChatRoomWithGroupName:(NSString *)groupName
                 listOfParticipantUserIDs:(NSArray *)participantUserIDArray
                                  success:(void (^)(TAPRoomModel *room))success

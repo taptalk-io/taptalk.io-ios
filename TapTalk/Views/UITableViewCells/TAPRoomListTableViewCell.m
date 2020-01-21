@@ -189,7 +189,7 @@
     
     TAPRoomModel *currentRoom = message.room;
     
-    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel) {
+    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel ||  currentRoom.type == RoomTypeTransaction) {
         //Group / Channel
         isGroup = YES;
     }
@@ -220,7 +220,7 @@
              roomName = [TAPUtil nullToEmptyString:roomName];
          }
      }
-     else if (message.room.type == RoomTypeGroup) {
+     else if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
          TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID];
          NSString *groupProfileImageURL = obtainedRoom.imageURL.thumbnail;
          groupProfileImageURL = [TAPUtil nullToEmptyString:groupProfileImageURL];
@@ -560,7 +560,7 @@
         }
     }
     
-    if (isGroup) {
+    if (isGroup && message.room.type != RoomTypeTransaction) {
         self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.expertIconImageView.alpha = 1.0f;
         

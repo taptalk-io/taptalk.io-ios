@@ -43,18 +43,18 @@
         
         UIFont *formLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormLabel];
         UIColor *formLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormLabel];
-        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 22.0f)];
+        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 22.0f)];
         self.titleLabel.font = formLabelFont;
         self.titleLabel.textColor = formLabelColor;
         [self addSubview:self.titleLabel];
         
-        _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 50.0f)];
+        _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 50.0f)];
         self.containerView.backgroundColor = [UIColor whiteColor];
         self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.containerView.layer.cornerRadius = 8.0f;
         self.containerView.layer.borderWidth = 1.0f;
         
-        _phoneNumberPickerView = [[TAPCustomPhoneNumberPickerView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 50.0f)];
+        _phoneNumberPickerView = [[TAPCustomPhoneNumberPickerView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame), 50.0f)];
         self.phoneNumberPickerView.delegate = self;
         [self.phoneNumberPickerView setCountryCodePhoneNumberWithData:[TAPCountryModel new]];
         
@@ -95,7 +95,7 @@
         
         UIFont *formDescriptionLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormDescriptionLabel];
         UIColor *formDescriptionLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormDescriptionLabel];
-        _infoDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 0.0f)];
+        _infoDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
         self.infoDescriptionLabel.font = formDescriptionLabelBodyFont;
         self.infoDescriptionLabel.textColor = formDescriptionLabelBodyColor;
         self.infoDescriptionLabel.numberOfLines = 0;
@@ -103,7 +103,7 @@
         
         UIFont *formErrorInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormErrorInfoLabel];
         UIColor *formErrorInfoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormErrorInfoLabel];
-        _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 0.0f)];
+        _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
         self.errorInfoLabel.font = formErrorInfoLabelFont;
         self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
@@ -276,6 +276,17 @@
                                             range:[self.titleLabel.text rangeOfString:optionalString]];
         self.titleLabel.attributedText = attributedString;
         
+        [self setInfoDescriptionText:@""];
+        [self setErrorInfoText:@""];
+        self.textField.keyboardType = UIKeyboardTypeEmailAddress;
+        self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self.textField.placeholder = NSLocalizedString(@"e.g example@work.com", @"");;
+        self.containerView.alpha = 1.0f;
+        self.phoneNumberPickerView.alpha = 0.0f;
+        [self showShowPasswordButton:NO];
+    }
+    else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeEmail) {
+        self.titleLabel.text = NSLocalizedString(@"Email Address", @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;

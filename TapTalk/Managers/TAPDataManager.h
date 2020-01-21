@@ -297,6 +297,9 @@
 + (void)callAPIGetRoomWithRoomID:(NSString *)roomID
                          success:(void (^)(TAPRoomModel *room))success
                          failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetRoomWithXCRoomID:(NSString *)xcRoomID
+                           success:(void (^)(TAPRoomModel *room))success
+                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIAddRoomParticipantsWithRoomID:(NSString *)roomID
                                  userIDArray:(NSArray *)userIDArray
                                      success:(void (^)(TAPRoomModel *room))success

@@ -491,7 +491,7 @@
     [self setThumbnailImageForVideoWithMessage:message];
     
     //CS NOTE - check chat room type, show sender info if group type
-    if (message.room.type == RoomTypeGroup) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         [self showSenderInfo:NO];
         //DV Note - Set sender image to show only sender image, because show sender info view yes will update quote view top constraint to 4.0f making white space in the top of the media
         self.senderImageViewWidthConstraint.constant = 30.0f;

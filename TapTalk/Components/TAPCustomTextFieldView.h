@@ -16,6 +16,7 @@ typedef NS_ENUM(NSInteger,TAPCustomTextFieldViewType) {
     TAPCustomTextFieldViewTypeUsernameWithoutDescription, //To show username without validation description
     TAPCustomTextFieldViewTypeMobileNumber,
     TAPCustomTextFieldViewTypeEmailOptional,
+    TAPCustomTextFieldViewTypeEmail,
     TAPCustomTextFieldViewTypePasswordOptional,
     TAPCustomTextFieldViewTypeReTypePassword,
     TAPCustomTextFieldViewTypeGroupName,

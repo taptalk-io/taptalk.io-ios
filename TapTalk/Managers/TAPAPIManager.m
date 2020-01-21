@@ -177,6 +177,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/room/get";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeGetRoom) {
+        NSString *apiPath = @"client/room/get_by_xc_room_id";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     else if (type == TAPAPIManagerTypeAddRoomParticipants) {
         NSString *apiPath = @"client/room/participants/add";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
