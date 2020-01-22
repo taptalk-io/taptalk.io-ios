@@ -6748,8 +6748,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _keyboardState = keyboardStateDefault;    
     self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenuBackground];
     UIImage *hamburgerIconImage = [UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    self.keyboardOptionButtonImageView.image = [self.keyboardOptionButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenu]];
-    [self.keyboardOptionButton setImage:hamburgerIconImage forState:UIControlStateNormal];
+    self.keyboardOptionButtonImageView.image = [hamburgerIconImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenu]];
 }
 
 - (void)setKeyboardStateOption {
@@ -6757,8 +6756,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
     self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboardBackground];
     UIImage *keyboardIconImage = [UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    self.keyboardOptionButtonImageView.image = [self.keyboardOptionButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboard]];
-    [self.keyboardOptionButton setImage:keyboardIconImage forState:UIControlStateNormal];
+    self.keyboardOptionButtonImageView.image = [keyboardIconImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboard]];
 }
 
 - (IBAction)keyboardOptionButtonDidTapped:(id)sender {

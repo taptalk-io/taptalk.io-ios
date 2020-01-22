@@ -560,10 +560,12 @@
         }
     }
     
-    if (isGroup && message.room.type != RoomTypeTransaction) {
-        self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.expertIconImageView.alpha = 1.0f;
-        
+    if (isGroup) {
+        if (message.room.type != RoomTypeTransaction) {
+            self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.expertIconImageView.alpha = 1.0f;
+        }
+            
         //Last Sender
         self.lastSenderLabel.alpha = 1.0f;
         self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastSenderLabel.frame), 16.0f);
