@@ -1196,4 +1196,8 @@
     }
 }
 
+- (void)hideSetupView {
+    [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeSuccess];
+}
+
 @end

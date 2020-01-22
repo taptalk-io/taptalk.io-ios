@@ -30,5 +30,6 @@
 - (void)viewLoadedSequence;
 - (void)showLoadingSetupView;
 - (void)clearAllData;
+- (void)hideSetupView;
 
 @end
