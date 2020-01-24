@@ -73,6 +73,10 @@
     roomID = [TAPUtil nullToEmptyString:roomID];
     room.roomID = roomID;
     
+    NSString *xcRoomID = [dictionary objectForKey:@"xcRoomID"];
+    xcRoomID = [TAPUtil nullToEmptyString:xcRoomID];
+    room.xcRoomID = xcRoomID;
+    
     NSString *roomName = [dictionary objectForKey:@"roomName"];
     roomName = [TAPUtil nullToEmptyString:roomName];
     roomName = [TAPDataManager normalizedDatabaseStringFromString:roomName];
@@ -105,6 +109,9 @@
     
     BOOL roomIsDeleted = [[dictionary objectForKey:@"roomIsDeleted"] boolValue];
     room.isDeleted = roomIsDeleted;
+    
+    BOOL roomIsLocked = [[dictionary objectForKey:@"roomIsLocked"] boolValue];
+    room.isLocked = roomIsLocked;
     
     NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
@@ -321,6 +328,10 @@
     roomID = [TAPUtil nullToEmptyString:roomID];
     room.roomID = roomID;
     
+    NSString *xcRoomID = [roomDictionary objectForKey:@"xcRoomID"];
+    xcRoomID = [TAPUtil nullToEmptyString:xcRoomID];
+    room.xcRoomID = xcRoomID;
+    
     NSString *roomName = [roomDictionary objectForKey:@"name"];
     roomName = [TAPUtil nullToEmptyString:roomName];
     room.name = roomName;
@@ -345,8 +356,18 @@
     
     NSInteger roomType = [[roomDictionary objectForKey:@"type"] integerValue];
     room.type = roomType;
-    message.room = room;
     
+    BOOL roomIsDeleted = [[roomDictionary objectForKey:@"isDeleted"] boolValue];
+    room.isDeleted = roomIsDeleted;
+    
+    BOOL roomIsLocked = [[roomDictionary objectForKey:@"isLocked"] boolValue];
+    room.isLocked = roomIsLocked;
+    
+    NSInteger roomDeleted = [[roomDictionary objectForKey:@"deleted"] integerValue];
+    room.deleted = [NSNumber numberWithInteger:roomDeleted];
+    
+    message.room = room;
+        
     NSDictionary *userDictionary = [dictionary objectForKey:@"user"];
     TAPUserModel *user = [TAPUserModel new];
     NSString *userID = [userDictionary objectForKey:@"userID"];
@@ -645,6 +666,10 @@
     roomID = [TAPUtil nullToEmptyString:roomID];
     room.roomID = roomID;
     
+    NSString *xcRoomID = [dictionary objectForKey:@"xcRoomID"];
+    xcRoomID = [TAPUtil nullToEmptyString:xcRoomID];
+    room.xcRoomID = xcRoomID;
+    
     NSString *name = [dictionary objectForKey:@"roomName"];
     name = [TAPUtil nullToEmptyString:name];
     room.name = name;
@@ -673,6 +698,16 @@
     
     NSInteger type = [[dictionary objectForKey:@"roomType"] integerValue];
     room.type = type;
+    
+    BOOL roomIsDeleted = [[dictionary objectForKey:@"roomIsDeleted"] boolValue];
+    room.isDeleted = roomIsDeleted;
+    
+    BOOL roomIsLocked = [[dictionary objectForKey:@"roomIsLocked"] boolValue];
+    room.isLocked = roomIsLocked;
+    
+    NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
+    room.deleted = [NSNumber numberWithInteger:roomDeleted];
+    
     recentSearch.room = room;
     
     return recentSearch;
@@ -898,6 +933,10 @@
     roomID = [TAPUtil nullToEmptyString:roomID];
     [messageMutableDictionary setValue:roomID forKey:@"roomID"];
     
+    NSString *xcRoomID = [roomDicitonary objectForKey:@"xcRoomID"];
+    xcRoomID = [TAPUtil nullToEmptyString:xcRoomID];
+    [messageMutableDictionary setValue:xcRoomID forKey:@"xcRoomID"];
+    
     NSString *roomName = [roomDicitonary objectForKey:@"name"];
     roomName = [TAPUtil nullToEmptyString:roomName];
     roomName = [TAPDataManager escapedDatabaseStringFromString:roomName];
@@ -918,6 +957,10 @@
     NSNumber *roomIsDeleted = [roomDicitonary objectForKey:@"isDeleted"];
     roomIsDeleted = [TAPUtil nullToEmptyNumber:roomIsDeleted];
     [messageMutableDictionary setValue:roomIsDeleted forKey:@"roomIsDeleted"];
+    
+    NSNumber *roomIsLocked = [roomDicitonary objectForKey:@"isLocked"];
+    roomIsLocked = [TAPUtil nullToEmptyNumber:roomIsLocked];
+    [messageMutableDictionary setValue:roomIsLocked forKey:@"roomIsLocked"];
     
     NSNumber *roomDeleted = [roomDicitonary objectForKey:@"deleted"];
     roomDeleted = [TAPUtil nullToEmptyNumber:roomDeleted];

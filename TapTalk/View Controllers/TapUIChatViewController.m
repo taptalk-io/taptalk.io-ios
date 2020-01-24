@@ -654,6 +654,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
     if (lastMessage.room.isLocked) {
+        [self showInputAccessoryExtensionView:NO];
+        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+        [self.messageTextView setText:@""];
         [self hideInputAccessoryView];
     }
     else {
@@ -1121,8 +1124,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         //if custom bubble from client available
                         NSString *cellName = [cellDataDictionary objectForKey:@"name"];
                         id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+                        NSBundle *obtainedBundle = [cellDataDictionary objectForKey:@"bundle"];
                         
-                        UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+                        UINib *cellNib = [UINib nibWithNibName:cellName bundle:obtainedBundle];
                         [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
                         
                         TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
@@ -1344,8 +1348,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         //if custom bubble from client available
                         NSString *cellName = [cellDataDictionary objectForKey:@"name"];
                         id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
+                        NSBundle *obtainedBundle = [cellDataDictionary objectForKey:@"bundle"];
                         
-                        UINib *cellNib = [UINib nibWithNibName:cellName bundle:[NSBundle mainBundle]];
+                        UINib *cellNib = [UINib nibWithNibName:cellName bundle:obtainedBundle];
                         [tableView registerNib:cellNib forCellReuseIdentifier:cellName];
                         
                         TAPBaseGeneralBubbleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName forIndexPath:indexPath];
@@ -1636,6 +1641,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     
     if (message.room.isLocked) {
+        [self showInputAccessoryExtensionView:NO];
+        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+        [self.messageTextView setText:@""];
         [self hideInputAccessoryView];
     }
     else {
@@ -5714,6 +5722,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             TAPMessageModel *lastMessage = [obtainedMessageArray firstObject];
             
             if (lastMessage.room.isLocked) {
+                [self showInputAccessoryExtensionView:NO];
+                [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+                [self.messageTextView setText:@""];
                 [self hideInputAccessoryView];
             }
             else {
@@ -6194,6 +6205,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if (![TAPUtil isEmptyString:self.tappedMessageLocalID]) {
                         [self scrollToMessageAndLoadDataWithLocalID:self.tappedMessageLocalID];
                     }
+                    
+                    [self checkEmptyState];
                 }];
             }
             else if ([messageArray count] == 0 && !hasMore) {
@@ -8172,6 +8185,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
     
     if (lastMessage.room.isLocked) {
+        [self showInputAccessoryExtensionView:NO];
+        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+        [self.messageTextView setText:@""];
         [self hideInputAccessoryView];
     }
     else {

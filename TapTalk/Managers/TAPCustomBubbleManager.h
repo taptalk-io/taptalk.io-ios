@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPCustomBubbleManager *)sharedManager;
 
-- (void)addCustomBubbleDataWithCellName:(NSString *)cellName type:(NSInteger)type delegate:(id)delegate;
+- (void)addCustomBubbleDataWithCellName:(NSString *)cellName type:(NSInteger)type delegate:(id)delegate bundle:(NSBundle *)bundle;
 - (NSDictionary *)getCustomBubbleClassNameWithType:(NSInteger)type;
 
 @end

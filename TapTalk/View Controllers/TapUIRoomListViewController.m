@@ -84,6 +84,10 @@
     [self.navigationController.view addSubview:self.setupRoomListView];
     [self.navigationController.view bringSubviewToFront:self.setupRoomListView];
     
+    //Check need to hide setup loading view or not
+    BOOL isHide = [[TapUI sharedInstance] getSetupLoadingFlowHiddenState];
+    [self.setupRoomListView setNotShowingLoadingFlow:isHide];
+    
     [self.roomListView.startChatNoChatsButton addTarget:self action:@selector(openNewChatViewController) forControlEvents:UIControlEventTouchDown];
     
     //LeftBarButton
@@ -116,9 +120,14 @@
     self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
     [self.leftBarButton addSubview:self.profileImageView];
     
-    [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
-    [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
+    
+    //Only show when is visible
+    BOOL isShowMyAccountInChatRoom = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
+    if (isShowMyAccountInChatRoom) {
+        [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
+    }
     
     //RightBarButton
     UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -129,12 +138,25 @@
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
     [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
-    [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+    
+    //Only show when is visible
+    BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
+    if (isShowNewChatButtonInChatRoom) {
+        [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+    }
     
     //TitleView
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
     self.searchBarView.searchTextField.delegate = self;
-    [self.navigationItem setTitleView:self.searchBarView];
+    
+    //Only show when is visible
+    BOOL isShowSearchBarInChatRoom = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
+    if (isShowSearchBarInChatRoom) {
+        [self.navigationItem setTitleView:self.searchBarView];
+    }
+    else {
+        self.title = NSLocalizedString(@"Chats", @"");
+    }
     
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;

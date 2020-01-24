@@ -669,12 +669,14 @@
     //Add action, groupTargetType, groupTargetID, groupTargetXCID, groupTargetName  in TAPMessageRealmModel
     //SCHEMA VERSION - 5 - 25 July 2019
     //Add roomIsDeleted, roomDeleted  in TAPMessageRealmModel
+    //SCHEMA VERSION - 6 - 24 January 2019
+    //Add roomIsLocked, xcRoomID  in TAPMessageRealmModel
 
     // Set the block which will be called automatically when opening a Realm with a
     // schema version lower than the one set above
     configuration.migrationBlock = ^(RLMMigration *migration, uint64_t oldSchemaVersion) {
-        // We haven’t migrated anything yet, so oldSchemaVersion == 5
-        if (oldSchemaVersion < 5) {
+        // We haven’t migrated anything yet, so oldSchemaVersion == 6
+        if (oldSchemaVersion < 6) {
             // Nothing to do!
             // Realm will automatically detect new properties and removed properties
             // And will update the schema on disk automatically
