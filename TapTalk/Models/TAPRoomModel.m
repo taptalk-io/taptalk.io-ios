@@ -70,6 +70,7 @@
 - (void)encodeWithCoder:(NSCoder *)encoder {
     //Encode properties, other class variables, etc
     [encoder encodeObject:self.roomID forKey:@"roomID"];
+    [encoder encodeObject:self.xcRoomID forKey:@"xcRoomID"];
     [encoder encodeObject:self.name forKey:@"name"];
     [encoder encodeObject:self.imageURL forKey:@"imageURL"];
     [encoder encodeInteger:self.type forKey:@"type"];
@@ -85,6 +86,7 @@
     if((self = [super init])) {
         //decode properties, other class vars
         self.roomID = [decoder decodeObjectForKey:@"roomID"];
+        self.xcRoomID = [decoder decodeObjectForKey:@"xcRoomID"];
         self.name = [decoder decodeObjectForKey:@"name"];
         self.imageURL = [decoder decodeObjectForKey:@"imageURL"];
         self.type = [decoder decodeIntegerForKey:@"type"];

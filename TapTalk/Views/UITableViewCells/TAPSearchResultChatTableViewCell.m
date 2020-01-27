@@ -236,10 +236,11 @@
         self.muteImageView.alpha = 0.0f;
     }
     
-    if (isGroup && room.type != RoomTypeTransaction) {
-        
-        self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.expertIconImageView.alpha = 1.0f;
+    if (isGroup) {
+        if (room.type != RoomTypeTransaction) {
+            self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.expertIconImageView.alpha = 1.0f;
+        }
         
         //DV Temp -  Adding how many people online in here for group
         if (isOnline) {

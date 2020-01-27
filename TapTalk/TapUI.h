@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Called when user click the profile button on the top right side of personal chat room page.
  
- @param viewController (UIViewController *) current shown view controller
+ @param currentViewController (UIViewController *) current shown view controller
  @param otherUser (TapUserModel *) user data that will be shown
  @param room (TAPRoomModel *) room data that will be shown
  @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Called when user click the profile button on the top right side of group chat room page.
  
- @param viewController (UIViewController *) current shown view controller
+ @param currentViewController (UIViewController *) current shown view controller
  @param room (TAPRoomModel *) room data that will be shown
  @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
  */
@@ -180,8 +180,10 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 /**
  Add new custom bubble class
  */
-- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate;
-
+- (void)addCustomBubbleWithClassName:(NSString *)className
+                                type:(NSInteger)type
+                            delegate:(id)delegate
+                              bundle:(NSBundle *)bundle;
 
 //==========================================================
 //                      My Account View
@@ -223,6 +225,14 @@ Show or hide right bar button item view in the top of Room List view (New Chat B
 - (void)setNewChatButtonInRoomListVisible:(BOOL)isVisible;
 
 /**
+Show or hide setup loading view flow of Room List view
+The default is false (showing), set the boolean to TRUE when you don't want to show setup loading view
+
+ @param hide (BOOL) boolean to indicating show or not
+*/
+- (void)hideSetupLoadingFlowInSetupRoomListView:(BOOL)hide;
+
+/**
 Get current visibility state of search bar view in the top of Room List view
 */
 - (BOOL)getSearchBarInRoomListVisibleState;
@@ -236,6 +246,11 @@ Get current visibility state of left bar button item view in the top of Room Lis
 Get current visibility state of right bar button item view in the top of Room List view (New Chat Button)
 */
 - (BOOL)getNewChatButtonInRoomListVisibleState;
+
+/**
+Get current visibility state of setup loading view flow in Room List vie
+*/
+- (BOOL)getSetupLoadingFlowHiddenState;
 
 //==========================================================
 //                      New Chat View

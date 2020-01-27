@@ -18,6 +18,7 @@
 @property (strong, nonatomic) UILabel *titleFirstLoadLabel;
 @property (strong, nonatomic) UILabel *descriptionFirstLoadLabel;
 @property (strong, nonatomic) UILabel *retryLabel;
+@property (nonatomic) BOOL notShowLoadingFlow;
 
 @end
 
@@ -107,6 +108,12 @@
 
 #pragma mark - Custom Method
 - (void)showSetupViewWithType:(TAPSetupRoomListViewType)type {
+    
+    if (self.notShowLoadingFlow) {
+        //Don't show any loading animation if the boolean is true
+        return;
+    }
+    
     if (type == TAPSetupRoomListViewTypeSettingUp) {
         self.titleFirstLoadLabel.text = NSLocalizedString(@"Setting up Your Chat Room", @"");
         self.descriptionFirstLoadLabel.text = NSLocalizedString(@"Make sure you have a stable conection", @"");
@@ -147,6 +154,12 @@
 }
 
 - (void)showFirstLoadingView:(BOOL)isVisible withType:(TAPSetupRoomListViewType)type {
+    
+    if (self.notShowLoadingFlow) {
+        //Don't show any loading animation if the boolean is true
+        return;
+    }
+    
     if (isVisible) {
         self.alpha = 1.0f;
         self.firstLoadOverlayView.alpha = 1.0f;
@@ -180,6 +193,10 @@
             }
         }];
     }
+}
+
+- (void)setNotShowingLoadingFlow:(BOOL)notShow {
+    _notShowLoadingFlow = notShow;
 }
 
 @end

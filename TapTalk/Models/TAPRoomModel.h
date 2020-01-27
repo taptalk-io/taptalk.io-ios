@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, RoomType) {
 @interface TAPRoomModel : TAPBaseModel
 
 @property (nonatomic, strong) NSString *roomID;
+@property (nonatomic, strong) NSString *xcRoomID;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) TAPImageURLModel *imageURL;
 @property (nonatomic) RoomType type;

@@ -20,6 +20,7 @@
 @property (nonatomic) BOOL isScanQRMenuButtonHidden;
 @property (nonatomic) BOOL isNewGroupMenuButtonHidden;
 @property (nonatomic) BOOL isProfileButtonInChatRoomHidden;
+@property (nonatomic) BOOL hideSetupLoadingViewFlow;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -89,8 +90,8 @@
 }
 
 //Custom Bubble
-- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate {
-    [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate];
+- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate bundle:(NSBundle *)bundle {
+    [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate bundle:bundle];
 }
 
 //Room List
@@ -344,6 +345,16 @@ Show or hide right bar button item view in the top of Room List view (New Chat B
 }
 
 /**
+Show or hide setup loading view flow of Room List view
+The default is false (showing), set the boolean to TRUE when you don't want to show setup loading view
+
+@param hide (BOOL) boolean to indicating show or not
+*/
+- (void)hideSetupLoadingFlowInSetupRoomListView:(BOOL)hide {
+    _hideSetupLoadingViewFlow = hide;
+}
+
+/**
 Show or hide add new contact option menu in NewChat view
 
 @param isVisible (BOOL) boolean to indicating is visible or not
@@ -432,6 +443,13 @@ Get current visibility state of profile button in chat room
 */
 - (BOOL)getProfileButtonInChatRoomVisibleState {
     return !self.isProfileButtonInChatRoomHidden;
+}
+
+/**
+Get current visibility state of setup loading view flow in Room List vie
+*/
+- (BOOL)getSetupLoadingFlowHiddenState {
+    return self.hideSetupLoadingViewFlow;
 }
 
 @end
