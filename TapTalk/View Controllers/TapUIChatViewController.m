@@ -8180,6 +8180,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self showInputAccessoryView];
 }
 
+- (void)hideTapTalkMessageComposerView {
+    [self.view endEditing:YES];
+    [self hideInputAccessoryView];
+}
+
 - (void)checkAndShowRoomViewState {
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];

@@ -160,9 +160,20 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 //                 Windows & View Controllers
 //==========================================================
 /**
- Set user active window to activate in app notification view on top of current user defined window
+ Set your current active window to TapTalk.io
  */
-- (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow;
+- (void)setCurrentActiveWindow:(UIWindow *)activeWindow;
+
+/**
+ To activate in-app push notification with your current window
+ The default is TRUE/YES
+ */
+- (void)activateTapTalkInAppNotification:(BOOL)activate;
+
+/**
+ Get the  activation status of In App Notification
+ */
+- (BOOL)getTapTalkInAppNotificationActivationStatus;
 
 /**
  Obtain current active navigation controller

@@ -195,7 +195,8 @@
 }
 
 - (void)initCustomNotificationAlertViewController {
-    if ([TapUI sharedInstance].activeWindow != nil) {
+    BOOL isActivate = [[TapUI sharedInstance] getTapTalkInAppNotificationActivationStatus];
+    if ([TapUI sharedInstance].activeWindow != nil && isActivate) {
         [TapUI sharedInstance].customNotificationAlertViewController.view.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 66.0f + 20.0f);
         [TapUI sharedInstance].customNotificationAlertViewController.delegate = self;
         [[TapUI sharedInstance].activeWindow addSubview:[TapUI sharedInstance].customNotificationAlertViewController.view];
