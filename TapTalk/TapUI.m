@@ -12,6 +12,7 @@
 @property (strong, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
+@property (nonatomic) BOOL isDisableActivateInAppNotification;
 @property (nonatomic) BOOL isLogoutButtonVisible;
 @property (nonatomic) BOOL isSearchBarRoomListViewHidden;
 @property (nonatomic) BOOL isLeftBarItemRoomListViewHidden;
@@ -62,8 +63,16 @@
 
 #pragma mark - Custom Method
 //Windows & View Controllers
-- (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow {
+- (void)setCurrentActiveWindow:(UIWindow *)activeWindow {
     _activeWindow = activeWindow;
+}
+
+- (void)activateTapTalkInAppNotification:(BOOL)activate {
+    _isDisableActivateInAppNotification = !activate;
+}
+
+- (BOOL)getTapTalkInAppNotificationActivationStatus {
+    return !self.isDisableActivateInAppNotification;
 }
 
 - (UINavigationController *)getCurrentTapTalkActiveNavigationController {

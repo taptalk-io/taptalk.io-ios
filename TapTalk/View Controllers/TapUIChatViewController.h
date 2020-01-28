@@ -72,4 +72,19 @@ Initialize chat room with room data and scrolled to selected message
  */
 - (void)showTapTalkMessageComposerView;
 
+/**
+ Hide input view / message composer view
+ */
+- (void)hideTapTalkMessageComposerView;
+
+/**
+Show left menu icon as keyboard state
+ */
+- (void)setKeyboardStateDefault;
+
+/**
+Show left menu icon as custom keyboard option state
+*/
+- (void)setKeyboardStateOption;
+
 @end
