@@ -33,9 +33,6 @@
 @property (strong, nonatomic) UIButton *leftBarButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 
-@property (strong, atomic) NSMutableArray *roomListArray;
-@property (strong, atomic) NSMutableDictionary *roomListDictionary;
-
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
 

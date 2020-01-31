@@ -4707,7 +4707,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [alertController addAction:documentsAction];
     [alertController addAction:cameraAction];
     [alertController addAction:galleryAction];
-    [alertController addAction:locationAction];
+    
+    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState]) {
+        //Only show when Google Places API Key is insert
+        [alertController addAction:locationAction];
+    }
+
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {

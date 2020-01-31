@@ -253,6 +253,11 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 */
 - (BOOL)isAutoContactSyncEnabled;
 
+/**
+ Obtain initialize status of Google Places API
+*/
+- (BOOL)obtainGooglePlacesAPIInitializeState;
+
 //==========================================================
 //                          User
 //==========================================================
