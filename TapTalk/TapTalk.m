@@ -9,6 +9,7 @@
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
 #import <CoreText/CoreText.h>
+#import <CoreLocation/CoreLocation.h>
 
 @import AFNetworking;
 @import GooglePlaces;
@@ -18,6 +19,7 @@
 
 @property (nonatomic) TapTalkImplentationType implementationType;
 @property (nonatomic) BOOL isAutoConnectDisabled;
+@property (nonatomic) BOOL isGooglePlacesAPIInitialize;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
 @property (strong, nonatomic) NSDictionary * _Nullable coreConfigsDictionary;
@@ -56,6 +58,12 @@
                 
         //Add notification manager delegate
         [TAPNotificationManager sharedManager].delegate = self;
+        
+        //Init TapLocationManager when already authorized to obtain current location first
+        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+            [TAPLocationManager sharedManager];
+        }
+        
         
     }
     
@@ -425,6 +433,11 @@
     //Google API Key
     [GMSPlacesClient provideAPIKey:apiKey];
     [GMSServices provideAPIKey:apiKey];
+    _isGooglePlacesAPIInitialize = YES;
+}
+
+- (BOOL)obtainGooglePlacesAPIInitializeState {
+    return self.isGooglePlacesAPIInitialize;
 }
 
 - (void)refreshActiveUser {

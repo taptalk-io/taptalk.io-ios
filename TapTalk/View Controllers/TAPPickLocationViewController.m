@@ -273,8 +273,6 @@
     CLLocationCoordinate2D center = [mapView centerCoordinate];
     [self.pickLocationView setAsLoading:YES];
     
-     
-    
     [[GMSGeocoder geocoder] reverseGeocodeCoordinate:center completionHandler:
      ^(GMSReverseGeocodeResponse *response, NSError *error){
          if ([[response.firstResult valueForKey:@"lines"] objectAtIndex:0]) {

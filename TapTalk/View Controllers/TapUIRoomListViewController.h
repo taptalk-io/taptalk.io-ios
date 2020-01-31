@@ -23,6 +23,9 @@
 
 @interface TapUIRoomListViewController : TAPBaseViewController
 
+@property (strong, atomic) NSMutableArray *roomListArray;
+@property (strong, atomic) NSMutableDictionary *roomListDictionary;
+
 @property (nonatomic) BOOL isViewAppear;
 @property (nonatomic) BOOL isShouldNotLoadFromAPI;
 @property (weak, nonatomic) id<TapUIRoomListViewControllerLifecycleDelegate> lifecycleDelegate;
