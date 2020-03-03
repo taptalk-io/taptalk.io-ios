@@ -7,7 +7,6 @@
 //
 
 #import "TAPPickLocationView.h"
-#import "TAPPinLocationView.h"
 
 @interface TAPPickLocationView ()
 
@@ -16,7 +15,6 @@
 @property (strong, nonatomic) UIImageView *addressIconImageView;
 @property (strong, nonatomic) UIImageView *pinIconImageView;
 @property (strong, nonatomic) UILabel *addressLabel;
-@property (strong, nonatomic) TAPPinLocationView *pinLocationView;
 
 @end
 
@@ -31,7 +29,7 @@
             additionalBottomSpacing = [TAPUtil safeAreaBottomPadding];
         }
         
-        _addressView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(frame) - (96.0f + additionalBottomSpacing), CGRectGetWidth(frame), 96.0f + additionalBottomSpacing)];
+        _addressView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(frame) - (152.0f + additionalBottomSpacing), CGRectGetWidth(frame), 152.0f + additionalBottomSpacing)];
         self.addressView.backgroundColor = [UIColor whiteColor];
         self.addressView.layer.shadowOffset = CGSizeMake(0.0f, -1.0f);
         self.addressView.layer.shadowColor = [UIColor blackColor].CGColor;
@@ -45,11 +43,18 @@
         
         UIFont *placeholderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerAddressPlaceholder];
         UIColor *placeholderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddressPlaceholder];
-        _addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f, 16.0f, CGRectGetWidth(self.addressView.frame) - (CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f) - 16.0f, 64.0f)];
+        _addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f, 20.0f, CGRectGetWidth(self.addressView.frame) - (CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f) - 16.0f, 64.0f)];
         self.addressLabel.font = placeholderLabelFont;
         self.addressLabel.textColor = placeholderLabelColor;
         self.addressLabel.numberOfLines = 0;
         [self.addressView addSubview:self.addressLabel];
+        
+        _sendLocationButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.addressLabel.frame) + 12.0f, CGRectGetWidth(self.frame), 44.0f)];
+        [self.sendLocationButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
+        [self.sendLocationButton setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
+        [self.sendLocationButton setButtonWithTitle:NSLocalizedString(@"Send Location", @"") andIcon:@"TAPIconSend" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.sendLocationButton setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        [self.addressView addSubview:self.sendLocationButton];
         
         _mapContainerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - CGRectGetHeight(self.addressView.frame))];
         [self addSubview:self.mapContainerView];
@@ -88,15 +93,6 @@
         self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerMarker]];
         
         [self addSubview:self.pinIconImageView];
-        
-        _pinLocationView = [[TAPPinLocationView alloc] initWithFrame:CGRectMake((CGRectGetWidth(frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f)];
-        self.pinLocationButton.frame = CGRectMake(CGRectGetMinX(self.pinLocationView.frame), CGRectGetMinY(self.pinLocationView.frame), CGRectGetWidth(self.pinLocationView.frame), CGRectGetHeight(self.pinLocationView.frame) - 15.0f);
-        self.pinLocationView.clipsToBounds = YES;
-        [self addSubview:self.pinLocationView];
-        
-        _pinLocationButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.pinLocationView.frame), CGRectGetMinY(self.pinLocationView.frame), CGRectGetWidth(self.pinLocationView.frame), CGRectGetHeight(self.pinLocationView.frame) - 15.0f)];
-        self.pinLocationButton.backgroundColor = [UIColor clearColor];
-        [self addSubview:self.pinLocationButton];
         
         _searchTableView = [[UITableView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchBarView.frame), CGRectGetMaxY(self.searchBarView.frame) + 5.0f, CGRectGetWidth(self.searchBarView.frame), 0.0f)];
         self.searchTableView.showsVerticalScrollIndicator = NO;
@@ -144,30 +140,11 @@
         
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressInactive]];
-        
-        [UIView animateWithDuration:0.2f animations:^{
-            CGRect setLocationViewFrame = self.pinLocationView.frame;
-            self.pinLocationView.frame = CGRectMake(CGRectGetWidth(self.frame) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame), 0.0f, 0.0f);
-            self.pinLocationView.layer.cornerRadius = CGRectGetHeight(setLocationViewFrame) / 2.0f;
-            self.pinLocationButton.frame = self.pinLocationView.frame;
-            [self.pinLocationView hideSendLocationView:YES];
-        } completion:^(BOOL finished) {
-            
-        }];
     }
     else {
         self.addressLabel.textColor = addressColor;
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressActive]];
-
-        [UIView animateWithDuration:0.2f animations:^{
-            self.pinLocationView.frame = CGRectMake((CGRectGetWidth(self.frame) - 140.0f) / 2.0f, CGRectGetMinY(self.pinIconImageView.frame) - 45.0f, 140.0f, 45.0f);
-            self.pinLocationView.layer.cornerRadius = 0.0f;
-            self.pinLocationButton.frame = CGRectMake(CGRectGetMinX(self.pinLocationView.frame), CGRectGetMinY(self.pinLocationView.frame), CGRectGetWidth(self.pinLocationView.frame), CGRectGetHeight(self.pinLocationView.frame) - 15.0f);
-            [self.pinLocationView hideSendLocationView:NO];
-        } completion:^(BOOL finished) {
-            
-        }];
     }
 }
 

@@ -352,8 +352,20 @@
         //MESSAGE IS READ BY RECIPIENT
         self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
+        
+        //Check if show read status
+        BOOL isHideReadStatus = [[TapUI sharedInstance] getReadStatusHiddenState];
+        if (isHideReadStatus) {
+            //Set to delivered icon
+            self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
+        }
+        else {
+            //Set to read icon
+            self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
+        }
+
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusDelivered) {

@@ -9,6 +9,7 @@
 #import "TAPBaseView.h"
 #import <MapKit/MapKit.h>
 #import "TAPLocationSearchBarView.h"
+#import "TAPCustomButtonView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIView *searchTableViewShadowView;
 @property (strong, nonatomic) TAPLocationSearchBarView *searchBarView;
 @property (strong, nonatomic) UIButton *goToCurrentLocationButton;
-@property (strong, nonatomic) UIButton *pinLocationButton;
+@property (strong, nonatomic) TAPCustomButtonView *sendLocationButton;
 
 - (void)setAsLoading:(BOOL)isLoading;
 - (void)setAddress:(NSString *)addressString;

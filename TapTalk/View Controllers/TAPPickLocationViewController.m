@@ -14,7 +14,7 @@
 @import GooglePlaces;
 @import GoogleMaps;
 
-@interface TAPPickLocationViewController () <TAPLocationSearchBarViewDelegate, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate>
+@interface TAPPickLocationViewController () <TAPLocationSearchBarViewDelegate, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, TAPCustomButtonViewDelegate>
 
 @property (strong, nonatomic) TAPPickLocationView *pickLocationView;
 
@@ -67,9 +67,9 @@
     
     self.pickLocationView.mapView.delegate = self;
     self.pickLocationView.searchTableView.delegate = self;
-    
+    self.pickLocationView.sendLocationButton.delegate = self;
+
     [self.pickLocationView.goToCurrentLocationButton addTarget:self action:@selector(goToCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
-    [self.pickLocationView.pinLocationButton addTarget:self action:@selector(setLocationButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     [self.pickLocationView setAsLoading:YES];
     _searchResultArray = [NSMutableArray array];
@@ -285,20 +285,31 @@
                  _selectedPostalCode = currentPostalCode;
                  [self.pickLocationView setAsLoading:NO];
                  [self.pickLocationView setAddress:currentLocation];
+                 [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
              }
              else {
                  //Location not found
                  [self.pickLocationView setAsLoading:YES];
                  [self.pickLocationView setAddress:NSLocalizedString(@"Location not found", @"")];
+                 [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
              }
          }
          else {
              //Location not found
              [self.pickLocationView setAsLoading:YES];
              [self.pickLocationView setAddress:NSLocalizedString(@"Location not found", @"")];
+             [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
          }
      }];
+}
+
+#pragma mark - TAPCustomButtonView
+- (void)customButtonViewDidTappedButton {
+    if ([self.delegate respondsToSelector:@selector(pickLocationViewControllerSetLocationWithLatitude:longitude:address:postalCode:)]) {
+        [self.delegate pickLocationViewControllerSetLocationWithLatitude:self.selectedLocationCoordinate.latitude longitude:self.selectedLocationCoordinate.longitude address:self.selectedLocationAddress postalCode:self.selectedPostalCode];
+    }
     
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - LocationManager Method

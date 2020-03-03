@@ -64,11 +64,13 @@ static const NSInteger kAPITimeOut = 60;
 
 #pragma mark - Custom Method
 - (AFHTTPSessionManager *)defaultManager {
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [manager.requestSerializer setValue:self.appKey forHTTPHeaderField:@"App-Key"];
+    [manager.requestSerializer setValue:bundleIdentifier forHTTPHeaderField:@"App-Identifier"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
@@ -614,7 +616,8 @@ refreshToken:(NSString *)refreshToken
     [self.currentDownloadTaskDictionary removeObjectForKey:fileID];
 }
 
-- (void)setAppKey:(NSString *)appKey {
+- (void)setAppKeyWithID:(NSString *)appKeyID secret:(NSString *)appKeySecret  {
+    NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
     NSData *base64Data = [appKey dataUsingEncoding:NSUTF8StringEncoding];
     NSString *encodedAppKey = [base64Data base64EncodedStringWithOptions:0];
     _appKey = encodedAppKey;

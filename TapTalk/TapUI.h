@@ -398,6 +398,21 @@ Get current visibility state of profile button in chat room
 */
 - (BOOL)getProfileButtonInChatRoomVisibleState;
 
+//==========================================================
+//                        Others
+//==========================================================
+/**
+Show or hide read status (green double checklist icon when read)
+ 
+@param isVisible (BOOL) boolean to indicating is hide or not
+*/
+- (void)setHideReadStatus:(BOOL)hideReadStatus;
+
+/**
+Get current state of hide read status
+*/
+- (BOOL)getReadStatusHiddenState;
+
 @end
 
 NS_ASSUME_NONNULL_END
