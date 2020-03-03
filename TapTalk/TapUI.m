@@ -22,6 +22,7 @@
 @property (nonatomic) BOOL isNewGroupMenuButtonHidden;
 @property (nonatomic) BOOL isProfileButtonInChatRoomHidden;
 @property (nonatomic) BOOL hideSetupLoadingViewFlow;
+@property (nonatomic) BOOL hideReadStatus;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -459,6 +460,22 @@ Get current visibility state of setup loading view flow in Room List vie
 */
 - (BOOL)getSetupLoadingFlowHiddenState {
     return self.hideSetupLoadingViewFlow;
+}
+
+/**
+Show or hide read status (green double checklist icon when read)
+ 
+@param isVisible (BOOL) boolean to indicating is hide or not
+*/
+- (void)setHideReadStatus:(BOOL)hideReadStatus {
+    _hideReadStatus = hideReadStatus;
+}
+
+/**
+Get current state of hide read status
+*/
+- (BOOL)getReadStatusHiddenState {
+    return self.hideReadStatus;
 }
 
 @end

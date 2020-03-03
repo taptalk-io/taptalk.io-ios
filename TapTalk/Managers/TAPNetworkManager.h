@@ -76,7 +76,7 @@ refreshToken:(NSString *)refreshToken
 
 - (void)cancelDownloadWithFileID:(NSString *)fileID;
 
-- (void)setAppKey:(NSString *)appKey;
+- (void)setAppKeyWithID:(NSString *)appKeyID secret:(NSString *)appKeySecret;
 - (NSString *)getAppKey;
 
 @end

@@ -430,8 +430,20 @@
             else {
                 self.messageStatusImageView.alpha = 1.0f;
             }
-            self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
+            
+            //Check if show read status
+            BOOL isHideReadStatus = [[TapUI sharedInstance] getReadStatusHiddenState];
+            if (isHideReadStatus) {
+                //Set to delivered icon
+                self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+                self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
+            }
+            else {
+                //Set to read icon
+                self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+                self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
+            }
+            
             break;
         }
         case TAPMessageStatusTypeFailed:

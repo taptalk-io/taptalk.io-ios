@@ -410,9 +410,8 @@
             appKeySecret:(NSString *_Nonnull)appKeySecret
             apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType {
-    
-    NSString *appKey = [NSString stringWithFormat:@"%@:%@", appKeyID, appKeySecret];
-    [[TAPNetworkManager sharedManager] setAppKey:appKey];
+        
+    [[TAPNetworkManager sharedManager] setAppKeyWithID:appKeyID secret:appKeySecret];
     [[TAPAPIManager sharedManager] setBaseAPIURLString:apiURLString];
     [[TAPConnectionManager sharedManager] setSocketURLString:apiURLString];
     

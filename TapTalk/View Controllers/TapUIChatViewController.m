@@ -623,6 +623,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     else {
+        [self setSendButtonActive:NO];
         [self checkIsContainQuoteMessage];
     }
     
@@ -2188,7 +2189,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     TAPMessageModel *quotedMessageModel = [tappedMessage copy];
     
-    //WK Note : Do reply here later.
     [self showInputAccessoryExtensionView:NO];
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
@@ -5240,7 +5240,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
-    if (message.isDeleted || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal)) {
+    if (message.isDeleted || message.isSending || message.isFailedSend || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal)) {
         return;
     }
     
@@ -7092,9 +7092,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.messageTextView.text = @"";
     }
     
-    if(self.currentInputAccessoryExtensionHeight > 0.0f) {
-        [self showInputAccessoryExtensionView:NO];
-    }
+    [self showInputAccessoryExtensionView:NO];
+    [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     
     if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
         //        Only scroll if table view is at bottom

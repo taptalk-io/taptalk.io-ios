@@ -98,7 +98,7 @@
         syncContactTopSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.syncContactButtonView addSubview:syncContactTopSeparatorView];
         
-        _syncButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, CGRectGetWidth(self.frame), 42.0f)];
+        _syncButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, CGRectGetWidth(self.frame), 44.0f)];
         [self.syncButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.syncButton setCustomButtonViewType:TAPCustomButtonViewTypeActive];
         [self.syncButton setButtonWithTitle:NSLocalizedString(@"Sync Contacts Now", @"") andIcon:@"TAPIconSync" iconPosition:TAPCustomButtonViewIconPosititonLeft];
