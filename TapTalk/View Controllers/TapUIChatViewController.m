@@ -1572,8 +1572,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
             if ([fileSize doubleValue] > [maxFileSize doubleValue]) {
                 //File size is larger than max file size
-                NSString *errorMessage = [NSString stringWithFormat:@"Maximum file size is %ld MB.", (long)maxFileSizeInMB];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error File Size Excedeed" title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(errorMessage, @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                NSString *subjectMessage = NSLocalizedStringFromTableInBundle(@"Maximum file size is ", nil, [TAPUtil currentBundle], @"");
+                NSString *errorMessage = [NSString stringWithFormat:@"%@ %ld MB.",subjectMessage, (long)maxFileSizeInMB];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error File Size Excedeed" title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 return;
             }
             
@@ -3780,7 +3781,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
     self.typingLabel.font = chatRoomStatusLabelFont;
     self.typingLabel.textColor = chatRoomStatusLabelColor;
-    self.typingLabel.text = NSLocalizedString(@"typing", @"");
+    self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
     [self.typingLabel sizeToFit];
     self.typingLabel.frame = CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
     [self.userTypingView addSubview:self.typingLabel];
@@ -3939,7 +3940,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     UIFont *buttonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
     UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
-    self.deleteRoomButtonLabel.text = NSLocalizedString(@"Delete Chat", @"");
+    self.deleteRoomButtonLabel.text = NSLocalizedStringFromTableInBundle(@"Delete Chat", nil, [TAPUtil currentBundle], @"");
     self.deleteRoomButtonLabel.textAlignment = NSTextAlignmentCenter;
     self.deleteRoomButtonLabel.font = buttonFont;
     self.deleteRoomButtonLabel.textColor = buttonColor;
@@ -3973,14 +3974,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (isGroup) {
         if (isGroupDeleted) {
-            self.deletedRoomContentLabel.text = NSLocalizedString(@"Sorry, this group is unavailable", @"");
+            self.deletedRoomContentLabel.text = NSLocalizedStringFromTableInBundle(@"Sorry, this group is unavailable", nil, [TAPUtil currentBundle], @"");
         }
         else {
-            self.deletedRoomContentLabel.text = NSLocalizedString(@"You are no longer a participant in this group", @"");
+            self.deletedRoomContentLabel.text = NSLocalizedStringFromTableInBundle(@"You are no longer a participant in this group", nil, [TAPUtil currentBundle], @"");
         }
     }
     else {
-        self.deletedRoomContentLabel.text = NSLocalizedString(@"This user is no longer available", @"");
+        self.deletedRoomContentLabel.text = NSLocalizedStringFromTableInBundle(@"This user is no longer available", nil, [TAPUtil currentBundle], @"");
     }
     
     //Delete button used to delete room
@@ -5249,7 +5250,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *replyAction = [UIAlertAction
-                                  actionWithTitle:@"Reply"
+                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Reply", nil, [TAPUtil currentBundle], @"")
                                   style:UIAlertActionStyleDefault
                                   handler:^(UIAlertAction * action) {
                                       //Reply Action Here
@@ -5358,7 +5359,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                   }];
     
     UIAlertAction *forwardAction = [UIAlertAction
-                                    actionWithTitle:@"Forward"
+                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"")
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
                                         [self showInputAccessoryView];
@@ -5371,7 +5372,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                     }];
     
     UIAlertAction *copyAction = [UIAlertAction
-                                 actionWithTitle:@"Copy"
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
                                      [self showInputAccessoryView];
@@ -5382,7 +5383,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  }];
     
     UIAlertAction *saveToGalleryAction = [UIAlertAction
-                                          actionWithTitle:@"Save"
+                                          actionWithTitle:NSLocalizedStringFromTableInBundle(@"Save", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
                                               [self showInputAccessoryView];
@@ -5413,7 +5414,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           }];
     
     UIAlertAction *deleteMessageAction = [UIAlertAction
-                                          actionWithTitle:@"Delete"
+                                          actionWithTitle:NSLocalizedStringFromTableInBundle(@"Delete", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
                                               [self showInputAccessoryView];
@@ -5421,7 +5422,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
@@ -5539,7 +5540,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         if ([message.forwardFrom.localID isEqualToString:@""] && [message.forwardFrom.fullname isEqualToString:@""]) {
             
             if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                self.replyMessageNameLabel.text = NSLocalizedString(@"You", @"");
+                self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
             }
             else {
                 self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
@@ -5548,7 +5549,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             //check id message sender is equal to active user id, if yes change the title to "You"
             if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                self.replyMessageNameLabel.text = NSLocalizedString(@"You", @"");
+                self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
             }
             else {
                 self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.forwardFrom.fullname];
@@ -5561,7 +5562,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         //check id message sender is equal to active user id, if yes change the title to "You"
         if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-            self.replyMessageNameLabel.text = NSLocalizedString(@"You", @"");
+            self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
         }
         else {
             self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
@@ -5575,7 +5576,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
+        self.quoteTitleLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
     }
     else {
         self.quoteTitleLabel.text = quote.title;
@@ -5846,9 +5847,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         //Note - this alert only shown at debug
                         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
+                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
                         
-                        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                         }];
                         
                         [alertController addAction:okAction];
@@ -6225,9 +6226,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             //Note - this alert only shown at debug
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
             
-            UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             }];
             
             [alertController addAction:okAction];
@@ -6906,13 +6907,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
         if (self.currentRoom.type == RoomTypePersonal) {
             //Personal
-            emptyTitleString = [NSString stringWithFormat:NSLocalizedString(@"Start a conversation with %@", @""), self.otherUser.fullname];
-           emptyDescriptionString = [NSString stringWithFormat:NSLocalizedString(@"Say hi to %@ and start a conversation", @""), self.otherUser.fullname];
+            NSString *emptyTitleInitialString = NSLocalizedStringFromTableInBundle(@"Start a conversation with ", nil, [TAPUtil currentBundle], @"");
+            emptyTitleString = [NSString stringWithFormat:@"%@%@",emptyTitleInitialString, self.otherUser.fullname];
+
+            NSString *emptyDescriptionInitialString = NSLocalizedStringFromTableInBundle(@"Say hi to ", nil, [TAPUtil currentBundle], @"");
+            NSString *emptyDescriptionEndingString = NSLocalizedStringFromTableInBundle(@" and start a conversation", nil, [TAPUtil currentBundle], @"");
+            emptyDescriptionString = [NSString stringWithFormat:@"%@%@%@",emptyDescriptionInitialString, self.otherUser.fullname, emptyDescriptionEndingString];
         }
         else {
             //Group or Channel
-            emptyTitleString = [NSString stringWithFormat:NSLocalizedString(@"It seems to be quiet in %@", @""), self.currentRoom.name];
-            emptyDescriptionString = NSLocalizedString(@"Say hi to the group and start the conversation", @"");
+            NSString *emptyTitleInitialString = NSLocalizedStringFromTableInBundle(@"It seems to be quiet in ", nil, [TAPUtil currentBundle], @"");
+            emptyTitleString = [NSString stringWithFormat:@"%@%@",emptyTitleInitialString, self.currentRoom.name];
+            emptyDescriptionString = NSLocalizedStringFromTableInBundle(@"Say hi to the group and start the conversation", nil, [TAPUtil currentBundle], @"");
         }
         
         self.emptyTitleLabel.text = emptyTitleString;
@@ -7293,7 +7299,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self isShowOnlineDotStatus:NO];
     
     if (self.onlineStatus.isOnline) {
-        lastSeenString = NSLocalizedString(@"Active now", @"");
+        lastSeenString = NSLocalizedStringFromTableInBundle(@"Active now", nil, [TAPUtil currentBundle], @"");
         [self isShowOnlineDotStatus:YES];
     }
     else if (timestamp == 0) {
@@ -7302,36 +7308,40 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else if (timeGap <= midnightTimeGap) {
         if (timeGap < 60.0f) {
             //Set recently
-            lastSeenString = NSLocalizedString(@"Active recently", @"");
+            lastSeenString = NSLocalizedStringFromTableInBundle(@"Active recently", nil, [TAPUtil currentBundle], @"");
         }
         else if (timeGap < 3600.0f) {
             //Set minutes before
             NSInteger numberOfMinutes = floor(timeGap/60.0f);
             
-            NSString *minuteString = NSLocalizedString(@"minutes", @"");
+            NSString *minuteString = NSLocalizedStringFromTableInBundle(@"minutes", nil, [TAPUtil currentBundle], @"");
             
             if (timeGap < 120.0f) {
-                minuteString = NSLocalizedString(@"minute", @"");
+                minuteString = NSLocalizedStringFromTableInBundle(@"minute", nil, [TAPUtil currentBundle], @"");
             }
-            
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfMinutes, minuteString];
+        
+            NSString *initialLastSeenAppendedString = NSLocalizedStringFromTableInBundle(@"Active ", nil, [TAPUtil currentBundle], @"");
+            NSString *endingLastSeenAppendedString = NSLocalizedStringFromTableInBundle(@" ago", nil, [TAPUtil currentBundle], @"");
+            lastSeenString = [NSString stringWithFormat:@"%@%li %@%@", initialLastSeenAppendedString, (long)numberOfMinutes, minuteString, endingLastSeenAppendedString];
         }
         else {
             //Set hour before
             NSInteger numberOfHours = round(timeGap/3600.0f);
             
-            NSString *hourString = NSLocalizedString(@"hours", @"");
+            NSString *hourString = NSLocalizedStringFromTableInBundle(@"hours", nil, [TAPUtil currentBundle], @"");
             
             if (timeGap < 120.0f) {
-                hourString = NSLocalizedString(@"hour", @"");
+                hourString = NSLocalizedStringFromTableInBundle(@"hour", nil, [TAPUtil currentBundle], @"");
             }
             
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfHours, hourString];
+            NSString *initialLastSeenAppendedString = NSLocalizedStringFromTableInBundle(@"Active ", nil, [TAPUtil currentBundle], @"");
+            NSString *endingLastSeenAppendedString = NSLocalizedStringFromTableInBundle(@" ago", nil, [TAPUtil currentBundle], @"");
+            lastSeenString = [NSString stringWithFormat:@"%@%li %@%@", initialLastSeenAppendedString, (long)numberOfHours, hourString, endingLastSeenAppendedString];
         }
     }
     else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Set yesterday
-        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active yesterday", @"")];
+        lastSeenString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"Active yesterday", nil, [TAPUtil currentBundle], @"")];
     }
     else if (timeGap <= 86400.0f * 6 + midnightTimeGap) {
         //Set days ago
@@ -7342,17 +7352,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             numberOfDays = 1;
         }
         
-        NSString *dayString = NSLocalizedString(@"days", @"");
+        NSString *dayString = NSLocalizedStringFromTableInBundle(@"days", nil, [TAPUtil currentBundle], @"");
         
-        lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active %li %@ ago", @""), (long)numberOfDays, dayString];
+        NSString *initialLastSeenAppendedString = NSLocalizedStringFromTableInBundle(@"Active ", nil, [TAPUtil currentBundle], @"");
+        NSString *endingLastSeenAppendedString = NSLocalizedStringFromTableInBundle(@" ago", nil, [TAPUtil currentBundle], @"");
+        lastSeenString = [NSString stringWithFormat:@"%@%li %@%@", initialLastSeenAppendedString, (long)numberOfDays, dayString, endingLastSeenAppendedString];
         
         if (timeGap <= 86400.0f || numberOfDays == 1) {
-            lastSeenString = [NSString stringWithFormat:NSLocalizedString(@"Active yesterday", @"")];
+            lastSeenString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"Active yesterday", nil, [TAPUtil currentBundle], @"")];
         }
     }
     else if (timeGap <= 86400.0f*7 + midnightTimeGap) {
         //Set a week ago
-        lastSeenString = @"Active a week ago";
+        lastSeenString = NSLocalizedStringFromTableInBundle(@"Active a week ago", nil, [TAPUtil currentBundle], @"");
     }
     else {
         //Set date
@@ -7362,7 +7374,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         dateFormatter.dateFormat = @"dd MMM YYYY";
         NSString *formattedCreatedDate = [dateFormatter stringFromDate:lastLoginDate];
         
-        lastSeenString = [NSString stringWithFormat:@"Last active %@", formattedCreatedDate];
+        NSString *headerString = NSLocalizedStringFromTableInBundle(@"Last active", nil, [TAPUtil currentBundle], @"");
+        lastSeenString = [NSString stringWithFormat:@"%@%@", formattedCreatedDate];
     }
     
     self.userStatusLabel.text = lastSeenString;
@@ -7412,10 +7425,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.loadMoreMessageViewHeight = 20.0f;
         
         if (type == LoadMoreMessageViewTypeOlderMessage) {
-            self.loadMoreMessageLoadingLabel.text = NSLocalizedString(@"Loading Older Messages", @"");
+            self.loadMoreMessageLoadingLabel.text = NSLocalizedStringFromTableInBundle(@"Loading Older Messages", nil, [TAPUtil currentBundle], @"");
         }
         else if (type == LoadMoreMessageViewTypeNewMessage) {
-            self.loadMoreMessageLoadingLabel.text = NSLocalizedString(@"Loading New Messages", @"");
+            self.loadMoreMessageLoadingLabel.text = NSLocalizedStringFromTableInBundle(@"Loading New Messages", nil, [TAPUtil currentBundle], @"");
         }
         
         [UIView animateWithDuration:0.2f animations:^{
@@ -7488,7 +7501,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     else if (type == TopFloatingIndicatorViewTypeLoading) {
-        self.topFloatingIndicatorLabel.text = NSLocalizedString(@"Loading", @"");
+        self.topFloatingIndicatorLabel.text = NSLocalizedStringFromTableInBundle(@"Loading", nil, [TAPUtil currentBundle], @"");
         self.topFloatingIndicatorImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
     }
@@ -7756,12 +7769,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 //Override completionSelector method of save image to gallery
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"Long Press Save Image"  title:NSLocalizedString(@"Success", @"") detailInformation:NSLocalizedString(@"Image saved successfully",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"Long Press Save Image"  title:NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Image saved successfully", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 }
 
 //Override completionSelector method of save video to gallery
 - (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"Long Press Save Video"  title:NSLocalizedString(@"Success", @"") detailInformation:NSLocalizedString(@"Video saved successfully",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"Long Press Save Video"  title:NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Video saved successfully", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 }
 
 - (void)showDeleteMessageActionWithMessageArray:(NSString *)deletedMessageIDArray {
@@ -7772,7 +7785,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
         
     } failure:^(NSError *error) {
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Failed to delete message, please try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Failed to delete message, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
     
     //DV Note - Uncomment this section later to show delete for me or everyone
@@ -7785,7 +7798,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //                                            [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:NO success:^(NSArray *deletedMessageIDArray) {
     //
     //                                            } failure:^(NSError *error) {
-    //                                                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Failed to delete message, please try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    //                                                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Failed to delete message, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     //                                            }];
     //                                        }];
     //
@@ -7797,7 +7810,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //                                                  [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
     //                                                      NSLog(@"DELETE MESSAGE ID ARRAY: %@", [deletedMessageIDArray description]);
     //                                                  } failure:^(NSError *error) {
-    //                                                      [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedString(@"Sorry", @"") detailInformation:NSLocalizedString(@"Failed to delete message, please try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    //                                                      [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Failed to delete message, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     //
     //                                                  }];
     //                                              }];
@@ -8038,7 +8051,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)refreshTypingLabelState {
     if (self.currentRoom.type == RoomTypePersonal) {
-        self.typingLabel.text = NSLocalizedString(@"typing", @"");
+        self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
     }
     else {
         NSDictionary *typingUserDictionary = [[TAPChatManager sharedManager] getTypingUsersWithRoomID:self.currentRoom.roomID];
@@ -8176,7 +8189,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self setDeleteRoomButtonAsLoading:NO animated:YES];
         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
 }
 

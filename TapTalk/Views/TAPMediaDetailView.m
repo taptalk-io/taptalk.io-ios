@@ -487,7 +487,7 @@
         [self animateSaveLoading:NO];
         self.saveLoadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.saveLoadingImageView.image = [self.saveLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
-        self.saveLoadingLabel.text = NSLocalizedString(@"Image Saved", @"");
+        self.saveLoadingLabel.text = NSLocalizedStringFromTableInBundle(@"Image Saved", nil, [TAPUtil currentBundle], @"");
         self.saveLoadingButton.alpha = 1.0f;
         self.saveLoadingButton.userInteractionEnabled = YES;
     }
@@ -496,7 +496,7 @@
         [self animateSaveLoading:YES];
         self.saveLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.saveLoadingImageView.image = [self.saveLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
-        self.saveLoadingLabel.text = NSLocalizedString(@"Saving…", @"");
+        self.saveLoadingLabel.text = NSLocalizedStringFromTableInBundle(@"Saving…", nil, [TAPUtil currentBundle], @"");
         self.saveLoadingButton.alpha = 1.0f;
         self.saveLoadingButton.userInteractionEnabled = YES;
     }
@@ -540,14 +540,17 @@
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
         NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+        
+        NSString *lastMessageDateAppendString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+        lastMessageDateString = [NSString stringWithFormat:@"%@%@", lastMessageDateAppendString, dateString];
     }
     else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Yesterday
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
         NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+        NSString *lastMessageDateAppendString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+        lastMessageDateString = [NSString stringWithFormat:@"%@%@", lastMessageDateAppendString, dateString];
     }
     else {
         //Set date
@@ -555,10 +558,12 @@
         dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
         
         NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-        lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+        NSString *lastMessageDateAppendString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+        lastMessageDateString = [NSString stringWithFormat:@"%@%@", lastMessageDateAppendString, dateString];
     }
     
-    NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+    NSString *appendStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+    NSString *statusString = [NSString stringWithFormat:@"%@%@", appendStatusString, lastMessageDateString];
     return statusString;
 }
 

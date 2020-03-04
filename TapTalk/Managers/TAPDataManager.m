@@ -2545,8 +2545,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -2625,8 +2624,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -2698,8 +2696,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -2811,7 +2808,7 @@
                     failure(newError);
                 });
 #else
-                NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+                NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
                 
                 _isShouldRefreshToken = NO;
                 [self.refreshTokenLock unlock];
@@ -2949,8 +2946,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3044,8 +3040,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3058,7 +3053,8 @@
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure {
     if(roomID == nil || [roomID isEqualToString:@""]) {
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"Input Error", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Room not found", @"")}];
+        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"Input Error", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Room not found", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
         return;
     }
@@ -3150,8 +3146,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3240,8 +3235,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3312,8 +3306,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3488,8 +3481,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3665,8 +3657,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3737,8 +3728,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3814,8 +3804,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3891,8 +3880,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -3971,8 +3959,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4051,8 +4038,7 @@
             
             failure(newError, username);
     #else
-            NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-            
+            NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
             failure(localizedError, username);
     #endif
         }];
@@ -4127,8 +4113,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4206,8 +4191,7 @@
         
         failure(newError, messageArray);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError, messageArray);
 #endif
     }];
@@ -4295,8 +4279,7 @@
         
         failure(newError, messageArray);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError, messageArray);
 #endif
     }];
@@ -4479,8 +4462,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4607,8 +4589,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4688,8 +4669,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4770,8 +4750,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4842,8 +4821,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -4936,8 +4914,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5115,8 +5092,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5201,8 +5177,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5301,8 +5276,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5384,8 +5358,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5467,8 +5440,7 @@
             
             failure(newError);
     #else
-            NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-            
+            NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
             failure(localizedError);
     #endif
         }];
@@ -5552,8 +5524,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5637,8 +5608,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5721,8 +5691,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5805,8 +5774,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5883,8 +5851,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -5966,8 +5933,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];
@@ -6048,8 +6014,7 @@
         
         failure(newError);
 #else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
-        
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
     }];

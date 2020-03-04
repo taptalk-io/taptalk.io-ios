@@ -137,7 +137,7 @@
         self.retryButton.alpha = 1.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
         
-        NSString *statusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
+        NSString *statusString = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
         self.statusLabel.text = statusString;
         self.statusLabel.alpha = 1.0f;
         self.statusLabelTopConstraint.constant = 2.0f;
@@ -257,14 +257,17 @@
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+            
+            NSString *appendedDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedDateString, dateString];
         }
         else if (timeGap <= 86400.0f + midnightTimeGap) {
             //Yesterday
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+            NSString *appendedDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedDateString, dateString];
         }
         else {
             //Set date
@@ -272,10 +275,12 @@
             dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
 
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+            NSString *appendedDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedDateString, dateString];
         }
 
-        NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
         self.statusLabel.text = statusString;
 
         CGFloat animationDuration = 0.2f;
@@ -303,7 +308,7 @@
             self.retryButton.alpha = 1.0f;
             self.chatBubbleRightConstraint.constant = 16.0f;
 
-            NSString *statusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
+            NSString *statusString = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
             self.statusLabel.text = statusString;
             self.statusLabel.alpha = 1.0f;
             self.statusLabelTopConstraint.constant = 2.0f;

@@ -45,7 +45,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    self.title = NSLocalizedString(@"Scan QR Code", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"");
     [self showCustomBackButton];
     
     [self.scanQRCodeView.QRCodeButton addTarget:self action:@selector(QRCodeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -128,7 +128,7 @@
         //Display user QR Code
         [self stopReading];
         
-        self.title = NSLocalizedString(@"My QR Code", @"");
+        self.title = NSLocalizedStringFromTableInBundle(@"My QR Code", nil, [TAPUtil currentBundle], @"");
         
         NSString *userID = [TAPDataManager getActiveUser].userID;
         userID = [TAPUtil nullToEmptyString:userID];
@@ -147,7 +147,7 @@
         //Display scan QR Code menu
         [self startReading];
         [self.scanQRCodeView setScanQRCodeViewType:ScanQRCodeViewTypeScanQRCode];
-        self.title = NSLocalizedString(@"Scan QR Code", @"");
+        self.title = NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"");
     }
 }
 

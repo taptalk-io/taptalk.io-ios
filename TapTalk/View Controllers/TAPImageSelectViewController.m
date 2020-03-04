@@ -91,7 +91,7 @@
     if(self.imageSelectViewControllerType == ImageSelectViewControllerTypeGallery) {
         _selectedMediaDataArray = [NSMutableArray array];
         
-        self.title = NSLocalizedString(@"Photo Gallery", @"");
+        self.title = NSLocalizedStringFromTableInBundle(@"Photo Gallery", nil, [TAPUtil currentBundle], @"");
         // Fetch all assets, sorted by date created.
         [self getAllPhotosFromCamera];
         [self fetchCameraRollData];

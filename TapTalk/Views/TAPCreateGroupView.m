@@ -51,7 +51,7 @@
         [self.bgView addSubview:self.searchBarBackgroundView];
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
-        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for people to add", @"");
+        self.searchBarView.customPlaceHolderString = NSLocalizedStringFromTableInBundle(@"Search for people to add", nil, [TAPUtil currentBundle], @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
         UIView *separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f, CGRectGetWidth(self.frame), 1.0f)];
@@ -61,7 +61,7 @@
         UIFont *searchBarCancelButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
-        NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
+        NSString *searchBarCancelString = NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"");
         NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
         NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
         float searchBarCancelLetterSpacing = -0.4f;
@@ -103,7 +103,7 @@
         _addMembersButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
         [self.addMembersButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.addMembersButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.addMembersButtonView setButtonWithTitle:NSLocalizedString(@"Add Members", @"") andIcon:@"TAPIconAddMembers" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.addMembersButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Add Members", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconAddMembers" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         [self.addMembersButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.addMembersButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.addMembersButtonView];
@@ -111,7 +111,7 @@
         _removeMembersButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
         [self.removeMembersButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeDestructiveWithIcon];
         [self.removeMembersButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.removeMembersButtonView setButtonWithTitle:NSLocalizedString(@"Remove Member", @"") andIcon:@"TAPIconRemoveMemberRed" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.removeMembersButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconRemoveMemberRed" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         [self.removeMembersButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconDestructive]];
         self.removeMembersButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.removeMembersButtonView];
@@ -119,14 +119,14 @@
         _promoteAdminButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
         [self.promoteAdminButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.promoteAdminButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.promoteAdminButtonView setButtonWithTitle:NSLocalizedString(@"Promote to Admin", @"") andIcon:@"TAPIconAppointAdminWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.promoteAdminButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Promote to Admin", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconAppointAdminWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         self.promoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.promoteAdminButtonView];
         
         _demoteAdminButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
         [self.demoteAdminButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.demoteAdminButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.demoteAdminButtonView setButtonWithTitle:NSLocalizedString(@"Demote from Admin", @"") andIcon:@"TAPIconDemoteWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.demoteAdminButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Demote from Admin", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconDemoteWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         [self.demoteAdminButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.demoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.demoteAdminButtonView];
@@ -157,7 +157,7 @@
         UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _emptyDescriptionButton = [[UIButton alloc] initWithFrame:CGRectMake(32.0f, CGRectGetMaxY(self.emptyTitleLabel.frame) + 6.0f, CGRectGetWidth(self.emptyView.frame) - 32.0f - 32.0f, 30.0f)];
-        [self.emptyDescriptionButton setTitle:NSLocalizedString(@"Try a different search", @"") forState:UIControlStateNormal];
+        [self.emptyDescriptionButton setTitle:NSLocalizedStringFromTableInBundle(@"Try a different search", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         [self.emptyDescriptionButton setTitleColor:clickableLabelColor forState:UIControlStateNormal];
         self.emptyDescriptionButton.titleLabel.font = clickableLabelFont;
         [self.emptyView addSubview:self.emptyDescriptionButton];
@@ -193,7 +193,7 @@
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame), 44.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
         [self.continueButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypePlain];
-        [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
+        [self.continueButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
         [self.selectedContactsView addSubview:self.continueButtonView];
         
         //Save Loading View
@@ -247,7 +247,7 @@
         _loadingMemberLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.loadingMemberImageView.frame) + 8.0f, CGRectGetMinY(self.loadingMemberImageView.frame)-1.0f, 200.0f, 22.0f)];
         self.loadingMemberLabel.font = clickableLabelFont;
         self.loadingMemberLabel.textColor = clickableLabelColor;
-        self.loadingMemberLabel.text = NSLocalizedString(@"Loading Members", @"");
+        self.loadingMemberLabel.text = NSLocalizedStringFromTableInBundle(@"Loading Members", nil, [TAPUtil currentBundle], @"");
         [self.loadingMembersBackgroundView addSubview:self.loadingMemberLabel];
         
         CGSize loadingLabelFitSize = [self.loadingMemberLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.loadingMemberLabel.frame))];
@@ -337,7 +337,7 @@
 - (void)setTapCreateGroupViewType:(TAPCreateGroupViewType)tapCreateGroupViewType {
     _tapCreateGroupViewType = tapCreateGroupViewType;
     if (tapCreateGroupViewType == TAPCreateGroupViewTypeAddMember) {
-        [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Add Members", @"")];
+        [self.continueButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Add Members", nil, [TAPUtil currentBundle], @"")];
         [self showBottomActionButtonView:NO];
     }
     else if (tapCreateGroupViewType == TAPCreateGroupViewTypeMemberList) {
@@ -432,20 +432,21 @@
     switch (type) {
         case TAPCreateGroupLoadingTypeAppointAdmin:
         {
-            loadingString = @"Updating...";
-            doneLoadingString = @"Admin Promoted";
+            
+            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Admin Promoted", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPCreateGroupLoadingTypeRemoveAdmin:
         {
-            loadingString = @"Updating...";
-            doneLoadingString = @"Admin Demoted";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Admin Demoted", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPCreateGroupLoadingTypeRemoveMember:
         {
-            loadingString = @"Removing...";
-            doneLoadingString = @"Member Removed";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Removing...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Member Removed", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPCreateGroupLoadingTypeDoneLoading:
@@ -456,8 +457,8 @@
         }
         default:
         {
-            loadingString = @"Updating...";
-            doneLoadingString = @"Success";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"");
             break;
         }
     }
@@ -466,7 +467,7 @@
         [self animateSaveLoading:YES];
         self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
-        self.loadingLabel.text = NSLocalizedString(loadingString, @"");
+        self.loadingLabel.text = loadingString;
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
     }
@@ -474,7 +475,7 @@
         [self animateSaveLoading:NO];
         self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
-        self.loadingLabel.text = NSLocalizedString(doneLoadingString, @"");
+        self.loadingLabel.text = doneLoadingString;
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
     }

@@ -404,7 +404,7 @@ Get current visibility state of profile button in chat room
 /**
 Show or hide read status (green double checklist icon when read)
  
-@param isVisible (BOOL) boolean to indicating is hide or not
+@param hideReadStatus (BOOL) boolean to indicating is hide or not
 */
 - (void)setHideReadStatus:(BOOL)hideReadStatus;
 

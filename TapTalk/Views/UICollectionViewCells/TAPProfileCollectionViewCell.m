@@ -87,7 +87,7 @@
     
     if (type == profileCollectionViewCellTypeNotification) {
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Notification", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Notification", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 1.0f;
         
@@ -118,10 +118,10 @@
         self.switchButton.alpha = 0.0f;
         
         if (isBlocked) {
-            self.titleLabel.text = NSLocalizedString(@"Unblock User", @"");
+            self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Unblock User", nil, [TAPUtil currentBundle], @"");
         }
         else {
-            self.titleLabel.text = NSLocalizedString(@"Block User", @"");
+            self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Block User", nil, [TAPUtil currentBundle], @"");
         }
         
         self.rightIconImageView.alpha = 0.0f;
@@ -131,7 +131,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuConversationColor]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Conversation Color", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Conversation Color", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         
@@ -142,7 +142,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuClearChat]];
 
         self.titleLabel.textColor = titleLabelDestructiveColor;
-        self.titleLabel.text = NSLocalizedString(@"Clear Chat", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Clear Chat", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -152,7 +152,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuClearChat]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
-        self.titleLabel.text = NSLocalizedString(@"Leave Group", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Leave Group", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -161,7 +161,7 @@
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
-        self.titleLabel.text = NSLocalizedString(@"Delete Group", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Delete Group", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -172,7 +172,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupProfileMenuViewMembers]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"View Group Members", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"View Group Members", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 1.0f;
@@ -183,7 +183,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuRemoveMember]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
-        self.titleLabel.text = NSLocalizedString(@"Remove Member", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -193,7 +193,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Promote to Admin", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Promote to Admin", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -203,7 +203,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Demote from Admin", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Demote from Admin", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -213,7 +213,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuSendMessage]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Send Message", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -223,7 +223,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Add to Contacts", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;

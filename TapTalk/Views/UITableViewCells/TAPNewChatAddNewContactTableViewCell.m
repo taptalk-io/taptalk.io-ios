@@ -27,7 +27,7 @@
         UIFont *infoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
         UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
         _descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 24.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, 18.0f)];
-        self.descriptionLabel.text = NSLocalizedString(@"Can’t find the contact you were looking for?", @"");
+        self.descriptionLabel.text = NSLocalizedStringFromTableInBundle(@"Can’t find the contact you were looking for?", nil, [TAPUtil currentBundle], @"");
         self.descriptionLabel.textColor = infoLabelColor;
         self.descriptionLabel.font = infoLabelFont;
         self.descriptionLabel.textAlignment = NSTextAlignmentCenter;
@@ -43,7 +43,7 @@
         UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.descriptionLabel.frame) + 8.0f, CGRectGetWidth(self.descriptionLabel.frame), 22.0f)];
-        self.titleLabel.text = NSLocalizedString(@"Add New Contact", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Add New Contact", nil, [TAPUtil currentBundle], @"");
         self.titleLabel.textColor = clickableLabelColor;
         self.titleLabel.font = clickableLabelFont;
         self.titleLabel.textAlignment = NSTextAlignmentCenter;

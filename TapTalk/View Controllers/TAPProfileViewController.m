@@ -638,11 +638,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     
                     if (self.isCurrentActiveUserIsAdmin && [self.room.participants count] == 1) {
                         //delete group
-                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Delete Group" title:NSLocalizedString(@"Delete Group", @"") detailInformation:NSLocalizedString(@"All data & participants in the group will be removed. This action is irreversible.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Delete"];
+                        
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Delete Group" title:NSLocalizedStringFromTableInBundle(@"Delete Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"All data & participants in the group will be removed. This action is irreversible.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Delete", nil, [TAPUtil currentBundle], @"")];
                     }
                     else {
                         //leave group
-                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedString(@"Leave Group", @"") detailInformation:NSLocalizedString(@"You will no longer be a participant and will lose access to all the data shared within the group.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Leave"];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedStringFromTableInBundle(@"Leave Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"You will no longer be a participant and will lose access to all the data shared within the group.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Leave", nil, [TAPUtil currentBundle], @"")];
                     }
                 }
             }
@@ -658,7 +659,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 if ([currentUserID isEqualToString:self.user.userID]) {
                     //Add theirselves
                     [self removeLoadingView];
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Can't add yourself as contact", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }
                 else {
                     [TAPDataManager callAPIAddContactWithUserID:self.user.userID success:^(NSString *message, TAPUserModel *user) {
@@ -690,7 +691,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else if (indexPath.row == 2) {
                 //appoint & remove admin
                 if ([self.room.admins containsObject:self.user.userID]) {
-                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Demote Admin" title:NSLocalizedString(@"Demote Admin", @"") detailInformation:NSLocalizedString(@"Are you sure you want to demote this admin?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"OK"];
+                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Demote Admin" title:NSLocalizedStringFromTableInBundle(@"Demote Admin", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to demote this admin?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
                 }
                 else {
                     //appoint as admin
@@ -713,14 +714,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [self removeLoadingView];
                         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Promote Admin" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Promote Admin" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                     }];
 
                 }
                 
             }    else if (indexPath.row == 3) {
                 //remove member
-                 [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Remove Member" title:NSLocalizedString(@"Remove Member", @"") detailInformation:NSLocalizedString(@"Are you sure you want to remove this member?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"OK"];
+                 [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Remove Member" title:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to remove this member?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
             }
             
         }
@@ -980,7 +981,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Demote Admin" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Demote Admin" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
     else if ([popupIdentifier isEqualToString:@"Remove Member"]) {
@@ -1004,7 +1005,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Remove Member" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Remove Member" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
         
     }
@@ -1034,13 +1035,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [self removeLoadingView];
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                 errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
             }];
         } failure:^(NSError *error) {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
     else if ([popupIdentifier isEqualToString:@"Delete Group"]) {
@@ -1070,14 +1071,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [self removeLoadingView];
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                 errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
             }];
             
         } failure:^(NSError *error) {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
 }

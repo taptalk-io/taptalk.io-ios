@@ -38,7 +38,7 @@
     [super loadView];
     
     _photoAlbumListView = [[TAPPhotoAlbumListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
-    self.title = NSLocalizedString(@"Albums", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Albums", nil, [TAPUtil currentBundle], @"");
     
     [self.view addSubview:self.photoAlbumListView];
 }

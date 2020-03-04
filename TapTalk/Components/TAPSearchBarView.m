@@ -53,13 +53,13 @@
         [leftView addSubview:leftViewImageView];
         self.searchTextField.leftView = leftView;
         self.searchTextField.leftViewMode = UITextFieldViewModeAlways;
-        NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(@"Search", @"")];
+        NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedStringFromTableInBundle(@"Search", nil, [TAPUtil currentBundle], @"")];
         [placeHolderAttributedString addAttribute:NSFontAttributeName
                                             value:searchBarPlaceholderFont
-                                            range:NSMakeRange(0, [NSLocalizedString(@"Search", @"") length])];
+                                            range:NSMakeRange(0, [NSLocalizedStringFromTableInBundle(@"Search", nil, [TAPUtil currentBundle], @"") length])];
         [placeHolderAttributedString addAttribute:NSForegroundColorAttributeName
                                             value:searchBarPlaceholderColor
-                                            range:NSMakeRange(0, [NSLocalizedString(@"Search", @"") length])];
+                                            range:NSMakeRange(0, [NSLocalizedStringFromTableInBundle(@"Search", nil, [TAPUtil currentBundle], @"") length])];
         self.searchTextField.attributedPlaceholder = placeHolderAttributedString;
         self.searchTextField.layer.cornerRadius = 10.0f;
         self.searchTextField.layer.borderWidth = 1.0f;
@@ -168,7 +168,7 @@
     
     UIFont *searchBarPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextPlaceholder];
     UIColor *searchBarPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextPlaceholder];
-    NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(self.customPlaceHolderString, @"")];
+    NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:self.customPlaceHolderString];
     [placeHolderAttributedString addAttribute:NSFontAttributeName
                                         value:searchBarPlaceholderFont
                                         range:NSMakeRange(0, [self.customPlaceHolderString length])];

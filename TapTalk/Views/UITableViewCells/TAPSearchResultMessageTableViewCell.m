@@ -136,7 +136,7 @@
     }
     else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Yesterday
-        timeString = NSLocalizedString(@"Yesterday", @"");
+        timeString = NSLocalizedStringFromTableInBundle(@"Yesterday", nil, [TAPUtil currentBundle], @"");
     }
     else {
         //Set date
@@ -305,7 +305,7 @@
     //Last Message
     TAPUserModel *activeUser = [TAPDataManager getActiveUser];
     if (user.userID == activeUser.userID) {
-        self.lastSenderLabel.text = NSLocalizedString(@"You: ", @"");
+        self.lastSenderLabel.text = NSLocalizedStringFromTableInBundle(@"You: ", nil, [TAPUtil currentBundle], @"");
     }
     else if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         NSString *fullName = user.fullname;

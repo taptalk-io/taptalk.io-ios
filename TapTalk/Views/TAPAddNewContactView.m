@@ -80,13 +80,13 @@
         [self addSubview:self.searchBarBackgroundView];
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
-        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search by username", @"");
+        self.searchBarView.customPlaceHolderString = NSLocalizedStringFromTableInBundle(@"Search by username", nil, [TAPUtil currentBundle], @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
-        NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
+        NSString *searchBarCancelString = NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"");
         NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
         NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat searchBarCancelLetterSpacing = -0.4f;
@@ -115,7 +115,7 @@
         
         _defaultLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarView.frame) + 23.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 40.0f)];
         self.backgroundColor = [UIColor clearColor];
-        self.defaultLabel.text = NSLocalizedString(@"Usernames are not case sensitive, but make sure you input the exact characters", @"");
+        self.defaultLabel.text = NSLocalizedStringFromTableInBundle(@"Usernames are not case sensitive, but make sure you input the exact characters", nil, [TAPUtil currentBundle], @"");
         self.defaultLabel.textColor = infoLabelBodyColor;
         self.defaultLabel.font = infoLabelBodyFont;
         self.defaultLabel.textAlignment = NSTextAlignmentCenter;
@@ -129,11 +129,11 @@
     
         [defaultLabelAttributedString addAttribute:NSFontAttributeName
                                                value:infoLabelBodyBoldFont
-                                               range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"not case sensitive", @"")]];
+                                               range:[self.defaultLabel.text rangeOfString:NSLocalizedStringFromTableInBundle(@"not case sensitive", nil, [TAPUtil currentBundle], @"")]];
         
         [defaultLabelAttributedString addAttribute:NSFontAttributeName
                                              value:infoLabelBodyBoldFont
-                                             range:[self.defaultLabel.text rangeOfString:NSLocalizedString(@"exact characters", @"")]];
+                                             range:[self.defaultLabel.text rangeOfString:NSLocalizedStringFromTableInBundle(@"exact characters", nil, [TAPUtil currentBundle], @"")]];
 
         self.defaultLabel.attributedText = defaultLabelAttributedString;
         
@@ -232,7 +232,7 @@
         UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
         UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
         _addExpertToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
-        self.addExpertToContactLabel.text = NSLocalizedString(@"Add to Contacts", @"");
+        self.addExpertToContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
         self.addExpertToContactLabel.font = buttonLabelFont;
         self.addExpertToContactLabel.textColor = buttonLabelColor;
         self.addExpertToContactLabel.textAlignment = NSTextAlignmentCenter;
@@ -259,7 +259,7 @@
         [self.searchExpertView addSubview:self.expertChatNowButtonView];
         
         _expertChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
-        self.expertChatNowLabel.text = NSLocalizedString(@"Chat Now", @"");
+        self.expertChatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
         self.expertChatNowLabel.font = buttonLabelFont;
         self.expertChatNowLabel.textColor = buttonLabelColor;
         self.expertChatNowLabel.textAlignment = NSTextAlignmentCenter;
@@ -290,7 +290,7 @@
         UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _searchSelfExpertLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.searchSelfExpertView.frame), CGRectGetHeight(self.searchSelfExpertView.frame))];
-        self.searchSelfExpertLabel.text = NSLocalizedString(@"This is you", @"");
+        self.searchSelfExpertLabel.text = NSLocalizedStringFromTableInBundle(@"This is you", nil, [TAPUtil currentBundle], @"");
         self.searchSelfExpertLabel.font = clickableLabelFont;
         self.searchSelfExpertLabel.textColor = clickableLabelColor;
         self.searchSelfExpertLabel.textAlignment = NSTextAlignmentCenter;
@@ -367,7 +367,7 @@
         [self.searchUserView addSubview:self.addUserToContactButtonView];
         
         _addUserToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
-        self.addUserToContactLabel.text = NSLocalizedString(@"Add to Contacts", @"");
+        self.addUserToContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
         self.addUserToContactLabel.font = buttonLabelFont;
         self.addUserToContactLabel.textColor = buttonLabelColor;
         self.addUserToContactLabel.textAlignment = NSTextAlignmentCenter;
@@ -395,7 +395,7 @@
         [self.searchUserView addSubview:self.userChatNowButtonView];
         
         _userChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
-        self.userChatNowLabel.text = NSLocalizedString(@"Chat Now", @"");
+        self.userChatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
         self.userChatNowLabel.font = buttonLabelFont;
         self.userChatNowLabel.textColor = buttonLabelColor;
         self.userChatNowLabel.textAlignment = NSTextAlignmentCenter;
@@ -424,7 +424,7 @@
         [self.searchUserView addSubview:self.searchSelfUserView];
         
         _searchSelfUserLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.searchSelfUserView.frame), CGRectGetHeight(self.searchSelfUserView.frame))];
-        self.searchSelfUserLabel.text = NSLocalizedString(@"This is you", @"");
+        self.searchSelfUserLabel.text = NSLocalizedStringFromTableInBundle(@"This is you", nil, [TAPUtil currentBundle], @"");
         self.searchSelfUserLabel.font = clickableLabelFont;
         self.searchSelfUserLabel.textColor = clickableLabelColor;
         self.searchSelfUserLabel.textAlignment = NSTextAlignmentCenter;
@@ -442,7 +442,7 @@
 //        [self.emptyStateView addSubview:self.emptyStateImageView];
         
 //        _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 40.0f)];
-//        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+//        self.emptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Oops…\nCould not find any results", nil, [TAPUtil currentBundle], @"");
 //        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
 //        NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
 //        //set attribute
@@ -463,7 +463,7 @@
         UIFont *bodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
         
         _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 60.0f)];
-        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+        self.emptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Oops…\nCould not find any results", nil, [TAPUtil currentBundle], @"");
         self.emptyStateLabel.font = bodyLabelFont;
         NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //set attribute

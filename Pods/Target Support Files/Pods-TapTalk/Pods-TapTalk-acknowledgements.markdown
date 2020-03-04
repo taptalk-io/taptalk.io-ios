@@ -26,11 +26,11 @@ THE SOFTWARE.
 
 ## GoogleMaps
 
-Copyright 2019 Google
+Copyright 2020 Google
 
 ## GooglePlaces
 
-Copyright 2019 Google
+Copyright 2020 Google
 
 ## JSONModel
 
@@ -331,7 +331,7 @@ regulations.
 
 ## SDWebImage
 
-Copyright (c) 2009-2017 Olivier Poitrey rs@dailymotion.com
+Copyright (c) 2009-2018 Olivier Poitrey rs@dailymotion.com
  
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -121,7 +121,7 @@
         self.navigationHeaderLabel.textColor = navigationBarTitleLabelColor;
         self.navigationHeaderLabel.font = navigationBarTitleLabelFont;
         self.navigationHeaderLabel.textAlignment = NSTextAlignmentCenter;
-        self.navigationHeaderLabel.text = NSLocalizedString(@"My Account", @"");
+        self.navigationHeaderLabel.text = NSLocalizedStringFromTableInBundle(@"My Account", nil, [TAPUtil currentBundle], @"");
         [self.navigationHeaderView addSubview:self.navigationHeaderLabel];
         
         _initialNameView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
@@ -165,7 +165,7 @@
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _changeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame) + 8.0f, 100.0f, 22.0f)];
         self.changeLabel.font = clickableLabelFont;
-        self.changeLabel.text = NSLocalizedString(@"Change", @"");
+        self.changeLabel.text = NSLocalizedStringFromTableInBundle(@"Change", nil, [TAPUtil currentBundle], @"");
         self.changeLabel.textColor = clickableLabelColor;
         CGSize changeLabelSize = [self.changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
         self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
@@ -174,7 +174,7 @@
         _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame) + 8.0f, CGRectGetWidth(self.frame), 22.0f)];
         self.loadingLabel.font = clickableLabelFont;
         self.loadingLabel.textColor = clickableLabelColor;
-        self.loadingLabel.text = NSLocalizedString(@"Uploading", @"");
+        self.loadingLabel.text = NSLocalizedStringFromTableInBundle(@"Uploading", nil, [TAPUtil currentBundle], @"");
         self.loadingLabel.alpha = 0.0f;
         self.loadingLabel.textAlignment = NSTextAlignmentCenter;
         [self.scrollView addSubview:self.loadingLabel];
@@ -236,7 +236,7 @@
         UIColor *clickableDestructiveColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableDestructiveLabel];
         CGFloat logoutLabelWidth = CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f - 15.0f - 15.0f;
         _logoutLabel = [[UILabel alloc] initWithFrame:CGRectMake(15.0f, 0.0f, logoutLabelWidth, CGRectGetHeight(self.logoutView.frame))];
-        self.logoutLabel.text = NSLocalizedString(@"Logout", @"");
+        self.logoutLabel.text = NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"");
         self.logoutLabel.textColor = clickableDestructiveColor;
         self.logoutLabel.font = clickableDestructiveFont;
         [self.logoutView addSubview:self.logoutLabel];
@@ -246,7 +246,7 @@
 
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
-        [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
+        [self.continueButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
 //        [self.scrollView addSubview:self.continueButtonView]; //CS TEMP - hide continue button
 
         //Logout Loading View
@@ -516,7 +516,7 @@
         
         self.logoutLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.logoutLoadingImageView.image = [self.logoutLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
-        self.logoutLoadingLabel.text = NSLocalizedString(@"Logging out...", @"");
+        self.logoutLoadingLabel.text = NSLocalizedStringFromTableInBundle(@"Logging out...", nil, [TAPUtil currentBundle], @"");
         self.logoutLoadingButton.alpha = 1.0f;
         self.logoutLoadingButton.userInteractionEnabled = YES;
 

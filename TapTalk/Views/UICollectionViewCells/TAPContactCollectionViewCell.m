@@ -68,7 +68,7 @@
     NSString *profileImageURL = user.imageURL.thumbnail;
     NSString *contactName = user.fullname;
     if ([user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        contactName = NSLocalizedString(@"You", @"");
+        contactName = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
     }
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {

@@ -51,7 +51,7 @@
         UIFont *popupTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogTitle];
         UIColor *popupTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogTitle];
         _titleFirstLoadLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.firstLoadImageView.frame) + 8.0f, CGRectGetWidth(self.firstLoadView.frame) - 16.0f - 16.0f, 20.0f)];
-        self.titleFirstLoadLabel.text = NSLocalizedString(@"Setting up Your Chat Room", @"");
+        self.titleFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Setting up Your Chat Room", nil, [TAPUtil currentBundle], @"");
         self.titleFirstLoadLabel.textColor = popupTitleLabelColor;
         self.titleFirstLoadLabel.font = popupTitleLabelFont;
         NSMutableDictionary *titleFirstLoadAttributesDictionary = [NSMutableDictionary dictionary];
@@ -68,7 +68,7 @@
         UIColor *popupBodyLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogBody];
         _descriptionFirstLoadLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleFirstLoadLabel.frame), CGRectGetMaxY(self.titleFirstLoadLabel.frame), CGRectGetWidth(self.titleFirstLoadLabel.frame), 18.0f)];
         self.descriptionFirstLoadLabel.textAlignment = NSTextAlignmentCenter;
-        self.descriptionFirstLoadLabel.text = NSLocalizedString(@"Make sure you have a stable conection", @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable conection", nil, [TAPUtil currentBundle], @"");
         self.descriptionFirstLoadLabel.textColor = popupBodyLabelColor;
         self.descriptionFirstLoadLabel.font = popupBodyLabelFont;
         NSMutableDictionary *descriptionFirstLoadAttributesDictionary = [NSMutableDictionary dictionary];
@@ -84,7 +84,7 @@
         UIColor *retryLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _retryLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleFirstLoadLabel.frame), CGRectGetMaxY(self.titleFirstLoadLabel.frame), CGRectGetWidth(self.titleFirstLoadLabel.frame), 18.0f)];
         self.retryLabel.textAlignment = NSTextAlignmentCenter;
-        self.retryLabel.text = NSLocalizedString(@"Retry Setup", @"");
+        self.retryLabel.text = NSLocalizedStringFromTableInBundle(@"Retry Setup", nil, [TAPUtil currentBundle], @"");
         self.retryLabel.textColor = retryLabelColor;
         self.retryLabel.font = retryLabelFont;
         [self.retryLabel sizeToFit];
@@ -115,8 +115,8 @@
     }
     
     if (type == TAPSetupRoomListViewTypeSettingUp) {
-        self.titleFirstLoadLabel.text = NSLocalizedString(@"Setting up Your Chat Room", @"");
-        self.descriptionFirstLoadLabel.text = NSLocalizedString(@"Make sure you have a stable conection", @"");
+        self.titleFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Setting up Your Chat Room", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable conection", nil, [TAPUtil currentBundle], @"");
         self.firstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconNewSettingUp" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -128,8 +128,8 @@
         self.retryButton.alpha = 0.0f;
     }
     else if (type == TAPSetupRoomListViewTypeSuccess) {
-        self.titleFirstLoadLabel.text = NSLocalizedString(@"Setup successful", @"");
-        self.descriptionFirstLoadLabel.text = NSLocalizedString(@"You are all set and ready to go!", @"");
+        self.titleFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Setup successful", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"You are all set and ready to go!", nil, [TAPUtil currentBundle], @"");
         self.firstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoaderSuccess" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListSetUpSuccess]];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconNewSetupSuccess" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -140,8 +140,8 @@
         self.retryButton.alpha = 1.0f;
     }
     else if (type == TAPSetupRoomListViewTypeFailed) {
-        self.titleFirstLoadLabel.text = NSLocalizedString(@"Setup failed", @"");
-        self.descriptionFirstLoadLabel.text = NSLocalizedString(@"", @"");
+        self.titleFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Setup failed", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = @"";
         self.firstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoaderSuccess" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListSetUpFailure]];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconSetupFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];

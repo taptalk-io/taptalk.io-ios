@@ -66,7 +66,7 @@
     self.addNewChatView.searchResultTableView.delegate = self;
     self.addNewChatView.searchResultTableView.dataSource = self;
     
-    self.title = NSLocalizedString(@"New Chat", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"New Chat", nil, [TAPUtil currentBundle], @"");
     
     [self showCustomCloseButton];
     
@@ -452,9 +452,9 @@
             NSString *selectedUsername = selectedUser.username;
             if ([currentUsername isEqualToString:selectedUsername]) {
                 //SELECTED THE USER ITSELF
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:@"Cannot chat with yourself, please select other room" preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") message:@"Cannot chat with yourself, please select other room" preferredStyle:UIAlertControllerStyleAlert];
                 
-                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 }];
                 
                 [alertController addAction:okAction];
@@ -494,9 +494,9 @@
             NSString *selectedUsername = selectedUser.username;
             if ([currentUsername isEqualToString:selectedUsername]) {
                 //Chat with himself/herself
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:@"Cannot chat with yourself, please select other room" preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") message:@"Cannot chat with yourself, please select other room" preferredStyle:UIAlertControllerStyleAlert];
                 
-                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 }];
                 
                 [alertController addAction:okAction];
@@ -598,7 +598,7 @@
     //Sync Button Tapped
 //    [self syncContactWithLoading:YES];
     
-    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Sync Contact Manually" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Sync Contact Manually" title:NSLocalizedStringFromTableInBundle(@"Contact Access", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Allow", nil, [TAPUtil currentBundle], @"")];
 }
 
 #pragma mark TAPAddNewContactViewController
@@ -705,7 +705,7 @@
                 [[NSUserDefaults standardUserDefaults] synchronize];
                 
                 if (loading) {
-                    [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"Syncing Contacts", @"") type:TAPSyncNotificationViewTypeSyncing];
+                    [self.addNewChatView showSyncNotificationWithString:NSLocalizedStringFromTableInBundle(@"Syncing Contacts", nil, [TAPUtil currentBundle], @"") type:TAPSyncNotificationViewTypeSyncing];
                 }
                 
                 //keys with fetching properties
@@ -764,19 +764,19 @@
                             if ([users count] > 0) {
                                 //new contacts synced
                                 
-                                NSString *contactString = NSLocalizedString(@"Contact", @"");
+                                NSString *contactString = NSLocalizedStringFromTableInBundle(@"Contact", nil, [TAPUtil currentBundle], @"");
                                 if ([users count] > 1) {
-                                    contactString = NSLocalizedString(@"Contacts", @"");
+                                    contactString = NSLocalizedStringFromTableInBundle(@"Contacts", nil, [TAPUtil currentBundle], @"");
                                 }
                                 
-                                NSString *syncedString = NSLocalizedString(@"Synced", @"");
+                                NSString *syncedString = NSLocalizedStringFromTableInBundle(@"Synced", nil, [TAPUtil currentBundle], @"");
                                 
                                 [self.addNewChatView showSyncNotificationWithString:[NSString stringWithFormat:@"%@ %ld %@", syncedString, [users count], contactString] type:TAPSyncNotificationViewTypeSynced];
                             }
                             else {
                                 //All contacts synced
                                 if (loading) {
-                                    [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"All Contacts Synced", @"") type:TAPSyncNotificationViewTypeSynced];
+                                    [self.addNewChatView showSyncNotificationWithString:NSLocalizedStringFromTableInBundle(@"All Contacts Synced", nil, [TAPUtil currentBundle], @"") type:TAPSyncNotificationViewTypeSynced];
                                 }
                             }
                         } failure:^(NSError *error) {
@@ -788,19 +788,20 @@
                     else {
                         //No New Contacts
                         if (loading) {
-                            [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"All Contacts Synced", @"") type:TAPSyncNotificationViewTypeSynced];
+                            [self.addNewChatView showSyncNotificationWithString:NSLocalizedStringFromTableInBundle(@"All Contacts Synced", nil, [TAPUtil currentBundle], @"") type:TAPSyncNotificationViewTypeSynced];
                         }
                     }
                 }
             }
             else {
                 NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSContactsUsageDescription"];
-                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
                 
-                UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
+                
+                UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
                 [alertController addAction:cancelAction];
                 
-                UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     if (IS_IOS_11_OR_ABOVE) {
                         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
                     }
@@ -841,7 +842,7 @@
         }];
     }
     else {
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Contact Access" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Contact Access" title:NSLocalizedStringFromTableInBundle(@"Contact Access", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Allow", nil, [TAPUtil currentBundle], @"")];
         [[TAPContactManager sharedManager] setContactPermissionAsked];
         [[NSUserDefaults standardUserDefaults] setSecureBool:NO forKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
         [[NSUserDefaults standardUserDefaults] synchronize];

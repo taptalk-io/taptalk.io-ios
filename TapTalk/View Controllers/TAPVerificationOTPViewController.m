@@ -60,7 +60,7 @@
     [self.verificationOTPView showResendVerificationButton:NO];
     
     if (self.isNeedShowLoadingRequestingOTP) {
-        [self.verificationOTPView showLoading:YES animated:NO title:NSLocalizedString(@"Requesting OTP", @"")];
+        [self.verificationOTPView showLoading:YES animated:NO title:NSLocalizedStringFromTableInBundle(@"Requesting OTP", nil, [TAPUtil currentBundle], @"")];
     }
     
     NSDictionary *phoneDictionary = [[NSUserDefaults standardUserDefaults] secureDictionaryForKey:TAP_PREFS_USER_LOGIN_PHONE_TEMP_DICTIONARY valid:nil];
@@ -143,7 +143,7 @@
     [self.verificationOTPView inputCodeWithUserInputData:@""];
     self.verificationOTPView.codeTextField.text = @"";
     
-    [self.verificationOTPView showLoading:YES animated:NO title:NSLocalizedString(@"Requesting OTP", @"")];
+    [self.verificationOTPView showLoading:YES animated:NO title:NSLocalizedStringFromTableInBundle(@"Requesting OTP", nil, [TAPUtil currentBundle], @"")];
     
     [TAPDataManager callAPIRequestVerificationCodeWithPhoneNumber:self.phoneNumber countryID:self.countryID method:@"phone" success:^(NSString *OTPKey, NSString *OTPID, NSString *successMessage) {
         [self.verificationOTPView showLoading:NO animated:NO title:@""];
@@ -219,7 +219,7 @@
     _isLoading = YES;
     [self.verificationOTPView.timer invalidate];
     [self.verificationOTPView removeLoadingSpinAnimation];
-    [self.verificationOTPView showLoading:YES animated:NO title:NSLocalizedString(@"Verifying OTP", @"")];
+    [self.verificationOTPView showLoading:YES animated:NO title:NSLocalizedStringFromTableInBundle(@"Verifying OTP", nil, [TAPUtil currentBundle], @"")];
     
     [TAPDataManager callAPIVerifyOTPWithCode:verificationCode OTPID:self.OTPID OTPKey:self.OTPKey success:^(BOOL isRegistered, NSString *userID, NSString *ticket) {
 
@@ -243,9 +243,9 @@
 
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                 errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
 
-                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 }];
 
                 [alertController addAction:okAction];

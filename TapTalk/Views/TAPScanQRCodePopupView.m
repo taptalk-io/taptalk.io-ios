@@ -163,7 +163,7 @@
         UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _selfInformedLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, CGRectGetMaxY(self.addedUserFullnameLabel.frame) + self.selfInformedLabelTopGap, CGRectGetWidth(self.whiteBaseView.frame) - 24.0f - 24.0f, 18.0f)];
-        self.selfInformedLabel.text = NSLocalizedString(@"This is you", @"");
+        self.selfInformedLabel.text = NSLocalizedStringFromTableInBundle(@"This is you", nil, [TAPUtil currentBundle], @"");
         self.selfInformedLabel.font = clickableLabelFont;
         self.selfInformedLabel.textColor = clickableLabelColor;
         self.selfInformedLabel.textAlignment = NSTextAlignmentCenter;
@@ -198,7 +198,7 @@
         self.addContactLabel.font = buttonLabelFont;
         self.addContactLabel.textColor = buttonLabelColor;
         self.addContactLabel.textAlignment = NSTextAlignmentCenter;
-        self.addContactLabel.text = NSLocalizedString(@"Add To Contacts", @"");
+        self.addContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add To Contacts", nil, [TAPUtil currentBundle], @"");
         [self.addContactView addSubview:self.addContactLabel];
         
         CGSize addContactDefaultLabelSize = [self.addContactLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.addContactLabel.frame))];
@@ -228,7 +228,7 @@
         self.chatNowLabel.font = buttonLabelFont;
         self.chatNowLabel.textColor = buttonLabelColor;
         self.chatNowLabel.textAlignment = NSTextAlignmentCenter;
-        self.chatNowLabel.text = NSLocalizedString(@"Chat Now", @"");
+        self.chatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
         [self.chatNowView addSubview:self.chatNowLabel];
         
         CGSize chatNowDefaultLabelSize = [self.chatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.chatNowLabel.frame))];
@@ -341,8 +341,8 @@
     }
     else if (type == ScanQRCodePopupViewTypeNewFriend) {
         //First time add user, showing icon add friend
-        NSString *localizedTemplateSuccessHeaderString = NSLocalizedString(@"You have added", @"");
-        NSString *localizedTemplateSuccessFooterString = NSLocalizedString(@"to your contacts", @"");
+        NSString *localizedTemplateSuccessHeaderString = NSLocalizedStringFromTableInBundle(@"You have added", nil, [TAPUtil currentBundle], @"");
+        NSString *localizedTemplateSuccessFooterString = NSLocalizedStringFromTableInBundle(@"to your contacts", nil, [TAPUtil currentBundle], @"");
         self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@ %@", localizedTemplateSuccessHeaderString, addedUserFullName, localizedTemplateSuccessFooterString];
         
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
@@ -363,7 +363,7 @@
         [self resizeToStandardPopupView];
     }
     else if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
-        NSString *localizedTemplateSuccessString = NSLocalizedString(@"is already in your contacts", @"");
+        NSString *localizedTemplateSuccessString = NSLocalizedStringFromTableInBundle(@"is already in your contacts", nil, [TAPUtil currentBundle], @"");
         self.successAddContactLabel.text = [NSString stringWithFormat:@"%@ %@", addedUserFullName, localizedTemplateSuccessString];
         
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];

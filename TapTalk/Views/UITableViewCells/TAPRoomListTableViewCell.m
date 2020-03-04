@@ -148,7 +148,7 @@
         [self.typingView addSubview:self.typingAnimationImageView];
         
         _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f, 16.0f)];
-        self.typingLabel.text = NSLocalizedString(@"typing", @"");
+        self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
         self.typingLabel.font = roomListMessageLabelFont;
         self.typingLabel.textColor = roomListMessageLabelColor;
         [self.typingLabel sizeToFit];
@@ -250,7 +250,7 @@
     if (isGroup) {
         TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
         if ([currentActiveUser.userID isEqualToString:message.user.userID]) {
-            lastSender = NSLocalizedString(@"You", @"");
+            lastSender = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
         }
         else {
             lastSender = message.user.fullname;
@@ -285,7 +285,7 @@
     }
     else if (timeGap <= 86400.0f + midnightTimeGap) {
         //Yesterday
-        timeString = NSLocalizedString(@"Yesterday", @"");
+        timeString = NSLocalizedStringFromTableInBundle(@"Yesterday", nil, [TAPUtil currentBundle], @"");
     }
     else {
         //Set date
@@ -481,10 +481,10 @@
         NSString *lastMessageUserID = message.user.userID;
         if ([lastMessageUserID isEqualToString:currentUserID]) {
             //last message is from ourselves
-            lastMessage = NSLocalizedString(@"You deleted this message.", @"");
+            lastMessage = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
         }
         else {
-            lastMessage = NSLocalizedString(@"This message was deleted.", @"");
+            lastMessage = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
         }
         
         self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -731,7 +731,7 @@
 
 - (void)refreshTypingLabelState {
     if (self.roomType == RoomTypePersonal) {
-        self.typingLabel.text = NSLocalizedString(@"typing", @"");
+        self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
     }
     else {
         NSDictionary *typingUserDictionary = [[TAPChatManager sharedManager] getTypingUsersWithRoomID:self.roomID];

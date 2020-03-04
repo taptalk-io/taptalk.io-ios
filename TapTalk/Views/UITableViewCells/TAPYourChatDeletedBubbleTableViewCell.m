@@ -108,7 +108,7 @@
 
 - (void)setMessage:(TAPMessageModel *)message {
     _message = message;
-    self.bubbleLabel.text = NSLocalizedString(@"This message was deleted.", @"");
+    self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
     
     //CS NOTE - check chat room type, show sender info if group type
     if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
@@ -185,14 +185,16 @@
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
         }
         else if (timeGap <= 86400.0f + midnightTimeGap) {
             //Yesterday
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
         }
         else {
             //Set date
@@ -200,10 +202,12 @@
             dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
             
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
         }
         
-        NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
         self.statusLabel.text = statusString;
         
         self.chatBubbleButton.alpha = 1.0f;

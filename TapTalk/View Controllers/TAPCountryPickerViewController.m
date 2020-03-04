@@ -64,7 +64,7 @@
     _countryListArray = [[NSArray alloc] init];
     _updatedString = @"";
     
-    self.title = NSLocalizedString(@"Select Country", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Select Country", nil, [TAPUtil currentBundle], @"");
     
     self.countryPickerView.searchBarView.delegate = self;
     self.countryPickerView.tableView.delegate = self;

@@ -46,7 +46,7 @@
 }
 
 - (void)setHeaderNumericKeyboardButtonTitleWithText:(NSString *)title {
-    [self.doneKeyboardButton setTitle:NSLocalizedString(title, @"") forState:UIControlStateNormal];
+    [self.doneKeyboardButton setTitle:title forState:UIControlStateNormal];
 }
 
 - (void)setIsLoading:(BOOL)isLoading {

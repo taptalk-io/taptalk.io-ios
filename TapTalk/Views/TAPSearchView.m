@@ -34,7 +34,7 @@
         _recentSearchLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, 150.0f, 13.0f)];
         self.recentSearchLabel.font = sectionHeaderLabelFont;
         self.recentSearchLabel.textColor = sectionHeaderLabelColor;
-        self.recentSearchLabel.text = NSLocalizedString(@"RECENT", @"");
+        self.recentSearchLabel.text = NSLocalizedStringFromTableInBundle(@"RECENT", nil, [TAPUtil currentBundle], @"");
         
         NSMutableAttributedString *recentSearchLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.recentSearchLabel.text];
         [recentSearchLabelAttributedString addAttribute:NSKernAttributeName
@@ -92,7 +92,7 @@
         //        [self.emptyStateView addSubview:self.emptyStateImageView];
         
         //        _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 40.0f)];
-        //        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+        //        self.emptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Oops…\nCould not find any results", nil, [TAPUtil currentBundle], @"");
         //        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         //        NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //        //set attribute
@@ -112,7 +112,7 @@
         UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
 
         _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 60.0f)];
-        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+        self.emptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Oops…\nCould not find any results", nil, [TAPUtil currentBundle], @"");
         self.emptyStateLabel.font = infoLabelBodyFont;
         NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //set attribute

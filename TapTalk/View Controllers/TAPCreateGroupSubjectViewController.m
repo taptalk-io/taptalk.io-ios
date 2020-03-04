@@ -40,7 +40,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = NSLocalizedString(@"Group Subject", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Group Subject", nil, [TAPUtil currentBundle], @"");
     TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
     NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
     self.createGroupSubjectView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedContactArray count], (long)maxGroupMember];
@@ -359,7 +359,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     NSString *groupName = self.createGroupSubjectView.groupNameTextField.textField.text;
     groupName = [groupName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if ([groupName isEqualToString:@""]) {
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group Name" title:NSLocalizedString(@"Failed", @"") detailInformation:@"Group name must be filled" leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group Name" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Group name must be filled", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         return;
     }
     
@@ -410,7 +411,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                     NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                     errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }];
             }
             else {
@@ -435,7 +436,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
     else if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
@@ -477,7 +478,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                     NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                     errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }];
             }
             else {
@@ -531,7 +532,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                     }];
                 }
                 else {
@@ -562,7 +563,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                 errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedString(@"Failed", @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
             }];
         }
     }

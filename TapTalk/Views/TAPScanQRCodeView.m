@@ -123,8 +123,8 @@
             self.rightBlackView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
             
             self.scanBoundImageView.image = [UIImage imageNamed:@"TAPIconQRBounds" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            [self.QRCodeButton setTitle:NSLocalizedString(@"Show QR Code", @"") forState:UIControlStateNormal];
-            self.descriptionLabel.text = NSLocalizedString(@"Show your QR code by tapping the button below", @"");
+            [self.QRCodeButton setTitle:NSLocalizedStringFromTableInBundle(@"Show QR Code", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
+            self.descriptionLabel.text = NSLocalizedStringFromTableInBundle(@"Show your QR code by tapping the button below", nil, [TAPUtil currentBundle], @"");
             self.descriptionLabel.textColor = [UIColor whiteColor];
             
             //Resize description label height
@@ -146,8 +146,8 @@
             
             UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
             self.scanBoundImageView.image = nil;
-            self.descriptionLabel.text = NSLocalizedString(@"To scan other's QR code, please tap the button below", @"");
-            [self.QRCodeButton setTitle:NSLocalizedString(@"Scan QR Code", @"") forState:UIControlStateNormal];
+            self.descriptionLabel.text = NSLocalizedStringFromTableInBundle(@"To scan other's QR code, please tap the button below", nil, [TAPUtil currentBundle], @"");
+            [self.QRCodeButton setTitle:NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
             self.descriptionLabel.textColor = infoLabelColor;
             
             //Resize description label height
