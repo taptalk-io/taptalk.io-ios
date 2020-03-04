@@ -423,7 +423,7 @@
     NSString *messageBodyCaption = [NSString string];
     //Check contain caption or not
     if ([caption isEqualToString:@""]) {
-        messageBodyCaption = NSLocalizedString(@"🖼 Photo", @"");
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🖼 Photo", nil, [TAPUtil currentBundle], @"");
     }
     else {
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
@@ -521,7 +521,7 @@
     NSString *messageBodyCaption = [NSString string];
     //Check contain caption or not
     if ([caption isEqualToString:@""]) {
-        messageBodyCaption = NSLocalizedString(@"🖼 Photo", @"");
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🖼 Photo", nil, [TAPUtil currentBundle], @"");
     }
     else {
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
@@ -619,7 +619,7 @@
     NSString *messageBodyCaption = [NSString string];
     //Check contain caption or not
     if ([caption isEqualToString:@""]) {
-        messageBodyCaption = NSLocalizedString(@"🎥 Video", @"");
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🎥 Video", nil, [TAPUtil currentBundle], @"");
     }
     else {
         messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
@@ -733,7 +733,7 @@
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
 
-    NSString *messageBodyString = NSLocalizedString(@"📍Location", @"");
+    NSString *messageBodyString = NSLocalizedStringFromTableInBundle(@"📍Location", nil, [TAPUtil currentBundle], @"");
     
     TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeLocation messageData:nil];
     

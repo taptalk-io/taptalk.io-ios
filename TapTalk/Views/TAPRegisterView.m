@@ -34,7 +34,7 @@
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.frame) - 32.0f, 46.0f)];
         titleLabel.font = titleLabelFont;
         titleLabel.textColor = titleLabelColor;
-        titleLabel.text = NSLocalizedString(@"Register", @"");
+        titleLabel.text = NSLocalizedStringFromTableInBundle(@"Register", nil, [TAPUtil currentBundle], @"");
         [self.scrollView addSubview:titleLabel];
         
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2, CGRectGetMaxY(titleLabel.frame) + 32.0f, 96.0f, 96.0f)];
@@ -61,7 +61,7 @@
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         UILabel *changeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame) + 8.0f, 100.0f, 22.0f)];
         changeLabel.font = clickableLabelFont;
-        changeLabel.text = NSLocalizedString(@"Change", @"");
+        changeLabel.text = NSLocalizedStringFromTableInBundle(@"Change", nil, [TAPUtil currentBundle], @"");
         changeLabel.textColor = clickableLabelColor;
         CGSize changeLabelSize = [changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
         changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(changeLabel.frame), changeLabelSize.width, 22.0f);
@@ -110,7 +110,7 @@
         //END CS TEMP
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)]; //CS TEMP - remove this line of code to show password
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
-        [self.continueButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
+        [self.continueButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
         [self.scrollView addSubview:self.continueButtonView];
         
         CGFloat bottomGap = 16.0f;

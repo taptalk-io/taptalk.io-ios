@@ -37,7 +37,7 @@
         [self addSubview:self.customNavigationView];
         
         _doneButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, 0.0f, 50.0f, CGRectGetHeight(self.customNavigationView.frame))];
-        [self.doneButton setTitle:NSLocalizedString(@"Done", @"") forState:UIControlStateNormal];
+        [self.doneButton setTitle:NSLocalizedStringFromTableInBundle(@"Done", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         [self.doneButton setTitleColor:[TAPUtil getColor:@"007AFF"] forState:UIControlStateNormal];
         [self.customNavigationView addSubview:self.doneButton];
         

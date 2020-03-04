@@ -72,7 +72,7 @@
         UIFont *clearButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerClearButton];
         UIColor *clearButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerClearButton];
         _clearViewLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.clearView.frame), CGRectGetHeight(self.clearView.frame))];
-        self.clearViewLabel.text = NSLocalizedString(@"CLEAR", @"");
+        self.clearViewLabel.text = NSLocalizedStringFromTableInBundle(@"CLEAR", nil, [TAPUtil currentBundle], @"");
         self.clearViewLabel.textColor = clearButtonColor;
         self.clearViewLabel.font = clearButtonFont;
         [self.clearView addSubview:self.clearViewLabel];

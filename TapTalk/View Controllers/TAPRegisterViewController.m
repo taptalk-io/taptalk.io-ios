@@ -101,19 +101,19 @@
     else if (textField == self.registerView.passwordTextField.textField) {
         if ([TAPUtil isEmptyString:string] && [self.registerView.passwordTextField.textField isSecureTextEntry] && self.passwordTextFieldJustEndEditing) {
             [self.registerView.passwordTextField setAsError:NO animated:YES];
-            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView.passwordTextField setErrorInfoText:@""];
             [self.registerView refreshViewPosition];
             _isPasswordValid = YES;
         }
         else if (![TAPUtil validatePassword:newText] && ![TAPUtil isEmptyString:newText]) {
             [self.registerView.passwordTextField setAsError:YES animated:YES];
-            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"Invalid password", @"")];
+            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid password", nil, [TAPUtil currentBundle], @"")];
             [self.registerView refreshViewPosition];
             _isPasswordValid = NO;
         }
         else {
             [self.registerView.passwordTextField setAsError:NO animated:YES];
-            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView.passwordTextField setErrorInfoText:@""];
             [self.registerView refreshViewPosition];
             _isPasswordValid = YES;
         }
@@ -122,13 +122,13 @@
          
             if (![self.registerView.retypePasswordTextField.textField.text isEqualToString:newText]) {
                 [self.registerView.retypePasswordTextField setAsError:YES animated:YES];
-                [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"Password does not match", @"")];
+                [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Password does not match", nil, [TAPUtil currentBundle], @"")];
                 [self.registerView refreshViewPosition];
                 _isPasswordValid = NO;
             }
             else {
                 [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
-                [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.registerView.retypePasswordTextField setErrorInfoText:@""];
                 [self.registerView refreshViewPosition];
                 _isPasswordValid = YES;
             }
@@ -138,12 +138,12 @@
     else if (textField == self.registerView.retypePasswordTextField.textField) {
         if (![newText isEqualToString:self.registerView.passwordTextField.textField.text] && ![TAPUtil isEmptyString:newText]) {
             [self.registerView.retypePasswordTextField setAsError:YES animated:YES];
-            [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"Password does not match", @"")];
+            [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Password does not match", nil, [TAPUtil currentBundle], @"")];
             [self.registerView refreshViewPosition];
         }
         else {
             [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
-            [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView.retypePasswordTextField setErrorInfoText:@""];
             [self.registerView refreshViewPosition];
         }
     }
@@ -218,7 +218,8 @@
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                 } failureBlock:^(NSError *error) {
                     //Show error, retry or skip popup
-                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Register" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+                    
+                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Register" title:NSLocalizedStringFromTableInBundle(@"Failed to upload image", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"An error occurred while uploading your profile picture, would you like to try again?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Retry", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Skip", nil, [TAPUtil currentBundle], @"")];
                     
                     [self.registerView.continueButtonView setAsLoading:NO animated:YES];
                     [self.registerView setContentEditable:YES];
@@ -239,9 +240,9 @@
             
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Failed", @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
             
-            UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             }];
             
             [alertController addAction:okAction];
@@ -251,7 +252,7 @@
         [self.registerView.continueButtonView setAsLoading:NO animated:YES];
         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Register" title:NSLocalizedString(@"Error", @"") detailInformation:errorMessage leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@""];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Register" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         [self.registerView setContentEditable:YES];
     }];
 }
@@ -332,19 +333,19 @@
     NSString *username = self.lastCheckUsernameString;
     if (![TAPUtil validateUsername:username] && ![TAPUtil isEmptyString:username]) {
         [self.registerView.usernameTextField setAsError:YES animated:YES];
-        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"Invalid Username", @"")];
+        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid Username", nil, [TAPUtil currentBundle], @"")];
         [self.registerView refreshViewPosition];
         _isUsernameValid = NO;
     }
     else if (([username length] < 4 || [username length] > 32) && ![TAPUtil isEmptyString:username]) {
         [self.registerView.usernameTextField setAsError:YES animated:YES];
-        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"Username's length must be 4-32 characters", @"")];
+        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Username's length must be 4-32 characters", nil, [TAPUtil currentBundle], @"")];
         [self.registerView refreshViewPosition];
         _isUsernameValid = NO;
     }
     else {
         [self.registerView.usernameTextField setAsError:NO animated:YES];
-        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView.usernameTextField setErrorInfoText:@""];
         [self.registerView refreshViewPosition];
         if (![TAPUtil isEmptyString:username]) {
             [self checkUsernameAPI:username];
@@ -361,13 +362,13 @@
     NSString *fullName = self.lastCheckFullNameString;
     if (![TAPUtil isAlphabetCharactersOnlyFromText:fullName] && ![TAPUtil isEmptyString:fullName]) {
         [self.registerView.fullNameTextField setAsError:YES animated:YES];
-        [self.registerView.fullNameTextField setErrorInfoText:NSLocalizedString(@"Invalid Full Name", @"")];
+        [self.registerView.fullNameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid Full Name", nil, [TAPUtil currentBundle], @"")];
         [self.registerView refreshViewPosition];
         _isFullNameValid = NO;
     }
     else {
         [self.registerView.fullNameTextField setAsError:NO animated:YES];
-        [self.registerView.fullNameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView.fullNameTextField setErrorInfoText:@""];
         [self.registerView refreshViewPosition];
         _isFullNameValid = YES;
     }
@@ -380,13 +381,13 @@
         if ([checkedUsername isEqualToString:self.registerView.usernameTextField.textField.text]) {
             if (isExists) {
                 [self.registerView.usernameTextField setAsError:YES animated:YES];
-                [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"Username already exists", @"")];
+                [self.registerView.usernameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Username already exists", nil, [TAPUtil currentBundle], @"")];
                 [self.registerView refreshViewPosition];
                 _isUsernameValid = NO;
             }
             else {
                 [self.registerView.usernameTextField setAsError:NO animated:YES];
-                [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.registerView.usernameTextField setErrorInfoText:@""];
                 [self.registerView refreshViewPosition];
                 _isUsernameValid = YES;
             }
@@ -397,7 +398,7 @@
         _isUsernameValid = NO;
         [self.registerView.usernameTextField setAsError:YES animated:YES];
         if (error.code == 999) {
-            [self.registerView.usernameTextField setErrorInfoText:@"Unable to verify username, please check your connection and try again"];
+            [self.registerView.usernameTextField setErrorInfoText: NSLocalizedStringFromTableInBundle(@"Unable to verify username, please check your connection and try again", nil, [TAPUtil currentBundle], @"")];
         }
         else {
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -415,13 +416,13 @@
     NSString *email = self.lastCheckEmailString;
     if (![TAPUtil validateEmail:email] && ![TAPUtil isEmptyString:email]) {
         [self.registerView.emailTextField setAsError:YES animated:YES];
-        [self.registerView.emailTextField setErrorInfoText:NSLocalizedString(@"Invalid email address", @"")];
+        [self.registerView.emailTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid email address", nil, [TAPUtil currentBundle], @"")];
         [self.registerView refreshViewPosition];
         _isEmailValid = NO;
     }
     else {
         [self.registerView.emailTextField setAsError:NO animated:YES];
-        [self.registerView.emailTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView.emailTextField setErrorInfoText:@""];
         [self.registerView refreshViewPosition];
         _isEmailValid = YES;
     }
@@ -437,21 +438,21 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *cameraAction = [UIAlertAction
-                                       actionWithTitle:@"Camera"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Camera", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleDefault
                                        handler:^(UIAlertAction * action) {
                                            [self openCamera];
                                        }];
     
     UIAlertAction *galleryAction = [UIAlertAction
-                                      actionWithTitle:@"Gallery"
+                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Gallery", nil, [TAPUtil currentBundle], @"")
                                       style:UIAlertActionStyleDefault
                                       handler:^(UIAlertAction * action) {
                                           [self openGallery];
                                       }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
@@ -506,12 +507,13 @@
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -600,7 +602,7 @@
             } failureBlock:^(NSError *error) {
                 //Show error, retry or skip popup
                 
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Register" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Skip"];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Register" title:NSLocalizedStringFromTableInBundle(@"Failed to upload image", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"An error occurred while uploading your profile picture, would you like to try again?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Retry", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Skip", nil, [TAPUtil currentBundle], @"")];
                 
                 [self.registerView.continueButtonView setAsLoading:NO animated:YES];
                 [self.registerView setContentEditable:YES];

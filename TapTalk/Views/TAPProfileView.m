@@ -194,38 +194,38 @@
     switch (type) {
         case TAPProfileLoadingTypeAppointAdmin:
         {
-            loadingString = @"Updating...";
-            doneLoadingString = @"Admin Promoted";
-             break;
+            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Admin Promoted", nil, [TAPUtil currentBundle], @"");
+            break;
         }
         case TAPProfileLoadingTypeRemoveAdmin:
         {
-            loadingString = @"Updating...";
-            doneLoadingString = @"Admin Demoted";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Admin Demoted", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPProfileLoadingTypeRemoveMember:
         {
-            loadingString = @"Removing...";
-            doneLoadingString = @"Member Removed";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Removing...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Member Removed", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPProfileLoadingTypeAddToContact:
         {
-            loadingString = @"Adding...";
-            doneLoadingString = @"Added to Contacts";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Adding...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Added to Contacts", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPProfileLoadingTypeLeaveGroup:
         {
-            loadingString = @"Removing...";
-            doneLoadingString = @"Group Removed";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Removing...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Group Removed", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPProfileLoadingTypeDeleteGroup:
         {
-            loadingString = @"Deleting...";
-            doneLoadingString = @"Group Deleted";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Deleting...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Group Deleted", nil, [TAPUtil currentBundle], @"");
             break;
         }
         case TAPProfileLoadingTypeDoneLoading:
@@ -236,8 +236,8 @@
         }
         default:
         {
-            loadingString = @"Updating...";
-            doneLoadingString = @"Success";
+            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"");
             break;
         }
     }
@@ -246,7 +246,7 @@
         [self animateSaveLoading:YES];
         self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
-        self.loadingLabel.text = NSLocalizedString(loadingString, @"");
+        self.loadingLabel.text = loadingString;
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
     }
@@ -254,7 +254,7 @@
         [self animateSaveLoading:NO];
         self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
-        self.loadingLabel.text = NSLocalizedString(doneLoadingString, @"");
+        self.loadingLabel.text = doneLoadingString;
         self.loadingButton.alpha = 1.0f;
         self.loadingButton.userInteractionEnabled = YES;
     }

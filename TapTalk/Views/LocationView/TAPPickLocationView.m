@@ -52,7 +52,7 @@
         _sendLocationButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.addressLabel.frame) + 12.0f, CGRectGetWidth(self.frame), 44.0f)];
         [self.sendLocationButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.sendLocationButton setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
-        [self.sendLocationButton setButtonWithTitle:NSLocalizedString(@"Send Location", @"") andIcon:@"TAPIconSend" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.sendLocationButton setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Location", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconSend" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         [self.sendLocationButton setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         [self.addressView addSubview:self.sendLocationButton];
         
@@ -81,7 +81,7 @@
         [self addSubview:self.goToCurrentLocationButton];
         
         _searchBarView = [[TAPLocationSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(frame) - 16.0f - 16.0f, 36.0f)];
-        self.searchBarView.placeholder = NSLocalizedString(@"Search Address", @"");
+        self.searchBarView.placeholder = NSLocalizedStringFromTableInBundle(@"Search Address", nil, [TAPUtil currentBundle], @"");
         self.searchBarView.leftViewImage = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.searchBarView.leftViewImage = [self.searchBarView.leftViewImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
 
@@ -124,7 +124,7 @@
     UIColor *placeholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddressPlaceholder];
     
     if (isLoading) {
-        NSString *addressString = NSLocalizedString(@"Searching for address", @"");
+        NSString *addressString = NSLocalizedStringFromTableInBundle(@"Searching for address", nil, [TAPUtil currentBundle], @"");
         self.addressLabel.text = addressString;
         NSMutableAttributedString *addressAttributedString = [[NSMutableAttributedString alloc] initWithString:self.addressLabel.text];
         NSMutableParagraphStyle *addressLabelStyle = [[NSMutableParagraphStyle alloc] init];

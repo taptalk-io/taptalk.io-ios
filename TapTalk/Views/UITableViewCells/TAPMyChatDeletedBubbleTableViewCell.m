@@ -99,7 +99,7 @@
 
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
-    self.bubbleLabel.text = NSLocalizedString(@"You deleted this message.", @"");
+    self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
 }
 
 - (void)receiveSentEvent {

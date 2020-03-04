@@ -48,7 +48,7 @@
         UIColor *sendLocationLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerSendLocationButton];
         _sendLocationLabel = [[UILabel alloc] initWithFrame:CGRectMake(8.0f, 8.0f, CGRectGetMinX(self.sendIconView.frame) - 8.0f - 8.0f, 14.0f)];
         self.sendLocationLabel.font = sendLocationLabelFont;
-        self.sendLocationLabel.text = NSLocalizedString(@"Send Location", @"");
+        self.sendLocationLabel.text = NSLocalizedStringFromTableInBundle(@"Send Location", nil, [TAPUtil currentBundle], @"");
         self.sendLocationLabel.textColor = sendLocationLabelColor;
         self.sendLocationLabel.textAlignment = NSTextAlignmentCenter;
         [self.sendLocationView addSubview:self.sendLocationLabel];

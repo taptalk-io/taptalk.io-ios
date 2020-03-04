@@ -54,7 +54,7 @@
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     
-    self.title = NSLocalizedString(@"Forward", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"");
     
     self.forwardListView.searchBarView.delegate = self;
     self.forwardListView.recentChatTableView.delegate = self;
@@ -181,7 +181,7 @@
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 13.0f)];
         titleLabel.font = sectionHeaderLabelFont;
         titleLabel.textColor = sectionHeaderLabelColor;
-        titleLabel.text = NSLocalizedString(@"CHATS AND CONTACTS", @"");
+        titleLabel.text = NSLocalizedStringFromTableInBundle(@"CHATS AND CONTACTS", nil, [TAPUtil currentBundle], @"");
         
         NSMutableAttributedString *titleLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:titleLabel.text];
         [titleLabelAttributedString addAttribute:NSKernAttributeName

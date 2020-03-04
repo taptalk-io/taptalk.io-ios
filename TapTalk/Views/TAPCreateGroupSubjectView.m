@@ -138,7 +138,7 @@
         self.navigationHeaderLabel.textColor = navigationHeaderLabelColor;
         self.navigationHeaderLabel.font = navigationHeaderLabelFont;
         self.navigationHeaderLabel.textAlignment = NSTextAlignmentCenter;
-        self.navigationHeaderLabel.text = NSLocalizedString(@"Group Subject", @"");
+        self.navigationHeaderLabel.text = NSLocalizedStringFromTableInBundle(@"Group Subject", nil, [TAPUtil currentBundle], @"");
         [self.navigationHeaderView addSubview:self.navigationHeaderLabel];
         
         _groupPictureImageView = [[TAPImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 96.0f) / 2,CGRectGetMaxY(self.navigationHeaderView.frame) + profilePictureTopGap,  96.0f, 96.0f)];
@@ -175,7 +175,7 @@
         UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
         _changeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.groupPictureImageView.frame) + 8.0f, 100.0f, 22.0f)];
         self.changeLabel.font = clickableLabelFont;
-        self.changeLabel.text = NSLocalizedString(@"Change", @"");
+        self.changeLabel.text = NSLocalizedStringFromTableInBundle(@"Change", nil, [TAPUtil currentBundle], @"");
         self.changeLabel.textColor = clickableLabelColor;
         CGSize changeLabelSize = [self.changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
         self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
@@ -184,7 +184,7 @@
         _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.groupPictureImageView.frame) + 8.0f, CGRectGetWidth(self.frame), 22.0f)];
         self.loadingLabel.font = clickableLabelFont;
         self.loadingLabel.textColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorCreateGroupSubjectLoadingLabel];
-        self.loadingLabel.text = NSLocalizedString(@"Uploading", @"");
+        self.loadingLabel.text = NSLocalizedStringFromTableInBundle(@"Uploading", nil, [TAPUtil currentBundle], @"");
         self.loadingLabel.alpha = 0.0f;
         self.loadingLabel.textAlignment = NSTextAlignmentCenter;
         [self.bgScrollView addSubview:self.loadingLabel];
@@ -236,12 +236,12 @@
         _createButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame), 44.0f)];
         [self.createButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
         [self.createButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypePlain];
-        [self.createButtonView setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
+        [self.createButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
         [self.selectedContactsView addSubview:self.createButtonView];
         
 //        TAPStyleModel *buttonLabelStyle = [[TAPStyleManager sharedManager] getComponentStyleForType:TAPComponentStyleButtonLabel];
 //        _createButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame) - 16.0f - 16.0f , 44.0f)];
-//        NSString *createString = NSLocalizedString(@"Create Group", @"");
+//        NSString *createString = NSLocalizedStringFromTableInBundle(@"Create Group", nil, [TAPUtil currentBundle], @"");
 //        NSMutableDictionary *createAttributesDictionary = [NSMutableDictionary dictionary];
 //        CGFloat createLetterSpacing = -0.2f;
 //        [createAttributesDictionary setObject:@(createLetterSpacing) forKey:NSKernAttributeName];
@@ -303,7 +303,7 @@
         self.selectedContactsShadowView.alpha = 0.0f;
         self.selectedContactsView.backgroundColor = [UIColor clearColor];
         self.selectedContactsTitleLabel.alpha = 0.0f;
-        [self.createButtonView setButtonWithTitle:NSLocalizedString(@"Update", @"")];
+        [self.createButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Update", nil, [TAPUtil currentBundle], @"")];
     }
 }
 

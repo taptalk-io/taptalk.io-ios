@@ -84,7 +84,7 @@
     self.imagePreviewView.captionTextView.delegate = self;
     self.imagePreviewView.captionTextView.minimumHeight = 22.0f;
     self.imagePreviewView.captionTextView.maximumHeight = 60.0f;
-    [self.imagePreviewView.captionTextView setPlaceholderText:NSLocalizedString(@"Add a caption", @"")];
+    [self.imagePreviewView.captionTextView setPlaceholderText:NSLocalizedStringFromTableInBundle(@"Add a caption", nil, [TAPUtil currentBundle], @"")];
     
     self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, (long)TAP_LIMIT_OF_CAPTION_CHARACTER];
     [self.imagePreviewView isShowCounterCharCount:NO];
@@ -660,7 +660,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             _showVideoPlayer = NO;
         } afterDelay:0.5f];
     } failureHandler:^{
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Cannot play video at the moment, please check your connection and try again.",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Cannot play video at the moment, please check your connection and try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
     }];
 }
@@ -813,7 +813,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
         NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
         
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedString(@"Some files may not send", @"") detailInformation:[NSString stringWithFormat:@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the %ldMB upload limit and won’t be sent.", (long)maxFileSizeInMB] leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Continue"];
+        
+        NSString *errorTitleInfoString = NSLocalizedStringFromTableInBundle(@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the ", nil, [TAPUtil currentBundle], @"");
+        NSString *errorTitleInfoEndString = NSLocalizedStringFromTableInBundle(@" upload limit and won’t be sent.", nil, [TAPUtil currentBundle], @"");
+        
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedStringFromTableInBundle(@"Some files may not send", nil, [TAPUtil currentBundle], @"") detailInformation:[NSString stringWithFormat:@"%@%ldMB%@",errorTitleInfoString, (long)maxFileSizeInMB, errorTitleInfoEndString] leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
     }
     else {
         if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {

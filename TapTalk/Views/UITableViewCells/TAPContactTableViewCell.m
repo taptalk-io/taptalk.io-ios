@@ -84,7 +84,7 @@
         self.adminIndicatorLabel.textColor = [TAPUtil getColor:@"9b9b9b"];
         self.adminIndicatorLabel.font = [UIFont fontWithName:TAP_FONT_FAMILY_REGULAR size:14.0f];
         self.adminIndicatorLabel.alpha = 0.0f;
-        self.adminIndicatorLabel.text = NSLocalizedString(@"Admin", @"");
+        self.adminIndicatorLabel.text = NSLocalizedStringFromTableInBundle(@"Admin", nil, [TAPUtil currentBundle], @"");
         [self.bgView addSubview:self.adminIndicatorLabel];
         
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.contactNameLabel.frame), 1.0f)];

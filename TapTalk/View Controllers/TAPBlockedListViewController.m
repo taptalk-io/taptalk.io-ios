@@ -27,7 +27,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    self.title = NSLocalizedString(@"Blocked List", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Blocked List", nil, [TAPUtil currentBundle], @"");
     [self showCustomBackButton];
 
     self.blockedListView.tableView.delegate = self;

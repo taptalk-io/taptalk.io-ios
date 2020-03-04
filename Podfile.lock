@@ -14,21 +14,21 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
-  - GoogleMaps (3.7.0):
-    - GoogleMaps/Maps (= 3.7.0)
-  - GoogleMaps/Base (3.7.0)
-  - GoogleMaps/Maps (3.7.0):
+  - GoogleMaps (3.8.0):
+    - GoogleMaps/Maps (= 3.8.0)
+  - GoogleMaps/Base (3.8.0)
+  - GoogleMaps/Maps (3.8.0):
     - GoogleMaps/Base
-  - GooglePlaces (3.7.0):
-    - GoogleMaps/Base (= 3.7.0)
+  - GooglePlaces (3.8.0):
+    - GoogleMaps/Base (= 3.8.0)
   - JSONModel (1.8.0)
   - PodAsset (1.0.0)
   - Realm (3.13.1):
     - Realm/Headers (= 3.13.1)
   - Realm/Headers (3.13.1)
-  - SDWebImage (4.4.2):
-    - SDWebImage/Core (= 4.4.2)
-  - SDWebImage/Core (4.4.2)
+  - SDWebImage (5.5.2):
+    - SDWebImage/Core (= 5.5.2)
+  - SDWebImage/Core (5.5.2)
   - SocketRocket (0.5.1)
   - ZSWTappableLabel (2.0)
 
@@ -39,7 +39,7 @@ DEPENDENCIES:
   - JSONModel (~> 1.1)
   - PodAsset
   - Realm (= 3.13.1)
-  - SDWebImage (= 4.4.2)
+  - SDWebImage
   - SocketRocket
   - ZSWTappableLabel (~> 2.0)
 
@@ -57,15 +57,15 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
-  GoogleMaps: 55da829c68aa931f3ae982b9e341cc2f3d89c587
-  GooglePlaces: a62077320f9d64239245af63aa1aa136393ebeb6
+  GoogleMaps: 7c8d66d70e4e8c300f43a7219d8fdaad7b325a9a
+  GooglePlaces: d5f70c3e9e427964fdeca1301a665d276ccd8754
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   PodAsset: c2c2b20013c1edf698fea2bacba6e75a638537a2
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
-  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
+  SDWebImage: 4d5c027c935438f341ed33dbac53ff9f479922ca
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: 839c5df083f59a7b79881aa324af378deaa6a627
+PODFILE CHECKSUM: 15cd9d035d6c72730159ad4e1009021cfb4215cc
 
 COCOAPODS: 1.8.3

@@ -85,7 +85,7 @@
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.connectionStatusView.layer replaceSublayer:[self.connectionStatusView.layer.sublayers objectAtIndex:0] with:gradient];
         
-        self.connectionStatusLabel.text = NSLocalizedString(@"Connecting", @"");
+        self.connectionStatusLabel.text = NSLocalizedStringFromTableInBundle(@"Connecting", nil, [TAPUtil currentBundle], @"");
         NSMutableDictionary *connectionStatusAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat connectionStatusLetterSpacing = -0.2f;
         [connectionStatusAttributesDictionary setObject:@(connectionStatusLetterSpacing) forKey:NSKernAttributeName];
@@ -121,7 +121,7 @@
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.connectionStatusView.layer replaceSublayer:[self.connectionStatusView.layer.sublayers objectAtIndex:0] with:gradient];
         
-        self.connectionStatusLabel.text = NSLocalizedString(@"Waiting for Network", @"");
+        self.connectionStatusLabel.text = NSLocalizedStringFromTableInBundle(@"Waiting for Network", nil, [TAPUtil currentBundle], @"");
         NSMutableDictionary *connectionStatusAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat connectionStatusLetterSpacing = -0.2f;
         [connectionStatusAttributesDictionary setObject:@(connectionStatusLetterSpacing) forKey:NSKernAttributeName];
@@ -157,7 +157,7 @@
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.connectionStatusView.layer replaceSublayer:[self.connectionStatusView.layer.sublayers objectAtIndex:0] with:gradient];
         
-        self.connectionStatusLabel.text = NSLocalizedString(@"Connected", @"");
+        self.connectionStatusLabel.text = NSLocalizedStringFromTableInBundle(@"Connected", nil, [TAPUtil currentBundle], @"");
         NSMutableDictionary *connectionStatusAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat connectionStatusLetterSpacing = -0.2f;
         [connectionStatusAttributesDictionary setObject:@(connectionStatusLetterSpacing) forKey:NSKernAttributeName];
@@ -187,7 +187,7 @@
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.connectionStatusView.layer replaceSublayer:[self.connectionStatusView.layer.sublayers objectAtIndex:0] with:gradient];
         
-        self.connectionStatusLabel.text = NSLocalizedString(@"Waiting for Network", @"");
+        self.connectionStatusLabel.text = NSLocalizedStringFromTableInBundle(@"Waiting for Network", nil, [TAPUtil currentBundle], @"");
         NSMutableDictionary *connectionStatusAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat connectionStatusLetterSpacing = -0.2f;
         [connectionStatusAttributesDictionary setObject:@(connectionStatusLetterSpacing) forKey:NSKernAttributeName];

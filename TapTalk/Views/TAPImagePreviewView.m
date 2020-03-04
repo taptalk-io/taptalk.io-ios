@@ -71,7 +71,7 @@
         UIFont *cancelButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewCancelButton];
         UIColor *cancelButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewCancelButton];
         _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.topMenuView.frame) - 21.0f) / 2.0f, 60.0f, 21.0f)];
-        [self.cancelButton setTitle:NSLocalizedString(@"Cancel", @"") forState:UIControlStateNormal];
+        [self.cancelButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         self.cancelButton.backgroundColor = [UIColor clearColor];
         self.cancelButton.titleLabel.font = cancelButtonFont;
         [self.cancelButton setTitleColor:cancelButtonColor forState:UIControlStateNormal];
@@ -110,7 +110,7 @@
         UIFont *sendButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaPreviewSendButtonLabel];
         UIColor *sendButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewSendButtonLabel];
         _sendButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bottomMenuView.frame) - 40.0f - 16.0f, (CGRectGetHeight(self.bottomMenuView.frame) - 21.0f) / 2.0f, 40.0f, 21.0f)];
-        [self.sendButton setTitle:NSLocalizedString(@"Send", @"") forState:UIControlStateNormal];
+        [self.sendButton setTitle:NSLocalizedStringFromTableInBundle(@"Send", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         self.sendButton.backgroundColor = [UIColor clearColor];
         self.sendButton.titleLabel.font = sendButtonFont;
         [self.sendButton setTitleColor:sendButtonColor forState:UIControlStateNormal];
@@ -194,7 +194,7 @@
         _alertDetailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.alertTitleLabel.frame), CGRectGetMaxY(self.alertTitleLabel.frame), CGRectGetWidth(self.alertTitleLabel.frame), 16.0f)];
         self.alertDetailLabel.font = imagePreviewAlertContentFont;
         self.alertDetailLabel.textColor = imagePreviewAlertContentColor;
-        self.alertDetailLabel.text = NSLocalizedString(@"Please remove this video to continue", @"");
+        self.alertDetailLabel.text = NSLocalizedStringFromTableInBundle(@"Please remove this video to continue", nil, [TAPUtil currentBundle], @"");
         [self.alertView addSubview:self.alertDetailLabel];
     }
     

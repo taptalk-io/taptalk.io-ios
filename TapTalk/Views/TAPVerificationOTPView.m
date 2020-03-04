@@ -64,7 +64,7 @@
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50.0f, currentStatusBarHeight + 165.0f, CGRectGetWidth(self.frame) - 50.0f - 50.0f, 20.0f)];
         self.titleLabel.font = titleLabelFont;
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedString(@"Enter the 6 digit OTP we’ve sent to", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Enter the 6 digit OTP we’ve sent to", nil, [TAPUtil currentBundle], @"");
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.titleLabel];
 
@@ -181,7 +181,7 @@
         _resendVerificationButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.verificationInformationLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 50.0f)];
         self.resendVerificationButton.alpha = 0.0f;
         self.resendVerificationButton.userInteractionEnabled = NO;
-        [self.resendVerificationButton setTitle:NSLocalizedString(@"Request Again", @"") forState:UIControlStateNormal];
+        [self.resendVerificationButton setTitle:NSLocalizedStringFromTableInBundle(@"Request Again", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         self.resendVerificationButton.titleLabel.font = clickableLabelFont;
         [self.resendVerificationButton setTitleColor:clickableLabelColor forState:UIControlStateNormal];
         self.resendVerificationButton.backgroundColor = [UIColor clearColor];
@@ -210,7 +210,7 @@
         _doneResendOTPLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 120.0f, 22.0f)];
         self.doneResendOTPLabel.font = verificationSuccessLabelFont;
         self.doneResendOTPLabel.textColor = verificationSuccessLabelColor;
-        self.doneResendOTPLabel.text = NSLocalizedString(@"OTP Successfully Sent", @"");
+        self.doneResendOTPLabel.text = NSLocalizedStringFromTableInBundle(@"OTP Successfully Sent", nil, [TAPUtil currentBundle], @"");
         [self.doneResendOTPView addSubview:self.doneResendOTPLabel];
         
         _doneResendOTPImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.doneResendOTPLabel.frame) + 8.0f, 1.0f, 20.0f, 20.0f)];
@@ -226,11 +226,11 @@
 - (void)setVerificationInformationAsInvalidOTP:(BOOL)isInvalid {
     if (isInvalid) {
         self.verificationInformationLabel.textColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorError];
-        self.verificationInformationLabel.text = NSLocalizedString(@"Invalid OTP, please try again", @"");
+        self.verificationInformationLabel.text = NSLocalizedStringFromTableInBundle(@"Invalid OTP, please try again", nil, [TAPUtil currentBundle], @"");
     }
     else {
         self.verificationInformationLabel.textColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPTextColorLoginVerificationCodeInputLabel];
-        self.verificationInformationLabel.text = NSLocalizedString(@"Didn’t receive the 6 digit OTP?", @"");
+        self.verificationInformationLabel.text = NSLocalizedStringFromTableInBundle(@"Didn’t receive the 6 digit OTP?", nil, [TAPUtil currentBundle], @"");
     }
 }
 

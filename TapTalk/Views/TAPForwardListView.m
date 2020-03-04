@@ -34,7 +34,7 @@
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 30.0f)];
         self.searchBarView.backgroundColor = [UIColor whiteColor];
-        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for chats or contacts", @"");
+        self.searchBarView.customPlaceHolderString = NSLocalizedStringFromTableInBundle(@"Search for chats or contacts", nil, [TAPUtil currentBundle], @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
         UIFont *sectionHeaderTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
@@ -42,7 +42,7 @@
         _recentChatLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame) + 8.0f, 150.0f, 13.0f)];
         self.recentChatLabel.font = sectionHeaderTitleFont;
         self.recentChatLabel.textColor = sectionHeaderTitleColor;
-        self.recentChatLabel.text = NSLocalizedString(@"RECENT CHATS", @"");
+        self.recentChatLabel.text = NSLocalizedStringFromTableInBundle(@"RECENT CHATS", nil, [TAPUtil currentBundle], @"");
         
         NSMutableAttributedString *recentChatLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.recentChatLabel.text];
         [recentChatLabelAttributedString addAttribute:NSKernAttributeName
@@ -79,7 +79,7 @@
         //        [self.emptyStateView addSubview:self.emptyStateImageView];
         
         //        _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 40.0f)];
-        //        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+        //        self.emptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Oops…\nCould not find any results", nil, [TAPUtil currentBundle], @"");
         //        self.emptyStateLabel.font = [UIFont fontWithName:TAP_FONT_NAME_REGULAR size:15.0f];
         //        NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //        //set attribute
@@ -99,7 +99,7 @@
         UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
         
         _emptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emptyStateImageView.frame) + 10.0f, CGRectGetWidth(self.emptyStateView.frame) - 16.0f - 16.0f, 60.0f)];
-        self.emptyStateLabel.text = NSLocalizedString(@"Oops…\nCould not find any results", @"");
+        self.emptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Oops…\nCould not find any results", nil, [TAPUtil currentBundle], @"");
         self.emptyStateLabel.font = infoLabelBodyFont;
         NSRange range = [self.emptyStateLabel.text rangeOfString:@"Oops…"];
         //set attribute

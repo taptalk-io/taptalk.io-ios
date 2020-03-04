@@ -39,7 +39,7 @@
         UIColor *welcomePlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTitleLabel];
         self.welcomePlacholderLabel.font = welcomePlaceholderFont;
         self.welcomePlacholderLabel.textColor = welcomePlaceholderColor;
-        self.welcomePlacholderLabel.text = NSLocalizedString(@"Welcome", @"");
+        self.welcomePlacholderLabel.text = NSLocalizedStringFromTableInBundle(@"Welcome", nil, [TAPUtil currentBundle], @"");
         [self addSubview:self.welcomePlacholderLabel];
         
         UIFont *subtitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormLabel];
@@ -47,7 +47,7 @@
         _subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.welcomePlacholderLabel.frame), CGRectGetMaxY(self.welcomePlacholderLabel.frame) + 8.0f, CGRectGetWidth(self.welcomePlacholderLabel.frame), 22.0f)];
         self.subtitleLabel.font = subtitleFont;
         self.subtitleLabel.textColor = subtitleColor;
-        self.subtitleLabel.text = NSLocalizedString(@"Enter your mobile number to continue", @"");
+        self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Enter your mobile number to continue", nil, [TAPUtil currentBundle], @"");
         [self addSubview:self.subtitleLabel];
         
         _phoneNumberPickerView = [[TAPCustomPhoneNumberPickerView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.subtitleLabel.frame) + 8.0f, CGRectGetWidth(self.frame), 50.0f)];
@@ -57,7 +57,7 @@
         _loginButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.phoneNumberPickerView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         self.loginButton.delegate = self;
         [self.loginButton setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
-        [self.loginButton setButtonWithTitle:NSLocalizedString(@"Continue", @"")];
+        [self.loginButton setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
         [self addSubview:self.loginButton];
     }
     

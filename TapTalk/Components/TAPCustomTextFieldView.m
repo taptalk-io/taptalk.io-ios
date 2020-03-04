@@ -221,21 +221,21 @@
 - (void)setTapCustomTextFieldViewType:(TAPCustomTextFieldViewType)tapCustomTextFieldViewType {
     _tapCustomTextFieldViewType = tapCustomTextFieldViewType;
     if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeFullName) {
-        self.titleLabel.text = NSLocalizedString(@"Full Name", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Full Name", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TAPUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeUsername) {
-        self.titleLabel.text = NSLocalizedString(@"Username", @"");
-        [self setInfoDescriptionText:NSLocalizedString(@"Username is always required.\nMust be between 4-32 characters.\nCan only contain a-z, 0-9, underscores, and dot.\nCan't start with number or underscore or dot.\nCan't end with underscore or dot.\nCan't contain consecutive underscores, consecutive dot, underscore followed with dot, and otherwise.", @"")];
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Username", nil, [TAPUtil currentBundle], @"");
+        [self setInfoDescriptionText:NSLocalizedStringFromTableInBundle(@"Username is always required.\nMust be between 4-32 characters.\nCan only contain a-z, 0-9, underscores, and dot.\nCan't start with number or underscore or dot.\nCan't end with underscore or dot.\nCan't contain consecutive underscores, consecutive dot, underscore followed with dot, and otherwise.", nil, [TAPUtil currentBundle], @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"e.g user_1234", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TAPUtil currentBundle], @"");
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
@@ -243,11 +243,11 @@
         [self showShowPasswordButton:NO];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeUsernameWithoutDescription) {
-        self.titleLabel.text = NSLocalizedString(@"Username", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Username", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"e.g user_1234", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TAPUtil currentBundle], @"");
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
@@ -255,7 +255,7 @@
         [self showShowPasswordButton:NO];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeMobileNumber) {
-        self.titleLabel.text = NSLocalizedString(@"Mobile Number", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Mobile Number", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
@@ -266,10 +266,10 @@
         [self.phoneNumberPickerView setAsDisabled:YES];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeEmailOptional) {
-        self.titleLabel.text = NSLocalizedString(@"Email Address Optional", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Email Address Optional", nil, [TAPUtil currentBundle], @"");
         
         UIFont *formDescriptionFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormDescriptionLabel];
-        NSString *optionalString = NSLocalizedString(@"Optional", @"");
+        NSString *optionalString = NSLocalizedStringFromTableInBundle(@"Optional", nil, [TAPUtil currentBundle], @"");
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
         [attributedString addAttribute:NSFontAttributeName
                                             value:formDescriptionFont
@@ -280,59 +280,59 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedString(@"e.g example@work.com", @"");;
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter email address", nil, [TAPUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeEmail) {
-        self.titleLabel.text = NSLocalizedString(@"Email Address", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Email Address", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedString(@"e.g example@work.com", @"");;
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter email address", nil, [TAPUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypePasswordOptional) {
-        self.titleLabel.text = NSLocalizedString(@"Password Optional", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Password Optional", nil, [TAPUtil currentBundle], @"");
         
         UIFont *formDescriptionFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormDescriptionLabel];
-        NSString *optionalString = NSLocalizedString(@"Optional", @"");
+        NSString *optionalString = NSLocalizedStringFromTableInBundle(@"Optional", nil, [TAPUtil currentBundle], @"");
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
         [attributedString addAttribute:NSFontAttributeName
                                  value:formDescriptionFont
                                  range:[self.titleLabel.text rangeOfString:optionalString]];
         self.titleLabel.attributedText = attributedString;
         
-        [self setInfoDescriptionText:NSLocalizedString(@"Password must contain at least one lowercase, uppercase, special character, and a number.", @"")];
+        [self setInfoDescriptionText:NSLocalizedStringFromTableInBundle(@"Password must contain at least one lowercase, uppercase, special character, and a number.", nil, [TAPUtil currentBundle], @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Insert Password", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Insert Password", nil, [TAPUtil currentBundle], @"");
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:YES];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeReTypePassword) {
-        self.titleLabel.text = NSLocalizedString(@"Retype Password", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Retype Password", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TAPUtil currentBundle], @"");
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:YES];
     }
     else if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeGroupName) {
-        self.titleLabel.text = NSLocalizedString(@"Group Name", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Group Name", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Insert Name", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Insert Name", nil, [TAPUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];

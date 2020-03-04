@@ -43,7 +43,7 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
-    self.title = NSLocalizedString(@"Send Location", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Send Location", nil, [TAPUtil currentBundle], @"");
     
     _pickLocationView = [[TAPPickLocationView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.pickLocationView];
@@ -290,14 +290,14 @@
              else {
                  //Location not found
                  [self.pickLocationView setAsLoading:YES];
-                 [self.pickLocationView setAddress:NSLocalizedString(@"Location not found", @"")];
+                 [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
                  [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
              }
          }
          else {
              //Location not found
              [self.pickLocationView setAsLoading:YES];
-             [self.pickLocationView setAddress:NSLocalizedString(@"Location not found", @"")];
+             [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
              [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
          }
      }];
@@ -329,12 +329,12 @@
 #pragma mark - Custom Method
 - (void)checkLocationPermission {
     if([TAPLocationManager authorizationStatus] == kCLAuthorizationStatusDenied || [TAPLocationManager authorizationStatus] == kCLAuthorizationStatusRestricted) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Location Disabled", @"") message:NSLocalizedString(@"Please allow Location Services to Continue", @"") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Location Disabled", nil, [TAPUtil currentBundle], @"") message:NSLocalizedStringFromTableInBundle(@"Please allow Location Services to Continue", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             
         }];
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Go to Settings", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Go to Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
             if (url != nil) {
                 if(IS_IOS_11_OR_ABOVE) {

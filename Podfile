@@ -9,7 +9,7 @@ def tapTalk_pods
     pod 'JSONModel', '~> 1.1'
     pod 'Realm', '3.13.1'
     pod 'PodAsset'
-    pod 'SDWebImage', '4.4.2'
+    pod 'SDWebImage'
     pod 'GooglePlaces'
     pod 'GoogleMaps'
     pod 'ZSWTappableLabel', '~> 2.0'

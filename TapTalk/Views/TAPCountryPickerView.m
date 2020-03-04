@@ -23,13 +23,13 @@
         [self addSubview:self.searchBarBackgroundView];
         
         _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 8.0f, CGRectGetWidth(self.searchBarBackgroundView.frame) - 16.0f - 16.0f, 36.0f)];
-        self.searchBarView.customPlaceHolderString = NSLocalizedString(@"Search for country", @"");
+        self.searchBarView.customPlaceHolderString = NSLocalizedStringFromTableInBundle(@"Search for country", nil, [TAPUtil currentBundle], @"");
         [self.searchBarBackgroundView addSubview:self.searchBarView];
         
         UIFont *searchBarCancelButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _searchBarCancelButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.searchBarView.frame) + 8.0f, 0.0f, 0.0f, CGRectGetHeight(self.searchBarBackgroundView.frame))];
-        NSString *searchBarCancelString = NSLocalizedString(@"Cancel", @"");
+        NSString *searchBarCancelString = NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"");
         NSMutableAttributedString *searchBarCancelAttributedString = [[NSMutableAttributedString alloc] initWithString:searchBarCancelString];
         NSMutableDictionary *searchBarCancelAttributesDictionary = [NSMutableDictionary dictionary];
         CGFloat searchBarCancelLetterSpacing = -0.4f;

@@ -40,7 +40,7 @@
         UIFont *imagePickerClearButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGalleryPickerCancelButton];
         UIColor *imagePickerClearButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGalleryPickerCancelButton];
         _clearButton = [[UIButton alloc] initWithFrame:CGRectMake(10.0f, 0.0f, 50.0f, CGRectGetHeight(self.bottomView.frame) - 1.0f)];
-        [self.clearButton setTitle:NSLocalizedString(@"Clear", @"") forState:UIControlStateNormal];
+        [self.clearButton setTitle:NSLocalizedStringFromTableInBundle(@"Clear", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         self.clearButton.titleLabel.font = imagePickerClearButtonFont;
         [self.clearButton setTitleColor:imagePickerClearButtonColor forState:UIControlStateNormal];
         [self.bottomView addSubview:self.clearButton];
@@ -66,7 +66,7 @@
         UIFont *imagePickerContinueButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGalleryPickerContinueButton];
         UIColor *imagePickerContinueButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGalleryPickerContinueButton];
         _continueButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.itemNumberView.frame)+ 6.0f, 0.0f, 65.0f, CGRectGetHeight(self.continueContainerView.frame))];
-        [self.continueButton setTitle:NSLocalizedString(@"Continue", @"") forState:UIControlStateNormal];
+        [self.continueButton setTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         self.continueButton.titleLabel.font = imagePickerContinueButtonFont;
         [self.continueButton setTitleColor:imagePickerContinueButtonColor forState:UIControlStateNormal];
         [self.continueContainerView addSubview:self.continueButton];

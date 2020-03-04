@@ -152,7 +152,7 @@
         [self.navigationItem setTitleView:self.searchBarView];
     }
     else {
-        self.title = NSLocalizedString(@"Chats", @"");
+        self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
     }
     
     self.roomListView.roomListTableView.delegate = self;

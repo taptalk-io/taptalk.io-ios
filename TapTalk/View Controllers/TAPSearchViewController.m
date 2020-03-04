@@ -233,10 +233,10 @@
         titleLabel.textColor = sectionHeaderTitleLabelColor;
         NSString *titleString = @"";
         if (section == 0) {
-            titleString = NSLocalizedString(@"CHATS AND CONTACTS", @"");
+            titleString = NSLocalizedStringFromTableInBundle(@"CHATS AND CONTACTS", nil, [TAPUtil currentBundle], @"");
         }
         else if (section == 1) {
-            titleString = NSLocalizedString(@"MESSAGES", @"");
+            titleString = NSLocalizedStringFromTableInBundle(@"MESSAGES", nil, [TAPUtil currentBundle], @"");
         }
         titleLabel.text = titleString;
         

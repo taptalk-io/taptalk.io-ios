@@ -821,7 +821,7 @@
     if (show) {
         //check id message sender is equal to active user id, if yes change the title to "You"
         if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-            self.replyNameLabel.text = NSLocalizedString(@"You", @"");
+            self.replyNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
         }
         else {
             self.replyNameLabel.text = message.quote.title;
@@ -926,14 +926,16 @@
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
         }
         else if (timeGap <= 86400.0f + midnightTimeGap) {
             //Yesterday
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"HH:mm";
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"yesterday at %@", @""), dateString];
+            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
         }
         else {
             //Set date
@@ -941,14 +943,16 @@
             dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
             
             NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            lastMessageDateString = [NSString stringWithFormat:NSLocalizedString(@"at %@", @""), dateString];
+            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
         }
         
-        NSString *statusString = [NSString stringWithFormat:NSLocalizedString(@"Sent %@", @""), lastMessageDateString];
+        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
         self.statusLabel.text = statusString;
         
         if (self.message.isFailedSend) {
-            NSString *failedStatusString = NSLocalizedString(@"Failed to send, tap to retry", @"");
+            NSString *failedStatusString = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
             self.statusLabel.text = failedStatusString;
         }
         
@@ -980,12 +984,13 @@
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
-    
-    NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+
+    NSString *initialAppendedFullnameString = NSLocalizedStringFromTableInBundle(@"From: ", nil, [TAPUtil currentBundle], @"");
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"%@%@", initialAppendedFullnameString, forwardData.fullname];
     
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        appendedFullnameString = NSLocalizedString(@"From: You", @"");
+        appendedFullnameString = NSLocalizedStringFromTableInBundle(@"From: You", nil, [TAPUtil currentBundle], @"");
     }
     
     self.forwardFromLabel.text = appendedFullnameString;
@@ -1011,7 +1016,7 @@
     }
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
+        self.quoteTitleLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
     }
     else {
         self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];

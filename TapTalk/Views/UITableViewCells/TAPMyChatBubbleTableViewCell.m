@@ -445,7 +445,7 @@
     if (show) {
         //check id message sender is equal to active user id, if yes change the title to "You"
         if ([message.replyTo.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-             self.replyNameLabel.text = NSLocalizedString(@"You", @"");
+             self.replyNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
         }
         else {
             self.replyNameLabel.text = message.quote.title;
@@ -518,11 +518,12 @@
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
     
-    NSString *appendedFullnameString = [NSString stringWithFormat:@"From: %@", forwardData.fullname];
+    NSString *initialNameString = NSLocalizedStringFromTableInBundle(@"From: ", nil, [TAPUtil currentBundle], @"");
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"%@%@", initialNameString, forwardData.fullname];
     
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        appendedFullnameString = NSLocalizedString(@"From: You", @"");
+        appendedFullnameString = NSLocalizedStringFromTableInBundle(@"From: You", nil, [TAPUtil currentBundle], @"");
     }
     
     self.forwardFromLabel.text = appendedFullnameString;
@@ -560,7 +561,7 @@
     
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-        self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
+        self.quoteTitleLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
     }
     else {
         self.quoteTitleLabel.text = [TAPUtil nullToEmptyString:quote.title];

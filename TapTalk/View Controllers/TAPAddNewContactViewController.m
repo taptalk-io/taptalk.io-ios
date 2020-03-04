@@ -40,7 +40,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.title = NSLocalizedString(@"New Contact", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"New Contact", nil, [TAPUtil currentBundle], @"");
     [self showCustomBackButton];
     
     [self.addNewContactView.userChatNowButton addTarget:self action:@selector(userChatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -203,7 +203,7 @@
     
     if ([currentUserID isEqualToString:searchedUserID]) {
         //Add theirselves
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Can't add yourself as contact", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {
@@ -250,7 +250,7 @@
     
     if ([currentUserID isEqualToString:searchedUserID]) {
         //Add theirselves
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add Expert To Contact"  title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Can't add yourself as contact",@"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add Expert To Contact"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Can't add yourself as contact", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }
     else {
         [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {
