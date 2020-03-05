@@ -307,6 +307,7 @@
 		D7F986F82251C1C40087B652 /* PTRootUI-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D7F986F42251C1C10087B652 /* PTRootUI-Light.ttf */; };
 		D7F986F92251C1C40087B652 /* PTRootUI-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D7F986F52251C1C30087B652 /* PTRootUI-Medium.ttf */; };
 		D7F986FA2251C1C40087B652 /* PTRootUI-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D7F986F62251C1C40087B652 /* PTRootUI-Regular.ttf */; };
+		D7FA52AB2410D7440049C73E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D7FA52AD2410D7440049C73E /* Localizable.strings */; };
 		D7FB9EDF21C8C7BC00E26FC7 /* TAPImagePreviewView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FB9EDD21C8C7BC00E26FC7 /* TAPImagePreviewView.h */; };
 		D7FB9EE021C8C7BC00E26FC7 /* TAPImagePreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7FB9EDE21C8C7BC00E26FC7 /* TAPImagePreviewView.m */; };
 		D7FB9EE321C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7FB9EE121C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h */; };
@@ -717,6 +718,8 @@
 		D7F986F42251C1C10087B652 /* PTRootUI-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Light.ttf"; sourceTree = "<group>"; };
 		D7F986F52251C1C30087B652 /* PTRootUI-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Medium.ttf"; sourceTree = "<group>"; };
 		D7F986F62251C1C40087B652 /* PTRootUI-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Regular.ttf"; sourceTree = "<group>"; };
+		D7FA52AE2410D7470049C73E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D7FA52AF2410D7640049C73E /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D7FB9EDD21C8C7BC00E26FC7 /* TAPImagePreviewView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPImagePreviewView.h; sourceTree = "<group>"; };
 		D7FB9EDE21C8C7BC00E26FC7 /* TAPImagePreviewView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPImagePreviewView.m; sourceTree = "<group>"; };
 		D7FB9EE121C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPImagePreviewCollectionViewCell.h; sourceTree = "<group>"; };
@@ -928,6 +931,7 @@
 				D774A94B22E8228F005CAD5D /* TapUI.h */,
 				D774A94C22E82290005CAD5D /* TapUI.m */,
 				D77B5E762158BAE400253BDC /* Supporting Files */,
+				D7FA52AD2410D7440049C73E /* Localizable.strings */,
 			);
 			path = TapTalk;
 			sourceTree = "<group>";
@@ -1681,6 +1685,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				id,
 			);
 			mainGroup = D77B5E3F2158BA8B00253BDC;
 			productRefGroup = D77B5E4A2158BA8C00253BDC /* Products */;
@@ -1711,6 +1716,7 @@
 				F56AAE5B2186EEFD00E0ECC3 /* TAPMyImageBubbleTableViewCell.xib in Resources */,
 				D7D0811A2190255B0037FA57 /* TAPProductListCollectionViewCell.xib in Resources */,
 				D776CB7922CC669D003B0D4F /* DMSans-Italic.ttf in Resources */,
+				D7FA52AB2410D7440049C73E /* Localizable.strings in Resources */,
 				DF86DC202224F25400D9D4A9 /* Assets.xcassets in Resources */,
 				D7FF4CE52176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.xib in Resources */,
 				D7E26BE2225E042200B50506 /* TAPYourVideoBubbleTableViewCell.xib in Resources */,
@@ -1982,6 +1988,18 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		D7FA52AD2410D7440049C73E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D7FA52AE2410D7470049C73E /* en */,
+				D7FA52AF2410D7640049C73E /* id */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		D77B5E5B2158BA8C00253BDC /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2142,7 +2160,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.6;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -2176,7 +2194,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.6;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

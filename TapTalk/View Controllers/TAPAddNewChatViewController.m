@@ -771,7 +771,7 @@
                                 
                                 NSString *syncedString = NSLocalizedStringFromTableInBundle(@"Synced", nil, [TAPUtil currentBundle], @"");
                                 
-                                [self.addNewChatView showSyncNotificationWithString:[NSString stringWithFormat:@"%@ %ld %@", syncedString, [users count], contactString] type:TAPSyncNotificationViewTypeSynced];
+                                [self.addNewChatView showSyncNotificationWithString:[NSString stringWithFormat:@"%ld %@ %@", [users count], syncedString, contactString] type:TAPSyncNotificationViewTypeSynced];
                             }
                             else {
                                 //All contacts synced
