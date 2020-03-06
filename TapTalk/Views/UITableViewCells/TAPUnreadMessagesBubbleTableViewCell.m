@@ -33,6 +33,7 @@
     UIColor *unreadMessageLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorUnreadMessageIdentifier];
     self.unreadMessageLabel.textColor = unreadMessageLabelColor;
     self.unreadMessageLabel.font = unreadMessageLabelFont;
+    self.unreadMessageLabel.text = NSLocalizedStringFromTableInBundle(@"Unread Messages", nil, [TAPUtil currentBundle], nil);
     
     self.arrowImageView.image = [self.arrowImageView.image setImageTintColor:unreadMessageLabelColor];
     

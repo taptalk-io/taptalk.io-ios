@@ -85,7 +85,7 @@
     else {
         TAPUserModel *activeUser = [TAPChatManager sharedManager].activeUser;
         if (activeUser == nil || [activeUser.userID isEqualToString:@""] || activeUser.userID == nil) {
-            NSString *errorMessage = @"Active user not found";
+            NSString *errorMessage =  NSLocalizedStringFromTableInBundle(@"Active user not found", nil, [TAPUtil currentBundle], @"");
             NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90001 errorMessage:errorMessage];
             failure(error);
         }

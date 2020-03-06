@@ -406,18 +406,17 @@
         NSError *err = nil;
         NSNumber *fileSize;
         if(![fileURI getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
-            NSString *errorMessage = @"Unable to get file data from URI";
+            NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"Unable to get file data from URI", nil, [TAPUtil currentBundle], @"");
             NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90301 errorMessage:errorMessage];
             failure(error);
             return;
         } else {
-            
             TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
             NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
             NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024;
             if ([fileSize doubleValue] > [maxFileSize doubleValue]) {
                 //File size is larger than max file size
-                NSString *errorMessage = [NSString stringWithFormat:@"Selected file exceeded %ld MB maximum", (long)maxFileSizeInMB];
+                NSString *errorMessage = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"Selected file exceeded %ld MB maximum", nil, [TAPUtil currentBundle], @""), (long)maxFileSizeInMB];
                 NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90302 errorMessage:errorMessage];
                 failure(error);
                 return;

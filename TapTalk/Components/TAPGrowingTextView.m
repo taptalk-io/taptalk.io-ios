@@ -50,6 +50,7 @@
 }
 
 - (void)xibSetup {
+
     self.backgroundColor = [UIColor clearColor];
     UIView *currentView = [[[TAPUtil currentBundle] loadNibNamed:[[self class] description] owner:self options:nil] lastObject];
     
@@ -160,6 +161,7 @@
     
     [self addSubview:currentView];
     
+    self.placeholderLabel.text = NSLocalizedStringFromTableInBundle(@"Send a message...", nil, [TAPUtil currentBundle], @"");
 }
 
 /*

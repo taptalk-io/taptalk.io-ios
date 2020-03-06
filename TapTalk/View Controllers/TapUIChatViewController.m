@@ -386,7 +386,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     CGFloat extensionHeight = 0.0f;
-    if(quotedMessage) {
+    if(quotedMessage != nil) {
         extensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
         _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
     }
@@ -4640,35 +4640,35 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *documentsAction = [UIAlertAction
-                                      actionWithTitle:@"Documents"
+                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Documents", nil, [TAPUtil currentBundle], @"")
                                       style:UIAlertActionStyleDefault
                                       handler:^(UIAlertAction * action) {
                                           [self performSelector:@selector(openFiles) withObject:nil];
                                       }];
     
     UIAlertAction *cameraAction = [UIAlertAction
-                                   actionWithTitle:@"Camera"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Camera", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleDefault
                                    handler:^(UIAlertAction * action) {
                                        [self performSelector:@selector(openCamera) withObject:nil];
                                    }];
     
     UIAlertAction *galleryAction = [UIAlertAction
-                                    actionWithTitle:@"Gallery"
+                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Gallery", nil, [TAPUtil currentBundle], @"")
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
                                         [self performSelector:@selector(openGallery) withObject:nil];
                                     }];
     
     UIAlertAction *locationAction = [UIAlertAction
-                                     actionWithTitle:@"Location"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Location", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          [self performSelector:@selector(pickLocation) withObject:nil];
                                      }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        [self showInputAccessoryView];
@@ -4957,7 +4957,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                         }];
         
         UIAlertAction *copyAction = [UIAlertAction
-                                     actionWithTitle:@"Copy"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          [self showInputAccessoryView];
@@ -4966,7 +4966,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }];
         
         UIAlertAction *cancelAction = [UIAlertAction
-                                       actionWithTitle:@"Cancel"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            [self showInputAccessoryView];
@@ -5032,7 +5032,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }];
         
         UIAlertAction *copyAction = [UIAlertAction
-                                     actionWithTitle:@"Copy"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          [self showInputAccessoryView];
@@ -5041,7 +5041,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }];
         
         UIAlertAction *cancelAction = [UIAlertAction
-                                       actionWithTitle:@"Cancel"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            [self showInputAccessoryView];
@@ -7495,7 +7495,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             else {
                 unreadMessagesString = [NSString stringWithFormat:@"%ld", (long)numberOfUnreadMessages];
             }
-            self.topFloatingIndicatorLabel.text = [NSString stringWithFormat:@"%@ unread messages", unreadMessagesString];
+            
+            self.topFloatingIndicatorLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ unread messages", nil, [TAPUtil currentBundle], @""), unreadMessagesString];
             self.topFloatingIndicatorImageView.image = [UIImage imageNamed:@"TAPIconUnreadMessageTop" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomFloatingUnreadButton]];
         }
