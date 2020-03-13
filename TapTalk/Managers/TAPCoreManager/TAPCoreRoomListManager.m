@@ -119,7 +119,7 @@
             NSString *userID = activeUser.userID;
             userID = [TAPUtil nullToEmptyString:userID];
             if ([userID isEqualToString:@""]) {
-                NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"Current active user is not found....", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Current active user is not found...", nil, [TAPUtil currentBundle], @"")}];
+                NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"Current active user is not found...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Current active user is not found...", nil, [TAPUtil currentBundle], @"")}];
                 failure(localizedError);
             }
             

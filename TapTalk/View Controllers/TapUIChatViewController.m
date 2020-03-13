@@ -386,7 +386,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     CGFloat extensionHeight = 0.0f;
-    if(quotedMessage) {
+    if(quotedMessage != nil) {
         extensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
         _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
     }
@@ -2386,21 +2386,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *googleMapsAction = [UIAlertAction
-                                           actionWithTitle:@"Open in Google Maps"
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Open in Google Maps", nil, [TAPUtil currentBundle], @"")
                                            style:UIAlertActionStyleDefault
                                            handler:^(UIAlertAction * action) {
                                                [self performSelector:@selector(openLocationInGoogleMaps:) withObject:dataDictionary];
                                            }];
         
         UIAlertAction *appleMapsAction = [UIAlertAction
-                                          actionWithTitle:@"Open in Maps"
+                                          actionWithTitle:NSLocalizedStringFromTableInBundle(@"Open in Maps", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
                                               [self performSelector:@selector(openLocationInAppleMaps:) withObject:dataDictionary];
                                           }];
         
         UIAlertAction *cancelAction = [UIAlertAction
-                                       actionWithTitle:@"Cancel"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            //Do some thing here
@@ -3170,28 +3170,28 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *googleMapsAction = [UIAlertAction
-                                       actionWithTitle:@"Open in Google Maps"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Open in Google Maps", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleDefault
                                        handler:^(UIAlertAction * action) {
                                            [self performSelector:@selector(openLocationInGoogleMaps:) withObject:dataDictionary];
                                        }];
     
     UIAlertAction *appleMapsAction = [UIAlertAction
-                                      actionWithTitle:@"Open in Maps"
+                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Open in Maps", nil, [TAPUtil currentBundle], @"")
                                       style:UIAlertActionStyleDefault
                                       handler:^(UIAlertAction * action) {
                                           [self performSelector:@selector(openLocationInAppleMaps:) withObject:dataDictionary];
                                       }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
                                        [self showInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
-    
+        
     [googleMapsAction setValue:[[UIImage imageNamed:@"TAPIconGoogleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     [appleMapsAction setValue:[[UIImage imageNamed:@"TAPIconAppleMaps" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
@@ -4640,35 +4640,35 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *documentsAction = [UIAlertAction
-                                      actionWithTitle:@"Documents"
+                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Documents", nil, [TAPUtil currentBundle], @"")
                                       style:UIAlertActionStyleDefault
                                       handler:^(UIAlertAction * action) {
                                           [self performSelector:@selector(openFiles) withObject:nil];
                                       }];
     
     UIAlertAction *cameraAction = [UIAlertAction
-                                   actionWithTitle:@"Camera"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Camera", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleDefault
                                    handler:^(UIAlertAction * action) {
                                        [self performSelector:@selector(openCamera) withObject:nil];
                                    }];
     
     UIAlertAction *galleryAction = [UIAlertAction
-                                    actionWithTitle:@"Gallery"
+                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Gallery", nil, [TAPUtil currentBundle], @"")
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
                                         [self performSelector:@selector(openGallery) withObject:nil];
                                     }];
     
     UIAlertAction *locationAction = [UIAlertAction
-                                     actionWithTitle:@"Location"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Location", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          [self performSelector:@selector(pickLocation) withObject:nil];
                                      }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        [self showInputAccessoryView];
@@ -4764,12 +4764,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -4807,12 +4807,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -4942,7 +4942,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *composeAction = [UIAlertAction
-                                        actionWithTitle:@"Compose"
+                                        actionWithTitle:NSLocalizedStringFromTableInBundle(@"Compose", nil, [TAPUtil currentBundle], @"")
                                         style:UIAlertActionStyleDefault
                                         handler:^(UIAlertAction * action) {
                                             [self showInputAccessoryView];
@@ -4957,7 +4957,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                         }];
         
         UIAlertAction *copyAction = [UIAlertAction
-                                     actionWithTitle:@"Copy"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          [self showInputAccessoryView];
@@ -4966,7 +4966,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }];
         
         UIAlertAction *cancelAction = [UIAlertAction
-                                       actionWithTitle:@"Cancel"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            [self showInputAccessoryView];
@@ -5016,7 +5016,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *openAction = [UIAlertAction
-                                     actionWithTitle:@"Open"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Open", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          //CS TEMP - temporary open safari
@@ -5032,7 +5032,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }];
         
         UIAlertAction *copyAction = [UIAlertAction
-                                     actionWithTitle:@"Copy"
+                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          [self showInputAccessoryView];
@@ -5041,7 +5041,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }];
         
         UIAlertAction *cancelAction = [UIAlertAction
-                                       actionWithTitle:@"Cancel"
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            [self showInputAccessoryView];
@@ -5094,7 +5094,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *callAction = [UIAlertAction
-                                 actionWithTitle:@"Call Number"
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Call Number", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
                                      [self showInputAccessoryView];
@@ -5110,7 +5110,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  }];
     
     UIAlertAction *smsAction = [UIAlertAction
-                                actionWithTitle:@"SMS Number"
+                                actionWithTitle:NSLocalizedStringFromTableInBundle(@"SMS Number", nil, [TAPUtil currentBundle], @"")
                                 style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction * action) {
                                     [self showInputAccessoryView];
@@ -5126,7 +5126,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                 }];
     
     UIAlertAction *copyAction = [UIAlertAction
-                                 actionWithTitle:@"Copy"
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
                                      [self showInputAccessoryView];
@@ -5135,7 +5135,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
@@ -6639,9 +6639,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         _keyboardHeight = self.initialKeyboardHeight;
     }
     
+    //DV Note - 12 Mar 2020
+    //adding validation to check if keyHeight is minus
+    //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
     if (self.isKeyboardShowed) {
-        [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+        CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
+        if (keyHeight < 0.0f) {
+            keyHeight = 0.0f;
+        }
+        [self.keyboardViewController setKeyboardHeight:keyHeight];
     }
+    //END DV Note
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
@@ -6690,9 +6698,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
         [self.view layoutIfNeeded];
         
+        //DV Note - 12 Mar 2020
+        //adding validation to check if keyHeight is minus
+        //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
         if (!self.isKeyboardShowed) {
-            [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+            CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
+            if (keyHeight < 0.0f) {
+                keyHeight = 0.0f;
+            }
+            [self.keyboardViewController setKeyboardHeight:keyHeight];
         }
+        //END DV Note
+        
     } completion:^(BOOL finished) {
         //Do something after animation completed.
         //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
@@ -6791,8 +6808,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (self.keyboardState == keyboardStateDefault) {
         [self setKeyboardStateOption];
-        
-        [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+
+        //DV Note - 12 Mar 2020
+        //adding validation to check if keyHeight is minus
+        //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+        CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
+        if (keyHeight < 0.0f) {
+            keyHeight = 0.0f;
+        }
+        [self.keyboardViewController setKeyboardHeight:keyHeight];
+        //END DV Note
         
         self.secondaryTextField.inputView = self.keyboardViewController.inputView;
         if (IS_IPHONE_X_FAMILY) {
@@ -7087,7 +7112,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.messageTextView.text = @"";
     }
     else {
-        
         //Check if forward message exist, send forward message
         TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
         
@@ -7098,7 +7122,23 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.messageTextView.text = @"";
     }
     
-    [self showInputAccessoryExtensionView:NO];
+
+    //DV Note - 12 Mar 2020
+    //Done with debt because if called showInputAccessoryExtensionView, after send, table view can scroll to bottom, error tableview inset
+//    [self showInputAccessoryExtensionView:NO];
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+        [self.inputAccessoryView layoutIfNeeded];
+        [[[self.inputAccessoryView superview] superview] layoutIfNeeded];
+    }];
+
+    if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
+        _initialKeyboardHeight = 0.0f;
+        _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
+    }
+    //END DV Note
+    
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     
     if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
@@ -7114,6 +7154,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.lastSeenTimer invalidate];
     _lastSeenTimer = nil;
     [self destroySequence];
+    
+    if ([self.delegate respondsToSelector:@selector(chatViewControllerDidPressCloseButton)]) {
+        [self.delegate chatViewControllerDidPressCloseButton];
+    }
+    
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -7495,7 +7540,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             else {
                 unreadMessagesString = [NSString stringWithFormat:@"%ld", (long)numberOfUnreadMessages];
             }
-            self.topFloatingIndicatorLabel.text = [NSString stringWithFormat:@"%@ unread messages", unreadMessagesString];
+            
+            self.topFloatingIndicatorLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ unread messages", nil, [TAPUtil currentBundle], @""), unreadMessagesString];
             self.topFloatingIndicatorImageView.image = [UIImage imageNamed:@"TAPIconUnreadMessageTop" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomFloatingUnreadButton]];
         }

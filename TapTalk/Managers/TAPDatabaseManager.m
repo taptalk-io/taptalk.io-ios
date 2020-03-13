@@ -655,7 +655,7 @@
     
     // Set the new schema version. This must be greater than the previously used
     // version (if you've never set a schema version before, the version is 0).
-    configuration.schemaVersion = 5;
+    configuration.schemaVersion = 6;
     
     //NOTES - CHANGES
     //SCHEMA VERSION - 1
@@ -670,7 +670,7 @@
     //SCHEMA VERSION - 5 - 25 July 2019
     //Add roomIsDeleted, roomDeleted  in TAPMessageRealmModel
     //SCHEMA VERSION - 6 - 24 January 2019
-    //Add roomIsLocked, xcRoomID  in TAPMessageRealmModel
+    //Add roomIsLocked, xcRoomID in TAPMessageRealmModel
 
     // Set the block which will be called automatically when opening a Realm with a
     // schema version lower than the one set above

@@ -402,6 +402,18 @@
     if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:fromActiveController:)]) {
         [self.delegate tapTalkDidTappedNotificationWithMessage:message fromActiveController:currentActiveController];
     }
+    else {
+        //Handle tapped notification message
+        if ([currentActiveController isKindOfClass:[TapUIChatViewController class]]) {
+            [currentActiveController.navigationController popViewControllerAnimated:NO];
+        }
+        
+        UINavigationController *latestActiveController = [[TapUI sharedInstance] getCurrentTapTalkActiveNavigationController];
+        [[TapUI sharedInstance] createRoomWithRoom:message.room customQuoteTitle:nil customQuoteContent:nil customQuoteImageURLString:nil userInfo:nil success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [latestActiveController pushViewController:chatViewController animated:YES];
+        }];
+    }
 }
 
 #pragma mark - Custom Method
@@ -508,17 +520,21 @@
     return self.implementationType;
 }
 
-- (void)logoutAndClearAllTapTalkDataWithSuccess:(void (^_Nonnull)(void))success
-                                        failure:(void (^_Nonnull)(NSError *_Nonnull error))failure {
+- (void)logoutAndClearAllTapTalkData {
+    
+    BOOL isAuthenticated = [[TapTalk sharedInstance] isAuthenticated];
+    if (!isAuthenticated) {
+        return;
+    }
+    
     [TAPDataManager callAPILogoutWithSuccess:^{
         [[TapTalk sharedInstance] clearAllTapTalkData];
         [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
         }];
-        
-        success();
     } failure:^(NSError *error) {
-        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-        failure(localizedError);
+        [[TapTalk sharedInstance] clearAllTapTalkData];
+        [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
+        }];
     }];
 }
 

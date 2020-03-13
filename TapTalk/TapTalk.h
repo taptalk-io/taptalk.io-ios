@@ -87,8 +87,7 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 /**
  Logout from TapTalk.io and clear all local cached data
  */
-- (void)logoutAndClearAllTapTalkDataWithSuccess:(void (^_Nonnull)(void))success
-                                        failure:(void (^_Nonnull)(NSError *_Nonnull error))failure;
+- (void)logoutAndClearAllTapTalkData;
 
 /**
  Clear all local cached data

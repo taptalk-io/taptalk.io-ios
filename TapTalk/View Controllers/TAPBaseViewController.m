@@ -214,7 +214,7 @@
     UIFont *leftBarButtonItemFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
     UIColor *leftBarButtonItemColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
     UIButton* leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
-    [leftBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    [leftBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [leftBarButton setTitleColor:leftBarButtonItemColor forState:UIControlStateNormal];
     leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     leftBarButton.titleLabel.font = leftBarButtonItemFont;
@@ -229,7 +229,7 @@
     UIColor *rightBarButtonItemColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
     
     UIButton* rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
-    [rightBarButton setTitle:@"Edit" forState:UIControlStateNormal];
+    [rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Edit", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [rightBarButton setTitleColor:rightBarButtonItemColor forState:UIControlStateNormal];
     rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     rightBarButton.titleLabel.font = rightBarButtonItemFont;
@@ -244,7 +244,7 @@
     UIColor *rightBarButtonItemColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
 
     UIButton* rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
-    [rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    [rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [rightBarButton setTitleColor:rightBarButtonItemColor forState:UIControlStateNormal];
     rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     rightBarButton.titleLabel.font = rightBarButtonItemFont;

@@ -424,21 +424,21 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *cameraAction = [UIAlertAction
-                                   actionWithTitle:@"Camera"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Camera", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleDefault
                                    handler:^(UIAlertAction * action) {
                                        [self openCamera];
                                    }];
     
     UIAlertAction *galleryAction = [UIAlertAction
-                                    actionWithTitle:@"Gallery"
+                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Gallery", nil, [TAPUtil currentBundle], @"")
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
                                         [self openGallery];
                                     }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
@@ -496,12 +496,12 @@
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -540,12 +540,12 @@
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -608,20 +608,14 @@
             [self.delegate myAccountViewControllerDidTappedLogoutButton];
         }
         
-            [[TapTalk sharedInstance] logoutAndClearAllTapTalkDataWithSuccess:^{
-                [self dismissViewControllerAnimated:NO completion:nil];
-                [self.myAccountView showLogoutLoadingView:NO];
-                
-                id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-                if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
-                    [tapTalkDelegate userLogout];
-                }
-
-            } failure:^(NSError *error) {
-                //Show alert
-                [self.myAccountView showLogoutLoadingView:NO];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Logout" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Something went wrong, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
-            }];
+        [[TapTalk sharedInstance] logoutAndClearAllTapTalkData];
+        [self dismissViewControllerAnimated:NO completion:nil];
+        [self.myAccountView showLogoutLoadingView:NO];
+        
+        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+            [tapTalkDelegate userLogout];
+        }
     }
 }
 

@@ -3054,7 +3054,7 @@
                                  failure:(void (^)(NSError *error))failure {
     if(roomID == nil || [roomID isEqualToString:@""]) {
         
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"Input Error", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Room not found", nil, [TAPUtil currentBundle], @"")}];
+        NSError *localizedError = [NSError errorWithDomain:@"Input Error" code:999 userInfo:@{@"message": @"Room not found"}];
         failure(localizedError);
         return;
     }

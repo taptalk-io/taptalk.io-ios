@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -20,27 +18,27 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="FOD-4O-9yd" customClass="TAPUnreadMessagesBubbleTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="FOD-4O-9yd" id="ez7-yu-1Kh">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="41.5"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FOD-4O-9yd" id="ez7-yu-1Kh">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="42"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aoz-el-zNp">
-                        <rect key="frame" x="0.0" y="6.5" width="320" height="20"/>
+                        <rect key="frame" x="0.0" y="6" width="320" height="20"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eJA-ae-AfO">
-                                <rect key="frame" x="100" y="0.0" width="120" height="20"/>
+                                <rect key="frame" x="95" y="0.0" width="130" height="20"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unread Messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uGX-mZ-YPB">
-                                        <rect key="frame" x="0.0" y="0.0" width="100" height="20"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="110" height="20"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="100" id="DEF-9t-81i"/>
+                                            <constraint firstAttribute="width" constant="110" id="DEF-9t-81i"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="12"/>
                                         <color key="textColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconArrowDown" translatesAutoresizingMaskIntoConstraints="NO" id="7Pt-re-bpV">
-                                        <rect key="frame" x="100" y="0.0" width="20" height="20"/>
+                                        <rect key="frame" x="110" y="0.0" width="20" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="N5X-sL-rEX"/>
                                             <constraint firstAttribute="width" constant="20" id="kas-co-YiA"/>
@@ -55,17 +53,17 @@
                                     <constraint firstItem="uGX-mZ-YPB" firstAttribute="top" secondItem="eJA-ae-AfO" secondAttribute="top" id="FkI-M2-7Rs"/>
                                     <constraint firstAttribute="bottom" secondItem="uGX-mZ-YPB" secondAttribute="bottom" id="atF-Xj-4ty"/>
                                     <constraint firstItem="7Pt-re-bpV" firstAttribute="top" secondItem="eJA-ae-AfO" secondAttribute="top" id="jQy-gM-2EJ"/>
-                                    <constraint firstAttribute="width" constant="120" id="tbh-4S-uBN"/>
+                                    <constraint firstAttribute="width" constant="130" id="tbh-4S-uBN"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="0.49411764705882355" blue="0.0" alpha="0.10000000000000001" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="20" id="7yp-gG-isc"/>
-                            <constraint firstItem="eJA-ae-AfO" firstAttribute="leading" secondItem="7Vv-uV-wUE" secondAttribute="leading" constant="100" id="FlF-K7-jfH"/>
+                            <constraint firstItem="eJA-ae-AfO" firstAttribute="leading" secondItem="7Vv-uV-wUE" secondAttribute="leading" constant="95" id="FlF-K7-jfH"/>
                             <constraint firstItem="7Vv-uV-wUE" firstAttribute="bottom" secondItem="eJA-ae-AfO" secondAttribute="bottom" id="W1x-I3-kre"/>
                             <constraint firstItem="eJA-ae-AfO" firstAttribute="top" secondItem="aoz-el-zNp" secondAttribute="top" id="wRh-il-nga"/>
-                            <constraint firstItem="7Vv-uV-wUE" firstAttribute="trailing" secondItem="eJA-ae-AfO" secondAttribute="trailing" constant="100" id="wuE-d7-jeI"/>
+                            <constraint firstItem="7Vv-uV-wUE" firstAttribute="trailing" secondItem="eJA-ae-AfO" secondAttribute="trailing" constant="95" id="wuE-d7-jeI"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="7Vv-uV-wUE"/>
                     </view>

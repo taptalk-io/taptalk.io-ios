@@ -431,7 +431,7 @@
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-        [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+        [self.rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         [self.rightBarButton setTitleColor:searchBarCancelColor forState:UIControlStateNormal];
         self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
         self.rightBarButton.titleLabel.font = searchBarCancelFont;

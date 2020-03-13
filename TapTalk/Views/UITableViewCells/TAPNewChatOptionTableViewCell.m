@@ -55,19 +55,19 @@
     
     if (type == TAPNewChatOptionTableViewCellTypeNewContact) {
         imageName = @"TAPIconNewContact";
-        descriptionString = @"New Contact";
+        descriptionString = NSLocalizedStringFromTableInBundle(@"New Contact", nil, [TAPUtil currentBundle], @"");
         self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMenuNewContact]];
     }
     else if (type == TAPNewChatOptionTableViewCellTypeScanQRCode) {
         imageName = @"TAPIconScanQrCode";
-        descriptionString = @"Scan QR code";
+        descriptionString = NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"");
         self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMenuScanQRCode]];
     }
     else if (type == TAPNewChatOptionTableViewCellTypeNewGroup) {
         imageName = @"TAPIconNewGroup";
-        descriptionString = @"New Group";
+        descriptionString = NSLocalizedStringFromTableInBundle(@"New Group", nil, [TAPUtil currentBundle], @"");
         self.iconImageView.image = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMenuNewGroup]];
     }

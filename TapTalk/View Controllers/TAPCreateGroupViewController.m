@@ -1241,25 +1241,25 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault) {
             if ([self.selectedUserModelArray count] > 0) {
                 [self.createGroupView showSelectedContacts:YES];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedUserModelArray count] + 1, maxGroupMember + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"GROUP MEMBERS (%ld/%ld)", nil, [TAPUtil currentBundle], @""), [self.selectedUserModelArray count] + 1, maxGroupMember + 1];
                 
                 [self.createGroupView.selectedContactsCollectionView reloadData];
             }
             else {
                 [self.createGroupView showSelectedContacts:NO];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (1/%ld)", maxGroupMember + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"GROUP MEMBERS (1/%ld)", nil, [TAPUtil currentBundle], @""), maxGroupMember + 1];
             }
         }
         else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             if ([self.selectedUserModelArray count] > 0) {
                 [self.createGroupView showSelectedContacts:YES];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (%ld/%ld)", [self.selectedUserModelArray count] + [self.room.participants count], maxGroupMember + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"GROUP MEMBERS (%ld/%ld)", nil, [TAPUtil currentBundle], @""), [self.selectedUserModelArray count] + [self.room.participants count], maxGroupMember + 1];
                 
                 [self.createGroupView.selectedContactsCollectionView reloadData];
             }
             else {
                 [self.createGroupView showSelectedContacts:NO];
-                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:@"GROUP MEMBERS (0/%ld)", maxGroupMember - [self.room.participants count] + 1];
+                self.createGroupView.selectedContactsTitleLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"GROUP MEMBERS (0/%ld)", nil, [TAPUtil currentBundle], @""), maxGroupMember - [self.room.participants count] + 1];
             }
         }
         

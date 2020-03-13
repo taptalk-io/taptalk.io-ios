@@ -86,7 +86,8 @@
         [self.phoneNumberContainerView addSubview:self.phoneNumberTextField];
         
         _keyboardAccessoryView = [[TAPNumericKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 44.0f)];
-        [self.keyboardAccessoryView setHeaderNumericKeyboardButtonTitleWithText:@"DONE"];
+        NSString *keyboardString = NSLocalizedStringFromTableInBundle(@"DONE", nil, [TAPUtil currentBundle], @"");
+        [self.keyboardAccessoryView setHeaderNumericKeyboardButtonTitleWithText:keyboardString];
         self.phoneNumberTextField.inputAccessoryView = self.keyboardAccessoryView;
         
         _pickerButton = [[UIButton alloc] initWithFrame:self.countryCodeContainerView.frame];

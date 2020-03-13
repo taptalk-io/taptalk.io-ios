@@ -281,7 +281,7 @@
         }
         case TAPComponentFontKeyboardAccessoryLabel:
         {
-            
+        
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
             font = [font fontWithSize:TAP_KEYBOARD_ACCESSORY_LABEL_FONTSIZE_STYLE];
             return font;
@@ -1955,6 +1955,12 @@
         case TAPComponentColorRoomListUnreadBadgeInactiveBackground:
         {
             UIColor *color = [TAPUtil getColor:TAP_UNREAD_BADGE_INACTIVE_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TAPComponentColorChatRoomBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR];
             return color;
             break;
         }

@@ -8,7 +8,6 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-#import "TAPLoginViewController.h"
 #import "TapUIRoomListViewController.h"
 #import "TAPProfileViewController.h"
 #import "TAPCustomNotificationAlertViewController.h"

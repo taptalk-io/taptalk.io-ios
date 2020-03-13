@@ -629,12 +629,13 @@
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -771,7 +772,7 @@
                                 
                                 NSString *syncedString = NSLocalizedStringFromTableInBundle(@"Synced", nil, [TAPUtil currentBundle], @"");
                                 
-                                [self.addNewChatView showSyncNotificationWithString:[NSString stringWithFormat:@"%@ %ld %@", syncedString, [users count], contactString] type:TAPSyncNotificationViewTypeSynced];
+                                [self.addNewChatView showSyncNotificationWithString:[NSString stringWithFormat:@"%ld %@ %@", [users count], syncedString, contactString] type:TAPSyncNotificationViewTypeSynced];
                             }
                             else {
                                 //All contacts synced
