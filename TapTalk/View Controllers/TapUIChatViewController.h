@@ -34,6 +34,11 @@ Triggered when user delete or leave from group and will pass the delegate to Tap
 */
 - (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room;
 
+/**
+Triggered when user click back or close button
+*/
+- (void)chatViewControllerDidPressCloseButton;
+
 @end
 
 @interface TapUIChatViewController : TAPBaseViewController

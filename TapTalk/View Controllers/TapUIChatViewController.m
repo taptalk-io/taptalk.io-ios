@@ -6639,9 +6639,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         _keyboardHeight = self.initialKeyboardHeight;
     }
     
+    //DV Note - 12 Mar 2020
+    //adding validation to check if keyHeight is minus
+    //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
     if (self.isKeyboardShowed) {
-        [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+        CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
+        if (keyHeight < 0.0f) {
+            keyHeight = 0.0f;
+        }
+        [self.keyboardViewController setKeyboardHeight:keyHeight];
     }
+    //END DV Note
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
@@ -6690,9 +6698,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.tableView setContentOffset:CGPointMake(0.0f, newYContentOffset)];
         [self.view layoutIfNeeded];
         
+        //DV Note - 12 Mar 2020
+        //adding validation to check if keyHeight is minus
+        //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
         if (!self.isKeyboardShowed) {
-            [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+            CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
+            if (keyHeight < 0.0f) {
+                keyHeight = 0.0f;
+            }
+            [self.keyboardViewController setKeyboardHeight:keyHeight];
         }
+        //END DV Note
+        
     } completion:^(BOOL finished) {
         //Do something after animation completed.
         //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
@@ -6791,8 +6808,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (self.keyboardState == keyboardStateDefault) {
         [self setKeyboardStateOption];
-        
-        [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+
+        //DV Note - 12 Mar 2020
+        //adding validation to check if keyHeight is minus
+        //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
+        CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
+        if (keyHeight < 0.0f) {
+            keyHeight = 0.0f;
+        }
+        [self.keyboardViewController setKeyboardHeight:keyHeight];
+        //END DV Note
         
         self.secondaryTextField.inputView = self.keyboardViewController.inputView;
         if (IS_IPHONE_X_FAMILY) {
@@ -7097,7 +7122,23 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.messageTextView.text = @"";
     }
     
-    [self showInputAccessoryExtensionView:NO];
+
+    //DV Note - 12 Mar 2020
+    //Done with debt because if called showInputAccessoryExtensionView, after send, table view can scroll to bottom, error tableview inset
+//    [self showInputAccessoryExtensionView:NO];
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+        [self.inputAccessoryView layoutIfNeeded];
+        [[[self.inputAccessoryView superview] superview] layoutIfNeeded];
+    }];
+
+    if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
+        _initialKeyboardHeight = 0.0f;
+        _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
+    }
+    //END DV Note
+    
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     
     if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
@@ -7113,6 +7154,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.lastSeenTimer invalidate];
     _lastSeenTimer = nil;
     [self destroySequence];
+    
+    if ([self.delegate respondsToSelector:@selector(chatViewControllerDidPressCloseButton)]) {
+        [self.delegate chatViewControllerDidPressCloseButton];
+    }
+    
     [self.navigationController popViewControllerAnimated:YES];
 }
 

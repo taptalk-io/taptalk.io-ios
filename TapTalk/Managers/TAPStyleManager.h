@@ -61,6 +61,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorSearchBarBorderInactive,
     TAPComponentColorRoomListUnreadBadgeBackground,
     TAPComponentColorRoomListUnreadBadgeInactiveBackground,
+    TAPComponentColorChatRoomBackground,
     TAPComponentColorChatRoomUnreadBadgeBackground,
     TAPComponentColorChatRoomUnreadBadgeInactiveBackground,
     TAPComponentColorQuoteLayoutDecorationBackground,

@@ -608,20 +608,14 @@
             [self.delegate myAccountViewControllerDidTappedLogoutButton];
         }
         
-            [[TapTalk sharedInstance] logoutAndClearAllTapTalkDataWithSuccess:^{
-                [self dismissViewControllerAnimated:NO completion:nil];
-                [self.myAccountView showLogoutLoadingView:NO];
-                
-                id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-                if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
-                    [tapTalkDelegate userLogout];
-                }
-
-            } failure:^(NSError *error) {
-                //Show alert
-                [self.myAccountView showLogoutLoadingView:NO];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Logout" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Something went wrong, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
-            }];
+        [[TapTalk sharedInstance] logoutAndClearAllTapTalkData];
+        [self dismissViewControllerAnimated:NO completion:nil];
+        [self.myAccountView showLogoutLoadingView:NO];
+        
+        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+            [tapTalkDelegate userLogout];
+        }
     }
 }
 
