@@ -483,8 +483,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView commitAnimations];
     
     self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, 0.0f);
+    self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
     
-    self.view.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+    self.view.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
     self.quoteStandingSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorQuoteLayoutDecorationBackground];
     
     //Connection status view
@@ -7420,7 +7421,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSString *formattedCreatedDate = [dateFormatter stringFromDate:lastLoginDate];
         
         NSString *headerString = NSLocalizedStringFromTableInBundle(@"Last active", nil, [TAPUtil currentBundle], @"");
-        lastSeenString = [NSString stringWithFormat:@"%@%@", formattedCreatedDate];
+        lastSeenString = [NSString stringWithFormat:@"%@ %@", headerString, formattedCreatedDate];
     }
     
     self.userStatusLabel.text = lastSeenString;
