@@ -736,7 +736,7 @@
             [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                _isShouldNotLoadFromAPI = NO;
+                self.isShouldNotLoadFromAPI = NO;
                 [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
                 [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
             });
@@ -772,7 +772,7 @@
         });
         
     } failure:^(NSError *error) {
-        _isShouldNotLoadFromAPI = NO;
+        self.isShouldNotLoadFromAPI = NO;
     }];
 }
 
