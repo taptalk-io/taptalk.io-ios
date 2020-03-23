@@ -1946,33 +1946,9 @@
             return color;
             break;
         }
-        case TAPComponentColorRoomListUnreadBadgeBackground:
-        {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
-            return color;
-            break;
-        }
-        case TAPComponentColorRoomListUnreadBadgeInactiveBackground:
-        {
-            UIColor *color = [TAPUtil getColor:TAP_UNREAD_BADGE_INACTIVE_BACKGROUND_COLOR];
-            return color;
-            break;
-        }
         case TAPComponentColorChatRoomBackground:
         {
             UIColor *color = [TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR];
-            return color;
-            break;
-        }
-        case TAPComponentColorChatRoomUnreadBadgeBackground:
-        {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
-            return color;
-            break;
-        }
-        case TAPComponentColorChatRoomUnreadBadgeInactiveBackground:
-        {
-            UIColor *color = [TAPUtil getColor:TAP_UNREAD_BADGE_INACTIVE_BACKGROUND_COLOR];
             return color;
             break;
         }

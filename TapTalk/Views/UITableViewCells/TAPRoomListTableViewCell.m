@@ -112,7 +112,7 @@
         
         _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 0.0f, 20.0f)];
         self.bubbleUnreadView.clipsToBounds = YES;
-        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListUnreadBadgeBackground];
+        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
         [self.bgView addSubview:self.bubbleUnreadView];
         

@@ -44,7 +44,7 @@
         
         _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f, 25.0f, 0.0f, 20.0f)];
         self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
-        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListUnreadBadgeBackground];
+        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         [self addSubview:self.bubbleUnreadView];
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
