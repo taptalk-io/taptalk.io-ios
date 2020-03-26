@@ -1909,7 +1909,7 @@
             }
 
             //Add user to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:messageModel.user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:messageModel.user saveToDatabase:NO saveActiveUser:NO];
             
             NSError *error;
             
@@ -2920,7 +2920,7 @@
             }
 
             //Add user to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO saveActiveUser:NO];
             
             [messageResultArray addObject:decryptedMessage];
             
@@ -3014,7 +3014,7 @@
             }
 
             //Add user to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO saveActiveUser:NO];
 
             [messageResultArray addObject:decryptedMessage];
             
@@ -3458,7 +3458,7 @@
             user.isContact = YES;
             
             //Add user to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:NO];
             
             [userResultArray addObject:user];
         }
@@ -3636,7 +3636,7 @@
         user.isContact = YES;
         
         //Add user to Contact Manager
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseContactWithData:@[user] success:^{
@@ -3789,7 +3789,7 @@
         TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
         
         //Add user to database with isContact = NO
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
         
         success(user);
         
@@ -3865,7 +3865,7 @@
         TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
         
         //Add user to database with isContact = NO
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
         
         success(user);
         
@@ -3944,7 +3944,7 @@
         TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
         
         //Add user to database with isContact = NO
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
         
         success(user);
         
@@ -4023,7 +4023,7 @@
             TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
             
             //Add user to database with isContact = NO
-            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
             
             success(user, username);
             
@@ -4444,7 +4444,7 @@
             TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
             
             //Add user to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
             
             [userModelArray addObject:user];
         }
@@ -5068,7 +5068,7 @@
             user.isContact = YES;
             
             //Add user to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
             
             [userResultArray addObject:user];
         }

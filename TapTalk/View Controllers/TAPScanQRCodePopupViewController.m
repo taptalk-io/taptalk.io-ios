@@ -111,7 +111,7 @@
         }
         else {
             //Upsert User to Contact Manager
-            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:NO];
             self.searchedUser = user;
             [TAPDataManager getDatabaseContactByUserID:user.userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
                 [self.scanQRCodePopupView setIsLoading:NO animated:YES];

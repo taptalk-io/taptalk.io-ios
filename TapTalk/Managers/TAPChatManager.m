@@ -1015,7 +1015,7 @@
     TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:dataDictionary];
     
     //Add User to Contact Manager
-    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:YES];
+    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:YES saveActiveUser:NO];
     
     decryptedMessage.isSending = NO;
     

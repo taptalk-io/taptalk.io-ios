@@ -7639,7 +7639,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 self.inputMessageAccessoryView.alpha = 1.0f;
                 
                 //Upsert User to Contact Manager
-                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
                 
                 BOOL isTyping = [[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID];
                 [self setAsTyping:isTyping];

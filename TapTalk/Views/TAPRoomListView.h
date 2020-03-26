@@ -14,5 +14,6 @@
 @property (strong, nonatomic) UIButton *startChatNoChatsButton;
 
 - (void)showNoChatsView:(BOOL)isVisible;
+- (void)setInitialYPositionOfTableView:(CGFloat)initialYPosition;
 
 @end

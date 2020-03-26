@@ -663,7 +663,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
                 else {
                     [TAPDataManager callAPIAddContactWithUserID:self.user.userID success:^(NSString *message, TAPUserModel *user) {
-                        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+                        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
                         [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAddToContact];
                         
                         [TAPUtil performBlock:^{
@@ -1300,7 +1300,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         if (self.room.type == RoomTypePersonal && (self.isFullNameChanged || self.isUserProfileURLChanged)) {
             //Save changes to contact dictionary
-            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
         }
         
     } failure:^(NSError *error) {

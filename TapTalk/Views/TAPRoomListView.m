@@ -14,6 +14,7 @@
 @property (strong, nonatomic) UIView *noChatsView;
 @property (strong, nonatomic) UILabel *titleNoChatsLabel;
 @property (strong, nonatomic) UILabel *descriptionNoChatsLabel;
+
 @end
 
 @implementation TAPRoomListView
@@ -27,7 +28,7 @@
         CGFloat tabbarHeight = CGRectGetHeight(tabBar.frame); //this will return 0 when tabBarController is nil.
         
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - tabbarHeight)];
-        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListBackground];
         [self addSubview:self.bgView];
         
         _roomListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
@@ -79,6 +80,10 @@
     else if (!isVisible && self.noChatsView.alpha != 0.0f) {
         self.noChatsView.alpha = 0.0f;
     }
+}
+
+- (void)setInitialYPositionOfTableView:(CGFloat)initialYPosition {
+    self.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListTableView.frame), initialYPosition, CGRectGetWidth(self.roomListTableView.frame), CGRectGetHeight(self.bgView.frame) - initialYPosition);
 }
 
 @end

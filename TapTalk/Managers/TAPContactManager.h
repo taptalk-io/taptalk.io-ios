@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPContactManager *)sharedManager;
 
-- (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save;
+- (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save saveActiveUser:(BOOL)saveActiveUser;
 - (void)addContactWithUserArray:(NSArray <TAPUserModel *> *)userArray saveToDatabase:(BOOL)save;
 - (TAPUserModel *)getUserWithUserID:(NSString *)userID;
 - (void)populateContactFromDatabase;
