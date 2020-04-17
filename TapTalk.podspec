@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.dependency "AFNetworking", "~> 3.1.0"
+    s.dependency "AFNetworking", "~> 4.0.0"
     s.dependency "SocketRocket"
     s.dependency "JSONModel", "~> 1.1"
     s.dependency "Realm", "3.13.1"

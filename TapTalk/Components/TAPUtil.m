@@ -7,6 +7,7 @@
 //
 
 #import "TAPUtil.h"
+#import <CoreServices/UTType.h>
 
 @implementation TAPUtil
 
