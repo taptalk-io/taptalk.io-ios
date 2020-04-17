@@ -392,7 +392,7 @@
 - (void)notificationManagerDidHandleTappedNotificationWithMessage:(TAPMessageModel *)message {
     
     //Save user to ContactManager Dictionary
-    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
+    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO saveActiveUser:NO];
     
     UIViewController *currentActiveController = nil;
     if (self.implementationType != TapTalkImplentationTypeCore) {

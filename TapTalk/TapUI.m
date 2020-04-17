@@ -116,7 +116,7 @@
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
     
     //Save user to ContactManager Dictionary
-    [[TAPContactManager sharedManager] addContactWithUserModel:otherUser saveToDatabase:NO];
+    [[TAPContactManager sharedManager] addContactWithUserModel:otherUser saveToDatabase:NO saveActiveUser:NO];
     
     TapUIChatViewController *chatViewController = [[TapUIChatViewController alloc] initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]];
     chatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -167,7 +167,7 @@
                 TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
                 
                 //Save user to ContactManager Dictionary
-                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
                 
                 if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
                     TAPQuoteModel *quote = [TAPQuoteModel new];
@@ -242,7 +242,7 @@
                 TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
                 
                 //Save user to ContactManager Dictionary
-                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO];
+                [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
                 
                 if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
                     TAPQuoteModel *quote = [TAPQuoteModel new];

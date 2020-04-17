@@ -1952,6 +1952,12 @@
             return color;
             break;
         }
+        case TAPComponentColorRoomListBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
         case TAPComponentColorQuoteLayoutDecorationBackground:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryExtraLight];

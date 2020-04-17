@@ -59,7 +59,7 @@
 }
 
 #pragma mark - Custom Method
-- (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save {
+- (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save saveActiveUser:(BOOL)saveActiveUser {
     TAPUserModel *savedUser = [self.contactUserDictionary objectForKey:user.userID];
     if(savedUser != nil && savedUser.isContact) {
         user.isContact = YES;
@@ -89,12 +89,15 @@
     }
     else {
         //update active user data
-        if (user.userID != nil) {
+        if (!saveActiveUser) {
+            return;
+        }
+        else if (user.userID != nil) {
             TAPUserModel *currentSavedUser = [self.contactUserDictionary objectForKey:user.userID];
             if ([user.updated longValue] < [currentSavedUser.updated longValue]) {
                 return;
             }
-            
+
             [TAPDataManager setActiveUser:user];
         }
     }

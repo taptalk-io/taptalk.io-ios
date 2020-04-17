@@ -14,6 +14,7 @@
 #import <TapTalk/Base64.h>
 #import <AVKit/AVKit.h>
 #import <Photos/Photos.h>
+#import <CoreServices/UTType.h>
 
 @import AFNetworking;
 

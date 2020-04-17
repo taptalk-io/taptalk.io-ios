@@ -14,6 +14,7 @@
 @property (strong, nonatomic) UIView *noChatsView;
 @property (strong, nonatomic) UILabel *titleNoChatsLabel;
 @property (strong, nonatomic) UILabel *descriptionNoChatsLabel;
+
 @end
 
 @implementation TAPRoomListView
@@ -27,7 +28,7 @@
         CGFloat tabbarHeight = CGRectGetHeight(tabBar.frame); //this will return 0 when tabBarController is nil.
         
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - tabbarHeight)];
-        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+        self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListBackground];
         [self addSubview:self.bgView];
         
         _roomListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
@@ -51,11 +52,11 @@
         
         UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
         UIColor *infoLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
-        _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 16.0f - 16.0f, 40.0f)];
+        _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 16.0f - 16.0f, 55.0f)];
         self.descriptionNoChatsLabel.text = NSLocalizedStringFromTableInBundle(@"It seems like you don't have any chats to show, but don't worry! Your chat list will grow once you", nil, [TAPUtil currentBundle], @"");
         self.descriptionNoChatsLabel.textColor = infoLabelBodyColor;
         self.descriptionNoChatsLabel.font = infoLabelBodyFont;
-        self.descriptionNoChatsLabel.numberOfLines = 2;
+        self.descriptionNoChatsLabel.numberOfLines = 0;
         self.descriptionNoChatsLabel.textAlignment = NSTextAlignmentCenter;
         [self.noChatsView addSubview:self.descriptionNoChatsLabel];
         
@@ -79,6 +80,10 @@
     else if (!isVisible && self.noChatsView.alpha != 0.0f) {
         self.noChatsView.alpha = 0.0f;
     }
+}
+
+- (void)setInitialYPositionOfTableView:(CGFloat)initialYPosition {
+    self.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListTableView.frame), initialYPosition, CGRectGetWidth(self.roomListTableView.frame), CGRectGetHeight(self.bgView.frame) - initialYPosition);
 }
 
 @end

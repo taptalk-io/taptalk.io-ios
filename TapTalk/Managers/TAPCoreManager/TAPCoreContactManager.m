@@ -59,7 +59,7 @@
                       success:(void (^)(TAPUserModel *user))success
                       failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
         success(user);
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -71,7 +71,7 @@
                         success:(void (^)(TAPUserModel *user))success
                         failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIGetUserByXCUserID:xcUserID success:^(TAPUserModel *user) {
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
         success(user);
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -80,14 +80,14 @@
 }
 
 - (void)saveUserData:(TAPUserModel *)user {
-    [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+    [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
 }
 
 - (void)addToTapTalkContactsWithUserID:(NSString *)userID
                                success:(void (^)(void))success
                                failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIAddContactWithUserID:userID success:^(NSString *message, TAPUserModel *user) {
-        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES];
+        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];

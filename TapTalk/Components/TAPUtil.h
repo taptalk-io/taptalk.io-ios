@@ -15,7 +15,7 @@
 
 #pragma mark - Math
 #define DEGREES_TO_RADIANS(x) (M_PI * x / 180.0f)
-#define RADIANS_TO_DEGREES(x) ((x) * M_PI * 180.0f)
+#define RADIANS_TO_DEGREES(x) ((x) * 180.0f / M_PI)
 
 #pragma mark - Device
 #define IS_IPHONE_4_INCH_AND_ABOVE ([[UIScreen mainScreen] bounds].size.height >= 568)?YES:NO

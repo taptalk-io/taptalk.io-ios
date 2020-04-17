@@ -124,6 +124,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] GET:urlString
                     parameters:parameters
+                       headers:[NSDictionary dictionary]
                       progress:^(NSProgress * _Nonnull downloadProgress) {
                           progress(downloadProgress);
                       }
@@ -160,6 +161,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] POST:urlString
                      parameters:parameters
+                        headers:[NSDictionary dictionary]
                        progress:^(NSProgress * _Nonnull uploadProgress) {
                            progress(uploadProgress);
                        }
@@ -190,6 +192,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] PUT:urlString
                     parameters:parameters
+                    headers:[NSDictionary dictionary]
                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                            success(task, (NSDictionary *)responseObject);
                        }
@@ -217,6 +220,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] DELETE:urlString
                        parameters:parameters
+                          headers:[NSDictionary dictionary]
                           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                               success(task, (NSDictionary *)responseObject);
     }
@@ -299,16 +303,17 @@ static const NSInteger kAPITimeOut = 60;
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
     [manager POST:urlString
-                     parameters:parameters
-                       progress:^(NSProgress * _Nonnull uploadProgress) {
-                           progress(uploadProgress);
-                       }
-                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                            success(task, (NSDictionary *)responseObject);
-                        }
-                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                            failure(task, error);
-                        }];
+       parameters:parameters
+          headers:[NSDictionary dictionary]
+         progress:^(NSProgress * _Nonnull uploadProgress) {
+           progress(uploadProgress);
+         }
+          success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+            success(task, (NSDictionary *)responseObject);
+         }
+          failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            failure(task, error);
+    }];
 }
 
 - (void)post:(NSString *)urlString
@@ -341,6 +346,7 @@ refreshToken:(NSString *)refreshToken
     
     [manager POST:urlString
        parameters:parameters
+          headers:[NSDictionary dictionary]
          progress:^(NSProgress * _Nonnull uploadProgress) {
              progress(uploadProgress);
          }
