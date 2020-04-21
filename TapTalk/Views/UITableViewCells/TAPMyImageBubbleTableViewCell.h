@@ -34,6 +34,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)myImageLongPressedPhoneNumber:(NSString *)phoneNumber
                               originalString:(NSString *)originalString;
 - (void)myImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)myImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 
 @end
 

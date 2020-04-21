@@ -75,6 +75,7 @@
 
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
+    self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleBackground];
         
     UIFont *bubbleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleDeletedMessageBody];

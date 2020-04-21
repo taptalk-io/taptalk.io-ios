@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -43,15 +43,11 @@
                         </constraints>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IEc-jH-68R">
-                        <rect key="frame" x="223" y="109" width="28" height="28"/>
+                        <rect key="frame" x="251" y="109" width="0.0" height="28"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="28" id="rSR-DF-zEb"/>
+                            <constraint firstAttribute="width" id="rSR-DF-zEb"/>
                             <constraint firstAttribute="height" constant="28" id="ths-CB-S8H"/>
                         </constraints>
-                        <state key="normal" image="TAPIconReplyChat"/>
-                        <connections>
-                            <action selector="replyButtonDidTapped:" destination="Jd7-BV-y4k" eventType="touchUpInside" id="1jz-Eo-lXP"/>
-                        </connections>
                     </button>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mMI-m8-7pV">
                         <rect key="frame" x="253" y="0.0" width="106" height="164"/>
@@ -460,6 +456,36 @@
                             <action selector="retryButtonDidTapped:" destination="Jd7-BV-y4k" eventType="touchUpInside" id="iFh-9d-gaZ"/>
                         </connections>
                     </button>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ey6-uk-rbm">
+                        <rect key="frame" x="-31" y="0.0" width="30" height="30"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ks8-jL-Dk5">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xm1-B3-s0O">
+                                        <rect key="frame" x="4" y="4" width="22" height="22"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstItem="xm1-B3-s0O" firstAttribute="leading" secondItem="Ks8-jL-Dk5" secondAttribute="leading" constant="4" id="Cwa-Mg-9oQ"/>
+                                    <constraint firstAttribute="width" constant="30" id="RbB-UV-gSy"/>
+                                    <constraint firstAttribute="height" constant="30" id="j6r-mm-lDr"/>
+                                    <constraint firstAttribute="trailing" secondItem="xm1-B3-s0O" secondAttribute="trailing" constant="4" id="nAj-Au-T8K"/>
+                                    <constraint firstAttribute="bottom" secondItem="xm1-B3-s0O" secondAttribute="bottom" constant="4" id="w3q-cI-TM0"/>
+                                    <constraint firstItem="xm1-B3-s0O" firstAttribute="top" secondItem="Ks8-jL-Dk5" secondAttribute="top" constant="4" id="xSe-zM-Ixz"/>
+                                </constraints>
+                                <viewLayoutGuide key="safeArea" id="DLS-Ao-xbm"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Ks8-jL-Dk5" firstAttribute="centerX" secondItem="ey6-uk-rbm" secondAttribute="centerX" id="Tpx-Fa-mPh"/>
+                            <constraint firstAttribute="height" constant="30" id="UXS-HQ-X3y"/>
+                            <constraint firstAttribute="width" constant="30" id="rJI-zQ-7on"/>
+                            <constraint firstItem="Ks8-jL-Dk5" firstAttribute="centerY" secondItem="ey6-uk-rbm" secondAttribute="centerY" id="tkX-d8-Zkz"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -478,8 +504,10 @@
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="RFn-yn-K8a" secondAttribute="trailing" constant="2" id="bbM-Qe-0BP"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="width" secondItem="wQr-8O-AHa" secondAttribute="width" id="cgA-R7-ntK"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="izc-Hi-fO1"/>
+                    <constraint firstItem="ey6-uk-rbm" firstAttribute="leading" secondItem="rCz-VI-RDG" secondAttribute="leadingMargin" constant="-46" id="nSm-GE-HYi"/>
                     <constraint firstAttribute="bottom" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="8" id="o4a-wI-ijd"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="bottom" secondItem="RFn-yn-K8a" secondAttribute="bottom" id="pb4-AL-GW7"/>
+                    <constraint firstItem="ey6-uk-rbm" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="uOP-H3-3rB"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="height" secondItem="wQr-8O-AHa" secondAttribute="height" id="wvO-Kn-8s9"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="IEc-jH-68R" secondAttribute="trailing" constant="2" id="z2s-Yx-4iR"/>
                 </constraints>
@@ -520,7 +548,6 @@
                 <outlet property="quoteViewLeadingConstraint" destination="BXY-7K-Y0V" id="t3d-yO-cvT"/>
                 <outlet property="quoteViewTopConstraint" destination="LaA-hC-hwa" id="3Jd-dv-0lR"/>
                 <outlet property="quoteViewTrailingConstraint" destination="btu-80-gGm" id="6aY-Ba-mUW"/>
-                <outlet property="replyButton" destination="IEc-jH-68R" id="rNL-G3-mdA"/>
                 <outlet property="replyButtonLeadingConstraint" destination="A4s-89-Rkg" id="JRV-jM-GEw"/>
                 <outlet property="replyButtonRightConstraint" destination="z2s-Yx-4iR" id="Sxu-47-62I"/>
                 <outlet property="replyButtonTrailingConstraint" destination="jja-Ma-cOc" id="jdr-Wn-Lq9"/>
@@ -552,6 +579,10 @@
                 <outlet property="statusLabel" destination="QFo-Q6-kr0" id="Xkk-ez-SvG"/>
                 <outlet property="statusLabelHeightConstraint" destination="41f-QE-a5z" id="txz-ME-JJt"/>
                 <outlet property="statusLabelTopConstraint" destination="42s-IA-DQH" id="L78-Op-MHS"/>
+                <outlet property="swipeReplyImageView" destination="xm1-B3-s0O" id="pRY-ef-ITg"/>
+                <outlet property="swipeReplyView" destination="Ks8-jL-Dk5" id="cWp-Zu-3eQ"/>
+                <outlet property="swipeReplyViewHeightConstraint" destination="j6r-mm-lDr" id="YkA-JO-pzm"/>
+                <outlet property="swipeReplyViewWidthConstraint" destination="RbB-UV-gSy" id="aaO-ec-Xws"/>
             </connections>
             <point key="canvasLocation" x="416.80000000000001" y="71.514242878560722"/>
         </tableViewCell>
@@ -560,7 +591,6 @@
         <image name="TAPIconAbort" width="32" height="32"/>
         <image name="TAPIconDocuments" width="32" height="32"/>
         <image name="TAPIconDownload" width="32" height="32"/>
-        <image name="TAPIconReplyChat" width="28" height="28"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>

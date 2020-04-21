@@ -260,6 +260,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (weak, nonatomic) id openedBubbleCell;
 
+//DV Temp
+@property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
+
+
 //Custom Method
 - (void)setupNavigationViewData;
 - (void)setupInputAccessoryView;
@@ -859,6 +863,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 TAPMyChatDeletedBubbleTableViewCell *cell = (TAPMyChatDeletedBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatDeletedBubbleTableViewCell description] forIndexPath:indexPath];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.tag = indexPath.row;
+                cell.contentView.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
@@ -873,6 +878,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -897,6 +903,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyImageBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -946,6 +953,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyVideoBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -1013,6 +1021,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyFileBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -1150,6 +1159,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 TAPYourChatDeletedBubbleTableViewCell *cell = (TAPYourChatDeletedBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatDeletedBubbleTableViewCell description] forIndexPath:indexPath];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.tag = indexPath.row;
+                cell.contentView.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
@@ -1166,6 +1176,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -1190,6 +1201,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourImageBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -1220,6 +1232,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourVideoBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -1264,6 +1277,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourFileBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
@@ -1912,6 +1926,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self handleLongPressedWithMessage:longPressedMessage];
 }
 
+- (void)myChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPMyChatDeletedBubbleTableViewCell
 - (void)myChatDeletedBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -2159,6 +2177,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self handleLongPressedWithMessage:longPressedMessage];
 }
 
+- (void)myImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPMyFileBubbleTableViewCell
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
     if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
@@ -2354,6 +2376,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self presentViewController:preview animated:YES completion:nil];
 }
 
+- (void)myFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPMyLocationBubbleTableViewCell
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
@@ -2485,6 +2511,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)myLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
     [self handleLongPressedWithMessage:longPressedMessage];
+}
+
+- (void)myLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
 }
 
 #pragma mark TAPMyVideoBubbleTableViewCell
@@ -2663,6 +2693,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+- (void)myVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPYourChatBubbleTableViewCell
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -2831,6 +2865,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)yourChatBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
 }
 
 #pragma mark TAPYourChatDeletedBubbleTableViewCell
@@ -3044,6 +3082,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
 
 #pragma mark TAPYourFileBubbleTableViewCell
 - (void)yourFileBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
@@ -3163,6 +3204,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPYourLocationBubbleTableViewCell
 - (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     NSDictionary *dataDictionary = tappedMessage.data;
@@ -3275,6 +3320,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)yourLocationBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
 }
 
 #pragma mark TAPYourVideoBubbleTableViewCell
@@ -3417,6 +3466,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)yourVideoBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
 }
 
 #pragma mark TAPProductListBubbleTableViewCell
@@ -3949,7 +4002,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.deleteRoomButtonIconImageView.image = [UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.deleteRoomButtonIconImageView.image = [self.deleteRoomButtonIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
     
-    self.deleteRoomButtonLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.deleteRoomButtonLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.deleteRoomButtonLoadingImageView.image = [self.deleteRoomButtonLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
     
     UIFont *deletedChatRoomTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeletedChatRoomInfoTitleLabel];
@@ -5585,12 +5638,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.quoteSubtitleLabel.text = quote.content;
     
+    self.quoteImageView.image = nil;
+    
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.quoteFileView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
+        
         if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.imageURL];
         }
@@ -8351,6 +8407,90 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
              }
          }
     });
+}
+
+- (void)processSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
+           return;
+    }
+    
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) {
+        //Type Text and Location
+        [self showInputAccessoryExtensionView:NO];
+        [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+        [self setReplyMessageWithMessage:message];
+        [self showInputAccessoryExtensionView:YES];
+           
+        TAPMessageModel *quotedMessageModel = [message copy];
+        [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+    }
+    else if (message.type == TAPChatMessageTypeFile) {
+        //Type File
+        TAPMessageModel *quotedMessageModel = [message copy];
+
+        [self showInputAccessoryExtensionView:NO];
+        [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+        [self showInputAccessoryExtensionView:YES];
+           
+        NSString *fileName = [quotedMessageModel.data objectForKey:@"fileName"];
+        fileName = [TAPUtil nullToEmptyString:fileName];
+        
+        NSString *fileExtension  = [[fileName pathExtension] uppercaseString];
+        fileName = [fileName stringByDeletingPathExtension];
+           
+        if ([fileExtension isEqualToString:@""]) {
+           fileExtension = [quotedMessageModel.data objectForKey:@"mediaType"];
+           fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+           fileExtension = [fileExtension lastPathComponent];
+           fileExtension = [fileExtension uppercaseString];
+        }
+        
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+           
+        //convert to quote model
+        TAPQuoteModel *quote = [TAPQuoteModel new];
+        quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+        quote.title = fileName;
+        quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+        NSString *fileTypeString = @"";
+        if (quotedMessageModel.type == TAPChatMessageTypeImage) {
+           fileTypeString = @"image";
+        }
+        else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
+           fileTypeString = @"video";
+        }
+        else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
+           fileTypeString = @"file";
+        }
+        quote.fileType = fileTypeString;
+        [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+           
+       quotedMessageModel.quote = quote;
+       
+       [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    }
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+        //Type Video and Image
+        TAPMessageModel *quotedMessageModel = [message copy];
+        
+        [self showInputAccessoryExtensionView:NO];
+        [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+        [self showInputAccessoryExtensionView:YES];
+        
+        //convert to quote model
+        TAPQuoteModel *quote = [TAPQuoteModel new];
+        quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+        quote.title = quotedMessageModel.user.fullname;
+        quote.content = quotedMessageModel.body;
+        [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+        
+        quotedMessageModel.quote = quote;
+        
+        [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    }
+    
+    //DV Note
+    //Add another type here for later
 }
 
 @end

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -20,18 +19,18 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="441.5"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bFI-lI-EW1" id="bE4-ty-KZj">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="441"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="441.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="psI-Hz-5HN">
-                        <rect key="frame" x="52" y="402" width="16" height="16"/>
+                        <rect key="frame" x="52" y="402.5" width="16" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="16" id="bZt-OV-iHu"/>
                             <constraint firstAttribute="height" constant="16" id="jhW-5Z-xEB"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MuH-gq-RYu">
-                        <rect key="frame" x="16" y="420" width="288" height="13"/>
+                        <rect key="frame" x="16" y="420.5" width="288" height="13"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="13" id="ZDf-o5-xBI"/>
@@ -41,18 +40,14 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kqB-yN-cYJ">
-                        <rect key="frame" x="40" y="363" width="28" height="28"/>
+                        <rect key="frame" x="68" y="363.5" width="0.0" height="28"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="28" id="Uis-Ar-q8V"/>
+                            <constraint firstAttribute="width" id="Uis-Ar-q8V"/>
                             <constraint firstAttribute="height" constant="28" id="sSi-po-mhP"/>
                         </constraints>
-                        <state key="normal" image="TAPIconReplyChat"/>
-                        <connections>
-                            <action selector="replyButtonDidTapped:" destination="bFI-lI-EW1" eventType="touchUpInside" id="aem-U2-Imm"/>
-                        </connections>
                     </button>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kau-oU-53h">
-                        <rect key="frame" x="70" y="0.0" width="234" height="418"/>
+                        <rect key="frame" x="70" y="0.0" width="234" height="418.5"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forwarded" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZBQ-XB-kQo">
                                 <rect key="frame" x="10" y="10" width="214" height="16"/>
@@ -186,7 +181,7 @@
                                 </constraints>
                             </view>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="roR-Uc-8gv" customClass="TAPImageView">
-                                <rect key="frame" x="0.0" y="104" width="234" height="294"/>
+                                <rect key="frame" x="0.0" y="104" width="234" height="294.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <accessibility key="accessibilityConfiguration" identifier="BubbleImageView"/>
                                 <constraints>
@@ -214,10 +209,10 @@
                                 </constraints>
                             </view>
                             <button opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aKv-Cu-CtC">
-                                <rect key="frame" x="0.0" y="104" width="234" height="294"/>
+                                <rect key="frame" x="0.0" y="104" width="234" height="294.5"/>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="85V-bT-cHy">
-                                <rect key="frame" x="93" y="227" width="48" height="48"/>
+                                <rect key="frame" x="93" y="227.5" width="48" height="48"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="q86-jh-9om">
                                         <rect key="frame" x="7" y="7" width="34" height="34"/>
@@ -366,7 +361,7 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PBO-gY-LD0" customClass="ZSWTappableLabel">
-                                <rect key="frame" x="10" y="408" width="214" height="0.0"/>
+                                <rect key="frame" x="10" y="408.5" width="214" height="0.0"/>
                                 <accessibility key="accessibilityConfiguration" identifier="CaptionLabel"/>
                                 <constraints>
                                     <constraint firstAttribute="height" id="qhB-S5-W6R"/>
@@ -410,25 +405,55 @@
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="Aqq-vh-MYF">
-                        <rect key="frame" x="308" y="397" width="16" height="16"/>
+                        <rect key="frame" x="308" y="397.5" width="16" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="16" id="UiS-5V-8f4"/>
                             <constraint firstAttribute="height" constant="16" id="sjV-0I-RTw"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryChat" translatesAutoresizingMaskIntoConstraints="NO" id="idr-Ld-l85">
-                        <rect key="frame" x="50" y="402" width="18" height="18"/>
+                        <rect key="frame" x="50" y="402.5" width="18" height="18"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="18" id="QPa-Xv-V8u"/>
                             <constraint firstAttribute="height" constant="18" id="qcj-JO-uY3"/>
                         </constraints>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kUz-GB-fdM">
-                        <rect key="frame" x="50" y="402" width="18" height="18"/>
+                        <rect key="frame" x="50" y="402.5" width="18" height="18"/>
                         <connections>
                             <action selector="retryButtonDidTapped:" destination="bFI-lI-EW1" eventType="touchUpInside" id="Hn3-hh-PiT"/>
                         </connections>
                     </button>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="V5z-UB-Xve">
+                        <rect key="frame" x="-31" y="11" width="30" height="30"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p6V-YE-3mP">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="J91-WW-mlo">
+                                        <rect key="frame" x="4" y="4" width="22" height="22"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="B3j-cQ-O9x"/>
+                                    <constraint firstItem="J91-WW-mlo" firstAttribute="leading" secondItem="p6V-YE-3mP" secondAttribute="leading" constant="4" id="Ixi-da-LFX"/>
+                                    <constraint firstItem="J91-WW-mlo" firstAttribute="top" secondItem="p6V-YE-3mP" secondAttribute="top" constant="4" id="PUA-Tn-ruv"/>
+                                    <constraint firstAttribute="trailing" secondItem="J91-WW-mlo" secondAttribute="trailing" constant="4" id="YQt-1f-H9c"/>
+                                    <constraint firstAttribute="height" constant="30" id="b1a-CH-ONK"/>
+                                    <constraint firstAttribute="bottom" secondItem="J91-WW-mlo" secondAttribute="bottom" constant="4" id="gAI-Sm-htW"/>
+                                </constraints>
+                                <viewLayoutGuide key="safeArea" id="ErB-kJ-Qjy"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="30" id="ViT-Xw-1hr"/>
+                            <constraint firstItem="p6V-YE-3mP" firstAttribute="centerX" secondItem="V5z-UB-Xve" secondAttribute="centerX" id="rDm-G9-xnK"/>
+                            <constraint firstItem="p6V-YE-3mP" firstAttribute="centerY" secondItem="V5z-UB-Xve" secondAttribute="centerY" id="svs-61-fWb"/>
+                            <constraint firstAttribute="height" constant="30" id="ynU-01-C1V"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -446,12 +471,15 @@
                     <constraint firstItem="idr-Ld-l85" firstAttribute="leading" secondItem="kUz-GB-fdM" secondAttribute="leading" id="WQV-8J-83y"/>
                     <constraint firstAttribute="trailing" secondItem="kau-oU-53h" secondAttribute="trailing" constant="16" id="ZbF-4m-p1v"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="bottom" secondItem="psI-Hz-5HN" secondAttribute="bottom" id="c7t-PP-YiO"/>
+                    <constraint firstItem="V5z-UB-Xve" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="topMargin" id="f4z-bn-ZIV"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="top" id="gDh-p4-b6e"/>
                     <constraint firstItem="MuH-gq-RYu" firstAttribute="top" secondItem="kau-oU-53h" secondAttribute="bottom" priority="999" constant="2" id="jVy-i7-ioI"/>
                     <constraint firstItem="psI-Hz-5HN" firstAttribute="top" secondItem="kqB-yN-cYJ" secondAttribute="bottom" constant="11" id="jzG-sV-hj3"/>
+                    <constraint firstItem="V5z-UB-Xve" firstAttribute="leading" secondItem="bE4-ty-KZj" secondAttribute="leadingMargin" constant="-46" id="kec-c2-udK"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="leading" secondItem="idr-Ld-l85" secondAttribute="trailing" constant="2" id="p0d-IE-2S2"/>
                 </constraints>
             </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bubbleImageView" destination="roR-Uc-8gv" id="9Q0-DS-Ahi"/>
                 <outlet property="bubbleImageViewHeightConstraint" destination="ejC-8R-wZq" id="P8u-s6-HPa"/>
@@ -488,7 +516,6 @@
                 <outlet property="quoteViewLeadingConstraint" destination="0nd-05-1JQ" id="QNt-1K-zUQ"/>
                 <outlet property="quoteViewTopConstraint" destination="BOg-h7-cDL" id="gP3-D1-1xB"/>
                 <outlet property="quoteViewTrailingConstraint" destination="3Wc-iM-6GK" id="CM8-vr-tc9"/>
-                <outlet property="replyButton" destination="kqB-yN-cYJ" id="Kw4-En-Ccd"/>
                 <outlet property="replyButtonLeadingConstraint" destination="Ctr-QO-F1a" id="2q3-Ds-Lys"/>
                 <outlet property="replyButtonRightConstraint" destination="5kk-ss-c8K" id="VYD-gp-A1R"/>
                 <outlet property="replyButtonTrailingConstraint" destination="pDW-8c-LIk" id="SIS-5P-j9A"/>
@@ -520,6 +547,10 @@
                 <outlet property="statusLabel" destination="MuH-gq-RYu" id="8eM-S0-bQK"/>
                 <outlet property="statusLabelHeightConstraint" destination="ZDf-o5-xBI" id="Jcn-FR-dHr"/>
                 <outlet property="statusLabelTopConstraint" destination="jVy-i7-ioI" id="1Fv-Zr-mlC"/>
+                <outlet property="swipeReplyImageView" destination="J91-WW-mlo" id="5rF-kJ-EmU"/>
+                <outlet property="swipeReplyView" destination="p6V-YE-3mP" id="ypD-Nt-NMa"/>
+                <outlet property="swipeReplyViewHeightConstraint" destination="b1a-CH-ONK" id="l0m-2Y-PXc"/>
+                <outlet property="swipeReplyViewWidthConstraint" destination="B3j-cQ-O9x" id="hw5-xW-Awk"/>
                 <outlet property="videoDurationAndSizeLabel" destination="Lrh-HN-lZf" id="tzx-9P-S8l"/>
                 <outlet property="videoDurationAndSizeView" destination="6Ie-Zm-vw1" id="e3N-4E-mtM"/>
             </connections>
@@ -530,7 +561,6 @@
         <image name="TAPIconAbort" width="32" height="32"/>
         <image name="TAPIconDownload" width="32" height="32"/>
         <image name="TAPIconPlayWhite" width="15" height="15"/>
-        <image name="TAPIconReplyChat" width="28" height="28"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>

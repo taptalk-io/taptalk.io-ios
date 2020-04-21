@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)myChatBubbleLongPressedPhoneNumber:(NSString *)phoneNumber
                             originalString:(NSString*)originalString;
 - (void)myChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
-
+- (void)myChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 @end
 
 @interface TAPMyChatBubbleTableViewCell : TAPBaseMyBubbleTableViewCell

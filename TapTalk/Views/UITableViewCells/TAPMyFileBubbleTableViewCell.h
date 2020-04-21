@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, TAPMyFileBubbleTableViewCellStateType) {
 - (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 
 @end
 
