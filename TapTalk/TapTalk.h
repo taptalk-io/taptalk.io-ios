@@ -14,10 +14,12 @@
 #import "TAPChatManager.h"
 #import "TAPGroupManager.h"
 #import "TAPAPIManager.h"
+#import "TAPLanguageManager.h"
 
 #import "TAPUserModel.h"
 #import "TAPMessageModel.h"
 #import "TAPProductModel.h"
+
 
 #import <AVKit/AVKit.h>
 #import <Photos/Photos.h>
@@ -256,6 +258,19 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  Obtain initialize status of Google Places API
 */
 - (BOOL)obtainGooglePlacesAPIInitializeState;
+
+//==========================================================
+//                 Language & Localization
+//==========================================================
+/**
+ Setup TapTalk.io main language (default is English)
+ 
+ Use below types:
+ - TAPLanguageTypeEnglish for English Language
+ - TAPLanguageTypeIndonesian for Indonesian Language
+ 
+ */
+- (void)setupTapTalkMainLanguageWithType:(TAPLanguageType)languageType;
 
 //==========================================================
 //                          User

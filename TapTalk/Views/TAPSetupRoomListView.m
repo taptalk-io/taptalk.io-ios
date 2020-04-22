@@ -109,7 +109,8 @@
 #pragma mark - Custom Method
 - (void)showSetupViewWithType:(TAPSetupRoomListViewType)type {
     
-    if (self.notShowLoadingFlow) {
+    BOOL isHide = [[TapUI sharedInstance] getSetupLoadingFlowHiddenState];
+    if (isHide) {
         //Don't show any loading animation if the boolean is true
         return;
     }
@@ -155,7 +156,8 @@
 
 - (void)showFirstLoadingView:(BOOL)isVisible withType:(TAPSetupRoomListViewType)type {
     
-    if (self.notShowLoadingFlow) {
+    BOOL isHide = [[TapUI sharedInstance] getSetupLoadingFlowHiddenState];
+    if (isHide) {
         //Don't show any loading animation if the boolean is true
         return;
     }
@@ -193,10 +195,6 @@
             }
         }];
     }
-}
-
-- (void)setNotShowingLoadingFlow:(BOOL)notShow {
-    _notShowLoadingFlow = notShow;
 }
 
 @end

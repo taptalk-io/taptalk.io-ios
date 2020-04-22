@@ -137,5 +137,6 @@
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;
++ (void)setLanguage:(NSString *)language;
 
 @end

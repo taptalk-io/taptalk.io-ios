@@ -112,6 +112,10 @@
 		D778FAA1221D7FA3000E3A00 /* TAPLocationSearchBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D778FA9F221D7FA3000E3A00 /* TAPLocationSearchBarView.m */; };
 		D778FAA4221D83C8000E3A00 /* TAPLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D778FAA2221D83C8000E3A00 /* TAPLocationManager.h */; };
 		D778FAA5221D83C8000E3A00 /* TAPLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D778FAA3221D83C8000E3A00 /* TAPLocationManager.m */; };
+		D77910A7244ED0DF002037DF /* TAPLanguageManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D77910A5244ED0DF002037DF /* TAPLanguageManager.h */; };
+		D77910A8244ED0DF002037DF /* TAPLanguageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D77910A6244ED0DF002037DF /* TAPLanguageManager.m */; };
+		D77910AB244ED123002037DF /* NSBundle+Language.m in Sources */ = {isa = PBXBuildFile; fileRef = D77910A9244ED122002037DF /* NSBundle+Language.m */; };
+		D77910AC244ED123002037DF /* NSBundle+Language.h in Headers */ = {isa = PBXBuildFile; fileRef = D77910AA244ED123002037DF /* NSBundle+Language.h */; };
 		D779658D215B3D4400756A38 /* TAPCustomTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7796588215B3D4300756A38 /* TAPCustomTextView.h */; };
 		D779658E215B3D4400756A38 /* TAPGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7796589215B3D4400756A38 /* TAPGrowingTextView.m */; };
 		D779658F215B3D4400756A38 /* TAPGrowingTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D779658A215B3D4400756A38 /* TAPGrowingTextView.h */; };
@@ -507,6 +511,10 @@
 		D778FA9F221D7FA3000E3A00 /* TAPLocationSearchBarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPLocationSearchBarView.m; sourceTree = "<group>"; };
 		D778FAA2221D83C8000E3A00 /* TAPLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPLocationManager.h; sourceTree = "<group>"; };
 		D778FAA3221D83C8000E3A00 /* TAPLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPLocationManager.m; sourceTree = "<group>"; };
+		D77910A5244ED0DF002037DF /* TAPLanguageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPLanguageManager.h; sourceTree = "<group>"; };
+		D77910A6244ED0DF002037DF /* TAPLanguageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPLanguageManager.m; sourceTree = "<group>"; };
+		D77910A9244ED122002037DF /* NSBundle+Language.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+Language.m"; sourceTree = "<group>"; };
+		D77910AA244ED123002037DF /* NSBundle+Language.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+Language.h"; sourceTree = "<group>"; };
 		D7796588215B3D4300756A38 /* TAPCustomTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomTextView.h; sourceTree = "<group>"; };
 		D7796589215B3D4400756A38 /* TAPGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPGrowingTextView.m; sourceTree = "<group>"; };
 		D779658A215B3D4400756A38 /* TAPGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPGrowingTextView.h; sourceTree = "<group>"; };
@@ -956,6 +964,8 @@
 				D7CAADFA2251F68A005493D9 /* TAPCustomButtonView.m */,
 				D776CB8222CCA760003B0D4F /* UIImage+Color.h */,
 				D776CB8322CCA760003B0D4F /* UIImage+Color.m */,
+				D77910AA244ED123002037DF /* NSBundle+Language.h */,
+				D77910A9244ED122002037DF /* NSBundle+Language.m */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1002,6 +1012,8 @@
 				D7683F6F22B8C91E003420DB /* TAPStyleManager.m */,
 				DFA6365022D42B4900B9CB99 /* TAPGroupManager.h */,
 				DFA6365122D42B4900B9CB99 /* TAPGroupManager.m */,
+				D77910A5244ED0DF002037DF /* TAPLanguageManager.h */,
+				D77910A6244ED0DF002037DF /* TAPLanguageManager.m */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -1421,6 +1433,7 @@
 				B357EBB92158F7E50049E288 /* TapTalk.h in Headers */,
 				B681FA5621F707470074749B /* Base64.h in Headers */,
 				D77B5F2E2158BB9500253BDC /* TAPBaseView.h in Headers */,
+				D77910AC244ED123002037DF /* NSBundle+Language.h in Headers */,
 				D778FAA0221D7FA3000E3A00 /* TAPLocationSearchBarView.h in Headers */,
 				D7D3B43722F0373700D1DFF7 /* TAPCoreContactManager.h in Headers */,
 				D77B5EDA2158BB6E00253BDC /* TAPUserModel.h in Headers */,
@@ -1569,6 +1582,7 @@
 				F5CC1B832189700200F39F7D /* TAPProfileCollectionViewCell.h in Headers */,
 				D798D3A7229D4D6D00F73CA9 /* TAPMyChatDeletedBubbleTableViewCell.h in Headers */,
 				D77B5ED12158BB6E00253BDC /* TAPBaseModel.h in Headers */,
+				D77910A7244ED0DF002037DF /* TAPLanguageManager.h in Headers */,
 				D77B5EFC2158BB8700253BDC /* TAPBaseXIBTableViewCell.h in Headers */,
 				DF94DD7922B0BD5B00E7E629 /* TAPSystemMessageTableViewCell.h in Headers */,
 				D77B5ED22158BB6E00253BDC /* TAPRoomModel.h in Headers */,
@@ -1804,6 +1818,7 @@
 				D74BA2AF2162066200DF494C /* TAPRoomListModel.m in Sources */,
 				D77B5E862158BB2900253BDC /* AESCrypt.m in Sources */,
 				D7F986F22251BB500087B652 /* TAPCustomPhoneNumberPickerView.m in Sources */,
+				D77910AB244ED123002037DF /* NSBundle+Language.m in Sources */,
 				D77B5F042158BB8700253BDC /* TAPNewChatOptionTableViewCell.m in Sources */,
 				DF61EABA22D2040000A67364 /* TAPPlainInfoLabelTableViewCell.m in Sources */,
 				D77B5EDC2158BB6E00253BDC /* TAPRecentSearchModel.m in Sources */,
@@ -1863,6 +1878,7 @@
 				D77B5EF92158BB8700253BDC /* TAPContactTableViewCell.m in Sources */,
 				D70EAA262163690200E6319E /* TAPBaseRealmModel.m in Sources */,
 				D77B5F682158BBEA00253BDC /* TAPCustomNavigationController.m in Sources */,
+				D77910A8244ED0DF002037DF /* TAPLanguageManager.m in Sources */,
 				F5CC1B842189700200F39F7D /* TAPProfileCollectionViewCell.m in Sources */,
 				D77B5F292158BB9500253BDC /* TAPBlockedListView.m in Sources */,
 				F55913E02175EF9D004A81EC /* TAPSearchResultMessageTableViewCell.m in Sources */,

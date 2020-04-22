@@ -8,6 +8,9 @@
 
 #import "TAPUtil.h"
 #import <CoreServices/UTType.h>
+#import <objc/runtime.h>
+
+static const char kBundleKey = 0;
 
 @implementation TAPUtil
 
@@ -953,8 +956,33 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle {
     NSBundle *resourceBundle = [PodAsset bundleForPod:@"TapTalk"];
-    
     return resourceBundle;
+}
+
++ (void)setLanguage:(NSString *)language {
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        object_setClass([TAPUtil currentBundle], [BundleEx class]);
+//    });
+    
+    if ([TAPLanguageManager isCurrentLanguageRTL]) {
+        if ([[[UIView alloc] init] respondsToSelector:@selector(setSemanticContentAttribute:)]) {
+            [[UIView appearance] setSemanticContentAttribute:UISemanticContentAttributeForceRightToLeft];
+            [[UITableView appearance] setSemanticContentAttribute:UISemanticContentAttributeForceRightToLeft];
+        }
+    }
+    else {
+        if ([[[UIView alloc] init] respondsToSelector:@selector(setSemanticContentAttribute:)]) {
+            [[UIView appearance] setSemanticContentAttribute:UISemanticContentAttributeForceLeftToRight];
+            [[UITableView appearance] setSemanticContentAttribute:UISemanticContentAttributeForceLeftToRight];
+        }
+    }
+    [[NSUserDefaults standardUserDefaults] setBool:[TAPLanguageManager isCurrentLanguageRTL] forKey:@"AppleTextDirection"];
+    [[NSUserDefaults standardUserDefaults] setBool:[TAPLanguageManager isCurrentLanguageRTL] forKey:@"NSForceRightToLeftWritingDirection"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    id value = language ? [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:language ofType:@"lproj"]] : nil;
+    objc_setAssociatedObject([NSBundle mainBundle], &kBundleKey, @"id", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

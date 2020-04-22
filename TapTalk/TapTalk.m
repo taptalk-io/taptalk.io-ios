@@ -473,6 +473,16 @@
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
 }
 
+//==========================================================
+//                 Language & Localization
+//==========================================================
+/**
+ Setup TapTalk.io main language (default is English)
+ */
+- (void)setupTapTalkMainLanguageWithType:(TAPLanguageType)languageType {
+    [TAPLanguageManager saveLanguageByType:languageType];
+}
+
 //Other
 - (void)refreshRemoteConfigsWithSuccess:(void (^)(void))success
                                 failure:(void (^)(NSError *error))failure {

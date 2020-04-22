@@ -93,11 +93,7 @@
     _setupRoomListView = [[TAPSetupRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.navigationController.view addSubview:self.setupRoomListView];
     [self.navigationController.view bringSubviewToFront:self.setupRoomListView];
-    
-    //Check need to hide setup loading view or not
-    BOOL isHide = [[TapUI sharedInstance] getSetupLoadingFlowHiddenState];
-    [self.setupRoomListView setNotShowingLoadingFlow:isHide];
-    
+        
     [self.roomListView.startChatNoChatsButton addTarget:self action:@selector(openNewChatViewController) forControlEvents:UIControlEventTouchDown];
     
  //======================================================== Navigation Bar ========================================================
@@ -701,9 +697,9 @@
             [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
             [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
             
-            NSLog(@"****************************************************/n/n/n");
+            NSLog(@"****************************************************\n\n\n");
             NSLog(@"TapTalk.io - Could not find active user data. Please make sure the client app is authenticated.");
-            NSLog(@"/n/n/n****************************************************");
+            NSLog(@"\n\n\n****************************************************");
         }
         
         return; //User not logged in
