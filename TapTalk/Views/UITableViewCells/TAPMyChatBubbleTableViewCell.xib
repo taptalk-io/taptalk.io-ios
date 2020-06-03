@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -23,11 +21,11 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="323"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="375" height="322.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="375" height="323"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xBZ-Oa-CNb">
-                        <rect key="frame" x="16" y="301.5" width="343" height="13"/>
+                        <rect key="frame" x="16" y="302" width="343" height="13"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="13" id="HJr-is-Wwd"/>
@@ -37,25 +35,21 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dkH-P5-52g">
-                        <rect key="frame" x="253" y="285.5" width="16" height="16"/>
+                        <rect key="frame" x="253" y="286" width="16" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="Fod-Nr-5rm"/>
                             <constraint firstAttribute="width" constant="16" id="xth-ve-KUn"/>
                         </constraints>
                     </imageView>
                     <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gjw-fa-TSr">
-                        <rect key="frame" x="271" y="271.5" width="28" height="28"/>
+                        <rect key="frame" x="299" y="272" width="0.0" height="28"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="28" id="1Cp-0O-OII"/>
+                            <constraint firstAttribute="width" id="1Cp-0O-OII"/>
                             <constraint firstAttribute="height" constant="28" id="wsM-uf-bNS"/>
                         </constraints>
-                        <state key="normal" image="TAPIconReplyChat"/>
-                        <connections>
-                            <action selector="replyButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="MMe-gA-7S4"/>
-                        </connections>
                     </button>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GBq-4A-GJ7">
-                        <rect key="frame" x="271" y="0.0" width="88" height="301.5"/>
+                        <rect key="frame" x="271" y="0.0" width="88" height="302"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forwarded" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4pM-m3-Jdz">
                                 <rect key="frame" x="10" y="10" width="68" height="16"/>
@@ -198,14 +192,14 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HId-QA-OEm" customClass="ZSWTappableLabel">
-                                <rect key="frame" x="12" y="97" width="64" height="192.5"/>
+                                <rect key="frame" x="12" y="97" width="64" height="193"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="15"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5YI-Ih-9ho">
-                                <rect key="frame" x="0.0" y="0.0" width="88" height="301.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="88" height="302"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <action selector="chatBubbleButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Q2y-sL-YBX"/>
@@ -240,25 +234,54 @@
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="iM8-gR-PXe">
-                        <rect key="frame" x="363" y="280.5" width="16" height="16"/>
+                        <rect key="frame" x="363" y="281" width="16" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="16" id="1PY-HK-WVa"/>
                             <constraint firstAttribute="height" constant="16" id="77m-e6-Qj3"/>
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetryChat" translatesAutoresizingMaskIntoConstraints="NO" id="fpH-0H-kQw">
-                        <rect key="frame" x="251" y="281.5" width="18" height="18"/>
+                        <rect key="frame" x="251" y="282" width="18" height="18"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="18" id="fVi-m9-fpO"/>
                             <constraint firstAttribute="height" constant="18" id="xoA-1W-9XN"/>
                         </constraints>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vWG-OV-8Uo">
-                        <rect key="frame" x="251" y="281.5" width="18" height="18"/>
+                        <rect key="frame" x="251" y="282" width="18" height="18"/>
                         <connections>
                             <action selector="retryButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="2RR-4S-O2t"/>
                         </connections>
                     </button>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TI4-tV-cjV">
+                        <rect key="frame" x="-46" y="0.0" width="30" height="30"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ITu-rs-gBS">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OI8-tB-iNP">
+                                        <rect key="frame" x="4" y="4" width="22" height="22"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstItem="OI8-tB-iNP" firstAttribute="top" secondItem="ITu-rs-gBS" secondAttribute="top" constant="4" id="5Ie-Tp-YLD"/>
+                                    <constraint firstAttribute="bottom" secondItem="OI8-tB-iNP" secondAttribute="bottom" constant="4" id="IiQ-Rd-PFm"/>
+                                    <constraint firstAttribute="trailing" secondItem="OI8-tB-iNP" secondAttribute="trailing" constant="4" id="L3P-rw-fIx"/>
+                                    <constraint firstAttribute="height" constant="30" id="Qzg-OS-Xwp"/>
+                                    <constraint firstAttribute="width" constant="30" id="X2Q-eg-Eys"/>
+                                    <constraint firstItem="OI8-tB-iNP" firstAttribute="leading" secondItem="ITu-rs-gBS" secondAttribute="leading" constant="4" id="fpw-vy-Jfo"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="30" id="8rh-GU-jb0"/>
+                            <constraint firstAttribute="height" constant="30" id="9K5-pR-pNF"/>
+                            <constraint firstItem="ITu-rs-gBS" firstAttribute="centerX" secondItem="TI4-tV-cjV" secondAttribute="centerX" id="D1q-DL-BZm"/>
+                            <constraint firstItem="ITu-rs-gBS" firstAttribute="centerY" secondItem="TI4-tV-cjV" secondAttribute="centerY" id="h8m-tJ-5mQ"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -275,9 +298,11 @@
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="leading" secondItem="dkH-P5-52g" secondAttribute="trailing" constant="2" id="UfI-ax-YHP"/>
                     <constraint firstItem="vWG-OV-8Uo" firstAttribute="width" secondItem="fpH-0H-kQw" secondAttribute="width" id="ZeG-QB-nsP"/>
                     <constraint firstItem="vWG-OV-8Uo" firstAttribute="height" secondItem="fpH-0H-kQw" secondAttribute="height" id="ao8-XG-PLC"/>
+                    <constraint firstItem="TI4-tV-cjV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="-46" id="eHN-1x-FKf"/>
                     <constraint firstItem="iM8-gR-PXe" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="trailing" constant="4" id="iNa-6B-vAX"/>
                     <constraint firstItem="xBZ-Oa-CNb" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="ik2-FB-Kmz"/>
                     <constraint firstAttribute="trailing" secondItem="GBq-4A-GJ7" secondAttribute="trailing" constant="16" id="mVW-oN-ID9"/>
+                    <constraint firstItem="TI4-tV-cjV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="wHE-ZK-VKf"/>
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="trailing" secondItem="xBZ-Oa-CNb" secondAttribute="trailing" id="wau-Hp-47l"/>
                     <constraint firstItem="xBZ-Oa-CNb" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="bottom" priority="999" id="xZ3-Cj-mZU"/>
                     <constraint firstItem="fpH-0H-kQw" firstAttribute="top" secondItem="vWG-OV-8Uo" secondAttribute="top" id="yGx-By-qJ4"/>
@@ -304,7 +329,6 @@
                 <outlet property="quoteViewLeadingConstraint" destination="JfB-33-PJ5" id="9lW-Ud-PpY"/>
                 <outlet property="quoteViewTopConstraint" destination="n66-tB-QQk" id="5fG-ey-lzh"/>
                 <outlet property="quoteViewTrailingConstraint" destination="URw-C8-8Yo" id="PKD-1N-MGG"/>
-                <outlet property="replyButton" destination="Gjw-fa-TSr" id="JAk-y0-8Nd"/>
                 <outlet property="replyButtonLeadingConstraint" destination="5pG-h7-LLs" id="pEk-vl-yCf"/>
                 <outlet property="replyButtonRightConstraint" destination="6vT-dz-4yM" id="fOI-zP-8Aj"/>
                 <outlet property="replyButtonTrailingConstraint" destination="9Rv-gA-CbQ" id="qej-GJ-pDO"/>
@@ -330,13 +354,16 @@
                 <outlet property="statusLabel" destination="xBZ-Oa-CNb" id="ain-AW-9Sp"/>
                 <outlet property="statusLabelHeightConstraint" destination="HJr-is-Wwd" id="Hca-cx-23q"/>
                 <outlet property="statusLabelTopConstraint" destination="xZ3-Cj-mZU" id="Rxm-4A-5s5"/>
+                <outlet property="swipeReplyImageView" destination="OI8-tB-iNP" id="uuF-zL-i6t"/>
+                <outlet property="swipeReplyView" destination="ITu-rs-gBS" id="fmK-KN-Ran"/>
+                <outlet property="swipeReplyViewHeightConstraint" destination="Qzg-OS-Xwp" id="BJN-cV-IUw"/>
+                <outlet property="swipeReplyViewWidthConstraint" destination="X2Q-eg-Eys" id="yV1-FJ-jv6"/>
             </connections>
             <point key="canvasLocation" x="416.80000000000001" y="219.04047976011995"/>
         </tableViewCell>
     </objects>
     <resources>
         <image name="TAPIconDocuments" width="32" height="32"/>
-        <image name="TAPIconReplyChat" width="28" height="28"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>
     </resources>

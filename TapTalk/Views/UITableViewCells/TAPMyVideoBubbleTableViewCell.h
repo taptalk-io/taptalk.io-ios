@@ -38,6 +38,15 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 - (void)myVideoCancelDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVideoDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myVideoBubblePressedMentionWithWord:(NSString*)word
+                              tappedAtIndex:(NSInteger)index
+                                    message:(TAPMessageModel *)message
+                        mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (void)myVideoBubbleLongPressedMentionWithWord:(NSString*)word
+                                  tappedAtIndex:(NSInteger)index
+                                        message:(TAPMessageModel *)message
+                            mentionIndexesArray:(NSArray *)mentionIndexesArray;
 
 @end
 
@@ -47,6 +56,7 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 @property (weak, nonatomic) TAPMessageModel *message;
 @property (nonatomic) TAPMyVideoBubbleTableViewCellStateType myVideoBubbleTableViewCellStateType;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
+@property (strong, nonatomic) NSArray *mentionIndexesArray;
 
 @property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;

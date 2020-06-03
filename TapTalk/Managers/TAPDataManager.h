@@ -50,6 +50,7 @@
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
 + (TAPCountryModel *)countryModelFromDictionary:(NSDictionary *)dictionary;
 + (TAPUserModel *)userModelFromDictionary:(NSDictionary *)dictionary;
++ (NSDictionary *)dictionaryFromUserModel:(TAPUserModel *)user;
 + (TAPProductModel *)productModelFromDictionary:(NSDictionary *)dictionary;
 + (NSDictionary *)dictionaryFromProductModel:(TAPProductModel *)product;
 
@@ -91,13 +92,18 @@
                         failure:(void (^)(NSError *error))failure;
 + (void)getRoomListSuccess:(void (^)(NSArray *resultArray))success
                    failure:(void (^)(NSError *error))failure;
-+ (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray))success
++ (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                      failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllUnreadMessagesWithSuccess:(void (^)(NSArray *unreadMessages))success
                                         failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseUnreadMessagesInRoomWithRoomID:(NSString *)roomID
                                      activeUserID:(NSString *)activeUserID
                                           success:(void (^)(NSArray *unreadMessages))success
+                                          failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseUnreadMentionsInRoomWithUsername:(NSString *)username
+                                             roomID:(NSString *)roomID
+                                     activeUserID:(NSString *)activeUserID
+                                          success:(void (^)(NSArray *unreadMentionMessages))success
                                           failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseMediaMessagesInRoomWithRoomID:(NSString *)roomID
                                    lastTimestamp:(NSString *)lastTimestamp
@@ -123,7 +129,7 @@
                             failure:(void (^)(NSError *error))failure;
 + (void)searchChatAndContactWithString:(NSString *)searchString
                                 SortBy:(NSString *)columnName
-                               success:(void (^)(NSArray *roomArray, NSArray *unreadCountArray))success
+                               success:(void (^)(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                failure:(void (^)(NSError *error))failure;
 + (void)insertDatabaseMessageWithData:(NSArray *)dataArray
                             tableName:(NSString *)tableName
@@ -165,9 +171,6 @@
 //API Call
 + (void)callAPILogoutWithSuccess:(void (^)(void))success
                          failure:(void (^)(NSError *error))failure;
-+ (void)callAPIGetAuthTicketWithUser:(TAPUserModel *)user
-                             success:(void (^)(NSString *authTicket))success
-                             failure:(void (^)(NSError *error))failure; //DV Temp
 + (void)callAPIGetAccessTokenWithAuthTicket:(NSString *)authTicket
                                     success:(void (^)(void))success
                                     failure:(void (^)(NSError *error))failure;

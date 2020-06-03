@@ -10,6 +10,9 @@
 
 @interface TAPBaseXIBTableViewCell : UITableViewCell
 
+@property (strong, nonatomic) IBOutlet UIView *swipeReplyView;
+@property (strong, nonatomic) IBOutlet UIImageView *swipeReplyImageView;
+
 + (UINib *)cellNib;
 - (CGFloat)automaticHeight;
 

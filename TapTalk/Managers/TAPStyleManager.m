@@ -1080,6 +1080,21 @@
             return font;
             break;
         }
+        case TAPComponentFontMentionListNameLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_MENTION_LIST_NAME_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontMentionListUsernameLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_MENTION_LIST_USERNAME_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -2251,6 +2266,18 @@
             break;
         }
         case TAPComponentColorIconActionSheetSMS:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconActionSheetSendMessage:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconActionSheetViewProfile:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;

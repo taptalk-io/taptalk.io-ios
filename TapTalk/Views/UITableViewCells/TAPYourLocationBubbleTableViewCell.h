@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yourLocationReplyDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)yourLocationBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
+- (void)yourLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 
 @end
 

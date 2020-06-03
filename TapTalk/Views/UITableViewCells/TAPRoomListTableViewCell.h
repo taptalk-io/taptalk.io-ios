@@ -25,5 +25,6 @@ typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
 - (void)setAsTyping:(BOOL)typing;
 - (void)showMessageDraftWithMessage:(NSString *)draftMessage;
 - (void)setIsLastCellSeparator:(BOOL)isLastCell;
+- (void)showUnreadMentionBadge:(BOOL)isShow;
 
 @end

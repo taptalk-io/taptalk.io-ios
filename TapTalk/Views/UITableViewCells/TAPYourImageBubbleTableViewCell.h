@@ -27,6 +27,15 @@ NS_ASSUME_NONNULL_BEGIN
                          originalString:(NSString*)originalString;
 - (void)yourImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)yourImageBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
+- (void)yourImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)yourImageBubblePressedMentionWithWord:(NSString*)word
+                                tappedAtIndex:(NSInteger)index
+                                      message:(TAPMessageModel *)message
+                          mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (void)yourImageBubbleLongPressedMentionWithWord:(NSString*)word
+                                    tappedAtIndex:(NSInteger)index
+                                          message:(TAPMessageModel *)message
+                              mentionIndexesArray:(NSArray *)mentionIndexesArray;
 
 @end
 
@@ -35,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id<TAPYourImageBubbleTableViewCellDelegate> delegate;
 
 @property (weak, nonatomic) TAPMessageModel *message;
+@property (strong, nonatomic) NSArray *mentionIndexesArray;
 
 @property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;

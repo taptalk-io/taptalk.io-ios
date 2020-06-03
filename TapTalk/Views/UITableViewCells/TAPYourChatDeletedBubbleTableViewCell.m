@@ -79,6 +79,7 @@
 
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
+    self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleBackground];
     
     UIFont *bubbleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleDeletedMessageBody];
@@ -107,7 +108,12 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
     _message = message;
+    
     self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
     
     //CS NOTE - check chat room type, show sender info if group type

@@ -172,6 +172,11 @@
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
     NSString *encodedAppKey = [[TAPNetworkManager sharedManager] getAppKey];
+    NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
+    
+    if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
+        clientUserAgent = @"ios";
+    }
     
     [urlRequest addValue:encodedAppKey forHTTPHeaderField:@"App-Key"];
     [urlRequest addValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
@@ -179,7 +184,7 @@
     [urlRequest addValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
     [urlRequest addValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
     [urlRequest addValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
-    [urlRequest addValue:@"ios" forHTTPHeaderField:@"User-Agent"];
+    [urlRequest addValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
     [urlRequest addValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
     SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];

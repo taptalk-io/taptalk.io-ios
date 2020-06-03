@@ -9,7 +9,7 @@
 #import "TAPMyChatBubbleTableViewCell.h"
 #import "ZSWTappableLabel.h"
 
-@interface TAPMyChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
+@interface TAPMyChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate, UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
@@ -59,9 +59,14 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
+@property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
+@property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
@@ -104,6 +109,13 @@
     self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
     
+    self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
+    self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
+    
+    UIImage *swipeReplyImage = [UIImage imageNamed:@"TAPIconReplyChatOrange" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
+    swipeReplyImage = [swipeReplyImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconPrimary]];
+    self.swipeReplyImageView.image = swipeReplyImage;
+    
     _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                               action:@selector(handleBubbleViewTap:)];
     [self.bubbleView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
@@ -113,6 +125,10 @@
     self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
     [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
     
+    _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureAction:)];
+    self.panGestureRecognizer.delegate = self;
+    [self.contentView addGestureRecognizer:self.panGestureRecognizer];
+    
     [self showQuoteView:NO];
     [self showForwardView:NO];
     
@@ -120,7 +136,13 @@
     self.bubbleLabel.longPressDelegate = self;
     self.bubbleLabel.longPressDuration = 0.05f;
     
+    self.swipeReplyViewHeightConstraint.constant = 30.0f;
+    self.swipeReplyViewWidthConstraint.constant = 30.0f;
+    self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
     [self setBubbleCellStyle];
+    
+    self.mentionIndexesArray = [[NSArray alloc] init];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -140,6 +162,10 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
+    self.swipeReplyViewHeightConstraint.constant = 30.0f;
+    self.swipeReplyViewWidthConstraint.constant = 30.0f;
+    self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    self.mentionIndexesArray = nil;
     [self.contentView layoutIfNeeded];
 }
 
@@ -189,6 +215,12 @@
                 break;
         }
     }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(myChatBubblePressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate myChatBubblePressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
+        }
+    }
 }
 
 - (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
@@ -234,10 +266,128 @@
                 break;
         }
     }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate myChatBubbleLongPressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
+        }
+    }
+}
+
+#pragma mark - Delegate
+#pragma mark UIGestureRecognizer
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+        CGPoint velocity = [panGestureRecognizer velocityInView:self];
+        if (fabs(velocity.x) > fabs(velocity.y)) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (void)handlePanGestureAction:(UIPanGestureRecognizer *)recognizer {
+     if (recognizer.state == UIGestureRecognizerStateBegan) {
+            _disableTriggerHapticFeedbackOnDrag = NO;
+        }
+        if (recognizer.state == UIGestureRecognizerStateChanged) {
+            CGPoint translation = [recognizer translationInView:self];
+            
+            if (translation.x < 0) {
+                //Cannot swipe left
+                return;
+            }
+            
+            if (translation.x > 50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
+                [TAPUtil tapticImpactFeedbackGenerator];
+                
+                [UIView animateWithDuration:0.075f delay:0.0f options:UIViewAnimationCurveEaseOut animations:^{
+                    self.swipeReplyView.alpha = 0.0f;
+                    self.swipeReplyViewHeightConstraint.constant = 15.0f;
+                    self.swipeReplyViewWidthConstraint.constant = 15.0f;
+                    [self.contentView layoutIfNeeded];
+                    self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+
+                } completion:^(BOOL finished) {
+                    [UIView animateWithDuration:0.15f delay:0.0f options:UIViewAnimationCurveEaseOut animations:^{
+                        self.swipeReplyView.alpha = 1.0f;
+                        self.swipeReplyViewHeightConstraint.constant = 30.0f;
+                        self.swipeReplyViewWidthConstraint.constant = 30.0f;
+                        [self.contentView layoutIfNeeded];
+                        self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+                    } completion:nil];
+                }];
+                
+                _disableTriggerHapticFeedbackOnDrag = YES;
+            }
+            
+            if (translation.x > 70.0f) {
+                translation.x = 70.0f;
+            }
+            
+            self.bubbleView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.replyButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.statusLabel.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.swipeReplyView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.sendingIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            
+            self.swipeReplyView.alpha = translation.x / 50.0f;
+        }
+        else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            
+            CGPoint translation = [recognizer translationInView:self];
+            if (translation.x > 50.0f) {
+                if ([self.delegate respondsToSelector:@selector(myChatBubbleDidTriggerSwipeToReplyWithMessage:)]) {
+                    [self.delegate myChatBubbleDidTriggerSwipeToReplyWithMessage:self.message];
+                }
+            }
+            
+            _disableTriggerHapticFeedbackOnDrag = NO;
+            [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+//                recognizer.view.transform = CGAffineTransformIdentity;
+                self.bubbleView.transform = CGAffineTransformIdentity;
+                self.replyButton.transform = CGAffineTransformIdentity;
+                self.statusLabel.transform = CGAffineTransformIdentity;
+                self.swipeReplyView.transform = CGAffineTransformIdentity;
+                self.statusIconImageView.transform = CGAffineTransformIdentity;
+                self.sendingIconImageView.transform = CGAffineTransformIdentity;
+                
+                self.swipeReplyView.alpha = 0.0f;
+            } completion:^(BOOL finished) {
+                self.swipeReplyViewHeightConstraint.constant = 30.0f;
+                self.swipeReplyViewWidthConstraint.constant = 30.0f;
+                [self.contentView layoutIfNeeded];
+                self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+            }];
+        }
+        else if (recognizer.state == UIGestureRecognizerStateCancelled) {
+            _disableTriggerHapticFeedbackOnDrag = NO;
+            
+            [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+//                recognizer.view.transform = CGAffineTransformIdentity;
+                self.bubbleView.transform = CGAffineTransformIdentity;
+                self.replyButton.transform = CGAffineTransformIdentity;
+                self.statusLabel.transform = CGAffineTransformIdentity;
+                self.swipeReplyView.transform = CGAffineTransformIdentity;
+                self.statusIconImageView.transform = CGAffineTransformIdentity;
+                self.sendingIconImageView.transform = CGAffineTransformIdentity;
+                
+                self.swipeReplyView.alpha = 0.0f;
+            } completion:^(BOOL finished) {
+                self.swipeReplyViewHeightConstraint.constant = 30.0f;
+                self.swipeReplyViewWidthConstraint.constant = 30.0f;
+                [self.contentView layoutIfNeeded];
+                self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+            }];
+        }
 }
 
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
+    self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleBackground];
     self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteBackground];
     self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteBackground];
@@ -288,7 +438,14 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
+//    _message = message;
     [super setMessage:message];
+    
+    
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
         //if reply exists check if image in quote exists
@@ -323,7 +480,7 @@
         [self showForwardView:NO];
     }
     
-    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
+//    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
     
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
@@ -331,7 +488,7 @@
     UIColor *highlightedTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURLHighlighted];
     UIColor *defaultTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURL];
     
-    NSString *messageText = [TAPUtil nullToEmptyString:self.bubbleLabel.text];
+    NSString *messageText = [TAPUtil nullToEmptyString:message.body];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
     // the next line throws an exception if string is nil - make sure you check
     [linkDetector enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
@@ -354,7 +511,25 @@
         
         [attributedString addAttributes:attributes range:result.range];
     }];
-    self.bubbleLabel.attributedText = attributedString;
+    
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeChannel) {
+        for (NSInteger counter = 0; counter < [self.mentionIndexesArray count]; counter++) {
+            NSArray *mentionRangeArray = self.mentionIndexesArray;
+            NSRange userRange = [[mentionRangeArray objectAtIndex:counter] rangeValue];
+            
+            NSString *mentionString = [self.message.body substringWithRange:userRange];
+            NSString *mentionedUserString = [mentionString substringFromIndex:1];
+            
+            NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+            attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+            attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+            attributes[NSForegroundColorAttributeName] = defaultTextColor;
+            attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
+            [attributedString addAttributes:attributes range:userRange];
+        }
+    }
+        
+        self.bubbleLabel.attributedText = attributedString;
 }
 
 - (void)receiveSentEvent {

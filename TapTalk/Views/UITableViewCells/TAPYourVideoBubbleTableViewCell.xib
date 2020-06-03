@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -20,7 +21,7 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="7mv-Ny-D4s" customClass="TAPYourVideoBubbleTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="463.5"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7mv-Ny-D4s" id="bD3-M2-xtQ">
+            <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7mv-Ny-D4s" id="bD3-M2-xtQ">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="463.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -453,15 +454,11 @@
                         </constraints>
                     </view>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ODG-45-PuS">
-                        <rect key="frame" x="286" y="410.5" width="28" height="28"/>
+                        <rect key="frame" x="286" y="410.5" width="0.0" height="28"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="28" id="3cs-3l-1ia"/>
-                            <constraint firstAttribute="width" constant="28" id="fyK-Qi-0pr"/>
+                            <constraint firstAttribute="width" id="fyK-Qi-0pr"/>
                         </constraints>
-                        <state key="normal" image="TAPIconReplyChat"/>
-                        <connections>
-                            <action selector="replyButtonDidTapped:" destination="7mv-Ny-D4s" eventType="touchUpInside" id="sBM-Cu-tG5"/>
-                        </connections>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HI8-sI-SJg">
                         <rect key="frame" x="50" y="442.5" width="254" height="13"/>
@@ -473,6 +470,36 @@
                         <color key="textColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="z7a-lD-laO">
+                        <rect key="frame" x="-30" y="11" width="30" height="30"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kVf-2N-Ord">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Zgc-BP-uN5">
+                                        <rect key="frame" x="4" y="4" width="22" height="22"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="Ait-NF-YoM"/>
+                                    <constraint firstAttribute="trailing" secondItem="Zgc-BP-uN5" secondAttribute="trailing" constant="4" id="I2S-zx-VYF"/>
+                                    <constraint firstItem="Zgc-BP-uN5" firstAttribute="top" secondItem="kVf-2N-Ord" secondAttribute="top" constant="4" id="N1J-cK-RL4"/>
+                                    <constraint firstItem="Zgc-BP-uN5" firstAttribute="leading" secondItem="kVf-2N-Ord" secondAttribute="leading" constant="4" id="T42-Yo-1fG"/>
+                                    <constraint firstAttribute="bottom" secondItem="Zgc-BP-uN5" secondAttribute="bottom" constant="4" id="diZ-Bo-4vp"/>
+                                    <constraint firstAttribute="height" constant="30" id="ted-6I-BOq"/>
+                                </constraints>
+                                <viewLayoutGuide key="safeArea" id="dPh-vJ-MVz"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="30" id="Fwa-Fa-5OS"/>
+                            <constraint firstItem="kVf-2N-Ord" firstAttribute="centerY" secondItem="z7a-lD-laO" secondAttribute="centerY" id="MfM-j1-sUa"/>
+                            <constraint firstItem="kVf-2N-Ord" firstAttribute="centerX" secondItem="z7a-lD-laO" secondAttribute="centerX" id="dRB-QY-rvZ"/>
+                            <constraint firstAttribute="height" constant="30" id="l1C-of-jqH"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -490,14 +517,17 @@
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="leading" secondItem="UgJ-tS-80I" secondAttribute="leading" id="YgY-4D-6bd"/>
                     <constraint firstItem="pLh-xA-KN1" firstAttribute="trailing" secondItem="UgJ-tS-80I" secondAttribute="trailing" id="Zmn-Ek-KYY"/>
                     <constraint firstItem="eS9-eE-7iP" firstAttribute="leading" secondItem="UgJ-tS-80I" secondAttribute="trailing" constant="4" id="aYH-Tg-zat"/>
+                    <constraint firstItem="z7a-lD-laO" firstAttribute="top" secondItem="bD3-M2-xtQ" secondAttribute="topMargin" id="dSC-nv-LoD"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="height" secondItem="UgJ-tS-80I" secondAttribute="height" id="j3B-Gn-vFt"/>
                     <constraint firstItem="UgJ-tS-80I" firstAttribute="leading" secondItem="bD3-M2-xtQ" secondAttribute="leading" constant="16" id="mIU-lr-C2e"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="trailing" secondItem="UgJ-tS-80I" secondAttribute="trailing" id="mdh-x4-glT"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="bottom" secondItem="UgJ-tS-80I" secondAttribute="bottom" id="vmJ-8k-OT1"/>
+                    <constraint firstItem="z7a-lD-laO" firstAttribute="leading" secondItem="bD3-M2-xtQ" secondAttribute="leadingMargin" constant="-46" id="wQn-oB-R2D"/>
                     <constraint firstItem="eS9-eE-7iP" firstAttribute="bottom" secondItem="ODG-45-PuS" secondAttribute="bottom" constant="2" id="wfO-NK-Lvt"/>
                     <constraint firstAttribute="trailing" secondItem="HI8-sI-SJg" secondAttribute="trailing" constant="16" id="x8u-At-hib"/>
                 </constraints>
             </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bubbleImageView" destination="aud-LS-c8o" id="LdH-rG-bWo"/>
                 <outlet property="bubbleImageViewHeightConstraint" destination="pUb-b6-Djc" id="o1M-Gj-LhW"/>
@@ -535,7 +565,6 @@
                 <outlet property="quoteViewLeadingConstraint" destination="Vbs-VK-PQ4" id="aVd-3z-dBd"/>
                 <outlet property="quoteViewTopConstraint" destination="fdJ-N0-hvQ" id="LrO-cS-5HR"/>
                 <outlet property="quoteViewTrailingConstraint" destination="Wa6-cn-iiE" id="mqD-GT-Q7c"/>
-                <outlet property="replyButton" destination="vAu-6q-hY5" id="MlW-bX-Kai"/>
                 <outlet property="replyButtonLeadingConstraint" destination="3VA-AJ-KbP" id="1Ad-hp-asB"/>
                 <outlet property="replyButtonTrailingConstraint" destination="bAD-tV-8ym" id="6ml-3B-VGU"/>
                 <outlet property="replyInnerView" destination="YfI-QL-rMS" id="GrY-qx-fLE"/>
@@ -568,6 +597,10 @@
                 <outlet property="statusLabel" destination="HI8-sI-SJg" id="WWE-ae-CfX"/>
                 <outlet property="statusLabelHeightConstraint" destination="mj0-Di-fQ5" id="Nj7-MF-wIE"/>
                 <outlet property="statusLabelTopConstraint" destination="NuN-VY-X2E" id="3Sc-Fl-QUk"/>
+                <outlet property="swipeReplyImageView" destination="Zgc-BP-uN5" id="B4A-Om-ayU"/>
+                <outlet property="swipeReplyView" destination="kVf-2N-Ord" id="z8d-YF-9Fr"/>
+                <outlet property="swipeReplyViewHeightConstraint" destination="ted-6I-BOq" id="PbL-1q-PAd"/>
+                <outlet property="swipeReplyViewWidthConstraint" destination="Ait-NF-YoM" id="JwB-WG-JfI"/>
                 <outlet property="videoDurationAndSizeLabel" destination="QCf-y3-Kpf" id="jct-yI-oLE"/>
                 <outlet property="videoDurationAndSizeView" destination="Lfs-I4-uie" id="zaz-hg-6oX"/>
             </connections>
@@ -579,7 +612,6 @@
         <image name="TAPIconDocuments" width="32" height="32"/>
         <image name="TAPIconDownload" width="32" height="32"/>
         <image name="TAPIconPlayWhite" width="15" height="15"/>
-        <image name="TAPIconReplyChat" width="28" height="28"/>
         <image name="TAPIconRetry" width="32" height="32"/>
     </resources>
 </document>

@@ -21,7 +21,6 @@ typedef NS_ENUM(NSInteger, TAPSetupRoomListViewType) {
 @property (strong, nonatomic) UIButton *retryButton;
 - (void)showSetupViewWithType:(TAPSetupRoomListViewType)type;
 - (void)showFirstLoadingView:(BOOL)isVisible withType:(TAPSetupRoomListViewType)type;
-- (void)setNotShowingLoadingFlow:(BOOL)notShow;
 
 @end
 

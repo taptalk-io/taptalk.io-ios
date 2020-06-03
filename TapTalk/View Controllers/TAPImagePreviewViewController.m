@@ -16,10 +16,11 @@
 
 #import "TAPThumbnailImagePreviewCollectionViewCell.h"
 #import "TAPImagePreviewCollectionViewCell.h"
+#import "TAPMentionListTableViewCell.h"
 
 #import "TAPMediaPreviewModel.h"
 
-@interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, AVPlayerViewControllerDelegate>
+@interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, AVPlayerViewControllerDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (strong, nonatomic) TAPImagePreviewView *imagePreviewView;
 
@@ -30,6 +31,10 @@
 @property (nonatomic) BOOL isScrolledFromThumbnailImageTapped;
 @property (nonatomic) BOOL showVideoPlayer;
 @property (nonatomic) BOOL isContainExcedeedFileSizeLimit;
+
+@property (nonatomic) NSInteger lastNumberOfWordArrayForShowMention;
+@property (nonatomic) NSInteger lastTypingWordArrayStartIndex;
+@property (strong, nonatomic) NSString *lastTypingWordString;
 
 - (void)cancelButtonDidTapped;
 - (void)morePictureButtonDidTapped;
@@ -73,12 +78,20 @@
     self.imagePreviewView.thumbnailCollectionView.delegate = self;
     self.imagePreviewView.thumbnailCollectionView.dataSource = self;
     
+    self.imagePreviewView.mentionTableView.delegate = self;
+    self.imagePreviewView.mentionTableView.dataSource = self;
+    
     [self.imagePreviewView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.imagePreviewView.morePictureButton addTarget:self action:@selector(morePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.imagePreviewView.sendButton addTarget:self action:@selector(sendButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     _selectedIndex = 0;
     _showVideoPlayer = NO;
+    
+    _filteredMentionListArray = [[NSMutableArray alloc] init];
+    _lastNumberOfWordArrayForShowMention = 0;
+    _lastTypingWordArrayStartIndex = 0;
+    _lastTypingWordString = @"";
     
     self.captionTextViewHeight = 22.0f;
     self.imagePreviewView.captionTextView.delegate = self;
@@ -109,6 +122,63 @@
 }
 
 #pragma mark - Data Source
+#pragma mark UITableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self.filteredMentionListArray count];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 54.0f;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 10.0f;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
+    view.layer.cornerRadius = 15.0f;
+    view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+    return view;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return FLT_MIN;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
+    return view;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    static NSString *cellID = @"TAPMentionListTableViewCell";
+    TAPMentionListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
+    if (cell == nil) {
+        cell = [[TAPMentionListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
+    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    if ([self.filteredMentionListArray count] != 0) {
+        TAPUserModel *user = [self.filteredMentionListArray objectAtIndex:indexPath.row];
+        [cell setMentionListCellWithUser:user];
+        
+        if (indexPath.row == [self.filteredMentionListArray count] - 1) {
+            [cell showSeparatorView:NO];
+        }
+        else {
+            [cell showSeparatorView:YES];
+        }
+    }
+
+    return cell;
+}
+
 #pragma mark CollectionView
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
@@ -342,6 +412,69 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Delegate
+#pragma mark UITableView
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    TAPUserModel *user = [self.filteredMentionListArray objectAtIndex:indexPath.row];
+    NSString *username = user.username;
+    username = [TAPUtil nullToEmptyString:username];
+
+    NSString *trimmedMessageString = [TAPUtil stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:self.imagePreviewView.captionTextView.text];
+    NSRange lastSpaceRange = [self.imagePreviewView.captionTextView.text rangeOfString:@" @" options:NSBackwardsSearch];
+    NSRange lastNewLineRange = [self.imagePreviewView.captionTextView.text rangeOfString:@"\n@" options:NSBackwardsSearch];
+    
+    //Detect which one is the last word in sentence
+    NSInteger lastStartIndex;
+    if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location == NSNotFound) {
+        //Not found space or new line
+        lastStartIndex = -1;
+    }
+    else if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location != NSNotFound) {
+        //Only found new line with following @ ("\n@")
+        lastStartIndex = lastNewLineRange.location;
+    }
+    else if (lastSpaceRange.location != NSNotFound && lastNewLineRange.location == NSNotFound) {
+        //Only found space with following @ (" @")
+        lastStartIndex = lastSpaceRange.location;
+    }
+    else if (lastSpaceRange.location >= lastNewLineRange.location) {
+        //Last word is separated by space
+        lastStartIndex = lastSpaceRange.location;
+    }
+    else {
+        //Last word is separated by newline
+        lastStartIndex = lastNewLineRange.location;
+    }
+    
+    NSString *replacedString;
+    NSArray *wordArray = [self.imagePreviewView.captionTextView.text componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if ([wordArray count] > 1 && lastStartIndex != -1) {
+        NSInteger totalReplacedWordLength = [trimmedMessageString length] - lastStartIndex;
+        NSRange replacedRange = NSMakeRange(lastStartIndex, totalReplacedWordLength);
+        replacedString = [trimmedMessageString stringByReplacingCharactersInRange:replacedRange withString:@""];
+        //Adding space in the end of the username
+        
+        NSInteger currentCaptionLength = [replacedString length];
+        NSInteger remainingCaptionLength = TAP_LIMIT_OF_CAPTION_CHARACTER - currentCaptionLength;
+        NSString *formattedUsernameString = [NSString stringWithFormat:@" @%@ ", username];
+        if ([formattedUsernameString length] > remainingCaptionLength) {
+            //Username more than current remaining char left, split to fit
+            NSString *splitRemainingString = [formattedUsernameString substringToIndex:remainingCaptionLength];
+            replacedString = [replacedString stringByAppendingString:splitRemainingString];
+        }
+        else {
+            replacedString = [replacedString stringByAppendingString:formattedUsernameString];
+        }
+    }
+    else {
+        //Adding space in the end of the username
+        replacedString = [NSString stringWithFormat:@"@%@ ", username];
+    }
+    
+    [self.imagePreviewView.captionTextView setText:replacedString];
+    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [replacedString length], TAP_LIMIT_OF_CAPTION_CHARACTER];
+    [self.imagePreviewView showMentionTableView:NO animated:YES];
+}
+
 #pragma mark CollectionView
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 
@@ -447,6 +580,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark UIScrollView
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    
+    if (scrollView == self.imagePreviewView.mentionTableView) {
+        return;
+    }
     
     [self.imagePreviewView.captionTextView resignFirstResponder];
     
@@ -554,6 +691,75 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return NO;
     }
     
+    
+    if (self.isNotFromPersonalRoom) {
+        if ([newString isEqualToString:@""]) {
+            self.lastNumberOfWordArrayForShowMention = 0;
+            _lastTypingWordArrayStartIndex = 0;
+            _lastTypingWordString = @"";
+        }
+            
+        NSInteger indexChar = 0;
+        BOOL isErasing = NO;
+        //DV Note
+        //When user is erase a character, range.length = 1, but when user add a character range.length = 0
+        if (range.length != 0) {
+            //User erase a character
+            //Example when there is string hello and user would erase char 'o' at the end, range.location would become 4 and range.length = 1
+            indexChar = range.location - range.length;
+            isErasing = YES;
+        }
+        else {
+            //User added a character
+            //Example when there is string hello and user would add char 'w' at the end (become hellow), range.location would become 5 and range.length = 0
+            indexChar = range.location;
+        }
+        
+        NSString *trimmedString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSArray *wordArray = [trimmedString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSInteger currentWordLength = 0;
+        NSString *selectedWord = @"";
+        NSInteger numberOfSeparator = [wordArray count] - 1;
+        for (NSInteger counter = 0; counter < [wordArray count]; counter++) {
+            NSString *word = [wordArray objectAtIndex:counter];
+            currentWordLength = currentWordLength + [word length];
+            if(indexChar - (numberOfSeparator - 1) <= currentWordLength) {
+                selectedWord = word;
+                _lastTypingWordArrayStartIndex = counter;
+                _lastTypingWordString = selectedWord;
+                break;
+            }
+        }
+
+        BOOL isSubstractArray = NO;
+        if (self.lastNumberOfWordArrayForShowMention > [wordArray count]) {
+            isSubstractArray = YES;
+        }
+        
+        _lastNumberOfWordArrayForShowMention = [wordArray count];
+        
+        if ([text isEqualToString:@" "] || [text isEqualToString:@"\n"] || ([text isEqualToString:@""] && isSubstractArray)) {
+            [self.filteredMentionListArray removeAllObjects];
+            [self.imagePreviewView showMentionTableView:NO animated:YES];
+            [self.imagePreviewView.mentionTableView reloadData];
+        }
+        else {
+            [self filterMentionListWithKeyword:selectedWord];
+            
+            if ([self.filteredMentionListArray count] == 0) {
+                [self.imagePreviewView showMentionTableView:NO animated:YES];
+                [self.imagePreviewView.mentionTableView reloadData];
+            }
+            else {
+                if (self.imagePreviewView.mentionTableView.alpha != 1.0f) {
+                    [self.imagePreviewView showMentionTableView:YES animated:YES];
+                }
+                
+                [self.imagePreviewView.mentionTableView reloadData];
+            }
+        }
+    }
+    
     return YES;
 }
 
@@ -571,6 +777,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         CGFloat captionViewHeight = CGRectGetMaxY(self.imagePreviewView.captionSeparatorView.frame) + 10.0f;
         self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - captionViewHeight, CGRectGetWidth(self.imagePreviewView.captionView.frame), captionViewHeight);
+        
+        self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - CGRectGetHeight(self.imagePreviewView.mentionTableView.frame), CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), CGRectGetHeight(self.imagePreviewView.mentionTableView.frame));
+        self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+        self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+        
+        self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
     }];
 }
 
@@ -674,6 +886,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.imagePreviewView.bottomMenuView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.bottomMenuView.frame), bottomMenuYPosition - keyboardHeight, CGRectGetWidth(self.imagePreviewView.bottomMenuView.frame), CGRectGetHeight(self.imagePreviewView.bottomMenuView.frame));
    
     self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - CGRectGetHeight(self.imagePreviewView.captionView.frame), CGRectGetWidth(self.imagePreviewView.captionView.frame), CGRectGetHeight(self.imagePreviewView.captionView.frame));
+    
+    self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - CGRectGetHeight(self.imagePreviewView.mentionTableView.frame), CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), CGRectGetHeight(self.imagePreviewView.mentionTableView.frame));
+    self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+    self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+    
+    self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
@@ -687,6 +905,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.imagePreviewView.bottomMenuView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.bottomMenuView.frame), bottomMenuYPosition, CGRectGetWidth(self.imagePreviewView.bottomMenuView.frame), CGRectGetHeight(self.imagePreviewView.bottomMenuView.frame));
     
     self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - CGRectGetHeight(self.imagePreviewView.captionView.frame), CGRectGetWidth(self.imagePreviewView.captionView.frame), CGRectGetHeight(self.imagePreviewView.captionView.frame));
+    
+    self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - CGRectGetHeight(self.imagePreviewView.mentionTableView.frame), CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), CGRectGetHeight(self.imagePreviewView.mentionTableView.frame));
+    self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+    self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+    
+    self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
 }
 
 - (void)setMediaPreviewDataWithData:(TAPMediaPreviewModel *)mediaPreviewData {
@@ -726,6 +950,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
         photoAlbumListViewController.delegate = self;
         [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
+        photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+        [photoAlbumListViewController setParticipantListArray:self.participantListArray];
         UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
         [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
     }
@@ -764,6 +990,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     if (status == PHAuthorizationStatusAuthorized) {
         TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
         [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
+        photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+        [photoAlbumListViewController setParticipantListArray:self.participantListArray];
         photoAlbumListViewController.delegate = self;
         UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
         [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
@@ -823,6 +1051,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
             [self.delegate imagePreviewDidTapSendButtonWithData:self.mediaDataArray];
         }
+        
+        
+        self.lastNumberOfWordArrayForShowMention = 0;
+        self.lastTypingWordArrayStartIndex = 0;
+        self.lastTypingWordString = @"";
+        [self.filteredMentionListArray removeAllObjects];
         
         [self dismissViewControllerAnimated:YES completion:^{
             if ([self.delegate respondsToSelector:@selector(imagePreviewDidSendDataAndCompleteDismissView)]) {
@@ -913,6 +1147,48 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else {
         [self.imagePreviewView enableSendButton:YES];
+    }
+}
+
+- (void)filterMentionListWithKeyword:(NSString *)keyword {
+    _filteredMentionListArray = [[NSMutableArray alloc] init];
+
+    if ([keyword length] == 0 || ![keyword hasPrefix:@"@"]) {
+        return;
+    }
+    
+    if ([keyword hasPrefix:@"@"] && [keyword length] != 1) {
+        keyword = [keyword substringFromIndex:1];
+    }
+    
+    
+    if ([keyword isEqualToString:@"@"]) {
+        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
+        NSArray *resultArray = [self.participantListArray filteredArrayUsingPredicate:predicate];
+        self.filteredMentionListArray = [resultArray mutableCopy];
+    }
+    else {
+        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
+        NSArray *resultArray = [self.participantListArray filteredArrayUsingPredicate:predicate];
+        self.filteredMentionListArray = [resultArray mutableCopy];
+    }
+    
+    if ([self.filteredMentionListArray count] > 0) {
+        CGFloat tableViewHeight = 0.0f;
+        if ([self.filteredMentionListArray count] >= 4) {
+            tableViewHeight = 4 * 54.0f;
+        }
+        else {
+            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+        }
+        
+        self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - tableViewHeight, CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), tableViewHeight + 10.0f); //10.0f for table view header
+        self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+        self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+        
+        self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
     }
 }
 

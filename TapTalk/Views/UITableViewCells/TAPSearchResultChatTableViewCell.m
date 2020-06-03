@@ -12,7 +12,6 @@
 
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *separatorView;
-@property (strong, nonatomic) UIView *bubbleUnreadView;
 @property (strong, nonatomic) UIView *onlineStatusView;
 @property (strong, nonatomic) UIView *initialNameView;
 @property (strong, nonatomic) UILabel *initialNameLabel;
@@ -20,7 +19,10 @@
 @property (strong, nonatomic) UIImageView *expertIconImageView;
 @property (strong, nonatomic) UIImageView *muteImageView;
 @property (strong, nonatomic) UILabel *roomNameLabel;
+@property (strong, nonatomic) UIView *bubbleUnreadView;
 @property (strong, nonatomic) UILabel *numberOfUnreadMessageLabel;
+@property (strong, nonatomic) UIView *unreadMentionView;
+@property (strong, nonatomic) UIImageView *unreadMentionImageView;
 @property (strong, nonatomic) UILabel *onlineStatusLabel;
 
 @end
@@ -77,6 +79,18 @@
         self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
         [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
         
+        _unreadMentionView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, 25.0f, 20.0f, 20.0f)];
+        self.unreadMentionView.clipsToBounds = YES;
+        self.unreadMentionView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
+        self.unreadMentionView.layer.cornerRadius = CGRectGetHeight(self.unreadMentionView.frame) / 2.0f;
+        self.unreadMentionView.alpha = 0.0f;
+        [self.bgView addSubview:self.unreadMentionView];
+
+        _unreadMentionImageView = [[UIImageView alloc] initWithFrame:CGRectMake(3.0f, 3.0f, 14.0f, 14.0f)];
+        self.unreadMentionImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.unreadMentionImageView.image = [self.unreadMentionImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        [self.unreadMentionView addSubview:self.unreadMentionImageView];
+        
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - rightPadding, 0.0f, 0.0f, 13.0f)];
         self.muteImageView.alpha = 0.0f;
         self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -114,7 +128,8 @@
 #pragma mark - Custom Methods
 - (void)setSearchResultChatTableViewCellWithData:(TAPRoomModel *)room
                                   searchedString:(NSString *)searchedString
-                          numberOfUnreadMessages:(NSString *)unreadMessageCount {
+                          numberOfUnreadMessages:(NSString *)unreadMessageCount
+                                      hasMention:(BOOL)hasMention {
     searchedString = [searchedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     //DV Temp
@@ -126,6 +141,13 @@
     BOOL isGroup = NO;
     if (room.type == RoomTypeGroup || room.type == RoomTypeChannel) {
         isGroup = YES;
+    }
+    
+    if (isGroup && hasMention) {
+        [self showUnreadMentionBadge:YES];
+    }
+    else {
+        [self showUnreadMentionBadge:NO];
     }
 
     NSString *profileImageURL = @"";
@@ -199,6 +221,7 @@
     if (numberOfUnreadMessage == 0) {
         self.bubbleUnreadView.alpha = 0.0f;
         self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetMinY(self.bgView.frame), 0.0f, CGRectGetHeight(self.bubbleUnreadView.frame));
+        self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetMinY(self.unreadMentionView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
     }
     else {
         if (numberOfUnreadMessage > 99) {
@@ -219,6 +242,7 @@
         
         self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
         self.bubbleUnreadView.alpha = 1.0f;
+        self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetMinY(self.unreadMentionView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
     }
     
     //MUTE IMAGE VIEW
@@ -313,6 +337,15 @@
     }
     else {
         self.separatorView.alpha = 1.0f;
+    }
+}
+
+- (void)showUnreadMentionBadge:(BOOL)isShow {
+    if (isShow) {
+        self.unreadMentionView.alpha = 1.0f;
+    }
+    else {
+        self.unreadMentionView.alpha = 0.0f;
     }
 }
 

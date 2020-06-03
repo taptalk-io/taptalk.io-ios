@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) TAPMessageModel *lastMessage;
 @property (nonatomic) NSInteger numberOfUnreadMessages;
+@property (nonatomic) NSInteger numberOfUnreadMentions;
 
 @end
 

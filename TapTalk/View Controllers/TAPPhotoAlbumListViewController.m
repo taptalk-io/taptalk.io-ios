@@ -179,6 +179,8 @@
         imageSelectViewController.currentTotalImageData = [self.selectedMediaDataArray count];
         [imageSelectViewController setImageSelectViewControllerType:ImageSelectViewControllerTypeGalleryAlbum];
         [imageSelectViewController setImageSelectViewControllerNavigateType:ImageSelectViewControllerNavigateTypePush];
+        imageSelectViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+        [imageSelectViewController setParticipantListArray:self.participantListArray];
         
         if (self.photoAlbumListViewControllerType == TAPPhotoAlbumListViewControllerTypeDefault) {
             [imageSelectViewController setImageSelectViewControllerContinueType:ImageSelectViewControllerContinueTypeDefault];
@@ -205,7 +207,9 @@
         imageSelectViewController.currentTotalImageData = [self.selectedMediaDataArray count];
         [imageSelectViewController setImageSelectViewControllerType:ImageSelectViewControllerTypeGalleryAlbum];
         [imageSelectViewController setImageSelectViewControllerNavigateType:ImageSelectViewControllerNavigateTypePush];
-        
+        imageSelectViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+        [imageSelectViewController setParticipantListArray:self.participantListArray];
+
         if (self.photoAlbumListViewControllerType == TAPPhotoAlbumListViewControllerTypeDefault) {
             [imageSelectViewController setImageSelectViewControllerContinueType:ImageSelectViewControllerContinueTypeDefault];
         }

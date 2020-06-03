@@ -14,10 +14,12 @@
 #import "TAPChatManager.h"
 #import "TAPGroupManager.h"
 #import "TAPAPIManager.h"
+#import "TAPLanguageManager.h"
 
 #import "TAPUserModel.h"
 #import "TAPMessageModel.h"
 #import "TAPProductModel.h"
+
 
 #import <AVKit/AVKit.h>
 #import <Photos/Photos.h>
@@ -93,6 +95,18 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  Clear all local cached data
  */
 - (void)clearAllTapTalkData;
+
+/**
+ Set custom User-Agent key as a header parameter for an API request
+ Note: By default, we will pass "ios" as User-Agent key
+ */
+- (void)setTapTalkUserAgent:(NSString *)userAgent;
+
+/**
+ get defined custom User-Agent key as a header parameter for an API request
+ Note: By default, we will pass "ios" as User-Agent key
+ */
+- (NSString *)getTapTalkUserAgent;
 
 //==========================================================
 //                       Connection
@@ -256,6 +270,19 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  Obtain initialize status of Google Places API
 */
 - (BOOL)obtainGooglePlacesAPIInitializeState;
+
+//==========================================================
+//                 Language & Localization
+//==========================================================
+/**
+ Setup TapTalk.io main language (default is English)
+ 
+ Use below types:
+ - TAPLanguageTypeEnglish for English Language
+ - TAPLanguageTypeIndonesian for Indonesian Language
+ 
+ */
+- (void)setupTapTalkMainLanguageWithType:(TAPLanguageType)languageType;
 
 //==========================================================
 //                          User

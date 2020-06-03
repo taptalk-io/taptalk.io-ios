@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +21,7 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="185" id="Wgf-FI-fQG" customClass="TAPYourFileBubbleTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="207"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Wgf-FI-fQG" id="qj8-8w-hdL">
+            <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Wgf-FI-fQG" id="qj8-8w-hdL">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="207"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -479,10 +479,41 @@
                         <color key="textColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TIC-sc-SMr">
+                        <rect key="frame" x="-31" y="11" width="30" height="30"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="e74-MM-wnj">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconReplyChatOrange" translatesAutoresizingMaskIntoConstraints="NO" id="slh-Vw-2Gq">
+                                        <rect key="frame" x="4" y="4" width="22" height="22"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="slh-Vw-2Gq" secondAttribute="bottom" constant="4" id="0go-Wa-Rvm"/>
+                                    <constraint firstAttribute="width" constant="30" id="9CB-eH-AUN"/>
+                                    <constraint firstAttribute="trailing" secondItem="slh-Vw-2Gq" secondAttribute="trailing" constant="4" id="NzC-Xi-Cf1"/>
+                                    <constraint firstAttribute="height" constant="30" id="apa-iv-Qqz"/>
+                                    <constraint firstItem="slh-Vw-2Gq" firstAttribute="leading" secondItem="e74-MM-wnj" secondAttribute="leading" constant="4" id="l9c-Ec-Mfe"/>
+                                    <constraint firstItem="slh-Vw-2Gq" firstAttribute="top" secondItem="e74-MM-wnj" secondAttribute="top" constant="4" id="urI-UD-8w7"/>
+                                </constraints>
+                                <viewLayoutGuide key="safeArea" id="fDx-pV-ROC"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="e74-MM-wnj" firstAttribute="centerX" secondItem="TIC-sc-SMr" secondAttribute="centerX" id="NSm-xr-6dD"/>
+                            <constraint firstAttribute="height" constant="30" id="Skg-ee-xSs"/>
+                            <constraint firstAttribute="width" constant="30" id="UNt-Tw-lgy"/>
+                            <constraint firstItem="e74-MM-wnj" firstAttribute="centerY" secondItem="TIC-sc-SMr" secondAttribute="centerY" id="fin-Cc-SKo"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
                     <constraint firstItem="4O7-Tz-qVj" firstAttribute="leading" secondItem="H1d-AO-jhD" secondAttribute="leading" id="5tR-m6-xjN"/>
+                    <constraint firstItem="TIC-sc-SMr" firstAttribute="leading" secondItem="qj8-8w-hdL" secondAttribute="leadingMargin" constant="-46" id="Ajf-PG-pfR"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="height" secondItem="4O7-Tz-qVj" secondAttribute="height" id="DyN-ES-fOS"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="G1T-11-PY8"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="width" secondItem="4O7-Tz-qVj" secondAttribute="width" id="MVE-UY-S7F"/>
@@ -493,6 +524,7 @@
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="trailing" secondItem="H1d-AO-jhD" secondAttribute="trailing" id="UrW-BM-5IL"/>
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="leading" secondItem="H1d-AO-jhD" secondAttribute="leading" id="XBc-8N-Ejc"/>
                     <constraint firstAttribute="trailing" secondItem="u5V-oM-bLv" secondAttribute="trailing" constant="16" id="XD3-uj-GXx"/>
+                    <constraint firstItem="TIC-sc-SMr" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="topMargin" id="YeW-9O-7B7"/>
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="bottom" secondItem="H1d-AO-jhD" secondAttribute="bottom" id="ag4-Go-zws"/>
                     <constraint firstItem="u5V-oM-bLv" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="leading" id="bzv-6e-sPp"/>
                     <constraint firstItem="4O7-Tz-qVj" firstAttribute="bottom" secondItem="H1d-AO-jhD" secondAttribute="bottom" id="gqq-tX-TZJ"/>
@@ -504,6 +536,7 @@
                     <constraint firstItem="6yA-Ee-rcg" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="wxA-iA-QYG"/>
                 </constraints>
             </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bubbleLabel" destination="J4M-Xo-U5R" id="Ejr-qe-68b"/>
                 <outlet property="bubbleView" destination="6yA-Ee-rcg" id="Ha3-be-kuh"/>
@@ -572,6 +605,10 @@
                 <outlet property="statusLabel" destination="u5V-oM-bLv" id="PGH-8j-eFc"/>
                 <outlet property="statusLabelHeightConstraint" destination="pyt-US-7n0" id="HLf-ec-75b"/>
                 <outlet property="statusLabelTopConstraint" destination="UUC-V8-Rim" id="jRI-z6-uhb"/>
+                <outlet property="swipeReplyImageView" destination="slh-Vw-2Gq" id="9aM-eL-yYb"/>
+                <outlet property="swipeReplyView" destination="e74-MM-wnj" id="p5p-1V-bOY"/>
+                <outlet property="swipeReplyViewHeightConstraint" destination="apa-iv-Qqz" id="L9X-vw-L5Q"/>
+                <outlet property="swipeReplyViewWidthConstraint" destination="9CB-eH-AUN" id="N4v-ux-X9q"/>
             </connections>
             <point key="canvasLocation" x="44.799999999999997" y="-40.029985007496258"/>
         </tableViewCell>
@@ -580,6 +617,7 @@
         <image name="TAPIconAbort" width="32" height="32"/>
         <image name="TAPIconDocuments" width="32" height="32"/>
         <image name="TAPIconDownload" width="32" height="32"/>
+        <image name="TAPIconReplyChatOrange" width="32" height="32"/>
         <image name="TAPIconRetry" width="32" height="32"/>
     </resources>
 </document>

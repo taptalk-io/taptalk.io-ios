@@ -25,6 +25,15 @@ NS_ASSUME_NONNULL_BEGIN
                             originalString:(NSString*)originalString;
 - (void)yourChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)yourChatBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
+- (void)yourChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)yourChatBubblePressedMentionWithWord:(NSString*)word
+                               tappedAtIndex:(NSInteger)index
+                                     message:(TAPMessageModel *)message
+                         mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (void)yourChatBubbleLongPressedMentionWithWord:(NSString*)word
+                                   tappedAtIndex:(NSInteger)index
+                                         message:(TAPMessageModel *)message
+                             mentionIndexesArray:(NSArray *)mentionIndexesArray;
 
 @end
 
@@ -32,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id<TAPYourChatBubbleTableViewCellDelegate> delegate;
 @property (weak, nonatomic) TAPMessageModel *message;
+@property (strong, nonatomic) NSArray *mentionIndexesArray;
 
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated;

@@ -52,7 +52,7 @@
         
         UIFont *infoLabelBodyFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
         UIColor *infoLabelBodyColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
-        _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 16.0f - 16.0f, 55.0f)];
+        _descriptionNoChatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleNoChatsLabel.frame) + 8.0f, CGRectGetWidth(self.noChatsView.frame) - 16.0f - 16.0f, 70.0f)];
         self.descriptionNoChatsLabel.text = NSLocalizedStringFromTableInBundle(@"It seems like you don't have any chats to show, but don't worry! Your chat list will grow once you", nil, [TAPUtil currentBundle], @"");
         self.descriptionNoChatsLabel.textColor = infoLabelBodyColor;
         self.descriptionNoChatsLabel.font = infoLabelBodyFont;

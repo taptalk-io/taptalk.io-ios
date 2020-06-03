@@ -38,6 +38,7 @@
 #import "TAPYourVideoBubbleTableViewCell.h"
 #import "TAPMyChatDeletedBubbleTableViewCell.h"
 #import "TAPYourChatDeletedBubbleTableViewCell.h"
+#import "TAPMentionListXIBTableViewCell.h"
 
 #import "TAPProductListBubbleTableViewCell.h"
 #import "TAPUnreadMessagesBubbleTableViewCell.h"
@@ -113,7 +114,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIButton *topFloatingIndicatorButton;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *topFloatingIndicatorWidthConstraint;
 
-@property (strong, nonatomic) IBOutlet UIImageView *chatAnchorImageView;
+@property (strong, nonatomic) IBOutlet UIView *mentionTableBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *mentionLoadingBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *mentionLoadingView;
+@property (strong, nonatomic) IBOutlet UIImageView *mentionLoadingImageView;
+@property (strong, nonatomic) IBOutlet UILabel *mentionLoadingCancelLabel;
+@property (strong, nonatomic) IBOutlet UIButton *mentionLoadingCancelButton;
+- (IBAction)mentionLoadingCancelButtonDidTapped:(id)sender;
+
+@property (strong, nonatomic) IBOutlet UITableView *mentionListTableView;
 
 @property (strong, nonatomic) IBOutlet UIButton *attachmentButton;
 
@@ -176,11 +185,26 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) CGFloat connectionStatusHeight;
 
 @property (strong, nonatomic) IBOutlet UIView *chatAnchorBackgroundView;
+@property (strong, nonatomic) IBOutlet UIImageView *chatAnchorImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatAnchorButton;
 @property (strong, nonatomic) IBOutlet TAPGradientView *chatAnchorBadgeView;
 @property (strong, nonatomic) IBOutlet UILabel *chatAnchorBadgeLabel;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatAnchorButtonBottomConstrait;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatAnchorBackgroundViewBottomConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatAnchorButtonHeightConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatAnchorBackgroundViewHeightConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatAnchorBadgeViewHeightConstrait;
+
+@property (strong, nonatomic) IBOutlet UIView *mentionAnchorBackgroundView;
+@property (strong, nonatomic) IBOutlet UIImageView *mentionAnchorImageView;
+@property (strong, nonatomic) IBOutlet UIButton *mentionAnchorButton;
+@property (strong, nonatomic) IBOutlet TAPGradientView *mentionAnchorBadgeView;
+@property (strong, nonatomic) IBOutlet UILabel *mentionAnchorBadgeLabel;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionAnchorButtonBottomConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionAnchorBackgroundViewBottomConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionAnchorButtonHeightConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionAnchorBackgroundViewHeightConstrait;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionAnchorBadgeViewHeightConstrait;
 
 //Input Accessory Extension
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
@@ -214,6 +238,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIButton *deleteRoomButton;
 @property (strong, nonatomic) IBOutlet UIImageView *deleteRoomButtonLoadingImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionListTableViewBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionListTableViewHeightConstraint;
 
 //Kicked or Removed Group Room View
 @property (strong, nonatomic) IBOutlet UIView *kickedGroupRoomBackgroundView;
@@ -241,7 +267,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)closeAddContactButtonDidTapped:(id)sender;
 
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
+@property (strong, nonatomic) NSMutableDictionary *anchorMentionMessageDictionary;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
+@property (strong, nonatomic) NSMutableArray *scrolledPendingMentionArray;
+@property (strong, nonatomic) NSMutableArray *filteredMentionListArray;
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
@@ -251,6 +280,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (nonatomic) NSInteger lastLoadingCellRowPosition;
 
+@property (nonatomic) NSInteger lastNumberOfWordArrayForShowMention;
+@property (nonatomic) NSInteger lastTypingWordArrayStartIndex;
+@property (strong, nonatomic) NSString *lastTypingWordString;
+
 @property (strong, nonatomic) TAPUserModel *otherUser;
 @property (nonatomic) BOOL isOtherUserIsContact;
 
@@ -259,6 +292,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isShowingUnreadMessageIdentifier;
 
 @property (weak, nonatomic) id openedBubbleCell;
+
+//DV Temp
+@property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
+
 
 //Custom Method
 - (void)setupNavigationViewData;
@@ -273,6 +310,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)sendButtonDidTapped:(id)sender;
 - (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
 - (IBAction)chatAnchorButtonDidTapped:(id)sender;
+- (IBAction)mentionAnchorButtonDidTapped:(id)sender;
 - (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender;
 - (IBAction)topFloatingIndicatorButtonDidTapped:(id)sender;
 - (IBAction)deleteGroupButtonDidTapped:(id)sender;
@@ -433,7 +471,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _messageDictionary = [[NSMutableDictionary alloc] init];
     _cellHeightsDictionary = [[NSMutableDictionary alloc] init];
     _anchorUnreadMessageArray = [[NSMutableArray alloc] init];
+    _anchorMentionMessageDictionary = [[NSMutableDictionary alloc] init];
     _scrolledPendingMessageArray = [[NSMutableArray alloc] init];
+    _scrolledPendingMentionArray = [[NSMutableArray alloc] init];
+    _filteredMentionListArray = [[NSMutableArray alloc] init];
     _otherUser = nil;
     _isKeyboardWasShowed = NO;
     _isKeyboardShowed = NO;
@@ -442,11 +483,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _tappedMessageLocalID = @"";
     _safeAreaBottomPadding = [TAPUtil safeAreaBottomPadding];
     _selectedMessage = nil;
+    _mentionIndexesDictionary = [[NSMutableDictionary alloc] init];
     
     _keyboardState = keyboardStateDefault;
     _keyboardHeight = 0.0f;
     _initialKeyboardHeight = 0.0f;
     _lastKeyboardHeight = 0.0f;
+    
+    _lastNumberOfWordArrayForShowMention = 0;
+    _lastTypingWordArrayStartIndex = 0;
+    _lastTypingWordString = @"";
     
     self.messageTextViewHeight = 32.0f;
     self.messageTextView.delegate = self;
@@ -457,7 +503,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.textViewBorderView.clipsToBounds = YES;
     self.messageTextView.minimumHeight = 32.0f;
     self.messageTextView.maximumHeight = 64.0f;
-    
+        
     if (IS_IPHONE_X_FAMILY) {
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
@@ -469,6 +515,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.chatAnchorBadgeView.layer.borderWidth = 1.0f;
     self.chatAnchorBadgeView.layer.cornerRadius = CGRectGetHeight(self.chatAnchorBadgeView.frame) / 2.0f;
     self.chatAnchorBackgroundView.layer.cornerRadius = CGRectGetHeight(self.chatAnchorBackgroundView.frame) / 2.0f;
+
+    self.mentionAnchorBadgeView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.mentionAnchorBadgeView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground].CGColor;
+    self.mentionAnchorBadgeView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
+    self.mentionAnchorBadgeView.layer.borderWidth = 1.0f;
+    self.mentionAnchorBadgeView.layer.cornerRadius = CGRectGetHeight(self.mentionAnchorBadgeView.frame) / 2.0f;
+    self.mentionAnchorBackgroundView.layer.cornerRadius = CGRectGetHeight(self.mentionAnchorBackgroundView.frame) / 2.0f;
+
     
     //Rotate table view and commit animation
     [UIView beginAnimations:nil context:nil];
@@ -484,6 +538,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, 0.0f);
     self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
+    
+    self.mentionListTableViewHeightConstraint.constant = 150.0f;
+    self.mentionListTableView.clipsToBounds = YES;
+    self.mentionListTableView.layer.cornerRadius = 15.0f;
+    self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+
+    self.mentionTableBackgroundView.clipsToBounds = YES;
+    self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
+    self.mentionTableBackgroundView.layer.shadowRadius = 10.0f;
+    self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+    self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+    self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
+    self.mentionTableBackgroundView.layer.masksToBounds = NO;
     
     self.view.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
     self.quoteStandingSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorQuoteLayoutDecorationBackground];
@@ -532,10 +599,61 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _lastSeenTimer = [NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(timerRefreshLastSeen) userInfo:nil repeats:YES];
     
     [self setupNavigationViewData];
-
     [self setupInputAccessoryView];
     [self setupDeletedRoomView];
     [self setupKickedGroupView];
+    
+    //Setup mention loading view
+    self.mentionLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.mentionLoadingImageView.image = [self.mentionLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
+    self.mentionLoadingView.layer.cornerRadius = 6.0f;
+    self.mentionLoadingCancelLabel.text = NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"");
+    UIFont *popupLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupLoadingLabel];
+    UIColor *popupLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupLoadingLabel];
+    self.mentionLoadingCancelLabel.textColor = popupLabelColor;
+    self.mentionLoadingCancelLabel.font = popupLabelFont;
+    
+    self.mentionLoadingBackgroundView.alpha = 0.0;
+    self.mentionLoadingImageView.alpha = 0.0;
+    self.mentionLoadingCancelLabel.alpha = 0.0f;
+    self.mentionLoadingCancelButton.alpha = 0.0f;
+    self.mentionLoadingCancelButton.userInteractionEnabled = NO;
+    
+    self.mentionLoadingBackgroundView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds));
+    self.mentionLoadingBackgroundView.layer.zPosition = 1;
+    [self.navigationController.view addSubview:self.mentionLoadingBackgroundView];
+    [self.navigationController.view bringSubviewToFront:self.mentionLoadingBackgroundView];
+    
+    //Get unread mention
+    NSString *usernameString = [TAPDataManager getActiveUser].username;
+    usernameString = [TAPUtil nullToEmptyString:usernameString];
+    
+    NSString *userIDString = [TAPDataManager getActiveUser].userID;
+    userIDString = [TAPUtil nullToEmptyString:userIDString];
+    
+    NSString *roomIDString = self.currentRoom.roomID;
+    roomIDString = [TAPUtil nullToEmptyString:roomIDString];
+    
+    if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeChannel) {
+        [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:usernameString roomID:roomIDString activeUserID:userIDString success:^(NSArray *unreadMentionMessages) {
+            [self addMessageToAnchorMentionArrayWithMessageArray:unreadMentionMessages];
+            if ([self.anchorMentionMessageDictionary count] > 0) {
+                self.mentionAnchorBackgroundView.alpha = 1.0f;
+                self.mentionAnchorBadgeView.alpha = 1.0f;
+                self.mentionAnchorButton.alpha = 1.0f;
+                self.mentionAnchorBadgeLabel.text = [NSString stringWithFormat:@"%li", [self.anchorMentionMessageDictionary count]];
+                
+                if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+                    self.chatAnchorButtonHeightConstrait.constant = 0.0f;
+                    self.chatAnchorBackgroundViewHeightConstrait.constant = 0.0f;
+                    self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+                    self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+                }
+            }
+        } failure:^(NSError *error) {
+
+        }];
+    }
     
     //load data
     [self firstLoadData];
@@ -569,6 +687,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     
     self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+    self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -755,6 +874,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
+        return [self.filteredMentionListArray count];
+    }
+    
+    //Chat table view
     if (self.isLoadingOldMessageFromAPI && [self.messageArray count] > 0 && !self.isShowingTopFloatingIdentifier) {
         return [self.messageArray count] + 1;
     }
@@ -763,37 +887,48 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (indexPath.row == [self.messageArray count] && [self.messageArray count] > 0) {
-        //load more view cell
-        //loading
-        return 48.0f;
-    }
-    
-    TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
-    if (currentMessage != nil) {
-        BOOL isHidden = currentMessage.isHidden;
-        if (isHidden) {
-            //Set height = 0 for hidden message
-            return 0.0f;
-        }
-    }
-    
-    if (currentMessage.type == TAPChatMessageTypeProduct) {
-        //DV Note - For product list height
-        //    Collection view height (347.0f) + 16.0f gap
-        return 363.0f;
-    }
-    else if (currentMessage.type == TAPChatMessageTypeUnreadMessageIdentifier) {
-        //Unread message identifier UI
-        return 42.0f;
+    if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
+        tableView.estimatedRowHeight = 54.0f;
+        return UITableViewAutomaticDimension;
     }
     else {
-        tableView.estimatedRowHeight = 70.0f;
-        return UITableViewAutomaticDimension;
+        //Chat Table View
+        if (indexPath.row == [self.messageArray count] && [self.messageArray count] > 0) {
+            //load more view cell
+            //loading
+            return 48.0f;
+        }
+        
+        TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
+        if (currentMessage != nil) {
+            BOOL isHidden = currentMessage.isHidden;
+            if (isHidden) {
+                //Set height = 0 for hidden message
+                return 0.0f;
+            }
+        }
+        
+        if (currentMessage.type == TAPChatMessageTypeProduct) {
+            //DV Note - For product list height
+            //    Collection view height (347.0f) + 16.0f gap
+            return 363.0f;
+        }
+        else if (currentMessage.type == TAPChatMessageTypeUnreadMessageIdentifier) {
+            //Unread message identifier UI
+            return 42.0f;
+        }
+        else {
+            tableView.estimatedRowHeight = 70.0f;
+            return UITableViewAutomaticDimension;
+        }
     }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
+        return UITableViewAutomaticDimension;
+    }
+    
     if (indexPath.row < [self.messageArray count]) {
         TAPMessageModel *currentMessage = [self.messageArray objectAtIndex:indexPath.row];
         if (currentMessage != nil) {
@@ -819,10 +954,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (tableView == self.mentionListTableView) {
+        return 10.0f;
+    }
+
     return FLT_MIN;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if (tableView == self.mentionListTableView) {
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
+        view.layer.cornerRadius = 15.0f;
+        view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+        view.clipsToBounds = YES;
+        return view;
+    }
+
     UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
     return view;
 }
@@ -837,6 +984,26 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
+        [tableView registerNib:[TAPMentionListXIBTableViewCell cellNib] forCellReuseIdentifier:[TAPMentionListXIBTableViewCell description]];
+        TAPMentionListXIBTableViewCell *cell = (TAPMentionListXIBTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMentionListXIBTableViewCell description] forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        if ([self.filteredMentionListArray count] != 0) {
+            TAPUserModel *user = [self.filteredMentionListArray objectAtIndex:indexPath.row];
+            [cell setMentionListCellWithUser:user];
+            
+            if (indexPath.row == [self.filteredMentionListArray count] - 1) {
+                [cell showSeparatorView:NO];
+            }
+            else {
+                [cell showSeparatorView:YES];
+            }
+        }
+
+        return cell;
+    }
     
     if ([self.messageArray count] != 0) {
         if (indexPath.row == [self.messageArray count]) {
@@ -859,6 +1026,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 TAPMyChatDeletedBubbleTableViewCell *cell = (TAPMyChatDeletedBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatDeletedBubbleTableViewCell description] forIndexPath:indexPath];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.tag = indexPath.row;
+                cell.contentView.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
@@ -873,10 +1041,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    
+                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                    if ([mentionArray count] > 0) {
+                        cell.mentionIndexesArray = mentionArray;
+                    }
+
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -897,10 +1073,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyImageBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+
+                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                    if ([mentionArray count] > 0) {
+                        cell.mentionIndexesArray = mentionArray;
+                    }
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     [cell showStatusLabel:YES];
                     
@@ -946,10 +1129,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyVideoBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
+                    
+                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                    if ([mentionArray count] > 0) {
+                        cell.mentionIndexesArray = mentionArray;
+                    }
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1013,10 +1203,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyFileBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1078,7 +1270,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyLocationBubbleTableViewCell *cell = (TAPMyLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyLocationBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
-                    cell.message = message;
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1150,6 +1343,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 TAPYourChatDeletedBubbleTableViewCell *cell = (TAPYourChatDeletedBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatDeletedBubbleTableViewCell description] forIndexPath:indexPath];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.tag = indexPath.row;
+                cell.contentView.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
                 cell.delegate = self;
@@ -1166,10 +1360,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    
+                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                    if ([mentionArray count] > 0) {
+                        cell.mentionIndexesArray = mentionArray;
+                    }
+                    
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1190,10 +1392,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourImageBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    
+                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                    if ([mentionArray count] > 0) {
+                        cell.mentionIndexesArray = mentionArray;
+                    }
+                    
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1220,10 +1430,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourVideoBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    
+                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                    if ([mentionArray count] > 0) {
+                        cell.mentionIndexesArray = mentionArray;
+                    }
+                    
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1264,10 +1482,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourFileBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    cell.message = message;
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1307,7 +1527,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourLocationBubbleTableViewCell *cell = (TAPYourLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourLocationBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
-                    cell.message = message;
+                    //DV Note - remove set message because in method setMessage will save cell.message too
+//                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1378,6 +1599,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    
+    if (tableView == self.mentionListTableView) {
+        return;
+    }
+    
     if ([self.messageArray count] == 0 || indexPath.row >= [self.messageArray count]) {
         //reject when out of message bounds
         return;
@@ -1394,6 +1621,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if ([self.anchorUnreadMessageArray count] > 0) {
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
         [self removeMessageFromAnchorUnreadArray:message];
+    }
+    
+    //Check and remove unread mention message array
+    if ([self.anchorMentionMessageDictionary count] > 0) {
+        TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
+        [self removeMessageFromAnchorMention:message];
     }
     
     //Retreive before message
@@ -1430,11 +1663,63 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #pragma mark - Delegate
 #pragma mark UITableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (tableView == self.mentionListTableView) {
+        TAPUserModel *user = [self.filteredMentionListArray objectAtIndex:indexPath.row];
+        NSString *username = user.username;
+        username = [TAPUtil nullToEmptyString:username];
     
+        NSString *trimmedMessageString = [TAPUtil stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:self.messageTextView.text];
+        NSRange lastSpaceRange = [self.messageTextView.text rangeOfString:@" @" options:NSBackwardsSearch];
+        NSRange lastNewLineRange = [self.messageTextView.text rangeOfString:@"\n@" options:NSBackwardsSearch];
+        
+        //Detect which one is the last word in sentence
+        NSInteger lastStartIndex;
+        if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location == NSNotFound) {
+            //Not found space or new line
+            lastStartIndex = -1;
+        }
+        else if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location != NSNotFound) {
+            //Only found new line with following @ ("\n@")
+            lastStartIndex = lastNewLineRange.location;
+        }
+        else if (lastSpaceRange.location != NSNotFound && lastNewLineRange.location == NSNotFound) {
+            //Only found space with following @ (" @")
+            lastStartIndex = lastSpaceRange.location;
+        }
+        else if (lastSpaceRange.location >= lastNewLineRange.location) {
+            //Last word is separated by space
+            lastStartIndex = lastSpaceRange.location;
+        }
+        else {
+            //Last word is separated by newline
+            lastStartIndex = lastNewLineRange.location;
+        }
+        
+        NSString *replacedString;
+        NSArray *wordArray = [self.messageTextView.text componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([wordArray count] > 1 && lastStartIndex != -1) {
+            NSInteger totalReplacedWordLength = [trimmedMessageString length] - lastStartIndex;
+            NSRange replacedRange = NSMakeRange(lastStartIndex, totalReplacedWordLength);
+            replacedString = [trimmedMessageString stringByReplacingCharactersInRange:replacedRange withString:@""];
+            //Adding space in the end of the username
+            replacedString = [replacedString stringByAppendingString:[NSString stringWithFormat:@" @%@ ", username]];
+        }
+        else {
+            //Adding space in the end of the username
+            replacedString = [NSString stringWithFormat:@"@%@ ", username];
+        }
+        
+        [self.messageTextView setText:replacedString];
+        [self showMentionListView:NO animated:YES];
+    }
 }
 
 #pragma mark UIScrollView
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if (scrollView == self.mentionListTableView) {
+        return;
+    }
+    
     _isScrollViewDragged = YES;
     
     //Hide unread message indicator top view
@@ -1446,12 +1731,27 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (scrollView == self.mentionListTableView) {
+        return;
+    }
+    
     _isScrollViewDragged = NO;
     
     //move chat anchor button position to default position according to keyboard height
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+
+//        if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//        }
+//        if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//            self.chatAnchorButtonHeightConstrait.constant = 0.0f;
+//            self.chatAnchorBackgroundViewHeightConstrait.constant = 0.0f;
+//            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//        }
         
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
         
@@ -1468,42 +1768,100 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (scrollView == self.mentionListTableView) {
+        return;
+    }
+    
+    NSLog(@"===================== SCROLL VIEW CONTENT OFFSET: %f TABLE VIEW OFFSET: %f", scrollView.contentOffset.y, self.tableView.contentOffset.y);
+    
     if (scrollView.contentOffset.y > kShowChatAnchorOffset) {
+        
+        [self showMentionAnchorView:YES];
+        
         if (self.chatAnchorBackgroundView.alpha != 1.0f) {
             [UIView animateWithDuration:0.2f animations:^{
+                self.chatAnchorButtonHeightConstrait.constant = 40.0f;
+                self.chatAnchorBackgroundViewHeightConstrait.constant = 40.0f;
+                
+                self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+                self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+                
                 self.chatAnchorBackgroundView.alpha = 1.0f;
+                self.chatAnchorImageView.alpha = 1.0f;
                 self.chatAnchorButton.alpha = 1.0f;
+                [self.view layoutIfNeeded];
             }];
             
             [self checkAnchorUnreadLabel];
         }
     }
     else {
-        if (self.chatAnchorBackgroundView.alpha != 0.0f) {
+        //Check scrolled pending array
+        if (!self.isOnScrollPendingChecking) {
+            _isOnScrollPendingChecking = YES;
+
+            NSInteger numberOfPendingArray = 0;
+            if ([self.scrolledPendingMessageArray count] > 0) {
+                numberOfPendingArray = [self.scrolledPendingMessageArray count];
+
+                //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
+                [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
+
+                [self.scrolledPendingMessageArray removeAllObjects];
+
+                NSMutableArray *indexesArray = [NSMutableArray array];
+                for (NSInteger counter = 0; counter < numberOfPendingArray; counter++) {
+                    [indexesArray addObject:[NSIndexPath indexPathForRow:counter inSection:0]];
+                }
+
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [self.tableView insertRowsAtIndexPaths:indexesArray withRowAnimation:UITableViewRowAnimationTop];
+                    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:numberOfPendingArray - 1 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+                } completion:^(BOOL finished) {
+                    
+                }];
+//                [self.tableView reloadData];
+            }
+
+            _isOnScrollPendingChecking = NO;
+        }
+        
+        if ([self.scrolledPendingMessageArray count] > 0) {
+           if (self.chatAnchorBackgroundView.alpha != 0.0f) {
+               [UIView animateWithDuration:0.2f delay:0.1f options:UIViewAnimationOptionTransitionNone animations:^{
+                   self.chatAnchorBackgroundView.alpha = 0.0f;
+                   self.chatAnchorImageView.alpha = 0.0f;
+                   self.chatAnchorButton.alpha = 0.0f;
+                   self.chatAnchorBadgeView.alpha = 0.0f;
+                   
+                   if ([self.anchorMentionMessageDictionary count] > 0) {
+                       self.chatAnchorButtonHeightConstrait.constant = 0.0f;
+                       self.chatAnchorBackgroundViewHeightConstrait.constant = 0.0f;
+                       self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+                       self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+                       [self.view layoutIfNeeded];
+                   }
+               } completion:nil];
+           }
+        }
+        else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.chatAnchorBackgroundView.alpha = 0.0f;
+                self.chatAnchorImageView.alpha = 0.0f;
                 self.chatAnchorButton.alpha = 0.0f;
                 self.chatAnchorBadgeView.alpha = 0.0f;
             }];
         }
         
-        //Check scrolled pending array
-        if (!self.isOnScrollPendingChecking) {
-            _isOnScrollPendingChecking = YES;
-            
-            NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
-            
-            if (numberOfPendingArray > 0) {
-                //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
-                [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
-                
-                [self.scrolledPendingMessageArray removeAllObjects];
-                [self.tableView reloadData];
-                
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:numberOfPendingArray - 1 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-            }
-            
-            _isOnScrollPendingChecking = NO;
+        if ([self.anchorMentionMessageDictionary count] <= 0) {
+            [self showMentionAnchorView:NO];
+        }
+        else {
+            self.chatAnchorButtonHeightConstrait.constant = 0.0f;
+            self.chatAnchorBackgroundViewHeightConstrait.constant = 0.0f;
+            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
         }
     }
     
@@ -1534,6 +1892,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
         self.chatAnchorButtonBottomConstrait.constant = chatAnchorBottomConstraint;
         self.chatAnchorBackgroundViewBottomConstrait.constant = chatAnchorBottomConstraint;
+
+//        if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//        }
+//        else if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//        }
     }
 }
 
@@ -1614,12 +1981,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
+    
+    //Handle mapping mention index to array
+    NSArray *mentionIndexArray = [NSArray array];
+    if (message.type == TAPChatMessageTypeText) {
+        NSString *messageContainString = message.body;
+        messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+        mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+    }
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+        NSString *messageContainString = [message.data objectForKey:@"caption"];
+        messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+        mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+    }
+    
+    if ([mentionIndexArray count] > 0) {
+        [self.mentionIndexesDictionary removeObjectForKey:message.localID];
+        [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
+    }
+    
     [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
     NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [self.tableView beginUpdates];
-    [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-    [self.tableView endUpdates];
-    [self.tableView scrollsToTop];
+
+    [self.tableView performBatchUpdates:^{
+        //changing beginUpdates and endUpdates with this because of deprecation
+        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+    } completion:^(BOOL finished) {
+        [self.tableView scrollsToTop];
+    }];
 }
 
 //- (void)chatManagerDidAddUnreadMessageIdentifier:(TAPMessageModel *)message indexPosition:(NSInteger)index {
@@ -1740,10 +2129,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            [self.tableView beginUpdates];
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            [self.tableView endUpdates];
-            [[TAPChatManager sharedManager] sendTextMessage:currentMessageString];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+                [[TAPChatManager sharedManager] sendTextMessage:currentMessageString];
+            }];
+
         } failure:^(NSError *error) {
             
         }];
@@ -1759,10 +2151,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                 //animation
-                [self.tableView beginUpdates];
-                [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
-                [cell layoutIfNeeded];
-                [self.tableView endUpdates];
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
+                    [cell layoutIfNeeded];
+                } completion:^(BOOL finished) {
+                    
+                }];
             } completion:^(BOOL finished) {
                 //completion
             }];
@@ -1779,10 +2174,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 
                 [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                     //animation
-                    [self.tableView beginUpdates];
-                    [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
-                    [cell layoutIfNeeded];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
+                        [cell layoutIfNeeded];
+                    } completion:^(BOOL finished) {
+                        
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -1820,8 +2218,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     
                     [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
                     [cell layoutIfNeeded];
-                    [self.tableView beginUpdates];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -1856,8 +2256,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //animation
         [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:self.selectedMessage];
         [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+        } completion:^(BOOL finished) {
+        }];
     } completion:^(BOOL finished) {
         //completion
     }];
@@ -1912,6 +2314,152 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self handleLongPressedWithMessage:longPressedMessage];
 }
 
+- (void)myChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
+- (void)myChatBubblePressedMentionWithWord:(NSString*)word
+                             tappedAtIndex:(NSInteger)index
+                                   message:(TAPMessageModel *)message
+                       mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [self tapTalkUserMentionTappedWithRoom:self.currentRoom message:message usernameString:username];
+}
+
+- (void)myChatBubbleLongPressedMentionWithWord:(NSString*)word
+                                 tappedAtIndex:(NSInteger)index
+                                       message:(TAPMessageModel *)message
+                           mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [TAPUtil tapticImpactFeedbackGenerator];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:username message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *viewProfileAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"View Profile", nil, [TAPUtil currentBundle], @"")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+        [self myChatBubblePressedMentionWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+    }];
+    
+    UIAlertAction *sendMessageAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self sendMessageFromLongPressMentionWithUsername:username message:message];
+                                 }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:username];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
+                                   }];
+    
+    UIImage *viewProfileActionImage = [UIImage imageNamed:@"TAPIconUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    viewProfileActionImage = [viewProfileActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetViewProfile]];
+    [viewProfileAction setValue:[viewProfileActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *sendMessageActionImage = [UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    sendMessageActionImage = [sendMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetSMS]];
+    [sendMessageAction setValue:[sendMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *copyActionImage = [UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [viewProfileAction setValue:@0 forKey:@"titleTextAlignment"];
+    [sendMessageAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [viewProfileAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [sendMessageAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    NSString *usernameWithoutPrefix = [username copy];
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        usernameWithoutPrefix = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //Selected mention is not ours, show other option besides copy
+        [alertController addAction:viewProfileAction];
+        [alertController addAction:sendMessageAction];
+    }
+    
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
+}
+
 #pragma mark TAPMyChatDeletedBubbleTableViewCell
 - (void)myChatDeletedBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -1925,10 +2473,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                 //animation
-                [self.tableView beginUpdates];
-                [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
-                [cell layoutIfNeeded];
-                [self.tableView endUpdates];
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
+                    [cell layoutIfNeeded];
+                } completion:^(BOOL finished) {
+                }];
             } completion:^(BOOL finished) {
                 //completion
             }];
@@ -1945,10 +2495,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 
                 [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
                     //animation
-                    [self.tableView beginUpdates];
-                    [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
-                    [cell layoutIfNeeded];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
+                        [cell layoutIfNeeded];
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -1986,8 +2538,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     
                     [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
                     [cell layoutIfNeeded];
-                    [self.tableView beginUpdates];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -2020,9 +2574,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //Update chat room UI
     NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-    [self.tableView beginUpdates];
-    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-    [self.tableView endUpdates];
+    [self.tableView performBatchUpdates:^{
+        //changing beginUpdates and endUpdates with this because of deprecation
+        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
@@ -2077,10 +2633,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:message.localID];
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            [self.tableView beginUpdates];
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            [self.tableView endUpdates];
-            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+        
             [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
                 
                 NSDictionary *dataDictionary = resultMessage.data;
@@ -2158,6 +2716,153 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)myImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
     [self handleLongPressedWithMessage:longPressedMessage];
 }
+
+- (void)myImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
+- (void)myImageBubblePressedMentionWithWord:(NSString*)word
+                              tappedAtIndex:(NSInteger)index
+                                    message:(TAPMessageModel *)message
+                        mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [self tapTalkUserMentionTappedWithRoom:self.currentRoom message:message usernameString:username];
+}
+
+- (void)myImageBubbleLongPressedMentionWithWord:(NSString*)word
+                                  tappedAtIndex:(NSInteger)index
+                                        message:(TAPMessageModel *)message
+                            mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [TAPUtil tapticImpactFeedbackGenerator];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:username message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *viewProfileAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"View Profile", nil, [TAPUtil currentBundle], @"")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+        [self myImageBubblePressedMentionWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+    }];
+    
+    UIAlertAction *sendMessageAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self sendMessageFromLongPressMentionWithUsername:username message:message];
+                                 }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:username];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
+                                   }];
+    
+    UIImage *viewProfileActionImage = [UIImage imageNamed:@"TAPIconUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    viewProfileActionImage = [viewProfileActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetViewProfile]];
+    [viewProfileAction setValue:[viewProfileActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *sendMessageActionImage = [UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    sendMessageActionImage = [sendMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetSMS]];
+    [sendMessageAction setValue:[sendMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *copyActionImage = [UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [viewProfileAction setValue:@0 forKey:@"titleTextAlignment"];
+    [sendMessageAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [viewProfileAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [sendMessageAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    NSString *usernameWithoutPrefix = [username copy];
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        usernameWithoutPrefix = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //Selected mention is not ours, show other option besides copy
+        [alertController addAction:viewProfileAction];
+        [alertController addAction:sendMessageAction];
+    }
+    
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
+}
+
 
 #pragma mark TAPMyFileBubbleTableViewCell
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
@@ -2264,9 +2969,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
             
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            [self.tableView beginUpdates];
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            [self.tableView endUpdates];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
             
             NSString *fileName = [tappedMessage.data objectForKey:@"fileName"];
             fileName = [TAPUtil nullToEmptyString:fileName];
@@ -2328,9 +3035,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         //Update chat room UI
         NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        [self.tableView beginUpdates];
-        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+        } completion:^(BOOL finished) {
+        }];
     }
     else {
         //File not exist, download file
@@ -2354,6 +3063,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self presentViewController:preview animated:YES completion:nil];
 }
 
+- (void)myFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPMyLocationBubbleTableViewCell
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
@@ -2371,9 +3084,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            [self.tableView beginUpdates];
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            [self.tableView endUpdates];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
             
             [[TAPChatManager sharedManager] sendLocationMessage:currentLatitude longitude:currentLongitude address:currentAddress];
         } failure:^(NSError *error) {
@@ -2476,8 +3191,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [cell showStatusLabel:YES animated:YES updateStatusIcon:YES message:tappedMessage];
         //        [cell showStatusLabel:NO animated:YES updateStatusIcon:YES message:tappedMessage];
         [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+        } completion:^(BOOL finished) {
+        }];
     } completion:^(BOOL finished) {
         //completion
     }];
@@ -2485,6 +3202,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)myLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
     [self handleLongPressedWithMessage:longPressedMessage];
+}
+
+- (void)myLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
 }
 
 #pragma mark TAPMyVideoBubbleTableViewCell
@@ -2583,9 +3304,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         //Update chat room UI
         NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        [self.tableView beginUpdates];
-        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+        } completion:^(BOOL finished) {
+        }];
     }
     else {
         //Video not exist, download file
@@ -2607,9 +3330,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
             NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            [self.tableView beginUpdates];
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            [self.tableView endUpdates];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
             
             NSString *thumbnailImageBase64String = [tappedMessage.data objectForKey:@"thumbnail"];
             NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
@@ -2663,6 +3388,152 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+- (void)myVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
+- (void)myVideoBubblePressedMentionWithWord:(NSString*)word
+                              tappedAtIndex:(NSInteger)index
+                                    message:(TAPMessageModel *)message
+                        mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [self tapTalkUserMentionTappedWithRoom:self.currentRoom message:message usernameString:username];
+}
+
+- (void)myVideoBubbleLongPressedMentionWithWord:(NSString*)word
+                                  tappedAtIndex:(NSInteger)index
+                                        message:(TAPMessageModel *)message
+                            mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [TAPUtil tapticImpactFeedbackGenerator];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:username message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *viewProfileAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"View Profile", nil, [TAPUtil currentBundle], @"")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+        [self myVideoBubblePressedMentionWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+    }];
+    
+    UIAlertAction *sendMessageAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self sendMessageFromLongPressMentionWithUsername:username message:message];
+                                 }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:username];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
+                                   }];
+    
+    UIImage *viewProfileActionImage = [UIImage imageNamed:@"TAPIconUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    viewProfileActionImage = [viewProfileActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetViewProfile]];
+    [viewProfileAction setValue:[viewProfileActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *sendMessageActionImage = [UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    sendMessageActionImage = [sendMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetSMS]];
+    [sendMessageAction setValue:[sendMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *copyActionImage = [UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [viewProfileAction setValue:@0 forKey:@"titleTextAlignment"];
+    [sendMessageAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [viewProfileAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [sendMessageAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    NSString *usernameWithoutPrefix = [username copy];
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        usernameWithoutPrefix = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //Selected mention is not ours, show other option besides copy
+        [alertController addAction:viewProfileAction];
+        [alertController addAction:sendMessageAction];
+    }
+    
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
+}
+
 #pragma mark TAPYourChatBubbleTableViewCell
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -2678,8 +3549,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 //animation
                 [cell showStatusLabel:NO animated:YES];
                 [cell layoutIfNeeded];
-                [self.tableView beginUpdates];
-                [self.tableView endUpdates];
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                } completion:^(BOOL finished) {
+                }];
             } completion:^(BOOL finished) {
                 //completion
             }];
@@ -2698,8 +3571,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //animation
                     [cell showStatusLabel:YES animated:YES];
                     [cell layoutIfNeeded];
-                    [self.tableView beginUpdates];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -2737,8 +3612,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     
                     [cell showStatusLabel:YES animated:YES];
                     [cell layoutIfNeeded];
-                    [self.tableView beginUpdates];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -2775,8 +3652,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //animation
         [cell showStatusLabel:NO animated:YES];
         [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+        } completion:^(BOOL finished) {
+        }];
     } completion:^(BOOL finished) {
         //completion
     }];
@@ -2833,6 +3712,151 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
+- (void)yourChatBubblePressedMentionWithWord:(NSString*)word
+                               tappedAtIndex:(NSInteger)index
+                                     message:(TAPMessageModel *)message
+                         mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [self tapTalkUserMentionTappedWithRoom:self.currentRoom message:message usernameString:username];
+}
+
+- (void)yourChatBubbleLongPressedMentionWithWord:(NSString*)word
+                                   tappedAtIndex:(NSInteger)index
+                                         message:(TAPMessageModel *)message
+                             mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [TAPUtil tapticImpactFeedbackGenerator];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:username message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *viewProfileAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"View Profile", nil, [TAPUtil currentBundle], @"")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+        [self yourChatBubblePressedMentionWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+    }];
+    
+    UIAlertAction *sendMessageAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self sendMessageFromLongPressMentionWithUsername:username message:message];
+                                 }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:username];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
+                                   }];
+    
+    UIImage *viewProfileActionImage = [UIImage imageNamed:@"TAPIconUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    viewProfileActionImage = [viewProfileActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetViewProfile]];
+    [viewProfileAction setValue:[viewProfileActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *sendMessageActionImage = [UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    sendMessageActionImage = [sendMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetSMS]];
+    [sendMessageAction setValue:[sendMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *copyActionImage = [UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [viewProfileAction setValue:@0 forKey:@"titleTextAlignment"];
+    [sendMessageAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [viewProfileAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [sendMessageAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    NSString *usernameWithoutPrefix = [username copy];
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        usernameWithoutPrefix = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //Selected mention is not ours, show other option besides copy
+        [alertController addAction:viewProfileAction];
+        [alertController addAction:sendMessageAction];
+    }
+    
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
+}
+
 #pragma mark TAPYourChatDeletedBubbleTableViewCell
 - (void)yourChatDeletedBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -2848,8 +3872,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 //animation
                 [cell showStatusLabel:NO animated:YES];
                 [cell layoutIfNeeded];
-                [self.tableView beginUpdates];
-                [self.tableView endUpdates];
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                } completion:^(BOOL finished) {
+                }];
             } completion:^(BOOL finished) {
                 //completion
             }];
@@ -2868,8 +3894,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //animation
                     [cell showStatusLabel:YES animated:YES];
                     [cell layoutIfNeeded];
-                    [self.tableView beginUpdates];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -2907,8 +3935,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     
                     [cell showStatusLabel:YES animated:YES];
                     [cell layoutIfNeeded];
-                    [self.tableView beginUpdates];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                    } completion:^(BOOL finished) {
+                    }];
                 } completion:^(BOOL finished) {
                     //completion
                 }];
@@ -3044,6 +4074,151 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
+- (void)yourImageBubblePressedMentionWithWord:(NSString*)word
+                                tappedAtIndex:(NSInteger)index
+                                      message:(TAPMessageModel *)message
+                          mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [self tapTalkUserMentionTappedWithRoom:self.currentRoom message:message usernameString:username];
+}
+
+- (void)yourImageBubbleLongPressedMentionWithWord:(NSString*)word
+                                    tappedAtIndex:(NSInteger)index
+                                          message:(TAPMessageModel *)message
+                              mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [TAPUtil tapticImpactFeedbackGenerator];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:username message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *viewProfileAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"View Profile", nil, [TAPUtil currentBundle], @"")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+        [self yourImageBubblePressedMentionWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+    }];
+    
+    UIAlertAction *sendMessageAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self sendMessageFromLongPressMentionWithUsername:username message:message];
+                                 }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:username];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
+                                   }];
+    
+    UIImage *viewProfileActionImage = [UIImage imageNamed:@"TAPIconUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    viewProfileActionImage = [viewProfileActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetViewProfile]];
+    [viewProfileAction setValue:[viewProfileActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *sendMessageActionImage = [UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    sendMessageActionImage = [sendMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetSMS]];
+    [sendMessageAction setValue:[sendMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *copyActionImage = [UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [viewProfileAction setValue:@0 forKey:@"titleTextAlignment"];
+    [sendMessageAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [viewProfileAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [sendMessageAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    NSString *usernameWithoutPrefix = [username copy];
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        usernameWithoutPrefix = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //Selected mention is not ours, show other option besides copy
+        [alertController addAction:viewProfileAction];
+        [alertController addAction:sendMessageAction];
+    }
+    
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
+}
+
 
 #pragma mark TAPYourFileBubbleTableViewCell
 - (void)yourFileBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
@@ -3163,6 +4338,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
 #pragma mark TAPYourLocationBubbleTableViewCell
 - (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     NSDictionary *dataDictionary = tappedMessage.data;
@@ -3261,8 +4440,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //animation
         [cell showStatusLabel:YES animated:YES];
         [cell layoutIfNeeded];
-        [self.tableView beginUpdates];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+        } completion:^(BOOL finished) {
+        }];
     } completion:^(BOOL finished) {
         //completion
     }];
@@ -3275,6 +4456,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)yourLocationBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
 }
 
 #pragma mark TAPYourVideoBubbleTableViewCell
@@ -3396,9 +4581,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         //Update chat room UI
         NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        [self.tableView beginUpdates];
-        [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+        } completion:^(BOOL finished) {
+        }];
     }
     else {
         //Video not exist, download file
@@ -3417,6 +4604,151 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)yourVideoBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
+
+- (void)yourVideoBubblePressedMentionWithWord:(NSString*)word
+                                tappedAtIndex:(NSInteger)index
+                                      message:(TAPMessageModel *)message
+                          mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [self tapTalkUserMentionTappedWithRoom:self.currentRoom message:message usernameString:username];
+}
+
+- (void)yourVideoBubbleLongPressedMentionWithWord:(NSString*)word
+                                    tappedAtIndex:(NSInteger)index
+                                          message:(TAPMessageModel *)message
+                              mentionIndexesArray:(NSArray *)mentionIndexesArray {
+    NSString *username = @"";
+    for (NSInteger counter = 0; counter < [mentionIndexesArray count]; counter++) {
+        NSRange userRange = [[mentionIndexesArray objectAtIndex:counter] rangeValue];
+        
+        NSInteger locationStart = userRange.location;
+        NSInteger locationEnd = locationStart + userRange.length - 1; // -1 for omit location start
+        
+        if (index >= locationStart && index <= locationEnd) {
+            username = [word substringWithRange:userRange];
+            break;
+        }
+    }
+    
+    if ([username isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //if tap our username, nothing happens
+        return;
+    }
+    
+    [TAPUtil tapticImpactFeedbackGenerator];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:username message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *viewProfileAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"View Profile", nil, [TAPUtil currentBundle], @"")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+        [self yourVideoBubblePressedMentionWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+    }];
+    
+    UIAlertAction *sendMessageAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self sendMessageFromLongPressMentionWithUsername:username message:message];
+                                 }];
+    
+    UIAlertAction *copyAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self showInputAccessoryView];
+                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                     [pasteboard setString:username];
+                                 }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [self showInputAccessoryView];
+                                       [self checkKeyboard];
+                                   }];
+    
+    UIImage *viewProfileActionImage = [UIImage imageNamed:@"TAPIconUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    viewProfileActionImage = [viewProfileActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetViewProfile]];
+    [viewProfileAction setValue:[viewProfileActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *sendMessageActionImage = [UIImage imageNamed:@"TAPIconSMS" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    sendMessageActionImage = [sendMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetSMS]];
+    [sendMessageAction setValue:[sendMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    UIImage *copyActionImage = [UIImage imageNamed:@"TAPIconCopy" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
+    [viewProfileAction setValue:@0 forKey:@"titleTextAlignment"];
+    [sendMessageAction setValue:@0 forKey:@"titleTextAlignment"];
+    [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetDefaultLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [viewProfileAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [sendMessageAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    NSString *usernameWithoutPrefix = [username copy];
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        usernameWithoutPrefix = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
+        //Selected mention is not ours, show other option besides copy
+        [alertController addAction:viewProfileAction];
+        [alertController addAction:sendMessageAction];
+    }
+    
+    [alertController addAction:copyAction];
+    [alertController addAction:cancelAction];
+    
+    if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
+        self.isKeyboardWasShowed = YES;
+    }
+    else {
+        self.isKeyboardWasShowed = NO;
+    }
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+    } completion:^(BOOL finished) {
+        [self presentViewController:alertController animated:YES completion:^{
+            //after animation
+        }];
+    }];
 }
 
 #pragma mark TAPProductListBubbleTableViewCell
@@ -3450,13 +4782,90 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 #pragma mark TAPGrowingTextView
+- (void)growingTextViewShouldChangeTextInRange:(NSRange)range
+                               replacementText:(NSString *)text
+                                       newText:(NSString *)newText {
+    
+    if (self.currentRoom.type == RoomTypePersonal) {
+        return;
+    }
+    
+    if ([newText isEqualToString:@""]) {
+        self.lastNumberOfWordArrayForShowMention = 0;
+        _lastTypingWordArrayStartIndex = 0;
+        _lastTypingWordString = @"";
+    }
+        
+    NSInteger indexChar = 0;
+    BOOL isErasing = NO;
+    //DV Note
+    //When user is erase a character, range.length = 1, but when user add a character range.length = 0
+    if (range.length != 0) {
+        //User erase a character
+        //Example when there is string hello and user would erase char 'o' at the end, range.location would become 4 and range.length = 1
+        indexChar = range.location - range.length;
+        isErasing = YES;
+    }
+    else {
+        //User added a character
+        //Example when there is string hello and user would add char 'w' at the end (become hellow), range.location would become 5 and range.length = 0
+        indexChar = range.location;
+    }
+    
+    NSString *trimmedString = [newText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSArray *wordArray = [trimmedString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    NSInteger numberOfSeparator = [wordArray count] - 1;
+    for (NSInteger counter = 0; counter < [wordArray count]; counter++) {
+        NSString *word = [wordArray objectAtIndex:counter];
+        currentWordLength = currentWordLength + [word length];
+        if(indexChar - (numberOfSeparator - 1) <= currentWordLength) {
+            selectedWord = word;
+            _lastTypingWordArrayStartIndex = counter;
+            _lastTypingWordString = selectedWord;
+            break;
+        }
+    }
+
+    BOOL isSubstractArray = NO;
+    if (self.lastNumberOfWordArrayForShowMention > [wordArray count]) {
+        isSubstractArray = YES;
+    }
+    
+    _lastNumberOfWordArrayForShowMention = [wordArray count];
+    
+    if ([text isEqualToString:@" "] || [text isEqualToString:@"\n"] || ([text isEqualToString:@""] && isSubstractArray)) {
+        [self.filteredMentionListArray removeAllObjects];
+        [self showMentionListView:NO animated:YES];
+        [self.mentionListTableView reloadData];
+        return;
+    }
+    
+    [self filterMentionListWithKeyword:selectedWord];
+    if ([self.filteredMentionListArray count] == 0) {
+        [self showMentionListView:NO animated:YES];
+        [self.mentionListTableView reloadData];
+    }
+    else {
+        if (self.mentionListTableView.alpha != 1.0f) {
+            [self showMentionListView:YES animated:YES];
+        }
+        
+        [self.mentionListTableView reloadData];
+        [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
+    }
+}
+
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
-    self.messageTextViewHeight = height;
-    self.messageTextViewHeightConstraint.constant = height;
-    self.messageViewHeightConstraint.constant = self.messageTextViewHeight + 16.0f + 4.0f;
-    [self.messageTextView layoutIfNeeded];
-    [self.inputMessageAccessoryView layoutIfNeeded];
-    [self.view layoutIfNeeded];
+    [UIView animateWithDuration:0.2f animations:^{
+        self.messageTextViewHeight = height;
+        self.messageTextViewHeightConstraint.constant = height;
+        self.messageViewHeightConstraint.constant = self.messageTextViewHeight + 16.0f + 4.0f;
+        [self.messageTextView layoutIfNeeded];
+        [self.inputMessageAccessoryView layoutIfNeeded];
+        [self.view layoutIfNeeded];
+    }];
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
@@ -3625,6 +5034,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self showInputAccessoryExtensionView:NO];
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+        
+//        if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//        }
+//        else if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//        }
+        
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
@@ -3693,6 +5112,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self showInputAccessoryExtensionView:NO];
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+
+//        if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//        }
+//        else if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//        }
+        
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
@@ -3859,7 +5288,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.deletedRoomIconImageView.image = [self.deletedRoomIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedChatRoom]];
     
     self.chatAnchorBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottomBackground];
+    self.chatAnchorImageView.image = [UIImage imageNamed:@"TAPIconChatAnchor" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
     self.chatAnchorImageView.image = [self.chatAnchorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottom]];
+
+    self.mentionAnchorBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottomBackground];
+    self.mentionAnchorImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
+    self.mentionAnchorImageView.image = [self.mentionAnchorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottom]];
     
     self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomUnreadButton]];
     
@@ -3949,7 +5383,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.deleteRoomButtonIconImageView.image = [UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.deleteRoomButtonIconImageView.image = [self.deleteRoomButtonIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
     
-    self.deleteRoomButtonLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.deleteRoomButtonLoadingImageView.image = [UIImage imageNamed:@"TAPIconLoadingSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.deleteRoomButtonLoadingImageView.image = [self.deleteRoomButtonLoadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
     
     UIFont *deletedChatRoomTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeletedChatRoomInfoTitleLabel];
@@ -4004,11 +5438,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //74 is button height and padding
         self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight + 74.0f;
         self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
+        self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
         
         self.deletedRoomView.alpha = 1.0f;
     }
     else {
         self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+        self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+        
         self.deletedRoomView.alpha = 0.0f;
         [self showInputAccessoryView];
     }
@@ -4169,16 +5606,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [self.tableView beginUpdates];
-        [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
-        [self.tableView endUpdates];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
+        } completion:^(BOOL finished) {
+        }];
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         cell.message = obtainedMessage;
-        [self.tableView beginUpdates];
-        [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeUploading];
-        [self.tableView endUpdates];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeUploading];
+        } completion:^(BOOL finished) {
+        }];
     }
 }
 
@@ -4210,16 +5653,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
       }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [self.tableView beginUpdates];
-        [cell animateFinishedUploadFile];
-        [self.tableView endUpdates];
+
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell animateFinishedUploadFile];
+        } completion:^(BOOL finished) {
+        }];
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         cell.message = obtainedMessage;
-        [self.tableView beginUpdates];
-        [cell animateFinishedUploadVideo];
-        [self.tableView endUpdates];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell animateFinishedUploadVideo];
+        } completion:^(BOOL finished) {
+        }];
     }
 }
 
@@ -4254,24 +5703,33 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if (type == TAPChatMessageTypeImage) {
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         [cell setMessage:currentMessage];
-        [self.tableView beginUpdates];
-        [cell animateFailedUploadingImage];
-        [self.tableView endUpdates];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell animateFailedUploadingImage];
+        } completion:^(BOOL finished) {
+        }];
     }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         [cell setMessage:currentMessage];
-        [self.tableView beginUpdates];
-        [cell animateFailedUploadFile];
-        [self.tableView endUpdates];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell animateFailedUploadFile];
+        } completion:^(BOOL finished) {
+        }];
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         cell.message = obtainedMessage;
         [cell setMessage:currentMessage];
-        [self.tableView beginUpdates];
-        [cell animateFailedUploadVideo];
-        [self.tableView endUpdates];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell animateFailedUploadVideo];
+        } completion:^(BOOL finished) {
+        }];
     }
 }
 
@@ -4540,16 +5998,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [self.tableView beginUpdates];
-                    [cell animateCancelDownloadFile];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateCancelDownloadFile];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
                 else {
                     //Their Chat
                     TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [self.tableView beginUpdates];
-                    [cell animateCancelDownloadFile];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateCancelDownloadFile];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             } else {
                 // failed
@@ -4572,16 +6034,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [self.tableView beginUpdates];
-                    [cell animateCancelDownloadVideo];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateCancelDownloadVideo];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
                 else {
                     //Their Chat
                     TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [self.tableView beginUpdates];
-                    [cell animateCancelDownloadVideo];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateCancelDownloadVideo];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             } else {
                 // failed
@@ -4750,6 +6216,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
         [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
         photoAlbumListViewController.delegate = self;
+        if (self.currentRoom.type != RoomTypeChannel) {
+            photoAlbumListViewController.isNotFromPersonalRoom = YES;
+        }
+        [photoAlbumListViewController setParticipantListArray:self.currentRoom.participants];
+
         UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
         photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
         [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
@@ -4891,10 +6362,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     imagePreviewViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     imagePreviewViewController.delegate = self;
     
+
+    if (self.currentRoom.type != RoomTypeChannel) {
+        imagePreviewViewController.isNotFromPersonalRoom = YES;
+    }
+    
     TAPMediaPreviewModel *imagePreview = [TAPMediaPreviewModel new];
     imagePreview.image = image;
     
     [imagePreviewViewController setMediaPreviewDataWithData:imagePreview];
+    [imagePreviewViewController setParticipantListArray:self.currentRoom.participants];
+    
     UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
     imagePreviewNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:nil];
@@ -5585,12 +7063,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.quoteSubtitleLabel.text = quote.content;
     
+    self.quoteImageView.image = nil;
+    
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.quoteFileView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
+        
         if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.imageURL];
         }
@@ -5724,6 +7205,26 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[NSNumber numberWithDouble:createdDate] limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
             
+            //Handle mapping mention index to array
+            NSArray *mentionIndexArray = [NSArray array];
+            for (TAPMessageModel *currentMessage in obtainedMessageArray) {
+                if (currentMessage.type == TAPChatMessageTypeText) {
+                    NSString *messageContainString = currentMessage.body;
+                    messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                    mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                }
+                else if (currentMessage.type == TAPChatMessageTypeImage || currentMessage.type == TAPChatMessageTypeVideo) {
+                    NSString *messageContainString = [currentMessage.data objectForKey:@"caption"];
+                    messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                    mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                }
+                
+                if ([mentionIndexArray count] > 0) {
+                    [self.mentionIndexesDictionary removeObjectForKey:currentMessage.localID];
+                    [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:currentMessage.localID];
+                }
+            }
+            
             //DV Note - check method checkAndShowRoomViewState too if wants to update code below
             //Check if room is deleted or kicked
             TAPMessageModel *lastMessage = [obtainedMessageArray firstObject];
@@ -5799,6 +7300,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
                         dispatch_async(queue, ^{
                             for (TAPMessageModel *message in messageArray) {
+                                
+                                //Handle mapping mention index to array
+                                NSArray *mentionIndexArray = [NSArray array];
+                                if (message.type == TAPChatMessageTypeText) {
+                                    NSString *messageContainString = message.body;
+                                    messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                                    mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                                }
+                                else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+                                    NSString *messageContainString = [message.data objectForKey:@"caption"];
+                                    messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                                    mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                                }
+                                
+                                if ([mentionIndexArray count] > 0) {
+                                    [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
+                                }
+                                
+                     
                                 if (message.isDeleted) {
                                     [TAPDataManager deletePhysicalFilesInBackgroundWithMessage:message success:^{
                                         
@@ -5806,9 +7326,24 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                         
                                     }];
                                 }
+                                
+                                //Check if we got the mention and scroll position in on the top, add and show mention anchor badge
+                                BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+                                if (hasMention && ![message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isRead) {
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                        [self addMessageToAnchorMentionArray:message];
+                                    });
+                                }
                             }
                         });
                         
+                        //Show mention anchor button when position is not on the bottom
+                        if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self showMentionAnchorView:YES];
+                            });
+
+                        }
                         
                         //Update View
                         [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:YES toTop:YES updateUserDetail:YES withCompletionHandler:^{
@@ -5888,6 +7423,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)handleMessageFromSocket:(TAPMessageModel *)message isUpdatedMessage:(BOOL)isUpdated {
     dispatch_async(dispatch_get_main_queue(), ^{
+        
+        //Handle mapping mention index to array
+        NSArray *mentionIndexArray = [NSArray array];
+        if (message.type == TAPChatMessageTypeText) {
+            NSString *messageContainString = message.body;
+            messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+            mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+        }
+        else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+            NSString *messageContainString = [message.data objectForKey:@"caption"];
+            messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+            mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+        }
+        
+        if ([mentionIndexArray count] > 0) {
+            [self.mentionIndexesDictionary removeObjectForKey:message.localID];
+            [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
+        }
+        
         //Check if message exist in Message Pointer Dictionary
         TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
         if(currentMessage != nil) {
@@ -5956,14 +7510,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 }
                 
                 //Update cell to deleted message
-                [self.tableView beginUpdates];
-                [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self.tableView endUpdates];
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                } completion:^(BOOL finished) {
+                }];
             }
             else {
                 if (currentMessage.type == TAPChatMessageTypeText) {
                     if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                        
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                         
                         if (isSendingAnimation) {
                             [cell receiveSentEvent];
@@ -5985,6 +7546,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 else if (currentMessage.type == TAPChatMessageTypeImage) {
                     if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                         TAPMyImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                         
                         if (isSendingAnimation) {
                             [cell receiveSentEvent];
@@ -6007,6 +7573,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                         //My Chat
                         TAPMyVideoBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
+
                         cell.message = currentMessage;
                         
                         if (isSendingAnimation) {
@@ -6090,8 +7662,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         
                         TAPBaseGeneralBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                         [cell setMessage:message];
-                        [self.tableView beginUpdates];
-                        [self.tableView endUpdates];
+                        [self.tableView performBatchUpdates:^{
+                            //changing beginUpdates and endUpdates with this because of deprecation
+                        } completion:^(BOOL finished) {
+                        }];
                     }
                 }
             }
@@ -6108,15 +7682,27 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     [self.messageDictionary setObject:message forKey:message.localID];
                     
                     [self addMessageToAnchorUnreadArray:message];
+                    
+                    //If new incoming message from emit and other user and also when scroll position in not in the bottom, add and show mention anchor
+                    BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+                    if (hasMention && ![message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isRead) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self.scrolledPendingMentionArray addObject:message];
+                            [self addMessageToAnchorMentionArray:message];
+                            [self showMentionAnchorView:YES];
+                        });
+                    }
                 }
                 else {
                     //RN Note - If crash happen on opening room see updateMessageDataAndUIWithMessages method
                     //Bottom table view visible, insert message normally
                     [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
                     NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                    [self.tableView beginUpdates];
-                    [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                    [self.tableView endUpdates];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             }
         }
@@ -6127,7 +7713,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)destroySequence {
     //Save to draft
     [self saveMessageDraft];
-    
+        
     //Update badge count
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
     
@@ -6152,6 +7738,37 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self checkAnchorUnreadLabel];
     }
 }
+
+- (void)addMessageToAnchorMentionArray:(TAPMessageModel *)message {
+    if (![self.anchorMentionMessageDictionary objectForKey:message.localID]) {
+        [self.anchorMentionMessageDictionary setObject:message forKey:message.localID];
+        [self checkAnchorMentionLabel];
+    }
+}
+
+- (void)addMessageToAnchorMentionArrayWithMessageArray:(NSArray *)messageArray {
+    for (TAPMessageModel *message in messageArray) {
+        if (![self.anchorMentionMessageDictionary objectForKey:message.localID]) {
+            [self.anchorMentionMessageDictionary setObject:message forKey:message.localID];
+            [self checkAnchorMentionLabel];
+        }
+    }
+}
+
+- (void)removeMessageFromAnchorMention:(TAPMessageModel *)message {
+    if ([self.anchorMentionMessageDictionary objectForKey:message.localID]) {
+        [self.anchorMentionMessageDictionary removeObjectForKey:message.localID];
+        [self checkAnchorMentionLabel];
+    }
+    
+    if ([self.anchorMentionMessageDictionary count] == 0) {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.mentionAnchorBackgroundView.alpha = 0.0f;
+            self.mentionAnchorBadgeView.alpha = 0.0f;
+            self.mentionAnchorButton.alpha = 0.0f;
+        }];
+    }
+ }
 
 - (void)retrieveExistingMessages {
     //Prevent retreive before message if already last page
@@ -6201,6 +7818,26 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self showLoadMessageCellLoading:YES];
         [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID maxCreated:maxCreated numberOfItems:[NSNumber numberWithInteger:TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE] success:^(NSArray *messageArray, BOOL hasMore) {
             if ([messageArray count] != 0) {
+                
+                //Handle mapping mention index to array
+                NSArray *mentionIndexArray = [NSArray array];
+                for (TAPMessageModel *message in messageArray) {
+                    if (message.type == TAPChatMessageTypeText) {
+                        NSString *messageContainString = message.body;
+                        messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                        mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                    }
+                    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+                        NSString *messageContainString = [message.data objectForKey:@"caption"];
+                        messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                        mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                    }
+                    
+                    if ([mentionIndexArray count] > 0) {
+                        [self.mentionIndexesDictionary removeObjectForKey:message.localID];
+                        [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
+                    }
+                }
                 
                 _isLastPage = !hasMore;
                 
@@ -6438,7 +8075,35 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Delete physical files when isDeleted = 1 (message is deleted)
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_async(queue, ^{
+
             for (TAPMessageModel *message in messageArray) {
+                
+                //Check if we got the mention and scroll position in on the top, add and show mention anchor badge
+                BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+                if (hasMention && ![message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isRead) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self addMessageToAnchorMentionArray:message];
+                    });
+                }
+                
+                //Handle mapping mention index to array
+                NSArray *mentionIndexArray = [NSArray array];
+                if (message.type == TAPChatMessageTypeText) {
+                    NSString *messageContainString = message.body;
+                    messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                    mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                }
+                else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+                    NSString *messageContainString = [message.data objectForKey:@"caption"];
+                    messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+                    mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+                }
+                
+                if ([mentionIndexArray count] > 0) {
+                    [self.mentionIndexesDictionary removeObjectForKey:message.localID];
+                    [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
+                }
+                
                 if (message.isDeleted) {
                     [TAPDataManager deletePhysicalFilesInBackgroundWithMessage:message success:^{
                         
@@ -6448,6 +8113,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 }
             }
         });
+        
+        if (!scrollToTop && self.tableView.contentOffset.y > kShowChatAnchorOffset) {
+            //Show mention anchor button when position is not on the bottom
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self showMentionAnchorView:YES];
+            });
+        }
         
         //Update View
         [self updateMessageDataAndUIWithMessages:messageArray checkFirstUnreadMessage:YES toTop:scrollToTop updateUserDetail:YES withCompletionHandler:^{
@@ -6595,8 +8267,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
             self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
             
+//            if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//                self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//                self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//            }
+//            else if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//                self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//                self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//            }
+            
             self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
             self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
+            
+            CGFloat safeAreaGap = [TAPUtil safeAreaBottomPadding];
+            CGFloat mentionListTableViewBottomValue = self.keyboardHeight;
+            if (IS_IPHONE_X_FAMILY) {
+                mentionListTableViewBottomValue = mentionListTableViewBottomValue - safeAreaGap;
+            }
+            self.mentionListTableViewBottomConstraint.constant = mentionListTableViewBottomValue;
+            
         } completion:^(BOOL finished) {
             //Do something after animation completed.
         }];
@@ -6664,9 +8353,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     
+    CGFloat safeAreaGap = [TAPUtil safeAreaBottomPadding];
+    CGFloat mentionListTableViewBottomValue = self.keyboardHeight;
+    if (IS_IPHONE_X_FAMILY) {
+        mentionListTableViewBottomValue = mentionListTableViewBottomValue - safeAreaGap;
+    }
+    self.mentionListTableViewBottomConstraint.constant = mentionListTableViewBottomValue;
+    
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
+        
+//        if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//        }
+//        else if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//        }
         
         CGFloat messageViewHeightDifference = self.messageViewHeightConstraint.constant - kInputMessageAccessoryViewHeight;
         if (messageViewHeightDifference < 0) {
@@ -6748,6 +8453,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.tableView.contentInset = UIEdgeInsetsMake(self.currentInputAccessoryExtensionHeight + messageViewHeightDifference, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(self.currentInputAccessoryExtensionHeight, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
     
+    CGFloat safeAreaGap = [TAPUtil safeAreaBottomPadding];
+    CGFloat mentionListTableViewBottomValue = self.keyboardHeight;
+    if (IS_IPHONE_X_FAMILY) {
+        mentionListTableViewBottomValue = mentionListTableViewBottomValue - safeAreaGap;
+    }
+    self.mentionListTableViewBottomConstraint.constant = mentionListTableViewBottomValue;
+    
     [UIView animateWithDuration:0.2f animations:^{
         if(self.isCustomKeyboardAvailable) {
             self.keyboardOptionButtonView.alpha = 1.0f;
@@ -6760,6 +8472,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + messageViewHeightDifference;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + messageViewHeightDifference;
+        
+//        if (self.chatAnchorBackgroundView.alpha == 1.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 20.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 20.0f;
+//        }
+//        else if (self.chatAnchorBackgroundView.alpha == 0.0f) {
+//            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
+//            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
+//        }
         
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -6856,6 +8577,325 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     
     _isKeyboardOptionTapped = NO;
+}
+
+#pragma mark Mentions
+- (IBAction)mentionLoadingCancelButtonDidTapped:(id)sender {
+    
+}
+
+- (void)showMentionLoadingView:(BOOL)isShow {
+    if (isShow) {
+        //Add Animation
+        if ([self.mentionLoadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            animation.fromValue = [NSNumber numberWithFloat:0.0f];
+            animation.toValue = [NSNumber numberWithFloat: 2 * M_PI];
+            animation.duration = 1.5f;
+            animation.repeatCount = INFINITY;
+            animation.removedOnCompletion = NO;
+            [self.mentionLoadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+        }
+
+        [UIView animateWithDuration:0.2f animations:^{
+            self.mentionLoadingBackgroundView.alpha = 1.0f;
+            self.mentionLoadingImageView.alpha = 1.0f;
+            self.mentionLoadingCancelLabel.alpha = 0.0f;
+            self.mentionLoadingCancelButton.alpha = 0.0f;
+            self.mentionLoadingCancelButton.userInteractionEnabled = NO;
+        }];
+        
+        [TAPUtil performBlock:^{
+            self.mentionLoadingCancelLabel.alpha = 1.0f;
+            self.mentionLoadingCancelButton.alpha = 1.0f;
+            self.mentionLoadingCancelButton.userInteractionEnabled = YES;
+        } afterDelay:1.0f];
+
+    }
+    else {
+        //REMOVE ANIMATION
+        if ([self.mentionLoadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+            [self.mentionLoadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
+        }
+        
+        [UIView animateWithDuration:0.2f animations:^{
+            self.mentionLoadingBackgroundView.alpha = 0.0f;
+            self.mentionLoadingImageView.alpha = 0.0f;
+            self.mentionLoadingCancelLabel.alpha = 0.0f;
+            self.mentionLoadingCancelButton.alpha = 0.0f;
+            self.mentionLoadingCancelButton.userInteractionEnabled = NO;
+        }];
+    }
+}
+
+- (void)sendMessageFromLongPressMentionWithUsername:(NSString *)username message:(TAPMessageModel *)message {
+    NSString *prefixToRemove = @"@";
+    if ([username hasPrefix:prefixToRemove]) {
+        username = [username substringFromIndex:[prefixToRemove length]];
+    }
+    
+    [self.messageTextView resignFirstResponder];
+    [self.secondaryTextField resignFirstResponder];
+    [self hideInputAccessoryView];
+    TAPUserModel *user = nil;
+    user = [self.participantListDictionary objectForKey:username];
+    if (user != nil) {
+        [[TapUI sharedInstance] createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+        }];
+    }
+    else {
+        //User not found in participant
+        //Check if user is exist
+        [self showMentionLoadingView:YES];
+        [TAPDataManager callAPIGetUserByUsername:username success:^(TAPUserModel *user) {
+            //User found, send message
+            [[TapUI sharedInstance] createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                chatViewController.hidesBottomBarWhenPushed = YES;
+                [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+            }];
+            
+            [self showMentionLoadingView:NO];
+        } failure:^(NSError *error) {
+           //User not found show error
+            [self showMentionLoadingView:NO];
+            [TAPUtil performBlock:^{
+                NSString *errorMessageString = NSLocalizedStringFromTableInBundle(@"User not found", nil, [TAPUtil currentBundle], @"");
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"User Not Found" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessageString leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            } afterDelay:0.1f];
+        }];
+    }
+}
+
+- (void)showMentionAnchorView:(BOOL)show {
+    if (show) {
+        if (self.mentionAnchorBackgroundView.alpha != 1.0f) {
+            if ([self.anchorMentionMessageDictionary count] > 0) {
+                [UIView animateWithDuration:0.2f animations:^{
+                    self.mentionAnchorBackgroundView.alpha = 1.0f;
+                    self.mentionAnchorBadgeView.alpha = 1.0f;
+                    self.mentionAnchorButton.alpha = 1.0f;
+                }];
+                [self checkAnchorMentionLabel];
+            }
+            else {
+                [UIView animateWithDuration:0.2f animations:^{
+                    self.mentionAnchorBackgroundView.alpha = 0.0f;
+                    self.mentionAnchorBadgeView.alpha = 0.0f;
+                    self.mentionAnchorButton.alpha = 0.0f;
+                }];
+            }
+        }
+    }
+    else {
+        if (self.mentionAnchorBackgroundView.alpha != 0.0f) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionAnchorBackgroundView.alpha = 0.0f;
+                self.mentionAnchorBadgeView.alpha = 0.0f;
+                self.mentionAnchorButton.alpha = 0.0f;
+            }];
+        }
+    }
+}
+
+- (void)filterMentionListWithKeyword:(NSString *)keyword {
+    _filteredMentionListArray = [[NSMutableArray alloc] init];
+
+    if ([keyword length] == 0 || ![keyword hasPrefix:@"@"]) {
+        return;
+    }
+    
+    if ([keyword hasPrefix:@"@"] && [keyword length] != 1) {
+        keyword = [keyword substringFromIndex:1];
+    }
+    
+    
+    if ([keyword isEqualToString:@"@"]) {
+        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
+        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+        self.filteredMentionListArray = [resultArray mutableCopy];
+    }
+    else {
+        
+        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
+        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+        self.filteredMentionListArray = [resultArray mutableCopy];
+    }
+    
+    if ([self.filteredMentionListArray count] > 0) {
+        CGFloat tableViewHeight = 0.0f;
+        if ([self.filteredMentionListArray count] >= 4) {
+            tableViewHeight = 4 * 54.0f;
+        }
+        else {
+            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+        }
+        
+        self.mentionListTableViewHeightConstraint.constant = tableViewHeight + 10.0f; //10.0f for table view header height
+        
+        self.mentionListTableView.clipsToBounds = YES;
+        self.mentionListTableView.layer.cornerRadius = 15.0f;
+        self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+        
+        self.mentionTableBackgroundView.clipsToBounds = YES;
+        self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
+        self.mentionTableBackgroundView.layer.shadowRadius = 20.0f;
+        self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+        self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
+        self.mentionTableBackgroundView.layer.masksToBounds = NO;
+    }
+}
+
+- (void)showMentionListView:(BOOL)show animated:(BOOL)animated {
+    if (show) {
+        if (animated) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionTableBackgroundView.alpha = 1.0f;
+                self.mentionListTableView.alpha = 1.0f;
+            }];
+        }
+        else {
+            self.mentionTableBackgroundView.alpha = 1.0f;
+            self.mentionListTableView.alpha = 1.0f;
+        }
+    }
+    else {
+        if (animated) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionTableBackgroundView.alpha = 0.0f;
+                self.mentionListTableView.alpha = 0.0f;
+            }];
+        }
+        else {
+            self.mentionTableBackgroundView.alpha = 0.0f;
+            self.mentionListTableView.alpha = 0.0f;
+        }
+    }
+}
+
+- (void)tapTalkUserMentionTappedWithRoom:(TAPRoomModel *)room
+                                   message:(TAPMessageModel *)message
+                            usernameString:(NSString *)username {
+    //reject if deletedRoomView exist
+    if (self.deletedRoomView.alpha == 1.0f || self.kickedGroupRoomBackgroundView.alpha == 1.0f) {
+        return;
+    }
+    
+    BOOL isParticipant = NO;
+    TAPUserModel *user = nil;
+    user = [self.participantListDictionary objectForKey:username];
+    if (user != nil) {
+        isParticipant = YES;
+    }
+    
+    if (isParticipant) {
+        //Client implement the delegate for handle tap mention
+        id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+        if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkUserMentionTappedWithRoom:mentionedUser:isRoomParticipant:message:currentViewController:currentShownNavigationController:)]) {
+            [tapUIChatRoomDelegate tapTalkUserMentionTappedWithRoom:room mentionedUser:user isRoomParticipant:isParticipant message:message currentViewController:self currentShownNavigationController:self.navigationController];
+            return;
+        }
+        
+        //Show default open profile
+        [TAPUtil performBlock:^{
+            [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
+        } afterDelay:1.0f];
+
+        [self setKeyboardStateDefault];
+
+        //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self hideInputAccessoryView];
+        
+        TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+        profileViewController.room = self.currentRoom;
+        profileViewController.user = user;
+        profileViewController.delegate = self;
+        profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
+        [self.navigationController pushViewController:profileViewController animated:YES];
+    }
+    else {
+        //User not found in participant
+        //Check if user is exist
+        id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+        if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkUserMentionTappedWithRoom:mentionedUser:isRoomParticipant:message:currentViewController:currentShownNavigationController:)]) {
+            [self showMentionLoadingView:NO];
+        }
+        else {
+            //Show default open profile
+            [TAPUtil performBlock:^{
+                [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
+            } afterDelay:1.0f];
+
+            [self setKeyboardStateDefault];
+
+            //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+            [self.messageTextView resignFirstResponder];
+            [self.secondaryTextField resignFirstResponder];
+            [self hideInputAccessoryView];
+            
+            [self showMentionLoadingView:YES];
+        }
+        [TAPDataManager callAPIGetUserByUsername:username success:^(TAPUserModel *user) {
+            //User found, open profile
+            TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+            
+            //Client implement the delegate for handle tap mention
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkUserMentionTappedWithRoom:mentionedUser:isRoomParticipant:message:currentViewController:currentShownNavigationController:)]) {
+                [tapUIChatRoomDelegate tapTalkUserMentionTappedWithRoom:room mentionedUser:user isRoomParticipant:isParticipant message:message currentViewController:self currentShownNavigationController:self.navigationController];
+                return;
+            }
+            
+            TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+            profileViewController.room = room;
+            profileViewController.user = user;
+            profileViewController.otherUserID = user.userID;
+            profileViewController.delegate = self;
+            profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypePersonalFromClickedMention;
+            [self.navigationController pushViewController:profileViewController animated:YES];
+            
+            [self showMentionLoadingView:NO];
+        } failure:^(NSError *error) {
+           //User not found show error
+            [self showMentionLoadingView:NO];
+            [TAPUtil performBlock:^{
+                NSString *errorMessageString = NSLocalizedStringFromTableInBundle(@"User not found", nil, [TAPUtil currentBundle], @"");
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"User Not Found" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessageString leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            } afterDelay:0.1f];
+        }];
+    }
+}
+
+- (IBAction)mentionAnchorButtonDidTapped:(id)sender {
+    
+    NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
+    if (numberOfPendingArray > 0) {
+        //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
+        [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
+        
+        [self.scrolledPendingMessageArray removeAllObjects];
+        [self.tableView reloadData];
+    }
+
+    TAPMessageModel *obtainedMentionMessage = [self.scrolledPendingMentionArray firstObject];
+    NSInteger rowIndex = [self.messageArray indexOfObject:obtainedMentionMessage];
+    
+    if (rowIndex != NSNotFound) {
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowIndex inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        [self.scrolledPendingMentionArray removeObjectAtIndex:0];
+    }
+    
+//    NSString *currentMesageLocalID = [self.anchorMentionMessageLocalIDArray firstObject];
+//    currentMesageLocalID = [TAPUtil nullToEmptyString:currentMesageLocalID];
+//
+//    if (![currentMesageLocalID isEqualToString:@""]) {
+//        [self scrollToMessageAndLoadDataWithLocalID:currentMesageLocalID];
+//    }
 }
 
 #pragma mark Others
@@ -7060,8 +9100,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Do nothing because hide popup handled when we press the button
         [self showInputAccessoryView];
     }
-    else if ([popupIdentifier isEqualToString:@"Error Delete Group Manually"]) {
-
+    else if ([popupIdentifier isEqualToString:@"User Not Found"]) {
+        [self showInputAccessoryView];
     }
 }
 
@@ -7086,6 +9126,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     id cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+    
+    //Remove mention list
+    [self showMentionListView:NO animated:YES];
     
     [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionTransitionNone animations:^{
         //animation
@@ -7123,29 +9166,37 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.messageTextView.text = @"";
     }
     
+            //DV Note - 12 Mar 2020
+            //Done with debt because if called showInputAccessoryExtensionView, after send, table view can scroll to bottom, error tableview inset
+        //    [self showInputAccessoryExtensionView:NO];
+            
+            _currentInputAccessoryExtensionHeight = 0.0f;
+            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+            
+            [UIView animateWithDuration:0.2f animations:^{
+                self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
+                [self.inputMessageAccessoryView layoutIfNeeded];
+                [[[self.inputAccessoryView superview] superview] layoutIfNeeded];
+            }];
 
-    //DV Note - 12 Mar 2020
-    //Done with debt because if called showInputAccessoryExtensionView, after send, table view can scroll to bottom, error tableview inset
-//    [self showInputAccessoryExtensionView:NO];
+            if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
+                _initialKeyboardHeight = 0.0f;
+                _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
+            }
+            //END DV Note
     
-    [UIView animateWithDuration:0.2f animations:^{
-        self.inputAccessoryExtensionHeightConstraint.constant = 0.0f;
-        [self.inputAccessoryView layoutIfNeeded];
-        [[[self.inputAccessoryView superview] superview] layoutIfNeeded];
-    }];
-
-    if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
-        _initialKeyboardHeight = 0.0f;
-        _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
-    }
-    //END DV Note
-    
+    [self showInputAccessoryExtensionView:NO];
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     
     if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
         //        Only scroll if table view is at bottom
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
+    
+    self.lastNumberOfWordArrayForShowMention = 0;
+    self.lastTypingWordArrayStartIndex = 0;
+    self.lastTypingWordString = @"";
+    [self.filteredMentionListArray removeAllObjects];
     
     [self checkEmptyState];
     [[TAPChatManager sharedManager] stopTyping];
@@ -7306,12 +9357,35 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     else {
         if (self.chatAnchorBadgeView.alpha != 1.0f && self.chatAnchorBackgroundView.alpha == 1.0f) {
+                        
             [UIView animateWithDuration:0.2f animations:^{
                 self.chatAnchorBadgeView.alpha = 1.0f;
             }];
         }
         
         self.chatAnchorBadgeLabel.text = [NSString stringWithFormat:@"%li", [self.anchorUnreadMessageArray count]];
+    }
+}
+
+- (void)checkAnchorMentionLabel {
+    if ([self.anchorMentionMessageDictionary count] <= 0) {
+        if (self.mentionAnchorBadgeView.alpha != 0.0f) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionAnchorBadgeView.alpha = 0.0f;
+            }];
+        }
+        
+        self.mentionAnchorBadgeLabel.text = @"0";
+    }
+    else {
+        if (self.mentionAnchorBadgeView.alpha != 1.0f && self.mentionAnchorBackgroundView.alpha == 1.0f) {
+                        
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionAnchorBadgeView.alpha = 1.0f;
+            }];
+        }
+        
+        self.mentionAnchorBadgeLabel.text = [NSString stringWithFormat:@"%li", [self.anchorMentionMessageDictionary count]];
     }
 }
 
@@ -7674,11 +9748,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             TAPRoomModel *room = [[TAPGroupManager sharedManager] getRoomWithRoomID:self.currentRoom.roomID];
             if (room != nil) {
                 _currentRoom = room;
+                self.participantListDictionary = [NSMutableDictionary dictionary];
+                for (TAPUserModel *user in self.currentRoom.participants) {
+                    [self.participantListDictionary setObject:user forKey:user.username];
+                }
                 [self refreshRoomStatusUIInfo];
             }
             
             [TAPDataManager callAPIGetRoomWithRoomID:self.currentRoom.roomID success:^(TAPRoomModel *room) {
                 _currentRoom = room;
+                self.participantListDictionary = [NSMutableDictionary dictionary];
+                for (TAPUserModel *user in room.participants) {
+                    [self.participantListDictionary setObject:user forKey:user.username];
+                }
                 [self refreshRoomStatusUIInfo];
             } failure:^(NSError *error) {
                 if (error.code == 40401) {
@@ -7740,6 +9822,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
         }
+        
         self.tappedMessageLocalID = localID;
         [self retrieveExistingMessages];
     }
@@ -7795,9 +9878,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //insert cell at last row
         _isLoadingOldMessageFromAPI = YES;
         NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:self.lastLoadingCellRowPosition inSection:0];
-        [self.tableView beginUpdates];
-        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
-        [self.tableView endUpdates];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+        } completion:^(BOOL finished) {
+        }];
     }
     else {
         if (!self.isLoadingOldMessageFromAPI || [self.messageArray count] == 0 || self.isShowingTopFloatingIdentifier) {
@@ -7807,9 +9892,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         _isLoadingOldMessageFromAPI = NO;
         NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:self.lastLoadingCellRowPosition inSection:0];
         if (self.lastLoadingCellRowPosition >= [self.messageArray count]) {
-            [self.tableView beginUpdates];
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
-            [self.tableView endUpdates];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+            } completion:^(BOOL finished) {
+            }];
         }
     }
 }
@@ -8351,6 +10438,90 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
              }
          }
     });
+}
+
+- (void)processSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
+           return;
+    }
+    
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) {
+        //Type Text and Location
+        [self showInputAccessoryExtensionView:NO];
+        [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+        [self setReplyMessageWithMessage:message];
+        [self showInputAccessoryExtensionView:YES];
+           
+        TAPMessageModel *quotedMessageModel = [message copy];
+        [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+    }
+    else if (message.type == TAPChatMessageTypeFile) {
+        //Type File
+        TAPMessageModel *quotedMessageModel = [message copy];
+
+        [self showInputAccessoryExtensionView:NO];
+        [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+        [self showInputAccessoryExtensionView:YES];
+           
+        NSString *fileName = [quotedMessageModel.data objectForKey:@"fileName"];
+        fileName = [TAPUtil nullToEmptyString:fileName];
+        
+        NSString *fileExtension  = [[fileName pathExtension] uppercaseString];
+        fileName = [fileName stringByDeletingPathExtension];
+           
+        if ([fileExtension isEqualToString:@""]) {
+           fileExtension = [quotedMessageModel.data objectForKey:@"mediaType"];
+           fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+           fileExtension = [fileExtension lastPathComponent];
+           fileExtension = [fileExtension uppercaseString];
+        }
+        
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+           
+        //convert to quote model
+        TAPQuoteModel *quote = [TAPQuoteModel new];
+        quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+        quote.title = fileName;
+        quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+        NSString *fileTypeString = @"";
+        if (quotedMessageModel.type == TAPChatMessageTypeImage) {
+           fileTypeString = @"image";
+        }
+        else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
+           fileTypeString = @"video";
+        }
+        else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
+           fileTypeString = @"file";
+        }
+        quote.fileType = fileTypeString;
+        [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+           
+       quotedMessageModel.quote = quote;
+       
+       [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    }
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+        //Type Video and Image
+        TAPMessageModel *quotedMessageModel = [message copy];
+        
+        [self showInputAccessoryExtensionView:NO];
+        [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+        [self showInputAccessoryExtensionView:YES];
+        
+        //convert to quote model
+        TAPQuoteModel *quote = [TAPQuoteModel new];
+        quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
+        quote.title = quotedMessageModel.user.fullname;
+        quote.content = quotedMessageModel.body;
+        [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+        
+        quotedMessageModel.quote = quote;
+        
+        [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    }
+    
+    //DV Note
+    //Add another type here for later
 }
 
 @end

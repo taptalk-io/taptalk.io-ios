@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -20,7 +21,7 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="TAPYourImageBubbleTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="463.5"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+            <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="463.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -240,7 +241,7 @@
                                         <visualEffectView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CdT-Mj-UHM">
                                             <rect key="frame" x="0.0" y="0.0" width="234" height="292"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" insetsLayoutMarginsFromSafeArea="NO" id="SGg-B6-REQ">
+                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="SGg-B6-REQ">
                                                 <rect key="frame" x="0.0" y="0.0" width="234" height="292"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             </view>
@@ -348,15 +349,11 @@
                         </constraints>
                     </view>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pAP-ue-Z6c">
-                        <rect key="frame" x="286" y="410.5" width="28" height="28"/>
+                        <rect key="frame" x="286" y="410.5" width="0.0" height="28"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="28" id="35a-mP-XeQ"/>
+                            <constraint firstAttribute="width" id="35a-mP-XeQ"/>
                             <constraint firstAttribute="height" constant="28" id="Hi3-nq-gee"/>
                         </constraints>
-                        <state key="normal" image="TAPIconReplyChat"/>
-                        <connections>
-                            <action selector="replyButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="z1e-cI-sHg"/>
-                        </connections>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ruq-Mt-UE7">
                         <rect key="frame" x="50" y="442.5" width="254" height="13"/>
@@ -368,6 +365,36 @@
                         <color key="textColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mbn-YM-uZm">
+                        <rect key="frame" x="-31" y="11" width="30" height="30"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OST-x7-wlF">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Xb2-9t-C0W">
+                                        <rect key="frame" x="4" y="4" width="22" height="22"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstItem="Xb2-9t-C0W" firstAttribute="top" secondItem="OST-x7-wlF" secondAttribute="top" constant="4" id="DON-zJ-0t7"/>
+                                    <constraint firstItem="Xb2-9t-C0W" firstAttribute="leading" secondItem="OST-x7-wlF" secondAttribute="leading" constant="4" id="JLO-TL-Wkv"/>
+                                    <constraint firstAttribute="bottom" secondItem="Xb2-9t-C0W" secondAttribute="bottom" constant="4" id="WbL-gd-dGh"/>
+                                    <constraint firstAttribute="width" constant="30" id="aba-Yg-sQf"/>
+                                    <constraint firstAttribute="height" constant="30" id="b6v-eG-VDm"/>
+                                    <constraint firstAttribute="trailing" secondItem="Xb2-9t-C0W" secondAttribute="trailing" constant="4" id="qHT-nW-cid"/>
+                                </constraints>
+                                <viewLayoutGuide key="safeArea" id="Scr-cK-2f7"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="G5b-DF-fRi"/>
+                            <constraint firstItem="OST-x7-wlF" firstAttribute="centerX" secondItem="Mbn-YM-uZm" secondAttribute="centerX" id="aaE-WK-kWx"/>
+                            <constraint firstItem="OST-x7-wlF" firstAttribute="centerY" secondItem="Mbn-YM-uZm" secondAttribute="centerY" id="gdA-8v-RjE"/>
+                            <constraint firstAttribute="width" constant="30" id="mmC-Ae-tsr"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -379,12 +406,14 @@
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="H0r-rf-zF2"/>
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="PPn-nr-ddL"/>
                     <constraint firstItem="meb-Tz-SWq" firstAttribute="trailing" secondItem="Jff-OV-cJx" secondAttribute="trailing" id="Psy-gs-Iys"/>
+                    <constraint firstItem="Mbn-YM-uZm" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="-46" id="RgH-Wn-Hm5"/>
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="width" secondItem="meb-Tz-SWq" secondAttribute="width" id="VJY-UE-TOW"/>
                     <constraint firstItem="xDZ-oV-2II" firstAttribute="trailing" secondItem="Jff-OV-cJx" secondAttribute="trailing" id="Yci-MR-EJe"/>
                     <constraint firstAttribute="trailing" secondItem="Ruq-Mt-UE7" secondAttribute="trailing" constant="16" id="Z6j-TD-P4X"/>
                     <constraint firstItem="Pdc-VM-5SJ" firstAttribute="leading" secondItem="Jff-OV-cJx" secondAttribute="trailing" constant="4" id="bBH-Qc-BXu"/>
                     <constraint firstItem="meb-Tz-SWq" firstAttribute="top" secondItem="Jff-OV-cJx" secondAttribute="top" id="bay-cr-a0e"/>
                     <constraint firstItem="pAP-ue-Z6c" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="trailing" constant="2" id="f6H-82-JWi"/>
+                    <constraint firstItem="Mbn-YM-uZm" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="h3n-bn-yO5"/>
                     <constraint firstAttribute="bottom" secondItem="Ruq-Mt-UE7" secondAttribute="bottom" constant="8" id="iL8-xh-A4E"/>
                     <constraint firstItem="meb-Tz-SWq" firstAttribute="leading" secondItem="Jff-OV-cJx" secondAttribute="leading" id="ktP-eY-BaT"/>
                     <constraint firstItem="Pdc-VM-5SJ" firstAttribute="bottom" secondItem="pAP-ue-Z6c" secondAttribute="bottom" constant="2" id="pQ0-hG-Y9R"/>
@@ -393,6 +422,7 @@
                     <constraint firstItem="Pdc-VM-5SJ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="zpC-ZE-s9O"/>
                 </constraints>
             </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bubbleImageView" destination="pVW-ZN-0k9" id="HVv-1g-lUR"/>
                 <outlet property="bubbleImageViewHeightConstraint" destination="iib-OH-RG0" id="umY-bW-b7k"/>
@@ -454,6 +484,10 @@
                 <outlet property="statusLabel" destination="Ruq-Mt-UE7" id="JJM-JM-e9g"/>
                 <outlet property="statusLabelHeightConstraint" destination="TZ7-Y5-8Up" id="DNs-1E-OHX"/>
                 <outlet property="statusLabelTopConstraint" destination="uue-BM-rEx" id="ONK-LS-dU9"/>
+                <outlet property="swipeReplyImageView" destination="Xb2-9t-C0W" id="015-Pe-eeB"/>
+                <outlet property="swipeReplyView" destination="OST-x7-wlF" id="Ya8-fu-DBb"/>
+                <outlet property="swipeReplyViewHeightConstraint" destination="b6v-eG-VDm" id="0fP-uO-4t8"/>
+                <outlet property="swipeReplyViewWidthConstraint" destination="aba-Yg-sQf" id="IhW-Ba-otq"/>
                 <outlet property="thumbnailBubbleImageView" destination="KOu-lI-oLh" id="fKI-dE-UfZ"/>
             </connections>
             <point key="canvasLocation" x="-27" y="55"/>
@@ -462,6 +496,5 @@
     <resources>
         <image name="TAPIconDocuments" width="32" height="32"/>
         <image name="TAPIconDownload" width="32" height="32"/>
-        <image name="TAPIconReplyChat" width="28" height="28"/>
     </resources>
 </document>

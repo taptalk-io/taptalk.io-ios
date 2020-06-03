@@ -64,6 +64,12 @@ static const NSInteger kAPITimeOut = 60;
 
 #pragma mark - Custom Method
 - (AFHTTPSessionManager *)defaultManager {
+    
+    NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
+    if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
+        clientUserAgent = @"ios";
+    }
+    
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
@@ -76,7 +82,7 @@ static const NSInteger kAPITimeOut = 60;
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
     [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"SDK-Version"];
-    [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"User-Agent"];
+    [manager.requestSerializer setValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
     
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];
     

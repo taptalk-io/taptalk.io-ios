@@ -618,6 +618,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                                 else {
                                     TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
                                     imagePreviewViewController.delegate = self;
+                                    imagePreviewViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+                                    [imagePreviewViewController setParticipantListArray:self.participantListArray];
                                     
                                     if (!(self.selectedMediaDataArray == nil) && ([self.selectedMediaDataArray count] > 0)) {
                                         [imagePreviewViewController setMediaPreviewDataWithArray:selectedResultArray];

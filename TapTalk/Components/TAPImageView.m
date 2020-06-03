@@ -104,6 +104,10 @@
             });
         }
         else {
+            if (![urlString hasPrefix:@"http"]) {
+                //Do not load url when url is fileID type
+                return;
+            }
             NSURL *imageURL = [NSURL URLWithString:urlString];
             
             SDWebImageDownloader *imageDownloader = [SDWebImageDownloader sharedDownloader];

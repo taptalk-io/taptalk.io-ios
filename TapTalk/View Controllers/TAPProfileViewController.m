@@ -162,7 +162,7 @@
     self.profileView.nameLabel.text = roomName;
     self.profileView.navigationNameLabel.text = roomName;
     
-    if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+    if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault || self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
         if (self.room.type == RoomTypePersonal) {
             //type personal
             self.profileView.editButton.alpha = 0.0f;
@@ -245,7 +245,6 @@
             }
             else if (indexPath.row == 1) {
                 //send message
-                
             }
             else if (indexPath.row == 2) {
                 //appont admin
@@ -256,6 +255,16 @@
             else if (indexPath.row == 3) {
                 //remove member
                 if (![self.room.admins containsObject:[TAPDataManager getActiveUser].userID]) {
+                    height = 0.0f;
+                }
+            }
+        }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
+            TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
+            if (indexPath.row == 0) {
+                //add to contacts
+                if (user != nil && user.isContact || [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                    //if user exists or already contact
                     height = 0.0f;
                 }
             }
@@ -330,6 +339,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
             return 4; //add to contact, send message, appoint as admin, remove member
+        }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
+            return 2; //add to contact, send message
         }
         return 0;
     }
@@ -427,7 +439,24 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             return cell;
         }
-        
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
+            NSString *cellID = @"TAPProfileCollectionViewCell";
+            [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
+            TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+            
+            if (indexPath.item == 0) {
+                //add contact
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeAddContacts];
+                [cell showSeparatorView:YES];
+            }
+            else if (indexPath.item == 1) {
+                //send message
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeSendMessage];
+                [cell showSeparatorView:YES];
+            }
+            
+            return cell;
+        }
     }
     else if (indexPath.section == 1) {
         NSString *cellID = @"TAPImageCollectionViewCell";
@@ -571,7 +600,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             UIColor *sectionHeaderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
 
             UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, CGRectGetHeight(headerView.frame))];
-            titleLabel.text = @"SHARED MEDIA";
+            titleLabel.text = NSLocalizedStringFromTableInBundle(@"SHARED MEDIA", nil, [TAPUtil currentBundle], @"");
             titleLabel.textColor = sectionHeaderLabelColor;
             titleLabel.font = sectionHeaderLabelFont;
             
@@ -716,14 +745,53 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
                         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Promote Admin" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                     }];
-
                 }
-                
-            }    else if (indexPath.row == 3) {
+            }
+            else if (indexPath.row == 3) {
                 //remove member
                  [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Remove Member" title:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to remove this member?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
             }
-            
+        }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
+            if (indexPath.row == 0) {
+                //add to contacts
+                [self.profileView showLoadingView:YES];
+                [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeAddToContact];
+                NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                currentUserID = [TAPUtil nullToEmptyString:currentUserID];
+                
+                if ([currentUserID isEqualToString:self.user.userID]) {
+                    //Add theirselves
+                    [self removeLoadingView];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Can't add yourself as contact", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                }
+                else {
+                    [TAPDataManager callAPIAddContactWithUserID:self.user.userID success:^(NSString *message, TAPUserModel *user) {
+                        [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
+                        [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAddToContact];
+                        
+                        [TAPUtil performBlock:^{
+                            [self.navigationController popViewControllerAnimated:YES];
+                        } afterDelay:1.2f];
+                        
+                    } failure:^(NSError *error) {
+#ifdef DEBUG
+                        NSLog(@"%@", error);
+#endif
+                        
+                        [self removeLoadingView];
+                    }];
+                }
+            }
+            else if (indexPath.row == 1) {
+                //send message
+                [self.navigationController popToRootViewControllerAnimated:NO];
+                
+                [[TapUI sharedInstance] createRoomWithOtherUser:self.user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    chatViewController.hidesBottomBarWhenPushed = YES;
+                    [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+                }];
+            }
         }
     }
     else if (indexPath.section == 1) {

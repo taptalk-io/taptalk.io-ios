@@ -180,6 +180,11 @@ shouldChangeTextInRange:(NSRange)range
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
     
     _text = newString;
+    
+    if ([self.delegate respondsToSelector:@selector(growingTextViewShouldChangeTextInRange:replacementText:newText:)]) {
+        [self.delegate growingTextViewShouldChangeTextInRange:range replacementText:text newText:newString];
+    }
+    
     if ([newString isEqualToString:@""]) {
         self.placeholderLabel.alpha = 1.0f;
         
