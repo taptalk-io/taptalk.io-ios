@@ -141,6 +141,8 @@
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
     [self setBubbleCellStyle];
+    
+    self.mentionIndexesArray = [[NSArray alloc] init];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -163,6 +165,7 @@
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    self.mentionIndexesArray = nil;
     [self.contentView layoutIfNeeded];
 }
 
@@ -212,6 +215,12 @@
                 break;
         }
     }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(myChatBubblePressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate myChatBubblePressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
+        }
+    }
 }
 
 - (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
@@ -255,6 +264,12 @@
                 
             default:
                 break;
+        }
+    }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate myChatBubbleLongPressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
         }
     }
 }
@@ -423,7 +438,14 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
+//    _message = message;
     [super setMessage:message];
+    
+    
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
         //if reply exists check if image in quote exists
@@ -458,7 +480,7 @@
         [self showForwardView:NO];
     }
     
-    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
+//    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", message.body];
     
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
     NSDataDetector *detectorPhoneNumber = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
@@ -466,7 +488,7 @@
     UIColor *highlightedTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURLHighlighted];
     UIColor *defaultTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURL];
     
-    NSString *messageText = [TAPUtil nullToEmptyString:self.bubbleLabel.text];
+    NSString *messageText = [TAPUtil nullToEmptyString:message.body];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:messageText attributes:nil];
     // the next line throws an exception if string is nil - make sure you check
     [linkDetector enumerateMatchesInString:messageText options:0 range:NSMakeRange(0, messageText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
@@ -489,7 +511,25 @@
         
         [attributedString addAttributes:attributes range:result.range];
     }];
-    self.bubbleLabel.attributedText = attributedString;
+    
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeChannel) {
+        for (NSInteger counter = 0; counter < [self.mentionIndexesArray count]; counter++) {
+            NSArray *mentionRangeArray = self.mentionIndexesArray;
+            NSRange userRange = [[mentionRangeArray objectAtIndex:counter] rangeValue];
+            
+            NSString *mentionString = [self.message.body substringWithRange:userRange];
+            NSString *mentionedUserString = [mentionString substringFromIndex:1];
+            
+            NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+            attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+            attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+            attributes[NSForegroundColorAttributeName] = defaultTextColor;
+            attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
+            [attributedString addAttributes:attributes range:userRange];
+        }
+    }
+        
+        self.bubbleLabel.attributedText = attributedString;
 }
 
 - (void)receiveSentEvent {

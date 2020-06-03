@@ -46,6 +46,8 @@ Triggered when user click back or close button
 @property (weak, nonatomic) id<TAPChatViewControllerDelegate> delegate;
 @property (nonatomic) TapUIChatViewControllerType chatViewControllerType;
 @property (strong, nonatomic) TAPRoomModel *currentRoom;
+@property (strong, nonatomic) NSMutableDictionary *mentionIndexesDictionary;
+@property (strong, nonatomic) NSMutableDictionary *participantListDictionary;
 @property (strong, nonatomic) NSString *scrollToMessageLocalIDString;
 
 - (void)setChatViewControllerType:(TapUIChatViewControllerType)chatViewControllerType;

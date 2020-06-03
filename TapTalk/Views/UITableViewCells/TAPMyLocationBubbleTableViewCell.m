@@ -351,6 +351,11 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
+//    _message = message;
     [super setMessage:message];
     
     BOOL replyToExists = NO;

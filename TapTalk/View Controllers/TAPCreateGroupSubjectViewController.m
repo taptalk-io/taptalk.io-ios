@@ -364,10 +364,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return;
     }
     
+    NSMutableDictionary *participantListDictionary = [[NSMutableDictionary alloc] init];
     if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeDefault) {
         NSMutableArray *userIDArray = [NSMutableArray array];
         for (TAPUserModel *user in self.selectedContactArray) {
             [userIDArray addObject:user.userID];
+            [participantListDictionary setObject:user forKey:user.username];
         }
         
         [TAPDataManager callAPICreateRoomWithName:groupName type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
@@ -401,6 +403,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     
                     [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
                         chatViewController.hidesBottomBarWhenPushed = YES;
+                        chatViewController.participantListDictionary = participantListDictionary;
                         [self.roomListViewController.navigationController pushViewController:chatViewController animated:YES];
                     }];
                     

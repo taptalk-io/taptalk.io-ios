@@ -134,7 +134,8 @@
         TAPRoomModel *room = recentSearch.room;
         [cell setSearchResultChatTableViewCellWithData:room
                                         searchedString:@""
-                                numberOfUnreadMessages:@"0"];
+                                numberOfUnreadMessages:@"0"
+                                            hasMention:NO];
         
         return cell;
     }
@@ -146,7 +147,8 @@
         TAPRoomModel *room = [self.searchResultChatAndContactArray objectAtIndex:indexPath.row];
         [cell setSearchResultChatTableViewCellWithData:room
                                         searchedString:self.updatedString
-                                numberOfUnreadMessages:@"0"];
+                                numberOfUnreadMessages:@"0"
+                                            hasMention:NO];
         
         return cell;
     }
@@ -299,7 +301,7 @@
         
         [self.forwardListView isShowRecentChatView:NO animated:YES];
         
-        [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray) {
+        [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
             self.searchResultChatAndContactArray = [roomArray mutableCopy];
 
             if (self.forwardListView.searchResultTableView.alpha == 1.0f) {

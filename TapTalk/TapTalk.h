@@ -96,6 +96,18 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  */
 - (void)clearAllTapTalkData;
 
+/**
+ Set custom User-Agent key as a header parameter for an API request
+ Note: By default, we will pass "ios" as User-Agent key
+ */
+- (void)setTapTalkUserAgent:(NSString *)userAgent;
+
+/**
+ get defined custom User-Agent key as a header parameter for an API request
+ Note: By default, we will pass "ios" as User-Agent key
+ */
+- (NSString *)getTapTalkUserAgent;
+
 //==========================================================
 //                       Connection
 //==========================================================

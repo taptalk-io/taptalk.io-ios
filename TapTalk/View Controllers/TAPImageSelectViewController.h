@@ -48,6 +48,9 @@ typedef NS_ENUM(NSInteger, ImageSelectViewControllerContinueType) {
 @property (nonatomic) NSInteger albumIndexSection; //used in ImageSelectViewControllerTypeGalleryAlbum
 @property (strong, nonatomic) NSMutableDictionary *selectedImagePositionDictionary; //used in ImageSelectViewControllerTypeGalleryAlbum
 
+@property (nonatomic) BOOL isNotFromPersonalRoom;
+@property (strong, nonatomic) NSArray *participantListArray;
+
 - (void)setImageSelectViewControllerNavigateType:(ImageSelectViewControllerNavigateType)imageSelectViewControllerNavigateType;
 - (void)setImageSelectViewControllerType:(ImageSelectViewControllerType)imageSelectViewControllerType;
 - (void)setImageSelectViewControllerContinueType:(ImageSelectViewControllerContinueType)imageSelectViewControllerContinueType;

@@ -32,7 +32,7 @@
     messageForReturn.isDelivered = NO;
     messageForReturn.isHidden = NO;
     messageForReturn.data = messageData;
-    
+
     //Obtain other user ID
     NSString *roomID = room.roomID;
     roomID = [TAPUtil nullToEmptyString:roomID];
@@ -127,4 +127,5 @@
     }
     return [super initWithDictionary:dict error:err];
 }
+
 @end

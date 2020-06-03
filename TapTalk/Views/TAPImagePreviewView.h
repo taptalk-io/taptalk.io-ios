@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIView *bottomMenuView;
 @property (strong, nonatomic) UIView *alertContainerView;
 
+@property (strong, nonatomic) UIView *mentionTableBackgroundView;
+@property (strong, nonatomic) UITableView *mentionTableView;
+
 @property (strong, nonatomic) UIButton *cancelButton;
 @property (strong, nonatomic) UIButton *morePictureButton;
 @property (strong, nonatomic) UIButton *sendButton;
@@ -33,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)isShowAsSingleImagePreview:(BOOL)isShow animated:(BOOL)animated;
 - (void)showExcedeedFileSizeAlertView:(BOOL)isShow animated:(BOOL)animated;
 - (void)enableSendButton:(BOOL)isEnable;
+- (void)showMentionTableView:(BOOL)show animated:(BOOL)animated;
 
 @end
 

@@ -368,6 +368,10 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
     _message = message;
     
     BOOL replyToExists = NO;

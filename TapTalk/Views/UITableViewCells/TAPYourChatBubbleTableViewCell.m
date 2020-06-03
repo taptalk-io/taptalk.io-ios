@@ -145,6 +145,8 @@
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
+    self.mentionIndexesArray = [[NSArray alloc] init];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -162,6 +164,7 @@
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     [self.contentView layoutIfNeeded];
 
+    self.mentionIndexesArray = nil;
     self.statusLabel.alpha = 0.0f;
     [self showSenderInfo:NO];
 }
@@ -212,6 +215,12 @@
                 break;
         }
     }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(yourChatBubblePressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate yourChatBubblePressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
+        }
+    }
 }
 
 - (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
@@ -254,6 +263,12 @@
                 
             default:
                 break;
+        }
+    }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(yourChatBubbleLongPressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate yourChatBubbleLongPressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
         }
     }
 }
@@ -431,6 +446,10 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
     _message = message;
     
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""]  && message.replyTo != nil && message.quote != nil) {
@@ -497,6 +516,24 @@
         
         [attributedString addAttributes:attributes range:result.range];
     }];
+    
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeChannel) {
+        for (NSInteger counter = 0; counter < [self.mentionIndexesArray count]; counter++) {
+            NSArray *mentionRangeArray = self.mentionIndexesArray;
+            NSRange userRange = [[mentionRangeArray objectAtIndex:counter] rangeValue];
+            
+            NSString *mentionString = [self.message.body substringWithRange:userRange];
+            NSString *mentionedUserString = [mentionString substringFromIndex:1];
+            
+            NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+            attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+            attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+            attributes[NSForegroundColorAttributeName] = defaultTextColor;
+            attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
+            [attributedString addAttributes:attributes range:userRange];
+        }
+    }
+    
     self.bubbleLabel.attributedText = attributedString;
     
     //CS NOTE - check chat room type, show sender info if group type

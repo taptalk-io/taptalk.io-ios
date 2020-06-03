@@ -204,6 +204,8 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    _mentionIndexesArray = [[NSArray alloc] init];
+    
     [self setBubbleCellStyle];
 }
 
@@ -218,6 +220,8 @@
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
+    self.mentionIndexesArray = nil;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -269,6 +273,12 @@
                 break;
         }
     }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(myImageBubblePressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate myImageBubblePressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
+        }
+    }
 }
 
 - (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
@@ -311,6 +321,12 @@
                 
             default:
                 break;
+        }
+    }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(myImageBubbleLongPressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate myImageBubbleLongPressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
         }
     }
 }
@@ -489,6 +505,11 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
+//    _message = message;
     [super setMessage:message];
     
     NSDictionary *dataDictionary = message.data;
@@ -1176,6 +1197,24 @@
         
         [attributedString addAttributes:attributes range:result.range];
     }];
+    
+    if (self.message.room.type == RoomTypeGroup || self.message.room.type == RoomTypeChannel) {
+        for (NSInteger counter = 0; counter < [self.mentionIndexesArray count]; counter++) {
+            NSArray *mentionRangeArray = self.mentionIndexesArray;
+            NSRange userRange = [[mentionRangeArray objectAtIndex:counter] rangeValue];
+            
+            NSString *mentionString = [messageText substringWithRange:userRange];
+            NSString *mentionedUserString = [mentionString substringFromIndex:1];
+            
+            NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+            attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+            attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+            attributes[NSForegroundColorAttributeName] = defaultTextColor;
+            attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
+            [attributedString addAttributes:attributes range:userRange];
+        }
+    }
+    
     self.captionLabel.attributedText = attributedString;
     
     [self showImageCaption:YES];

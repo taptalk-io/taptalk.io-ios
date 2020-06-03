@@ -27,6 +27,9 @@ typedef NS_ENUM(NSInteger, TAPPhotoAlbumListViewControllerType) {
 @property (strong, nonatomic) NSMutableArray *selectedMediaDataArray;
 @property (strong, nonatomic) NSMutableDictionary *selectedImagePositionDictionary; //dictionary key format albumsection-albumrow-imagerow ex:1-2-3
 
+@property (nonatomic) BOOL isNotFromPersonalRoom;
+@property (strong, nonatomic) NSArray *participantListArray;
+
 - (void)setPhotoAlbumListViewControllerType:(TAPPhotoAlbumListViewControllerType)photoAlbumListViewControllerType;
 
 @end

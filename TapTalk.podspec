@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalk"
-    s.version      = "1.1.12"
+    s.version      = "1.2.0"
     s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.authors = { 'Ritchie Nathaniel' => 'ritchie@taptalk.io',
-                  'Dominic Vedericho' => 'domini10c@taptalk.io' }
+                  'Dominic Vedericho' => 'dominic@taptalk.io' }
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

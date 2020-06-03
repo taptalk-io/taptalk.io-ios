@@ -231,6 +231,8 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    _mentionIndexesArray = [[NSArray alloc] init];
+    
     [self setBubbleCellStyle];
     [self showSenderInfo:NO];
 }
@@ -253,6 +255,8 @@
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
     [self setVideoCaptionWithString:@""];
+    
+    self.mentionIndexesArray = nil;
     
     self.statusLabel.text = @"";
 }
@@ -303,6 +307,12 @@
                 break;
         }
     }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(yourVideoBubblePressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate yourVideoBubblePressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
+        }
+    }
 }
 
 - (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
@@ -345,6 +355,12 @@
                 
             default:
                 break;
+        }
+    }
+    else {
+        //Handle for mention
+        if ([self.delegate respondsToSelector:@selector(yourVideoBubbleLongPressedMentionWithWord:tappedAtIndex:message:mentionIndexesArray:)]) {
+            [self.delegate yourVideoBubbleLongPressedMentionWithWord:tappableLabel.text tappedAtIndex:idx message:self.message mentionIndexesArray:self.mentionIndexesArray];
         }
     }
 }
@@ -538,7 +554,10 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
-
+    if(message == nil) {
+        return;
+    }
+    
     _message = message;
     
     NSDictionary *dataDictionary = message.data;
@@ -1002,6 +1021,24 @@
         
         [attributedString addAttributes:attributes range:result.range];
     }];
+    
+    if (self.message.room.type == RoomTypeGroup || self.message.room.type == RoomTypeChannel) {
+        for (NSInteger counter = 0; counter < [self.mentionIndexesArray count]; counter++) {
+            NSArray *mentionRangeArray = self.mentionIndexesArray;
+            NSRange userRange = [[mentionRangeArray objectAtIndex:counter] rangeValue];
+            
+            NSString *mentionString = [messageText substringWithRange:userRange];
+            NSString *mentionedUserString = [mentionString substringFromIndex:1];
+            
+            NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+            attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+            attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+            attributes[NSForegroundColorAttributeName] = defaultTextColor;
+            attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
+            [attributedString addAttributes:attributes range:userRange];
+        }
+    }
+    
     self.captionLabel.attributedText = attributedString;
     
     [self showVideoCaption:YES];

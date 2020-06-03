@@ -35,6 +35,14 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
                               originalString:(NSString *)originalString;
 - (void)myImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myImageBubblePressedMentionWithWord:(NSString*)word
+                              tappedAtIndex:(NSInteger)index
+                                    message:(TAPMessageModel *)message
+                        mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (void)myImageBubbleLongPressedMentionWithWord:(NSString*)word
+                                  tappedAtIndex:(NSInteger)index
+                                        message:(TAPMessageModel *)message
+                            mentionIndexesArray:(NSArray *)mentionIndexesArray;
 
 @end
 
@@ -44,6 +52,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 @property (weak, nonatomic) TAPMessageModel *message;
 @property (nonatomic) TAPMyImageBubbleTableViewCellStateType myImageBubbleTableViewCellStateType;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
+@property (strong, nonatomic) NSArray *mentionIndexesArray;
 
 @property (strong, nonatomic) IBOutlet TAPImageView *bubbleImageView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewWidthConstraint;

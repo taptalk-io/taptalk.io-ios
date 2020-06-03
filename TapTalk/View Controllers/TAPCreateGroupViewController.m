@@ -1582,7 +1582,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //is done search from database
             //check if contact is not found in database, call api get user by username
             if (([self.searchResultUserMutableArray count] == 0 && [self.searchResultNonContactUserMutableArray count] == 0) && !self.isContactLocallyFound) {
-                //DV TODO - Add loading here
                 [self.createGroupView showOverlayView:NO];
                 self.createGroupView.searchResultTableView.alpha = 1.0f;
                 [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
@@ -1602,7 +1601,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self.createGroupView showOverlayView:NO];
                     [UIView animateWithDuration:0.2f animations:^{
                         self.createGroupView.searchResultTableView.alpha = 1.0f;
-                        //DV TODO - remove loading here
                         _isLoading = NO;
                         [self.createGroupView.searchResultTableView reloadData];
                         [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
@@ -1623,7 +1621,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [self.createGroupView showOverlayView:NO];
                         [UIView animateWithDuration:0.2f animations:^{
                             self.createGroupView.searchResultTableView.alpha = 1.0f;
-                            //DV TODO - remove loading here
                             _isLoading = NO;
                             [self.createGroupView.searchResultTableView reloadData];
                             [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
@@ -1642,7 +1639,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [self.createGroupView showOverlayView:NO];
                         [UIView animateWithDuration:0.2f animations:^{
                             self.createGroupView.searchResultTableView.alpha = 1.0f;
-                            //DV TODO - remove loading here
                             _isLoading = NO;
                             [self.createGroupView.searchResultTableView reloadData];
                             [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
@@ -1728,7 +1724,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self.createGroupView showOverlayView:NO];
                     [UIView animateWithDuration:0.2f animations:^{
                         self.createGroupView.searchResultTableView.alpha = 1.0f;
-                        //DV TODO - remove loading here
                         _isLoading = NO;
                         [self.createGroupView.searchResultTableView reloadData];
                         [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];
@@ -1749,7 +1744,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [self.createGroupView showOverlayView:NO];
                         [UIView animateWithDuration:0.2f animations:^{
                             self.createGroupView.searchResultTableView.alpha = 1.0f;
-                            //DV TODO - remove loading here
                             _isLoading = NO;
                             [self.createGroupView.searchResultTableView reloadData];
                             [self.createGroupView setSearchResultAsEmptyView:NO withKeywordString:@""];
@@ -1768,7 +1762,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [self.createGroupView showOverlayView:NO];
                         [UIView animateWithDuration:0.2f animations:^{
                             self.createGroupView.searchResultTableView.alpha = 1.0f;
-                            //DV TODO - remove loading here
                             _isLoading = NO;
                             [self.createGroupView.searchResultTableView reloadData];
                             [self.createGroupView setSearchResultAsEmptyView:YES withKeywordString:trimmedString];

@@ -33,6 +33,8 @@
 @property (strong, nonatomic) UIButton *leftBarButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 
+@property (strong, nonatomic) NSMutableDictionary *unreadMentionDictionary;
+
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
 
@@ -175,6 +177,7 @@
     
     _roomListArray = [NSMutableArray array];
     _roomListDictionary = [NSMutableDictionary dictionary];
+    _unreadMentionDictionary = [NSMutableDictionary dictionary];
     
     _connectionStatusViewController = [[TAPConnectionStatusViewController alloc] init];
     [self addChildViewController:self.connectionStatusViewController];
@@ -530,12 +533,18 @@
 #pragma mark TapUIChatViewController
 - (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID {
     NSInteger readCount = [[TAPMessageStatusManager sharedManager] getReadCountAndClearDictionaryForRoomID:roomID];
+    NSInteger readMentionCount = [[TAPMessageStatusManager sharedManager] getReadMentionCountAndClearDictionaryForRoomID:roomID];
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
     roomList.numberOfUnreadMessages = roomList.numberOfUnreadMessages - readCount;
+    roomList.numberOfUnreadMentions = roomList.numberOfUnreadMentions - readMentionCount;
     
     if(roomList.numberOfUnreadMessages < 0) {
         roomList.numberOfUnreadMessages = 0;
+    }
+    
+    if(roomList.numberOfUnreadMentions < 0) {
+        roomList.numberOfUnreadMentions = 0;
     }
     
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
@@ -544,9 +553,10 @@
 }
 
 - (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
-    //Force mark unread bubble to 0
+    //Force mark unread bubble and unread mention to 0
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
     roomList.numberOfUnreadMessages = 0;
+    roomList.numberOfUnreadMentions = 0;
         
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
@@ -911,10 +921,12 @@
             
             //Handle room insert
             if([insertIndexArray count] > 0) {
-                [self.roomListView.roomListTableView beginUpdates];
-                [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self.roomListView.roomListTableView endUpdates];
-                [self.roomListView.roomListTableView scrollsToTop];
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                } completion:^(BOOL finished) {
+                    [self.roomListView.roomListTableView scrollsToTop];
+                }];
             }
             
             //Handle room move
@@ -924,9 +936,11 @@
                     NSInteger newIndex = [moveToIndexArray objectAtIndex:count];
 
                     [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
-                    [self.roomListView.roomListTableView beginUpdates];
-                    [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
-                    [self.roomListView.roomListTableView endUpdates];
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             }
             
@@ -946,9 +960,11 @@
                     //Data not exist, delete cell
                     NSInteger oldIndex = [oldRoomListArray indexOfObject:oldRoomList];
                     [oldRoomListArray removeObjectAtIndex:oldIndex];
-                    [self.roomListView.roomListTableView beginUpdates];
-                    [self.roomListView.roomListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.roomListView.roomListTableView endUpdates];
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [self.roomListView.roomListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             }
         }
@@ -976,6 +992,7 @@
         
         _firstUnreadProcessCount = 0;
         _firstUnreadTotalCount = [roomListLocalArray count];
+        NSMutableDictionary *unreadMentionDataDictionary = [NSMutableDictionary dictionary];
         
         for (TAPRoomListModel *roomList in roomListLocalArray) {
             TAPMessageModel *messageData = roomList.lastMessage;
@@ -983,29 +1000,47 @@
             NSString *roomIDString = roomData.roomID;
             roomIDString = [TAPUtil nullToEmptyString:roomIDString];
             
-            [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomIDString activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
-                //Set number of unread messages to array and dictionary
-                NSInteger numberOfUnreadMessages = [unreadMessages count];
-                TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomIDString];
-                roomList.numberOfUnreadMessages = numberOfUnreadMessages;
+            NSString *usernameString = [TAPDataManager getActiveUser].username;
+            usernameString = [TAPUtil nullToEmptyString:usernameString];
+            NSString *activeUserID = [TAPDataManager getActiveUser].userID;
+            activeUserID = [TAPUtil nullToEmptyString:activeUserID];
+            
+            [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:usernameString roomID:roomIDString activeUserID:activeUserID success:^(NSArray *unreadMentionMessages) {
+                NSInteger totalUnreadMention = [unreadMentionMessages count];
+                [unreadMentionDataDictionary setObject:[NSNumber numberWithInteger:totalUnreadMention] forKey:roomIDString];
                 
-                if(roomList.numberOfUnreadMessages < 0) {
-                    roomList.numberOfUnreadMessages = 0;
-                }
-                
-                _firstUnreadProcessCount++;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if(self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
-                        [self getAndUpdateNumberOfUnreadToDelegate];
+                [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomIDString activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
+                    //Set number of unread messages to array and dictionary
+                    NSInteger numberOfUnreadMessages = [unreadMessages count];
+                    NSInteger numberOfUnreadMentions = [[unreadMentionDataDictionary objectForKey:roomIDString] integerValue];
+                    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomIDString];
+                    roomList.numberOfUnreadMessages = numberOfUnreadMessages;
+                    roomList.numberOfUnreadMentions = numberOfUnreadMentions;
+                    
+                    if(roomList.numberOfUnreadMessages < 0) {
+                        roomList.numberOfUnreadMessages = 0;
                     }
                     
-                    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
-                    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
-                    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
-                });
-            } failure:^(NSError *error) {
+                    if(roomList.numberOfUnreadMentions < 0) {
+                        roomList.numberOfUnreadMentions = 0;
+                    }
+                    
+                    _firstUnreadProcessCount++;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if(self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
+                            [self getAndUpdateNumberOfUnreadToDelegate];
+                        }
+                        
+                        NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+                        NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+                        [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+                    });
+                } failure:^(NSError *error) {
 
+                }];
+            } failure:^(NSError *error) {
+                
             }];
         }
         
@@ -1065,6 +1100,11 @@
             if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && isNewMessage) {
                 //Message from other recipient, increment number of unread message
                 roomList.numberOfUnreadMessages++;
+                
+                BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+                if (hasMention) {
+                    roomList.numberOfUnreadMentions++;
+                }
             }
 
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
@@ -1076,9 +1116,11 @@
                 //Move cell to top
                 [self.roomListArray removeObject:roomList];
                 [self.roomListArray insertObject:roomList atIndex:0];
-                [self.roomListView.roomListTableView beginUpdates];
-                [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-                [self.roomListView.roomListTableView endUpdates];
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                } completion:^(BOOL finished) {
+                }];
             }
         }
     }
@@ -1095,17 +1137,28 @@
         if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
             //Message from other recipient, set unread as 1
             newRoomList.numberOfUnreadMessages = 1;
+            
+            BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+            if (hasMention) {
+                newRoomList.numberOfUnreadMentions = 1;
+            }
+            else {
+                newRoomList.numberOfUnreadMentions = 0;
+            }
         }
         else {
             //Current user send new message, set unread to 0
             newRoomList.numberOfUnreadMessages = 0;
+            newRoomList.numberOfUnreadMentions = 0;
         }
         
         [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
-        [self.roomListView.roomListTableView beginUpdates];
-        [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.roomListView.roomListTableView endUpdates];
-        [self.roomListView showNoChatsView:NO];
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        } completion:^(BOOL finished) {
+            [self.roomListView showNoChatsView:NO];
+        }];
     }
     
     [self getAndUpdateNumberOfUnreadToDelegate];

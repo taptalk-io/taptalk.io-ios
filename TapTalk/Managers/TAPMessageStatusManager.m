@@ -15,6 +15,7 @@
 @property (strong, nonatomic) NSMutableArray *filteredBulkDeliveryMessageArray;
 
 @property (strong, nonatomic) NSMutableDictionary *readCountDictionary;
+@property (strong, nonatomic) NSMutableDictionary *readCountMentionDictionary;
 
 @property (nonatomic) NSInteger apiRequestCount;
 
@@ -25,6 +26,7 @@
 - (void)changingBulkFilteredDeliveredStatusFlowFinishUpdateDatabase:(void (^)())finish;
 - (void)changingReadStatusFlow;
 - (void)increaseReadCountDictionaryWithRoomID:(NSString *)roomID;
+- (void)increaseReadCountMentionDictionaryWithRoomID:(NSString *)roomID;
 
 @end
 
@@ -48,6 +50,7 @@
         _deliveryMessageQueueArray = [[NSMutableArray alloc] init];
         _filteredBulkDeliveryMessageArray = [[NSMutableArray alloc] init];
         _readCountDictionary = [[NSMutableDictionary alloc] init];
+        _readCountMentionDictionary = [[NSMutableDictionary alloc] init];
         _isProcessingUpdateDeliveredStatus = NO;
         _isProcessingUpdateReadStatus = NO;
     }
@@ -61,6 +64,13 @@
     
     //Add to read count dictionary
     [self increaseReadCountDictionaryWithRoomID:message.room.roomID];
+    
+    //Check if has mention
+    BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+    if (hasMention) {
+        //Add to read mention count dictionary
+        [self increaseReadCountMentionDictionaryWithRoomID:message.room.roomID];
+    }
 }
 
 - (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message {
@@ -280,6 +290,39 @@
 
 - (void)clearReadCountDictionary {
     [self.readCountDictionary removeAllObjects];
+}
+
+- (void)increaseReadCountMentionDictionaryWithRoomID:(NSString *)roomID {
+    NSNumber *currentCount = [self.readCountMentionDictionary objectForKey:roomID];
+    
+    if(currentCount == nil) {
+        //Count is nil, create new object in dictionary
+        [self.readCountMentionDictionary setObject:[NSNumber numberWithInt:1] forKey:roomID];
+        return;
+    }
+    
+    //Count not nil, increase count
+    NSInteger countInteger = [currentCount integerValue];
+    countInteger++;
+    
+    [self.readCountMentionDictionary setObject:[NSNumber numberWithInt:countInteger] forKey:roomID];
+}
+
+- (NSInteger)getReadMentionCountAndClearDictionaryForRoomID:(NSString *)roomID {
+    NSNumber *currentCount = [self.readCountMentionDictionary objectForKey:roomID];
+    
+    if(currentCount == nil) {
+        return 0;
+    }
+    
+    NSInteger countInteger = [currentCount integerValue];
+    [self.readCountMentionDictionary removeObjectForKey:roomID];
+    
+    return countInteger;
+}
+
+- (void)clearReadMentionCountDictionary {
+    [self.readCountMentionDictionary removeAllObjects];
 }
 
 - (void)clearMessageStatusManagerData {

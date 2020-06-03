@@ -173,7 +173,6 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     dictionary = dataMutableDictionary;
     
     TAPMessageModel *message = [[TAPMessageModel alloc] initWithDictionary:dictionary error:nil];
-    
     message.body = [self decryptString:message.body localID:message.localID];
     message.quote.content = [self decryptString:message.quote.content localID:message.localID];
         

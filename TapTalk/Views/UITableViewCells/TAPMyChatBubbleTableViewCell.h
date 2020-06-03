@@ -25,12 +25,21 @@ NS_ASSUME_NONNULL_BEGIN
                             originalString:(NSString*)originalString;
 - (void)myChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myChatBubblePressedMentionWithWord:(NSString*)word
+                             tappedAtIndex:(NSInteger)index
+                                   message:(TAPMessageModel *)message
+                       mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (void)myChatBubbleLongPressedMentionWithWord:(NSString*)word
+                                 tappedAtIndex:(NSInteger)index
+                                       message:(TAPMessageModel *)message
+                           mentionIndexesArray:(NSArray *)mentionIndexesArray;
 @end
 
 @interface TAPMyChatBubbleTableViewCell : TAPBaseMyBubbleTableViewCell
 
 @property (weak, nonatomic) id<TAPMyChatBubbleTableViewCellDelegate> delegate;
 @property (strong, nonatomic) TAPMessageModel *message;
+@property (strong, nonatomic) NSArray *mentionIndexesArray;
 
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)receiveSentEvent;

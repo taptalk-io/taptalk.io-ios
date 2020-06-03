@@ -1932,30 +1932,54 @@
     }];
 }
 
-+ (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray))success
++ (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                      failure:(void (^)(NSError *error))failure {
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableRecentSearch whereClauseQuery:@"" sortByColumnName:@"created" isAscending:NO success:^(NSArray *resultArray) {
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
         NSMutableArray *obtainedArray = [NSMutableArray array];
         NSMutableArray *unreadCountArray = [NSMutableArray arrayWithCapacity:[resultArray count]];
+        NSMutableDictionary *unreadMentionDictionary = [NSMutableDictionary dictionaryWithCapacity:[resultArray count]];
         NSInteger __block counterLoop = 0;
         for (NSDictionary *databaseDictionary in resultArray) {
             TAPRecentSearchModel *recentSearch = [TAPDataManager recentSearchModelFromDictionary:databaseDictionary];
             [obtainedArray addObject:recentSearch];
             [unreadCountArray addObject:@"0"];
             TAPRoomModel *room = recentSearch.room;
-            [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:room.roomID activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
-                NSString *unreadCountString = [NSString stringWithFormat:@"%ld", [unreadMessages count]];
-                //                [unreadCountArray addObject:unreadCountString];
-                [unreadCountArray replaceObjectAtIndex:[obtainedArray indexOfObject:recentSearch] withObject:unreadCountString];
-                if (counterLoop == [resultArray count] - 1) {
-                    success(obtainedArray, unreadCountArray);
+            
+            //Get unread mention
+            TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+            NSString *usernameString = activeUser.username;
+            usernameString = [TAPUtil nullToEmptyString:usernameString];
+            NSString *activeUserID = activeUser.userID;
+            activeUserID = [TAPUtil nullToEmptyString:activeUserID];
+            NSString *roomIDString = room.roomID;
+            roomIDString = [TAPUtil nullToEmptyString:roomIDString];
+            
+            [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:usernameString roomID:roomIDString activeUserID:activeUserID success:^(NSArray *unreadMentionMessages) {
+                            
+                BOOL hasMention = NO;
+                if ([unreadMentionMessages count] > 0) {
+                    hasMention = YES;
                 }
                 
-                counterLoop += 1;
+                [unreadMentionDictionary setObject:[NSNumber numberWithBool:hasMention] forKey:roomIDString];
+                
+                [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:room.roomID activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
+                    NSString *unreadCountString = [NSString stringWithFormat:@"%ld", [unreadMessages count]];
+                    [unreadCountArray replaceObjectAtIndex:[obtainedArray indexOfObject:recentSearch] withObject:unreadCountString];
+                    
+                    if (counterLoop == [resultArray count] - 1) {
+                        success(obtainedArray, unreadCountArray, unreadMentionDictionary);
+                    }
+                    
+                    counterLoop += 1;
+                } failure:^(NSError *error) {
+                    [unreadCountArray addObject:@"0"];
+                }];
+                
             } failure:^(NSError *error) {
-                [unreadCountArray addObject:@"0"];
+                
             }];
         }
     } failure:^(NSError *error) {
@@ -1987,6 +2011,47 @@
                                           failure:(void (^)(NSError *))failure {
     
     NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && !(userID LIKE '%@')", roomID, activeUserID];
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
+        
+        resultArray = [TAPUtil nullToEmptyArray:resultArray];
+        
+        NSMutableArray *obtainedArray = [NSMutableArray array];
+        for (NSDictionary *databaseDictionary in resultArray) {
+            TAPMessageModel *message = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            [obtainedArray addObject:message];
+        }
+        
+        success(obtainedArray);
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)getDatabaseUnreadMentionsInRoomWithUsername:(NSString *)username
+                                             roomID:(NSString *)roomID
+                                       activeUserID:(NSString *)activeUserID
+                                            success:(void (^)(NSArray *unreadMentionMessages))success
+                                            failure:(void (^)(NSError *error))failure {
+//    NSString *usernameEndSpace = [NSString stringWithFormat:@"@%@", username];
+//    NSString *usernameFilterSpace = [NSString stringWithFormat:@"@%@ ", username];
+//    NSString *usernameFilterNewline = [NSString stringWithFormat:@"@%@\\n", username];
+//
+//    NSString *subQueryMentionValidationString = [NSString stringWithFormat:@"(body CONTAINS[c] '%@' || body CONTAINS[c] '%@' || (body CONTAINS[c] '%@' && body ENDSWITH '%@'))", usernameFilterSpace, usernameFilterNewline, usernameEndSpace, usernameEndSpace];
+    
+    NSString *firstPredicateString = [NSString stringWithFormat:@"* @%@ *", username];
+    NSString *secondPredicateString = [NSString stringWithFormat:@"*\\n@%@ *", username];
+    NSString *thirdPredicateString = [NSString stringWithFormat:@"@%@ *", username];
+    NSString *fourthPredicateString = [NSString stringWithFormat:@"* @%@\\n*", username];
+    NSString *fifthPredicateString = [NSString stringWithFormat:@"*\\n@%@\\n*", username];
+    NSString *sixthPredicateString = [NSString stringWithFormat:@"@%@\\n*", username];
+    NSString *seventhPredicateString = [NSString stringWithFormat:@"* @%@", username];
+    NSString *eighthPredicateString = [NSString stringWithFormat:@"*\\n@%@", username];
+    NSString *ninthPredicateString = [NSString stringWithFormat:@"@%@", username];
+    
+    NSString *subQueryMentionValidationString = [NSString stringWithFormat:@"(body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@')", firstPredicateString, secondPredicateString, thirdPredicateString, fourthPredicateString, fifthPredicateString, sixthPredicateString, seventhPredicateString, eighthPredicateString, ninthPredicateString];
+    
+    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && !(userID LIKE '%@') && (type == %ld || type == %ld || type == %ld) && %@", roomID, activeUserID, TAPChatMessageTypeText, TAPChatMessageTypeImage, TAPChatMessageTypeVideo, subQueryMentionValidationString];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
@@ -2054,7 +2119,7 @@
 
 + (void)searchChatAndContactWithString:(NSString *)searchString
                                 SortBy:(NSString *)columnName
-                               success:(void (^)(NSArray *roomArray, NSArray *unreadCountArray))success
+                               success:(void (^)(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                failure:(void (^)(NSError *error))failure {
     //CS NOTE - uncomment to use trimmed string
 //    //WK Note - Create nonAlphaNumericCharacters
@@ -2095,22 +2160,44 @@
             NSMutableArray *valuesArray = [NSMutableArray arrayWithArray:[modelDictionary allValues]];
             NSMutableArray *roomArray = [NSMutableArray array];
             NSMutableArray *unreadCountArray = [NSMutableArray array];
+            NSMutableDictionary *unreadMentionDictionary = [NSMutableDictionary dictionary];
+            
             if ([valuesArray count] == 0) {
-                success(roomArray, unreadCountArray);
+                success(roomArray, unreadCountArray, unreadMentionDictionary);
             }
             else {
                 NSInteger __block counterLoop = 0;
                 for (TAPRoomModel *room in valuesArray) {
-                    [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:room.roomID activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
-                        NSString *unreadCountString = [NSString stringWithFormat:@"%ld", [unreadMessages count]];
-                        [unreadCountArray addObject:unreadCountString];
-                        [roomArray addObject:room];
-                        if (counterLoop == [valuesArray count] - 1) {
-                            success(roomArray, unreadCountArray);
+                    //Get unread mention
+                    TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+                    NSString *usernameString = activeUser.username;
+                    usernameString = [TAPUtil nullToEmptyString:usernameString];
+                    NSString *activeUserID = activeUser.userID;
+                    activeUserID = [TAPUtil nullToEmptyString:activeUserID];
+                    NSString *roomIDString = room.roomID;
+                    roomIDString = [TAPUtil nullToEmptyString:roomIDString];
+
+                    [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:usernameString roomID:roomIDString activeUserID:activeUserID success:^(NSArray *unreadMentionMessages) {
+                        BOOL hasMention = NO;
+                        if ([unreadMentionMessages count] > 0) {
+                            hasMention = YES;
                         }
-                        counterLoop += 1;
+                        
+                        [unreadMentionDictionary setObject:[NSNumber numberWithBool:hasMention] forKey:roomIDString];
+                        
+                        [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:room.roomID activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
+                            NSString *unreadCountString = [NSString stringWithFormat:@"%ld", [unreadMessages count]];
+                            [unreadCountArray addObject:unreadCountString];
+                            [roomArray addObject:room];
+                            if (counterLoop == [valuesArray count] - 1) {
+                                success(roomArray, unreadCountArray, unreadMentionDictionary);
+                            }
+                            counterLoop += 1;
+                         } failure:^(NSError *error) {
+                             [unreadCountArray addObject:@"0"];
+                         }];
                     } failure:^(NSError *error) {
-                        [unreadCountArray addObject:@"0"];
+                       
                     }];
                 }
             }
@@ -2550,86 +2637,6 @@
 #endif
     }];
 }
-
-+ (void)callAPIGetAuthTicketWithUser:(TAPUserModel *)user
-                             success:(void (^)(NSString *authTicket))success
-                             failure:(void (^)(NSError *error))failure {
-    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetAuthTicket];
-    
-    NSString *IPAddress = [[NSString alloc] initWithContentsOfURL:[NSURL URLWithString:@"https://api.ipify.org/"] encoding:NSUTF8StringEncoding error:nil];
-    IPAddress = [TAPUtil nullToEmptyString:IPAddress];
-    
-    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:IPAddress forKey:@"userIPAddress"];
-    [parameterDictionary setObject:@"ios" forKey:@"userAgent"];
-    [parameterDictionary setObject:@"ios" forKey:@"userPlatform"];
-    [parameterDictionary setObject:[[UIDevice currentDevice] identifierForVendor].UUIDString forKey:@"userDeviceID"];
-    
-    NSString *xcUserID = user.xcUserID;
-    xcUserID = [TAPUtil nullToEmptyString:xcUserID];
-    NSString *fullName = user.fullname;
-    fullName = [TAPUtil nullToEmptyString:fullName];
-    NSString *email = user.email;
-    email = [TAPUtil nullToEmptyString:email];
-    NSString *phone = user.phone;
-    phone = [TAPUtil nullToEmptyString:phone];
-    NSString *username = user.username;
-    username = [TAPUtil nullToEmptyString:username];
-    
-    [parameterDictionary setObject:xcUserID forKey:@"xcUserID"];
-    [parameterDictionary setObject:fullName forKey:@"fullName"];
-    [parameterDictionary setObject:email forKey:@"email"];
-    [parameterDictionary setObject:phone forKey:@"phone"];
-    [parameterDictionary setObject:username forKey:@"username"];
-    
-    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
-        
-    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
-        if (![self isResponseSuccess:responseObject]) {
-            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
-            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
-            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            
-            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
-            
-            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
-                errorCode = 999;
-            }
-            
-            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
-            failure(error);
-            return;
-        }
-        
-        if ([self isDataEmpty:responseObject]) {
-            success([NSString string]);
-            return;
-        }
-        
-        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
-        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-        NSString *authTicket = [dataDictionary objectForKey:@"ticket"];
-        authTicket = [TAPUtil nullToEmptyString:authTicket];
-        
-        success(authTicket);
-        
-    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
-        [TAPDataManager logErrorStringFromError:error];
-        
-#ifdef DEBUG
-        NSString *errorDomain = error.domain;
-        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
-        
-        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
-        
-        failure(newError);
-#else
-        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
-        failure(localizedError);
-#endif
-    }];
-}
-//END DV Temp
 
 + (void)callAPIGetAccessTokenWithAuthTicket:(NSString *)authTicket
                                     success:(void (^)(void))success

@@ -417,6 +417,11 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
+    if(message == nil) {
+        return;
+    }
+    
+//    _message = message;
     [super setMessage:message];
     
     if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {

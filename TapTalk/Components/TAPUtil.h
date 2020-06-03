@@ -88,6 +88,10 @@
 + (NSString *)ordinalNumberWithInteger:(NSInteger)number;
 + (NSString *)formattedCurrencyWithCurrencySign:(NSString *)currencySign value:(CGFloat)value;
 + (NSString *)hexadecimalStringFromData:(NSData *)data;
++ (NSString *)stringByTrimmingLeadingCharactersInSet:(NSCharacterSet *)characterSet withString:(NSString *)string;
++ (NSString *)stringByTrimmingLeadingWhitespaceAndNewlineCharactersWithString:(NSString *)string;
++ (NSString *)stringByTrimmingTrailingCharactersInSet:(NSCharacterSet *)characterSet withString:(NSString *)string;
++ (NSString *)stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:(NSString *)string;
 
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2;
@@ -138,5 +142,8 @@
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;
 + (void)setLanguage:(NSString *)language;
++ (NSArray *)getMentionIndexes:(NSString *)messageString;
++ (BOOL)isActiveUserMentionedWithMessage:(TAPMessageModel *)message
+                              activeUser:(TAPUserModel *)activeUser;
 
 @end

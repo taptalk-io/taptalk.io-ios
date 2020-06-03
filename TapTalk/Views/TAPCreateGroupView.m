@@ -126,7 +126,7 @@
         _demoteAdminButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
         [self.demoteAdminButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
         [self.demoteAdminButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.demoteAdminButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Demote from Admin", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconDemoteWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        [self.demoteAdminButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Demote from Admin", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconDemote" iconPosition:TAPCustomButtonViewIconPosititonLeft];
         [self.demoteAdminButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.demoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.demoteAdminButtonView];

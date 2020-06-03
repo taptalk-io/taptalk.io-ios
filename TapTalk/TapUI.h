@@ -56,6 +56,23 @@ Called when user click the avatar in bubble chat in group room.
               currentShownNavigationController:(UINavigationController *)currentNavigationController;
 
 /**
+Called when user click mention in the bubble chat.
+
+@param room (TAPRoomModel *) room data that will be shown
+@param mentionedUser (TAPUserModel *) user data that is selected
+@param isRoomParticipant (BOOL) indicator to show current mention user is participant of the group or not
+@param message  (TAPMessageModel *) message data of the mention
+@param currentViewController (UIViewController *) current shown view controller
+@param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+*/
+- (void)tapTalkUserMentionTappedWithRoom:(TAPRoomModel *)room
+                           mentionedUser:(TAPUserModel *)mentionedUser
+                           isRoomParticipant:(BOOL)isRoomParticipant
+                                 message:(TAPMessageModel *)message
+                   currentViewController:(UIViewController *)currentViewController
+        currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
  Called when user click the quote view that appears in the message chat bubble.
  
  @param userInfo (NSDictionary *) other data or details of custom quote

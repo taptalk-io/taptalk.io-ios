@@ -19,6 +19,9 @@
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView;
 - (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView;
 - (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView;
+- (void)growingTextViewShouldChangeTextInRange:(NSRange)range
+                               replacementText:(NSString *)text
+                                       newText:(NSString *)newText;
 
 @end
 

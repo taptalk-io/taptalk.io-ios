@@ -24,9 +24,11 @@
 @property (strong, nonatomic) NSMutableArray *recentSearchArray;
 @property (strong, nonatomic) NSMutableArray *recentSearchUppercaseArray;
 @property (strong, nonatomic) NSMutableArray *recentSearchUnreadCountArray;
+@property (strong, nonatomic) NSMutableDictionary *recentSearchUnreadMentionDictionary;
 @property (strong, nonatomic) NSMutableArray *searchResultMessageArray;
 @property (strong, nonatomic) NSMutableArray *searchResultChatAndContactArray;
 @property (strong, nonatomic) NSMutableArray *searchResultUnreadCountArray;
+@property (strong, nonatomic) NSMutableDictionary *searchResultUnreadMentionDictionary;
 @property (strong, nonatomic) NSString *updatedString;
 
 @end
@@ -70,11 +72,12 @@
     self.searchBarView.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
-    [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray) {
+    [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
 //        for (TAPRecentSearchModel *recentSearch in recentSearchArray) {
 //            TAPRoomModel *room = recentSearch.room;
-            self.recentSearchArray = [recentSearchArray mutableCopy];
-            self.recentSearchUnreadCountArray = [unreadCountArray mutableCopy];
+        self.recentSearchArray = [recentSearchArray mutableCopy];
+        self.recentSearchUnreadCountArray = [unreadCountArray mutableCopy];
+        self.recentSearchUnreadMentionDictionary = [unreadMentionDictionary mutableCopy];
         [self.searchView.recentSearchTableView reloadData];
 //        }
     } failure:^(NSError *error) {
@@ -84,6 +87,7 @@
     _searchResultMessageArray = [NSMutableArray array];
     _searchResultChatAndContactArray = [NSMutableArray array];
     _searchResultUnreadCountArray = [NSMutableArray array];
+    _searchResultUnreadMentionDictionary = [NSMutableDictionary dictionary];
     _updatedString = @"";
     // Do any additional setup after loading the view.
 }
@@ -155,9 +159,15 @@
         
         TAPRecentSearchModel *recentSearch = [self.recentSearchArray objectAtIndex:indexPath.row];
         TAPRoomModel *room = recentSearch.room;
+        BOOL hasMention = NO;
+        if ([self.recentSearchUnreadMentionDictionary count] > 0) {
+            hasMention = [[self.recentSearchUnreadMentionDictionary objectForKey:room.roomID] boolValue];
+        }
+        
         [cell setSearchResultChatTableViewCellWithData:room
                                         searchedString:@""
-                                numberOfUnreadMessages:[self.recentSearchUnreadCountArray objectAtIndex:indexPath.row]];
+                                numberOfUnreadMessages:[self.recentSearchUnreadCountArray objectAtIndex:indexPath.row]
+                                            hasMention:hasMention];
         
         return cell;
     }
@@ -166,11 +176,15 @@
             //CHATS AND CONTACTS
             static NSString *cellID = @"TAPSearchResultChatTableViewCell";
             TAPSearchResultChatTableViewCell *cell = [[TAPSearchResultChatTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
-            
             TAPRoomModel *room = [self.searchResultChatAndContactArray objectAtIndex:indexPath.row];
+            BOOL hasMention = NO;
+            if ([self.searchResultUnreadMentionDictionary count] > 0) {
+                hasMention = [[self.searchResultUnreadMentionDictionary objectForKey:room.roomID] boolValue];
+            }
             [cell setSearchResultChatTableViewCellWithData:room
                                             searchedString:self.updatedString
-                                    numberOfUnreadMessages:[self.searchResultUnreadCountArray objectAtIndex:indexPath.row]];
+                                    numberOfUnreadMessages:[self.searchResultUnreadCountArray objectAtIndex:indexPath.row]
+                                                hasMention:hasMention];
             
             if (indexPath.row == [self.searchResultChatAndContactArray count] - 1) {
                 [cell hideSeparatorView:YES];
@@ -311,12 +325,14 @@
             recentSearch.created = [NSNumber numberWithLong:createdDate];
             
             [TAPDataManager updateOrInsertDatabaseRecentSearchWithData:@[recentSearch] success:^{
-                [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray) {
+                    [TAPDataManager getDatabaseRecentSearchResultSuccess:^(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
                     [self.recentSearchUnreadCountArray removeAllObjects];
+                    [self.recentSearchUnreadMentionDictionary removeAllObjects];
                     for (TAPRecentSearchModel *recentSearch in recentSearchArray) {
                         TAPRoomModel *room = recentSearch.room;
                         self.recentSearchArray = [recentSearchArray mutableCopy];
                         self.recentSearchUnreadCountArray = [unreadCountArray mutableCopy];
+                        self.recentSearchUnreadMentionDictionary = [unreadMentionDictionary mutableCopy];
                     }
                     
                     [self.searchView.recentSearchTableView reloadData];
@@ -350,6 +366,7 @@
     [self.searchResultMessageArray removeAllObjects];
     [self.searchResultChatAndContactArray removeAllObjects];
     [self.searchResultUnreadCountArray removeAllObjects];
+    [self.searchResultUnreadMentionDictionary removeAllObjects];
     
     [UIView animateWithDuration:0.2f animations:^{
         self.searchView.recentSearchTableView.alpha = 1.0f;
@@ -375,10 +392,11 @@
         
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [TAPDataManager searchMessageWithString:trimmedString sortBy:@"created" success:^(NSArray *resultArray) {
-            [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray) {
+            [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
                 self.searchResultMessageArray = [resultArray mutableCopy];
                 self.searchResultChatAndContactArray = [roomArray mutableCopy];
                 self.searchResultUnreadCountArray = [unreadCountArray mutableCopy];
+                self.searchResultUnreadMentionDictionary = [unreadMentionDictionary mutableCopy];
                 
                 if (self.searchView.searchResultTableView.alpha == 1.0f) {
                     if ([self.searchResultMessageArray count] == 0 && [self.searchResultChatAndContactArray count] == 0) {
@@ -414,6 +432,7 @@
         [self.searchResultMessageArray removeAllObjects];
         [self.searchResultChatAndContactArray removeAllObjects];
         [self.searchResultUnreadCountArray removeAllObjects];
+        [self.searchResultUnreadMentionDictionary removeAllObjects];
         [UIView animateWithDuration:0.2f animations:^{
             self.searchView.recentSearchTableView.alpha = 1.0f;
             self.searchView.searchResultTableView.alpha = 0.0f;

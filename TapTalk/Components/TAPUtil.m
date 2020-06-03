@@ -434,6 +434,31 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
   return [hexString copy];
 }
 
++ (NSString *)stringByTrimmingLeadingCharactersInSet:(NSCharacterSet *)characterSet withString:(NSString *)string {
+    NSRange rangeOfFirstWantedCharacter = [string rangeOfCharacterFromSet:[characterSet invertedSet]];
+    if (rangeOfFirstWantedCharacter.location == NSNotFound) {
+        return @"";
+    }
+    return [string substringFromIndex:rangeOfFirstWantedCharacter.location];
+}
+
++ (NSString *)stringByTrimmingLeadingWhitespaceAndNewlineCharactersWithString:(NSString *)string {
+    return [self stringByTrimmingLeadingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] withString:string];
+}
+
++ (NSString *)stringByTrimmingTrailingCharactersInSet:(NSCharacterSet *)characterSet withString:(NSString *)string {
+    NSRange rangeOfLastWantedCharacter = [string rangeOfCharacterFromSet:[characterSet invertedSet]
+                                                               options:NSBackwardsSearch];
+    if (rangeOfLastWantedCharacter.location == NSNotFound) {
+        return @"";
+    }
+    return [string substringToIndex:rangeOfLastWantedCharacter.location + 1];
+}
+
++ (NSString *)stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:(NSString *)string {
+    return [self stringByTrimmingTrailingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] withString:string];
+}
+
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2 {
     CLLocation *locationA = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
@@ -983,6 +1008,96 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     
     id value = language ? [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:language ofType:@"lproj"]] : nil;
     objc_setAssociatedObject([NSBundle mainBundle], &kBundleKey, @"id", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
++ (NSArray *)getMentionIndexes:(NSString *)messageString {
+    NSMutableArray *appendedRangeArray = [NSMutableArray array];
+//    NSRegularExpression *mentionExpression = [NSRegularExpression regularExpressionWithPattern:@"(?:^|\\s)(@\\w+[.]?\\w+)" options:NO error:nil]; //default mention validation
+    //    NSRegularExpression *mentionExpression = [NSRegularExpression regularExpressionWithPattern:@"(?:^|)(@[^ \\n]+)" options:NO error:nil]; // use this when only wants to omit space and \n
+    NSRegularExpression *mentionExpression = [NSRegularExpression regularExpressionWithPattern:@"(?:^|)(@[^\\s]+)" options:NO error:nil];
+    
+    NSArray *matches = [mentionExpression matchesInString:messageString options:0 range:NSMakeRange(0, [messageString length])];
+    for (NSTextCheckingResult *match in matches) {
+        NSRange matchRange = [match rangeAtIndex:1];
+        NSString *mentionString = [messageString substringWithRange:matchRange];
+        NSString *mentionedUserString = [mentionString substringFromIndex:1];
+        [appendedRangeArray addObject:[NSValue valueWithRange:matchRange]];
+    }
+    
+    return [appendedRangeArray copy];
+}
+
++ (BOOL)isActiveUserMentionedWithMessage:(TAPMessageModel *)message
+                              activeUser:(TAPUserModel *)activeUser {
+    NSString *activeUserUsername = activeUser.username;
+    activeUserUsername = [TAPUtil nullToEmptyString:activeUserUsername];
+    
+    NSString *textString = message.body;
+    textString = [TAPUtil nullToEmptyString:textString];
+    
+    if ([message.user.userID isEqualToString:activeUser.userID] || message.room.type == RoomTypePersonal || [activeUserUsername isEqualToString:@""] || [textString isEqualToString:@""]) {
+        //Current user is mentioned self
+        //Room type is personal
+        //Active user is empty
+        //Body message is empty
+        return NO;
+    }
+    
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+                
+        NSString *firstPredicateString = [NSString stringWithFormat:@" @%@ ", activeUserUsername];
+        NSString *secondPredicateString = [NSString stringWithFormat:@" @%@\n", activeUserUsername];
+        NSString *thirdPredicateString = [NSString stringWithFormat:@" @%@", activeUserUsername];
+        NSString *thirdSuffixPredicateString = [NSString stringWithFormat:@"%@", activeUserUsername];
+        NSString *fourthPredicateString = [NSString stringWithFormat:@"\n@%@ ", activeUserUsername];
+        NSString *fifthPredicateString = [NSString stringWithFormat:@"\n@%@\n", activeUserUsername];
+        NSString *sixthPredicateString = [NSString stringWithFormat:@"\n@%@", activeUserUsername];
+        NSString *sixthSuffixPredicateString = [NSString stringWithFormat:@"%@", activeUserUsername];
+        NSString *seventhPrefixPredicateString = [NSString stringWithFormat:@"@%@", activeUserUsername];
+        NSString *seventhPredicateString = [NSString stringWithFormat:@"@%@ ", activeUserUsername];
+        NSString *eighthPrefixPredicateString = [NSString stringWithFormat:@"@%@", activeUserUsername];
+        NSString *eighthPredicateString = [NSString stringWithFormat:@"@%@\n", activeUserUsername];
+        NSString *ninthPredicateString = [NSString stringWithFormat:@"@%@", activeUserUsername];
+        
+        if ([textString rangeOfString:firstPredicateString].location != NSNotFound ||
+            [textString rangeOfString:secondPredicateString].location != NSNotFound ||
+            ([textString rangeOfString:thirdPredicateString].location != NSNotFound && [textString hasSuffix:thirdSuffixPredicateString]) ||
+            [textString rangeOfString:fourthPredicateString].location != NSNotFound ||
+            [textString rangeOfString:fifthPredicateString].location != NSNotFound ||
+            ([textString rangeOfString:sixthPredicateString].location != NSNotFound && [textString hasSuffix:sixthSuffixPredicateString]) ||
+            ([textString rangeOfString:seventhPredicateString].location != NSNotFound && [textString hasPrefix:seventhPrefixPredicateString]) ||
+            ([textString rangeOfString:eighthPredicateString].location != NSNotFound && [textString hasPrefix:eighthPredicateString]) ||
+            [textString isEqualToString:ninthPredicateString]
+            ) {
+            //Exist
+            return YES;
+        }
+        
+//        NSString *firstPredicateString = [NSString stringWithFormat:@" @%@ ", activeUserUsername];
+//        NSString *secondPredicateString = [NSString stringWithFormat:@"\\n@%@ ", activeUserUsername];
+//        NSString *thirdPredicateString = [NSString stringWithFormat:@"@%@ ", activeUserUsername];
+//        NSString *fourthPredicateString = [NSString stringWithFormat:@" @%@\\n", activeUserUsername];
+//        NSString *fifthPredicateString = [NSString stringWithFormat:@"\\n@%@\\n", activeUserUsername];
+//        NSString *sixthPredicateString = [NSString stringWithFormat:@"@%@\\n", activeUserUsername];
+//        NSString *seventhPredicateString = [NSString stringWithFormat:@" @%@", activeUserUsername];
+//        NSString *eighthPredicateString = [NSString stringWithFormat:@"\\n@%@", activeUserUsername];
+//        NSString *ninthPredicateString = [NSString stringWithFormat:@"@%@", activeUserUsername];
+
+//        if ([textString rangeOfString:firstPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:secondPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:thirdPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:fourthPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:fifthPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:sixthPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:seventhPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:eighthPredicateString].location != NSNotFound ||
+//            [textString rangeOfString:ninthPredicateString].location != NSNotFound) {
+//            //Exist
+//            return YES;
+//        }
+    }
+        
+    return NO;
 }
 
 @end

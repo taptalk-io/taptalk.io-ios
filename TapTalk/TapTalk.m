@@ -20,6 +20,7 @@
 @property (nonatomic) TapTalkImplentationType implementationType;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
+@property (strong, nonatomic) NSString *clientCustomUserAgent;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
 @property (strong, nonatomic) NSDictionary * _Nullable coreConfigsDictionary;
@@ -52,6 +53,7 @@
         _projectConfigsDictionary = [[NSDictionary alloc] init];
         _coreConfigsDictionary = [[NSDictionary alloc] init];
         _customConfigsDictionary = [[NSDictionary alloc] init];
+        _clientCustomUserAgent = @"";
         
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
@@ -240,6 +242,9 @@
     
     //Remove all read count on MessageStatusManager because the room list is reloaded from database
     [[TAPMessageStatusManager sharedManager] clearReadCountDictionary];
+    
+    //Remove all read mention count on MessageStatusManager because the room list is reloaded from database
+    [[TAPMessageStatusManager sharedManager] clearReadMentionCountDictionary];
     
     if (self.implementationType != TapTalkImplentationTypeCore) {
         //Call to run room list view controller sequence
@@ -585,6 +590,19 @@
     [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
     [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
+}
+
+/**
+ Set custom User-Agent key as a header parameter for an API request
+ Note: By default, we will pass "ios" as User-Agent key
+ */
+- (void)setTapTalkUserAgent:(NSString *)userAgent {
+    _clientCustomUserAgent = userAgent;
+}
+
+
+- (NSString *)getTapTalkUserAgent {
+    return self.clientCustomUserAgent;
 }
 
 - (TAPUserModel *_Nonnull)getTapTalkActiveUser {

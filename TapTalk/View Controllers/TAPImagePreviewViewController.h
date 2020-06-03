@@ -21,6 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPImagePreviewViewController : TAPBaseViewController
 
 @property (weak, nonatomic) id <TAPImagePreviewViewControllerDelegate> delegate;
+@property (strong, nonatomic) NSArray *participantListArray;
+@property (strong, nonatomic) NSMutableArray *filteredMentionListArray;
+@property (nonatomic) BOOL isNotFromPersonalRoom;
 
 - (void)setMediaPreviewDataWithData:(TAPMediaPreviewModel *)mediaPreviewData;
 - (void)setMediaPreviewDataWithArray:(NSMutableArray *)array;

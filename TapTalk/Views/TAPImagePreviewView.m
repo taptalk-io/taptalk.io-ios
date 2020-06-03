@@ -196,6 +196,21 @@
         self.alertDetailLabel.textColor = imagePreviewAlertContentColor;
         self.alertDetailLabel.text = NSLocalizedStringFromTableInBundle(@"Please remove this video to continue", nil, [TAPUtil currentBundle], @"");
         [self.alertView addSubview:self.alertDetailLabel];
+        
+        _mentionTableBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMinY(self.captionView.frame) - 0.0f, CGRectGetWidth(self.frame), 0.0f)];
+        self.mentionTableBackgroundView.alpha = 0.0f;
+        self.mentionTableBackgroundView.layer.shadowRadius = 20.0f;
+        self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+        self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
+        self.mentionTableBackgroundView.layer.masksToBounds = NO;
+        [self addSubview:self.mentionTableBackgroundView];
+        
+        _mentionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMinY(self.captionView.frame) - 0.0f, CGRectGetWidth(self.frame), 0.0f)];
+        self.mentionTableView.alpha = 0.0f;
+        self.mentionTableView.clipsToBounds = YES;
+        self.mentionTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        [self addSubview:self.mentionTableView];
     }
     
     return self;
@@ -295,6 +310,33 @@
     else {
         [self.sendButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5f] forState:UIControlStateNormal];
         self.sendButton.userInteractionEnabled = NO;
+    }
+}
+
+- (void)showMentionTableView:(BOOL)show animated:(BOOL)animated {
+    if (animated) {
+        if (show) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionTableBackgroundView.alpha = 1.0f;
+                self.mentionTableView.alpha = 1.0f;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.mentionTableBackgroundView.alpha = 0.0f;
+                self.mentionTableView.alpha = 0.0f;
+            }];
+        }
+    }
+    else {
+        if (show) {
+            self.mentionTableBackgroundView.alpha = 1.0f;
+            self.mentionTableView.alpha = 1.0f;
+        }
+        else {
+            self.mentionTableBackgroundView.alpha = 0.0f;
+            self.mentionTableView.alpha = 0.0f;
+        }
     }
 }
 
