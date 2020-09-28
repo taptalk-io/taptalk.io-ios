@@ -1051,8 +1051,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         cell.mentionIndexesArray = mentionArray;
                     }
 
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1082,8 +1081,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if ([mentionArray count] > 0) {
                         cell.mentionIndexesArray = mentionArray;
                     }
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    
+                    cell.message = message;
                     
                     [cell showStatusLabel:YES];
                     
@@ -1133,8 +1132,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                     if ([mentionArray count] > 0) {
@@ -1207,8 +1205,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1270,8 +1267,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPMyLocationBubbleTableViewCell *cell = (TAPMyLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyLocationBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1370,8 +1366,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         cell.mentionIndexesArray = mentionArray;
                     }
                     
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1402,8 +1397,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         cell.mentionIndexesArray = mentionArray;
                     }
                     
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1440,8 +1434,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         cell.mentionIndexesArray = mentionArray;
                     }
                     
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1486,8 +1479,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -1527,8 +1519,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     TAPYourLocationBubbleTableViewCell *cell = (TAPYourLocationBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourLocationBubbleTableViewCell description] forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
-                    //DV Note - remove set message because in method setMessage will save cell.message too
-//                    cell.message = message;
+                    cell.message = message;
                     
                     if (!message.isHidden) {
                         [cell setMessage:message];
@@ -5288,11 +5279,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.deletedRoomIconImageView.image = [self.deletedRoomIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedChatRoom]];
     
     self.chatAnchorBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottomBackground];
-    self.chatAnchorImageView.image = [UIImage imageNamed:@"TAPIconChatAnchor" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
+    
+    if (IS_BELOW_IOS_13) {
+        self.chatAnchorImageView.image = [UIImage imageNamed:@"TAPIconChatAnchor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        self.chatAnchorImageView.image = [UIImage imageNamed:@"TAPIconChatAnchor" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
+    }
+
     self.chatAnchorImageView.image = [self.chatAnchorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottom]];
 
     self.mentionAnchorBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottomBackground];
-    self.mentionAnchorImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
+    
+    if (IS_BELOW_IOS_13) {
+        self.mentionAnchorImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else {
+        self.mentionAnchorImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] withConfiguration:nil];
+    }
+    
     self.mentionAnchorImageView.image = [self.mentionAnchorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomScrollToBottom]];
     
     self.topFloatingIndicatorImageView.image = [self.topFloatingIndicatorImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomUnreadButton]];

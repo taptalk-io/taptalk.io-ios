@@ -1299,8 +1299,10 @@
     [currentUploadTask cancel];
     
     //Remove from queue array
-    [uploadQueueRoomArray removeObjectAtIndex:currentUploadedIndex];
-    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentRoomID];
+    if ([uploadQueueRoomArray count] != 0 && uploadQueueRoomArray != nil) {
+        [uploadQueueRoomArray removeObjectAtIndex:currentUploadedIndex];
+        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentRoomID];
+    }
     
     if (currentUploadedIndex == 0) {
         //Run next upload image when deleted image is still uploading
