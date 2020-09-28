@@ -207,9 +207,11 @@
     
     if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
         NSString *thumbnailString = [message.data objectForKey:@"thumbnail"];
-        NSData *thumbnailImageData = [[NSData alloc]
-                                      initWithBase64EncodedString:thumbnailString options:0];
-        thumbnailImage = [UIImage imageWithData:thumbnailImageData];
+        if (![thumbnailString isEqualToString:@""] && thumbnailString != nil) {
+            NSData *thumbnailImageData = [[NSData alloc]
+                                          initWithBase64EncodedString:thumbnailString options:0];
+            thumbnailImage = [UIImage imageWithData:thumbnailImageData];
+        }
     }
     
     if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {

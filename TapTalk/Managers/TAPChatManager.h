@@ -38,6 +38,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message;
+- (void)chatManagerDidSendMessagePending:(TAPMessageModel *)message;
 
 @end
 
@@ -52,6 +53,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 @property (strong, nonatomic) NSMutableDictionary *filePathStoredDictionary;
 @property (nonatomic) TAPChatManagerQuoteActionType chatManagerQuoteActionType;
 @property (nonatomic) BOOL isTyping;
+@property (nonatomic) BOOL isSendMessageDisabled;
 
 + (TAPChatManager *)sharedManager;
 
@@ -85,6 +87,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendCustomMessage:(TAPMessageModel *)customMessage;
+- (void)sendEmitWithMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;

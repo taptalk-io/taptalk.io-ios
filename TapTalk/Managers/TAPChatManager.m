@@ -212,6 +212,22 @@
 }
 
 - (void)runSendMessageSequenceWithMessage:(TAPMessageModel *)message {
+    //DV TODO
+    //DV NOTE - 28 Sept 2020
+    //Flag to send message for API, this will be used for OneTalk mobile agent when send message to different channel using API not emit
+    if (self.isSendMessageDisabled) {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidSendMessagePending:)]) {
+                [delegate chatManagerDidSendMessagePending:[message copyMessageModel]];
+            }
+        }
+        return;
+    }
+    
+    [self sendEmitWithMessage:message];
+}
+
+- (void)sendEmitWithMessage:(TAPMessageModel *)message {
     TAPConnectionManagerStatusType statusType = [[TAPConnectionManager sharedManager] getSocketConnectionStatus];
     if (statusType != TAPConnectionManagerStatusTypeConnected) {
         //When socket is not connected

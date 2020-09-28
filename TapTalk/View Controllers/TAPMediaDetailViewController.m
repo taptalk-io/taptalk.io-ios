@@ -223,11 +223,16 @@
     [self.mediaDetailView setSaveLoadingAsFinishedState:NO];
     [self.mediaDetailView showSaveLoadingView:YES];
     UIImage *currentImage = [self.imageArray firstObject];
-    UIImageWriteToSavedPhotosAlbum(currentImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+    if(currentImage == nil) {
+        [self showFinishSavingImageState];
+    }
+    else {
+        UIImageWriteToSavedPhotosAlbum(currentImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+    }
 }
 
 - (void)mediaDetailViewDidTappedSaveVideoButton {
-
+    
 }
 
 - (void)mediaDetailViewDidTappedBackButton {
