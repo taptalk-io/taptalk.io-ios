@@ -16,17 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermission.h"
+#import "RLMSyncPermission_Private.hpp"
 
 #import "RLMArray.h"
 #import "RLMObjectSchema.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMResults.h"
-#import "RLMSyncUser.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMResults.h"
 
 using namespace realm;
+
+using ConditionType = Permission::Condition::Type;
 
 static void verifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm, SEL sel) {
     if (!realm) {
@@ -218,6 +219,18 @@ id RLMPermissionForRole(RLMArray *array, id role) {
 
 #pragma mark - Permission
 
+@interface RLMSyncPermission () {
+@private
+    NSString *_identity;
+    NSString *_key;
+    NSString *_value;
+    util::Optional<Permission> _underlying;
+    RLMSyncAccessLevel _accessLevel;
+    NSString *_path;
+    NSDate *_updatedAt;
+}
+@end
+
 @implementation RLMSyncPermission
 
 - (instancetype)initWithRealmPath:(NSString *)path
@@ -249,8 +262,27 @@ id RLMPermissionForRole(RLMArray *array, id role) {
     return self;
 }
 
-+ (BOOL)accessInstanceVariablesDirectly {
-    return NO;
+- (instancetype)initWithPermission:(Permission)permission {
+    if (self = [super init]) {
+        _underlying = util::make_optional<Permission>(std::move(permission));
+        return self;
+    }
+    return nil;
+}
+
+- (NSString *)path {
+    if (!_underlying) {
+        REALM_ASSERT(_path);
+        return _path;
+    }
+    return @(_underlying->path.c_str());
+}
+
+- (RLMSyncAccessLevel)accessLevel {
+    if (!_underlying) {
+        return _accessLevel;
+    }
+    return objCAccessLevelForAccessLevel(_underlying->access);
 }
 
 - (BOOL)mayRead {
@@ -265,47 +297,73 @@ id RLMPermissionForRole(RLMArray *array, id role) {
     return self.accessLevel == RLMSyncAccessLevelAdmin;
 }
 
+- (NSString *)identity {
+    if (!_underlying) {
+        return _identity;
+    }
+    if (_underlying->condition.type == ConditionType::UserId) {
+        return @(_underlying->condition.user_id.c_str());
+    }
+    return nil;
+}
+
+- (NSString *)key {
+    if (!_underlying) {
+        return _key;
+    }
+    if (_underlying->condition.type == ConditionType::KeyValue) {
+        return @(_underlying->condition.key_value.first.c_str());
+    }
+    return nil;
+}
+
+- (NSString *)value {
+    if (!_underlying) {
+        return _value;
+    }
+    if (_underlying->condition.type == ConditionType::KeyValue) {
+        return @(_underlying->condition.key_value.second.c_str());
+    }
+    return nil;
+}
+
+- (NSDate *)updatedAt {
+    if (!_underlying) {
+        return _updatedAt;
+    }
+    return RLMTimestampToNSDate(_underlying->updated_at);
+}
+
+- (realm::Permission)rawPermission {
+    if (_underlying) {
+        return *_underlying;
+    }
+    auto condition = (_identity
+                      ? Permission::Condition([_identity UTF8String])
+                      : Permission::Condition([_key UTF8String], [_value UTF8String]));
+    return Permission{
+        [_path UTF8String],
+        accessLevelForObjCAccessLevel(_accessLevel),
+        std::move(condition)
+    };
+}
+
 - (NSUInteger)hash {
-    return self.identity.hash ^ self.accessLevel ^ self.path.hash ^ self.key.hash ^ self.value.hash;
+    return [self.identity hash] ^ self.accessLevel;
 }
 
 - (BOOL)isEqual:(id)object {
     if (self == object) {
         return YES;
     }
-    if (![object isKindOfClass:[RLMSyncPermission class]]) {
-        return NO;
+    if ([object isKindOfClass:[RLMSyncPermission class]]) {
+        RLMSyncPermission *that = (RLMSyncPermission *)object;
+        return (self.accessLevel == that.accessLevel
+                && Permission::paths_are_equivalent([self.path UTF8String], [that.path UTF8String],
+                                                    [self.identity UTF8String], [that.identity UTF8String])
+                && [self.identity isEqualToString:that.identity]);
     }
-
-    RLMSyncPermission *that = (RLMSyncPermission *)object;
-    if (self.accessLevel != that.accessLevel) {
-        return NO;
-    }
-    if (![self.path isEqualToString:that.path]) {
-        return NO;
-    }
-    if (self.identity) {
-        if (!that.identity || ![self.identity isEqualToString:that.identity]) {
-            return NO;
-        }
-    }
-    else {
-        if (that.identity || ![self.key isEqualToString:that.key] || ![self.value isEqualToString:that.value]) {
-            return NO;
-        }
-    }
-    return YES;
-}
-
-- (RLMSyncPermission *)tildeExpandedSyncPermissionForUser:(RLMSyncUser *)user {
-    if (![self.path hasPrefix:@"/~/"]) {
-        return self;
-    }
-    NSString *path = [self.path stringByReplacingCharactersInRange:{1, 1} withString:user.identity];
-    if (_identity) {
-        return [[RLMSyncPermission alloc] initWithRealmPath:path identity:_identity accessLevel:_accessLevel];
-    }
-    return [[RLMSyncPermission alloc] initWithRealmPath:path username:_value accessLevel:_accessLevel];
+    return NO;
 }
 
 - (NSString *)description {
@@ -316,60 +374,9 @@ id RLMPermissionForRole(RLMArray *array, id role) {
         typeDescription = [NSString stringWithFormat:@"key: %@, value: %@", self.key, self.value];
     }
     return [NSString stringWithFormat:@"<RLMSyncPermission> %@, path: %@, access level: %@",
-            typeDescription, self.path, RLMSyncAccessLevelToString(self.accessLevel)];
+            typeDescription,
+            self.path,
+            @(Permission::description_for_access_level(accessLevelForObjCAccessLevel(self.accessLevel)).c_str())];
 }
 
-NSString *RLMSyncAccessLevelToString(RLMSyncAccessLevel level) {
-    switch (level) {
-        case RLMSyncAccessLevelNone:  return @"none";
-        case RLMSyncAccessLevelRead:  return @"read";
-        case RLMSyncAccessLevelWrite: return @"write";
-        case RLMSyncAccessLevelAdmin: return @"admin";
-    }
-    return @"unknown";
-}
-
-RLMSyncAccessLevel RLMSyncAccessLevelFromString(NSString *level) {
-    if ([level isEqualToString:@"none"]) {
-        return RLMSyncAccessLevelNone;
-    }
-    if ([level isEqualToString:@"read"]) {
-        return RLMSyncAccessLevelRead;
-    }
-    if ([level isEqualToString:@"write"]) {
-        return RLMSyncAccessLevelWrite;
-    }
-    if ([level isEqualToString:@"admin"]) {
-        return RLMSyncAccessLevelAdmin;
-    }
-    @throw RLMException(@"Invalid access level %@", level);
-}
-
-@end
-
-@implementation RLMSyncPermissionOffer
-- (instancetype)initWithRealmPath:(NSString *)path
-                            token:(NSString *)token
-                        expiresAt:(NSDate *)expiresAt
-                        createdAt:(NSDate *)createdAt
-                      accessLevel:(RLMSyncAccessLevel)accessLevel {
-    if (self = [super init]) {
-        _realmPath = path;
-        _token = token;
-        _expiresAt = expiresAt;
-        _createdAt = createdAt;
-        _accessLevel = accessLevel;
-    }
-    return self;
-}
-
-+ (BOOL)accessInstanceVariablesDirectly {
-    return NO;
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"<RLMSyncPermissionOffer: %p> path: %@, access level: %@, token: %@, createdAt: %@, expiresAt: %@",
-            self, _realmPath, RLMSyncAccessLevelToString(_accessLevel),
-            _token, _createdAt, _expiresAt];
-}
 @end

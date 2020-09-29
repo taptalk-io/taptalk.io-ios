@@ -27,7 +27,7 @@ namespace realm {
 namespace util {
 namespace metered {
 /// String with metered allocation
-using string = std::basic_string<char, std::char_traits<char>, MeteredSTLAllocator<char>>;
+using string = std::basic_string<char, std::char_traits<char>, MeteredAllocator<char>>;
 } // namespace metered
 } // namespace util
 } // namespace realm

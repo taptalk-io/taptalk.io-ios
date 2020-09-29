@@ -51,8 +51,7 @@ public:
 
     SharedPtr<T>& operator=(const SharedPtr<T>& o)
     {
-        // if (m_ptr == o.m_ptr)
-        if (this == &o)
+        if (m_ptr == o.m_ptr)
             return *this;
         decref();
         m_ptr = o.m_ptr;
