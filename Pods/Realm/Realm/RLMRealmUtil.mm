@@ -27,25 +27,26 @@
 #import <Realm/RLMSchema.h>
 
 #import "binding_context.hpp"
-#import "shared_realm.hpp"
-#import "util/scheduler.hpp"
 
 #import <map>
 #import <mutex>
+#import <sys/event.h>
+#import <sys/stat.h>
+#import <sys/time.h>
+#import <unistd.h>
 
 // Global realm state
-static auto& s_realmCacheMutex = *new std::mutex();
-static auto& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
-static auto& s_frozenRealms = *new std::map<std::string, NSMapTable *>();
+static std::mutex& s_realmCacheMutex = *new std::mutex();
+static std::map<std::string, NSMapTable *>& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
 
-void RLMCacheRealm(std::string const& path, void *key, __unsafe_unretained RLMRealm *const realm) {
+void RLMCacheRealm(std::string const& path, __unsafe_unretained RLMRealm *const realm) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
     NSMapTable *realms = s_realmsPerPath[path];
     if (!realms) {
         s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality|NSPointerFunctionsOpaqueMemory
                                                                valueOptions:NSPointerFunctionsWeakMemory];
     }
-    [realms setObject:realm forKey:(__bridge id)key];
+    [realms setObject:realm forKey:(__bridge id)pthread_self()];
 }
 
 RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
@@ -53,50 +54,40 @@ RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
     return [s_realmsPerPath[path] objectEnumerator].nextObject;
 }
 
-RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key) {
+RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
-    RLMRealm *realm = [s_realmsPerPath[path] objectForKey:(__bridge id)key];
-    if (realm && !realm->_realm->scheduler()->is_on_thread()) {
-        // We can get here in two cases: if the user is trying to open a
-        // queue-bound Realm from the wrong queue, or if we have a stale cached
-        // Realm which is bound to a thread that no longer exists. In the first
-        // case we'll throw an error later on; in the second we'll just create
-        // a new RLMRealm and replace the cache entry with one bound to the
-        // thread that now exists.
-        realm = nil;
-    }
-    return realm;
+    return [s_realmsPerPath[path] objectForKey:(__bridge id)pthread_self()];
 }
 
 void RLMClearRealmCache() {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
     s_realmsPerPath.clear();
-    s_frozenRealms.clear();
 }
 
-RLMRealm *RLMGetFrozenRealmForSourceRealm(__unsafe_unretained RLMRealm *const sourceRealm) {
-    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
-    auto& r = *sourceRealm->_realm;
-    auto& path = r.config().path;
-    NSMapTable *realms = s_realmsPerPath[path];
-    if (!realms) {
-        s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsIntegerPersonality|NSPointerFunctionsOpaqueMemory
-                                                               valueOptions:NSPointerFunctionsWeakMemory];
+bool RLMIsInRunLoop() {
+    // The main thread may not be in a run loop yet if we're called from
+    // something like `applicationDidFinishLaunching:`, but it presumably will
+    // be in the future
+    if ([NSThread isMainThread]) {
+        return true;
     }
-    r.read_group();
-    auto version = reinterpret_cast<void *>(r.read_transaction_version().version);
-    RLMRealm *realm = [realms objectForKey:(__bridge id)version];
-    if (!realm) {
-        realm = [sourceRealm frozenCopy];
-        [realms setObject:realm forKey:(__bridge id)version];
+    // Current mode indicates why the current callout from the runloop was made,
+    // and is null if a runloop callout isn't currently being processed
+    if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
+        CFRelease(mode);
+        return true;
     }
-    return realm;
+    return false;
 }
 
 namespace {
 class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
+
+    bool can_deliver_notifications() const noexcept override {
+        return RLMIsInRunLoop();
+    }
 
     void changes_available() override {
         @autoreleasepool {

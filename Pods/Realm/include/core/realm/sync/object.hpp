@@ -40,13 +40,17 @@ class WriteTransaction;
 namespace sync {
 
 class SyncHistory;
+
+static const char object_id_column_name[] = "!OID";
+static const char array_value_column_name[] = "!ARRAY_VALUE"; // FIXME call Jorgen
+
 struct TableInfoCache;
 
 /// Determine whether the Group has a sync-type history, and therefore whether
 /// it supports globally stable object IDs.
 ///
 /// The Group does not need to be in a transaction.
-bool has_object_ids(const Table&);
+bool has_object_ids(const Group&);
 
 /// Determine whether object IDs for objects without primary keys are globally
 /// stable. This is true if and only if the Group has been in touch with the
@@ -56,7 +60,7 @@ bool has_object_ids(const Table&);
 /// (i.e. where `has_object_ids()` returns false).
 ///
 /// The Group is assumed to be in a read transaction.
-bool is_object_id_stability_achieved(const DB&, const Transaction&);
+bool is_object_id_stability_achieved(const Group&);
 
 /// Create a table with an object ID column.
 ///
@@ -70,10 +74,7 @@ bool is_object_id_stability_achieved(const DB&, const Transaction&);
 /// Object Store conventions.
 ///
 /// The Group must be in a write transaction.
-inline TableRef create_table(Transaction& wt, StringData name)
-{
-    return wt.get_or_add_table(name);
-}
+TableRef create_table(Group&, StringData name);
 
 /// Create a table with an object ID column and a primary key column.
 ///
@@ -96,19 +97,8 @@ inline TableRef create_table(Transaction& wt, StringData name)
 /// Object Store conventions.
 ///
 /// The Group must be in a write transaction.
-inline TableRef create_table_with_primary_key(Transaction& wt, StringData name, DataType pk_type,
-                                       StringData pk_column_name, bool nullable = false)
-{
-    if (TableRef table = wt.get_table(name)) {
-        if (!table->get_primary_key_column() ||
-                table->get_column_name(table->get_primary_key_column()) != pk_column_name ||
-                table->is_nullable(table->get_primary_key_column()) != nullable) {
-            throw std::runtime_error("Inconsistent schema");
-        }
-        return table;
-    }
-    return wt.add_table_with_primary_key(name, pk_type, pk_column_name, nullable);
-}
+TableRef create_table_with_primary_key(Group&, StringData name, DataType pk_type,
+                                       StringData pk_column_name, bool nullable = false);
 
 
 //@{
@@ -116,18 +106,25 @@ inline TableRef create_table_with_primary_key(Transaction& wt, StringData name, 
 ///
 /// It is an error to erase tables via the Group API, because it does not
 /// correctly update metadata tables (such as the `pk` table).
-void erase_table(Transaction&, TableInfoCache& table_info_cache, StringData name);
-void erase_table(Transaction&, TableInfoCache& table_info_cache, TableRef);
+void erase_table(Group& g, TableInfoCache& table_info_cache, StringData name);
+void erase_table(Group& g, TableInfoCache& table_info_cache, TableRef);
 //@}
 
 /// Create an array column with the specified element type.
 ///
 /// The result will be a column of type type_Table with one subcolumn named
-/// "!ARRAY_VALUE" of the specified element type and nullability.
+/// "!ARRAY_VALUE" of the specified element type.
 ///
 /// Return the column index of the inserted array column.
-ColKey add_array_column(Table&, DataType element_type, StringData column_name, bool is_nullable = false);
+size_t add_array_column(Table&, DataType element_type, StringData column_name);
 
+
+//@{
+/// Calculate the object ID from the argument, where the argument is a primary
+/// key value.
+ObjectID object_id_for_primary_key(StringData);
+ObjectID object_id_for_primary_key(util::Optional<int64_t>);
+//@}
 
 /// Determine whether it is safe to call `object_id_for_row()` on tables without
 /// primary keys. If the table has a primary key, always returns true.
@@ -140,35 +137,25 @@ bool table_has_primary_key(const TableInfoCache&, const Table&);
 /// If the table has a primary key, this is guaranteed to succeed. Otherwise, if
 /// the server has not been contacted yet (`has_globally_stable_object_ids()`
 /// returns false), an exception is thrown.
-GlobalKey object_id_for_row(const TableInfoCache&, const Table&, ObjKey);
-GlobalKey object_id_for_row(const TableInfoCache&, const ConstObj&);
+ObjectID object_id_for_row(const TableInfoCache&, const Table&, size_t);
 
 /// Get the index of the row with the object ID.
 ///
 /// \returns realm::npos if the object does not exist in the table.
-ObjKey row_for_object_id(const TableInfoCache&, const Table&, GlobalKey);
-Obj obj_for_object_id(const TableInfoCache&, Table&, GlobalKey);
-ConstObj obj_for_object_id(const TableInfoCache&, const Table&, GlobalKey);
+size_t row_for_object_id(const TableInfoCache&, const Table&, ObjectID);
 
 //@{
 /// Add a row to the table and populate the object ID with an appropriate value.
 ///
-/// In the variant which takes an GlobalKey parameter, a check is performed to see
+/// In the variant which takes an ObjectID parameter, a check is performed to see
 /// if the object already exists. If it does, the row index of the existing object
 /// is returned.
 ///
 /// If the table has a primary key column, an exception is thrown.
 ///
 /// \returns the row index of the object.
-inline Obj create_object(const TableInfoCache&, Table& t)
-{
-    return t.create_object();
-}
-
-inline Obj create_object(const TableInfoCache&, Table& t, GlobalKey object_id)
-{
-    return t.create_object(object_id);
-}
+size_t create_object(const TableInfoCache&, Table&);
+size_t create_object(const TableInfoCache&, Table&, ObjectID);
 //@}
 
 //@{
@@ -188,53 +175,51 @@ inline Obj create_object(const TableInfoCache&, Table& t, GlobalKey object_id)
 ///
 /// These are convenience functions, equivalent to the following:
 ///   - Add an empty row to the table.
-///   - Obtain an `GlobalKey` with `object_id_for_primary_key()`.
+///   - Obtain an `ObjectID` with `object_id_for_primary_key()`.
 ///   - Obtain a local object ID with `global_to_local_object_id()`.
 ///   - Store the local object ID in the object ID column.
 ///   - Call `set_int_unique()`,`set_string_unique()`, or `set_null_unique()`
 ///     to set the primary key value.
 ///
 /// \returns the row index of the created object.
-Obj create_object_with_primary_key(const TableInfoCache&, Table&, util::Optional<int64_t> primary_key);
-Obj create_object_with_primary_key(const TableInfoCache&, Table&, StringData primary_key);
-Obj create_object_with_primary_key(const TableInfoCache&, Table&, int64_t primary_key);
+size_t create_object_with_primary_key(const TableInfoCache&, Table&, util::Optional<int64_t> primary_key);
+size_t create_object_with_primary_key(const TableInfoCache&, Table&, StringData primary_key);
 //@}
 
 struct TableInfoCache {
-    const Transaction& m_transaction;
+    const Group& m_group;
+
+    explicit TableInfoCache(const ReadTransaction&);
+    explicit TableInfoCache(const WriteTransaction&);
 
     // Implicit conversion deliberately allowed for the purpose of calling the above
     // functions without constructing a cache manually.
-    TableInfoCache(const Transaction&);
-    TableInfoCache(WriteTransaction&);
-    TableInfoCache(ReadTransaction&);
+    TableInfoCache(const Group&);
     TableInfoCache(TableInfoCache&&) noexcept = default;
 
     struct TableInfo {
         struct VTable;
 
-        TableKey key;
         StringData name;
-        ColKey primary_key_col;
-
-        ConstTableRef get_table(const Transaction&) const;
-        TableRef get_table(Transaction&) const;
-        bool primary_key_nullable;
-        DataType primary_key_type;
-        mutable ObjKey last_obj_key;
-        mutable GlobalKey last_object_id;
+        const VTable* vtable;
+        size_t object_id_index = size_t(-1);
+        size_t primary_key_index;
+        DataType primary_key_type = DataType(-1);
+        bool primary_key_nullable = false;
+        mutable size_t last_row_index = size_t(-1);
+        mutable ObjectID last_object_id;
 
         void clear_last_object() const
         {
-            last_obj_key = realm::null_key;
+            last_row_index = size_t(-1);
             last_object_id = {};
         }
     };
 
-    mutable std::map<TableKey, TableInfo> m_table_info;
+    mutable std::vector<util::Optional<TableInfo>> m_table_info;
 
     const TableInfo& get_table_info(const Table&) const;
-    const TableInfo& get_table_info(TableKey) const;
+    const TableInfo& get_table_info(size_t table_index) const;
     void clear();
     void clear_last_object(const Table&);
     void verify();
@@ -270,19 +255,8 @@ inline StringData class_name_to_table_name(StringData class_name, TableNameBuffe
     return StringData(buffer.data(), class_prefix_len + len);
 }
 
-inline TableInfoCache::TableInfoCache(WriteTransaction& wt)
-    : TableInfoCache(wt.operator Transaction&())
-{
-}
-
-inline TableInfoCache::TableInfoCache(ReadTransaction& rt)
-    : TableInfoCache(rt.operator Transaction&())
-{
-}
-
 } // namespace sync
 } // namespace realm
 
 #endif // REALM_SYNC_OBJECT_HPP
-
 

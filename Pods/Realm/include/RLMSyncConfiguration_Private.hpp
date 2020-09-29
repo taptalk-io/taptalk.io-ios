@@ -36,11 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
                     realmURL:(NSURL *)url
                customFileURL:(nullable NSURL *)customFileURL
                    isPartial:(BOOL)isPartial
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
+                errorHandler:(std::function<realm::SyncSessionErrorHandler>)errorHandler;
 
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config;
 
-- (realm::SyncConfig&)rawConfiguration;
+- (realm::SyncConfig)rawConfiguration;
 
 @end
 
