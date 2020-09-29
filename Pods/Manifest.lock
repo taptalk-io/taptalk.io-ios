@@ -23,9 +23,9 @@ PODS:
     - GoogleMaps/Base (= 3.10.0)
   - JSONModel (1.8.0)
   - PodAsset (1.0.0)
-  - Realm (5.4.4):
-    - Realm/Headers (= 5.4.4)
-  - Realm/Headers (5.4.4)
+  - Realm (5.4.5):
+    - Realm/Headers (= 5.4.5)
+  - Realm/Headers (5.4.5)
   - SDWebImage (5.9.1):
     - SDWebImage/Core (= 5.9.1)
   - SDWebImage/Core (5.9.1)
@@ -61,11 +61,11 @@ SPEC CHECKSUMS:
   GooglePlaces: 9a6f5f3a0c88da2aa1bf7426a65d3e004f5e69a1
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   PodAsset: c2c2b20013c1edf698fea2bacba6e75a638537a2
-  Realm: b845bf406e03b9c52a53e0de2394480288aa532a
+  Realm: 155c60aec98b1044a05d676017be6900a9ee93b6
   SDWebImage: a990c053fff71e388a10f3357edb0be17929c9c5
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: e9baf8880422c59e5a9f1790d2ba23903113ddc3
+PODFILE CHECKSUM: df0ed7aa344be634b97ad18666b4621e3198ecb0
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.9.3
