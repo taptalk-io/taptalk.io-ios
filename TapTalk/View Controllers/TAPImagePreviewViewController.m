@@ -947,13 +947,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
-        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
-        photoAlbumListViewController.delegate = self;
-        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
-        photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
-        [photoAlbumListViewController setParticipantListArray:self.participantListArray];
-        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
-        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
+            photoAlbumListViewController.delegate = self;
+            [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
+            photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+            [photoAlbumListViewController setParticipantListArray:self.participantListArray];
+            UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+            [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+        });
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
         //request
@@ -988,13 +990,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
-        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
-        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
-        photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
-        [photoAlbumListViewController setParticipantListArray:self.participantListArray];
-        photoAlbumListViewController.delegate = self;
-        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
-        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
+            [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
+            photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+            [photoAlbumListViewController setParticipantListArray:self.participantListArray];
+            photoAlbumListViewController.delegate = self;
+            UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+            [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+        });
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
         //request
