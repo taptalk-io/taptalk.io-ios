@@ -9913,7 +9913,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if (error != nil) {
         if (status == PHAuthorizationStatusDenied) {
             //No permission. Trying to normally request it
-            [self removeSaveImageLoadingView];
             
             NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
@@ -9946,7 +9945,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if (error != nil) {
         if (status == PHAuthorizationStatusDenied) {
             //No permission. Trying to normally request it
-            [self removeSaveImageLoadingView];
             
             NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
