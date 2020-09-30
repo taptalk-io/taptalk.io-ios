@@ -7,7 +7,7 @@ def tapTalk_pods
     pod 'AFNetworking', '~> 4.0.0'
     pod 'SocketRocket'
     pod 'JSONModel', '~> 1.1'
-    pod 'Realm', '3.13.1'
+    pod 'Realm'
     pod 'PodAsset'
     pod 'SDWebImage'
     pod 'GooglePlaces'
@@ -33,8 +33,11 @@ end
 #add to remove arm64 because xcode 12 problems in realm
 post_install do |installer|
      installer.pods_project.targets.each do |target|
-           target.build_configurations.each do |config|
-                 config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-           end
+         target.build_configurations.each do |config|
+             config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+             config.build_settings['EXCLUDED_ARCHS[sdk=watchsimulator*]'] = 'arm64'
+             config.build_settings['EXCLUDED_ARCHS[sdk=appletvsimulator*]'] = 'arm64'
+    
+         end
      end
  end
