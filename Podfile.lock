@@ -26,9 +26,9 @@ PODS:
   - Realm (5.4.6):
     - Realm/Headers (= 5.4.6)
   - Realm/Headers (5.4.6)
-  - SDWebImage (5.9.1):
-    - SDWebImage/Core (= 5.9.1)
-  - SDWebImage/Core (5.9.1)
+  - SDWebImage (5.9.2):
+    - SDWebImage/Core (= 5.9.2)
+  - SDWebImage/Core (5.9.2)
   - SocketRocket (0.5.1)
   - ZSWTappableLabel (2.0)
 
@@ -62,10 +62,10 @@ SPEC CHECKSUMS:
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   PodAsset: c2c2b20013c1edf698fea2bacba6e75a638537a2
   Realm: bb8d7be40d0bc92f139c47095124513c489c0baf
-  SDWebImage: a990c053fff71e388a10f3357edb0be17929c9c5
+  SDWebImage: 0b42b8719ab0c5257177d5894306e8a336b21cbb
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: 2a2563c3a88c697fddb303126404f51b8331dc5a
+PODFILE CHECKSUM: 0df405459fdb90ee4a0a4373849d6d2e9ffeed5c
 
 COCOAPODS: 1.9.3
