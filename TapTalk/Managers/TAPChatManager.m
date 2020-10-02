@@ -227,6 +227,12 @@
     [self sendEmitWithMessage:message];
 }
 
+- (void)saveMessageToPendingMessageArray:(TAPMessageModel *)message {
+    if (message != nil) {
+        [self.pendingMessageArray addObject:message];
+    }
+}
+
 - (void)sendEmitWithMessage:(TAPMessageModel *)message {
     TAPConnectionManagerStatusType statusType = [[TAPConnectionManager sharedManager] getSocketConnectionStatus];
     if (statusType != TAPConnectionManagerStatusTypeConnected) {

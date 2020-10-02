@@ -87,6 +87,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
 - (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendCustomMessage:(TAPMessageModel *)customMessage;
+- (void)saveMessageToPendingMessageArray:(TAPMessageModel *)message;
 - (void)sendEmitWithMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
 
