@@ -227,7 +227,34 @@
         [self showFinishSavingImageState];
     }
     else {
-        UIImageWriteToSavedPhotosAlbum(currentImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (status == PHAuthorizationStatusAuthorized) {
+                    UIImageWriteToSavedPhotosAlbum(currentImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+                }
+                else if (status == PHAuthorizationStatusDenied || status == PHAuthorizationStatusRestricted) {
+                    [self removeSaveImageLoadingView];
+                    //No permission. Trying to normally request it
+                    
+                    NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
+                    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
+                                            [alertController addAction:cancelAction];
+                    UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                          
+                        if (IS_IOS_11_OR_ABOVE) {
+                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
+                        }
+                        else {
+                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                        }
+                    }];
+                    [alertController addAction:settingsAction];
+    
+                    [self presentViewController:alertController animated:YES completion:nil];
+                }
+            });
+        }];
     }
 }
 
@@ -486,68 +513,23 @@
 
 //Override completionSelector method of save image to gallery
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
-    if (error != nil) {
-        if (status == PHAuthorizationStatusDenied) {
-            //No permission. Trying to normally request it
-            [self removeSaveImageLoadingView];
-            
-            NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
-            
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
-            [alertController addAction:cancelAction];
-            
-            UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                if (IS_IOS_11_OR_ABOVE) {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-                }
-                else {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }
-            }];
-            [alertController addAction:settingsAction];
-            
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
+    if (error == nil && status == PHAuthorizationStatusAuthorized) {
+        [self showFinishSavingImageState];
     }
     else {
-        [self showFinishSavingImageState];
+        [self removeSaveImageLoadingView];
     }
 }
 
 //Override completionSelector method of save video to gallery
 - (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
-    if (error != nil) {
-        if (status == PHAuthorizationStatusDenied) {
-            //No permission. Trying to normally request it
-            [self removeSaveImageLoadingView];
-            
-            NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
-            
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
-            [alertController addAction:cancelAction];
-            
-            UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                if (IS_IOS_11_OR_ABOVE) {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-                }
-                else {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }
-            }];
-            [alertController addAction:settingsAction];
-            
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
+    if (error == nil && status == PHAuthorizationStatusAuthorized) {
+        [self showFinishSavingImageState];
     }
     else {
-        [self showFinishSavingImageState];
+        [self removeSaveImageLoadingView];
     }
 }
 
