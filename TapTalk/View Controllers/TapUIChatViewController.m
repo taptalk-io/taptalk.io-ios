@@ -1973,6 +1973,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #pragma mark TAPChatManager
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
     
+    //DV Note - 6 Nov 2020
+    //Check if message.roomID is not equal to active room ID, dont send message
+    //This is to handle case bubble show in previous room
+    if (![message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID]) {
+        return;
+    }
+    
     //Handle mapping mention index to array
     NSArray *mentionIndexArray = [NSArray array];
     if (message.type == TAPChatMessageTypeText) {

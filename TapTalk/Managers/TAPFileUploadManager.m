@@ -188,6 +188,9 @@
                     
                     NSString *fileID = [responseDataDictionary objectForKey:@"id"];
                     fileID = [TAPUtil nullToEmptyString:fileID];
+
+                    NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    fileURL = [TAPUtil nullToEmptyString:fileURL];
                     
                     if ([mediaType hasPrefix:@"image"]) {
                         NSString *caption = [responseDataDictionary objectForKey:@"caption"];
@@ -216,6 +219,7 @@
                     
                     [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
                     [resultDataDictionary setObject:fileID forKey:@"fileID"];
+                    [resultDataDictionary setObject:fileURL forKey:@"fileURL"];
                     [resultDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
                     resultMessage.data = resultDataDictionary;
                     
@@ -379,6 +383,9 @@
         
         NSString *fileID = [responseDataDictionary objectForKey:@"id"];
         fileID = [TAPUtil nullToEmptyString:fileID];
+
+        NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
         
         NSString *fileName = dataFile.fileName;
         
@@ -389,6 +396,7 @@
         
         [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
         [resultDataDictionary setObject:fileID forKey:@"fileID"];
+        [resultDataDictionary setObject:fileURL forKey:@"fileURL"];
         [resultDataDictionary setObject:fileName forKey:@"fileName"];
         [resultDataDictionary setObject:sizeNum forKey:@"size"];
         currentMessage.data = resultDataDictionary;
@@ -602,6 +610,9 @@
                     
                     NSString *fileID = [responseDataDictionary objectForKey:@"id"];
                     fileID = [TAPUtil nullToEmptyString:fileID];
+
+                    NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    fileURL = [TAPUtil nullToEmptyString:fileURL];
                     
                     if ([mediaType hasPrefix:@"image"]) {
                         NSString *caption = [responseDataDictionary objectForKey:@"caption"];
@@ -630,6 +641,7 @@
                     
                     [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
                     [resultDataDictionary setObject:fileID forKey:@"fileID"];
+                    [resultDataDictionary setObject:fileURL forKey:@"fileURL"];
                     [resultDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
                     resultMessage.data = resultDataDictionary;
                     
@@ -882,6 +894,9 @@
                     
                     NSString *fileID = [responseDataDictionary objectForKey:@"id"];
                     fileID = [TAPUtil nullToEmptyString:fileID];
+
+                    NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    fileURL = [TAPUtil nullToEmptyString:fileURL];
                     
                     NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
                     sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
@@ -896,6 +911,7 @@
                     
                     [appendedDataDictionary setObject:fileNameString forKey:@"fileName"];
                     [appendedDataDictionary setObject:fileID forKey:@"fileID"];
+                    [appendedDataDictionary setObject:fileID forKey:@"fileURL"];
                     [appendedDataDictionary setObject:mediaType forKey:@"mediaType"];
                     [appendedDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
                     [appendedDataDictionary setObject:sizeNumber forKey:@"size"];
@@ -1058,6 +1074,9 @@
     
     NSString *fileID = [dictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
+
+    NSString *fileURL = [dictionary objectForKey:@"fileURL"];
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
     
     NSString *mediaType = [dictionary objectForKey:@"mediaType"];
     mediaType = [TAPUtil nullToEmptyString:mediaType];
@@ -1080,6 +1099,7 @@
     PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
     
     dataMedia.fileID = fileID;
+    dataMedia.fileURL = fileURL;
     dataMedia.imageWidth = imageWidth;
     dataMedia.imageHeight = imageHeight;
     dataMedia.size = size;
@@ -1096,6 +1116,9 @@
     
     NSString *fileID = dataMedia.fileID;
     fileID = [TAPUtil nullToEmptyString:fileID];
+
+    NSString *fileURL = dataMedia.fileURL;
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
     
     NSString *mediaType = dataMedia.mediaType;
     mediaType = [TAPUtil nullToEmptyString:mediaType];
@@ -1112,6 +1135,7 @@
     PHAsset *asset = dataMedia.asset;
     
     [dataDictionary setObject:fileID forKey:@"fileID"];
+    [dataDictionary setObject:fileURL forKey:@"fileURL"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:caption forKey:@"caption"];
     [dataDictionary setObject:imageHeight forKey:@"imageHeight"];
@@ -1127,6 +1151,9 @@
     
     NSString *fileID = [dictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
+
+    NSString *fileURL = [dictionary objectForKey:@"fileURL"];
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
     
     NSString *fileName = [dictionary objectForKey:@"fileName"];
     fileName = [TAPUtil nullToEmptyString:fileName];
@@ -1137,6 +1164,7 @@
     NSNumber *size = [dictionary objectForKey:@"size"];
     
     dataFile.fileID = fileID;
+    dataFile.fileURL = fileURL;
     dataFile.fileName = fileName;
     dataFile.mediaType = mediaType;
     dataFile.size = size;
@@ -1149,6 +1177,9 @@
     
     NSString *fileID = dataFile.fileID;
     fileID = [TAPUtil nullToEmptyString:fileID];
+
+    NSString *fileURL = dataFile.fileURL;
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
     
     NSString *fileName = dataFile.fileName;
     fileName = [TAPUtil nullToEmptyString:fileName];
@@ -1159,6 +1190,7 @@
     NSNumber *size = dataFile.size;
     
     [dataDictionary setObject:fileID forKey:@"fileID"];
+    [dataDictionary setObject:fileID forKey:@"fileURL"];
     [dataDictionary setObject:fileName forKey:@"fileName"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:size forKey:@"size"];

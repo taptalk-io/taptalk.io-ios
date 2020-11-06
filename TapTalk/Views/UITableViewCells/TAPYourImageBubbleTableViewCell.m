@@ -581,9 +581,25 @@
                 [self.bubbleImageView setImage:savedImage];
             }
             else {
-                self.bubbleImageViewWidthConstraint.constant = 0.0f;
-                self.bubbleImageViewHeightConstraint.constant = 0.0f;
-                [self.contentView layoutIfNeeded];
+                NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                    NSString *fileURL = [dataDictionary objectForKey:@"fileURL"];
+                }
+                if (fileURL != nil || ![fileURL isEqualToString:@""]) {
+                    [self.bubbleImageView setImageWithURLString:fileURL];
+                    if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
+                        self.bubbleImageViewWidthConstraint.constant = 240.0f;
+                    }
+                    if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
+                        self.bubbleImageViewHeightConstraint.constant = 240.0f;
+                    }
+                    [self.contentView layoutIfNeeded];
+                }
+                else {
+                    self.bubbleImageViewWidthConstraint.constant = 0.0f;
+                    self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                    [self.contentView layoutIfNeeded];
+                }
             }
         }];
     }

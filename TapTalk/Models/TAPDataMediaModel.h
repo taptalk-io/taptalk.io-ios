@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPDataMediaModel : TAPBaseModel
 
 @property (strong, nonatomic) NSString *fileID;
+@property (strong, nonatomic) NSString *fileURL;
 @property (strong, nonatomic) NSString *mediaType;
 @property (strong, nonatomic) NSString *caption;
 @property (strong, nonatomic) UIImage *dummyImage;
