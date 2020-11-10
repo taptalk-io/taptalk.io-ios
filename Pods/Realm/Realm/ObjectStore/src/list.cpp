@@ -19,6 +19,7 @@
 #include "list.hpp"
 
 #include "impl/list_notifier.hpp"
+#include "impl/primitive_list_notifier.hpp"
 #include "impl/realm_coordinator.hpp"
 #include "object_schema.hpp"
 #include "object_store.hpp"
@@ -26,23 +27,10 @@
 #include "schema.hpp"
 #include "shared_realm.hpp"
 
-namespace {
-using namespace realm;
-
-template<typename T>
-struct ListType {
-    using type = Lst<T>;
-};
-
-template<>
-struct ListType<Obj> {
-    using type = LnkLst;
-};
-
-}
+#include <realm/link_view.hpp>
 
 namespace realm {
-using namespace _impl;
+using namespace realm::_impl;
 
 List::List() noexcept = default;
 List::~List() = default;
@@ -52,17 +40,30 @@ List& List::operator=(const List&) = default;
 List::List(List&&) = default;
 List& List::operator=(List&&) = default;
 
-List::List(std::shared_ptr<Realm> r, const Obj& parent_obj, ColKey col)
+List::List(std::shared_ptr<Realm> r, Table& parent_table, size_t col, size_t row)
 : m_realm(std::move(r))
-, m_type(ObjectSchema::from_core_type(*parent_obj.get_table(), col) & ~PropertyType::Array)
-, m_list_base(parent_obj.get_listbase_ptr(col))
 {
+    auto type = parent_table.get_column_type(col);
+    REALM_ASSERT(type == type_LinkList || type == type_Table);
+    if (type == type_LinkList) {
+        m_link_view = parent_table.get_linklist(col, row);
+        m_table.reset(&m_link_view->get_target_table());
+    }
+    else {
+        m_table = parent_table.get_subtable(col, row);
+    }
 }
 
-List::List(std::shared_ptr<Realm> r, const LstBase& list)
+List::List(std::shared_ptr<Realm> r, LinkViewRef l) noexcept
 : m_realm(std::move(r))
-, m_type(ObjectSchema::from_core_type(*list.get_table(), list.get_col_key()) & ~PropertyType::Array)
-, m_list_base(list.clone())
+, m_link_view(std::move(l))
+{
+    m_table.reset(&m_link_view->get_target_table());
+}
+
+List::List(std::shared_ptr<Realm> r, TableRef t) noexcept
+: m_realm(std::move(r))
+, m_table(std::move(t))
 {
 }
 
@@ -74,42 +75,28 @@ static StringData object_name(Table const& table)
 ObjectSchema const& List::get_object_schema() const
 {
     verify_attached();
+    REALM_ASSERT(m_link_view);
 
-    REALM_ASSERT(get_type() == PropertyType::Object);
-    auto object_schema = m_object_schema.load();
-    if (!object_schema) {
-        auto object_type = object_name(*static_cast<LnkLst&>(*m_list_base).get_target_table());
+    if (!m_object_schema) {
+        REALM_ASSERT(get_type() == PropertyType::Object);
+        auto object_type = object_name(m_link_view->get_target_table());
         auto it = m_realm->schema().find(object_type);
         REALM_ASSERT(it != m_realm->schema().end());
-        m_object_schema = object_schema = &*it;
+        m_object_schema = &*it;
     }
-    return *object_schema;
+    return *m_object_schema;
 }
 
 Query List::get_query() const
 {
     verify_attached();
-    if (m_type == PropertyType::Object)
-        return static_cast<LnkLst&>(*m_list_base).get_target_table()->where(as<Obj>());
-    throw std::runtime_error("not implemented");
+    return m_link_view ? m_table->where(m_link_view) : m_table->where();
 }
 
-ObjKey List::get_parent_object_key() const
+size_t List::get_origin_row_index() const
 {
     verify_attached();
-    return m_list_base->get_key();
-}
-
-ColKey List::get_parent_column_key() const
-{
-    verify_attached();
-    return m_list_base->get_col_key();
-}
-
-TableKey List::get_parent_table_key() const
-{
-    verify_attached();
-    return m_list_base->get_table()->get_key();
+    return m_link_view ? m_link_view->get_origin_row_index() : m_table->get_parent_row_index();
 }
 
 void List::verify_valid_row(size_t row_ndx, bool insertion) const
@@ -120,15 +107,14 @@ void List::verify_valid_row(size_t row_ndx, bool insertion) const
     }
 }
 
-void List::validate(const Obj& obj) const
+void List::validate(RowExpr row) const
 {
-    if (!obj.is_valid())
+    if (!row.is_attached())
         throw std::invalid_argument("Object has been deleted or invalidated");
-    auto target = static_cast<LnkLst&>(*m_list_base).get_target_table();
-    if (obj.get_table() != target)
+    if (row.get_table() != &m_link_view->get_target_table())
         throw std::invalid_argument(util::format("Object of type (%1) does not match List type (%2)",
-                                                 object_name(*obj.get_table()),
-                                                 object_name(*target)));
+                                                 object_name(*row.get_table()),
+                                                 object_name(m_link_view->get_target_table())));
 }
 
 bool List::is_valid() const
@@ -136,9 +122,9 @@ bool List::is_valid() const
     if (!m_realm)
         return false;
     m_realm->verify_thread();
-    if (!m_realm->is_in_read_transaction())
-        return false;
-    return m_list_base->is_attached();
+    if (m_link_view)
+        return m_link_view->is_attached();
+    return m_table && m_table->is_attached();
 }
 
 void List::verify_attached() const
@@ -157,65 +143,101 @@ void List::verify_in_transaction() const
 size_t List::size() const
 {
     verify_attached();
-    return m_list_base->size();
+    return m_link_view ? m_link_view->size() : m_table->size();
+}
+
+size_t List::to_table_ndx(size_t row) const noexcept
+{
+    return m_link_view ? m_link_view->get(row).get_index() : row;
+}
+
+PropertyType List::get_type() const
+{
+    verify_attached();
+    return m_link_view ? PropertyType::Object
+                       : ObjectSchema::from_core_type(*m_table->get_descriptor(), 0);
+}
+
+namespace {
+template<typename T>
+auto get(Table& table, size_t row)
+{
+    return table.get<T>(0, row);
+}
+
+template<>
+auto get<RowExpr>(Table& table, size_t row)
+{
+    return table.get(row);
+}
 }
 
 template<typename T>
 T List::get(size_t row_ndx) const
 {
     verify_valid_row(row_ndx);
-    return as<T>().get(row_ndx);
+    return realm::get<T>(*m_table, to_table_ndx(row_ndx));
 }
 
-template<>
-Obj List::get(size_t row_ndx) const
-{
-    verify_valid_row(row_ndx);
-    auto& list = as<Obj>();
-    return list.get_target_table()->get_object(list.get(row_ndx));
-}
+template RowExpr List::get(size_t) const;
 
 template<typename T>
 size_t List::find(T const& value) const
 {
     verify_attached();
-    return as<T>().find_first(value);
+    return m_table->find_first(0, value);
 }
 
 template<>
-size_t List::find(Obj const& o) const
+size_t List::find(RowExpr const& row) const
 {
     verify_attached();
-    if (!o.is_valid())
+    if (!row.is_attached())
         return not_found;
-    validate(o);
+    validate(row);
 
-    return as<Obj>().ConstLstIf<ObjKey>::find_first(o.get_key());
+    return m_link_view ? m_link_view->find(row.get_index()) : row.get_index();
 }
 
 size_t List::find(Query&& q) const
 {
     verify_attached();
-    if (m_type == PropertyType::Object) {
-        ObjKey key = get_query().and_query(std::move(q)).find();
-        return key ? as<Obj>().ConstLstIf<ObjKey>::find_first(key) : not_found;
+    if (m_link_view) {
+        size_t index = get_query().and_query(std::move(q)).find();
+        return index == not_found ? index : m_link_view->find(index);
     }
-    throw std::runtime_error("not implemented");
+    return q.find();
 }
 
 template<typename T>
 void List::add(T value)
 {
     verify_in_transaction();
-    as<T>().add(value);
+    m_table->set(0, m_table->add_empty_row(), value);
 }
 
 template<>
-void List::add(Obj o)
+void List::add(size_t target_row_ndx)
 {
     verify_in_transaction();
-    validate(o);
-    as<Obj>().add(o.get_key());
+    m_link_view->add(target_row_ndx);
+}
+
+template<>
+void List::add(RowExpr row)
+{
+    validate(row);
+    add(row.get_index());
+}
+
+template<>
+void List::add(int value)
+{
+    verify_in_transaction();
+    if (m_link_view)
+        add(static_cast<size_t>(value));
+    else
+        add(static_cast<int64_t>(value));
 }
 
 template<typename T>
@@ -223,16 +245,23 @@ void List::insert(size_t row_ndx, T value)
 {
     verify_in_transaction();
     verify_valid_row(row_ndx, true);
-    as<T>().insert(row_ndx, value);
+    m_table->insert_empty_row(row_ndx);
+    m_table->set(0, row_ndx, value);
 }
 
 template<>
-void List::insert(size_t row_ndx, Obj o)
+void List::insert(size_t row_ndx, size_t target_row_ndx)
 {
     verify_in_transaction();
     verify_valid_row(row_ndx, true);
-    validate(o);
-    as<Obj>().insert(row_ndx, o.get_key());
+    m_link_view->insert(row_ndx, target_row_ndx);
+}
+
+template<>
+void List::insert(size_t row_ndx, RowExpr row)
+{
+    validate(row);
+    insert(row_ndx, row.get_index());
 }
 
 void List::move(size_t source_ndx, size_t dest_ndx)
@@ -243,20 +272,29 @@ void List::move(size_t source_ndx, size_t dest_ndx)
     if (source_ndx == dest_ndx)
         return;
 
-    m_list_base->move(source_ndx, dest_ndx);
+    if (m_link_view)
+        m_link_view->move(source_ndx, dest_ndx);
+    else
+        m_table->move_row(source_ndx, dest_ndx);
 }
 
 void List::remove(size_t row_ndx)
 {
     verify_in_transaction();
     verify_valid_row(row_ndx);
-    m_list_base->remove(row_ndx, row_ndx + 1);
+    if (m_link_view)
+        m_link_view->remove(row_ndx);
+    else
+        m_table->remove(row_ndx);
 }
 
 void List::remove_all()
 {
     verify_in_transaction();
-    m_list_base->clear();
+    if (m_link_view)
+        m_link_view->clear();
+    else
+        m_table->clear();
 }
 
 template<typename T>
@@ -264,17 +302,22 @@ void List::set(size_t row_ndx, T value)
 {
     verify_in_transaction();
     verify_valid_row(row_ndx);
-//    validate(row);
-    as<T>().set(row_ndx, value);
+    m_table->set(0, row_ndx, value);
 }
 
 template<>
-void List::set(size_t row_ndx, Obj o)
+void List::set(size_t row_ndx, size_t target_row_ndx)
 {
     verify_in_transaction();
     verify_valid_row(row_ndx);
-    validate(o);
-    as<Obj>().set(row_ndx, o.get_key());
+    m_link_view->set(row_ndx, target_row_ndx);
+}
+
+template<>
+void List::set(size_t row_ndx, RowExpr row)
+{
+    validate(row);
+    set(row_ndx, row.get_index());
 }
 
 void List::swap(size_t ndx1, size_t ndx2)
@@ -282,39 +325,40 @@ void List::swap(size_t ndx1, size_t ndx2)
     verify_in_transaction();
     verify_valid_row(ndx1);
     verify_valid_row(ndx2);
-    m_list_base->swap(ndx1, ndx2);
+    if (m_link_view)
+        m_link_view->swap(ndx1, ndx2);
+    else
+        m_table->swap_rows(ndx1, ndx2);
 }
 
 void List::delete_at(size_t row_ndx)
 {
     verify_in_transaction();
     verify_valid_row(row_ndx);
-    if (m_type == PropertyType::Object)
-        as<Obj>().remove_target_row(row_ndx);
+    if (m_link_view)
+        m_link_view->remove_target_row(row_ndx);
     else
-        m_list_base->remove(row_ndx, row_ndx + 1);
+        m_table->remove(row_ndx);
 }
 
 void List::delete_all()
 {
     verify_in_transaction();
-    if (m_type == PropertyType::Object)
-        as<Obj>().remove_all_target_rows();
+    if (m_link_view)
+        m_link_view->remove_all_target_rows();
     else
-        m_list_base->clear();
+        m_table->clear();
 }
 
 Results List::sort(SortDescriptor order) const
 {
     verify_attached();
-    if ((m_type == PropertyType::Object)) {
-        return Results(m_realm, std::dynamic_pointer_cast<LnkLst>(m_list_base), util::none, std::move(order));
-    }
-    else {
-        DescriptorOrdering o;
-        o.append_sort(order);
-        return Results(m_realm, m_list_base, std::move(o));
-    }
+    if (m_link_view)
+        return Results(m_realm, m_link_view, util::none, std::move(order));
+
+    DescriptorOrdering new_order;
+    new_order.append_sort(std::move(order));
+    return Results(m_realm, get_query(), std::move(new_order));
 }
 
 Results List::sort(std::vector<std::pair<std::string, bool>> const& keypaths) const
@@ -325,15 +369,15 @@ Results List::sort(std::vector<std::pair<std::string, bool>> const& keypaths) co
 Results List::filter(Query q) const
 {
     verify_attached();
-    return Results(m_realm, std::dynamic_pointer_cast<LnkLst>(m_list_base), get_query().and_query(std::move(q)));
+    if (m_link_view)
+        return Results(m_realm, m_link_view, get_query().and_query(std::move(q)));
+    return Results(m_realm, get_query().and_query(std::move(q)));
 }
 
 Results List::as_results() const
 {
     verify_attached();
-    return m_type == PropertyType::Object
-        ? Results(m_realm, std::static_pointer_cast<LnkLst>(m_list_base))
-        : Results(m_realm, m_list_base);
+    return m_link_view ? Results(m_realm, m_link_view) : Results(m_realm, *m_table);
 }
 
 Results List::snapshot() const
@@ -341,99 +385,37 @@ Results List::snapshot() const
     return as_results().snapshot();
 }
 
-// The simpler definition of void_t below does not work in gcc 4.9 due to a bug
-// in that version of gcc (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64395)
-
-// template<class...> using VoidT = void;
-namespace _impl {
-    template<class... > struct MakeVoid { using type = void; };
-}
-template<class... T> using VoidT = typename _impl::MakeVoid<T...>::type;
-
-template<class, class = VoidT<>>
-struct HasMinmaxType : std::false_type { };
-template<class T>
-struct HasMinmaxType<T, VoidT<typename ColumnTypeTraits<T>::minmax_type>> : std::true_type { };
-
-template<class, class = VoidT<>>
-struct HasSumType : std::false_type { };
-template<class T>
-struct HasSumType<T, VoidT<typename ColumnTypeTraits<T>::sum_type>> : std::true_type { };
-
-template<bool cond>
-struct If;
-
-template<>
-struct If<true> {
-    template<typename T, typename Then, typename Else>
-    static auto call(T self, Then&& fn, Else&&) { return fn(self); }
-};
-template<>
-struct If<false> {
-    template<typename T, typename Then, typename Else>
-    static auto call(T, Then&&, Else&& fn) { return fn(); }
-};
-
-util::Optional<Mixed> List::max(ColKey col) const
+util::Optional<Mixed> List::max(size_t column)
 {
-    if (get_type() == PropertyType::Object)
-        return as_results().max(col);
-    size_t out_ndx = not_found;
-    auto result = m_list_base->max(&out_ndx);
-    if (result.is_null()) {
-        throw realm::Results::UnsupportedColumnTypeException(m_list_base->get_col_key(), m_list_base->get_table(), "max");
-    }
-    return out_ndx == not_found ? none : make_optional(result);
+    return as_results().max(column);
 }
 
-util::Optional<Mixed> List::min(ColKey col) const
+util::Optional<Mixed> List::min(size_t column)
 {
-    if (get_type() == PropertyType::Object)
-        return as_results().min(col);
-
-    size_t out_ndx = not_found;
-    auto result = m_list_base->min(&out_ndx);
-    if (result.is_null()) {
-        throw realm::Results::UnsupportedColumnTypeException(m_list_base->get_col_key(), m_list_base->get_table(), "min");
-    }
-    return out_ndx == not_found ? none : make_optional(result);
+    return as_results().min(column);
 }
 
-Mixed List::sum(ColKey col) const
+Mixed List::sum(size_t column)
 {
-    if (get_type() == PropertyType::Object)
-        return *as_results().sum(col);
-
-    auto result = m_list_base->sum();
-    if (result.is_null()) {
-        throw realm::Results::UnsupportedColumnTypeException(m_list_base->get_col_key(), m_list_base->get_table(), "sum");
-    }
-    return result;
+    // Results::sum() returns none only for Mode::Empty Results, so we can
+    // safely ignore that possibility here
+    return *as_results().sum(column);
 }
 
-util::Optional<double> List::average(ColKey col) const
+util::Optional<double> List::average(size_t column)
 {
-    if (get_type() == PropertyType::Object)
-        return as_results().average(col);
-    size_t count = 0;
-    auto result = m_list_base->avg(&count);
-    if (result.is_null()) {
-        throw realm::Results::UnsupportedColumnTypeException(m_list_base->get_col_key(), m_list_base->get_table(), "average");
-    }
-    return count == 0 ? none : make_optional(result.get_double());
+    return as_results().average(column);
 }
 
+// These definitions rely on that LinkViews and Tables are interned by core
 bool List::operator==(List const& rgt) const noexcept
 {
-    return m_list_base->get_table() == rgt.m_list_base->get_table()
-        && m_list_base->get_key() == rgt.m_list_base->get_key()
-        && m_list_base->get_col_key() == rgt.m_list_base->get_col_key();
+    return m_link_view == rgt.m_link_view && m_table.get() == rgt.m_table.get();
 }
 
 NotificationToken List::add_notification_callback(CollectionChangeCallback cb) &
 {
     verify_attached();
-    m_realm->verify_notifications_available();
     // Adding a new callback to a notifier which had all of its callbacks
     // removed does not properly reinitialize the notifier. Work around this by
     // recreating it instead.
@@ -443,20 +425,13 @@ NotificationToken List::add_notification_callback(CollectionChangeCallback cb) &
     if (m_notifier && !m_notifier->have_callbacks())
         m_notifier.reset();
     if (!m_notifier) {
-        m_notifier = std::make_shared<ListNotifier>(m_realm, *m_list_base, m_type);
+        if (get_type() == PropertyType::Object)
+            m_notifier = std::static_pointer_cast<_impl::CollectionNotifier>(std::make_shared<ListNotifier>(m_link_view, m_realm));
+        else
+            m_notifier = std::static_pointer_cast<_impl::CollectionNotifier>(std::make_shared<PrimitiveListNotifier>(m_table, m_realm));
         RealmCoordinator::register_notifier(m_notifier);
     }
     return {m_notifier, m_notifier->add_callback(std::move(cb))};
-}
-
-List List::freeze(std::shared_ptr<Realm> const& frozen_realm) const
-{
-    return List(frozen_realm, *frozen_realm->import_copy_of(*m_list_base));
-}
-
-bool List::is_frozen() const noexcept
-{
-    return m_realm->is_frozen();
 }
 
 List::OutOfBoundsIndexException::OutOfBoundsIndexException(size_t r, size_t c)
@@ -477,7 +452,6 @@ REALM_PRIMITIVE_LIST_TYPE(double)
 REALM_PRIMITIVE_LIST_TYPE(StringData)
 REALM_PRIMITIVE_LIST_TYPE(BinaryData)
 REALM_PRIMITIVE_LIST_TYPE(Timestamp)
-REALM_PRIMITIVE_LIST_TYPE(ObjKey)
 REALM_PRIMITIVE_LIST_TYPE(util::Optional<bool>)
 REALM_PRIMITIVE_LIST_TYPE(util::Optional<int64_t>)
 REALM_PRIMITIVE_LIST_TYPE(util::Optional<float>)
@@ -486,22 +460,9 @@ REALM_PRIMITIVE_LIST_TYPE(util::Optional<double>)
 #undef REALM_PRIMITIVE_LIST_TYPE
 } // namespace realm
 
-namespace {
-size_t hash_combine() { return 0; }
-template<typename T, typename... Rest>
-size_t hash_combine(const T& v, Rest... rest)
-{
-    size_t h = hash_combine(rest...);
-    h ^= std::hash<T>()(v) + 0x9e3779b9 + (h<<6) + (h>>2);
-    return h;
-}
-}
-
 namespace std {
-size_t hash<List>::operator()(List const& list) const
+size_t hash<realm::List>::operator()(realm::List const& list) const
 {
-    auto& impl = *list.m_list_base;
-    return hash_combine(impl.get_key().value, impl.get_table()->get_key().value,
-                        impl.get_col_key().value);
+    return std::hash<void*>()(list.m_link_view ? list.m_link_view.get() : (void*)list.m_table.get());
 }
 }

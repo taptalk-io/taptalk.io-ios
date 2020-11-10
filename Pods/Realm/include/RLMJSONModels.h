@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable, readonly) NSString *path;
 @property (nonatomic, readonly) NSTimeInterval expires;
 @property (nonatomic, readonly) BOOL isAdmin;
+//@property (nonatomic, readonly) NSArray *access;
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 
@@ -66,7 +67,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, nullable) RLMTokenModel *accessToken;
 @property (nonatomic, readonly, nullable) RLMTokenModel *refreshToken;
-@property (nonatomic, readonly, nullable) NSString *urlPrefix;
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary
                 requireAccessToken:(BOOL)requireAccessToken

@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include <realm/binary_data.hpp>
-#include <realm/column_binary.hpp>
 #include <realm/impl/cont_transact_hist.hpp>
 #include <realm/util/buffer.hpp>
 

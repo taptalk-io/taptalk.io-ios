@@ -22,28 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- * \defgroup PlacesOpenNowStatus GMSPlacesOpenNowStatus
- * @{
- */
-
-/**
- * Describes the current open status of a place.
- *
- * (Deprecated: This enum is currently not supported and should not be used. Use GMSPlaceOpenStatus
- * instead.)
- */
-typedef NS_ENUM(NSInteger, GMSPlacesOpenNowStatus) {
-  /** The place is open now. */
-  kGMSPlacesOpenNowStatusYes,
-  /** The place is not open now. */
-  kGMSPlacesOpenNowStatusNo,
-  /** We don't know whether the place is open now. */
-  kGMSPlacesOpenNowStatusUnknown,
-};
-
-/**@}*/
-
-/**
  * \defgroup PlacesPriceLevel GMSPlacesPriceLevel
  * @{
  */
@@ -121,14 +99,6 @@ typedef NS_ENUM(NSInteger, GMSPlacesBusinessStatus) {
  * the Place.
  */
 @property(nonatomic, readonly, assign) CLLocationCoordinate2D coordinate;
-
-/**
- * Represents the open now status of the place at the time that the place was created.
- *
- */
-@property(nonatomic, readonly, assign)
-    GMSPlacesOpenNowStatus openNowStatus __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "openNowStatus property is currently not supported and should not be used");
 
 /**
  * Phone number of this place, in international format, i.e. including the country code prefixed

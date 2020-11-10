@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <realm/obj.hpp>
+#include <realm/row.hpp>
 #include <realm/table.hpp>
 #include <realm/util/optional.hpp>
 
@@ -38,17 +38,17 @@ class SyncUserMetadata {
 public:
     struct Schema {
         // The ROS identity of the user. This, plus the auth server URL, uniquely identifies a user.
-        ColKey idx_identity;
+        size_t idx_identity;
         // A locally issued UUID for the user. This is used to generate the on-disk user directory.
-        ColKey idx_local_uuid;
+        size_t idx_local_uuid;
         // Whether or not this user has been marked for removal.
-        ColKey idx_marked_for_removal;
+        size_t idx_marked_for_removal;
         // The cached refresh token for this user.
-        ColKey idx_user_token;
+        size_t idx_user_token;
         // The URL of the authentication server this user resides upon.
-        ColKey idx_auth_server_url;
+        size_t idx_auth_server_url;
         // Whether or not the auth server reported that this user is marked as an administrator.
-        ColKey idx_user_is_admin;
+        size_t idx_user_is_admin;
     };
 
     // Cannot be set after creation.
@@ -78,12 +78,12 @@ public:
     }
 
     // INTERNAL USE ONLY
-    SyncUserMetadata(Schema schema, SharedRealm realm, const Obj& obj);
+    SyncUserMetadata(Schema schema, SharedRealm realm, RowExpr row);
 private:
     bool m_invalid = false;
     SharedRealm m_realm;
     Schema m_schema;
-    Obj m_obj;
+    Row m_row;
 };
 
 // A facade for a metadata Realm object representing a pending action to be carried out upon a specific file(s).
@@ -91,15 +91,15 @@ class SyncFileActionMetadata {
 public:
     struct Schema {
         // The original path on disk of the file (generally, the main file for an on-disk Realm).
-        ColKey idx_original_name;
+        size_t idx_original_name;
         // A new path on disk for a file to be written to. Context-dependent.
-        ColKey idx_new_name;
+        size_t idx_new_name;
         // An enum describing the action to take.
-        ColKey idx_action;
+        size_t idx_action;
         // The full remote URL of the Realm on the ROS.
-        ColKey idx_url;
+        size_t idx_url;
         // The local UUID of the user to whom the file action applies (despite the internal column name).
-        ColKey idx_user_identity;
+        size_t idx_user_identity;
     };
 
     enum class Action {
@@ -126,18 +126,18 @@ public:
     void remove();
 
     // INTERNAL USE ONLY
-    SyncFileActionMetadata(Schema schema, SharedRealm realm, const Obj& obj);
+    SyncFileActionMetadata(Schema schema, SharedRealm realm, RowExpr row);
 private:
     SharedRealm m_realm;
     Schema m_schema;
-    Obj m_obj;
+    Row m_row;
 };
 
 class SyncClientMetadata {
 public:
     struct Schema {
         // A UUID that identifies this client.
-        ColKey idx_uuid;
+        size_t idx_uuid;
     };
 };
 
@@ -146,14 +146,12 @@ class SyncMetadataResults {
 public:
     size_t size() const
     {
-        m_realm->refresh();
         return m_results.size();
     }
 
     T get(size_t idx) const
     {
-        m_realm->refresh();
-        auto row = m_results.get(idx);
+        RowExpr row = m_results.get(idx);
         return T(m_schema, m_realm, row);
     }
 
@@ -187,19 +185,24 @@ public:
     // Return a Results object containing all pending actions.
     SyncFileActionMetadataResults all_pending_actions() const;
 
+    // Delete an existing metadata action given the original name of the Realm it involves.
+    // Returns true iff there was an existing metadata action and it was deleted.
+    bool delete_metadata_action(const std::string&) const;
+
     // Retrieve or create user metadata.
     // Note: if `make_is_absent` is true and the user has been marked for deletion, it will be unmarked.
     util::Optional<SyncUserMetadata> get_or_make_user_metadata(const std::string& identity, const std::string& url,
                                                                bool make_if_absent=true) const;
 
     // Retrieve file action metadata.
-    util::Optional<SyncFileActionMetadata> get_file_action_metadata(StringData path) const;
+    util::Optional<SyncFileActionMetadata> get_file_action_metadata(const std::string& path) const;
 
     // Create file action metadata.
-    void make_file_action_metadata(StringData original_name, StringData url,
-                                   StringData local_uuid,
-                                   SyncFileActionMetadata::Action action,
-                                   StringData new_name = {}) const;
+    SyncFileActionMetadata make_file_action_metadata(const std::string& original_name,
+                                                     const std::string& url,
+                                                     const std::string& local_uuid,
+                                                     SyncFileActionMetadata::Action action,
+                                                     util::Optional<std::string> new_name=none) const;
 
     // Get the unique identifier of this client.
     const std::string& client_uuid() const { return m_client_uuid; }
@@ -220,8 +223,6 @@ private:
     SyncFileActionMetadata::Schema m_file_action_schema;
     SyncClientMetadata::Schema m_client_schema;
     std::string m_client_uuid;
-
-    std::shared_ptr<Realm> get_realm() const;
 };
 
 }

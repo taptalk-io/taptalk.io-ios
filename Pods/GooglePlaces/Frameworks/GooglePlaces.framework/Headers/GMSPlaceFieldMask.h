@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  *       supported for |GMSPlaceLikelihoodList| place objects. Please refer to
  *       https://developers.google.com/places/ios-sdk/place-data-fields for more details.
  */
-typedef NS_ENUM(NSUInteger, GMSPlaceField) {
+typedef NS_OPTIONS(NSUInteger, GMSPlaceField) {
   GMSPlaceFieldName = 1 << 0,
   GMSPlaceFieldPlaceID = 1 << 1,
   GMSPlaceFieldPlusCode = 1 << 2,

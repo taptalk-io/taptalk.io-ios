@@ -11,7 +11,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIKit.h>
 
-#import "GMSAutocompleteBoundsMode.h"
 #import "GMSPlace.h"
 #import "GMSPlaceFieldMask.h"
 #import "GMSPlacesDeprecationUtils.h"
@@ -219,73 +218,6 @@ typedef void (^GMSPlacePhotoImageResultCallback)(UIImage *_Nullable photo,
  * @param callback The callback to invoke with the place likelihood list.
  */
 - (void)currentPlaceWithCallback:(GMSPlaceLikelihoodListCallback)callback;
-
-/**
- * Autocompletes a given text query. Results may optionally be biased towards a certain location.
- *
- * The supplied callback will be invoked with an array of autocompletion predictions upon success
- * and an NSError upon an error.
- *
- * @param query The partial text to autocomplete.
- * @param bounds The bounds used to bias the results. This is not a hard restrict - places may still
- *               be returned outside of these bounds. This parameter may be nil.
- * @param filter The filter to apply to the results. This parameter may be nil.
- * @param callback The callback to invoke with the predictions.
- */
-- (void)autocompleteQuery:(NSString *)query
-                   bounds:(nullable GMSCoordinateBounds *)bounds
-                   filter:(nullable GMSAutocompleteFilter *)filter
-                 callback:(GMSAutocompletePredictionsCallback)callback
-    __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "Method deprecated in favor of findAutocompletePredictionsFromQuery:filter:sessionToken:callback");
-
-/**
- * Autocompletes a given text query. Results may optionally be biased towards a certain location,
- * or restricted to an area.
- *
- * The supplied callback will be invoked with an array of autocompletion predictions upon success
- * and an NSError upon an error.
- *
- * @param query The partial text to autocomplete.
- * @param bounds The bounds used to bias or restrict the results. Whether this biases or restricts
- *               is determined by the value of the |boundsMode| parameter. This parameter may be
- *               nil.
- * @param boundsMode How to treat the |bounds| parameter. Has no effect if |bounds| is nil.
- * @param filter The filter to apply to the results. This parameter may be nil.
- * @param callback The callback to invoke with the predictions.
- */
-- (void)autocompleteQuery:(NSString *)query
-                   bounds:(nullable GMSCoordinateBounds *)bounds
-               boundsMode:(GMSAutocompleteBoundsMode)boundsMode
-                   filter:(nullable GMSAutocompleteFilter *)filter
-                 callback:(GMSAutocompletePredictionsCallback)callback
-    __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "Method deprecated in favor of findAutocompletePredictionsFromQuery:filter:sessionToken:callback");
-
-/**
- * Find Autocomplete predictions from text query. Results may optionally be biased towards a
- * certain location or restricted to an area. This method is non-blocking.
- *
- * The supplied callback will be invoked with an array of autocompletion predictions upon success
- * and an NSError upon an error.
- *
- * @param query The partial text to autocomplete.
- * @param bounds The bounds used to bias or restrict the results. Whether this biases or restricts
- *               is determined by the value of the |boundsMode| parameter. This parameter may be
- *               nil.
- * @param boundsMode How to treat the |bounds| parameter. Has no effect if |bounds| is nil.
- * @param filter The filter to apply to the results. This parameter may be nil.
- * @param sessionToken The |GMSAutocompleteSessionToken| to associate request to a billing session.
- * @param callback The callback to invoke with the predictions.
- */
-- (void)findAutocompletePredictionsFromQuery:(NSString *)query
-                                      bounds:(nullable GMSCoordinateBounds *)bounds
-                                  boundsMode:(GMSAutocompleteBoundsMode)boundsMode
-                                      filter:(nullable GMSAutocompleteFilter *)filter
-                                sessionToken:(nullable GMSAutocompleteSessionToken *)sessionToken
-                                    callback:(GMSAutocompletePredictionsCallback)callback
-    __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "Method deprecated in favor of findAutocompletePredictionsFromQuery:filter:sessionToken:callback");
 
 /**
  * Find Autocomplete predictions from text query. Results may optionally be biased towards a

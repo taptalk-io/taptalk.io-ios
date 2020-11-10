@@ -37,6 +37,7 @@
 #define TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER @"Prefs.TapTalkIsContactSyncAllowedByUser"
 #define TAP_PREFS_PENDING_UPDATE_READ_MESSAGE @"Prefs.TapTalkPendingUpdateReadMessage"
 #define TAP_PREFS_USER_IGNORE_ADD_CONTACT_POPUP_DICTIONARY @"Prefs.TapTalkUserIgnoreAddContactPopupDictionary"
+#define TAP_PREFS_GOOGLE_PLACES_TOKEN @"Prefs.TapTalkGooglePlacesToken"
 
 //Color
 #define TAP_COLOR_WHITE @"FFFFFF"

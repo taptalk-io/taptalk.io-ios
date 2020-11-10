@@ -28,30 +28,29 @@
 using namespace realm;
 
 namespace realm {
-bool operator==(Schema const& a, Schema const& b) noexcept
+bool operator==(Schema const& a, Schema const& b)
 {
     return static_cast<Schema::base const&>(a) == static_cast<Schema::base const&>(b);
 }
 }
 
-Schema::Schema() noexcept = default;
+Schema::Schema() = default;
 Schema::~Schema() = default;
 Schema::Schema(Schema const&) = default;
-Schema::Schema(Schema &&) noexcept = default;
+Schema::Schema(Schema &&) = default;
 Schema& Schema::operator=(Schema const&) = default;
-Schema& Schema::operator=(Schema&&) noexcept = default;
+Schema& Schema::operator=(Schema&&) = default;
 
 Schema::Schema(std::initializer_list<ObjectSchema> types) : Schema(base(types)) { }
 
-Schema::Schema(base types) noexcept
-: base(std::move(types))
+Schema::Schema(base types) : base(std::move(types))
 {
     std::sort(begin(), end(), [](ObjectSchema const& lft, ObjectSchema const& rgt) {
         return lft.name < rgt.name;
     });
 }
 
-Schema::iterator Schema::find(StringData name) noexcept
+Schema::iterator Schema::find(StringData name)
 {
     auto it = std::lower_bound(begin(), end(), name, [](ObjectSchema const& lft, StringData rgt) {
         return lft.name < rgt;
@@ -62,7 +61,7 @@ Schema::iterator Schema::find(StringData name) noexcept
     return it;
 }
 
-Schema::const_iterator Schema::find(StringData name) const noexcept
+Schema::const_iterator Schema::find(StringData name) const
 {
     return const_cast<Schema *>(this)->find(name);
 }
@@ -81,7 +80,6 @@ void Schema::validate() const
 {
     std::vector<ObjectSchemaValidationException> exceptions;
 
-    // As the types are added sorted by name, we can detect duplicates by just looking at the following element.
     auto find_next_duplicate = [&](const_iterator start) {
         return std::adjacent_find(start, cend(), [](ObjectSchema const& lft, ObjectSchema const& rgt) {
             return lft.name == rgt.name;
@@ -100,6 +98,19 @@ void Schema::validate() const
     if (exceptions.size()) {
         throw SchemaValidationException(exceptions);
     }
+}
+
+namespace {
+struct IsNotRemoveProperty {
+    bool operator()(SchemaChange sc) const { return sc.visit(*this); }
+    bool operator()(schema_change::RemoveProperty) const { return false; }
+    template<typename T> bool operator()(T) const { return true; }
+};
+struct GetRemovedColumn {
+    size_t operator()(SchemaChange sc) const { return sc.visit(*this); }
+    size_t operator()(schema_change::RemoveProperty p) const { return p.property->table_column; }
+    template<typename T> size_t operator()(T) const { REALM_COMPILER_HINT_UNREACHABLE(); }
+};
 }
 
 static void compare(ObjectSchema const& existing_schema,
@@ -139,19 +150,25 @@ static void compare(ObjectSchema const& existing_schema,
         }
     }
 
+    if (existing_schema.primary_key != target_schema.primary_key) {
+        changes.emplace_back(schema_change::ChangePrimaryKey{&existing_schema, target_schema.primary_key_property()});
+    }
+
     for (auto& target_prop : target_schema.persisted_properties) {
         if (!existing_schema.property_for_name(target_prop.name)) {
             changes.emplace_back(schema_change::AddProperty{&existing_schema, &target_prop});
         }
     }
 
-    if (existing_schema.primary_key != target_schema.primary_key) {
-        changes.emplace_back(schema_change::ChangePrimaryKey{&existing_schema, target_schema.primary_key_property()});
-    }
+    // Move all RemovePropertys to the end and sort in descending order of
+    // column index, as removing a column will shift all columns after that one
+    auto it = std::partition(begin(changes), end(changes), IsNotRemoveProperty{});
+    std::sort(it, end(changes),
+              [](auto a, auto b) { return GetRemovedColumn()(a) > GetRemovedColumn()(b); });
 }
 
 template<typename T, typename U, typename Func>
-void Schema::zip_matching(T&& a, U&& b, Func&& func) noexcept
+void Schema::zip_matching(T&& a, U&& b, Func&& func)
 {
     size_t i = 0, j = 0;
     while (i < a.size() && j < b.size()) {
@@ -206,24 +223,23 @@ std::vector<SchemaChange> Schema::compare(Schema const& target_schema, bool incl
     return changes;
 }
 
-void Schema::copy_keys_from(realm::Schema const& other) noexcept
+void Schema::copy_table_columns_from(realm::Schema const& other)
 {
     zip_matching(*this, other, [&](ObjectSchema* existing, const ObjectSchema* other) {
         if (!existing || !other)
             return;
 
-        existing->table_key = other->table_key;
         for (auto& current_prop : other->persisted_properties) {
             auto target_prop = existing->property_for_name(current_prop.name);
             if (target_prop) {
-                target_prop->column_key = current_prop.column_key;
+                target_prop->table_column = current_prop.table_column;
             }
         }
     });
 }
 
 namespace realm {
-bool operator==(SchemaChange const& lft, SchemaChange const& rgt) noexcept
+bool operator==(SchemaChange const& lft, SchemaChange const& rgt)
 {
     if (lft.m_kind != rgt.m_kind)
         return false;
