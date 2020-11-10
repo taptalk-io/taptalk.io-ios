@@ -18,11 +18,9 @@
 
 #import <Realm/RLMSyncConfiguration.h>
 
-#import <Realm/RLMConstants.h>
-
 NS_ASSUME_NONNULL_BEGIN
 
-typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
+typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
     RLMSyncStopPolicyImmediately,
     RLMSyncStopPolicyLiveIndefinitely,
     RLMSyncStopPolicyAfterChangesUploaded,

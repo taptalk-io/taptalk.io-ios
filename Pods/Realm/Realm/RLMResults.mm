@@ -178,11 +178,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!_info) {
         return 0;
     }
-    if (state->state == 0) {
-        translateRLMResultsErrors([&] {
-            _results.evaluate_query_if_needed();
-        });
-    }
     return RLMFastEnumerate(state, len, self);
 }
 
@@ -213,7 +208,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    RLMAccessorContext ctx(*_info);
+    RLMAccessorContext ctx(_realm, *_info);
     return translateRLMResultsErrors([&] {
         return _results.get(ctx, index);
     });
@@ -223,7 +218,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!_info) {
         return nil;
     }
-    RLMAccessorContext ctx(*_info);
+    RLMAccessorContext ctx(_realm, *_info);
     return translateRLMResultsErrors([&] {
         return _results.first(ctx);
     });
@@ -233,23 +228,17 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!_info) {
         return nil;
     }
-    RLMAccessorContext ctx(*_info);
+    RLMAccessorContext ctx(_realm, *_info);
     return translateRLMResultsErrors([&] {
         return _results.last(ctx);
     });
 }
 
-- (NSUInteger)indexOfObject:(id)object {
-    if (!_info || !object) {
+- (NSUInteger)indexOfObject:(RLMObject *)object {
+    if (!_info || !object || (!object->_realm && !object.invalidated)) {
         return NSNotFound;
     }
-    if (RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(object)) {
-        // Unmanaged objects are considered not equal to all managed objects
-        if (!obj->_realm && !obj.invalidated) {
-            return NSNotFound;
-        }
-    }
-    RLMAccessorContext ctx(*_info);
+    RLMAccessorContext ctx(_realm, *_info);
     return translateRLMResultsErrors([&] {
         return RLMConvertNotFound(_results.index_of(ctx, object));
     });
@@ -284,7 +273,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         return @[];
     }
     return translateRLMResultsErrors([&] {
-        return RLMCollectionValueForKey(_results, key, *_info);
+        return RLMCollectionValueForKey(_results, key, _realm, *_info);
     });
 }
 
@@ -294,7 +283,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath
-                            method:(util::Optional<Mixed> (Results::*)(ColKey))method
+                            method:(util::Optional<Mixed> (Results::*)(size_t))method
                         methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
     assertKeyPathIsNotNested(keyPath);
     return [self aggregate:keyPath method:method methodName:methodName returnNilForEmpty:returnNilForEmpty];
@@ -320,7 +309,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (NSArray *)_unionOfObjectsForKeyPath:(NSString *)keyPath {
     assertKeyPathIsNotNested(keyPath);
     return translateRLMResultsErrors([&] {
-        return RLMCollectionValueForKey(_results, keyPath, *_info);
+        return RLMCollectionValueForKey(_results, keyPath, _realm, *_info);
     });
 }
 
@@ -336,7 +325,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
     return translateRLMResultsErrors([&] {
         NSMutableArray *flatArray = [NSMutableArray new];
-        for (id<NSFastEnumeration> array in RLMCollectionValueForKey(_results, keyPath, *_info)) {
+        for (id<NSFastEnumeration> array in RLMCollectionValueForKey(_results, keyPath, _realm, *_info)) {
             for (id value in array) {
                 [flatArray addObject:value];
             }
@@ -415,12 +404,12 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self objectAtIndex:index];
 }
 
-- (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(ColKey))method
+- (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method
      methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
     if (_results.get_mode() == Results::Mode::Empty) {
         return returnNilForEmpty ? nil : @0;
     }
-    ColKey column;
+    size_t column = 0;
     if (self.type == RLMPropertyTypeObject || ![property isEqualToString:@"self"]) {
         column = _info->tableColumn(property);
     }
@@ -448,7 +437,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (_results.get_mode() == Results::Mode::Empty) {
         return nil;
     }
-    ColKey column;
+    size_t column = 0;
     if (self.type == RLMPropertyTypeObject || ![property isEqualToString:@"self"]) {
         column = _info->tableColumn(property);
     }
@@ -483,30 +472,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (RLMFastEnumerator *)fastEnumerator {
     return translateRLMResultsErrors([&] {
         return [[RLMFastEnumerator alloc] initWithResults:_results collection:self
-                                                classInfo:*_info];
+                                                    realm:_realm classInfo:*_info];
     });
-}
-
-- (RLMResults *)snapshot {
-    return translateRLMResultsErrors([&] {
-        return [self subresultsWithResults:_results.snapshot()];
-    });
-}
-
-- (instancetype)freeze {
-    if (self.frozen) {
-        return self;
-    }
-
-    RLMRealm *frozenRealm = [_realm freeze];
-    return translateRLMResultsErrors([&] {
-        return [self.class resultsWithObjectInfo:_info->freeze(frozenRealm)
-                                         results:_results.freeze(frozenRealm->_realm)];
-    });
-}
-
-- (BOOL)isFrozen {
-    return _realm.frozen;
 }
 
 // The compiler complains about the method's argument type not matching due to
@@ -516,35 +483,34 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block {
-    return RLMAddNotificationBlock(self, block, nil);
-}
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
-    return RLMAddNotificationBlock(self, block, queue);
+    [_realm verifyNotificationsAreSupported:true];
+    return RLMAddNotificationBlock(self, _results, block, true);
 }
 #pragma clang diagnostic pop
 
-realm::Results& RLMGetBackingCollection(RLMResults *self) {
-    return self->_results;
-}
-
-- (BOOL)isAttached {
+- (BOOL)isAttached
+{
     return !!_realm;
 }
 
 #pragma mark - Thread Confined Protocol Conformance
 
-- (realm::ThreadSafeReference)makeThreadSafeReference {
-    return _results;
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
+    return std::make_unique<realm::ThreadSafeReference<Results>>(_realm->_realm->obtain_thread_safe_reference(_results));
 }
 
 - (id)objectiveCMetadata {
     return nil;
 }
 
-+ (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
++ (instancetype)objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
                                      metadata:(__unused id)metadata
                                         realm:(RLMRealm *)realm {
-    auto results = reference.resolve<Results>(realm->_realm);
+    REALM_ASSERT_DEBUG(dynamic_cast<realm::ThreadSafeReference<Results> *>(reference.get()));
+    auto results_reference = static_cast<realm::ThreadSafeReference<Results> *>(reference.get());
+
+    Results results = realm->_realm->resolve_thread_safe_reference(std::move(*results_reference));
+
     return [RLMResults resultsWithObjectInfo:realm->_info[RLMStringDataToNSString(results.get_object_type())]
                                      results:std::move(results)];
 }
@@ -556,3 +522,4 @@ realm::Results& RLMGetBackingCollection(RLMResults *self) {
     return RLMDescriptionWithMaxDepth(@"RLMLinkingObjects", self, RLMDescriptionMaxDepth);
 }
 @end
+

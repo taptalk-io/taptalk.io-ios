@@ -1,4 +1,3 @@
-#import "GMSAutocompleteBoundsMode.h"
 #import "GMSAutocompleteFetcher.h"
 #import "GMSAutocompleteFilter.h"
 #import "GMSAutocompleteMatchFragment.h"

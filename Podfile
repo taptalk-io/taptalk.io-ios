@@ -7,7 +7,7 @@ def tapTalk_pods
     pod 'AFNetworking', '~> 4.0.0'
     pod 'SocketRocket'
     pod 'JSONModel', '~> 1.1'
-    pod 'Realm'
+    pod 'Realm', '3.13.1'
     pod 'PodAsset'
     pod 'SDWebImage'
     pod 'GooglePlaces'

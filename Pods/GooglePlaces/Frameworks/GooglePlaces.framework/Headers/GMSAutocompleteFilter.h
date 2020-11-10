@@ -97,7 +97,7 @@ typedef NS_ENUM(NSInteger, GMSPlacesAutocompleteTypeFilter) {
 @property(nonatomic, nullable) CLLocation *origin;
 
 /**
- * The optional location bias to perfer place results near the location.
+ * The optional location bias to prefer place results near the location.
  */
 @property(nonatomic, nullable) id<GMSPlaceLocationBias> locationBias;
 

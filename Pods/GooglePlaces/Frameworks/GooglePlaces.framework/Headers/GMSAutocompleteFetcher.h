@@ -8,7 +8,6 @@
 //  Service: https://developers.google.com/maps/terms
 //
 
-#import "GMSAutocompleteBoundsMode.h"
 #import "GMSAutocompleteFilter.h"
 #import "GMSPlacesDeprecationUtils.h"
 
@@ -55,42 +54,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initialize the fetcher.
  *
- * @param bounds The bounds used to bias or restrict the results. Whether this biases or restricts
- *               is determined by the value of the |autocompleteBoundsMode| property.
- *               This parameter may be nil.
- * @param filter The filter to apply to the results. This parameter may be nil.
- */
-- (instancetype)initWithBounds:(nullable GMSCoordinateBounds *)bounds
-                        filter:(nullable GMSAutocompleteFilter *)filter NS_DESIGNATED_INITIALIZER
-    __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "initWithBounds:filter is deprecated in favor of initWithFilter:");
-
-/**
- * Initialize the fetcher.
- *
  * @param filter The filter to apply to the results. This parameter may be nil.
  */
 - (instancetype)initWithFilter:(nullable GMSAutocompleteFilter *)filter NS_DESIGNATED_INITIALIZER;
 
 /** Delegate to be notified with autocomplete prediction results. */
 @property(nonatomic, weak, nullable) id<GMSAutocompleteFetcherDelegate> delegate;
-
-/**
- * Bounds used to bias or restrict the autocomplete results depending on the value of
- * |autocompleteBoundsMode| (can be nil).
- */
-@property(nonatomic, strong, nullable)
-    GMSCoordinateBounds *autocompleteBounds __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "autocompleteBounds property is deprecated in favor of autocompleteFilter.locationBias or autocompleteFilter.locationRestriction");
-
-/**
- * How to treat the |autocompleteBounds| property. Defaults to |kGMSAutocompleteBoundsModeBias|.
- *
- * Has no effect if |autocompleteBounds| is nil.
- */
-@property(nonatomic, assign)
-    GMSAutocompleteBoundsMode autocompleteBoundsMode __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
-        "autocompleteBoundsMode property is deprecated in favor of autocompleteFilter.locationBias or autocompleteFilter.locationRestriction");
 
 /** Filter to apply to autocomplete suggestions (can be nil). */
 @property(nonatomic, strong, nullable) GMSAutocompleteFilter *autocompleteFilter;

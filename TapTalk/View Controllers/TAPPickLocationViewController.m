@@ -416,41 +416,86 @@
     GMSAutocompleteFilter *filter = [[GMSAutocompleteFilter alloc] init];
     filter.country = @"ID";
     
-    if ([keyword length] > 1) {
-        [[GMSPlacesClient sharedClient] autocompleteQuery:keyword bounds:bounds filter:filter callback:^(NSArray *result, NSError *error) {
-            _searchResultArray = [result mutableCopy];
-            CGFloat heightCounter = 0.0f;
-            if ([self.searchResultArray count] > 3) {
-                heightCounter = 3.5f;
-            }
-            else {
-                heightCounter = [self.searchResultArray count];
-            }
-            
-            if (self.hideSearchResult) {
-                _hideSearchResult = NO;
-                [UIView animateWithDuration:0.2f animations:^{
-                    self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 0.0f);
-                    self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
-                } completion:^(BOOL finished) {
-                    [self.pickLocationView.searchTableView reloadData];
-                    
-                    
-                }];
-            }
-            else {
-                [self.pickLocationView.searchTableView reloadData];
-                [UIView animateWithDuration:0.2f animations:^{
-                    self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 36.0f * heightCounter);
-                    self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
-                } completion:^(BOOL finished) {
-                    if (YES) {
-                        [self.pickLocationView.searchBarView becomeFirstResponder];
-                    }
-                }];
-            }
-        }];
+    GMSAutocompleteSessionToken *googlePlacesAutocompleteToken = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_GOOGLE_PLACES_TOKEN valid:nil];
+    if (googlePlacesAutocompleteToken == nil) {
+        GMSAutocompleteSessionToken *token = [[GMSAutocompleteSessionToken alloc] init];
+        googlePlacesAutocompleteToken = token;
+        [[NSUserDefaults standardUserDefaults] setSecureObject:token forKey:TAP_PREFS_GOOGLE_PLACES_TOKEN];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    
+    [[GMSPlacesClient sharedClient] findAutocompletePredictionsFromQuery:keyword filter:filter sessionToken:googlePlacesAutocompleteToken callback:^(NSArray<GMSAutocompletePrediction *> * _Nullable results, NSError * _Nullable error) {
+        _searchResultArray = [results mutableCopy];
+        CGFloat heightCounter = 0.0f;
+        if ([self.searchResultArray count] > 3) {
+           heightCounter = 3.5f;
+        }
+        else {
+           heightCounter = [self.searchResultArray count];
+        }
+
+        if (self.hideSearchResult) {
+           _hideSearchResult = NO;
+           [UIView animateWithDuration:0.2f animations:^{
+               self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 0.0f);
+               self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
+           } completion:^(BOOL finished) {
+               [self.pickLocationView.searchTableView reloadData];
+               
+               
+           }];
+        }
+        else {
+            [self.pickLocationView.searchTableView reloadData];
+            [UIView animateWithDuration:0.2f animations:^{
+                self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 36.0f * heightCounter);
+                self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
+            } completion:^(BOOL finished) {
+                if (YES) {
+                    [self.pickLocationView.searchBarView becomeFirstResponder];
+                }
+            }];
+        }
+    }];
+           
+//DV Note - 6 Nov 2020
+//Deprecated usage of GooglePlaces
+    
+//    if ([keyword length] > 1) {
+//        [[GMSPlacesClient sharedClient] autocompleteQuery:keyword bounds:bounds filter:filter callback:^(NSArray *result, NSError *error) {
+//            _searchResultArray = [result mutableCopy];
+//            CGFloat heightCounter = 0.0f;
+//            if ([self.searchResultArray count] > 3) {
+//                heightCounter = 3.5f;
+//            }
+//            else {
+//                heightCounter = [self.searchResultArray count];
+//            }
+//
+//            if (self.hideSearchResult) {
+//                _hideSearchResult = NO;
+//                [UIView animateWithDuration:0.2f animations:^{
+//                    self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 0.0f);
+//                    self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
+//                } completion:^(BOOL finished) {
+//                    [self.pickLocationView.searchTableView reloadData];
+//
+//
+//                }];
+//            }
+//            else {
+//                [self.pickLocationView.searchTableView reloadData];
+//                [UIView animateWithDuration:0.2f animations:^{
+//                    self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 36.0f * heightCounter);
+//                    self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
+//                } completion:^(BOOL finished) {
+//                    if (YES) {
+//                        [self.pickLocationView.searchBarView becomeFirstResponder];
+//                    }
+//                }];
+//            }
+//        }];
+//    }
 }
 
 - (void)setLocationButtonDidTapped {    
