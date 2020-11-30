@@ -501,8 +501,8 @@
 		D76948B821B10D2B00AE0BE6 /* TAPCustomBubbleManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCustomBubbleManager.h; sourceTree = "<group>"; };
 		D76948B921B10D2B00AE0BE6 /* TAPCustomBubbleManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCustomBubbleManager.m; sourceTree = "<group>"; };
 		D769A2F322535B5B0059DC9B /* TAPCustomButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomButtonView.h; sourceTree = "<group>"; };
-		D774A94B22E8228F005CAD5D /* TapUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TapUI.h; path = "/Users/macintosh/Desktop/taptalk.io-ios/TapTalk/TapUI.h"; sourceTree = "<absolute>"; };
-		D774A94C22E82290005CAD5D /* TapUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TapUI.m; path = "/Users/macintosh/Desktop/taptalk.io-ios/TapTalk/TapUI.m"; sourceTree = "<absolute>"; };
+		D774A94B22E8228F005CAD5D /* TapUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapUI.h; sourceTree = "<group>"; };
+		D774A94C22E82290005CAD5D /* TapUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapUI.m; sourceTree = "<group>"; };
 		D774A95022E97429005CAD5D /* TAPCoreRoomListManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCoreRoomListManager.h; sourceTree = "<group>"; };
 		D774A95122E9742A005CAD5D /* TAPCoreRoomListManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAPCoreRoomListManager.m; sourceTree = "<group>"; };
 		D774A95422E974C8005CAD5D /* TAPCoreMessageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TAPCoreMessageManager.h; sourceTree = "<group>"; };
