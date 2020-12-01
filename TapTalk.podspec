@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.source       = { :git => 'https://github.com/alfian0/taptalk.io-ios.git', :commit => '8d86fc99df36d169ddce18092f9a812797b6d064' }
+    s.source       = { :git => 'https://github.com/alfian0/taptalk.io-ios.git' }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
