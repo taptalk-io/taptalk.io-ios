@@ -4,15 +4,15 @@ inhibit_all_warnings!
 use_frameworks!
 
 def tapTalk_pods
-    pod 'AFNetworking'
+    pod 'AFNetworking', '~> 4.0.0'
     pod 'SocketRocket'
-    pod 'JSONModel'
-    pod 'Realm'
+    pod 'JSONModel', '~> 1.1'
+    pod 'Realm', '3.13.1'
     pod 'PodAsset'
     pod 'SDWebImage'
     pod 'GooglePlaces'
     pod 'GoogleMaps'
-    pod 'ZSWTappableLabel'
+    pod 'ZSWTappableLabel', '~> 2.0'
 end
 
 target "TapTalk" do

@@ -38,15 +38,15 @@ Pod::Spec.new do |s|
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.dependency "AFNetworking"
+    s.dependency "AFNetworking", "~> 4.0.0"
     s.dependency "SocketRocket"
-    s.dependency "JSONModel"
-    s.dependency "Realm"
+    s.dependency "JSONModel", "~> 1.1"
+    s.dependency "Realm", "3.13.1"
     s.dependency "SDWebImage"
     s.dependency "PodAsset"
     s.dependency "GooglePlaces"
     s.dependency "GoogleMaps"
-    s.dependency "ZSWTappableLabel"
+    s.dependency "ZSWTappableLabel", '~> 2.0'
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
