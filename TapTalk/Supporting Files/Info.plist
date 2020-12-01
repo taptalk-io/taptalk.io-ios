@@ -30,6 +30,7 @@
 	<string>$(PRODUCT_NAME) needs to request access to your location to send location chat</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>DMSans-Italic.ttf</string>
 		<string>PTRootUI-Bold.ttf</string>
 		<string>PTRootUI-Medium.ttf</string>
 		<string>PTRootUI-Regular.ttf</string>
