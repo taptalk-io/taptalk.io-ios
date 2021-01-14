@@ -954,6 +954,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
             [photoAlbumListViewController setParticipantListArray:self.participantListArray];
             UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+            photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
             [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
         });
     }

@@ -870,108 +870,159 @@
         
         return;
     }
+        
+    CGFloat ratio = width / height;
+    CGFloat dimensionRatio = 0.86f;
+    CGFloat resultWidth;
+    CGFloat resultHeight;
     
-    CGFloat previousImageWidth = width;
-    CGFloat previousImageHeight = height;
-    
-    CGFloat imageWidth = width;
-    CGFloat imageHeight = height;
-    
-    _cellWidth = imageWidth;
-    _cellHeight = imageHeight;
-    
-    if (imageWidth > imageHeight) {
-        if (imageWidth > self.maxWidth) {
-            imageWidth = self.maxWidth;
-            _cellWidth = imageWidth;
-            
-            imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
-            _cellHeight = imageHeight;
-            
-            if (imageHeight > self.maxHeight) {
-                imageHeight = self.maxHeight;
-                _cellHeight = imageHeight;
-                
-                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
-                _cellWidth = imageWidth;
-            }
-            else if (imageHeight < self.minHeight) {
-                imageHeight = self.minHeight;
-                _cellHeight = imageHeight;
-                
-                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
-                _cellWidth = imageWidth;
-            }
+    if (ratio > (self.maxWidth / self.minHeight)) {
+        // Image width is higher than maxWidth, but height is lower than minHeight
+        // Set width to maxWidth, height to minHeight and crop image
+        resultWidth = self.maxWidth;
+        resultHeight = self.minHeight;
+//        self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
+//        self.thumbnailBubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
+    } else if (ratio < (self.minWidth / self.maxHeight)) {
+        // Image height is higher than maxHeight, but width is lower than minWidth
+        // Set width to minWidth, height to maxHeight and crop image
+        resultWidth = self.minWidth;
+        resultHeight = self.maxHeight;
+//        self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
+//        self.thumbnailBubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
+    } else if (ratio > dimensionRatio) {
+        // Width ratio is higher than limit -> use maxWidth
+        if (width > self.maxWidth) {
+            resultWidth = self.maxWidth;
+            resultHeight = resultWidth / ratio;
+        } else if (width < self.minWidth) {
+            resultWidth = self.minWidth;
+            resultHeight = resultWidth / ratio;
+        } else {
+            resultWidth = width;
+            resultHeight = height;
         }
-        else if (imageWidth < self.minWidth) {
-            imageWidth = self.minWidth;
-            _cellWidth = imageWidth;
-            
-            imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
-            _cellHeight = imageHeight;
-            
-            if (imageHeight > self.maxHeight) {
-                imageHeight = self.maxHeight;
-                _cellHeight = imageHeight;
-                
-                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
-                _cellWidth = imageWidth;
-            }
-            else if (imageHeight < self.minHeight) {
-                imageHeight = self.minHeight;
-                _cellHeight = imageHeight;
-                
-                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
-                _cellWidth = imageWidth;
-            }
+//        self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        self.thumbnailBubbleImageView.contentMode = UIViewContentModeScaleAspectFit;
+    } else {
+        // Height ratio is higher than limit -> use maxHeight
+        if (height > self.maxHeight) {
+            resultHeight = self.maxHeight;
+            resultWidth = resultHeight * ratio;
+        } else if (height < self.minHeight) {
+            resultHeight = self.minHeight;
+            resultWidth = resultHeight * ratio;
+        } else {
+            resultWidth = width;
+            resultHeight = height;
         }
+//        self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        self.thumbnailBubbleImageView.contentMode = UIViewContentModeScaleAspectFit;
     }
-    else {
-        if (imageHeight > self.maxHeight) {
-            imageHeight = self.maxHeight;
-            _cellHeight = imageHeight;
-            
-            imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
-            _cellWidth = imageWidth;
-            
-            if (imageWidth > self.maxWidth) {
-                imageWidth = self.maxWidth;
-                _cellWidth = imageWidth;
-
-                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
-                _cellHeight = imageHeight;
-            }
-            else if (imageWidth < self.minWidth) {
-                imageWidth = self.minWidth;
-                _cellWidth = imageWidth;
-
-                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
-                _cellHeight = imageHeight;
-            }
-        }
-        else if (imageHeight < self.minHeight) {
-            imageHeight = self.minHeight;
-            _cellHeight = imageHeight;
-            
-            imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
-            _cellWidth = imageWidth;
-            
-            if (imageWidth > self.maxWidth) {
-                imageWidth = self.maxWidth;
-                _cellWidth = imageWidth;
-
-                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
-                _cellHeight = imageHeight;
-            }
-            else if (imageWidth < self.minWidth) {
-                imageWidth = self.minWidth;
-                _cellWidth = imageWidth;
-
-                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
-                _cellHeight = imageHeight;
-            }
-        }
-    }
+    _cellWidth = resultWidth;
+    _cellHeight = resultHeight;
+    
+//    CGFloat previousImageWidth = width;
+//    CGFloat previousImageHeight = height;
+//    
+//    CGFloat imageWidth = width;
+//    CGFloat imageHeight = height;
+//    
+//    _cellWidth = imageWidth;
+//    _cellHeight = imageHeight;
+//    
+//    if (imageWidth > imageHeight) {
+//        if (imageWidth > self.maxWidth) {
+//            imageWidth = self.maxWidth;
+//            _cellWidth = imageWidth;
+//            
+//            imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+//            _cellHeight = imageHeight;
+//            
+//            if (imageHeight > self.maxHeight) {
+//                imageHeight = self.maxHeight;
+//                _cellHeight = imageHeight;
+//                
+//                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+//                _cellWidth = imageWidth;
+//            }
+//            else if (imageHeight < self.minHeight) {
+//                imageHeight = self.minHeight;
+//                _cellHeight = imageHeight;
+//                
+//                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+//                _cellWidth = imageWidth;
+//            }
+//        }
+//        else if (imageWidth < self.minWidth) {
+//            imageWidth = self.minWidth;
+//            _cellWidth = imageWidth;
+//            
+//            imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+//            _cellHeight = imageHeight;
+//            
+//            if (imageHeight > self.maxHeight) {
+//                imageHeight = self.maxHeight;
+//                _cellHeight = imageHeight;
+//                
+//                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+//                _cellWidth = imageWidth;
+//            }
+//            else if (imageHeight < self.minHeight) {
+//                imageHeight = self.minHeight;
+//                _cellHeight = imageHeight;
+//                
+//                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+//                _cellWidth = imageWidth;
+//            }
+//        }
+//    }
+//    else {
+//        if (imageHeight > self.maxHeight) {
+//            imageHeight = self.maxHeight;
+//            _cellHeight = imageHeight;
+//            
+//            imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+//            _cellWidth = imageWidth;
+//            
+//            if (imageWidth > self.maxWidth) {
+//                imageWidth = self.maxWidth;
+//                _cellWidth = imageWidth;
+//
+//                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+//                _cellHeight = imageHeight;
+//            }
+//            else if (imageWidth < self.minWidth) {
+//                imageWidth = self.minWidth;
+//                _cellWidth = imageWidth;
+//
+//                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+//                _cellHeight = imageHeight;
+//            }
+//        }
+//        else if (imageHeight < self.minHeight) {
+//            imageHeight = self.minHeight;
+//            _cellHeight = imageHeight;
+//            
+//            imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+//            _cellWidth = imageWidth;
+//            
+//            if (imageWidth > self.maxWidth) {
+//                imageWidth = self.maxWidth;
+//                _cellWidth = imageWidth;
+//
+//                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+//                _cellHeight = imageHeight;
+//            }
+//            else if (imageWidth < self.minWidth) {
+//                imageWidth = self.minWidth;
+//                _cellWidth = imageWidth;
+//
+//                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+//                _cellHeight = imageHeight;
+//            }
+//        }
+//    }
 }
 
 - (void)showVideoCaption:(BOOL)show {

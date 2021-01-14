@@ -502,7 +502,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.textViewBorderView.layer.borderWidth = 1.0f;
     self.textViewBorderView.clipsToBounds = YES;
     self.messageTextView.minimumHeight = 32.0f;
-    self.messageTextView.maximumHeight = 64.0f;
+    self.messageTextView.maximumHeight = 120.0f;
         
     if (IS_IPHONE_X_FAMILY) {
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;

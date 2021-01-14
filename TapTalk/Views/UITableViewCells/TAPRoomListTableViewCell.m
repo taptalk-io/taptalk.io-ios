@@ -629,7 +629,11 @@
         [lastSenderAttributedString addAttributes:lastSenderAttributesDictionary
                                             range:NSMakeRange(0, [self.lastSenderLabel.text length])];
         self.lastSenderLabel.attributedText = lastSenderAttributedString;
-        if (numberOfUnreadMessage > 0) {
+        
+        if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0) {
+            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f, 16.0f);
+        }
+        else if (numberOfUnreadMessage > 0) {
             self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, 16.0f);
         }
         else {
@@ -673,7 +677,11 @@
     
     //Resize lastMessageLabel
     CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
-    if (numberOfUnreadMessage > 0) {
+    
+    if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0) {
+        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f, newLastMessageLabelSize.height);
+    }
+    else if (numberOfUnreadMessage > 0) {
         self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, newLastMessageLabelSize.height);
     }
     else {
@@ -681,7 +689,6 @@
     }
     
     [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
-
 }
 
 - (void)setAsTyping:(BOOL)typing {
