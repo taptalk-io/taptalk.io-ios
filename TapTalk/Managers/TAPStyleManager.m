@@ -635,7 +635,7 @@
             
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_FONTSIZE_STYLE];
-            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_FONTSIZE_STYLE weight:UIFontWeightMedium];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -653,7 +653,7 @@
             
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_URL_FONTSIZE_STYLE];
-            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_URL_FONTSIZE_STYLE weight:UIFontWeightMedium];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_URL_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -671,7 +671,7 @@
             
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_URL_HIGHLIGHTED_FONTSIZE_STYLE];
-            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_URL_HIGHLIGHTED_FONTSIZE_STYLE weight:UIFontWeightMedium];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_BODY_URL_HIGHLIGHTED_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -687,7 +687,7 @@
         case TAPComponentFontRightBubbleDeletedMessageBody: {
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_BUBBLE_DELETED_MESSAGE_BODY_FONTSIZE_STYLE];
-            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_DELETED_MESSAGE_BODY_FONTSIZE_STYLE weight:UIFontWeightMedium];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_DELETED_MESSAGE_BODY_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -721,7 +721,7 @@
             
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_BUBBLE_QUOTE_CONTENT_FONTSIZE_STYLE];
-            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_QUOTE_CONTENT_FONTSIZE_STYLE weight:UIFontWeightMedium];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_QUOTE_CONTENT_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -757,7 +757,7 @@
             
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_FILE_BUBBLE_INFO_FONTSIZE_STYLE];
-            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_FILE_BUBBLE_INFO_FONTSIZE_STYLE weight:UIFontWeightMedium];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_FILE_BUBBLE_INFO_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -1995,7 +1995,8 @@
         }
         case TAPComponentColorQuoteLayoutDecorationBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryExtraLight];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryExtraLight];
+            UIColor *color = [TAPUtil getColor:TAP_COLOR_WHITE];
             return color;
             break;
         }
@@ -2007,7 +2008,7 @@
         }
         case TAPComponentColorRightBubbleBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_BACKGROUND_COLOR];
             return color;
             break;
         }
@@ -2019,19 +2020,19 @@
         }
         case TAPComponentColorRightBubbleQuoteBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryDark];
+            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_DARK_BACKGROUND_COLOR];
             return color;
             break;
         }
         case TAPComponentColorLeftFileButtonBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_BACKGROUND_COLOR];
             return color;
             break;
         }
         case TAPComponentColorRightFileButtonBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryDark];
+            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_DARK_BACKGROUND_COLOR];
             return color;
             break;
         }

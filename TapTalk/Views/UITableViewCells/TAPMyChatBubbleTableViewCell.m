@@ -535,8 +535,15 @@
             [attributedString addAttributes:attributes range:userRange];
         }
     }
-        
-        self.bubbleLabel.attributedText = attributedString;
+    
+    // Add line spacing
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setLineSpacing:self.bubbleLabel.font.pointSize * 0.25f];
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:style
+                             range:NSMakeRange(0, [attributedString length])];
+
+    self.bubbleLabel.attributedText = attributedString;
 }
 
 - (void)receiveSentEvent {
