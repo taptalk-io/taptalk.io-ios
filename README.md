@@ -14,7 +14,7 @@ brew install git-lfs
 git lfs install
 ```
 
-## Getting TapTalk.io Omnichannel SDK
+## Getting TapTalk.io SDK
 1. **Install git-lfs**
 2.  Add `pod 'TapTalk'` to your podfile
 3. Check out the samples or follow the **Quick Start & Documentation** guide to start using it in your project.
