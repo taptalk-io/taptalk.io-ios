@@ -18,7 +18,9 @@
 
 @property (strong, nonatomic) TAPSearchView *searchView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
-@property (strong, nonatomic) UIButton *leftBarButton;
+@property (strong, nonatomic) UIView *leftBarView;
+@property (strong, nonatomic) UIView *myAccountView;
+@property (strong, nonatomic) UIButton *closeButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 
 @property (strong, nonatomic) NSMutableArray *recentSearchArray;
@@ -55,6 +57,16 @@
     [super viewDidLoad];
     
     self.navigationController.navigationBar.alpha = 0.0f;
+    
+    _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    _myAccountView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    _leftBarView = [[UIView alloc] initWithFrame:CGRectMake(
+        0.0f,
+        0.0f,
+        CGRectGetMaxX(self.myAccountView.frame),
+        40.0f
+    )];
+    self.leftBarView.alpha = 0.0f;
     
     UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
     UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
@@ -453,29 +465,15 @@
     
     self.searchBarView.searchTextField.text = @"";
     
-    UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-    rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
-
-    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-    [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-    self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
-    [self.rightBarButton addTarget:self action:nil forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
-    [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
-    
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
-    [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-    self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
-    
     [TAPUtil performBlock:^{
         if ([self.delegate respondsToSelector:@selector(searchViewControllerDidTappedSearchCancelButton)]) {
             [self.delegate searchViewControllerDidTappedSearchCancelButton];
         }
     } afterDelay:0.1f];
     
+    [self setUpRoomListNavigationBar];
+    
     [UIView animateWithDuration:0.2f animations:^{
-        self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
-        
         self.view.alpha = 0.0f;
     } completion:^(BOOL finished) {
         self.navigationController.navigationBar.alpha = 0.0f;
@@ -483,6 +481,126 @@
             //completion
         }];
     }];
+}
+
+- (void)setUpRoomListNavigationBar {
+    BOOL showCloseButton = [[TapUI sharedInstance] getCloseRoomListButtonVisibleState];
+    BOOL showMyAccountButton = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
+    BOOL showSearchBar = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
+    BOOL showNewChatButton = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
+    
+    if (showCloseButton || showMyAccountButton) {
+        if (showCloseButton) {
+            UIImage *buttonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
+            
+            self.closeButton.frame = CGRectMake(-20.0f, 0.0f, 40.0f, 40.0f);
+            self.closeButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+            [self.closeButton setImage:buttonImage forState:UIControlStateNormal];
+            
+            [self.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        }
+        
+        if (showMyAccountButton) {
+            CGFloat myAccountButtonX;
+            if (showCloseButton) {
+                myAccountButtonX = CGRectGetMaxX(self.closeButton.frame) + 8.0f;
+            }
+            else {
+                myAccountButtonX = 0.0f;
+            }
+            
+            self.myAccountView.frame = CGRectMake(myAccountButtonX, 0.0f, 40.0f, 40.0f);
+        }
+        
+        if (showCloseButton && showMyAccountButton) {
+            self.leftBarView.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetMaxX(self.myAccountView.frame),
+                40.0f
+            );
+            [self.leftBarView addSubview:self.closeButton];
+            [self.leftBarView addSubview:self.myAccountView];
+        }
+        else if (showMyAccountButton) {
+            self.leftBarView.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetMaxX(self.myAccountView.frame),
+                40.0f
+            );
+            [self.leftBarView addSubview:self.myAccountView];
+        }
+        else if (showCloseButton) {
+            self.leftBarView.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetMaxX(self.closeButton.frame),
+                40.0f
+            );
+            [self.leftBarView addSubview:self.closeButton];
+        }
+        UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarView];
+        [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
+        [UIView animateWithDuration:0.2f animations:^{
+            self.leftBarView.alpha = 1.0f;
+        }];
+        self.searchBarView.frame = CGRectMake(
+            CGRectGetMinX(self.searchBarView.frame),
+            CGRectGetMinY(self.searchBarView.frame),
+            CGRectGetWidth(self.searchBarView.frame) - CGRectGetWidth(self.leftBarView.frame),
+            CGRectGetHeight(self.searchBarView.frame)
+        );
+    }
+    else {
+        self.leftBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
+        [self.navigationItem setLeftBarButtonItem:nil];
+    }
+        
+    if (showNewChatButton) {
+        //RightBarButton
+        UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
+        
+        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
+        self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
+        [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
+        [self.rightBarButton setTitle:nil forState:UIControlStateNormal];
+        [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+        [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+    }
+    else {
+        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
+        [self.navigationItem setRightBarButtonItem:nil];
+        self.searchBarView.frame = CGRectMake(
+            CGRectGetMinX(self.searchBarView.frame),
+            CGRectGetMinY(self.searchBarView.frame),
+            CGRectGetWidth(self.searchBarView.frame) + CGRectGetWidth(self.rightBarButton.frame),
+            CGRectGetHeight(self.searchBarView.frame)
+        );
+    }
+    
+    if (showSearchBar) {
+        //TitleView
+        [UIView animateWithDuration:0.2f animations:^{
+            self.searchBarView.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarButton.frame) - 36.0f,
+                30.0f
+            );
+        }];
+        self.searchBarView.searchTextField.delegate = self;
+        
+        [self.navigationItem setTitleView:self.searchBarView];
+    }
+    else {
+        [UIView animateWithDuration:0.2f animations:^{
+            self.searchBarView.alpha = 0.0f;
+        }];
+    }
 }
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
