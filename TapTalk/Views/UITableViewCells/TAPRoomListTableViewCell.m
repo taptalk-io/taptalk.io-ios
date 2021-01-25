@@ -20,7 +20,7 @@
 @property (strong, nonatomic) UIImageView *expertIconImageView;
 @property (strong, nonatomic) UILabel *roomNameLabel;
 @property (strong, nonatomic) UIImageView *muteImageView;
-@property (strong, nonatomic) UILabel *lastSenderLabel;
+//@property (strong, nonatomic) UILabel *lastSenderLabel;
 @property (strong, nonatomic) UILabel *lastMessageLabel;
 @property (strong, nonatomic) UILabel *timeLabel;
 @property (strong, nonatomic) UIImageView *messageStatusImageView;
@@ -100,12 +100,12 @@
         [self.bgView addSubview:self.roomNameLabel];
         self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
         
-        UIFont *lastSenderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGroupRoomListSenderName];
-        UIColor *lastSenderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGroupRoomListSenderName];
-        _lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.roomNameLabel.frame), 16.0f)];
-        self.lastSenderLabel.textColor = lastSenderLabelColor;
-        self.lastSenderLabel.font = lastSenderLabelFont;
-        [self.bgView addSubview:self.lastSenderLabel];
+//        UIFont *lastSenderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGroupRoomListSenderName];
+//        UIColor *lastSenderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGroupRoomListSenderName];
+//        _lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.roomNameLabel.frame), 16.0f)];
+//        self.lastSenderLabel.textColor = lastSenderLabelColor;
+//        self.lastSenderLabel.font = lastSenderLabelFont;
+//        [self.bgView addSubview:self.lastSenderLabel];
         
         _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 20.0f, 20.0f, 20.0f)];
         self.messageStatusImageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -178,12 +178,12 @@
     
     _isShouldForceUpdateUnreadBubble = YES;
     [self.typingAnimationImageView stopAnimating];
-    if (self.roomType != RoomTypePersonal) {
-        self.lastSenderLabel.alpha = 1.0f;
-    }
-    else {
-        self.lastSenderLabel.alpha = 0.0f;
-    }
+//    if (self.roomType != RoomTypePersonal) {
+//        self.lastSenderLabel.alpha = 1.0f;
+//    }
+//    else {
+//        self.lastSenderLabel.alpha = 0.0f;
+//    }
 }
 
 #pragma mark - Custom Method
@@ -613,33 +613,44 @@
             self.expertIconImageView.alpha = 1.0f;
         }
             
-        //Last Sender
-        self.lastSenderLabel.alpha = 1.0f;
-        self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastSenderLabel.frame), 16.0f);
-        self.lastSenderLabel.text = lastSender;
+        // Last Sender
+//        self.lastSenderLabel.alpha = 1.0f;
+//        self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastSenderLabel.frame), 16.0f);
+//        self.lastSenderLabel.text = lastSender;
         
-        NSMutableDictionary *lastSenderAttributesDictionary = [NSMutableDictionary dictionary];
-        CGFloat lastSenderLetterSpacing = -0.2f;
-        [lastSenderAttributesDictionary setObject:@(lastSenderLetterSpacing) forKey:NSKernAttributeName];
-        NSMutableParagraphStyle *lastSenderStyle = [[NSMutableParagraphStyle alloc] init];
-        lastSenderStyle.lineBreakMode = NSLineBreakByTruncatingTail;
-        [lastSenderStyle setLineSpacing:2];
-        [lastSenderAttributesDictionary setObject:lastSenderStyle forKey:NSParagraphStyleAttributeName];
-        NSMutableAttributedString *lastSenderAttributedString = [[NSMutableAttributedString alloc] initWithString:self.lastSenderLabel.text];
-        [lastSenderAttributedString addAttributes:lastSenderAttributesDictionary
-                                            range:NSMakeRange(0, [self.lastSenderLabel.text length])];
-        self.lastSenderLabel.attributedText = lastSenderAttributedString;
-        if (numberOfUnreadMessage > 0) {
-            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, 16.0f);
+//        NSMutableDictionary *lastSenderAttributesDictionary = [NSMutableDictionary dictionary];
+//        CGFloat lastSenderLetterSpacing = -0.2f;
+//        [lastSenderAttributesDictionary setObject:@(lastSenderLetterSpacing) forKey:NSKernAttributeName];
+//        NSMutableParagraphStyle *lastSenderStyle = [[NSMutableParagraphStyle alloc] init];
+//        lastSenderStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+//        [lastSenderStyle setLineSpacing:2];
+//        [lastSenderAttributesDictionary setObject:lastSenderStyle forKey:NSParagraphStyleAttributeName];
+//        NSMutableAttributedString *lastSenderAttributedString = [[NSMutableAttributedString alloc] initWithString:self.lastSenderLabel.text];
+//        [lastSenderAttributedString addAttributes:lastSenderAttributesDictionary
+//                                            range:NSMakeRange(0, [self.lastSenderLabel.text length])];
+//        self.lastSenderLabel.attributedText = lastSenderAttributedString;
+        
+//        if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0) {
+//            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f, 16.0f);
+//        }
+//        else if (numberOfUnreadMessage > 0) {
+//            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, 16.0f);
+//        }
+//        else {
+//            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, 16.0f);
+//        }
+        
+        NSString *senderFirstName = [[lastSender componentsSeparatedByString:@" "] objectAtIndex:0];
+        
+        // Last Message
+//        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMaxY(self.lastSenderLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 20.0f);
+        self.lastMessageLabel.numberOfLines = 1;
+        if (message.isDeleted || message.type == TAPChatMessageTypeSystemMessage) {
+            self.lastMessageLabel.text = lastMessage;
         }
         else {
-            self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, 16.0f);
+            self.lastMessageLabel.text = [NSString stringWithFormat:@"%@: %@", senderFirstName, lastMessage];
         }
-        
-        //Last Message
-        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMaxY(self.lastSenderLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 20.0f);
-        self.lastMessageLabel.numberOfLines = 1;
-        self.lastMessageLabel.text = lastMessage;
     }
     else {
         if (isExpert) {
@@ -650,11 +661,12 @@
             self.expertIconImageView.alpha = 0.0f;
         }
         
-        self.lastSenderLabel.alpha = 0.0f;
+//        self.lastSenderLabel.alpha = 0.0f;
         
-        //Last Message
+        // Last Message
         self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 44.0f);
-        self.lastMessageLabel.numberOfLines = 2;
+//        self.lastMessageLabel.numberOfLines = 2;
+        self.lastMessageLabel.numberOfLines = 1;
         self.lastMessageLabel.text = lastMessage;
     }
     
@@ -671,17 +683,46 @@
                                          range:NSMakeRange(0, [self.lastMessageLabel.text length])];
     self.lastMessageLabel.attributedText = lastMessageAttributedString;
     
-    //Resize lastMessageLabel
+    // Resize roomNameLabel & lastMessageLabel
+    CGSize roomNameLabelSize = [self.roomNameLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.roomNameLabel.frame), CGFLOAT_MAX)];
+    
     CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
-    if (numberOfUnreadMessage > 0) {
-        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f, newLastMessageLabelSize.height);
+    
+    self.roomNameLabel.frame = CGRectMake(
+        CGRectGetMinX(self.roomNameLabel.frame),
+        (CGRectGetHeight(self.bgView.frame) - roomNameLabelSize.height - newLastMessageLabelSize.height - 4.0f) / 2,
+        CGRectGetWidth(self.roomNameLabel.frame),
+        CGRectGetHeight(self.roomNameLabel.frame)
+    );
+    
+    CGFloat lastMessageLabelNewY = CGRectGetMaxY(self.roomNameLabel.frame) + 2.0f;
+    
+    if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0) {
+        self.lastMessageLabel.frame = CGRectMake(
+            CGRectGetMinX(self.lastMessageLabel.frame),
+            lastMessageLabelNewY,
+            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f,
+            newLastMessageLabelSize.height
+        );
+    }
+    else if (numberOfUnreadMessage > 0) {
+        self.lastMessageLabel.frame = CGRectMake(
+            CGRectGetMinX(self.lastMessageLabel.frame),
+            lastMessageLabelNewY,
+            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f,
+            newLastMessageLabelSize.height
+        );
     }
     else {
-        self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, newLastMessageLabelSize.height);
+        self.lastMessageLabel.frame = CGRectMake(
+            CGRectGetMinX(self.lastMessageLabel.frame),
+            lastMessageLabelNewY,
+            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f,
+            newLastMessageLabelSize.height
+        );
     }
     
     [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
-
 }
 
 - (void)setAsTyping:(BOOL)typing {
@@ -689,9 +730,9 @@
         [self refreshTypingLabelState];
         self.typingView.alpha = 1.0f;
         self.lastMessageLabel.alpha = 0.0f;
-        if (self.roomType != RoomTypePersonal) {
-            self.lastSenderLabel.alpha = 0.0f;
-        }
+//        if (self.roomType != RoomTypePersonal) {
+//            self.lastSenderLabel.alpha = 0.0f;
+//        }
         
         [self.typingAnimationImageView startAnimating];
         [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
@@ -699,9 +740,9 @@
     else {
         self.typingView.alpha = 0.0f;
         self.lastMessageLabel.alpha = 1.0f;
-        if (self.roomType != RoomTypePersonal) {
-            self.lastSenderLabel.alpha = 1.0f;
-        }
+//        if (self.roomType != RoomTypePersonal) {
+//            self.lastSenderLabel.alpha = 1.0f;
+//        }
         
         [self.typingAnimationImageView stopAnimating];
     }
@@ -712,9 +753,9 @@
     self.typingView.alpha = 0.0f;
     [self.typingAnimationImageView stopAnimating];
     self.lastMessageLabel.alpha = 1.0f;
-    if (self.roomType != RoomTypePersonal) {
-        self.lastSenderLabel.alpha = 1.0f;
-    }
+//    if (self.roomType != RoomTypePersonal) {
+//        self.lastSenderLabel.alpha = 1.0f;
+//    }
 }
 
 - (void)showMessageDraftWithMessage:(NSString *)draftMessage {

@@ -458,7 +458,17 @@
     CGFloat mapLongitude = [[dataDictionary objectForKey:@"longitude"] floatValue];
     
     [self setMapWithLatitude:mapLatitude longitude:mapLongitude];
-    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", mapAddress];
+    
+    // Add line spacing
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:mapAddress attributes:nil];
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setLineSpacing:self.bubbleLabel.font.pointSize * 0.25f];
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:style
+                             range:NSMakeRange(0, [attributedString length])];
+    self.bubbleLabel.attributedText = attributedString;
+    
+//    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", mapAddress];
     
     if (self.isShowForwardView || replyToExists || quoteExists) {
         self.mapView.layer.cornerRadius = 0.0f;

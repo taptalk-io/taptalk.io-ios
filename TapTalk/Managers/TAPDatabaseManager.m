@@ -73,10 +73,10 @@
     NSArray *resultArray = [NSArray array];
     resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
     
-    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-        // handle error
-        failure(error);
-    }];
+//    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//        // handle error
+//        failure(error);
+//    }];
     
     success(resultArray);
 }
@@ -121,12 +121,12 @@
         NSArray *resultArray = [NSArray array];
         resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
 
-        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-            // handle error
-             dispatch_async(dispatch_get_main_queue(), ^{
-                failure(error);
-             });
-        }];
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//             dispatch_async(dispatch_get_main_queue(), ^{
+//                failure(error);
+//             });
+//        }];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             success(resultArray);
@@ -169,12 +169,12 @@
         NSArray *resultArray = [NSArray array];
         resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
 
-        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-            // handle error
-            dispatch_async(dispatch_get_main_queue(), ^{
-                failure(error);
-            });
-        }];
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                failure(error);
+//            });
+//        }];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             success(resultArray);
@@ -208,12 +208,12 @@
                 NSArray *resultArray = [NSArray array];
                 resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
                 
-                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                    // handle error
-                    //                dispatch_async(dispatch_get_main_queue(), ^{
-                    failure(error);
-                    //                });
-                }];
+//                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                    // handle error
+//                    //                dispatch_async(dispatch_get_main_queue(), ^{
+//                    failure(error);
+//                    //                });
+//                }];
                 //            dispatch_async(dispatch_get_main_queue(), ^{
                 success(resultArray);
                 //            });
@@ -231,12 +231,12 @@
                     NSArray *resultArray = [NSArray array];
                     resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
                     
-                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                        // handle error
-                        //                dispatch_async(dispatch_get_main_queue(), ^{
-                        failure(error);
-                        //                });
-                    }];
+//                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                        // handle error
+//                        //                dispatch_async(dispatch_get_main_queue(), ^{
+//                        failure(error);
+//                        //                });
+//                    }];
                     
                     //            dispatch_async(dispatch_get_main_queue(), ^{
                     success(resultArray);
@@ -253,12 +253,12 @@
                     NSArray *resultArray = [NSArray array];
                     resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
                     
-                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                        // handle error
-                        //                dispatch_async(dispatch_get_main_queue(), ^{
-                        failure(error);
-                        //                });
-                    }];
+//                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                        // handle error
+//                        //                dispatch_async(dispatch_get_main_queue(), ^{
+//                        failure(error);
+//                        //                });
+//                    }];
                     //            dispatch_async(dispatch_get_main_queue(), ^{
                     success(resultArray);
                     //            });
@@ -325,12 +325,12 @@
         NSArray *resultArray = [NSArray array];
         resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
         
-        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-            // handle error
-            dispatch_async(dispatch_get_main_queue(), ^{
-                failure(error);
-            });
-        }];
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                failure(error);
+//            });
+//        }];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             success(resultArray);
@@ -344,10 +344,10 @@
                              failure:(void (^)(NSError *error))failure {
     
     if ([dataArray count] <= 0) {
-        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-            // handle error
-            failure(error);
-        }];
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//            failure(error);
+//        }];
         
         success();
     }
@@ -368,10 +368,10 @@
              [realm commitWriteTransaction];
              
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                     // handle error
-                     failure(error);
-                 }];
+//                 [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                     // handle error
+//                     failure(error);
+//                 }];
                  
                  success();
              });
@@ -399,10 +399,10 @@
     [realm addObjects:resultArray];
     [realm commitWriteTransaction];
 
-    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-        // handle error
-        failure(error);
-    }];
+//    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//        // handle error
+//        failure(error);
+//    }];
 
     success();
 }
@@ -432,10 +432,10 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                // handle error
-                failure(error);
-            }];
+//            [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                // handle error
+//                failure(error);
+//            }];
             
             success();
         });
@@ -462,10 +462,10 @@
     [realm addOrUpdateObjects:resultArray];
     [realm commitWriteTransaction];
     
-    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-        // handle error
-        failure(error);
-    }];
+//    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//        // handle error
+//        failure(error);
+//    }];
     
     success();
 }
@@ -480,10 +480,10 @@
             [realm deleteAllObjects];
             [realm commitWriteTransaction];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                    // handle error
-                    failure(error);
-                }];
+//                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                    // handle error
+//                    failure(error);
+//                }];
                 
                 success();
             });
@@ -504,10 +504,10 @@
             [realm deleteObjects:results];
             [realm commitWriteTransaction];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                    // handle error
-                    failure(error);
-                }];
+//                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                    // handle error
+//                    failure(error);
+//                }];
                 
                 success();
             });
@@ -546,10 +546,10 @@
             [realm commitWriteTransaction];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                    // handle error
-                    failure(error);
-                }];
+//                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                    // handle error
+//                    failure(error);
+//                }];
                 
                 success();
             });
@@ -585,10 +585,10 @@
         [realm deleteObjects:results];
         [realm commitWriteTransaction];
         
-        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-            // handle error
-            failure(error);
-        }];
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//            failure(error);
+//        }];
         
         success();
     }
@@ -614,10 +614,10 @@
             [realm commitWriteTransaction];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-                    // handle error
-                    failure(error);
-                }];
+//                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//                    // handle error
+//                    failure(error);
+//                }];
                 
                 success();
             });

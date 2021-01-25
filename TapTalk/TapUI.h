@@ -429,6 +429,176 @@ Get current state of hide read status
 */
 - (BOOL)getReadStatusHiddenState;
 
+/**
+Show or hide close button in room list
+*/
+- (void)setCloseRoomListButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of close button in room list
+*/
+- (BOOL)getCloseRoomListButtonVisibleState;
+    
+/**
+Show or hide document attachment in chat room
+*/
+- (void)setDocumentAttachmentEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of document attachment in chat room
+*/
+- (BOOL)isDocumentAttachmentEnabled;
+
+/**
+Show or hide camera attachment in chat room
+*/
+- (void)setCameraAttachmentEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of camera attachment in chat room
+*/
+- (BOOL)isCameraAttachmentEnabled;
+
+/**
+Show or hide gallery attachment in chat room
+*/
+- (void)setGalleryAttachmentEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of gallery attachment in chat room
+*/
+- (BOOL)isGalleryAttachmentEnabled;
+
+/**
+Show or hide location attachment in chat room
+*/
+- (void)setLocationAttachmentEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of location attachment in chat room
+*/
+- (BOOL)isLocationAttachmentEnabled;
+
+/**
+Show or hide reply message long press menu in chat room
+*/
+- (void)setReplyMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of reply message long press menu in chat room
+*/
+- (BOOL)isReplyMessageMenuEnabled;
+
+/**
+Show or hide forward message long press menu in chat room
+*/
+- (void)setForwardMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of forward message long press menu in chat room
+*/
+- (BOOL)isForwardMessageMenuEnabled;
+
+/**
+Show or hide copy message long press menu in chat room
+*/
+- (void)setCopyMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of copy message long press menu in chat room
+*/
+- (BOOL)isCopyMessageMenuEnabled;
+
+/**
+Show or hide delete message long press menu in chat room
+*/
+- (void)setDeleteMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of delete message long press menu in chat room
+*/
+- (BOOL)isDeleteMessageMenuEnabled;
+
+/**
+Show or hide save media long press menu in chat room
+*/
+- (void)setSaveMediaToGalleryMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of save media long press menu in chat room
+*/
+- (BOOL)isSaveMediaToGalleryMenuEnabled;
+
+/**
+Show or hide save document long press menu in chat room
+*/
+- (void)setSaveDocumentMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of save document long press menu in chat room
+*/
+- (BOOL)isSaveDocumentMenuEnabled;
+
+/**
+Show or hide open link long press menu in chat room
+*/
+- (void)setOpenLinkMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of open link long press menu in chat room
+*/
+- (BOOL)isOpenLinkMenuEnabled;
+
+/**
+Show or hide compose email long press menu in chat room
+*/
+- (void)setComposeEmailMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of compose email long press menu in chat room
+*/
+- (BOOL)isComposeEmailMenuEnabled;
+
+/**
+Show or hide dial number long press menu in chat room
+*/
+- (void)setDialNumberMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of dial number long press menu in chat room
+*/
+- (BOOL)isDialNumberMenuEnabled;
+
+/**
+Show or hide send SMS long press menu in chat room
+*/
+- (void)setSendSMSMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of send SMS long press menu in chat room
+*/
+- (BOOL)isSendSMSMenuEnabled;
+
+/**
+Show or hide view profile long press menu in chat room
+*/
+- (void)setViewProfileMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of view profile long press menu in chat room
+*/
+- (BOOL)isViewProfileMenuEnabled;
+
+/**
+Show or hide send message long press menu in chat room
+*/
+- (void)setSendMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current visibility state of send message long press menu in chat room
+*/
+- (BOOL)isSendMessageMenuEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

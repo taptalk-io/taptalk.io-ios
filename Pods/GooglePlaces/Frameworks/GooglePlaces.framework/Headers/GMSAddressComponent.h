@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  * https://developers.google.com/places/ios-sdk/supported_types#table2. This string will be one
  * of the constants defined in GMSPlaceTypes.h.
  */
-@property(nonatomic, readonly, copy) NSString *type __GMS_PLACES_AVAILABLE_BUT_DEPRECATED_MSG(
+@property(nonatomic, readonly, copy) NSString *type __GMS_AVAILABLE_BUT_DEPRECATED_MSG(
     "type property is deprecated in favor of types");
 
 /**

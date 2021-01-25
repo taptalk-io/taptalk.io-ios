@@ -502,7 +502,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.textViewBorderView.layer.borderWidth = 1.0f;
     self.textViewBorderView.clipsToBounds = YES;
     self.messageTextView.minimumHeight = 32.0f;
-    self.messageTextView.maximumHeight = 64.0f;
+    self.messageTextView.maximumHeight = 120.0f;
         
     if (IS_IPHONE_X_FAMILY) {
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
@@ -2434,11 +2434,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -2837,11 +2843,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -3508,11 +3520,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -3831,11 +3849,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -4193,11 +4217,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -4725,11 +4755,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6184,11 +6220,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [locationAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:documentsAction];
-    [alertController addAction:cameraAction];
-    [alertController addAction:galleryAction];
+    if ([[TapUI sharedInstance] isDocumentAttachmentEnabled]) {
+        [alertController addAction:documentsAction];
+    }
+    if ([[TapUI sharedInstance] isCameraAttachmentEnabled]) {
+        [alertController addAction:cameraAction];
+    }
+    if ([[TapUI sharedInstance] isGalleryAttachmentEnabled]) {
+        [alertController addAction:galleryAction];
+    }
     
-    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState]) {
+    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState] &&
+        [[TapUI sharedInstance] isLocationAttachmentEnabled]
+    ) {
         //Only show when Google Places API Key is insert
         [alertController addAction:locationAction];
     }
@@ -6482,8 +6526,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
         [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
         
-        [alertController addAction:composeAction];
-        [alertController addAction:copyAction];
+        if ([[TapUI sharedInstance] isComposeEmailMenuEnabled]) {
+            [alertController addAction:composeAction];
+        }
+        if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+            [alertController addAction:copyAction];
+        }
         [alertController addAction:cancelAction];
         
         if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6556,8 +6604,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
         [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
         
-        [alertController addAction:openAction];
-        [alertController addAction:copyAction];
+        if ([[TapUI sharedInstance] isOpenLinkMenuEnabled]) {
+            [alertController addAction:openAction];
+        }
+        if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+            [alertController addAction:copyAction];
+        }
         [alertController addAction:cancelAction];
         
         if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6657,9 +6709,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:callAction];
-    [alertController addAction:smsAction];
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isDialNumberMenuEnabled]) {
+        [alertController addAction:callAction];
+    }
+    if ([[TapUI sharedInstance] isSendSMSMenuEnabled]) {
+        [alertController addAction:smsAction];
+    }
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6958,20 +7016,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [deleteMessageAction setValue:actionSheetDestructiveColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:replyAction];
+    if ([[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
+        [alertController addAction:replyAction];
+    }
     
-    if ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) && message.room.type != RoomTypeTransaction) {
+    if ([[TapUI sharedInstance] isForwardMessageMenuEnabled] && ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) && message.room.type != RoomTypeTransaction)) {
         //DV Temp
         //Show forward action for text and location only (temporary)
         [alertController addAction:forwardAction];
     }
     
-    if (message.type == TAPChatMessageTypeText) {
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && message.type == TAPChatMessageTypeText) {
         //Show copy action for chat type text only
         [alertController addAction:copyAction];
     }
     
-    if (message.type == TAPChatMessageTypeImage) {
+    if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeImage) {
         //check already downloaded or not
         NSString *roomID = message.room.roomID;
         NSString *fileID = [message.data objectForKey:@"fileID"];
@@ -6986,7 +7046,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    if (message.type == TAPChatMessageTypeVideo) {
+    if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeVideo) {
         //check already downloaded or not
         NSString *roomID = message.room.roomID;
         NSString *fileID = [message.data objectForKey:@"fileID"];
@@ -7000,7 +7060,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending) {
+    if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && [message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending) {
         //Show delete message for our bubble (my bubble) only
         [alertController addAction:deleteMessageAction];
     }

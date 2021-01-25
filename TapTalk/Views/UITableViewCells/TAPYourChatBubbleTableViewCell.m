@@ -541,6 +541,13 @@
         }
     }
     
+    // Add line spacing
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setLineSpacing:self.bubbleLabel.font.pointSize * 0.25f];
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:style
+                             range:NSMakeRange(0, [attributedString length])];
+    
     self.bubbleLabel.attributedText = attributedString;
     
     //CS NOTE - check chat room type, show sender info if group type

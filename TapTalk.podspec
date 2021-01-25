@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalk"
-    s.version      = "1.2.2"
+    s.version      = "1.2.8"
     s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. TapTalk.io provides UI-based and code-based implementation & fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -13,8 +13,7 @@ Pod::Spec.new do |s|
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.authors = { 'Ritchie Nathaniel' => 'ritchie@taptalk.io',
-                  'Dominic Vedericho' => 'dominic@taptalk.io' }
+    s.authors = { 'TapTalk.io' => 'hello@taptalk.io' }
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
@@ -41,7 +40,7 @@ Pod::Spec.new do |s|
     s.dependency "AFNetworking", "~> 4.0.0"
     s.dependency "SocketRocket"
     s.dependency "JSONModel", "~> 1.1"
-    s.dependency "Realm", "3.13.1"
+    s.dependency "Realm", "10.1.0"
     s.dependency "SDWebImage"
     s.dependency "PodAsset"
     s.dependency "GooglePlaces"
@@ -69,7 +68,7 @@ Pod::Spec.new do |s|
     # ――― XCConfig ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     #uncomment to disable bitcode
 #    s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
-#    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-#    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
 end
