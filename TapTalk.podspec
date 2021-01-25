@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
     s.dependency "AFNetworking", "~> 4.0.0"
     s.dependency "SocketRocket"
     s.dependency "JSONModel", "~> 1.1"
-    s.dependency "Realm", "3.13.1"
+    s.dependency "Realm", "10.1.0"
     s.dependency "SDWebImage"
     s.dependency "PodAsset"
     s.dependency "GooglePlaces"
@@ -68,7 +68,7 @@ Pod::Spec.new do |s|
     # ――― XCConfig ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     #uncomment to disable bitcode
 #    s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
-#    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-#    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
 end
