@@ -13,7 +13,6 @@
 
 @class GMSAutocompletePrediction;
 @class GMSAutocompleteSessionToken;
-@class GMSCoordinateBounds;
 
 NS_ASSUME_NONNULL_BEGIN
 

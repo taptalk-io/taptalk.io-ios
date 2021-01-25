@@ -17,7 +17,6 @@
 #import "GMSPlacesDeprecationUtils.h"
 
 @class GMSAutocompleteViewController;
-@class GMSCoordinateBounds;
 
 NS_ASSUME_NONNULL_BEGIN
 
