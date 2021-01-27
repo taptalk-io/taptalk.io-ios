@@ -238,8 +238,12 @@
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
             if (indexPath.row == 0) {
                 //add to contacts
-                if (user != nil && user.isContact || [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                    //if user exists or already contact
+                if (![[TapUI sharedInstance] isAddContactEnabled] ||
+                    ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState] ||
+                    user != nil && user.isContact ||
+                    [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
+                ) {
+                    // Hide if add to contacts menu is disabled in TapUI or user is already a contact
                     height = 0.0f;
                 }
             }
@@ -263,8 +267,12 @@
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
             if (indexPath.row == 0) {
                 //add to contacts
-                if (user != nil && user.isContact || [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-                    //if user exists or already contact
+                if (![[TapUI sharedInstance] isAddContactEnabled] ||
+                    ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState] ||
+                    user != nil && user.isContact ||
+                    [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
+                ) {
+                    // Hide if add to contacts menu is disabled in TapUI or user is already a contact
                     height = 0.0f;
                 }
             }

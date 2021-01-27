@@ -766,6 +766,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         [UIView performWithoutAnimation:^{
             [self.messageTextView resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
         }];
         _isKeyboardShowed = NO;
     }
@@ -849,6 +850,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //Override present view controller method to resign keyboard before presenting view controller from Chat Room to avoid keyboard accessory missing after VC presented from Chat Room
     [self.secondaryTextField resignFirstResponder];
     [self.messageTextView resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     [super presentViewController:viewControllerToPresent animated:flag completion:completion];
 }
 
@@ -875,6 +877,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
+        if (![[TapUI sharedInstance] isMentionUsernameEnabled]) {
+            return 0;
+        }
         return [self.filteredMentionListArray count];
     }
     
@@ -954,7 +959,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (tableView == self.mentionListTableView) {
+    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         return 10.0f;
     }
 
@@ -962,7 +967,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if (tableView == self.mentionListTableView) {
+    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
         view.layer.cornerRadius = 15.0f;
         view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
@@ -1046,9 +1051,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
 
                     cell.message = message;
@@ -1076,10 +1083,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1134,9 +1143,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.delegate = self;
                     cell.message = message;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     if (!message.isHidden) {
@@ -1361,9 +1372,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1392,9 +1405,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1429,9 +1444,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1762,8 +1779,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if (scrollView == self.mentionListTableView) {
         return;
     }
-    
-    NSLog(@"===================== SCROLL VIEW CONTENT OFFSET: %f TABLE VIEW OFFSET: %f", scrollView.contentOffset.y, self.tableView.contentOffset.y);
     
     if (scrollView.contentOffset.y > kShowChatAnchorOffset) {
         
@@ -2457,6 +2472,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -2659,6 +2675,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     _isShowAccessoryView = NO;
     [self reloadInputViews];
@@ -2866,6 +2883,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -3543,6 +3561,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -3872,6 +3891,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -4022,6 +4042,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     _isShowAccessoryView = NO;
     [self reloadInputViews];
@@ -4240,6 +4261,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -4778,6 +4800,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -5454,6 +5477,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     if (isGroup) {
         if (isGroupDeleted) {
@@ -5518,6 +5542,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)checkAndSetupAddToContactsView {
+    if (![[TapUI sharedInstance] isAddContactEnabled] || ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState]) {
+        return;
+    }
     //Setup Add to Contacts View
     UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
     UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
@@ -6249,6 +6276,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -6544,6 +6572,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [UIView animateWithDuration:0.2f animations:^{
             [self.messageTextView resignFirstResponder];
             [self.secondaryTextField resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
         } completion:^(BOOL finished) {
             [self presentViewController:alertController animated:YES completion:^{
                 //after animation
@@ -6622,6 +6651,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [UIView animateWithDuration:0.2f animations:^{
             [self.messageTextView resignFirstResponder];
             [self.secondaryTextField resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
         } completion:^(BOOL finished) {
             [self presentViewController:alertController animated:YES completion:^{
                 //after animation
@@ -6730,6 +6760,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -6765,6 +6796,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                                  //CS NOTE - add resign first responder before every pushVC to handle keyboard height
                                                  [self.messageTextView resignFirstResponder];
                                                  [self.secondaryTextField resignFirstResponder];
+                                                 [self keyboardWillHideWithHeight:0.0f];
                                                  [self.navigationController pushViewController:webViewController animated:YES];
                                              }
                                          }];
@@ -7077,6 +7109,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -7205,7 +7238,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         _currentInputAccessoryExtensionHeight = 0.0f;
         
         if (self.isKeyboardShowed) {
-            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
+            _keyboardHeight = /*kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding +*/ self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
         }
         else {
             _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
@@ -8329,6 +8362,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     if(!self.isKeyboardShowedForFirstTime) {
         _isKeyboardShowedForFirstTime = YES;
+        
+        return;
+    }
+    
+    keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
+    
+    if (keyboardHeight < 0) {
+        return;
     }
     
     if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
@@ -8380,14 +8421,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     CGFloat tempHeight = 0.0f;
-    if (keyboardHeight > self.keyboardHeight) {
+//    if (keyboardHeight > self.keyboardHeight) {
         //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
-        if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
+//        if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
             tempHeight = self.keyboardHeight;
             _lastKeyboardHeight = self.keyboardHeight;
             _keyboardHeight = keyboardHeight;
-        }
-    }
+//        }
+//    }
     
     //handle change keyboard height if keyboard is change to emoji
     if (keyboardHeight > self.initialKeyboardHeight && keyboardHeight != accessoryViewAndSafeAreaHeight) {
@@ -8618,6 +8659,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if (self.isKeyboardShowed) {
                 [UIView performWithoutAnimation:^{
                     [self.messageTextView resignFirstResponder];
+                    [self keyboardWillHideWithHeight:0.0f];
                     [self.secondaryTextField becomeFirstResponder];
                 }];
             }
@@ -8636,6 +8678,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if (self.isKeyboardShowed) {
                 [UIView performWithoutAnimation:^{
                     [self.secondaryTextField resignFirstResponder];
+                    [self keyboardWillHideWithHeight:0.0f];
                     [self.messageTextView becameFirstResponder];
                 }];
             }
@@ -8708,6 +8751,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     [self hideInputAccessoryView];
     TAPUserModel *user = nil;
     user = [self.participantListDictionary objectForKey:username];
@@ -8823,6 +8867,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)showMentionListView:(BOOL)show animated:(BOOL)animated {
+    if (![[TapUI sharedInstance] isMentionUsernameEnabled]) {
+        return;
+    }
     if (show) {
         if (animated) {
             [UIView animateWithDuration:0.2f animations:^{
@@ -8882,6 +8929,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //CS NOTE - add resign first responder before every pushVC to handle keyboard height
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
         [self hideInputAccessoryView];
         
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
@@ -8909,6 +8957,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             //CS NOTE - add resign first responder before every pushVC to handle keyboard height
             [self.messageTextView resignFirstResponder];
             [self.secondaryTextField resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
             [self hideInputAccessoryView];
             
             [self showMentionLoadingView:YES];
@@ -9304,6 +9353,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //CS NOTE - add resign first responder before every pushVC to handle keyboard height
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     if (self.currentRoom.type == RoomTypePersonal) {
         id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
@@ -9358,6 +9408,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //CS NOTE - add resign first responder before every pushVC to handle keyboard height
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
        [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
@@ -9395,6 +9446,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
 }
 
 - (IBAction)chatAnchorButtonDidTapped:(id)sender {
@@ -9580,7 +9632,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)isShowOnlineDotStatus:(BOOL)isShow {
     if (isShow) {
-        self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f);
+//        self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f);
+        self.userStatusView.frame = CGRectMake(0.0f, (CGRectGetHeight(self.userStatusLabel.frame) - 7.0f) / 2.0f - 1.0f + 1.6f, 7.0f, 7.0f);
         self.userStatusView.alpha = 1.0f;
         self.userStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 4.0f, 0.0f, 0.0f, 16.0f);
     }

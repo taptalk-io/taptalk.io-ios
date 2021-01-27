@@ -697,7 +697,7 @@
     
     CGFloat lastMessageLabelNewY = CGRectGetMaxY(self.roomNameLabel.frame) + 2.0f;
     
-    if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0) {
+    if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0 && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         self.lastMessageLabel.frame = CGRectMake(
             CGRectGetMinX(self.lastMessageLabel.frame),
             lastMessageLabelNewY,
@@ -836,7 +836,7 @@
 }
 
 - (void)showUnreadMentionBadge:(BOOL)isShow {
-    if (isShow) {
+    if (isShow && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         self.unreadMentionView.alpha = 1.0f;
     }
     else {

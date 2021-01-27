@@ -341,7 +341,7 @@
 }
 
 - (void)showUnreadMentionBadge:(BOOL)isShow {
-    if (isShow) {
+    if (isShow && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         self.unreadMentionView.alpha = 1.0f;
     }
     else {

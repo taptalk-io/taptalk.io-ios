@@ -599,6 +599,46 @@ Get current visibility state of send message long press menu in chat room
 */
 - (BOOL)isSendMessageMenuEnabled;
 
+/**
+Enable or disable mention username in chat room
+*/
+- (void)setMentionUsernameEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of mention username
+*/
+- (BOOL)isMentionUsernameEnabled;
+
+/**
+Show or hide add to contacts button in chat room
+*/
+- (void)setAddToContactsButtonInChatRoomVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of add to contacts button in chat room
+*/
+- (BOOL)getAddToContactsButtonInChatRoomVisibleState;
+
+/**
+Show or hide add to contacts button in user / group profile
+*/
+- (void)setAddToContactsButtonInChatProfileVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of add to contacts button in user / group profile
+*/
+- (BOOL)getAddToContactsButtonInChatProfileVisibleState;
+
+/**
+Enable or disable adding contacts & contact list
+*/
+- (void)setAddContactEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of adding contacts & contact list
+*/
+- (BOOL)isAddContactEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

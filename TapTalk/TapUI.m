@@ -42,6 +42,10 @@
 @property (nonatomic) BOOL isSendSMSMenuDisabled;
 @property (nonatomic) BOOL isViewProfileMenuDisabled;
 @property (nonatomic) BOOL isSendMessageMenuDisabled;
+@property (nonatomic) BOOL isMentionUsernameDisabled;
+@property (nonatomic) BOOL isAddToContactsButtonInChatRoomHidden;
+@property (nonatomic) BOOL isAddToContactsButtonInChatProfileHidden;
+@property (nonatomic) BOOL isAddContactDisabled;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -732,6 +736,62 @@ Get current visibility state of send message long press menu in chat room
 */
 - (BOOL)isSendMessageMenuEnabled {
     return !self.isSendMessageMenuDisabled;
+}
+
+/**
+Enable or disable mention username in chat room
+*/
+- (void)setMentionUsernameEnabled:(BOOL)isEnabled {
+    _isMentionUsernameDisabled = !isEnabled;
+}
+
+/**
+Get current status of mention username
+*/
+- (BOOL)isMentionUsernameEnabled {
+    return !self.isMentionUsernameDisabled;
+}
+
+/**
+Show or hide add to contacts button in chat room
+*/
+- (void)setAddToContactsButtonInChatRoomVisible:(BOOL)isVisible {
+    _isAddToContactsButtonInChatRoomHidden = !isVisible;
+}
+
+/**
+Get current visibility state of add to contacts button in chat room
+*/
+- (BOOL)getAddToContactsButtonInChatRoomVisibleState {
+    return !self.isAddToContactsButtonInChatRoomHidden;
+}
+
+/**
+Show or hide add to contacts button in user / group profile
+*/
+- (void)setAddToContactsButtonInChatProfileVisible:(BOOL)isVisible {
+    _isAddToContactsButtonInChatProfileHidden = !isVisible;
+}
+
+/**
+Get current visibility state of add to contacts button in user / group profile
+*/
+- (BOOL)getAddToContactsButtonInChatProfileVisibleState {
+    return !self.isAddToContactsButtonInChatProfileHidden;
+}
+
+/**
+Enable or disable adding contacts & contact list
+*/
+- (void)setAddContactEnabled:(BOOL)isEnabled {
+    _isAddContactDisabled = !isEnabled;
+}
+
+/**
+Get current status of adding contacts & contact list
+*/
+- (BOOL)isAddContactEnabled {
+    return !self.isAddContactDisabled;
 }
 
 @end

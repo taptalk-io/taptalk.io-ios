@@ -684,14 +684,18 @@
             return font;
             break;
         }
-        case TAPComponentFontRightBubbleDeletedMessageBody: {
+        case TAPComponentFontRightBubbleDeletedMessageBody:
+        {
+            
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
 //            font = [font fontWithSize:TAP_RIGHT_BUBBLE_DELETED_MESSAGE_BODY_FONTSIZE_STYLE];
             UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_DELETED_MESSAGE_BODY_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
-        case TAPComponentFontLeftBubbleDeletedMessageBody: {
+        case TAPComponentFontLeftBubbleDeletedMessageBody:
+        {
+            
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
 //            font = [font fontWithSize:TAP_LEFT_BUBBLE_MESSAGE_BODY_URL_HIGHLIGHTED_FONTSIZE_STYLE];
             UIFont *font = [UIFont systemFontOfSize:TAP_LEFT_BUBBLE_MESSAGE_BODY_URL_HIGHLIGHTED_FONTSIZE_STYLE weight:UIFontWeightRegular];

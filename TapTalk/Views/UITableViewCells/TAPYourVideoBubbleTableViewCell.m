@@ -387,6 +387,10 @@
 }
 
 - (void)handlePanGestureAction:(UIPanGestureRecognizer *)recognizer {
+    if (![[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
+        return;
+    }
+    
      if (recognizer.state == UIGestureRecognizerStateBegan) {
             _disableTriggerHapticFeedbackOnDrag = NO;
         }

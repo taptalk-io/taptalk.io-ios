@@ -60,11 +60,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.addNewChatView.searchBarView.delegate = self;
     self.addNewChatView.contactsTableView.delegate = self;
     self.addNewChatView.contactsTableView.dataSource = self;
-    self.addNewChatView.searchResultTableView.delegate = self;
-    self.addNewChatView.searchResultTableView.dataSource = self;
+    
+    if ([[TapUI sharedInstance] isAddContactEnabled]) {
+        self.addNewChatView.searchBarView.delegate = self;
+        self.addNewChatView.searchResultTableView.delegate = self;
+        self.addNewChatView.searchResultTableView.dataSource = self;
+    }
+    else {
+        self.addNewChatView.searchBarBackgroundView.alpha = 0.0f;
+        self.addNewChatView.searchBarView.alpha = 0.0f;
+    }
     
     self.title = NSLocalizedStringFromTableInBundle(@"New Chat", nil, [TAPUtil currentBundle], @"");
     
@@ -89,11 +96,11 @@
     
     _filledMenuOptionArray = [NSMutableArray array];
     
-    if ([[TapUI sharedInstance] getNewContactMenuButtonVisibleState]) {
+    if ([[TapUI sharedInstance] isAddContactEnabled] && [[TapUI sharedInstance] getNewContactMenuButtonVisibleState]) {
         //options Add New Contact
         [self.filledMenuOptionArray addObject:@"1"];
     }
-    if ([[TapUI sharedInstance] getScanQRMenuButtonVisibleState]) {
+    if ([[TapUI sharedInstance] isAddContactEnabled] && [[TapUI sharedInstance] getScanQRMenuButtonVisibleState]) {
         //options Scan QR Code
         [self.filledMenuOptionArray addObject:@"2"];
     }
@@ -650,7 +657,6 @@
 }
 
 - (void)loadContactListFromDatabase {
-    
     [TAPDataManager getDatabaseAllContactSortBy:@"fullname" success:^(NSArray *resultArray) {
         _contactListArray = [NSMutableArray array];
         _indexSectionDictionary = [NSMutableDictionary dictionary];
@@ -697,6 +703,10 @@
 }
 
 - (void)syncContactWithLoading:(BOOL)loading {
+    if (![[TapUI sharedInstance] isAddContactEnabled]) {
+        return;
+    }
+    
     CNContactStore *store = [[CNContactStore alloc] init];
     [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -819,6 +829,10 @@
 }
 
 - (void)requestAccessAndCheckNewContact {
+    if (![[TapUI sharedInstance] isAddContactEnabled]) {
+        return;
+    }
+    
     BOOL isAutoSyncEnabled = [[TapTalk sharedInstance] isAutoContactSyncEnabled];
     BOOL isContactSyncAllowedByUser = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER valid:nil];
     if (!isAutoSyncEnabled) {
