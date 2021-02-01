@@ -1855,6 +1855,30 @@
             return color;
             break;
         }
+        case TAPComponentColorDefaultRightBubbleBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TAPComponentColorDefaultRightBubbleDarkBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_DARK_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TAPComponentColorDefaultLeftBubbleBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_LEFT_BUBBLE_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TAPComponentColorDefaultLeftBubbleDarkBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_LEFT_BUBBLE_QUOTE_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
         case TAPComponentColorTextFieldCursor:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
@@ -1999,44 +2023,43 @@
         }
         case TAPComponentColorQuoteLayoutDecorationBackground:
         {
-//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryExtraLight];
-            UIColor *color = [TAPUtil getColor:TAP_COLOR_WHITE];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryExtraLight];
             return color;
             break;
         }
         case TAPComponentColorLeftBubbleBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_LEFT_BUBBLE_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultLeftBubbleBackground];
             return color;
             break;
         }
         case TAPComponentColorRightBubbleBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultRightBubbleBackground];
             return color;
             break;
         }
         case TAPComponentColorLeftBubbleQuoteBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_LEFT_BUBBLE_QUOTE_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultLeftBubbleDarkBackground];
             return color;
             break;
         }
         case TAPComponentColorRightBubbleQuoteBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_DARK_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultRightBubbleDarkBackground];
             return color;
             break;
         }
         case TAPComponentColorLeftFileButtonBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultRightBubbleBackground];
             return color;
             break;
         }
         case TAPComponentColorRightFileButtonBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_DARK_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultRightBubbleDarkBackground];
             return color;
             break;
         }

@@ -7233,6 +7233,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             self.inputAccessoryExtensionHeightConstraint.constant = self.currentInputAccessoryExtensionHeight;
         }
+        
+        if (self.isKeyboardShowed) {
+            [self keyboardWillShowWithHeight:self.keyboardHeight];
+        }
+        else {
+            [self keyboardWillHideWithHeight:self.keyboardHeight];
+        }
     }
     else {
         _currentInputAccessoryExtensionHeight = 0.0f;
@@ -7258,6 +7265,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
             _initialKeyboardHeight = 0.0f;
             _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
+        }
+        
+        if (self.isKeyboardShowed) {
+            [self keyboardWillShowWithHeight:self.keyboardHeight];
+        }
+        else {
+            [self keyboardWillHideWithHeight:self.keyboardHeight];
         }
     }
 }

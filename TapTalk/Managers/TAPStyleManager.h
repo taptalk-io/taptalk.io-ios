@@ -38,6 +38,10 @@ typedef NS_ENUM(NSInteger, TAPDefaultFont) {
 typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorDefaultNavigationBarBackground,
     TAPComponentColorDefaultBackground,
+    TAPComponentColorDefaultRightBubbleBackground,
+    TAPComponentColorDefaultRightBubbleDarkBackground,
+    TAPComponentColorDefaultLeftBubbleBackground,
+    TAPComponentColorDefaultLeftBubbleDarkBackground,
     TAPComponentColorTextFieldCursor,
     TAPComponentColorTextFieldBorderActive,
     TAPComponentColorTextFieldBorderInactive,
