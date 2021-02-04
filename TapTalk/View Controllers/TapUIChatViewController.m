@@ -163,6 +163,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic) CGFloat lastKeyboardHeight;
 @property (nonatomic) CGFloat initialKeyboardHeight;
+@property (nonatomic) CGFloat hiddenKeyboardHeight; // Used to fix table view content inset when scroll view is dragged
 @property (nonatomic) CGFloat currentInputAccessoryExtensionHeight;
 
 @property (nonatomic) long apiBeforeLastCreated;
@@ -1760,8 +1761,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
 //            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
 //        }
-        
-        CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        CGFloat currentKeyboardHeight;
+        if (self.isKeyboardShowed) {
+            currentKeyboardHeight = self.keyboardHeight;
+        }
+        else {
+            currentKeyboardHeight = self.hiddenKeyboardHeight;
+        }
+        CGFloat tableViewYContentInset = currentKeyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
@@ -8565,6 +8572,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //set default keyboard height including accessory view height
     _keyboardHeight = self.messageViewHeightConstraint.constant + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+    _hiddenKeyboardHeight = self.messageViewHeightConstraint.constant + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
@@ -9461,6 +9469,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
     [self keyboardWillHideWithHeight:0.0f];
+    [self.view endEditing:YES];
+    [self.view layoutIfNeeded];
 }
 
 - (IBAction)chatAnchorButtonDidTapped:(id)sender {

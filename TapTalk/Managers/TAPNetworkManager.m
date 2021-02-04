@@ -41,6 +41,7 @@ static const NSInteger kAPITimeOut = 60;
             NSDictionary *statusDictionary = @{@"AFNetworkReachabilityNotificationStatusItem" : [NSNumber numberWithInteger:status]};
             [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:statusDictionary userInfo:statusDictionary];
             
+#ifdef DEBUG
             switch (status) {
                     case AFNetworkReachabilityStatusReachableViaWWAN:
                     NSLog(@"Connected via mobile network");
@@ -54,6 +55,7 @@ static const NSInteger kAPITimeOut = 60;
                 default:
                     break;
             }
+#endif
         }];
         _currentDownloadTaskDictionary = [[NSMutableDictionary alloc] init];
         _appKey = [NSString string];

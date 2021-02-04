@@ -176,8 +176,6 @@
             self.sendingIconLeftConstraint.constant = 4.0f;
             self.sendingIconImageView.alpha = 0.0f;
             [self setMessage:self.message];
-            
-            NSLog(@"MESSAGEEE: %@", [self.message description]);
         }];
     }];
     
