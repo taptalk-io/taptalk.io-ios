@@ -20,6 +20,20 @@ NS_ASSUME_NONNULL_BEGIN
 //==========================================================
 @protocol TapUIChatRoomDelegate <NSObject>
 @optional
+
+/**
+ Called when user sends any message to a chat room
+ 
+ @param message (TAPMessageModel *) temporary message data that is being sent to the chat room
+ @param room (TAPRoomModel *) room data that will be shown
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkActiveUserDidSendMessage:(TAPMessageModel *)message
+                                   room:(TAPRoomModel *)room
+                  currentViewController:(UIViewController *)currentViewController
+       currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
 /**
  Called when user click the profile button on the top right side of personal chat room page.
  

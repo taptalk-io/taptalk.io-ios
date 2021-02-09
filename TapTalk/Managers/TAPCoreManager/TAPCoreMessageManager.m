@@ -740,6 +740,22 @@
     [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
 }
 
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+                           success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                           failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager getAllMessageWithRoomID:roomID
+                                  sortByKey:@"created"
+                                  ascending:NO
+    success:^(NSArray<TAPMessageModel *> *messageArray) {
+        success(messageArray);
+    }
+    failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+        }];
+    }
+
 - (void)getOlderMessagesBeforeTimestamp:(NSNumber *)timestamp
                                  roomID:(NSString *)roomID
                           numberOfItems:(NSNumber *)numberOfItems
@@ -759,7 +775,7 @@
                                success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                                failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreatedTimestamp lastUpdated:lastUpdatedTimestamp needToSaveLastUpdatedTimestamp:NO success:^(NSArray *messageArray) {
-
+        success(messageArray);
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
@@ -781,11 +797,137 @@
         
         NSNumber *lastUpdatedFromPreference = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
         [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated lastUpdated:lastUpdatedFromPreference needToSaveLastUpdatedTimestamp:YES success:^(NSArray *messageArray) {
-            
+            success(messageArray);
         } failure:^(NSError *error) {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
             failure(localizedError);
         }];
+    } failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
+- (void)getAllMessagesWithRoomID:(NSString *)roomID
+            successLocalMessages:(void (^)(NSArray <TAPMessageModel *> *messageArray))successLocalMessages
+              successAllMessages:(void (^)(NSArray <TAPMessageModel *> *allMessagesArray,
+                                           NSArray <TAPMessageModel *> *olderMessagesArray,
+                                           NSArray <TAPMessageModel *> *newerMessagesArray))successAllMessages
+                         failure:(void (^)(NSError *error))failure {
+    
+    NSMutableDictionary<NSString*, TAPMessageModel *> *messageDictionary = [NSMutableDictionary dictionary];
+    NSMutableArray<TAPMessageModel *> *allMessages = [NSMutableArray array];
+    NSMutableArray<TAPMessageModel *> *olderMessages = [NSMutableArray array];
+    NSMutableArray<TAPMessageModel *> *newerMessages = [NSMutableArray array];
+    
+    // Get messages from database
+    [self getLocalMessagesWithRoomID:roomID success:^(NSArray<TAPMessageModel *> *messageArray) {
+        successLocalMessages(messageArray);
+        
+        [allMessages addObjectsFromArray:messageArray];
+        for (TAPMessageModel *message in messageArray) {
+            [messageDictionary setObject:message forKey:message.localID];
+        }
+        
+        long lastTimestamp;
+        if ([allMessages count] > 0) {
+            lastTimestamp = [allMessages objectAtIndex:[allMessages count] - 1].created;
+        }
+        else {
+            lastTimestamp = [[NSDate date] timeIntervalSince1970];
+        }
+        
+        // Fetch older messages from API
+        [self getAllOlderMessagesBeforeTimestamp:[NSNumber numberWithLong:lastTimestamp]
+                                          roomID:roomID
+                               olderMessageArray:[NSMutableArray array]
+        success:^(NSArray<TAPMessageModel *> * _Nonnull messageArray) {
+            NSMutableArray<TAPMessageModel *> *filteredMessages = [NSMutableArray array];
+            for (TAPMessageModel *message in messageArray) {
+                if ([messageDictionary objectForKey:message.localID] == nil) {
+                    [filteredMessages addObject:message];
+                }
+                [messageDictionary setObject:message forKey:message.localID];
+            }
+            [allMessages addObjectsFromArray:filteredMessages];
+            [olderMessages addObjectsFromArray:filteredMessages];
+            
+            // Fetch newer messages from API
+            long lastUpdateTimestamp = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
+            long minCreatedTimestamp = 0L;
+            if ([allMessages count] > 0) {
+                minCreatedTimestamp = [allMessages objectAtIndex:0].created;
+            }
+            [self getNewerMessagesAfterTimestamp:[NSNumber numberWithLong:minCreatedTimestamp]
+                            lastUpdatedTimestamp:[NSNumber numberWithLong:lastUpdateTimestamp]
+                                          roomID:roomID
+            success:^(NSArray<TAPMessageModel *> * _Nonnull messageArray) {
+                NSMutableArray<TAPMessageModel *> *filteredMessages = [NSMutableArray array];
+                for (TAPMessageModel *message in messageArray) {
+                    if ([messageDictionary objectForKey:message.localID] == nil) {
+                        [filteredMessages addObject:message];
+                    }
+                    [messageDictionary setObject:message forKey:message.localID];
+                }
+                [allMessages addObjectsFromArray:filteredMessages];
+                [newerMessages addObjectsFromArray:filteredMessages];
+                
+                // Sort message array
+                NSMutableArray *currentMessageArray = [NSMutableArray arrayWithArray:allMessages];
+                NSMutableArray *sortedArray;
+                
+                sortedArray = [currentMessageArray sortedArrayUsingComparator:^NSComparisonResult(id message1, id message2) {
+                    TAPMessageModel *messageModel1 = (TAPMessageModel *)message1;
+                    TAPMessageModel *messageModel2 = (TAPMessageModel *)message2;
+                    
+                    NSNumber *message1CreatedDate = messageModel1.created;
+                    NSNumber *message2CreatedDate = messageModel2.created;
+                    
+                    return [message2CreatedDate compare:message1CreatedDate];
+                }];
+                
+                successAllMessages(sortedArray, olderMessages, newerMessages);
+            } failure:^(NSError * _Nonnull error) {
+                NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+                failure(localizedError);
+            }];
+        }
+        failure:^(NSError * _Nonnull error) {
+            NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+            failure(localizedError);
+        }];
+    }
+    failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
+- (void)getAllOlderMessagesBeforeTimestamp:(NSNumber *)timestamp
+                                    roomID:(NSString *)roomID
+                         olderMessageArray:(NSMutableArray<TAPMessageModel *> *)olderMessages
+                                   success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                                   failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetMessageBeforeWithRoomID:roomID
+                                           maxCreated:timestamp
+                                        numberOfItems:[NSNumber numberWithInt:TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE]
+    success:^(NSArray *messageArray, BOOL hasMore) {
+        [olderMessages addObjectsFromArray:messageArray];
+        
+        if (hasMore) {
+            // Fetch more older messages
+            TAPMessageModel *oldestMessage = [messageArray objectAtIndex:[messageArray count] - 1];
+            [self getAllOlderMessagesBeforeTimestamp:oldestMessage.created
+                                              roomID:roomID
+                                   olderMessageArray:olderMessages
+                                             success:success
+                                             failure:failure];
+        }
+        else {
+            // Return all older messages
+            success(olderMessages);
+        }
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);

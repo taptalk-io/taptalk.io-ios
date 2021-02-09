@@ -168,6 +168,9 @@ NS_ASSUME_NONNULL_BEGIN
                           success:(void (^)(void))success
                           failure:(void (^)(NSError *error))failure;
 - (void)markMessageAsRead:(TAPMessageModel *)message;
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+                           success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                           failure:(void (^)(NSError *error))failure;
 - (void)getOlderMessagesBeforeTimestamp:(NSNumber *)timestamp
                                  roomID:(NSString *)roomID
                           numberOfItems:(NSNumber *)numberOfItems
@@ -181,6 +184,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getNewerMessagesWithRoomID:(NSString *)roomID
                            success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                            failure:(void (^)(NSError *error))failure;
+- (void)getAllMessagesWithRoomID:(NSString *)roomID
+            successLocalMessages:(void (^)(NSArray <TAPMessageModel *> *messageArray))successLocalMessages
+              successAllMessages:(void (^)(NSArray <TAPMessageModel *> *allMessagesArray,
+                                           NSArray <TAPMessageModel *> *olderMessagesArray,
+                                           NSArray <TAPMessageModel *> *newerMessagesArray))successAllMessages
+                         failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

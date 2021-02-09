@@ -1994,6 +1994,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
+    // Trigger send message callback to TapUI
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkActiveUserDidSendMessage:room:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkActiveUserDidSendMessage:message room:message.room currentViewController:self currentShownNavigationController:self.navigationController];
+    }
     
     //DV Note - 6 Nov 2020
     //Check if message.roomID is not equal to active room ID, dont send message
