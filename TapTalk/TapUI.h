@@ -22,6 +22,28 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 /**
+ Called when a chat room is opened
+ 
+ @param room (TAPRoomModel *) room data that is opened
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkChatRoomDidOpen:(TAPRoomModel *)room
+         currentViewController:(UIViewController *)currentViewController
+currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
+ Called when a chat room is closed
+ 
+ @param room (TAPRoomModel *) room data that is closed
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkChatRoomDidClose:(TAPRoomModel *)room
+          currentViewController:(UIViewController *)currentViewController
+currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
  Called when user sends any message to a chat room
  
  @param message (TAPMessageModel *) temporary message data that is being sent to the chat room

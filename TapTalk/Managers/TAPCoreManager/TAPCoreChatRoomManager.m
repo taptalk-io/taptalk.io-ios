@@ -69,6 +69,10 @@
 }
 
 #pragma mark - Custom Method
+- (TAPRoomModel *)getActiveChatRoom {
+    return [TAPChatManager sharedManager].activeRoom;
+}
+
 - (void)getPersonalChatRoomWithRecipientUserID:(NSString *)userID
                                        success:(void (^)(TAPRoomModel *room))success
                                        failure:(void (^)(NSError *error))failure {

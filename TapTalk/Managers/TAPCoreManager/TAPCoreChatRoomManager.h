@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPCoreChatRoomManager *)sharedManager;
 
+- (TAPRoomModel *)getActiveChatRoom;
+
 - (void)getPersonalChatRoomWithRecipientUserID:(NSString *)userID
                                        success:(void (^)(TAPRoomModel *room))success
                                        failure:(void (^)(NSError *error))failure;

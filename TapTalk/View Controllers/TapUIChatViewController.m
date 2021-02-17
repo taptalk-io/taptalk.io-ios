@@ -689,6 +689,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
     self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+    
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom currentViewController:self currentShownNavigationController:self.navigationController];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -846,7 +852,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     // Dispose of any resources that can be recreated.
 }
 
-
 - (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
     //Override present view controller method to resign keyboard before presenting view controller from Chat Room to avoid keyboard accessory missing after VC presented from Chat Room
     [self.secondaryTextField resignFirstResponder];
@@ -868,6 +873,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_USER_PROFILE_CHANGES object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:nil];
+    
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidClose:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkChatRoomDidClose:self.currentRoom currentViewController:self currentShownNavigationController:self.navigationController];
+    }
 }
 
 #pragma mark - Data Source
