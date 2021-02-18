@@ -691,9 +691,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
     
     id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:currentViewController:currentShownNavigationController:)]) {
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:otherUser:currentViewController:currentShownNavigationController:)]) {
         
-        [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom currentViewController:self currentShownNavigationController:self.navigationController];
+        [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
     }
 }
 
@@ -875,9 +875,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:nil];
     
     id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidClose:currentViewController:currentShownNavigationController:)]) {
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidClose:otherUser:currentViewController:currentShownNavigationController:)]) {
         
-        [tapUIChatRoomDelegate tapTalkChatRoomDidClose:self.currentRoom currentViewController:self currentShownNavigationController:self.navigationController];
+        [tapUIChatRoomDelegate tapTalkChatRoomDidClose:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
     }
 }
 
