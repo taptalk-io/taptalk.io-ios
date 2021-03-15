@@ -347,6 +347,39 @@
     }];
 }
 
+- (void)uploadImage:(UIImage *)image
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure {
+    
+    // Resize image
+    [self resizeImage:image maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
+        // Convert image to data
+        NSData *imageData = UIImageJPEGRepresentation(resizedImage, 0.6f);
+
+        [TAPDataManager callAPIUploadFileWithFileData:imageData
+                                               roomID:@""
+                                             fileName:@"images.png"
+                                             fileType:@"image"
+                                             mimeType:@"image/jpeg"
+                                              caption:@""
+        completionBlock:^(NSDictionary *responseObject) {
+            NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
+            
+            NSString *fileID = [responseDataDictionary objectForKey:@"id"];
+            fileID = [TAPUtil nullToEmptyString:fileID];
+            
+            NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            success(fileID, fileURL);
+        } progressBlock:^(CGFloat progress, CGFloat total) {
+            
+        } failureBlock:^(NSError *error) {
+            failure(error);
+        }];
+    }];
+}
+
 - (void)runUploadFileWithRoomID:(NSString *)roomID {
     
     NSMutableArray *uploadQueueRoomArray = [self.uploadQueueDictionary objectForKey:roomID];

@@ -615,6 +615,17 @@
     }];
 }
 
+- (void)uploadImage:(UIImage *)image
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure {
+    
+    [[TAPFileUploadManager sharedManager]uploadImage:image success:^(NSString * _Nonnull fileID, NSString * _Nonnull fileURL) {
+        success(fileID, fileURL);
+    } failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+}
+
 - (void)cancelMessageFileUpload:(TAPMessageModel *)message
                         success:(void (^)(void))success
                         failure:(void (^)(NSError *error))failure {

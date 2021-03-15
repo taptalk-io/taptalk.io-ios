@@ -25,6 +25,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearFileUploadManagerData;
 - (BOOL)isUploadingFile;
 
+- (void)uploadImage:(UIImage *)image
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -146,6 +146,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID
               success:(void (^)(void))success
               failure:(void (^)(NSError *error))failure;
+- (void)uploadImage:(UIImage *)image
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure;
 - (void)cancelMessageFileUpload:(TAPMessageModel *)message
                         success:(void (^)(void))success
                         failure:(void (^)(NSError *error))failure;
