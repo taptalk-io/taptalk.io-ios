@@ -59,6 +59,55 @@ static const char kBundleKey = 0;
     return totalTimeString;
 }
 
++ (NSString *)getMessageTimestampText:(NSNumber *)createdTime {
+    NSDate *currentDate = [NSDate date];
+    NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+    NSTimeInterval messageTimeInterval = [createdTime doubleValue] / 1000.0f; //change to second from milisecond
+
+    NSTimeInterval timeGap = currentTimeInterval - messageTimeInterval;
+    NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+    [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+    midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+    NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+
+    NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+    NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+
+    NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+
+    NSDate *messageDate = [NSDate dateWithTimeIntervalSince1970:messageTimeInterval];
+    NSString *messageDateString = @"";
+    if (timeGap <= midnightTimeGap) {
+        // Today
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        
+        NSString *today = NSLocalizedStringFromTableInBundle(@"Today", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ • %@", today, dateString];
+    }
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
+        // Yesterday
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        NSString *yesterday = NSLocalizedStringFromTableInBundle(@"Yesterday", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ • %@", yesterday, dateString];
+    }
+    else {
+        // Set date and time
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"dd/MM/yy";
+        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
+        timeFormatter.dateFormat = @"HH:mm";
+
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        NSString *timeString = [timeFormatter stringFromDate:messageDate];
+        messageDateString = [NSString stringWithFormat:@"%@ • %@", dateString, timeString];
+    }
+    return messageDateString;
+}
+
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value {
     NSString *emptyString = @"";

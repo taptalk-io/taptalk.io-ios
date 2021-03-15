@@ -15,6 +15,7 @@
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
@@ -65,7 +66,7 @@
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
-    self.statusIconImageView.alpha = 0.0f;
+//    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     
     self.bubbleView.clipsToBounds = YES;
@@ -77,7 +78,7 @@
     self.replyView.layer. cornerRadius = 4.0f;
     
     self.sendingIconImageView.image = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    self.sendingIconImageView.image = [self.sendingIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSending]];
+    self.sendingIconImageView.image = [self.sendingIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageSending]];
 }
 
 - (void)prepareForReuse {
@@ -145,6 +146,8 @@
         self.replyButton.alpha = 0.0f;
         self.statusIconImageView.alpha = 0.0f;
     }
+    
+    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
 }
 
 - (void)receiveSentEvent {
@@ -164,7 +167,7 @@
     
     [UIView animateWithDuration:0.16f delay:0.2f options:UIViewAnimationOptionCurveLinear animations:^{
         self.chatBubbleRightConstraint.constant = 16.0f;
-        self.statusIconRightConstraint.constant = 2.0f;
+//        self.statusIconRightConstraint.constant = 2.0f;
         [self.contentView layoutIfNeeded];
         [self layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -230,57 +233,12 @@
     [self setStatusIconUIWithStatus:TAPBaseMyBubbleStatusRead];
 }
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
+- (void)showStatusLabel:(BOOL)isShowed
+               animated:(BOOL)animated
+       updateStatusIcon:(BOOL)updateStatusIcon
+                message:(TAPMessageModel *)message {
+    
     if (isShowed) {
-        NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
-
-        NSDate *currentDate = [NSDate date];
-        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-
-        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
-        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
-        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
-        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
-        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
-
-        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
-        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
-
-        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
-
-        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
-        NSString *lastMessageDateString = @"";
-        if (timeGap <= midnightTimeGap) {
-            //Today
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            
-            NSString *appendedDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedDateString, dateString];
-        }
-        else if (timeGap <= 86400.0f + midnightTimeGap) {
-            //Yesterday
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedDateString, dateString];
-        }
-        else {
-            //Set date
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
-
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedDateString, dateString];
-        }
-
-        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
-        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
-        self.statusLabel.text = statusString;
-
         CGFloat animationDuration = 0.2f;
 
         if (!animated) {
@@ -293,8 +251,8 @@
             self.statusLabelHeightConstraint.constant = 13.0f;
             self.replyButton.alpha = 1.0f;
             self.replyButtonRightConstraint.constant = 2.0f;
-            self.statusIconBottomConstraint.constant = -17.0f;
-            self.statusIconImageView.alpha = 0.0f;
+//            self.statusIconBottomConstraint.constant = -17.0f;
+//            self.statusIconImageView.alpha = 0.0f;
             [self.contentView layoutIfNeeded];
             [self layoutIfNeeded];
         } completion:^(BOOL finished) {
@@ -337,7 +295,7 @@
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.replyButton.alpha = 0.0f;
     self.replyButtonRightConstraint.constant = -28.0f;
-    self.statusIconBottomConstraint.constant = 0.0f;
+//    self.statusIconBottomConstraint.constant = 0.0f;
     
     if (updateStatusIcon) {
         self.statusIconImageView.alpha = 1.0f;
@@ -353,7 +311,7 @@
     
     if (status == TAPBaseMyBubbleStatusRead) {
         //MESSAGE IS READ BY RECIPIENT
-        self.statusIconRightConstraint.constant = 2.0f;
+//        self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
         
         //Check if show read status
@@ -361,38 +319,39 @@
         if (isHideReadStatus) {
             //Set to delivered icon
             self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
+            self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageDelivered]];
         }
         else {
             //Set to read icon
             self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageRead]];
+            self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageRead]];
         }
 
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusDelivered) {
         //MESSAGE IS DELIVERED TO RECIPIENT
-        self.statusIconRightConstraint.constant = 2.0f;
+//        self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
         self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageDelivered]];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageDelivered]];
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusSent) {
         //MESSAGE IS SENT
-        self.statusIconRightConstraint.constant = 2.0f;
+//        self.statusIconRightConstraint.constant = 2.0f;
         self.chatBubbleRightConstraint.constant = 16.0f;
         self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSent]];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageSent]];
         self.statusIconImageView.alpha = 1.0f;
     }
     else if (status == TAPBaseMyBubbleStatusSending) {
         //MESSAGE IS BEING SENT
-        self.statusIconRightConstraint.constant = -17.0f;
+//        self.statusIconRightConstraint.constant = -17.0f;
         self.chatBubbleRightConstraint.constant = 32.0f;
         self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageSent]];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageSent]];
+        self.statusIconImageView.alpha = 0.0f;
         self.sendingIconImageView.alpha = 1.0f;
     }
 }

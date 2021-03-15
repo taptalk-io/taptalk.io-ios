@@ -45,7 +45,7 @@
     self.sendingIconImageView.alpha = 0.0f;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.cornerRadius = 16.0f;
     if (@available(iOS 11.0, *)) {
         self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     } else {

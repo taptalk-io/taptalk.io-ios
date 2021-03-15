@@ -51,7 +51,7 @@
     self.statusLabel.alpha = 0.0f;
     
     self.bubbleView.clipsToBounds = YES;
-    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
     
     self.senderImageView.clipsToBounds = YES;

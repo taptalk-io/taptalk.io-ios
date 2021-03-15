@@ -18,6 +18,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionSizePlaceholderLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
@@ -151,7 +152,7 @@
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
-    self.statusIconImageView.alpha = 0.0f;
+//    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     
     self.progressContainerView.layer.cornerRadius = CGRectGetHeight(self.innerBackgroundView.frame) / 2.0f;
@@ -161,7 +162,7 @@
     
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
@@ -300,7 +301,7 @@
             self.replyButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.statusLabel.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.swipeReplyView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
-            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+//            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.sendingIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             
             self.swipeReplyView.alpha = translation.x / 50.0f;
@@ -320,7 +321,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
-                self.statusIconImageView.transform = CGAffineTransformIdentity;
+//                self.statusIconImageView.transform = CGAffineTransformIdentity;
                 self.sendingIconImageView.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
@@ -339,7 +340,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
-                self.statusIconImageView.transform = CGAffineTransformIdentity;
+//                self.statusIconImageView.transform = CGAffineTransformIdentity;
                 self.sendingIconImageView.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
@@ -373,6 +374,9 @@
     UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
     UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
 
+    UIFont *timestampLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleMessageTimestamp];
+    UIColor *timestampLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageTimestamp];
+
     UIFont *fileNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightFileBubbleName];
     UIColor *fileNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightFileBubbleName];
     
@@ -402,6 +406,9 @@
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
+
+    self.timestampLabel.textColor = timestampLabelColor;
+    self.timestampLabel.font = timestampLabelFont;
     
     self.fileDescriptionLabel.textColor = fileInfoLabelColor;
     self.fileDescriptionLabel.font = fileInfoLabelFont;
@@ -410,20 +417,20 @@
     self.fileDescriptionSizePlaceholderLabel.font = fileInfoLabelFont;
     
     UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownload]];
+    abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownloadPrimary]];
     self.cancelImageView.image = abortImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary]];
     self.fileImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownload]];
+    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownloadPrimary]];
     self.retryDownloadImageView.image = retryImage;
     
     UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownload]];
+    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownloadPrimary]];
     self.downloadImageView.image = downloadImage;
 }
 
@@ -905,7 +912,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
     
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackgroundPrimary].CGColor;
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);
@@ -937,7 +944,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
     
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackgroundPrimary].CGColor;
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);
@@ -989,7 +996,7 @@
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
         self.statusLabel.text = self.statusLabelTimeString;
-        [self showStatusLabel:YES];
+        [self showStatusLabel:NO];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeNotDownloaded) {
         self.cancelView.alpha = 0.0f;
@@ -1001,7 +1008,7 @@
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
         self.statusLabel.text = self.statusLabelTimeString;
-        [self showStatusLabel:YES];
+        [self showStatusLabel:NO];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeUploading) {
         self.cancelView.alpha = 1.0f;
@@ -1025,7 +1032,7 @@
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
         self.statusLabel.text = self.statusLabelTimeString;
-        [self showStatusLabel:YES];
+        [self showStatusLabel:NO];
     }
     else if (type == TAPMyFileBubbleTableViewCellStateTypeRetryUpload) {
         self.cancelView.alpha = 0.0f;
@@ -1053,7 +1060,7 @@
         self.retryIconImageView.alpha = 0.0f;
         self.retryButton.alpha = 0.0f;
         self.statusLabel.text = self.statusLabelTimeString;
-        [self showStatusLabel:YES];
+        [self showStatusLabel:NO];
     }
 }
 

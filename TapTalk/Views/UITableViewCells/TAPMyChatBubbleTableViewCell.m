@@ -17,6 +17,7 @@
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet ZSWTappableLabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
@@ -95,11 +96,11 @@
     [self.contentView layoutIfNeeded];
 
     self.statusLabel.alpha = 0.0f;
-    self.statusIconImageView.alpha = 0.0f;
+//    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
@@ -342,7 +343,7 @@
             self.replyButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.statusLabel.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.swipeReplyView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
-            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+//            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.sendingIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             
             self.swipeReplyView.alpha = translation.x / 50.0f;
@@ -363,7 +364,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
-                self.statusIconImageView.transform = CGAffineTransformIdentity;
+//                self.statusIconImageView.transform = CGAffineTransformIdentity;
                 self.sendingIconImageView.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
@@ -383,7 +384,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
-                self.statusIconImageView.transform = CGAffineTransformIdentity;
+//                self.statusIconImageView.transform = CGAffineTransformIdentity;
                 self.sendingIconImageView.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
@@ -415,6 +416,9 @@
     
     UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
     UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
+
+    UIFont *timestampLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleMessageTimestamp];
+    UIColor *timestampLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageTimestamp];
     
     self.replyNameLabel.textColor = quoteTitleColor;
     self.replyNameLabel.font = quoteTitleFont;
@@ -439,12 +443,15 @@
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
+
+    self.timestampLabel.textColor = timestampLabelColor;
+    self.timestampLabel.font = timestampLabelFont;
     
     UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.sendingIconImageView.image = sendingImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary]];
     self.fileImageView.image = documentsImage;
 }
 
@@ -562,41 +569,41 @@
     [super receiveReadEvent];
 }
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
-    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon message:message];
-    
-    self.chatBubbleButton.userInteractionEnabled = NO;
-    
-    if (isShowed) {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        self.chatBubbleButton.alpha = 1.0f;
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
-    }
-    else {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.alpha = 0.0f;
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
-    }
-}
+//- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
+//    [super showStatusLabel:isShowed animated:animated updateStatusIcon:updateStatusIcon message:message];
+//
+//    self.chatBubbleButton.userInteractionEnabled = NO;
+//
+//    if (isShowed) {
+//        CGFloat animationDuration = 0.2f;
+//
+//        if (!animated) {
+//            animationDuration = 0.0f;
+//        }
+//
+//        self.chatBubbleButton.alpha = 1.0f;
+//
+//        [UIView animateWithDuration:animationDuration animations:^{
+//            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
+//        } completion:^(BOOL finished) {
+//            self.chatBubbleButton.userInteractionEnabled = YES;
+//        }];
+//    }
+//    else {
+//        CGFloat animationDuration = 0.2f;
+//
+//        if (!animated) {
+//            animationDuration = 0.0f;
+//        }
+//
+//        [UIView animateWithDuration:animationDuration animations:^{
+//            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+//        } completion:^(BOOL finished) {
+//            self.chatBubbleButton.alpha = 0.0f;
+//            self.chatBubbleButton.userInteractionEnabled = YES;
+//        }];
+//    }
+//}
 
 - (IBAction)replyButtonDidTapped:(id)sender {
     [super replyButtonDidTapped:sender];
@@ -623,9 +630,9 @@
 }
 
 - (IBAction)chatBubbleButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
-        [self.delegate myChatBubbleViewDidTapped:self.message];
-    }
+//    if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
+//        [self.delegate myChatBubbleViewDidTapped:self.message];
+//    }
 }
 
 - (IBAction)quoteButtonDidTapped:(id)sender {

@@ -17,6 +17,7 @@
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
@@ -104,11 +105,11 @@
     [self.contentView layoutIfNeeded];
     
     self.statusLabel.alpha = 0.0f;
-    self.statusIconImageView.alpha = 0.0f;
+//    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;    
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
@@ -126,7 +127,7 @@
     self.mapView.layer.borderColor = [TAPUtil getColor:@"E4E4E4"].CGColor;
     self.mapView.layer.borderWidth = 1.0f;
     self.mapView.layer.cornerRadius = 8.0f;
-    self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+    self.mapView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -254,7 +255,7 @@
             self.replyButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.statusLabel.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.swipeReplyView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
-            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+//            self.statusIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.sendingIconImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             
             self.swipeReplyView.alpha = translation.x / 50.0f;
@@ -275,7 +276,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
-                self.statusIconImageView.transform = CGAffineTransformIdentity;
+//                self.statusIconImageView.transform = CGAffineTransformIdentity;
                 self.sendingIconImageView.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
@@ -294,7 +295,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
-                self.statusIconImageView.transform = CGAffineTransformIdentity;
+//                self.statusIconImageView.transform = CGAffineTransformIdentity;
                 self.sendingIconImageView.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
@@ -326,6 +327,9 @@
     
     UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
     UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
+
+    UIFont *timestampLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleMessageTimestamp];
+    UIColor *timestampLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageTimestamp];
     
     self.centerMarkerLocationImageView.image = [self.centerMarkerLocationImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationBubbleMarker]];
     
@@ -352,12 +356,15 @@
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
+
+    self.timestampLabel.textColor = timestampLabelColor;
+    self.timestampLabel.font = timestampLabelFont;
     
     UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.sendingIconImageView.image = sendingImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary]];
     self.fileImageView.image = documentsImage;
 }
 
@@ -455,14 +462,14 @@
     
 //    self.bubbleLabel.text = [NSString stringWithFormat:@"%@", mapAddress];
     
-    if (self.isShowForwardView || replyToExists || quoteExists) {
-        self.mapView.layer.cornerRadius = 0.0f;
-        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
-    }
-    else {
-        self.mapView.layer.cornerRadius = 8.0f;
-        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
-    }
+//    if (self.isShowForwardView || replyToExists || quoteExists) {
+//        self.mapView.layer.cornerRadius = 0.0f;
+//        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+//    }
+//    else {
+//        self.mapView.layer.cornerRadius = 8.0f;
+//        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
+//    }
 }
 
 - (void)receiveSentEvent {
@@ -479,122 +486,122 @@
 
 
 
-- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
-    
-    if (isShowed) {
-        NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
-        
-        NSDate *currentDate = [NSDate date];
-        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-        
-        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
-        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
-        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
-        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
-        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
-        
-        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
-        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
-        
-        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
-        
-        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
-        NSString *lastMessageDateString = @"";
-        if (timeGap <= midnightTimeGap) {
-            //Today
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
-        }
-        else if (timeGap <= 86400.0f + midnightTimeGap) {
-            //Yesterday
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
-        }
-        else {
-            //Set date
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
-            
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
-        }
-        
-        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
-        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
-        self.statusLabel.text = statusString;
-        
-        self.statusLabel.alpha = 1.0f;
-        self.statusLabelTopConstraint.constant = 2.0f;
-        self.statusLabelHeightConstraint.constant = 13.0f;
-        self.replyButton.alpha = 1.0f;
-        self.replyButtonRightConstraint.constant = 2.0f;
-        self.statusIconImageView.alpha = 0.0f;
-        [self.contentView layoutIfNeeded];
-
-    }
-    else {
-        if (message.isFailedSend) {
-            self.retryIconImageView.alpha = 1.0f;
-            self.retryButton.alpha = 1.0f;
-            self.chatBubbleRightConstraint.constant = 16.0f;
-            
-            NSString *statusString = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
-            self.statusLabel.text = statusString;
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButton.alpha = 0.0f;
-            self.statusIconImageView.alpha = 0.0f;
-        }
-        else {
-//            if (!animated) {
-//                [self hideStatusLabelAlpha];
-//                [self hideStatusLabelConstraintUpdateStatusIcon:updateStatusIcon];
-//            }
-//            else {
-//                [UIView animateWithDuration:0.2f animations:^{
-//                    [self hideStatusLabelAlpha];
-//                    [self hideStatusLabelConstraintUpdateStatusIcon:updateStatusIcon];
-//                    [self.contentView layoutIfNeeded];
-//                    [self layoutIfNeeded];
-//                } completion:^(BOOL finished) {
-//                }];
-//            }
-        }
-    }
-    
-    self.chatBubbleButton.userInteractionEnabled = NO;
-    
-    if (!self.message.isFailedSend) {
-        self.statusIconImageView.alpha = 1.0f;
-    }
-    else {
-        self.statusIconImageView.alpha = 0.0f;
-    }
-    
-    if (isShowed) {
-
-        self.chatBubbleButton.alpha = 1.0f;
-        
-        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-        self.chatBubbleButton.userInteractionEnabled = YES;
-    }
-    else {
-        CGFloat animationDuration = 0.2f;
-        
-        
-        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-        self.chatBubbleButton.alpha = 0.0f;
-        self.chatBubbleButton.userInteractionEnabled = YES;
-    }
-}
+//- (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {
+//
+//    if (isShowed) {
+//        NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
+//
+//        NSDate *currentDate = [NSDate date];
+//        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+//
+//        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
+//        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+//        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+//        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+//        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+//
+//        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+//        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+//
+//        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+//
+//        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
+//        NSString *lastMessageDateString = @"";
+//        if (timeGap <= midnightTimeGap) {
+//            //Today
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"HH:mm";
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
+//        }
+//        else if (timeGap <= 86400.0f + midnightTimeGap) {
+//            //Yesterday
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"HH:mm";
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
+//        }
+//        else {
+//            //Set date
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
+//
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
+//        }
+//
+//        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+//        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
+//        self.statusLabel.text = statusString;
+//
+//        self.statusLabel.alpha = 1.0f;
+//        self.statusLabelTopConstraint.constant = 2.0f;
+//        self.statusLabelHeightConstraint.constant = 13.0f;
+//        self.replyButton.alpha = 1.0f;
+//        self.replyButtonRightConstraint.constant = 2.0f;
+//        self.statusIconImageView.alpha = 0.0f;
+//        [self.contentView layoutIfNeeded];
+//
+//    }
+//    else {
+//        if (message.isFailedSend) {
+//            self.retryIconImageView.alpha = 1.0f;
+//            self.retryButton.alpha = 1.0f;
+//            self.chatBubbleRightConstraint.constant = 16.0f;
+//
+//            NSString *statusString = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
+//            self.statusLabel.text = statusString;
+//            self.statusLabel.alpha = 1.0f;
+//            self.statusLabelTopConstraint.constant = 2.0f;
+//            self.statusLabelHeightConstraint.constant = 13.0f;
+//            self.replyButton.alpha = 0.0f;
+//            self.statusIconImageView.alpha = 0.0f;
+//        }
+//        else {
+////            if (!animated) {
+////                [self hideStatusLabelAlpha];
+////                [self hideStatusLabelConstraintUpdateStatusIcon:updateStatusIcon];
+////            }
+////            else {
+////                [UIView animateWithDuration:0.2f animations:^{
+////                    [self hideStatusLabelAlpha];
+////                    [self hideStatusLabelConstraintUpdateStatusIcon:updateStatusIcon];
+////                    [self.contentView layoutIfNeeded];
+////                    [self layoutIfNeeded];
+////                } completion:^(BOOL finished) {
+////                }];
+////            }
+//        }
+//    }
+//
+//    self.chatBubbleButton.userInteractionEnabled = NO;
+//
+//    if (!self.message.isFailedSend) {
+//        self.statusIconImageView.alpha = 1.0f;
+//    }
+//    else {
+//        self.statusIconImageView.alpha = 0.0f;
+//    }
+//
+//    if (isShowed) {
+//
+//        self.chatBubbleButton.alpha = 1.0f;
+//
+//        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+//        self.chatBubbleButton.userInteractionEnabled = YES;
+//    }
+//    else {
+//        CGFloat animationDuration = 0.2f;
+//
+//
+//        self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+//        self.chatBubbleButton.alpha = 0.0f;
+//        self.chatBubbleButton.userInteractionEnabled = YES;
+//    }
+//}
 
 - (IBAction)replyButtonDidTapped:(id)sender {
     [super replyButtonDidTapped:sender];
@@ -655,7 +662,7 @@
         self.replyViewBottomConstraint.active = YES;
         self.replyViewBottomConstraint.constant = 8.0f;
         self.replyViewTopConstraint.active = YES;
-        self.replyViewTopConstraint.constant = 6.0f;
+//        self.replyViewTopConstraint.constant = 6.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
         self.replyNameLabelLeadingConstraint.constant = 4.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
@@ -663,6 +670,13 @@
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
+        
+        if (self.isShowForwardView) {
+            self.replyViewTopConstraint.constant = 4.0f;
+        }
+        else {
+            self.replyViewTopConstraint.constant = 0.0f;
+        }
     }
     else {
         self.replyNameLabel.text = @"";
@@ -673,7 +687,7 @@
             self.replyViewBottomConstraint.constant = 8.0f;
         }
         else {
-            self.replyViewBottomConstraint.constant = 0.0f;
+            self.replyViewBottomConstraint.constant = 10.0f;
         }
         self.replyViewTopConstraint.active = YES;
         self.replyViewTopConstraint.constant = 0.0f;

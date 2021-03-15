@@ -74,7 +74,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorRightFileButtonBackground,
     TAPComponentColorSystemMessageBackground,
     TAPComponentColorSystemMessageBackgroundShadow,
-    TAPComponentColorFileProgressBackground,
+    TAPComponentColorFileProgressBackgroundPrimary,
+    TAPComponentColorFileProgressBackgroundWhite,
     TAPComponentColorDeletedChatRoomInfoBackground,
     TAPComponentColorChatComposerBackground,
     TAPComponentColorUnreadIdentifierBackground,
@@ -84,12 +85,21 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorButtonIcon,
     TAPComponentColorButtonIconPrimary,
     TAPComponentColorButtonIconDestructive,
-    TAPComponentColorIconMessageSending,
-    TAPComponentColorIconMessageFailed,
-    TAPComponentColorIconMessageSent,
-    TAPComponentColorIconMessageDelivered,
-    TAPComponentColorIconMessageRead,
-    TAPComponentColorIconMessageDeleted,
+    TAPComponentColorIconRoomListMessageSending,
+    TAPComponentColorIconRoomListMessageFailed,
+    TAPComponentColorIconRoomListMessageSent,
+    TAPComponentColorIconRoomListMessageDelivered,
+    TAPComponentColorIconRoomListMessageRead,
+    TAPComponentColorIconRoomListMessageDeleted,
+    TAPComponentColorIconChatRoomMessageSending,
+    TAPComponentColorIconChatRoomMessageFailed,
+    TAPComponentColorIconChatRoomMessageSent,
+    TAPComponentColorIconChatRoomMessageSentImage,
+    TAPComponentColorIconChatRoomMessageDelivered,
+    TAPComponentColorIconChatRoomMessageDeliveredImage,
+    TAPComponentColorIconChatRoomMessageRead,
+    TAPComponentColorIconChatRoomMessageDeletedLeft,
+    TAPComponentColorIconChatRoomMessageDeletedRight,
     TAPComponentColorIconRemoveItem,
     TAPComponentColorIconRemoveItemBackground,
     TAPComponentColorIconLoadingProgressPrimary,
@@ -126,7 +136,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconSelectPictureCamera, // Register
     TAPComponentColorIconSelectPictureGallery, // Register
     TAPComponentColorIconChatRoomCancelQuote, //Chat Room
-    TAPComponentColorIconCancelUploadDownload, //Chat Room
+    TAPComponentColorIconCancelUploadDownloadPrimary, //Chat Room
+    TAPComponentColorIconCancelUploadDownloadWhite, //Chat Room
     TAPComponentColorIconChatComposerSend, //Chat Room
     TAPComponentColorIconChatComposerSendInactive, //Chat Room
     TAPComponentColorIconChatComposerBurgerMenu, //Chat Room
@@ -182,10 +193,14 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatComposerBurgerMenuBackground, //Chat Room Page
     TAPComponentColorIconChatComposerShowKeyboardBackground, //Chat Room Page
     TAPComponentColorIconChatComposerAttach, //Chat Room Page
-    TAPComponentColorIconFile, //Chat Room Page
-    TAPComponentColorIconFileUploadDownload, //Chat Room Page
-    TAPComponentColorIconFileCancelUploadDownload, //Chat Room Page
-    TAPComponentColorIconFileRetryUploadDownload, //Chat Room Page
+    TAPComponentColorIconFilePrimary, //Chat Room Page
+    TAPComponentColorIconFileWhite, //Chat Room Page
+    TAPComponentColorIconFileUploadDownloadPrimary, //Chat Room Page
+    TAPComponentColorIconFileUploadDownloadWhite, //Chat Room Page
+    TAPComponentColorIconFileCancelUploadDownloadPrimary, //Chat Room Page
+    TAPComponentColorIconFileCancelUploadDownloadWhite, //Chat Room Page
+    TAPComponentColorIconFileRetryUploadDownloadPrimary, //Chat Room Page
+    TAPComponentColorIconFileRetryUploadDownloadWhite, //Chat Room Page
     TAPComponentColorIconFilePlayMedia, //Chat Room Page
 };
 
@@ -268,6 +283,8 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorLeftFileBubbleInfo,
     TAPTextColorLeftBubbleSenderName,
     TAPTextColorBubbleMessageStatus,
+    TAPTextColorRightBubbleMessageTimestamp,
+    TAPTextColorLeftBubbleMessageTimestamp,
     TAPTextColorBubbleMediaInfo,
     TAPTextColorSystemMessageBody,
     TAPTextColorChatRoomUnreadBadge,
@@ -392,6 +409,8 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontLeftFileBubbleInfo,
     TAPComponentFontLeftBubbleSenderName,
     TAPComponentFontBubbleMessageStatus,
+    TAPComponentFontRightBubbleMessageTimestamp,
+    TAPComponentFontLeftBubbleMessageTimestamp,
     TAPComponentFontBubbleMediaInfo,
     TAPComponentFontSystemMessageBody,
     TAPComponentFontChatRoomUnreadBadge,

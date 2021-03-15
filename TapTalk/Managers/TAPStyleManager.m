@@ -792,6 +792,18 @@
             return font;
             break;
         }
+        case TAPComponentFontRightBubbleMessageTimestamp:
+        {
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_BUBBLE_MESSAGE_TIMESTAMP_FONTSIZE_STYLE weight:UIFontWeightRegular];
+            return font;
+            break;
+        }
+        case TAPComponentFontLeftBubbleMessageTimestamp:
+        {
+            UIFont *font = [UIFont systemFontOfSize:TAP_LEFT_BUBBLE_MESSAGE_TIMESTAMP_FONTSIZE_STYLE weight:UIFontWeightRegular];
+            return font;
+            break;
+        }
         case TAPComponentFontBubbleMediaInfo:
         {
             
@@ -1612,6 +1624,16 @@
             return color;
             break;
         }
+        case TAPTextColorRightBubbleMessageTimestamp: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPTextColorLeftBubbleMessageTimestamp: {
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.4f];
+            return color;
+            break;
+        }
         case TAPTextColorBubbleMediaInfo: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
             return color;
@@ -2053,13 +2075,13 @@
         }
         case TAPComponentColorLeftFileButtonBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultRightBubbleBackground];
+            UIColor *color = [TAPUtil getColor:TAP_COLOR_PRIMARY];
             return color;
             break;
         }
         case TAPComponentColorRightFileButtonBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultRightBubbleDarkBackground];
+            UIColor *color = [TAPUtil getColor:@"FFFFFF"];
             return color;
             break;
         }
@@ -2075,9 +2097,15 @@
             return color;
             break;
         }
-        case TAPComponentColorFileProgressBackground:
+        case TAPComponentColorFileProgressBackgroundPrimary:
         {
-            UIColor *color = [TAPUtil getColor:TAP_FILE_PROGRESS_BACKGROUND_COLOR];
+            UIColor *color = [TAPUtil getColor:TAP_FILE_PROGRESS_BACKGROUND_COLOR_PRIMARY];
+            return color;
+            break;
+        }
+        case TAPComponentColorFileProgressBackgroundWhite:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_FILE_PROGRESS_BACKGROUND_COLOR_WHITE];
             return color;
             break;
         }
@@ -2137,37 +2165,91 @@
             return color;
             break;
         }
-        case TAPComponentColorIconMessageSending:
+        case TAPComponentColorIconRoomListMessageSending:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
             break;
         }
-        case TAPComponentColorIconMessageFailed:
+        case TAPComponentColorIconRoomListMessageFailed:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
             break;
         }
-        case TAPComponentColorIconMessageSent:
+        case TAPComponentColorIconRoomListMessageSent:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
             break;
         }
-        case TAPComponentColorIconMessageDelivered:
+        case TAPComponentColorIconRoomListMessageDelivered:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
             break;
         }
-        case TAPComponentColorIconMessageRead:
+        case TAPComponentColorIconRoomListMessageRead:
         {
             UIColor *color = [TAPUtil getColor:@"19C700"];
             return color;
             break;
         }
-        case TAPComponentColorIconMessageDeleted:
+        case TAPComponentColorIconRoomListMessageDeleted:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageSending:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageFailed:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageSent:
+        {
+            UIColor *color = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.2f];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageSentImage:
+        {
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite] colorWithAlphaComponent:0.6f];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageDelivered:
+        {
+            UIColor *color = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.2f];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageDeliveredImage:
+        {
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite] colorWithAlphaComponent:0.6f];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageRead:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageDeletedRight:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconChatRoomMessageDeletedLeft:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
@@ -2393,7 +2475,13 @@
             return color;
             break;
         }
-        case TAPComponentColorIconCancelUploadDownload:
+        case TAPComponentColorIconCancelUploadDownloadPrimary:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconCancelUploadDownloadWhite:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
             return color;
@@ -2513,25 +2601,49 @@
             return color;
             break;
         }
-        case TAPComponentColorIconFile:
+        case TAPComponentColorIconFilePrimary:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconFileWhite:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
             return color;
             break;
         }
-        case TAPComponentColorIconFileUploadDownload:
+        case TAPComponentColorIconFileUploadDownloadPrimary:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconFileUploadDownloadWhite:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
             return color;
             break;
         }
-        case TAPComponentColorIconFileCancelUploadDownload:
+        case TAPComponentColorIconFileCancelUploadDownloadPrimary:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconFileCancelUploadDownloadWhite:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
             return color;
             break;
         }
-        case TAPComponentColorIconFileRetryUploadDownload:
+        case TAPComponentColorIconFileRetryUploadDownloadPrimary:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconFileRetryUploadDownloadWhite:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
             return color;

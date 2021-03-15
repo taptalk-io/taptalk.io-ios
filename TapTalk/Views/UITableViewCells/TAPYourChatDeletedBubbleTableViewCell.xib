@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -44,7 +45,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="i0w-rP-pIj" firstAttribute="top" secondItem="oOx-ah-C0w" secondAttribute="top" id="Fgy-nW-wmi"/>
                             <constraint firstAttribute="bottom" secondItem="i0w-rP-pIj" secondAttribute="bottom" id="RyD-LA-sZz"/>
@@ -59,7 +60,7 @@
                             <constraint firstAttribute="width" constant="30" id="zJT-Rj-CyN"/>
                         </constraints>
                     </imageView>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sHc-Zm-c9w">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sHc-Zm-c9w">
                         <rect key="frame" x="16" y="0.0" width="30" height="30"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="30" id="Fzk-H0-hho"/>
@@ -74,17 +75,17 @@
                         </connections>
                     </button>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qkd-U2-OpQ">
-                        <rect key="frame" x="50" y="0.0" width="134.5" height="95"/>
+                        <rect key="frame" x="50" y="0.0" width="136.5" height="95"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconBlock" translatesAutoresizingMaskIntoConstraints="NO" id="KBX-91-s0M">
-                                <rect key="frame" x="6" y="45.5" width="22" height="22"/>
+                                <rect key="frame" x="10" y="50" width="16" height="16"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="22" id="aV9-0z-TUg"/>
-                                    <constraint firstAttribute="width" constant="22" id="ncn-JI-OZ7"/>
+                                    <constraint firstAttribute="height" constant="16" id="aV9-0z-TUg"/>
+                                    <constraint firstAttribute="width" constant="16" id="ncn-JI-OZ7"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZzA-ee-IEA">
-                                <rect key="frame" x="10" y="10" width="114.5" height="18"/>
+                                <rect key="frame" x="10" y="10" width="116.5" height="18"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="t3p-l8-40F"/>
@@ -94,14 +95,14 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This message was deleted." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Pq-dc-vOe" customClass="ZSWTappableLabel">
-                                <rect key="frame" x="28" y="31" width="96.5" height="51"/>
+                                <rect key="frame" x="30" y="31" width="96.5" height="54"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="15"/>
                                 <color key="textColor" red="0.17254901959999999" green="0.17254901959999999" blue="0.17254901959999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0x4-Nb-yFw">
-                                <rect key="frame" x="0.0" y="0.0" width="134.5" height="95"/>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0x4-Nb-yFw">
+                                <rect key="frame" x="0.0" y="0.0" width="136.5" height="95"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <action selector="chatBubbleButtonDidTapped:" destination="WHg-h0-VPS" eventType="touchUpInside" id="5Ar-qo-zef"/>
@@ -112,7 +113,7 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="5Pq-dc-vOe" secondAttribute="trailing" constant="10" id="2fh-b4-amZ"/>
                             <constraint firstItem="ZzA-ee-IEA" firstAttribute="top" secondItem="Qkd-U2-OpQ" secondAttribute="top" constant="10" id="EGE-bF-XYO"/>
-                            <constraint firstItem="5Pq-dc-vOe" firstAttribute="leading" secondItem="KBX-91-s0M" secondAttribute="trailing" id="GNE-Ox-QQ7"/>
+                            <constraint firstItem="5Pq-dc-vOe" firstAttribute="leading" secondItem="KBX-91-s0M" secondAttribute="trailing" constant="4" id="GNE-Ox-QQ7"/>
                             <constraint firstItem="0x4-Nb-yFw" firstAttribute="top" secondItem="Qkd-U2-OpQ" secondAttribute="top" id="Mja-ZN-t8n"/>
                             <constraint firstAttribute="bottom" secondItem="0x4-Nb-yFw" secondAttribute="bottom" id="NvC-7C-eVZ"/>
                             <constraint firstItem="0x4-Nb-yFw" firstAttribute="leading" secondItem="Qkd-U2-OpQ" secondAttribute="leading" id="O4O-GU-w6z"/>
@@ -120,10 +121,10 @@
                             <constraint firstItem="5Pq-dc-vOe" firstAttribute="top" secondItem="ZzA-ee-IEA" secondAttribute="bottom" constant="3" id="Q9I-kK-jjM"/>
                             <constraint firstItem="5Pq-dc-vOe" firstAttribute="centerY" secondItem="KBX-91-s0M" secondAttribute="centerY" id="RBv-CG-hey"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" priority="750" constant="45" id="Vpz-tY-bIs"/>
-                            <constraint firstAttribute="bottom" secondItem="5Pq-dc-vOe" secondAttribute="bottom" constant="13" id="XYx-XH-uL5"/>
+                            <constraint firstAttribute="bottom" secondItem="5Pq-dc-vOe" secondAttribute="bottom" constant="10" id="XYx-XH-uL5"/>
                             <constraint firstItem="ZzA-ee-IEA" firstAttribute="leading" secondItem="Qkd-U2-OpQ" secondAttribute="leading" constant="10" id="dtO-aq-BDq"/>
                             <constraint firstAttribute="trailing" secondItem="ZzA-ee-IEA" secondAttribute="trailing" constant="10" id="s3i-B2-GF0"/>
-                            <constraint firstItem="KBX-91-s0M" firstAttribute="leading" secondItem="Qkd-U2-OpQ" secondAttribute="leading" constant="6" id="wvF-e9-ITG"/>
+                            <constraint firstItem="KBX-91-s0M" firstAttribute="leading" secondItem="Qkd-U2-OpQ" secondAttribute="leading" constant="10" id="wvF-e9-ITG"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -173,6 +174,9 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="TAPIconBlock" width="22" height="22"/>
+        <image name="TAPIconBlock" width="16" height="16"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>
