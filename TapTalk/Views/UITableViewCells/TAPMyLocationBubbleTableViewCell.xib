@@ -67,7 +67,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EDs-Vh-gBM">
-                                <rect key="frame" x="12" y="48" width="240" height="48"/>
+                                <rect key="frame" x="10" y="48" width="244" height="48"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="m2Z-lx-ihf" customClass="TAPImageView">
                                         <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
@@ -83,7 +83,7 @@
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aoS-e6-cm5">
-                                        <rect key="frame" x="56" y="10" width="176" height="14"/>
+                                        <rect key="frame" x="56" y="10" width="180" height="14"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" priority="750" constant="14" id="Kfo-lO-1av"/>
@@ -93,14 +93,14 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tJq-Rb-Q8m">
-                                        <rect key="frame" x="56" y="24" width="176" height="0.0"/>
+                                        <rect key="frame" x="56" y="24" width="180" height="0.0"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5lv-eG-aZB">
-                                        <rect key="frame" x="0.0" y="0.0" width="240" height="48"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="244" height="48"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <action selector="quoteButtonDidTapped:" destination="I8s-QR-CXF" eventType="touchUpInside" id="cgA-JM-VNQ"/>
@@ -129,13 +129,13 @@
                                 </constraints>
                             </view>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1th-ab-Lvj">
-                                <rect key="frame" x="12" y="48" width="240" height="48"/>
+                                <rect key="frame" x="10" y="48" width="244" height="48"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vz3-p5-zl5">
-                                        <rect key="frame" x="4" y="0.0" width="236" height="48"/>
+                                        <rect key="frame" x="4" y="0.0" width="240" height="48"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ax0-Ix-dZf">
-                                                <rect key="frame" x="4" y="10" width="224" height="14"/>
+                                                <rect key="frame" x="4" y="10" width="228" height="14"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" priority="750" constant="14" id="H4n-u4-J7Y"/>
@@ -145,7 +145,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1BK-oR-f24">
-                                                <rect key="frame" x="4" y="25" width="224" height="13"/>
+                                                <rect key="frame" x="4" y="25" width="228" height="13"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -165,7 +165,7 @@
                                         </constraints>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g7K-lU-kI4">
-                                        <rect key="frame" x="0.0" y="0.0" width="240" height="48"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="244" height="48"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <action selector="quoteButtonDidTapped:" destination="I8s-QR-CXF" eventType="touchUpInside" id="ZGL-Uq-7Dj"/>
@@ -236,16 +236,16 @@
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
                             <constraint firstItem="YxV-Bw-fl5" firstAttribute="centerX" secondItem="o4h-r7-Vhc" secondAttribute="centerX" id="2EJ-2j-qkF"/>
-                            <constraint firstItem="1th-ab-Lvj" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="12" id="2O2-vv-yyp"/>
+                            <constraint firstItem="1th-ab-Lvj" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="2O2-vv-yyp"/>
                             <constraint firstItem="AjF-HY-hwC" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="3FQ-G3-hEU"/>
                             <constraint firstItem="1th-ab-Lvj" firstAttribute="top" secondItem="36F-Ej-VDx" secondAttribute="bottom" constant="6" id="4oF-D8-xbj"/>
                             <constraint firstItem="HLV-s5-iUh" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" id="83a-Dm-53e"/>
-                            <constraint firstAttribute="trailing" secondItem="EDs-Vh-gBM" secondAttribute="trailing" constant="12" id="8hM-an-ibi"/>
+                            <constraint firstAttribute="trailing" secondItem="EDs-Vh-gBM" secondAttribute="trailing" constant="10" id="8hM-an-ibi"/>
                             <constraint firstItem="EDs-Vh-gBM" firstAttribute="top" secondItem="36F-Ej-VDx" secondAttribute="bottom" constant="6" id="9a2-zm-lxL"/>
                             <constraint firstItem="o4h-r7-Vhc" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="Atr-7p-Anr"/>
                             <constraint firstAttribute="bottom" secondItem="AjF-HY-hwC" secondAttribute="bottom" constant="10" id="Frk-Ho-Ez4"/>
                             <constraint firstAttribute="trailing" secondItem="HLV-s5-iUh" secondAttribute="trailing" id="IKt-gV-x1Y"/>
-                            <constraint firstItem="EDs-Vh-gBM" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="12" id="IPK-Jd-wgd"/>
+                            <constraint firstItem="EDs-Vh-gBM" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="IPK-Jd-wgd"/>
                             <constraint firstItem="AjF-HY-hwC" firstAttribute="top" secondItem="VRr-qr-gF5" secondAttribute="bottom" constant="2" id="IQR-mV-dSj"/>
                             <constraint firstItem="78u-Dl-gHW" firstAttribute="leading" secondItem="AjF-HY-hwC" secondAttribute="trailing" constant="4" id="IcB-3l-NVe"/>
                             <constraint firstItem="36F-Ej-VDx" firstAttribute="top" secondItem="K9C-Yu-vpf" secondAttribute="bottom" id="OHY-rC-kvc"/>
@@ -266,7 +266,7 @@
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="rgI-WR-fNp"/>
                             <constraint firstItem="o4h-r7-Vhc" firstAttribute="top" secondItem="1th-ab-Lvj" secondAttribute="bottom" constant="4" id="smg-hX-yXw"/>
                             <constraint firstItem="HLV-s5-iUh" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" id="zKD-Aw-WBm"/>
-                            <constraint firstAttribute="trailing" secondItem="1th-ab-Lvj" secondAttribute="trailing" constant="12" id="zy0-WA-rWx"/>
+                            <constraint firstAttribute="trailing" secondItem="1th-ab-Lvj" secondAttribute="trailing" constant="10" id="zy0-WA-rWx"/>
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconSending" translatesAutoresizingMaskIntoConstraints="NO" id="QLT-aC-en2">

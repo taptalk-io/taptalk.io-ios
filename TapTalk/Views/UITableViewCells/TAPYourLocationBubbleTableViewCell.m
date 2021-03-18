@@ -828,7 +828,18 @@
         self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
         self.senderProfileImageButton.userInteractionEnabled = YES;
         self.senderNameHeightConstraint.constant = 18.0f;
-        self.forwardTitleLabelTopConstraint.constant = 4.0f;
+        if (self.isShowReplyView) {
+            self.replyViewBottomConstraint.constant = 8.0f;
+        }
+        else {
+            self.replyViewBottomConstraint.constant = 0.0f;
+        }
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 4.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 0.0f;
+        }
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
