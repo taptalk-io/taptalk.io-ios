@@ -10,6 +10,8 @@
 @import AFNetworking;
 
 #define NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY @"Prefs.NetworkManagerNoConnectionNotificationKey"
+#define NETWORK_MANAGER_NO_CONNECTION_MESSAGE NSLocalizedStringFromTableInBundle(@"Oops! It seems like you are offline, please check your connection.", nil, [TAPUtil currentBundle], @"");
+#define NETWORK_MANAGER_NO_CONNECTION_MESSAGE_OLD NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TAPUtil currentBundle], @"");
 
 @interface TAPNetworkManager : NSObject
 

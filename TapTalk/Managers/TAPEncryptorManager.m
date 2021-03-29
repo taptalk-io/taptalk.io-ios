@@ -83,6 +83,10 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     NSInteger randomNumber = 1 + (arc4random() % 9); //Random number from 1 - 9
     NSInteger encryptedStringLength = [encryptedString length];
     
+    if (encryptedStringLength <= 0) {
+        return nil;
+    }
+    
     NSInteger saltCharIndexPosition = (((encryptedStringLength + randomNumber) * randomNumber) % encryptedStringLength);
     
     NSMutableString *encryptedStringWithSalt = [NSMutableString stringWithString:encryptedString];

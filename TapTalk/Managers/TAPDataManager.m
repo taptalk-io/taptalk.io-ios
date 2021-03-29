@@ -4685,6 +4685,17 @@
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
 #ifdef DEBUG
         NSString *errorDomain = error.domain;
         NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
@@ -4696,6 +4707,7 @@
         NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
+        }
     }];
 }
 
@@ -4930,6 +4942,17 @@
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
 #ifdef DEBUG
         NSString *errorDomain = error.domain;
         NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
@@ -4941,6 +4964,7 @@
         NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
+        }
     }];
 }
 
