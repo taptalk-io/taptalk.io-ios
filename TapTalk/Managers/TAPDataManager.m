@@ -4605,7 +4605,8 @@
 + (void)callAPIRequestVerificationCodeWithPhoneNumber:(NSString *)phoneNumber
                                             countryID:(NSString *)countryID
                                                method:(NSString *)method
-                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, NSString *successMessage))success
+                                              channel:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
                                               failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestOTP];
     
@@ -4613,6 +4614,7 @@
     [parameterDictionary setObject:phoneNumber forKey:@"phone"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:[countryID integerValue]] forKey:@"countryID"];
     [parameterDictionary setObject:method forKey:@"method"]; //method should be phone or email
+    [parameterDictionary setObject:channel forKey:@"channel"]; //channel should be `sms` or `whatsapp`
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4629,7 +4631,7 @@
             if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIRequestVerificationCodeWithPhoneNumber:phoneNumber countryID:countryID method:method success:success failure:failure];
+                    [TAPDataManager callAPIRequestVerificationCodeWithPhoneNumber:phoneNumber countryID:countryID method:method channel:channel success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error);
                 }];
@@ -4648,7 +4650,7 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success([NSString string], [NSString string], [NSString string]);
+            success([NSString string], [NSString string], NO, [NSString string], [NSString string], 0, [NSString string]);
             return;
         }
         
@@ -4660,10 +4662,25 @@
         NSString *OTPID = [dataDictionary objectForKey:@"otpID"];
         OTPID = [TAPUtil nullToEmptyString:OTPID];
         
+        NSString *isSuccessString = [dataDictionary objectForKey:@"success"];
+        isSuccessString = [TAPUtil nullToEmptyString:isSuccessString];
+        BOOL isSuccessBoolean = [isSuccessString boolValue];
+        
+        NSString *channelString = [dataDictionary objectForKey:@"channel"];
+        channelString = [TAPUtil nullToEmptyString:channelString];
+        
+        NSString *whatsAppFailureReason = [dataDictionary objectForKey:@"whatsAppFailureReason"];
+        whatsAppFailureReason = [TAPUtil nullToEmptyString:whatsAppFailureReason];
+        
         NSString *successMessage = [dataDictionary objectForKey:@"message"];
         successMessage = [TAPUtil nullToEmptyString:successMessage];
         
-        success(OTPKey, OTPID, successMessage);
+        
+        NSString *nextRequestSecondsRaw = [dataDictionary objectForKey:@"nextRequestSeconds"];
+        nextRequestSecondsRaw = [TAPUtil nullToEmptyString:nextRequestSecondsRaw];
+        NSInteger nextRequestSeconds = [nextRequestSecondsRaw integerValue];
+        
+        success(OTPKey, OTPID, isSuccessBoolean,channelString, whatsAppFailureReason, nextRequestSeconds, successMessage);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

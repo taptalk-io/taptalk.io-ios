@@ -170,7 +170,8 @@
         case TAPComponentFontNavigationBarButtonLabel:
         {
             
-            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+//            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular]; //AS NOTE - old value
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
             font = [font fontWithSize:TAP_NAVIGATION_BAR_BUTTON_LABEL_FONTSIZE_STYLE];
             return font;
             break;
@@ -178,7 +179,8 @@
         case TAPComponentFontFormLabel:
         {
             
-            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
+//            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium]; //AS NOTE - old value
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
             font = [font fontWithSize:TAP_FORM_LABEL_FONTSIZE_STYLE];
             return font;
             break;
@@ -194,7 +196,8 @@
         case TAPComponentFontFormErrorInfoLabel:
         {
             
-            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+//            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular]; //AS NOTE - old value
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
             font = [font fontWithSize:TAP_FORM_ERROR_INFO_LABEL_FONTSIZE_STYLE];
             return font;
             break;
@@ -338,7 +341,7 @@
         case TAPComponentFontSearchBarTextCancelButton:
         {
             
-            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
             font = [font fontWithSize:TAP_SEARCHBAR_TEXT_CANCEL_BUTTON_FONTSIZE_STYLE];
             return font;
             break;
@@ -402,7 +405,7 @@
         case TAPComponentFontTableViewSectionHeaderLabel:
         {
             
-            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
             font = [font fontWithSize:TAP_TABLEVIEW_SECTION_HEADER_LABEL_FONTSIZE_STYLE];
             return font;
             break;
@@ -1125,9 +1128,15 @@
         }
         case TAPComponentFontMentionListUsernameLabel:
         {
-            
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:TAP_MENTION_LIST_USERNAME_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontVersionCode:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_VERSION_CODE_FONTSIZE_STYLE];
             return font;
             break;
         }
@@ -1235,7 +1244,8 @@
     
     switch (textColorType) {
         case TAPTextColorTitleLabel: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark]; //AS NOTE - old code
+//            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.8f];
             return color;
             break;
         }
@@ -1255,7 +1265,8 @@
             break;
         }
         case TAPTextColorFormDescriptionLabel: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark]; //AS NOTE - old value
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.8f]; //AS NOTE - old value
             return color;
             break;
         }
@@ -1270,7 +1281,8 @@
             break;
         }
         case TAPTextColorFormTextFieldPlaceholder: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium]; //AS NOTE - old value
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
             return color;
             break;
         }
@@ -1286,6 +1298,11 @@
         }
         case TAPTextColorButtonLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPTextColorButtonInactiveLabel: {
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.4f];
             return color;
             break;
         }
@@ -1345,7 +1362,8 @@
             break;
         }
         case TAPTextColorSearchBarTextPlaceholder: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium]; //AS NOTE - old value
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.6f];
             return color;
             break;
         }
@@ -1390,7 +1408,7 @@
             break;
         }
         case TAPTextColorTableViewSectionHeaderLabel: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
             break;
         }
@@ -1774,7 +1792,7 @@
             return color;
             break;
         }
-        case TAPComponentFontGroupMemberCount: {
+        case TAPTextColorGroupMemberCount: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium];
             return color;
             break;
@@ -1785,12 +1803,14 @@
             break;
         }
         case TAPTextColorLoginVerificationInfoLabel: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark]; //AS NOTE - old value
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.8f];
             return color;
             break;
         }
         case TAPTextColorLoginVerificationPhoneNumberLabel: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark]; //AS NOTE - old value
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.8f];
             return color;
             break;
         }
@@ -1805,12 +1825,14 @@
             break;
         }
         case TAPTextColorLoginVerificationStatusSuccessLabel: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorSuccess];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorSuccess]; //AS NOTE - old value
+            UIColor *color = [TAPUtil getColor:@"19C700"];
             return color;
             break;
         }
         case TAPTextColorLoginVerificationCodeInputLabel: {
-            UIColor *color = [TAPUtil getColor:@"191919"];
+//            UIColor *color = [TAPUtil getColor:@"191919"]; //AS NOTE - old value
+            UIColor *color = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
             return color;
             break;
         }
@@ -1846,6 +1868,11 @@
         }
         case TAPTextColorRoomAvatarExtraLargeLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TAPTextColorVersionCode: {
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.4f];
             return color;
             break;
         }
@@ -1885,7 +1912,7 @@
         }
         case TAPComponentColorDefaultRightBubbleDarkBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_DARK_BACKGROUND_COLOR];
+            UIColor *color = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.1f];
             return color;
             break;
         }
@@ -1897,7 +1924,7 @@
         }
         case TAPComponentColorDefaultLeftBubbleDarkBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_LEFT_BUBBLE_QUOTE_BACKGROUND_COLOR];
+            UIColor *color = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.05f];
             return color;
             break;
         }
@@ -1937,7 +1964,8 @@
         }
         case TAPComponentColorButtonActiveBackgroundGradientDark:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryDark];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryDark]; //AS NOTE - old value
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
@@ -1949,19 +1977,20 @@
         }
         case TAPComponentColorButtonInactiveBackgroundGradientLight:
         {
-            UIColor *color = [TAPUtil getColor:TAP_BUTTON_INACTIVE_BACKGROUND_GRADIENT_LIGHT_COLOR];
+            UIColor *color = [[TAPUtil getColor:TAP_BUTTON_INACTIVE_BACKGROUND_GRADIENT_LIGHT_COLOR] colorWithAlphaComponent:0.1f];
             return color;
             break;
         }
         case TAPComponentColorButtonInactiveBackgroundGradientDark:
         {
-            UIColor *color = [TAPUtil getColor:TAP_BUTTON_INACTIVE_BACKGROUND_GRADIENT_DARK_COLOR];
+            UIColor *color = [[TAPUtil getColor:TAP_BUTTON_INACTIVE_BACKGROUND_GRADIENT_DARK_COLOR] colorWithAlphaComponent:0.1f];
             return color;
             break;
         }
         case TAPComponentColorButtonInactiveBorder:
         {
-            UIColor *color = [TAPUtil getColor:TAP_BUTTON_INACTIVE_BORDER_COLOR];
+//            UIColor *color = [TAPUtil getColor:TAP_BUTTON_INACTIVE_BORDER_COLOR];
+            UIColor *color = [UIColor clearColor];
             return color;
             break;
         }
@@ -2046,6 +2075,18 @@
         case TAPComponentColorQuoteLayoutDecorationBackground:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimaryExtraLight];
+            return color;
+            break;
+        }
+        case TAPComponentColorRightBubbleQuoteDecorationBackground:
+        {
+            UIColor *color = [TAPUtil getColor:@"FFFFFF"];
+            return color;
+            break;
+        }
+        case TAPComponentColorLeftBubbleQuoteDecorationBackground:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
@@ -2348,7 +2389,14 @@
         }
         case TAPComponentColorIconSearchBarMagnifier:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+//            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray]; //AS NOTE - old value
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconSearchBarMagnifierActive:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
@@ -2610,6 +2658,18 @@
         case TAPComponentColorIconFileWhite:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconQuotedFileBackgroundRight:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconQuotedFileBackgroundLeft:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }

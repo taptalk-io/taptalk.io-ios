@@ -78,3 +78,8 @@
 
 //Domain
 #define TAPErrorDomain @"user/updated"
+
+//Login
+#define API_REQUEST_OTP_TYPE_SMS @"sms"
+#define API_REQUEST_OTP_TYPE_WHATSAPP @"whatsapp"
+#define API_REQUEST_OTP_TYPE_WHATSAPP_INVALID_RECIPIENT @"invalid_recipient"

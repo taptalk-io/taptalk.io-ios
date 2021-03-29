@@ -262,7 +262,8 @@
 + (void)callAPIRequestVerificationCodeWithPhoneNumber:(NSString *)phoneNumber
                                             countryID:(NSString *)countryID
                                                method:(NSString *)method
-                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, NSString *successMessage))success
+                                              channel:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
                                               failure:(void (^)(NSError *error))failure;
 + (void)callAPIVerifyOTPWithCode:(NSString *)OTPcode
                            OTPID:(NSString *)OTPID

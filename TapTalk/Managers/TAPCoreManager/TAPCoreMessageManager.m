@@ -435,7 +435,7 @@
             dataFile.size = fileSize;
             dataFile.fileData = fileData;
             
-            [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
+            [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
                 NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
                 
                 void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];

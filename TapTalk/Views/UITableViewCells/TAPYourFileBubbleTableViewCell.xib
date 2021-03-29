@@ -113,7 +113,7 @@
                                                 </constraints>
                                             </imageView>
                                         </subviews>
-                                        <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstItem="Cz9-ae-onE" firstAttribute="centerX" secondItem="it5-Ef-cgs" secondAttribute="centerX" id="4s4-ou-atn"/>
                                             <constraint firstItem="Cz9-ae-onE" firstAttribute="centerY" secondItem="it5-Ef-cgs" secondAttribute="centerY" id="Uok-WF-Rk4"/>
@@ -183,7 +183,7 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JXE-S2-myJ">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JXE-S2-myJ">
                                                 <rect key="frame" x="4" y="25" width="70" height="13"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="11"/>
@@ -566,6 +566,7 @@
                 <outlet property="downloadView" destination="iVE-Dw-cJc" id="4sd-iU-Tbe"/>
                 <outlet property="fileDescriptionLabel" destination="jZS-MG-OpQ" id="p3f-h9-e0a"/>
                 <outlet property="fileDescriptionSizePlaceholderLabel" destination="9OW-SB-qa6" id="Snv-Wu-YsB"/>
+                <outlet property="fileImageView" destination="Cz9-ae-onE" id="EeY-yv-iCw"/>
                 <outlet property="fileView" destination="it5-Ef-cgs" id="p41-nL-v17"/>
                 <outlet property="forwardFromLabel" destination="iLw-Gy-lXq" id="wcB-3g-ClL"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="EMj-wZ-HGI" id="9II-nB-uoQ"/>

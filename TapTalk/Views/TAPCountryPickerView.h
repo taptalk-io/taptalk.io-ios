@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) UITableView *searchResultTableView;
 
+- (void)isShowEmptyState:(BOOL)isShow;
+
 @end
 
 NS_ASSUME_NONNULL_END

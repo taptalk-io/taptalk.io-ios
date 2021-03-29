@@ -64,7 +64,7 @@
         self.shadowView.layer.shadowOpacity = 1.0f;
         self.shadowView.layer.masksToBounds = NO;
         self.shadowView.alpha = 0.0f;
-        [self addSubview:self.shadowView];
+//        [self addSubview:self.shadowView];
         
         _phoneNumberContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame) + 10.0f, CGRectGetMinY(self.countryCodeContainerView.frame), phoneNumberContainerViewWidth, 50.0f)];
         self.phoneNumberContainerView.layer.cornerRadius = 8.0f;
@@ -79,7 +79,7 @@
         _phoneNumberTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame))];
         self.phoneNumberTextField.delegate = self;
         self.phoneNumberTextField.keyboardType = UIKeyboardTypePhonePad;
-        self.phoneNumberTextField.placeholder = @"82212345678";
+        self.phoneNumberTextField.placeholder = @"12345678910";
         [self.phoneNumberTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         self.phoneNumberTextField.textColor = textFieldColor;
         self.phoneNumberTextField.font = textFieldFont;
@@ -318,11 +318,29 @@
     UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextFieldPlaceholder];
     UIColor *textFieldPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
     
+    //AS NOTE - ADDED FOR DEFAULT COLOR `countryCodeContainerView`
+    self.countryCodeContainerView.backgroundColor = [UIColor whiteColor];
+    self.countryCodeLabel.alpha = 1.0f;
+    
+    //AS NOTE - ADDED FOR DEFAULT COLOR `phoneNumberContainerView`
+    self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
+    self.phoneNumberTextField.alpha = 1.0f;
+    
     if (disabled) {
         self.pickerButton.userInteractionEnabled = NO;
         self.phoneNumberTextField.userInteractionEnabled = NO;
+        
+        //AS NOTE - CHANGE FOR DISABLED COLOR `countryCodeContainerView`
+        UIColor *countryCodeContainerViewBackgroundColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.1f]; //AS TEMP
+        self.countryCodeContainerView.backgroundColor = countryCodeContainerViewBackgroundColor; //AS TEMP
+        self.countryCodeLabel.alpha = 0.4f; //AS TEMP
         self.countryCodeLabel.textColor = textFieldPlaceholderColor;
-        self.phoneNumberTextField.textColor = textFieldPlaceholderColor;
+        
+        //AS NOTE - CHANGE FOR DISABLED COLOR `phoneNumberContainerView`
+        UIColor *phoneNumberContainerViewBackgroundColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.1f]; //AS TEMP
+        self.phoneNumberContainerView.backgroundColor = phoneNumberContainerViewBackgroundColor; //AS TEMP
+        self.phoneNumberTextField.alpha = 0.4f; //AS TEMP
+        self.phoneNumberTextField.textColor = textFieldColor; //AS TEMP - CHANGE DISABLED COLOR OF TEXTFIELD
     }
     else {
         self.pickerButton.userInteractionEnabled = YES;

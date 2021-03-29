@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPCountryPickerTableViewCell : TAPBaseTableViewCell
 
 - (void)setCountryData:(TAPCountryModel *)country;
-- (void)showSeparatorView:(BOOL)show;
+//- (void)showSeparatorView:(BOOL)show;
 - (void)setAsSelected:(BOOL)selected animated:(BOOL)animated;
 
 @end

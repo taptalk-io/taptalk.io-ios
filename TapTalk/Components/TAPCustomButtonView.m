@@ -99,6 +99,9 @@
             self.button.userInteractionEnabled = YES;
             self.shadowView.layer.shadowColor = [UIColor clearColor].CGColor;
             self.shadowView.alpha = 0.0f;
+            
+            UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+            self.buttonTitleLabel.textColor = buttonColor;
         }
     }
     else if (self.customButtonViewType == TAPCustomButtonViewTypeInactive) {
@@ -116,6 +119,9 @@
             
             self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
             self.shadowView.alpha = 1.0f;
+            
+            UIColor *buttonInactiveLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonInactiveLabel];
+            self.buttonTitleLabel.textColor = buttonInactiveLabelColor;
         }
         else {
             //destructive type, no button background
@@ -192,7 +198,13 @@
                 self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
                 self.button.userInteractionEnabled = YES;
                 
-                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder] colorWithAlphaComponent:0.5f].CGColor;            }];
+//                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder] colorWithAlphaComponent:0.5f].CGColor; //AS NOTE - OLD CODE
+                
+                self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
+                
+                UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+                self.buttonTitleLabel.textColor = buttonColor;
+            }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
@@ -207,6 +219,9 @@
                 self.button.userInteractionEnabled = NO;
                 
                 self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
+                
+                UIColor *buttonInactiveLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonInactiveLabel];
+                self.buttonTitleLabel.textColor = buttonInactiveLabelColor;
             }];
         }
     }
@@ -222,7 +237,10 @@
             self.buttonContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
             self.button.userInteractionEnabled = YES;
             
-            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder] colorWithAlphaComponent:0.5f].CGColor;
+//            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder] colorWithAlphaComponent:0.5f].CGColor;
+            
+            UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+            self.buttonTitleLabel.textColor = buttonColor;
         }
         else {
             CAGradientLayer *gradient = [CAGradientLayer layer];
@@ -236,6 +254,9 @@
             self.button.userInteractionEnabled = NO;
             
             self.shadowView.layer.shadowColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonInactiveBorder].CGColor;
+            
+            UIColor *buttonInactiveLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonInactiveLabel];
+            self.buttonTitleLabel.textColor = buttonInactiveLabelColor;
         }
     }
 }

@@ -36,6 +36,8 @@
 @property (nonatomic) CGFloat endAngle;
 @property (nonatomic) NSInteger updateInterval;
 
+@property (strong, nonatomic) UILabel *versionLabel;
+
 - (void)setChangeImageButtonAsEnabled:(BOOL)enabled;
 - (void)animateFinishedUploadingImage;
 
@@ -179,8 +181,8 @@
         self.loadingLabel.textAlignment = NSTextAlignmentCenter;
         [self.scrollView addSubview:self.loadingLabel];
 
-        _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame) + 4.0f, 14.0f, 14.0f)];
-        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame), 20.0f, 20.0f)];
+        self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconEditPicture" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.changeIconImageView.image = [self.changeIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChangePicture]];
 
         [self.scrollView addSubview:self.changeIconImageView];
@@ -282,16 +284,38 @@
         self.logoutLoadingButton.userInteractionEnabled = NO;
         [self.logoutLoadingBackgroundView addSubview:self.logoutLoadingButton];
         
-        CGFloat bottomGap = 16.0f;
+        //VERSION SECTION
+        NSString *appVersion = @"";
+        appVersion =  [appVersion stringByAppendingString:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+#ifdef DEBUG
+        appVersion = [NSString stringWithFormat:@"%@-DEBUG(%@)", appVersion, [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]; //DEBUG
+#else
+        appVersion = [NSString stringWithFormat:@"%@(%@)", appVersion, [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]; //RELEASE
+#endif
+        
+        //AS NOTE - ADDED VERSION LABEL
+        CGFloat padding = 16.0f;
+        UIFont *versionLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontVersionCode];
+        UIColor *versionLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorVersionCode];
+        _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(padding, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - padding - padding, 16.0f)];
+        self.versionLabel.text = [NSString stringWithFormat:@"V %@", appVersion];
+        self.versionLabel.textColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.4f];
+        self.versionLabel.font = versionLabelFont;
+        [self.scrollView addSubview:self.versionLabel];
+        //END AS NOTE - ADDED VERSION LABEL
+        
+        CGFloat bottomGap = 24.0f;
         if (IS_IPHONE_X_FAMILY) {
-            bottomGap = [TAPUtil safeAreaBottomPadding];
+            bottomGap = [TAPUtil safeAreaBottomPadding] + 24.0f;
         }
 
         if (IS_IOS_13_OR_ABOVE) {
-            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame) + bottomGap + [TAPUtil topGapPresentingViewController]);
+//            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame) + bottomGap + [TAPUtil topGapPresentingViewController]); //AS NOTE - OLD VALUE
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.versionLabel.frame) + bottomGap + [TAPUtil topGapPresentingViewController]);
         }
         else {
-            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame) + bottomGap);
+//            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame) + bottomGap); //AS NOTE - OLD VALUE
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.versionLabel.frame) + bottomGap);
         }
         
 //        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap); //CS TEMP - hide continue button
@@ -327,16 +351,18 @@
         //END CS TEMP
         self.continueButtonView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f); // CS TEMP - remove this line of code to show password
         
-        CGFloat bottomGap = 16.0f;
+        CGFloat bottomGap = 24.0f;
         if (IS_IPHONE_X_FAMILY) {
-            bottomGap = [TAPUtil safeAreaBottomPadding];
+            bottomGap = [TAPUtil safeAreaBottomPadding] + 24.0f;
         }
         
         if (IS_IOS_13_OR_ABOVE) {
-            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap + [TAPUtil topGapPresentingViewController]);
+//            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap + [TAPUtil topGapPresentingViewController]); //AS NOTE - OLD VALUE
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.versionLabel.frame) + bottomGap + [TAPUtil topGapPresentingViewController]); //AS NOTE - NEW VALUE
         }
         else {
-            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap);
+//            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.continueButtonView.frame) + bottomGap); //AS NOTE - OLD VALUE
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.frame), CGRectGetMaxY(self.versionLabel.frame) + bottomGap); //AS NOTE - NEW VALUE
         }
     }];
 }

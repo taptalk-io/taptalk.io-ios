@@ -45,6 +45,8 @@
 
 + (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type messageData:(NSDictionary * _Nullable)messageData;
 + (instancetype)createMessageWithUser:(TAPUserModel *)user created:(NSNumber *)created room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type messageData:(NSDictionary * _Nullable)messageData;
++ (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type quotedMessage:(TAPMessageModel *)quotedMessage messageData:(NSDictionary * _Nullable)messageData;
++ (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type quote:(TAPQuoteModel *)quote messageData:(NSDictionary * _Nullable)messageData;
 
 - (TAPMessageModel *)copyMessageModel;
 

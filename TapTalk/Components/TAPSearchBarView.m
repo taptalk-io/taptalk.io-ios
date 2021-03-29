@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *shadowView;
+@property (strong, nonatomic) UIImageView *leftViewImageView;
 
 @end
 
@@ -23,14 +24,13 @@
     if (self) {
         _shadowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.shadowView.backgroundColor = [UIColor whiteColor];
-        self.shadowView.layer.borderWidth = 1.0f;
         self.shadowView.layer.cornerRadius = CGRectGetHeight(self.shadowView.frame) / 2.0f;
         self.shadowView.layer.shadowRadius = 5.0f;
         self.shadowView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
         self.shadowView.layer.shadowOpacity = 1.0f;
         self.shadowView.layer.masksToBounds = NO;
         self.shadowView.alpha = 0.0f;
-        [self addSubview:self.shadowView];
+//        [self addSubview:self.shadowView]; //AS NOTE - COMMENT BECAUSE NOT USE ANYMORE SHADOW
         
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.bgView.backgroundColor = [UIColor clearColor];
@@ -43,14 +43,16 @@
         
         _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
         self.searchTextField.delegate = self;
-        self.searchTextField.backgroundColor = [UIColor whiteColor];
+        self.searchTextField.backgroundColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.05f];
         [self.searchTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         self.searchTextField.clearButtonMode = YES;
-        UIImageView *leftViewImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, 0.0f, 14.0, 14.0f)];
-        leftViewImageView.image = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        leftViewImageView.image = [leftViewImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
-        UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(leftViewImageView.frame) + 8.0f + 8.0f, CGRectGetHeight(leftViewImageView.frame))];
-        [leftView addSubview:leftViewImageView];
+        _leftViewImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, 0.0f, 14.0, 14.0f)];
+        self.leftViewImageView.alpha = 0.6f;
+        UIImage *searchIconImage = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        searchIconImage = [searchIconImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
+        self.leftViewImageView.image = searchIconImage;
+        UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftViewImageView.frame) + 8.0f + 8.0f, CGRectGetHeight(self.leftViewImageView.frame))];
+        [leftView addSubview:self.leftViewImageView];
         self.searchTextField.leftView = leftView;
         self.searchTextField.leftViewMode = UITextFieldViewModeAlways;
         NSMutableAttributedString *placeHolderAttributedString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedStringFromTableInBundle(@"Search", nil, [TAPUtil currentBundle], @"")];
@@ -141,12 +143,16 @@
                 self.shadowView.alpha = 1.0f;
                 self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
                 self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive].CGColor;
+                self.leftViewImageView.alpha = 1.0f;
+                self.leftViewImageView.image = [self.leftViewImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifierActive]];
             }];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
                 self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
+                self.leftViewImageView.alpha = 0.6f;
+                self.leftViewImageView.image = [self.leftViewImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
             }];
         }
     }
@@ -155,10 +161,15 @@
             self.shadowView.alpha = 1.0f;
             self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
             self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderActive].CGColor;
+            self.leftViewImageView.alpha = 1.0f;
+            self.leftViewImageView.image = [self.leftViewImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifierActive]];
         }
         else {
             self.shadowView.alpha = 0.0f;
             self.searchTextField.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorSearchBarBorderInactive].CGColor;
+            self.leftViewImageView.alpha = 0.6f;
+            self.leftViewImageView.image = [self.leftViewImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
+            
         }
     }
 }
@@ -187,7 +198,7 @@
 }
 
 - (void)handleCancelButtonTappedState {
-    [self setAsActive:NO animated:YES];
+    [self setAsActive:NO animated:NO]; //AS NOTE - CHANGE TO WITHOUT ANIMATION
 }
 
 @end

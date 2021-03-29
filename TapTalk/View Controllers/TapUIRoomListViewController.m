@@ -1006,9 +1006,9 @@
             //Handle room move
             if ([moveFromIndexArray count] > 0) {
                 for (int count = 0; count < [moveFromIndexArray count]; count++) {
-                    NSInteger oldIndex = [moveFromIndexArray objectAtIndex:count];
-                    NSInteger newIndex = [moveToIndexArray objectAtIndex:count];
-
+                    NSInteger oldIndex = [[moveFromIndexArray objectAtIndex:count] intValue];
+                    NSInteger newIndex = [[moveToIndexArray objectAtIndex:count] intValue];
+                    
                     [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
                     [self.roomListView.roomListTableView performBatchUpdates:^{
                         //changing beginUpdates and endUpdates with this because of deprecation

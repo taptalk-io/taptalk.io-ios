@@ -106,6 +106,9 @@
         else {
             if (![urlString hasPrefix:@"http"]) {
                 //Do not load url when url is fileID type
+                if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+                    [self.delegate imageViewDidFinishLoadImage:self];
+                }
                 return;
             }
             NSURL *imageURL = [NSURL URLWithString:urlString];

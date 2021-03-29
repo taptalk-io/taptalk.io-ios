@@ -269,6 +269,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *anchorMentionMessageDictionary;
+@property (strong, nonatomic) NSMutableArray *anchorMentionMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMentionArray;
 @property (strong, nonatomic) NSMutableArray *filteredMentionListArray;
@@ -473,6 +474,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _cellHeightsDictionary = [[NSMutableDictionary alloc] init];
     _anchorUnreadMessageArray = [[NSMutableArray alloc] init];
     _anchorMentionMessageDictionary = [[NSMutableDictionary alloc] init];
+    _anchorMentionMessageArray = [[NSMutableArray alloc] init];
     _scrolledPendingMessageArray = [[NSMutableArray alloc] init];
     _scrolledPendingMentionArray = [[NSMutableArray alloc] init];
     _filteredMentionListArray = [[NSMutableArray alloc] init];
@@ -481,10 +483,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _isKeyboardShowed = NO;
     _isShowAccessoryView = YES;
     _isShowingUnreadMessageIdentifier = NO;
-    _tappedMessageLocalID = @"";
     _safeAreaBottomPadding = [TAPUtil safeAreaBottomPadding];
     _selectedMessage = nil;
     _mentionIndexesDictionary = [[NSMutableDictionary alloc] init];
+    
+    if (self.tappedMessageLocalID == nil) {
+        _tappedMessageLocalID = @"";
+    }
     
     _keyboardState = keyboardStateDefault;
     _keyboardHeight = 0.0f;
@@ -563,6 +568,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.connectionStatusViewController.delegate = self;
     [self.view addSubview:self.connectionStatusViewController.view];
     _connectionStatusHeight = CGRectGetHeight(self.connectionStatusViewController.view.frame);
+    
+    self.inputMessageAccessoryDocumentsImageView.image = [self.inputMessageAccessoryDocumentsImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     
     //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
@@ -683,9 +690,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //check if there's scroll to message passed from open room method
     //if yes scroll to message after open chat room
-    if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
-        [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
-    }
+//    if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
+//        [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
+//    }
     
     self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
     self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
@@ -1988,7 +1995,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #ifdef DEBUG
             NSLog(@"FileName: %@ \nMimeType:%@ \nFileSize: %ld",decodedFileName, mimeType, [fileSize doubleValue]);
 #endif
-            [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath];
+            [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
             
             [TAPUtil performBlock:^{
                 if ([self.messageArray count] != 0) {
@@ -2268,7 +2275,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myChatReplyDidTapped {
-    
     if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
         return;
     }
@@ -2303,28 +2309,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-            
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)myChatBubbleDidTappedUrl:(NSURL *)url
@@ -2654,20 +2639,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
@@ -2918,26 +2890,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPMyFileBubbleTableViewCell
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)myFileReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -3048,7 +3001,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             NSData *fileData = [NSData dataWithContentsOfURL:newURL];
             dataFile.fileData = fileData;
             
-            [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath];
+            [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
             
         } failure:^(NSError *error) {
             
@@ -3198,23 +3151,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -3262,24 +3199,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPMyVideoBubbleTableViewCell
 - (void)myVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)myVideoReplyDidTappedWithMessage:(TAPMessageModel *)message {
-    
     if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
         return;
     }
@@ -3721,26 +3644,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)yourChatBubbleDidTappedUrl:(NSURL *)url
@@ -4047,20 +3951,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
@@ -4300,26 +4191,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)yourFileReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -4467,26 +4339,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)yourLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -4538,20 +4391,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPYourVideoBubbleTableViewCell
 - (void)yourVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)yourVideoReplyDidTappedWithMessage:(TAPMessageModel *)message {
@@ -7212,6 +7052,28 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+- (void)messageBubbleQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
+        //reply to exists
+        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
+            //check if no reply message in loading / fetch to handle double tapped on waiting action
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
+        }
+    }
+    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
+        //quote exists
+        if(tappedMessage.data) {
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
+        }
+    }
+}
 
 #pragma mark Input Accessory View
 //Implement Input Accessory View
@@ -7432,6 +7294,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if ([lastUpdated longLongValue] == 0 || lastUpdated == nil) {
                         //First time call, set minCreated to lastUpdated preference
                         [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:minCreated];
+                    }
+                    
+                    if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
+                        [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
                     }
                     
                     //Call API Get After Message
@@ -7885,6 +7751,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)addMessageToAnchorMentionArray:(TAPMessageModel *)message {
     if (![self.anchorMentionMessageDictionary objectForKey:message.localID]) {
         [self.anchorMentionMessageDictionary setObject:message forKey:message.localID];
+        [self.anchorMentionMessageArray addObject:message];
         [self checkAnchorMentionLabel];
     }
 }
@@ -7893,6 +7760,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     for (TAPMessageModel *message in messageArray) {
         if (![self.anchorMentionMessageDictionary objectForKey:message.localID]) {
             [self.anchorMentionMessageDictionary setObject:message forKey:message.localID];
+            [self.anchorMentionMessageArray addObject:message];
             [self checkAnchorMentionLabel];
         }
     }
@@ -7901,6 +7769,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)removeMessageFromAnchorMention:(TAPMessageModel *)message {
     if ([self.anchorMentionMessageDictionary objectForKey:message.localID]) {
         [self.anchorMentionMessageDictionary removeObjectForKey:message.localID];
+        [self.anchorMentionMessageArray removeObject:message];
         [self checkAnchorMentionLabel];
     }
     
@@ -7912,6 +7781,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }];
     }
  }
+
+- (void)clearAnchorMentionDictionary {
+    [self.anchorMentionMessageDictionary removeAllObjects];
+    [self.anchorMentionMessageArray removeAllObjects];
+}
 
 - (void)retrieveExistingMessages {
     //Prevent retreive before message if already last page
@@ -9032,30 +8906,32 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (IBAction)mentionAnchorButtonDidTapped:(id)sender {
+    TAPMessageModel *messageWithMention = [self.anchorMentionMessageArray firstObject];
+    [self scrollToMessageAndLoadDataWithLocalID:messageWithMention.localID];
     
-    NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
-    if (numberOfPendingArray > 0) {
-        //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
-        [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
-        
-        [self.scrolledPendingMessageArray removeAllObjects];
-        [self.tableView reloadData];
-    }
-
-    TAPMessageModel *obtainedMentionMessage = [self.scrolledPendingMentionArray firstObject];
-    NSInteger rowIndex = [self.messageArray indexOfObject:obtainedMentionMessage];
-    
-    if (rowIndex != NSNotFound) {
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowIndex inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
-        [self.scrolledPendingMentionArray removeObjectAtIndex:0];
-    }
-    
-//    NSString *currentMesageLocalID = [self.anchorMentionMessageLocalIDArray firstObject];
-//    currentMesageLocalID = [TAPUtil nullToEmptyString:currentMesageLocalID];
+//    NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
+//    if (numberOfPendingArray > 0) {
+//        //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
+//        [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
 //
-//    if (![currentMesageLocalID isEqualToString:@""]) {
-//        [self scrollToMessageAndLoadDataWithLocalID:currentMesageLocalID];
+//        [self.scrolledPendingMessageArray removeAllObjects];
+//        [self.tableView reloadData];
 //    }
+//
+//    TAPMessageModel *obtainedMentionMessage = [self.scrolledPendingMentionArray firstObject];
+//    NSInteger rowIndex = [self.messageArray indexOfObject:obtainedMentionMessage];
+//
+//    if (rowIndex != NSNotFound) {
+//        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowIndex inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+//        [self.scrolledPendingMentionArray removeObjectAtIndex:0];
+//    }
+//
+////    NSString *currentMesageLocalID = [self.anchorMentionMessageLocalIDArray firstObject];
+////    currentMesageLocalID = [TAPUtil nullToEmptyString:currentMesageLocalID];
+////
+////    if (![currentMesageLocalID isEqualToString:@""]) {
+////        [self scrollToMessageAndLoadDataWithLocalID:currentMesageLocalID];
+////    }
 }
 
 #pragma mark Others
@@ -9508,6 +9384,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
+    
+    [self clearAnchorMentionDictionary];
 }
 
 - (void)checkAnchorUnreadLabel {

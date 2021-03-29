@@ -101,7 +101,7 @@
                     <constraint firstItem="ZOq-VC-kEi" firstAttribute="top" secondItem="oPO-rY-DCk" secondAttribute="top" id="bOJ-DZ-CVB"/>
                     <constraint firstItem="4wh-Pn-xVV" firstAttribute="leading" secondItem="ZOq-VC-kEi" secondAttribute="trailing" constant="4" id="fQe-5V-ktF"/>
                     <constraint firstAttribute="bottom" secondItem="Wyf-0L-wCJ" secondAttribute="bottom" constant="8" id="fkU-iL-CFW"/>
-                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="oPO-rY-DCk" secondAttribute="leading" constant="80" id="x0y-5L-fHn"/>
+                    <constraint firstItem="ZOq-VC-kEi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="oPO-rY-DCk" secondAttribute="leading" constant="32" id="x0y-5L-fHn"/>
                     <constraint firstItem="ZOq-VC-kEi" firstAttribute="bottom" secondItem="wfl-OL-tvu" secondAttribute="bottom" id="zFP-Rt-Y5Q"/>
                 </constraints>
             </tableViewCellContentView>

@@ -10,6 +10,9 @@
 
 @interface TAPCountryPickerView ()
 
+@property (strong, nonatomic) UILabel *titleEmptyStateLabel;
+@property (strong, nonatomic) UILabel *descriptionEmptyStateLabel;
+
 @end
 
 @implementation TAPCountryPickerView
@@ -56,9 +59,59 @@
         self.searchResultTableView.alpha = 0.0f;
         [self.searchResultTableView setInsetsContentViewsToSafeArea:YES];
         [self addSubview:self.searchResultTableView];
+        
+        UIFont *titleEmptyStateLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
+        UIColor *titleEmptyStateLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorCountryPickerLabel];
+        _titleEmptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.searchBarView.frame) + 160.0f, 0.0f, 24.0f)]; //AS NOTE - width will be resized
+        self.titleEmptyStateLabel.alpha = 0.0f; //AS NOTE - default value is hidden
+        self.titleEmptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"No countries found", nil, [TAPUtil currentBundle], @"");
+        NSMutableAttributedString *titleEmptyStateLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.titleEmptyStateLabel.text];
+        NSMutableDictionary *titleEmptyStateLabelAttributesDictionary = [NSMutableDictionary dictionary];
+        CGFloat titleEmptyStateLabelLetterSpacing = -0.5f;
+        [titleEmptyStateLabelAttributesDictionary setObject:@(titleEmptyStateLabelLetterSpacing) forKey:NSKernAttributeName];
+        [titleEmptyStateLabelAttributesDictionary setObject:titleEmptyStateLabelFont forKey:NSFontAttributeName];
+        [titleEmptyStateLabelAttributesDictionary setObject:titleEmptyStateLabelColor forKey:NSForegroundColorAttributeName];
+        [titleEmptyStateLabelAttributedString addAttributes:titleEmptyStateLabelAttributesDictionary
+                                               range:NSMakeRange(0, [self.titleEmptyStateLabel.text length])];
+        self.titleEmptyStateLabel.attributedText = titleEmptyStateLabelAttributedString;
+        
+        CGSize titleEmptyStateLabelSize = [self.titleEmptyStateLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.titleEmptyStateLabel.frame))];
+        self.titleEmptyStateLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - titleEmptyStateLabelSize.width) / 2.0f, CGRectGetMinY(self.titleEmptyStateLabel.frame), titleEmptyStateLabelSize.width, CGRectGetHeight(self.titleEmptyStateLabel.frame));
+        [self addSubview:self.titleEmptyStateLabel];
+        
+        UIFont *descriptionEmptyStateLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontActionSheetDestructiveLabel];
+        UIColor *descriptionEmptyStateLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextPlaceholder];
+        _descriptionEmptyStateLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.titleEmptyStateLabel.frame) + 4.0f, 0.0f, 24.0f)]; //AS NOTE - width will be resized
+        self.descriptionEmptyStateLabel.alpha = 0.0f; //AS NOTE - default value is hidden
+        self.descriptionEmptyStateLabel.text = NSLocalizedStringFromTableInBundle(@"Try a different search.", nil, [TAPUtil currentBundle], @"");
+        NSMutableAttributedString *descriptionEmptyStateLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.descriptionEmptyStateLabel.text];
+        NSMutableDictionary *descriptionEmptyStateLabelAttributesDictionary = [NSMutableDictionary dictionary];
+        CGFloat descriptionEmptyStateLabelLetterSpacing = -0.3f;
+        [descriptionEmptyStateLabelAttributesDictionary setObject:@(descriptionEmptyStateLabelLetterSpacing) forKey:NSKernAttributeName];
+        [descriptionEmptyStateLabelAttributesDictionary setObject:descriptionEmptyStateLabelFont forKey:NSFontAttributeName];
+        [descriptionEmptyStateLabelAttributesDictionary setObject:descriptionEmptyStateLabelColor forKey:NSForegroundColorAttributeName];
+        [descriptionEmptyStateLabelAttributedString addAttributes:descriptionEmptyStateLabelAttributesDictionary
+                                               range:NSMakeRange(0, [self.descriptionEmptyStateLabel.text length])];
+        self.descriptionEmptyStateLabel.attributedText = descriptionEmptyStateLabelAttributedString;
+        
+        CGSize descriptionEmptyStateLabelSize = [self.descriptionEmptyStateLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.descriptionEmptyStateLabel.frame))];
+        self.descriptionEmptyStateLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - descriptionEmptyStateLabelSize.width) / 2.0f, CGRectGetMinY(self.descriptionEmptyStateLabel.frame), descriptionEmptyStateLabelSize.width, CGRectGetHeight(self.descriptionEmptyStateLabel.frame));
+        [self addSubview:self.descriptionEmptyStateLabel];
     }
     
     return self;
+}
+
+#pragma mark - Custom Method
+- (void)isShowEmptyState:(BOOL)isShow {
+    if (isShow) {
+        self.titleEmptyStateLabel.alpha = 1.0f;
+        self.descriptionEmptyStateLabel.alpha = 1.0f;
+    }
+    else {
+        self.titleEmptyStateLabel.alpha = 0.0f;
+        self.descriptionEmptyStateLabel.alpha = 0.0f;
+    }
 }
 
 @end

@@ -71,6 +71,88 @@
     return messageForReturn;
 }
 
++ (instancetype)createMessageWithUser:(TAPUserModel *)user
+                                 room:(TAPRoomModel *)room
+                                 body:(NSString *)body
+                                 type:(TAPChatMessageType)type
+                        quotedMessage:(TAPMessageModel *)quotedMessage
+                          messageData:(NSDictionary * _Nullable)messageData {
+    
+    TAPMessageModel *message = [self createMessageWithUser:user room:room body:body type:type messageData:messageData];
+    
+    // Generate quote model from quoted message
+    TAPQuoteModel *quote = [TAPQuoteModel new];
+    if (quotedMessage.type == TAPChatMessageTypeFile) {
+        // Set file name for quote title
+        // Set file description for quote content
+        NSString *fileName = [quotedMessage.data objectForKey:@"fileName"];
+        fileName = [TAPUtil nullToEmptyString:fileName];
+        
+        NSString *fileExtension  = [[fileName pathExtension] uppercaseString];
+        
+        fileName = [fileName stringByDeletingPathExtension];
+        
+        if ([fileExtension isEqualToString:@""]) {
+            fileExtension = [quotedMessage.data objectForKey:@"mediaType"];
+            fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+            fileExtension = [fileExtension lastPathComponent];
+            fileExtension = [fileExtension uppercaseString];
+        }
+        
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessage.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        
+        quote.title = fileName;
+        quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+    }
+    else {
+        // Set sender name for quote title
+        // Set message body for quote content
+        quote.title = quotedMessage.user.fullname;
+        quote.content = quotedMessage.body;
+    }
+    
+    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"fileID"]];
+    quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"url"]];
+    if (quote.imageURL == @"") {
+        quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"imageURL"]];
+    }
+    if (quotedMessage.type == TAPChatMessageTypeImage) {
+        quote.fileType = @"image";
+    }
+    else if (quotedMessage.type == TAPChatMessageTypeVideo) {
+        quote.fileType = @"video";
+    }
+    else if (quotedMessage.type == TAPChatMessageTypeFile) {
+        quote.fileType = @"file";
+    }
+    message.quote = quote;
+    
+    // Generate reply to model from quoted message
+    TAPReplyToModel *replyTo = [TAPReplyToModel new];
+    replyTo.messageID = quotedMessage.messageID;
+    replyTo.localID = quotedMessage.localID;
+    replyTo.messageType = quotedMessage.type;
+    replyTo.fullname = quotedMessage.user.fullname;
+    replyTo.xcUserID = quotedMessage.user.xcUserID;
+    replyTo.userID = quotedMessage.user.userID;
+    message.replyTo = replyTo;
+    
+    return message;
+}
+
++ (instancetype)createMessageWithUser:(TAPUserModel *)user
+                                 room:(TAPRoomModel *)room
+                                 body:(NSString *)body
+                                 type:(TAPChatMessageType)type
+                                quote:(TAPQuoteModel *)quote
+                          messageData:(NSDictionary * _Nullable)messageData {
+    
+    TAPMessageModel *message = [self createMessageWithUser:user room:room body:body type:type messageData:messageData];
+    message.quote = quote;
+    
+    return message;
+}
+
 - (NSString *)generateLocalIDwithLength:(int)length {
     NSString* AB = @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
     

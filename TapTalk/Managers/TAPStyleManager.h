@@ -66,6 +66,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorChatRoomBackground,
     TAPComponentColorRoomListBackground,
     TAPComponentColorQuoteLayoutDecorationBackground,
+    TAPComponentColorRightBubbleQuoteDecorationBackground,
+    TAPComponentColorLeftBubbleQuoteDecorationBackground,
     TAPComponentColorLeftBubbleBackground,
     TAPComponentColorRightBubbleBackground,
     TAPComponentColorLeftBubbleQuoteBackground,
@@ -116,6 +118,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconNavigationBarCloseButton, //Navigation Bar
     TAPComponentColorIconClearTextButton, //Navigation Bar
     TAPComponentColorIconSearchBarMagnifier, //Navigation Bar
+    TAPComponentColorIconSearchBarMagnifierActive, //Navigation Bar
     TAPComponentColorIconActionSheetDocument, //Action Sheet
     TAPComponentColorIconActionSheetCamera, //Action Sheet
     TAPComponentColorIconActionSheetGallery, //Action Sheet
@@ -195,6 +198,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatComposerAttach, //Chat Room Page
     TAPComponentColorIconFilePrimary, //Chat Room Page
     TAPComponentColorIconFileWhite, //Chat Room Page
+    TAPComponentColorIconQuotedFileBackgroundRight, //Chat Room Page
+    TAPComponentColorIconQuotedFileBackgroundLeft, //Chat Room Page
     TAPComponentColorIconFileUploadDownloadPrimary, //Chat Room Page
     TAPComponentColorIconFileUploadDownloadWhite, //Chat Room Page
     TAPComponentColorIconFileCancelUploadDownloadPrimary, //Chat Room Page
@@ -216,6 +221,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorClickableLabel,
     TAPTextColorClickableDestructiveLabel,
     TAPTextColorButtonLabel,
+    TAPTextColorButtonInactiveLabel,
     TAPTextColorInfoLabelTitle,
     TAPTextColorInfoLabelSubtitle,
     TAPTextColorInfoLabelSubtitleBold,
@@ -328,6 +334,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorRoomAvatarMediumLabel,
     TAPTextColorRoomAvatarLargeLabel,
     TAPTextColorRoomAvatarExtraLargeLabel,
+    TAPTextColorVersionCode,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -452,6 +459,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontRoomAvatarExtraLargeLabel,
     TAPComponentFontMentionListNameLabel,
     TAPComponentFontMentionListUsernameLabel,
+    TAPComponentFontVersionCode,
 };
 
 @interface TAPStyleManager : NSObject
