@@ -617,7 +617,7 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
-    if(message == nil) {
+    if (message == nil) {
         return;
     }
     
@@ -631,9 +631,16 @@
     
     [self setImageCaptionWithString:captionString];
     
-    CGFloat imageTimestampContainerWidthWithMargin = CGRectGetWidth(self.imageTimestampContainerView.frame) + (6.0f * 2);
-    if (self.minWidth < imageTimestampContainerWidthWithMargin) {
-        _minWidth = imageTimestampContainerWidthWithMargin;
+    CGFloat timestampWidthWithMargin = 0.0f;
+    if ([captionString isEqual:@""]) {
+        timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampContainerView.frame) + (6.0f * 2);
+    }
+    else {
+        CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+        timestampWidthWithMargin = timestampTextSize.width;
+    }
+    if (self.minWidth < timestampWidthWithMargin) {
+        _minWidth = timestampWidthWithMargin;
     }
     
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];

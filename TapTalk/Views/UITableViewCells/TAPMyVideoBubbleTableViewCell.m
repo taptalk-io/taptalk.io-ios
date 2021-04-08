@@ -601,7 +601,7 @@
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
-    if(message == nil) {
+    if (message == nil) {
         return;
     }
     
@@ -616,9 +616,16 @@
     
     [self setVideoCaptionWithString:captionString];
     
-    CGFloat imageTimestampContainerWidthWithMargin = CGRectGetWidth(self.imageTimestampStatusContainerView.frame) + (6.0f * 2);
-    if (self.minWidth < imageTimestampContainerWidthWithMargin) {
-        _minWidth = imageTimestampContainerWidthWithMargin;
+    CGFloat timestampWidthWithMargin = 0.0f;
+    if ([captionString isEqual:@""]) {
+        timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampStatusContainerView.frame) + (6.0f * 2);
+    }
+    else {
+        CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame);
+    }
+    if (self.minWidth < timestampWidthWithMargin) {
+        _minWidth = timestampWidthWithMargin;
     }
     
     if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {

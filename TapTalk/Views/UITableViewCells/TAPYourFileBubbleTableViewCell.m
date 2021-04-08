@@ -9,13 +9,15 @@
 #import "TAPYourFileBubbleTableViewCell.h"
 #import "TAPGradientView.h"
 
-@interface TAPYourFileBubbleTableViewCell () <UIGestureRecognizerDelegate>
+@interface TAPYourFileBubbleTableViewCell () <UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
-@property (strong, nonatomic) IBOutlet UIView *fileView;
+@property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
@@ -171,11 +173,16 @@
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     
-    self.replyView.layer. cornerRadius = 4.0f;
+    self.replyView.layer.cornerRadius = 4.0f;
+    self.replyView.clipsToBounds = YES;
     
-    self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
-    self.fileView.layer.cornerRadius = 8.0f;
+    self.quoteView.clipsToBounds = YES;
+    
+    self.quoteImageView.layer.cornerRadius = 4.0f;
+    self.quoteImageView.delegate = self;
+    
+    self.fileBackgroundView.layer.cornerRadius = 24.0f;
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -347,13 +354,26 @@
         }
 }
 
+#pragma mark - TAPImageViewDelegate
+
+- (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
+    if (imageView == self.quoteImageView) {
+        if (imageView.image == nil) {
+            [self showQuoteView:NO];
+            [self showReplyView:YES withMessage:self.message];
+        }
+    }
+}
+
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
     self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleBackground];
     self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
     self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
-    self.replyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.replyDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.quoteDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.fileBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconQuotedFileBackgroundLeft];
     self.progressContainerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftFileButtonBackground];
 
     UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleQuoteTitle];
@@ -430,6 +450,7 @@
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
+    self.fileImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -439,10 +460,6 @@
     UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownloadWhite]];
     self.downloadImageView.image = downloadImage;
-    
-    UIImage *quoteDocumentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    quoteDocumentsImage = [quoteDocumentsImage setImageTintColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleQuoteContent]];
-    self.fileImageView.image = quoteDocumentsImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -795,9 +812,9 @@
         self.replyViewTopConstraint.active = YES;
         self.replyViewTopConstraint.constant = 0.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
-        self.replyNameLabelLeadingConstraint.constant = 4.0f;
+        self.replyNameLabelLeadingConstraint.constant = 8.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
-        self.replyMessageLabelLeadingConstraint.constant = 4.0f;
+        self.replyMessageLabelLeadingConstraint.constant = 8.0f;
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
@@ -893,7 +910,7 @@
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
-        self.fileView.alpha = 1.0f;
+        self.fileImageView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
@@ -903,7 +920,7 @@
         else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
-        self.fileView.alpha = 0.0f;
+        self.fileImageView.alpha = 0.0f;
         self.quoteImageView.alpha = 1.0f;
     }
     

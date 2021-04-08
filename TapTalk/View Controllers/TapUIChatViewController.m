@@ -2661,7 +2661,40 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
                 currentCaption = [TAPUtil nullToEmptyString:currentCaption];
                 
-                [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
+                if (savedImage != nil) {
+                    [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
+                }
+                else {
+                    NSString *assetIdentifier = [dataDictionary objectForKey:@"assetIdentifier"];
+                    assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+                    
+                    if (![assetIdentifier isEqualToString:@""]) {
+                        NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+                        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+                        PHAsset *imageAsset = [fetchResult firstObject];
+                        if (imageAsset != nil) {
+                            [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:imageAsset caption:currentCaption];
+                        }
+                        else {
+                            // Image data not found
+                            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                             popupIdentifier:@"Image Asset Not Found"
+                                                       title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                           detailInformation:NSLocalizedStringFromTableInBundle(@"Image data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                                       leftOptionButtonTitle:nil
+                              singleOrRightOptionButtonTitle:nil];
+                        }
+                    }
+                    else {
+                        // Image data not found
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                         popupIdentifier:@"Image Asset Not Found"
+                                                   title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                       detailInformation:NSLocalizedStringFromTableInBundle(@"Image data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                                   leftOptionButtonTitle:nil
+                          singleOrRightOptionButtonTitle:nil];
+                    }
+                }
             }];
     } failure:^(NSError *error) {
         
@@ -3300,6 +3333,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Video exist, retry upload
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
         
+        NSString *caption = [tappedMessage.data objectForKey:@"caption"];
+        caption = [TAPUtil nullToEmptyString:caption];
+        
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
 
             [self.messageArray removeObjectAtIndex:messageIndex];
@@ -3316,14 +3352,30 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             //            PHAsset *asset = [tappedMessage.data objectForKey:@"asset"];
             NSString *assetIdentifier = [tappedMessage.data objectForKey:@"assetIdentifier"];
-            PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
-            NSString *caption = [tappedMessage.data objectForKey:@"caption"];
-            caption = [TAPUtil nullToEmptyString:caption];
+            assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
             
-            if (asset.mediaType == PHAssetMediaTypeVideo) {
+            PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
+            
+            if (asset != nil && asset.mediaType == PHAssetMediaTypeVideo) {
                 [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData];
             }
-            
+            else {
+                NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+                PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+                PHAsset *videoAsset = [fetchResult firstObject];
+                if (videoAsset != nil && videoAsset.mediaType == PHAssetMediaTypeVideo) {
+                    [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:videoAsset caption:caption thumbnailImageData:thumbnailImageData];
+                }
+                else {
+                    // Video data not found
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                     popupIdentifier:@"Video Asset Not Found"
+                                               title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                   detailInformation:NSLocalizedStringFromTableInBundle(@"Video data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                               leftOptionButtonTitle:nil
+                      singleOrRightOptionButtonTitle:nil];
+                }
+            }
         } failure:^(NSError *error) {
             
         }];
@@ -5612,64 +5664,66 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)fileUploadManagerFailureNotification:(NSNotification *)notification {
-    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
-    
-    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
-    
-    NSString *roomID = obtainedMessage.room.roomID;
-    roomID = [TAPUtil nullToEmptyString:roomID];
-    
-//    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-    NSString *currentActiveRoomID = self.currentRoom.roomID;
-    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-    
-    if (![roomID isEqualToString:currentActiveRoomID]) {
-        return;
-    }
-    
-    NSString *localID = obtainedMessage.localID;
-    localID = [TAPUtil nullToEmptyString:localID];
-    
-    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-    NSArray *messageArray = [self.messageArray copy];
-    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-    
-    //Update message status to array and dictionary
-    currentMessage.isFailedSend = YES;
-    currentMessage.isSending = NO;
-    
-    TAPChatMessageType type = currentMessage.type;
-    if (type == TAPChatMessageTypeImage) {
-        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell setMessage:currentMessage];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
         
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [cell animateFailedUploadingImage];
-        } completion:^(BOOL finished) {
-        }];
-    }
-    else if (type == TAPChatMessageTypeFile) {
-        TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell setMessage:currentMessage];
+        TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
         
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [cell animateFailedUploadFile];
-        } completion:^(BOOL finished) {
-        }];
-    }
-    else if (type == TAPChatMessageTypeVideo) {
-        TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        cell.message = obtainedMessage;
-        [cell setMessage:currentMessage];
+        NSString *roomID = obtainedMessage.room.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
         
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [cell animateFailedUploadVideo];
-        } completion:^(BOOL finished) {
-        }];
-    }
+    //    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+        NSString *currentActiveRoomID = self.currentRoom.roomID;
+        currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+        
+        if (![roomID isEqualToString:currentActiveRoomID]) {
+            return;
+        }
+        
+        NSString *localID = obtainedMessage.localID;
+        localID = [TAPUtil nullToEmptyString:localID];
+        
+        TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+        NSArray *messageArray = [self.messageArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+        
+        //Update message status to array and dictionary
+        currentMessage.isFailedSend = YES;
+        currentMessage.isSending = NO;
+        
+        TAPChatMessageType type = currentMessage.type;
+        if (type == TAPChatMessageTypeImage) {
+            TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadingImage];
+            } completion:^(BOOL finished) {
+            }];
+        }
+        else if (type == TAPChatMessageTypeFile) {
+            TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadFile];
+            } completion:^(BOOL finished) {
+            }];
+        }
+        else if (type == TAPChatMessageTypeVideo) {
+            TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            cell.message = obtainedMessage;
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadVideo];
+            } completion:^(BOOL finished) {
+            }];
+        }
+    });
 }
 
 #pragma mark Download Notification

@@ -8,12 +8,15 @@
 
 #import "TAPMyFileBubbleTableViewCell.h"
 
-@interface TAPMyFileBubbleTableViewCell () <UIGestureRecognizerDelegate>
+@interface TAPMyFileBubbleTableViewCell () <UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
+@property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionSizePlaceholderLabel;
@@ -167,10 +170,16 @@
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
     
-    self.replyView.layer. cornerRadius = 4.0f;
+    self.replyView.layer.cornerRadius = 4.0f;
+    self.replyView.clipsToBounds = YES;
     
-    self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
+    self.quoteView.clipsToBounds = YES;
+    
+    self.quoteImageView.layer.cornerRadius = 4.0f;
+    self.quoteImageView.delegate = self;
+    
+    self.fileBackgroundView.layer.cornerRadius = 24.0f;
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -353,13 +362,26 @@
         }
 }
 
+#pragma mark - TAPImageViewDelegate
+
+- (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
+    if (imageView == self.quoteImageView) {
+        if (imageView.image == nil) {
+            [self showQuoteView:NO];
+            [self showReplyView:YES withMessage:self.message];
+        }
+    }
+}
+
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
     self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleBackground];
     self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteBackground];
     self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteBackground];
-    self.replyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteDecorationBackground];
+    self.replyDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteDecorationBackground];
+    self.quoteDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightBubbleQuoteDecorationBackground];
+    self.fileBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconQuotedFileBackgroundRight];
     self.progressContainerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRightFileButtonBackground];
     
     UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRightBubbleQuoteTitle];
@@ -421,7 +443,7 @@
     self.cancelImageView.image = abortImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary]];
     self.fileImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
     
@@ -687,9 +709,9 @@
         self.replyViewTopConstraint.active = YES;
         self.replyViewTopConstraint.constant = 0.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
-        self.replyNameLabelLeadingConstraint.constant = 4.0f;
+        self.replyNameLabelLeadingConstraint.constant = 8.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
-        self.replyMessageLabelLeadingConstraint.constant = 4.0f;
+        self.replyMessageLabelLeadingConstraint.constant = 8.0f;
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
