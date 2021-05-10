@@ -207,6 +207,11 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconFileRetryUploadDownloadPrimary, //Chat Room Page
     TAPComponentColorIconFileRetryUploadDownloadWhite, //Chat Room Page
     TAPComponentColorIconFilePlayMedia, //Chat Room Page
+    TAPComponentColorShareExtensionIconSearch, //Share Extension
+    TAPComponentColorBorderSendToContactProfileImage, //Share Extension Profile Image Border Color
+    TAPComponentColorIconCheckmarkSendToContactProfile, //Share Extension Profile Image with checkMark
+    TAPComponentColorBackgroundCheckmarkSendToContact, //Share Extension backgroundColor checkmark on Profile Image with checkMark
+    TAPComponentColorDefaultBackgroundTableView,
 };
 
 typedef NS_ENUM(NSInteger, TAPTextColor) {
@@ -335,6 +340,14 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorRoomAvatarLargeLabel,
     TAPTextColorRoomAvatarExtraLargeLabel,
     TAPTextColorVersionCode,
+    TAPTextColorShareExtensionCancelButton,
+    TAPTextColorShareExtensionNavigationBarTitleLabel,
+    TAPTextColorShareExtensionSelectedChatsLabel,
+    TAPTextColorShareExtensionSendButtonTitleLabel,
+    TAPTextColorProfileNameSendToContactLabel,
+    TAPTextColorInitialProfileNameSendToContactLabel,
+    TAPTextColorShareExtensionCollectionViewCellHeaderLabel,
+    TAPTextColorTableViewProfileNameSendToContactLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -460,6 +473,15 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontMentionListNameLabel,
     TAPComponentFontMentionListUsernameLabel,
     TAPComponentFontVersionCode,
+    TAPComponentFontShareExtensionCancelButton,
+    TAPComponentFontShareExtensionNavigationBarTitleLabel,
+    TAPComponentFontShareExtensionSelectedChatsLabel,
+    TAPComponentFontShareExtensionSendButtonTitleLabel,
+    TAPComponentFontProfileNameSendToContactLabel,
+    TAPComponentFontInitialProfileNameSendToContactLabel,
+    TAPComponentFontShareExtensionCollectionViewCellHeaderLabel,
+    TAPComponentFontTableViewInitialProfileNameSendToContactLabel,
+    TAPComponentFontTableViewProfileNameSendToContactLabel,
 };
 
 @interface TAPStyleManager : NSObject

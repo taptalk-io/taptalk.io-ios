@@ -1140,6 +1140,69 @@
             return font;
             break;
         }
+        case TAPComponentFontShareExtensionCancelButton:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_SHARE_EXTENSION_CANCEL_BUTTON_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontShareExtensionNavigationBarTitleLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_SHARE_EXTENSION_NAVIGATIONBAR_TITLE_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontShareExtensionSelectedChatsLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_SHARE_EXTENSION_SELECTED_CHATS_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontShareExtensionSendButtonTitleLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_SHARE_EXTENSION_SEND_BUTTON_TITLE_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontProfileNameSendToContactLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_PROFILE_NAME_SEND_TO_CONTACT_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontInitialProfileNameSendToContactLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_INITIAL_NAME_SEND_TO_CONTACT_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontShareExtensionCollectionViewCellHeaderLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontMedium];
+            font = [font fontWithSize:TAP_SHARE_EXTENSION_COLLECTION_VIEW_CELL_HEADER_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontTableViewInitialProfileNameSendToContactLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_TABLEVIEW_CELL_INITIAL_NAME_SEND_TO_CONTACT_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontTableViewProfileNameSendToContactLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_TABLEVIEW_CELL_PROFILE_NAME_SEND_TO_CONTACT_LABEL];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -1876,6 +1939,46 @@
             return color;
             break;
         }
+        case TAPTextColorShareExtensionCancelButton: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TAPTextColorShareExtensionNavigationBarTitleLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+            return color;
+            break;
+        }
+        case TAPTextColorShareExtensionSelectedChatsLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium];
+            return color;
+            break;
+        }
+        case TAPTextColorShareExtensionSendButtonTitleLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TAPTextColorProfileNameSendToContactLabel: {
+            UIColor *color = [UIColor blackColor];
+            return color;
+            break;
+        }
+        case TAPTextColorInitialProfileNameSendToContactLabel: {
+            UIColor *color = [UIColor whiteColor];
+            return color;
+            break;
+        }
+        case TAPTextColorShareExtensionCollectionViewCellHeaderLabel: {
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.6f];
+            return color;
+            break;
+        }
+        case TAPTextColorTableViewProfileNameSendToContactLabel: {
+            UIColor *color = [TAPUtil getColor:@"191919"];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TAPUtil getColor:@"9B9B9B"];
@@ -2116,7 +2219,7 @@
         }
         case TAPComponentColorLeftFileButtonBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_COLOR_PRIMARY];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
@@ -2935,6 +3038,36 @@
         case TAPComponentColorIconLocationPickerAddressInactive:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium];
+            return color;
+            break;
+        }
+        case TAPComponentColorShareExtensionIconSearch:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorBorderSendToContactProfileImage:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconCheckmarkSendToContactProfile:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconWhite];
+            return color;
+            break;
+        }
+        case TAPComponentColorBackgroundCheckmarkSendToContact:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorDefaultBackgroundTableView:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR_TABLEVIEW];
             return color;
             break;
         }

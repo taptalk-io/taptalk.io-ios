@@ -44,7 +44,6 @@ typedef NS_ENUM(NSInteger, TAPConnectionManagerStatusType) {
 - (void)sendEmit:(NSString *)eventName parameters:(NSDictionary *)parameterDictionary;
 - (void)disconnect;
 - (TAPConnectionManagerStatusType)getSocketConnectionStatus;
-- (void)validateToken;
 - (void)setSocketURLString:(NSString *)urlString;
 
 @end

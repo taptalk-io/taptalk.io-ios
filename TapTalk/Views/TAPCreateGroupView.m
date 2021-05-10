@@ -360,7 +360,6 @@
 
 - (void)showRemoveMembersButton {
     self.addMembersButtonView.alpha = 0.0f;
-    self.removeMembersButtonView.alpha = 1.0f;
     [self showBottomActionButtonViewExtension:NO withActiveButton:0];
 }
 
@@ -491,6 +490,7 @@
             self.demoteAdminButtonView.alpha = 1.0f;
             self.promoteAdminButtonView.alpha = 0.0f;
         }
+        self.removeMembersButtonView.alpha = 1.0f;
         
         self.contactsTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 128.0f + [TAPUtil safeAreaBottomPadding], 0.0f);
 
@@ -519,6 +519,7 @@
         
         self.demoteAdminButtonView.alpha = 0.0f;
         self.promoteAdminButtonView.alpha = 0.0f;
+        self.removeMembersButtonView.alpha = 0.0f;
     }
 }
 

@@ -394,6 +394,64 @@
     [self sendVideoMessageWithAsset:asset caption:caption room:room start:start progress:progress success:success failure:failure];
 }
 
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                                    start:(void (^)(TAPMessageModel *message))start
+                                 progress:(void (^)(CGFloat progress, CGFloat total))progress
+                                  success:(void (^)(TAPMessageModel *message))success
+                                  failure:(void (^)(NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    //Check if caption is more than 100 words, failed
+    NSInteger maxCaptionCharacterLength = 100;
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(error);
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //Retrieve the video frame at 1 sec to define the video thumbnail
+        AVURLAsset *urlVideoAsset = [[AVURLAsset alloc] initWithURL:videoAssetURL options:nil];
+        AVAssetImageGenerator *assetImageVideoGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlVideoAsset];
+        assetImageVideoGenerator.appliesPreferredTrackTransform = YES;
+        CMTime time = CMTimeMake(1, 1);
+        CGImageRef imageRef = [assetImageVideoGenerator copyCGImageAtTime:time actualTime:NULL error:nil];
+        
+        //Finalize video attachment
+        UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+        NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+        //END - Retrieve the video frame at 1 sec to define the video thumbnail
+        
+        [[TAPChatManager sharedManager] sendVideoMessageWithVideoAssetURL:videoAssetURL
+                                                                  caption:caption
+                                                       thumbnailImageData:videoThumbnailImageData
+                                                                     room:room
+                                                   successGenerateMessage:^(TAPMessageModel *message) {
+            //Handle block to dictionary
+            NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+            
+            void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+            [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
+            
+            void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+            [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+            
+            void (^handlerFailure)(NSError *) = [failure copy];
+            [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
+            
+            [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+            
+            start(message);
+        }];
+    });
+}
+
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start

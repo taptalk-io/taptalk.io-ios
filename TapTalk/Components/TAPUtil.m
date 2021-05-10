@@ -1149,4 +1149,28 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return NO;
 }
 
++ (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message {
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key;
+    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+        fileURL = [dataDictionary objectForKey:@"fileURL"];
+    }
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
+    
+    if (![fileURL isEqualToString:@""]) {
+        key = fileURL;
+    }
+    else {
+        key = [dataDictionary objectForKey:@"fileID"];
+        key = [TAPUtil nullToEmptyString:key];
+    }
+    
+    key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    
+    return key;
+}
+
 @end

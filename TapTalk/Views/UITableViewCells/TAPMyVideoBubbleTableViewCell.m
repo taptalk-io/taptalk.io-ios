@@ -694,16 +694,16 @@
     CGFloat imageTempHeight = [[dataDictionary objectForKey:@"height"] floatValue];
     CGFloat imageTempWidth = [[dataDictionary objectForKey:@"width"] floatValue];
     
-    if (imageTempWidth == 0.0f && imageTempHeight == 0.0f) {
-        self.bubbleImageViewWidthConstraint.constant = 0.0f;
-        self.bubbleImageViewHeightConstraint.constant = 0.0f;
-    }
-    else {
+//    if (imageTempWidth == 0.0f && imageTempHeight == 0.0f) {
+//        self.bubbleImageViewWidthConstraint.constant = 0.0f;
+//        self.bubbleImageViewHeightConstraint.constant = 0.0f;
+//    }
+//    else {
         [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
         
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-    }
+//    }
     [self.contentView layoutIfNeeded];
     
     [self setThumbnailImageForVideoWithMessage:message];
@@ -784,6 +784,11 @@
 //}
 
 - (void)getImageSizeFromImage:(UIImage *)image {
+    if (image == nil) {
+        _cellWidth = self.maxWidth;
+        _cellHeight = self.maxWidth;
+        return;
+    }
     
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
@@ -871,6 +876,12 @@
 }
 
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width {
+    if (height == 0.0f && width == 0.0f) {
+        _cellWidth = self.maxWidth;
+        _cellHeight = self.maxHeight;
+        return;
+    }
+    
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;
@@ -1637,75 +1648,79 @@
     dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
 
     NSNumber *duration = [dataDictionary objectForKey:@"duration"];
-    NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
-    NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
-    
     NSNumber *size = [dataDictionary objectForKey:@"size"];
-    NSString *fileSizeString = [NSByteCountFormatter stringFromByteCount:[size integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-
-    NSString *appendedString = @"";
-
-    if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeNotDownloaded || self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeRetryDownload) {
-        //Not Downloaded, show duration label and video size
-        appendedString = [NSString stringWithFormat:@"%@ - %@",fileSizeString, videoDurationString];
-    }
-    else if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded) {
-        //Done Download, show duration label
-        appendedString = videoDurationString;
-    }
-    else if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeUploading) {
-        //Show uploading file size progress
-        double currentProgress = [progress doubleValue];
-        NSInteger currentProgressInByte = currentProgress * [size integerValue];
-        NSString *currentProgressSizeString = [NSByteCountFormatter stringFromByteCount:currentProgressInByte countStyle:NSByteCountFormatterCountStyleBinary];
-        
-        appendedString = [NSString stringWithFormat:@"%@ / %@",currentProgressSizeString, fileSizeString];
-    }
-    else if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeDownloading) {
-        //Show downloading file size progress
-        double currentProgress = [progress doubleValue];
-        NSInteger currentProgressInByte = currentProgress * [size integerValue];
-        NSString *currentProgressSizeString = [NSByteCountFormatter stringFromByteCount:currentProgressInByte countStyle:NSByteCountFormatterCountStyleBinary];
-        
-        appendedString = [NSString stringWithFormat:@"%@ / %@",currentProgressSizeString, fileSizeString];
-    }
     
-    self.videoDurationAndSizeLabel.text = appendedString;
-    
-    CGSize contentSize = [self.videoDurationAndSizeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.videoDurationAndSizeLabel.frame))];
-    
-    self.videoDurationAndSizeLabel.frame = CGRectMake(CGRectGetMinX(self.videoDurationAndSizeLabel.frame), CGRectGetMinY(self.videoDurationAndSizeLabel.frame), contentSize.width, CGRectGetHeight(self.videoDurationAndSizeLabel.frame));
-    self.videoDurationAndSizeView.frame = CGRectMake(CGRectGetMinX(self.videoDurationAndSizeView.frame), CGRectGetMinY(self.videoDurationAndSizeView.frame), contentSize.width + 8.0f + 8.0f, CGRectGetHeight(self.videoDurationAndSizeView.frame));
-    
-    if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeRetryDownload) {
+    if ([duration longValue] == 0L && [size longValue] == 0L) {
         self.videoDurationAndSizeView.alpha = 0.0f;
     }
     else {
-        self.videoDurationAndSizeView.alpha = 1.0f;
+        NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
+        NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+        NSString *fileSizeString = [NSByteCountFormatter stringFromByteCount:[size integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+
+        NSString *appendedString = @"";
+
+        if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeNotDownloaded || self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeRetryDownload) {
+            //Not Downloaded, show duration label and video size
+            appendedString = [NSString stringWithFormat:@"%@ - %@",fileSizeString, videoDurationString];
+        }
+        else if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded) {
+            //Done Download, show duration label
+            appendedString = videoDurationString;
+        }
+        else if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeUploading) {
+            //Show uploading file size progress
+            double currentProgress = [progress doubleValue];
+            NSInteger currentProgressInByte = currentProgress * [size integerValue];
+            NSString *currentProgressSizeString = [NSByteCountFormatter stringFromByteCount:currentProgressInByte countStyle:NSByteCountFormatterCountStyleBinary];
+            
+            appendedString = [NSString stringWithFormat:@"%@ / %@",currentProgressSizeString, fileSizeString];
+        }
+        else if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeDownloading) {
+            //Show downloading file size progress
+            double currentProgress = [progress doubleValue];
+            NSInteger currentProgressInByte = currentProgress * [size integerValue];
+            NSString *currentProgressSizeString = [NSByteCountFormatter stringFromByteCount:currentProgressInByte countStyle:NSByteCountFormatterCountStyleBinary];
+            
+            appendedString = [NSString stringWithFormat:@"%@ / %@",currentProgressSizeString, fileSizeString];
+        }
+        
+        self.videoDurationAndSizeLabel.text = appendedString;
+        
+        CGSize contentSize = [self.videoDurationAndSizeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.videoDurationAndSizeLabel.frame))];
+        
+        self.videoDurationAndSizeLabel.frame = CGRectMake(CGRectGetMinX(self.videoDurationAndSizeLabel.frame), CGRectGetMinY(self.videoDurationAndSizeLabel.frame), contentSize.width, CGRectGetHeight(self.videoDurationAndSizeLabel.frame));
+        self.videoDurationAndSizeView.frame = CGRectMake(CGRectGetMinX(self.videoDurationAndSizeView.frame), CGRectGetMinY(self.videoDurationAndSizeView.frame), contentSize.width + 8.0f + 8.0f, CGRectGetHeight(self.videoDurationAndSizeView.frame));
+        
+        if (self.myVideoBubbleTableViewCellStateType == TAPMyVideoBubbleTableViewCellStateTypeRetryDownload) {
+            self.videoDurationAndSizeView.alpha = 0.0f;
+        }
+        else {
+            self.videoDurationAndSizeView.alpha = 1.0f;
+        }
     }
 }
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
     NSDictionary *dataDictionary = message.data;
     dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
     
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-        if (savedImage != nil) {
-            [self.bubbleImageView setImage:savedImage];
-            CGFloat width = savedImage.size.width;
-            CGFloat height = savedImage.size.height;
+    [TAPImageView imageFromCacheWithKey:key message:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        [self.bubbleImageView setImage:savedImage];
+    }
+    failure:^(TAPMessageModel *resultMessage) {
+        // Get from message.data
+        NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
+        thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
+        if ([thumbnailImageBase64String isEqualToString:@""]) {
+            return;
         }
-        else {
-            //Get from message.data
-            NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
-            NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
-            UIImage *image = [UIImage imageWithData:thumbnailImageData];
-            if (image != nil) {
-                self.bubbleImageView.image = image;
-            }
+        NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+        UIImage *image = [UIImage imageWithData:thumbnailImageData];
+        if (image != nil) {
+            self.bubbleImageView.image = image;
         }
     }];
 }

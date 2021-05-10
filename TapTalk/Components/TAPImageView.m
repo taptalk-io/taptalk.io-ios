@@ -115,12 +115,12 @@
             
             SDWebImageDownloader *imageDownloader = [SDWebImageDownloader sharedDownloader];
             [imageDownloader downloadImageWithURL:imageURL options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-#ifdef RNIMAGE_LOG
+#ifdef DEBUG
                 NSLog(@"Image Download: %ld of %ld", (long)receivedSize, (long)expectedSize);
 #endif
             } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                 if (finished && image != nil) {
-#ifdef RNIMAGE_LOG
+#ifdef DEBUG
                     NSLog(@"Image Download Completed");
 #endif
                     //            [imageCache storeImage:image forKey:urlString];
@@ -137,7 +137,7 @@
                     }
                 }
                 else {
-#ifdef RNIMAGE_LOG
+#ifdef DEBUG
                     NSLog(@"Image Download Failed: %@", [error description]);
 #endif
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -158,13 +158,50 @@
 }
 
 #pragma mark - TapTalk
-+ (void)imageFromCacheWithKey:(NSString *)key message:(TAPMessageModel *)receivedMessage success:(void (^)(UIImage *savedImage, TAPMessageModel *resultMessage))success {
-    //Run in background thread, async
++ (void)imageFromCacheWithKey:(NSString *)key
+                      message:(TAPMessageModel *)receivedMessage
+                      success:(void (^)(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage))success {
+    
+    if (key == nil || [key isEqual:@""]) {
+        return;
+    }
+    
+    // Run in background thread, async
     [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        if (image == nil) {
+            return;
+        }
         dispatch_async(dispatch_get_main_queue(), ^{
             success(image, receivedMessage);
         });
     }];
+}
+
++ (void)imageFromCacheWithKey:(NSString *)key
+                      message:(TAPMessageModel *)receivedMessage
+                      success:(void (^)(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage))success
+                      failure:(void (^)(TAPMessageModel *resultMessage))failure {
+    
+    if (key == nil || [key isEqual:@""]) {
+        failure(receivedMessage);
+    }
+    
+    @try {
+        // Run in background thread, async
+        [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (image == nil) {
+                    failure(receivedMessage);
+                }
+                else {
+                    success(image, receivedMessage);
+                }
+            });
+        }];
+    }
+    @catch (NSException *exception) {
+        return;
+    }
 }
 
 @end

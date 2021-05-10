@@ -114,7 +114,7 @@
 @property (nonatomic) CGFloat pathWidth;
 @property (nonatomic) NSInteger updateInterval;
 
-@property (strong, nonatomic) NSString *currentFileID;
+@property (strong, nonatomic) NSString *currentFileKey;
 
 - (void)getImageSizeFromImage:(UIImage *)image;
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width;
@@ -660,97 +660,58 @@
     }
     
     UIImage *selectedImage = nil;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    if (fileID == nil || [fileID isEqualToString:@""]) {
-        
-        _currentFileID = nil;
-        
-        CGFloat imageTempHeight = [[dataDictionary objectForKey:@"height"] floatValue];
-        CGFloat imageTempWidth = [[dataDictionary objectForKey:@"width"] floatValue];
-        
-        if (imageTempWidth == 0.0f && imageTempHeight == 0.0f) {
-            // FIXME: COMMENTED TO SHOW IMAGE WITH 0 WIDTH/HEIGHT
-//            self.bubbleImageViewWidthConstraint.constant = 0.0f;
-//            self.bubbleImageViewHeightConstraint.constant = 0.0f;
-//            [self.contentView layoutIfNeeded];
-        }
-        else {
-            [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
+    
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+    
+    if (key == nil || [key isEqualToString:@""]) {
+        [TAPImageView imageFromCacheWithKey:message.localID message:message
+        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            [self getImageSizeFromImage:savedImage];
+            
             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
             [self.contentView layoutIfNeeded];
+            [self.bubbleImageView setImage:savedImage];
         }
-        NSDictionary *dataDictionary = message.data;
-//        PHAsset *asset = nil;
-//        asset = [dataDictionary objectForKey:@"asset"];
-        NSString *assetIdentifier = [dataDictionary objectForKey:@"assetIdentifier"];
-        PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
-
-        if (asset != nil) {
-            [[TAPFetchMediaManager sharedManager] fetchImageDataForAsset:asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
-                
-            } resultHandler:^(UIImage * _Nonnull resultImage) {
-                if (resultImage != nil) {
-                    [self.bubbleImageView setImage:resultImage];
+        failure:^(TAPMessageModel *resultMessage) {
+            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [dataDictionary objectForKey:@"fileURL"];
+            }
+            if (fileURL != nil || ![fileURL isEqualToString:@""]) {
+                [self.bubbleImageView setImageWithURLString:fileURL];
+                if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
+                    self.bubbleImageViewWidthConstraint.constant = 240.0f;
                 }
-                else {
-                    self.bubbleImageViewWidthConstraint.constant = 0.0f;
-                    self.bubbleImageViewHeightConstraint.constant = 0.0f;
-                    [self.contentView layoutIfNeeded];
+                if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
+                    self.bubbleImageViewHeightConstraint.constant = 240.0f;
                 }
-            } failureHandler:^{
+                [self.contentView layoutIfNeeded];
+            }
+            else {
                 self.bubbleImageViewWidthConstraint.constant = 0.0f;
                 self.bubbleImageViewHeightConstraint.constant = 0.0f;
                 [self.contentView layoutIfNeeded];
-            }];
-        }
-        else {
-            [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                if (savedImage != nil) {
-                    [self.bubbleImageView setImage:savedImage];
-                }
-                else {
-                    NSString *fileURL = [dataDictionary objectForKey:@"url"];
-                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
-                        NSString *fileURL = [dataDictionary objectForKey:@"fileURL"];
-                    }
-                    if (fileURL != nil || ![fileURL isEqualToString:@""]) {
-                        [self.bubbleImageView setImageWithURLString:fileURL];
-                        if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
-                            self.bubbleImageViewWidthConstraint.constant = 240.0f;
-                        }
-                        if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
-                            self.bubbleImageViewHeightConstraint.constant = 240.0f;
-                        }
-                        [self.contentView layoutIfNeeded];
-                    }
-                    else {
-                        self.bubbleImageViewWidthConstraint.constant = 0.0f;
-                        self.bubbleImageViewHeightConstraint.constant = 0.0f;
-                        [self.contentView layoutIfNeeded];
-                    }
-                }
-            }];
-        }
+            }
+        }];
     }
-    else {        
-        //already called fetchImageDataWithMessage function in view controller for fetch image
-        //so no need to set the image here
-        //just save the height and width constraint
-        
-        if(![self.currentFileID isEqualToString:fileID] && self.currentFileID != nil) {
+    else {
+        if (self.currentFileKey == nil || ![self.currentFileKey isEqualToString:key]) {
             //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
             self.bubbleImageView.image = nil;
         }
+        
+        //already called fetchImageDataWithMessage function in view controller for fetch image
+        //so no need to set the image here
+        //just save the height and width constraint
         
         CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
         CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-        [self.contentView layoutIfNeeded];
-        
-        _currentFileID = fileID;
+            
+        _currentFileKey = key;
     }
     
     if (self.cellWidth == 0.0f || self.cellHeight == 0.0f) {
@@ -889,6 +850,11 @@
 }
 
 - (void)getImageSizeFromImage:(UIImage *)image {
+    if (image == nil) {
+        _cellWidth = self.maxWidth;
+        _cellHeight = self.maxHeight;
+        return;
+    }
     
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
@@ -976,6 +942,12 @@
 }
 
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width {
+    if (height == 0.0f && width == 0.0f) {
+        _cellWidth = self.maxWidth;
+        _cellHeight = self.maxWidth;
+        return;
+    }
+    
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;

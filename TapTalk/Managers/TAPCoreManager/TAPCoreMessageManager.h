@@ -94,6 +94,18 @@ NS_ASSUME_NONNULL_BEGIN
                          progress:(void (^)(CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure;
+/**
+ * @param videoAssetURL this should be a file's path from local only (e.g: abcd/efgh/media/video.mov)
+ *
+ * return TAPMessageModel
+ */
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                                    start:(void (^)(TAPMessageModel *message))start
+                                 progress:(void (^)(CGFloat progress, CGFloat total))progress
+                                  success:(void (^)(TAPMessageModel *message))success
+                                  failure:(void (^)(NSError *error))failure;
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start

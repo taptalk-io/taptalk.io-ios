@@ -167,29 +167,40 @@
     _webSocket.delegate = nil;
     _webSocket = nil;
     
-    [self validateToken];
-    
-    NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
-    NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
-    NSString *encodedAppKey = [[TAPNetworkManager sharedManager] getAppKey];
-    NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
-    
-    if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
-        clientUserAgent = @"ios";
+    NSString *accessToken = [TAPDataManager getAccessToken];
+
+    if (accessToken == nil || [accessToken isEqualToString:@""]) {
+        return;
     }
     
-    [urlRequest addValue:encodedAppKey forHTTPHeaderField:@"App-Key"];
-    [urlRequest addValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
-    [urlRequest addValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
-    [urlRequest addValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
-    [urlRequest addValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
-    [urlRequest addValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
-    [urlRequest addValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
-    [urlRequest addValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
-    
-    SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];
-    webSocket.delegate = self;
-    [webSocket open];
+    [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:^{
+#ifdef DEBUG
+        NSLog(@"Token Validated");
+#endif
+        NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
+        NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
+        NSString *encodedAppKey = [[TAPNetworkManager sharedManager] getAppKey];
+        NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
+        
+        if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
+            clientUserAgent = @"ios";
+        }
+        
+        [urlRequest addValue:encodedAppKey forHTTPHeaderField:@"App-Key"];
+        [urlRequest addValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
+        [urlRequest addValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
+        [urlRequest addValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
+        [urlRequest addValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
+        [urlRequest addValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
+        [urlRequest addValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
+        [urlRequest addValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
+        
+        SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];
+        webSocket.delegate = self;
+        [webSocket open];
+    } failure:^(NSError *error) {
+        
+    }];
 }
 
 - (void)reconnect {
@@ -273,22 +284,6 @@
 
 - (TAPConnectionManagerStatusType)getSocketConnectionStatus {
     return self.tapConnectionStatus;
-}
-
-- (void)validateToken {
-    NSString *accessToken = [TAPDataManager getAccessToken];
-
-    if (accessToken == nil || [accessToken isEqualToString:@""]) {
-        return;
-    }
-    
-    [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:^{
-#ifdef DEBUG
-        NSLog(@"Token Validated");
-#endif
-    } failure:^(NSError *error) {
-        
-    }];
 }
 
 - (void)setSocketURLString:(NSString *)urlString {

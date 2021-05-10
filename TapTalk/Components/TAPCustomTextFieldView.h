@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger,TAPCustomTextFieldViewType) {
     TAPCustomTextFieldViewTypePasswordOptional,
     TAPCustomTextFieldViewTypeReTypePassword,
     TAPCustomTextFieldViewTypeGroupName,
+    TAPCustomTextFieldViewTypeShareExtensionAddMessage,
 };
 
 @protocol TAPCustomTextFieldViewDelegate <NSObject>

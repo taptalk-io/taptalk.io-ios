@@ -7,8 +7,7 @@
 //
 
 #import "TAPBaseModel.h"
-
-NS_ASSUME_NONNULL_BEGIN
+@class TAPMessageModel;
 
 @interface TAPQuoteModel : TAPBaseModel
 
@@ -18,6 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *imageURL; //Image from Client
 @property (nonatomic, strong) NSString *fileType; //fileType is the same as message type casted to NSString
 
-@end
++ (instancetype)constructFromMessageModel:(TAPMessageModel *)message;
 
-NS_ASSUME_NONNULL_END
+@end

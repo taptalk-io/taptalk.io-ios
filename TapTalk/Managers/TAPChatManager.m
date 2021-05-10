@@ -568,6 +568,97 @@
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
 
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendVideoMessageWithVideoAssetURL:videoAssetURL caption:caption thumbnailImageData:thumbnailImageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
+}
+
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🎥 Video", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
+    }
+    
+    AVAsset *videoAsset = [AVAsset assetWithURL:videoAssetURL]; //AS NOTE - get AVAsset via videoURLAsset
+    
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+    
+    //AS NOTE - GET FILE SIZE
+    NSNumber *fileSizeValue = nil;
+    NSError *fileSizeError = nil;
+    NSNumber *videoAssetURLFileSize = nil;
+    [videoAssetURL getResourceValue:&fileSizeValue forKey:NSURLFileSizeKey
+                         error:(&fileSizeError)];
+    
+    if (fileSizeValue) {
+        NSLog(@"value for %@ is %@", videoAssetURL, fileSizeValue);
+        videoAssetURLFileSize = fileSizeValue;
+    }
+    else {
+        NSLog(@"error getting size for url %@ error was %@", videoAssetURL, fileSizeError);
+        videoAssetURLFileSize = [NSNumber numberWithFloat:0.0f];
+    }
+    
+    CGSize naturalSizeVideo = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject] naturalSize];
+    CGFloat videoWidthFloat = (CGFloat)naturalSizeVideo.width;
+    CGFloat videoHeightFloat = (CGFloat)naturalSizeVideo.height;
+    
+    NSNumber *videoHeight = [NSNumber numberWithFloat:videoWidthFloat];
+    NSNumber *videoWidth = [NSNumber numberWithFloat:videoHeightFloat];
+    
+    Float64 videoDurationFloat = floorf(CMTimeGetSeconds(videoAsset.duration));
+    Float64 videoDurationInMilisecondsFloat = videoDurationFloat * 1000; // in miliseconds
+    NSInteger videoDurationInteger = (NSInteger)videoDurationInMilisecondsFloat;
+    
+    NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+    
+//    NSURL *videoAssetURL = [(AVURLAsset *)videoAsset URL];
+    NSString *videoAssetURLString = [videoAssetURL absoluteString];
+    videoAssetURLString = [TAPUtil nullToEmptyString:videoAssetURLString];
+    
+    NSString *fileNameString = [videoAssetURLString lastPathComponent];
+    fileNameString = [TAPUtil nullToEmptyString:fileNameString];
+    
+    NSString *assetIdentifier = fileNameString;
+    assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+    
+    //Save asset to dictionary
+    [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAVAsset:videoAsset];
+    
+    [dataDictionary setObject:videoHeight forKey:@"height"];
+    [dataDictionary setObject:videoWidth forKey:@"width"];
+    [dataDictionary setObject:videoAssetURLFileSize forKey:@"size"];
+//    [dataDictionary setObject:asset forKey:@"asset"];
+    [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
+    [dataDictionary setObject:videoAssetURLString forKey:@"videoAssetURLString"];
+    [dataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    [dataDictionary setObject:[NSNumber numberWithInteger:videoDurationInteger] forKey:@"duration"];
+    
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeVideo
+                                                    messageData:dataDictionary];
+    
+    successGenerateMessage(message);
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+    
+    [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+}
+
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     [self sendLocationMessage:latitude longitude:longitude address:address room:room successGenerateMessage:^(TAPMessageModel *message) {

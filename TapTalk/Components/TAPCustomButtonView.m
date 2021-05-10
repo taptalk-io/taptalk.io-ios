@@ -100,7 +100,7 @@
             self.shadowView.layer.shadowColor = [UIColor clearColor].CGColor;
             self.shadowView.alpha = 0.0f;
             
-            UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+            UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableDestructiveLabel];
             self.buttonTitleLabel.textColor = buttonColor;
         }
     }

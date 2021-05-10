@@ -235,7 +235,7 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HId-QA-OEm" customClass="ZSWTappableLabel">
-                                <rect key="frame" x="12" y="114" width="74" height="161"/>
+                                <rect key="frame" x="10" y="114" width="78" height="161"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="15"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -269,7 +269,7 @@
                         <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="HId-QA-OEm" secondAttribute="trailing" constant="12" id="21e-lQ-AaL"/>
+                            <constraint firstAttribute="trailing" secondItem="HId-QA-OEm" secondAttribute="trailing" constant="10" id="21e-lQ-AaL"/>
                             <constraint firstItem="stb-Nf-ld4" firstAttribute="top" secondItem="4pM-m3-Jdz" secondAttribute="bottom" id="26L-ux-QSb"/>
                             <constraint firstAttribute="trailing" secondItem="5YI-Ih-9ho" secondAttribute="trailing" id="3En-3e-7Uz"/>
                             <constraint firstAttribute="bottom" secondItem="dkH-P5-52g" secondAttribute="bottom" constant="10" id="6rT-3v-FFH"/>
@@ -283,7 +283,7 @@
                             <constraint firstAttribute="bottom" secondItem="xBZ-Oa-CNb" secondAttribute="bottom" constant="10" id="Rkf-3d-9TA"/>
                             <constraint firstAttribute="trailing" secondItem="FpM-fx-qIk" secondAttribute="trailing" constant="10" id="URw-C8-8Yo"/>
                             <constraint firstItem="5YI-Ih-9ho" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" id="VHj-dp-dEh"/>
-                            <constraint firstItem="HId-QA-OEm" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="12" id="XAP-a9-e2N"/>
+                            <constraint firstItem="HId-QA-OEm" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="10" id="XAP-a9-e2N"/>
                             <constraint firstAttribute="bottom" secondItem="5YI-Ih-9ho" secondAttribute="bottom" id="Xvh-hq-Zo9"/>
                             <constraint firstItem="dkH-P5-52g" firstAttribute="top" secondItem="HId-QA-OEm" secondAttribute="bottom" constant="2" id="b0L-Jn-Xg1"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="emZ-JP-RK4"/>

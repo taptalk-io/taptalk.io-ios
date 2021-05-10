@@ -120,7 +120,7 @@
 @property (nonatomic) CGFloat newProgress;
 @property (nonatomic) NSInteger updateInterval;
 
-@property (strong, nonatomic) NSString *currentFileID;
+@property (strong, nonatomic) NSString *currentFileKey;
 @property (strong, nonatomic) NSString *currentProfileImageURLString;
 
 - (IBAction)replyButtonDidTapped:(id)sender;
@@ -643,43 +643,42 @@
         _minWidth = timestampWidthWithMargin;
     }
     
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
     
-    if (fileID == nil || [fileID isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            if (savedImage != nil) {
-                [self getImageSizeFromImage:savedImage];
-                
-                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+    if (key == nil || [key isEqualToString:@""]) {
+        [TAPImageView imageFromCacheWithKey:message.localID message:message
+        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            [self getImageSizeFromImage:savedImage];
+            
+            self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+            self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+            [self.contentView layoutIfNeeded];
+            [self.bubbleImageView setImage:savedImage];
+        }
+        failure:^(TAPMessageModel *resultMessage) {
+            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [dataDictionary objectForKey:@"fileURL"];
+            }
+            if (fileURL != nil || ![fileURL isEqualToString:@""]) {
+                [self.bubbleImageView setImageWithURLString:fileURL];
+                if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
+                    self.bubbleImageViewWidthConstraint.constant = 240.0f;
+                }
+                if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
+                    self.bubbleImageViewHeightConstraint.constant = 240.0f;
+                }
                 [self.contentView layoutIfNeeded];
-                [self.bubbleImageView setImage:savedImage];
             }
             else {
-                NSString *fileURL = [dataDictionary objectForKey:@"url"];
-                if (fileURL == nil || [fileURL isEqualToString:@""]) {
-                    NSString *fileURL = [dataDictionary objectForKey:@"fileURL"];
-                }
-                if (fileURL != nil || ![fileURL isEqualToString:@""]) {
-                    [self.bubbleImageView setImageWithURLString:fileURL];
-                    if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
-                        self.bubbleImageViewWidthConstraint.constant = 240.0f;
-                    }
-                    if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
-                        self.bubbleImageViewHeightConstraint.constant = 240.0f;
-                    }
-                    [self.contentView layoutIfNeeded];
-                }
-                else {
-                    self.bubbleImageViewWidthConstraint.constant = 0.0f;
-                    self.bubbleImageViewHeightConstraint.constant = 0.0f;
-                    [self.contentView layoutIfNeeded];
-                }
+                self.bubbleImageViewWidthConstraint.constant = 0.0f;
+                self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                [self.contentView layoutIfNeeded];
             }
         }];
     }
     else {
-        if(_currentFileID == nil || ![self.currentFileID isEqualToString:fileID]) {
+        if (self.currentFileKey == nil || ![self.currentFileKey isEqualToString:key]) {
             //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
             self.bubbleImageView.image = nil;
         }
@@ -694,7 +693,7 @@
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
             
-        _currentFileID = fileID;
+        _currentFileKey = key;
     }
     
     NSString *thumbnailImageString = [message.data objectForKey:@"thumbnail"];
@@ -1012,6 +1011,11 @@
 }
 
 - (void)getImageSizeFromImage:(UIImage *)image {
+    if (image == nil) {
+        _cellWidth = self.maxWidth;
+        _cellHeight = self.maxWidth;
+        return;
+    }
     
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
@@ -1099,6 +1103,12 @@
 }
 
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width {
+    if (height == 0.0f && width == 0.0f) {
+        _cellWidth = self.maxWidth;
+        _cellHeight = self.maxHeight;
+        return;
+    }
+    
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;

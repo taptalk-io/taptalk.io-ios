@@ -146,5 +146,6 @@
 + (NSArray *)getMentionIndexes:(NSString *)messageString;
 + (BOOL)isActiveUserMentionedWithMessage:(TAPMessageModel *)message
                               activeUser:(TAPUserModel *)activeUser;
++ (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message;
 
 @end

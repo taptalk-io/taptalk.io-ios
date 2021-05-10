@@ -73,118 +73,98 @@
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
     
     NSString *roomID = message.room.roomID;
-    NSDictionary *dataDictionary = message.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
     
-    if (roomID == nil || [roomID isEqualToString:@""] || fileID == nil || [fileID isEqualToString:@""]) {
+    if (roomID == nil || [roomID isEqualToString:@""] || key == nil || [key isEqualToString:@""]) {
         return;
     }
     
-    [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-        NSString *currentRoomID = resultMessage.room.roomID;
-        NSString *currentLocalID = resultMessage.localID;
-        NSDictionary *currentDataDictionary = resultMessage.data;
-        NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
-        currentFileID = [TAPUtil nullToEmptyString:currentFileID];
+    [TAPImageView imageFromCacheWithKey:key message:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        //Image exist
+        success(savedImage, resultMessage);
         
-        //Check image exist in cache
-        if (savedImage != nil) {
-            //Image exist
-            success(savedImage, resultMessage);
-            
-            CGFloat progress = 1.0f;
-            CGFloat total = 1.0f;
-            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-            [objectDictionary setObject:resultMessage forKey:@"message"];
-            [objectDictionary setObject:savedImage forKey:@"fullImage"];
-            [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-            [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+        CGFloat progress = 1.0f;
+        CGFloat total = 1.0f;
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:resultMessage forKey:@"message"];
+        [objectDictionary setObject:savedImage forKey:@"fullImage"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+    }
+    failure:^(TAPMessageModel *resultMessage) {
+        //Image not exist in cache
+        if ([self.currentDownloadingDictionary objectForKey:key]) {
+            return;
         }
-        else {
-            //Image not exist in cache
-            if ([self.currentDownloadingDictionary objectForKey:currentFileID]) {
-                return;
-            }
+        
+        //add to temp processing dictionary
+        [self.currentDownloadingDictionary setObject:[NSNumber numberWithInteger:1] forKey:key];
+        
+        //Notify start downloading
+        startProgress(resultMessage);
+        
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:resultMessage forKey:@"message"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
+        
+        [self runDownloadImageWithRoomID:roomID message:resultMessage progress:^(CGFloat progress, CGFloat total, TAPMessageModel *currentDownloadMessage) {
             
-            //add to temp processing dictionary
-            [self.currentDownloadingDictionary setObject:[NSNumber numberWithInteger:1] forKey:currentFileID];
+            [self updateDownloadProgress:progress total:total message:currentDownloadMessage];
             
-            //Notify start downloading
-            startProgress(resultMessage);
-            
-            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-            [objectDictionary setObject:resultMessage forKey:@"message"];
-            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
-            
-            [self runDownloadImageWithRoomID:currentRoomID message:resultMessage progress:^(CGFloat progress, CGFloat total, TAPMessageModel *currentDownloadMessage) {
-                
-                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                [objectDictionary setObject:resultMessage forKey:@"message"];
-                [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-                [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-                
-                [self.downloadProgressDictionary setObject:objectDictionary forKey:currentDownloadMessage.localID];
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
-                
-                progressBlock(progress, total, resultMessage);
-            } success:^(UIImage *fullImage, TAPMessageModel *currentDownloadMessage) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSString *roomID = currentDownloadMessage.room.roomID;
-                    NSString *localID = currentDownloadMessage.localID;
-                    NSDictionary *dataDictionary = currentDownloadMessage.data;
-                    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-                    fileID = [TAPUtil nullToEmptyString:fileID];
-                    
-                    NSInteger currentProcessingCounter = [[self.currentDownloadingDictionary objectForKey:fileID] integerValue];
-                    if (currentProcessingCounter == 1) {
-                        //done processing
-                        [self.currentDownloadingDictionary removeObjectForKey:fileID];
-                    }
-                    
-                    [self.downloadProgressDictionary removeObjectForKey:currentDownloadMessage.localID];
-                    
-                    if (fullImage != nil) {
-                        CGFloat progress = 1.0f;
-                        CGFloat total = 1.0f;
-                        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                        [objectDictionary setObject:currentDownloadMessage forKey:@"message"];
-                        [objectDictionary setObject:fullImage forKey:@"fullImage"];
-                        [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-                        [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-                        
-                        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
-                        
-                        success(fullImage, currentDownloadMessage);
-                    }
-                });
-            } failure:^(NSError *error, TAPMessageModel *currentDownloadMessage) {
+            progressBlock(progress, total, resultMessage);
+        } success:^(UIImage *fullImage, TAPMessageModel *currentDownloadMessage) {
+            dispatch_async(dispatch_get_main_queue(), ^{
                 NSString *roomID = currentDownloadMessage.room.roomID;
                 NSString *localID = currentDownloadMessage.localID;
                 NSDictionary *dataDictionary = currentDownloadMessage.data;
-                NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-                fileID = [TAPUtil nullToEmptyString:fileID];
+//                    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+//                    fileID = [TAPUtil nullToEmptyString:fileID];
                 
-                NSInteger currentProcessingCounter = [[self.currentDownloadingDictionary objectForKey:fileID] integerValue];
+                NSInteger currentProcessingCounter = [[self.currentDownloadingDictionary objectForKey:key] integerValue];
                 if (currentProcessingCounter == 1) {
                     //done processing
-                    [self.currentDownloadingDictionary removeObjectForKey:fileID];
+                    [self.currentDownloadingDictionary removeObjectForKey:key];
                 }
                 
                 [self.downloadProgressDictionary removeObjectForKey:currentDownloadMessage.localID];
                 
-                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                [objectDictionary setObject:currentDownloadMessage forKey:@"message"];
-                [objectDictionary setObject:error forKey:@"error"];
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
-
-                failure(error, currentDownloadMessage);
-            }];
-        }
+                if (fullImage != nil) {
+                    CGFloat progress = 1.0f;
+                    CGFloat total = 1.0f;
+                    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                    [objectDictionary setObject:currentDownloadMessage forKey:@"message"];
+                    [objectDictionary setObject:fullImage forKey:@"fullImage"];
+                    [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+                    [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+                    
+                    success(fullImage, currentDownloadMessage);
+                }
+            });
+        } failure:^(NSError *error, TAPMessageModel *currentDownloadMessage) {
+            failure(error, currentDownloadMessage);
+            
+            NSString *localID = currentDownloadMessage.localID;
+            NSString *key = [TAPUtil getFileKeyFromMessage:message];
+            
+            NSInteger currentProcessingCounter = [[self.currentDownloadingDictionary objectForKey:key] integerValue];
+            if (currentProcessingCounter == 1) {
+                //done processing
+                [self.currentDownloadingDictionary removeObjectForKey:key];
+            }
+            
+            [self.downloadProgressDictionary removeObjectForKey:message.localID];
+            
+            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+            [objectDictionary setObject:message forKey:@"message"];
+            [objectDictionary setObject:error forKey:@"error"];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
+        }];
     }];
 }
 
@@ -195,6 +175,10 @@
                            failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
     NSDictionary *currentDataDictionary = message.data;
     NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+    NSString *currentFileURL = [currentDataDictionary objectForKey:@"url"];
+    if (currentFileURL == nil || [currentFileURL isEqualToString:@""]) {
+        currentFileURL = [currentDataDictionary objectForKey:@"fileURL"];
+    }
     
     //Call API Download File
     startProgress(message);
@@ -203,84 +187,59 @@
     [objectDictionary setObject:message forKey:@"message"];
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
     
-    [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
-                                           roomID:message.room.roomID completionBlock:^(NSData *downloadedData) {
-                                               //CS Note
-                                               //Store downloaded data to local storage
-                                               
-                                               NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-                                               NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
-                                               
-                                               NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Files"];
-                                               
-                                               if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
-                                                   [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
-                                               }
-                                               
-                                               NSString *fileName = [message.data objectForKey:@"fileName"];
-                                               fileName = [TAPUtil nullToEmptyString:fileName];
-                                               
-                                               if ([fileName isEqualToString:@""]) {
-                                                   
-                                                   NSDate *currentDate = [NSDate date];
-                                                   NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-                                                   NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
-                                                   
-                                                   NSString *fileExtension = @"";
-                                                   if ([fileExtension isEqualToString:@""]) {
-                                                       fileExtension = [message.data objectForKey:@"mediaType"];
-                                                       fileExtension = [TAPUtil nullToEmptyString:fileExtension];
-                                                       fileExtension = [fileExtension lastPathComponent];
-                                                   }
+    if (currentFileURL != nil || ![currentFileURL isEqualToString:@""]) {
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
 
-                                                   fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
-                                               }
-                                               
-                                               destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
-                                               
-                                               NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
-                                                                                                     fileNameCounterStart:0];
-                                               
-                                               [downloadedData writeToFile:destinationFileString atomically:YES];
+        NSURL *url = [NSURL URLWithString:currentFileURL];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
 
-                                               [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:currentFileID];
-                                                [self.failedDownloadDictionary removeObjectForKey:message.localID];
-                                               
-                                               [self.downloadProgressDictionary removeObjectForKey:message.localID];
-                                               
-                                               CGFloat progress = 1.0f;
-                                               CGFloat total = 1.0f;
-                                               NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                                               [objectDictionary setObject:message forKey:@"message"];
-                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-                                               
-                                               [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
-                                               
-                                               success(downloadedData, message);
-                                           } progressBlock:^(CGFloat progress, CGFloat total) {
-                                               
-                                               NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                                               [objectDictionary setObject:message forKey:@"message"];
-                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-                                               [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-                                               [self.downloadProgressDictionary setObject:objectDictionary forKey:message.localID];
-                                               
-                                               [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
-                                               
-                                               progressBlock(progress, total, message);
-                                           } failureBlock:^(NSError *error) {
-                                               failure(error, message);
-                                               [self.failedDownloadDictionary setObject:message forKey:message.localID];
-                                               
-                                               [self.downloadProgressDictionary removeObjectForKey:message.localID];
-                                               
-                                               NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-                                               [objectDictionary setObject:message forKey:@"message"];
-                                               [objectDictionary setObject:error forKey:@"error"];
-                                               
-                                               [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
-                                           }];
+        NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request
+        progress:^(NSProgress * _Nonnull downloadProgress) {
+            progressBlock(downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, message);
+            [self updateDownloadProgress:downloadProgress.completedUnitCount total:downloadProgress.totalUnitCount message:message];
+        }
+        destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
+            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                                  inDomain:NSUserDomainMask
+                                                                         appropriateForURL:nil
+                                                                                    create:NO
+                                                                                     error:nil];
+            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+        }
+        completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            if (error != nil) {
+                [self handleFileDownloadError:error message:message];
+                failure(error, message);
+                return;
+            }
+            NSData *downloadedData = [NSData dataWithContentsOfURL:filePath];
+            if (downloadedData != nil) {
+                [self saveDownloadedData:downloadedData andThumbnailWithKey:currentFileURL message:message success:success failure:failure];
+            }
+            else {
+                [self handleFileDownloadError:error message:message];
+                failure(error, message);
+            }
+        }];
+        [downloadTask resume];
+    }
+    else {
+        [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
+                                               roomID:message.room.roomID
+        completionBlock:^(NSData *downloadedData) {
+            [self saveDownloadedData:downloadedData message:message];
+            success(downloadedData, message);
+        }
+        progressBlock:^(CGFloat progress, CGFloat total) {
+            [self updateDownloadProgress:progress total:total message:message];
+            progressBlock(progress, total, message);
+        }
+        failureBlock:^(NSError *error) {
+            failure(error, message);
+            [self handleFileDownloadError:error message:message];
+        }];
+    }
 }
 
 - (void)receiveVideoDataWithMessage:(TAPMessageModel *)message
@@ -288,8 +247,13 @@
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
                             success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    
     NSDictionary *currentDataDictionary = message.data;
     NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+    NSString *currentFileURL = [currentDataDictionary objectForKey:@"url"];
+    if (currentFileURL == nil || [currentFileURL isEqualToString:@""]) {
+        currentFileURL = [currentDataDictionary objectForKey:@"fileURL"];
+    }
     
     //Call API Download File
     startProgress(message);
@@ -298,97 +262,213 @@
     [objectDictionary setObject:message forKey:@"message"];
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:objectDictionary];
     
-    [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:message.room.roomID completionBlock:^(NSData *downloadedData) {
-        //CS Note
-        //Store downloaded data to local storage
-        
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
-        
-        NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Videos"];
-        
-        if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
-            [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
-        }
-        
-        NSString *fileName = [message.data objectForKey:@"fileName"];
-        fileName = [TAPUtil nullToEmptyString:fileName];
-        
-        if ([fileName isEqualToString:@""]) {
-            
-            NSDate *currentDate = [NSDate date];
-            NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-            NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
-            
-            NSString *fileExtension = @"";
-            if ([fileExtension isEqualToString:@""]) {
-                fileExtension = [message.data objectForKey:@"mediaType"];
-                fileExtension = [TAPUtil nullToEmptyString:fileExtension];
-                fileExtension = [fileExtension lastPathComponent];
-            }
-            
-            fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
-        }
-        
-        destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
-        
-        NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
-                                                                 fileNameCounterStart:0];
-        
-        [downloadedData writeToFile:destinationFileString atomically:YES];
-        
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:currentFileID];
-        [self.failedDownloadDictionary removeObjectForKey:message.localID];
-        
-        //Get thumbnail image for video
-        [TAPImageView imageFromCacheWithKey:currentFileID success:^(UIImage *savedImage) {
-           if (savedImage == nil) {
-               NSURL *url = [NSURL fileURLWithPath:destinationFilePath];
-               AVAsset *asset = [AVAsset assetWithURL:url];
-               UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:destinationFilePath];
-               [TAPImageView saveImageToCache:thumbnailVideoImage withKey:currentFileID];
-           }
+    if (currentFileURL != nil || ![currentFileURL isEqualToString:@""]) {
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
 
-           success(downloadedData, message);
-            
-            [self.downloadProgressDictionary removeObjectForKey:message.localID];
-            
-            CGFloat progress = 1.0f;
-            CGFloat total = 1.0f;
-            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-            [objectDictionary setObject:message forKey:@"message"];
-            [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
-            [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+        NSURL *url = [NSURL URLWithString:currentFileURL];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+
+        NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request
+        progress:^(NSProgress * _Nonnull downloadProgress) {
+            progressBlock(downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, message);
+            [self updateDownloadProgress:downloadProgress.completedUnitCount total:downloadProgress.totalUnitCount message:message];
+        }
+        destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
+            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                                  inDomain:NSUserDomainMask
+                                                                         appropriateForURL:nil
+                                                                                    create:NO
+                                                                                     error:nil];
+            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+        }
+        completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            if (error != nil) {
+                [self handleFileDownloadError:error message:message];
+                failure(error, message);
+                return;
+            }
+            NSData *downloadedData = [NSData dataWithContentsOfURL:filePath];
+            if (downloadedData != nil) {
+                [self saveDownloadedData:downloadedData andThumbnailWithKey:currentFileURL message:message success:success failure:failure];
+            }
+            else {
+                [self handleFileDownloadError:error message:message];
+                failure(error, message);
+            }
         }];
+        [downloadTask resume];
+    }
+    else {
+        [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
+                                               roomID:message.room.roomID
+        completionBlock:^(NSData *downloadedData) {
+            [self saveDownloadedData:downloadedData andThumbnailWithKey:currentFileID message:message success:success failure:failure];
+        }
+        progressBlock:^(CGFloat progress, CGFloat total) {
+            [self updateDownloadProgress:progress total:total message:message];
+            
+            progressBlock(progress, total, message);
+        }
+        failureBlock:^(NSError *error) {
+            failure(error, message);
+            [self handleFileDownloadError:error message:message];
+        }];
+    }
+};
+
+- (void)updateDownloadProgress:(CGFloat)progress
+                         total:(CGFloat)total
+                       message:(TAPMessageModel *)message {
+    
+    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+    [objectDictionary setObject:message forKey:@"message"];
+    [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+    [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+    [self.downloadProgressDictionary setObject:objectDictionary forKey:message.localID];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
+}
+
+- (void)handleFileDownloadError:(NSError *)error
+                        message:(TAPMessageModel *)message {
+    
+   [self.failedDownloadDictionary setObject:message forKey:message.localID];
+   
+   [self.downloadProgressDictionary removeObjectForKey:message.localID];
+   
+   NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+   [objectDictionary setObject:message forKey:@"message"];
+   [objectDictionary setObject:error forKey:@"error"];
+   
+   [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];\
+}
+
+- (void)saveDownloadedData:(NSData *)data
+                   message:(TAPMessageModel *)message {
+    
+    // Save file message data
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+    
+    NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Files"];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
+    }
+    
+    NSString *fileName = [message.data objectForKey:@"fileName"];
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    if ([fileName isEqualToString:@""]) {
+    
+        NSDate *currentDate = [NSDate date];
+        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+        NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
+    
+        NSString *fileExtension = @"";
+        if ([fileExtension isEqualToString:@""]) {
+            fileExtension = [message.data objectForKey:@"mediaType"];
+            fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+            fileExtension = [fileExtension lastPathComponent];
+        }
+
+        fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
+    }
+    
+    destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
+    
+    NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
+                                                          fileNameCounterStart:0];
+    
+    [data writeToFile:destinationFileString atomically:YES];
+
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:key];
+     [self.failedDownloadDictionary removeObjectForKey:message.localID];
+    
+    [self.downloadProgressDictionary removeObjectForKey:message.localID];
+    
+    CGFloat progress = 1.0f;
+    CGFloat total = 1.0f;
+    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+    [objectDictionary setObject:message forKey:@"message"];
+    [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+    [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+}
+
+- (void)saveDownloadedData:(NSData *)data
+       andThumbnailWithKey:(NSString *)key
+                   message:(TAPMessageModel *)message
+                   success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                   failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    
+    // Save video message data
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+    
+    NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Videos"];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
+    }
+    
+    NSString *fileName = [message.data objectForKey:@"fileName"];
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    if ([fileName isEqualToString:@""]) {
         
-    } progressBlock:^(CGFloat progress, CGFloat total) {
+        NSDate *currentDate = [NSDate date];
+        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+        NSString *timestamp = [NSString stringWithFormat:@"%f", currentTimeInterval];
         
+        NSString *fileExtension = @"";
+        if ([fileExtension isEqualToString:@""]) {
+            fileExtension = [message.data objectForKey:@"mediaType"];
+            fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+            fileExtension = [fileExtension lastPathComponent];
+        }
+        
+        fileName = [NSString stringWithFormat:@"%@.%@", timestamp, fileExtension];
+    }
+    
+    destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
+    
+    NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
+                                                             fileNameCounterStart:0];
+    
+    [data writeToFile:destinationFileString atomically:YES];
+    
+    key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    
+    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:key];
+    [self.failedDownloadDictionary removeObjectForKey:message.localID];
+    
+    //Get thumbnail image for video
+    [TAPImageView imageFromCacheWithKey:key success:^(UIImage *savedImage) {
+        if (savedImage == nil) {
+            NSURL *url = [NSURL fileURLWithPath:destinationFilePath];
+            AVAsset *asset = [AVAsset assetWithURL:url];
+            UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager]  generateThumbnailImageFromFilePathString:destinationFilePath];
+            [TAPImageView saveImageToCache:thumbnailVideoImage withKey:key];
+        }
+ 
+        success(data, message);
+        
+        [self.downloadProgressDictionary removeObjectForKey:message.localID];
+        
+        CGFloat progress = 1.0f;
+        CGFloat total = 1.0f;
         NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
         [objectDictionary setObject:message forKey:@"message"];
         [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
         [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
         
-        [self.downloadProgressDictionary setObject:objectDictionary forKey:message.localID];
-        
-         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:objectDictionary];
-        
-        progressBlock(progress, total, message);
-    } failureBlock:^(NSError *error) {
-        failure(error, message);
-        [self.failedDownloadDictionary setObject:message forKey:message.localID];
-        
-        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-        [objectDictionary setObject:message forKey:@"message"];
-        [objectDictionary setObject:error forKey:@"error"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
-        
-        [self.downloadProgressDictionary removeObjectForKey:message.localID];
-
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
     }];
-};
+}
 
 - (void)runDownloadImageWithRoomID:(NSString *)roomID
                            message:(TAPMessageModel *)message
@@ -398,21 +478,81 @@
     
     NSDictionary *currentDataDictionary = message.data;
     NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+    NSString *currentFileURL = [currentDataDictionary objectForKey:@"url"];
+    if (currentFileURL == nil || [currentFileURL isEqualToString:@""]) {
+        currentFileURL = [currentDataDictionary objectForKey:@"fileURL"];
+    }
     
-    //Call API Download Full Image
-    [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:roomID isThumbnail:NO completionBlock:^(UIImage *downloadedImage) {
-        
-        //Save image to cache
-        [TAPImageView saveImageToCache:downloadedImage withKey:currentFileID];
-        
-        //Send back success download image
-        success(downloadedImage, message);
-        
-    } progressBlock:^(CGFloat progress, CGFloat total) {
-        progressBlock(progress, total, message);
-    } failureBlock:^(NSError *error) {
-        failure(error, message);
-    }];
+    if (currentFileURL != nil || ![currentFileURL isEqualToString:@""]) {
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+
+        NSURL *url = [NSURL URLWithString:currentFileURL];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+
+        NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request
+        progress:^(NSProgress * _Nonnull downloadProgress) {
+            progressBlock(downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, message);
+        }
+        destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
+            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                                  inDomain:NSUserDomainMask
+                                                                         appropriateForURL:nil
+                                                                                    create:NO
+                                                                                     error:nil];
+            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+        }
+        completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            if (error == nil) {
+                @try {
+//                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//                    NSString *homeDirectoryPath = [paths objectAtIndex: 0];
+//                    NSString *filePathString = [NSString stringWithFormat:@"%@/%@", homeDirectoryPath, filePath.relativeString];
+
+                    NSString *filePathString = filePath.relativeString;
+//                    UIImage *image = [UIImage imageWithContentsOfFile:filePathString];
+                    UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:filePath]];
+                    
+                    if (image != nil) {
+                        //Save image to cache
+                        NSString *key = [[currentFileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                        [TAPImageView saveImageToCache:image withKey:key];
+                        
+                        // Send back success download image
+                        success(image, message);
+                    }
+                    else {
+                        NSString *errorMessage = @"Unable to retrieve image from url.";
+                        failure([NSError errorWithDomain:errorMessage code:999 userInfo:@{@"message": errorMessage}], message);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSString *errorMessage = [exception reason];
+                    failure([NSError errorWithDomain:errorMessage code:999 userInfo:@{@"message": errorMessage}], message);
+                }
+            }
+            else {
+                failure(error, message);
+            }
+        }];
+        [downloadTask resume];
+    }
+    else {
+        //Call API Download Full Image
+        [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:roomID isThumbnail:NO completionBlock:^(UIImage *downloadedImage) {
+            
+            //Save image to cache
+            [TAPImageView saveImageToCache:downloadedImage withKey:currentFileID];
+            
+            //Send back success download image
+            success(downloadedImage, message);
+            
+        } progressBlock:^(CGFloat progress, CGFloat total) {
+            progressBlock(progress, total, message);
+        } failureBlock:^(NSError *error) {
+            failure(error, message);
+        }];
+    }
 }
 
 - (NSDictionary *)getDownloadProgressWithLocalID:(NSString *)localID {

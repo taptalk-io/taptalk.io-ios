@@ -337,7 +337,7 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
         
-        placeholderString = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TAPUtil currentBundle], @""); //AS TEMP - NOT YET IN LOCALIZE
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TAPUtil currentBundle], @"");
         self.textField.placeholder = placeholderString;
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
@@ -349,8 +349,23 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        placeholderString = NSLocalizedStringFromTableInBundle(@"Insert Name", nil, [TAPUtil currentBundle], @""); //AS TEMP - NOT YET IN LOCALIZE
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Insert Name", nil, [TAPUtil currentBundle], @"");
         self.textField.placeholder = placeholderString;
+        self.containerView.alpha = 1.0f;
+        self.phoneNumberPickerView.alpha = 0.0f;
+        [self showShowPasswordButton:NO];
+    }
+    if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeShareExtensionAddMessage) {
+        self.titleLabel.text = @"";
+        self.titleLabel.frame = CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f); //AS NOTE - BECAUSE USED in SHARE EXTENSION, so hide
+        
+        self.containerView.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.frame) - 16.0f - 16.0f, 50.0f);
+        [self setInfoDescriptionText:@""];
+        [self setErrorInfoText:@""];
+        self.textField.keyboardType = UIKeyboardTypeDefault;
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Add Message...", nil, [TAPUtil currentBundle], @""); //TODO: NOT YET ADDED TO NSLOCALIZED
+        self.textField.placeholder = placeholderString;
+        
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];

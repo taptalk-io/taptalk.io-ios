@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) PHAsset *asset;
 @property (strong, nonatomic) NSString *assetIdentifier;
+@property (strong, nonatomic) AVAsset *avAsset;
 
 @end
 

@@ -21,7 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cancelUploadingOperationWithMessage:(TAPMessageModel *)message;
 - (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success;
 - (void)saveToPendingUploadAssetDictionaryWithAsset:(PHAsset *)asset;
+- (void)saveToPendingUploadAssetDictionaryWithAVAsset:(AVAsset *)asset;
 - (PHAsset *)getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:(NSString *)assetIdentifier;
+- (AVAsset *)getAssetFromPendingUploadAVAssetDictionaryWithAssetIdentifier:(NSString *)assetIdentifier;
 - (void)clearFileUploadManagerData;
 - (BOOL)isUploadingFile;
 
