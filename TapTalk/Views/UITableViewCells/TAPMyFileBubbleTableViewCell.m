@@ -237,6 +237,14 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    self.lastProgress = 0.0f;
+    self.progressLayer.strokeEnd = 0.0f;
+    self.progressLayer.strokeStart = 0.0f;
+    [self.progressLayer removeAllAnimations];
+    [self.syncProgressSubView removeFromSuperview];
+    _progressLayer = nil;
+    _syncProgressSubView = nil;
+    
     [self.contentView layoutIfNeeded];
     
     self.bubbleLabel.text = @"";

@@ -11,6 +11,8 @@
 
 #import "TAPContactCollectionViewCell.h"
 
+#define GROUP_NAME_MAX_LENGTH 100
+
 @interface TAPCreateGroupSubjectViewController () <TAPCustomTextFieldViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate>
 
 @property (strong, nonatomic) TAPCreateGroupSubjectView *createGroupSubjectView;
@@ -260,7 +262,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (BOOL)customTextFieldViewTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     newString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    self.roomModel.name = newString;
+//    self.roomModel.name = newString; //AS NOTE - TIDAK PERLU LANGSUNG DIUBAH
     
     if ([newString length] <= 0) {
         //disable button create
@@ -269,6 +271,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else {
         //enable button create
         [self.createGroupSubjectView.createButtonView setAsActiveState:YES animated:NO];
+    }
+    
+    if ([newString length] > GROUP_NAME_MAX_LENGTH) {
+        return NO;
     }
     
     return YES;

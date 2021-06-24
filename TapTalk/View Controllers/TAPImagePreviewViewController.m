@@ -477,7 +477,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark CollectionView
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-
     [self.imagePreviewView.captionTextView resignFirstResponder];
 
     if (collectionView == self.imagePreviewView.imagePreviewCollectionView) {
@@ -542,22 +541,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             TAPMediaPreviewModel *nextSelectedMediaPreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
             BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:nextSelectedMediaPreview];
             [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
-        }
-        else {
-            TAPThumbnailImagePreviewCollectionViewCell *previousCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.selectedIndex inSection:0]];
-            [previousCell setAsSelected:NO];
             
-            _selectedIndex = indexPath.item;
-            
-            TAPThumbnailImagePreviewCollectionViewCell *currentSelectedCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
-            [currentSelectedCell setAsSelected:YES];
-            
-            [self.imagePreviewView.imagePreviewCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
-            
-            TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
-            NSString *savedCaptionString = currentImagePreview.caption;
+            NSString *savedCaptionString = nextSelectedMediaPreview.caption;
             savedCaptionString = [TAPUtil nullToEmptyString:savedCaptionString];
-            
+
             if (![savedCaptionString isEqualToString:@""] && savedCaptionString != nil) {
                 //contain previous saved caption
                 [self.imagePreviewView.captionTextView setInitialText:@""];
@@ -570,7 +557,37 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
                 [self.imagePreviewView isShowCounterCharCount:NO];
             }
+        }
+        else {
+            TAPThumbnailImagePreviewCollectionViewCell *previousCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.selectedIndex inSection:0]];
+            [previousCell setAsSelected:NO];
+
+            _selectedIndex = indexPath.item;
+
+            TAPThumbnailImagePreviewCollectionViewCell *currentSelectedCell = [self.imagePreviewView.thumbnailCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+            [currentSelectedCell setAsSelected:YES];
             
+            [self.imagePreviewView.imagePreviewCollectionView setContentOffset:CGPointMake(CGRectGetWidth([UIScreen mainScreen].bounds) * indexPath.item, self.imagePreviewView.imagePreviewCollectionView.contentOffset.y) animated:YES];
+            
+//            [self.imagePreviewView.imagePreviewCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+            
+            TAPMediaPreviewModel *currentImagePreview = [self.mediaDataArray objectAtIndex:self.selectedIndex];
+            NSString *savedCaptionString = currentImagePreview.caption;
+            savedCaptionString = [TAPUtil nullToEmptyString:savedCaptionString];
+
+            if (![savedCaptionString isEqualToString:@""] && savedCaptionString != nil) {
+                //contain previous saved caption
+                [self.imagePreviewView.captionTextView setInitialText:@""];
+                [self.imagePreviewView.captionTextView setInitialText:savedCaptionString];
+                self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [savedCaptionString length], TAP_LIMIT_OF_CAPTION_CHARACTER];
+                [self.imagePreviewView isShowCounterCharCount:YES];
+            }
+            else {
+                [self.imagePreviewView.captionTextView setInitialText:@""];
+                self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", 0, TAP_LIMIT_OF_CAPTION_CHARACTER];
+                [self.imagePreviewView isShowCounterCharCount:NO];
+            }
+
             //Show excedeed bottom view if needed
             BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:currentImagePreview];
             [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
@@ -631,7 +648,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 [self.imagePreviewView showExcedeedFileSizeAlertView:NO animated:YES];
             }
-            
         }
         else {
             //currentIndex == self.selectedIndex

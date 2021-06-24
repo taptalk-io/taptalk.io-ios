@@ -445,13 +445,17 @@
 
 #pragma mark TAPConnectionStatusViewController
 - (void)connectionStatusViewControllerDelegateHeightChange:(CGFloat)height {
-//DV Note - v1.0.18
-//28 Nov 2019 - Temporary comment to hide connecting, waiting for network, connected state for further changing UI flow
-//    [UIView animateWithDuration:0.2f animations:^{
-//        //change frame
-//        self.roomListView.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListView.roomListTableView.frame), height, CGRectGetWidth(self.roomListView.roomListTableView.frame), CGRectGetHeight(self.roomListView.roomListTableView.frame));
-//    }];
-//END DV Note
+#ifdef DEBUG
+//    DV Note - v1.0.18
+//    28 Nov 2019 - Temporary comment to hide connecting, waiting for network, connected state for further changing UI flow
+    NSLog(@"===============connectionStatusViewControllerDelegateHeightChange");
+        [UIView animateWithDuration:0.2f animations:^{
+            //change frame
+            self.roomListView.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListView.roomListTableView.frame), height, CGRectGetWidth(self.roomListView.roomListTableView.frame), CGRectGetHeight(self.roomListView.roomListTableView.frame));
+        }];
+//    END DV Note
+#endif
+
 }
 
 #pragma mark TAPAddNewChatViewController

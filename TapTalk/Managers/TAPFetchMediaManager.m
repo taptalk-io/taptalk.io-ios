@@ -244,6 +244,8 @@
     // Convert Image from CGImage to UIImage so you can display it easily in a image view.
     UIImage *resultImage = [[UIImage alloc] initWithCGImage:imgRef];
 
+    CGImageRelease(imgRef); //AS NOTE - ADDED FOR RELEASE UNUSED MEMORY
+    
     return resultImage;
 }
 

@@ -49,6 +49,10 @@
         _socketURL = [[NSString alloc] init];
         
         _delegatesArray = [[NSMutableArray alloc] init];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(reachabilityDidChange:)
+                                                     name:AFNetworkingReachabilityDidChangeNotification
+                                                   object:nil];
     }
     
     return self;
@@ -56,6 +60,9 @@
 
 - (void)dealloc {
     // Should never be called, but just here for clarity really.
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AFNetworkingReachabilityDidChangeNotification
+                                                  object:nil];
 }
 
 #pragma mark - Delegate
@@ -149,7 +156,10 @@
     NSLog(@"ConnectionManager Connect");
 #endif
     
-    if (self.tapConnectionStatus != TAPConnectionManagerStatusTypeDisconnected && self.tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) {
+    if ((self.tapConnectionStatus != TAPConnectionManagerStatusTypeDisconnected &&
+         self.tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) ||
+        [[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable
+    ) {
         return;
     }
     
@@ -199,7 +209,7 @@
         webSocket.delegate = self;
         [webSocket open];
     } failure:^(NSError *error) {
-        
+
     }];
 }
 
@@ -310,6 +320,40 @@
 
 - (void)removeDelegate:(id)delegate {
     [self.delegatesArray removeObject:delegate];
+}
+
+- (void)reachabilityDidChange:(NSNotification *)notification {
+    
+    BOOL reachable;
+    NSString *status = [notification.userInfo objectForKey:AFNetworkingReachabilityNotificationStatusItem];
+    NSInteger statusValue = [status integerValue];
+    switch(statusValue)
+    {
+        case 0:
+            //AFNetworkReachabilityStatusNotReachable
+            reachable = NO;
+            break;
+        case 1:
+            //AFNetworkReachabilityStatusReachableViaWWAN
+            reachable = YES;
+            break;
+        case 2:
+            //AFNetworkReachabilityStatusReachableViaWiFi
+            reachable = YES;
+            break;
+        default:
+            //AFNetworkReachabilityStatusUnknown
+            reachable = NO;
+            break;
+    }
+    
+    [self reachabilityChangeIsReachable:reachable];
+}
+
+- (void)reachabilityChangeIsReachable:(BOOL)reachable {
+    if (reachable) {
+        [self tryToReconnect];
+    }
 }
 
 @end

@@ -302,18 +302,36 @@
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
     NSDictionary *dataDictionary = message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
     
-    [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+    NSString *urlKey = [dataDictionary objectForKey:@"url"];
+    if (urlKey == nil || [urlKey isEqualToString:@""]) {
+        urlKey = [dataDictionary objectForKey:@"fileURL"];
+    }
+    urlKey = [TAPUtil nullToEmptyString:urlKey];
+    
+    if (![urlKey isEqualToString:@""]) {
+        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
+    urlKey = [TAPUtil nullToEmptyString:urlKey];
+    
+    [TAPImageView imageFromCacheWithKey:urlKey message:message
+    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
         if (savedImage != nil) {
             [self.imageView setImage:savedImage];
             CGFloat width = savedImage.size.width;
             CGFloat height = savedImage.size.height;
         }
-        else {
+    } failure:^(TAPMessageModel *resultMessage) {
+        [TAPImageView imageFromCacheWithKey:fileID message:message
+        success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+            if (savedImage != nil) {
+                [self.imageView setImage:savedImage];
+                CGFloat width = savedImage.size.width;
+                CGFloat height = savedImage.size.height;
+            }
+        } failure:^(TAPMessageModel *resultMessage) {
             //Get from message.data
             NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
             NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
@@ -321,7 +339,7 @@
             if (image != nil) {
                 self.thumbnailImageView.image = image;
             }
-        }
+        }];
     }];
 }
 

@@ -1114,11 +1114,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         if (status != 0) {
                             //Set current progress
                             NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                            [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
                             if (uploadProgressDictionary == nil) {
                                 CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
                                 CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
-                                
-                                [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
                                 
                                 [cell animateProgressUploadingImageWithProgress:progress total:total];
                             }
@@ -1158,7 +1157,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         NSDictionary *dataDictionary = message.data;
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
-                        NSString *fileKey = [TAPUtil getFileKeyFromMessage:message];
                         
                         if (message.isFailedSend) {
                             //Update view to failed send
@@ -1172,21 +1170,50 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             if (status != 0) {
                                 //Set current progress
                                 NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                                [cell showVideoBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                 if (uploadProgressDictionary == nil) {
                                     CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
                                     CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
                                     
-                                    [cell showVideoBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                     [cell animateProgressUploadingVideoWithProgress:progress total:total];
                                 }
                             }
                             else {
                                 //Check video is done downloaded or not
-                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileKey];
+                                NSDictionary *dataDictionary = message.data;
+                                dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                                 
-                                if ([filePath isEqualToString:@""] || filePath == nil) {
-                                    //File not exist, download file
-                                    if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                                NSString *key = [dataDictionary objectForKey:@"fileID"];
+                                key = [TAPUtil nullToEmptyString:key];
+                                
+                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                        fileURL = [dataDictionary objectForKey:@"fileURL"];
+                                    }
+                                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+                                    
+                                    if (![fileURL isEqualToString:@""]) {
+                                        key = fileURL;
+                                        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                                    }
+                                    
+                                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                }
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                                    if (downloadProgressDictionary != nil) {
+                                        // Show downloading in progress
+                                        CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                        CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                        
+                                        [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
+                                        [cell animateProgressDownloadingVideoWithProgress:progress total:total];
+                                    }
+                                    else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                         //previous download fail, show retry
                                         [cell showVideoBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeRetryDownload];
                                     }
@@ -1226,7 +1253,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         NSDictionary *dataDictionary = message.data;
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
-                        NSString *fileKey = [TAPUtil getFileKeyFromMessage:message];
                         
                         if (message.isFailedSend) {
                             //Update view to failed send
@@ -1240,21 +1266,50 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             if (status != 0) {
                                 //Set current progress
                                 NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                                [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                 if (uploadProgressDictionary == nil) {
                                     CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
                                     CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
                                     
-                                    [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                     [cell animateProgressUploadingFileWithProgress:progress total:total];
                                 }
                             }
                             else {
                                 //Check file is done downloaded or not
-                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileKey];
+                                NSDictionary *dataDictionary = message.data;
+                                dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                                 
-                                if ([filePath isEqualToString:@""] || filePath == nil) {
-                                    //File not exist, download file
-                                    if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                                NSString *key = [dataDictionary objectForKey:@"fileID"];
+                                key = [TAPUtil nullToEmptyString:key];
+                                
+                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                        fileURL = [dataDictionary objectForKey:@"fileURL"];
+                                    }
+                                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+                                    
+                                    if (![fileURL isEqualToString:@""]) {
+                                        key = fileURL;
+                                        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                                    }
+                                    
+                                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                }
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                                    if (downloadProgressDictionary != nil) {
+                                        // Show downloading in progress
+                                        CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                        CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                        
+                                        [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeDownloading];
+                                        [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                                    }
+                                    else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                         //previous download fail, show retry
                                         [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeRetryDownload];
                                     }
@@ -1459,16 +1514,42 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     
                     if (message != nil) {
                         NSDictionary *dataDictionary = message.data;
+                        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
-                        NSString *fileKey = [TAPUtil getFileKeyFromMessage:message];
                         
                         //Check video is done downloaded or not
-                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileKey];
+                        NSString *key = [dataDictionary objectForKey:@"fileID"];
+                        key = [TAPUtil nullToEmptyString:key];
                         
-                        if ([filePath isEqualToString:@""] || filePath == nil) {
-                            //File not exist, download file
-                            if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                fileURL = [dataDictionary objectForKey:@"fileURL"];
+                            }
+                            fileURL = [TAPUtil nullToEmptyString:fileURL];
+                            
+                            if (![fileURL isEqualToString:@""]) {
+                                key = fileURL;
+                                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                            }
+                            
+                            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        }
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                            if (downloadProgressDictionary != nil) {
+                                // Show downloading in progress
+                                CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                
+                                [cell showVideoBubbleStatusWithType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
+                                [cell animateProgressDownloadingVideoWithProgress:progress total:total];
+                            }
+                            else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                 //previous download fail, show retry
                                 [cell showVideoBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeRetry];
                             }
@@ -1504,17 +1585,42 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     
                     if (message != nil) {
                         NSDictionary *dataDictionary = message.data;
+                        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
-                        NSString *fileKey = [TAPUtil getFileKeyFromMessage:message];
                         
                         //Check file is done downloaded or not
-                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileKey];
+                        NSString *key = [dataDictionary objectForKey:@"fileID"];
+                        key = [TAPUtil nullToEmptyString:key];
                         
-                        if ([filePath isEqualToString:@""] || filePath == nil) {
-                            //File not exist, download file
-                            //File not exist, download file
-                            if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                fileURL = [dataDictionary objectForKey:@"fileURL"];
+                            }
+                            fileURL = [TAPUtil nullToEmptyString:fileURL];
+                            
+                            if (![fileURL isEqualToString:@""]) {
+                                key = fileURL;
+                                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                            }
+                            
+                            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        }
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                            if (downloadProgressDictionary != nil) {
+                                // Show downloading in progress
+                                CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                
+                                [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDownloading];
+                                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                            }
+                            else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                 //previous download fail, show retry
                                 [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeRetry];
                             }
@@ -2620,6 +2726,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
+    
     NSInteger messageIndex = [self.messageArray indexOfObject:message];
     
     [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
@@ -2663,13 +2773,27 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
                 }
                 else {
-                    // Image data not found
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
-                                     popupIdentifier:@"Image Asset Not Found"
-                                               title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
-                                   detailInformation:NSLocalizedStringFromTableInBundle(@"Image data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
-                               leftOptionButtonTitle:nil
-                      singleOrRightOptionButtonTitle:nil];
+                    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+                    if (![key isEqualToString:@""] && message.isFailedSend) {
+                        // Image already uploaded, resend message
+                        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:message.user
+                                                                                             room:message.room
+                                                                                             body:message.body
+                                                                                             type:message.type
+                                                                                            quote:message.quote
+                                                                                      messageData:message.data];
+                        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+                        [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
+                    }
+                    else {
+                        // Image data not found
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                         popupIdentifier:@"Image Asset Not Found"
+                                                   title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                       detailInformation:NSLocalizedStringFromTableInBundle(@"Image data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                                   leftOptionButtonTitle:nil
+                          singleOrRightOptionButtonTitle:nil];
+                    }
                 }
             }];
     } failure:^(NSError *error) {
@@ -2678,13 +2802,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
-    [self.messageTextView resignFirstResponder];
-    [self.secondaryTextField resignFirstResponder];
-    [self keyboardWillHideWithHeight:0.0f];
-    
-    _isShowAccessoryView = NO;
-    [self reloadInputViews];
-    
     CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
     
     TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
@@ -2695,6 +2812,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
     NSArray *imageSliderImage = [NSArray array];
     if(cellImage != nil) {
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
+        
+        _isShowAccessoryView = NO;
+        [self reloadInputViews];
+        
         imageSliderImage = @[cellImage];
         
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
@@ -2930,12 +3054,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myFileRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
     
     NSDictionary *dataDictionary = tappedMessage.data;
     NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
     
     if ([key isEqualToString:@""]) {
-        
         //Remove from waiting upload dictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
         
@@ -2976,6 +3102,30 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
             
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+    else if (tappedMessage.isFailedSend) {
+        // File already uploaded, resend message
+        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:tappedMessage.user
+                                                                             room:tappedMessage.room
+                                                                             body:tappedMessage.body
+                                                                             type:tappedMessage.type
+                                                                            quote:tappedMessage.quote
+                                                                      messageData:tappedMessage.data];
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+            
+            [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
         } failure:^(NSError *error) {
             
         }];
@@ -3027,8 +3177,33 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
     NSString *roomID = tappedMessage.room.roomID;
-    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
     NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
     self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
     
     QLPreviewController *preview = [[QLPreviewController alloc] init];
@@ -3259,6 +3434,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    NSLog(@"myVideoRetryUploadDownloadButtonDidTapped: %ld", [[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus]);
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
+    
     NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
     
     if ([key isEqualToString:@""]) {
@@ -3308,6 +3488,30 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                       singleOrRightOptionButtonTitle:nil];
                 }
             }
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+    else if (tappedMessage.isFailedSend) {
+        // Video already uploaded, resend message
+        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:tappedMessage.user
+                                                                             room:tappedMessage.room
+                                                                             body:tappedMessage.body
+                                                                             type:tappedMessage.type
+                                                                            quote:tappedMessage.quote
+                                                                      messageData:tappedMessage.data];
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+            
+            [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
         } failure:^(NSError *error) {
             
         }];
@@ -3915,13 +4119,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
-    [self.messageTextView resignFirstResponder];
-    [self.secondaryTextField resignFirstResponder];
-    [self keyboardWillHideWithHeight:0.0f];
-    
-    _isShowAccessoryView = NO;
-    [self reloadInputViews];
-    
     CGFloat bubbleImageViewMinY = CGRectGetMinY(yourImageBubbleCell.bubbleImageView.frame);
     
     TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
@@ -3932,6 +4129,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIImage *cellImage = yourImageBubbleCell.bubbleImageView.image;
     NSArray *imageSliderImage = [NSArray array];
     if(cellImage != nil) {
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
+        
+        _isShowAccessoryView = NO;
+        [self reloadInputViews];
+        
         imageSliderImage = @[cellImage];
         TAPMessageModel *currentMessage = yourImageBubbleCell.message;
         
@@ -4210,8 +4414,33 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)yourFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
     NSString *roomID = tappedMessage.room.roomID;
-    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
     NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
     self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
     
     QLPreviewController *preview = [[QLPreviewController alloc] init];
@@ -5740,7 +5969,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
         
         TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
-        
         NSString *roomID = obtainedMessage.room.roomID;
         roomID = [TAPUtil nullToEmptyString:roomID];
         
@@ -5767,15 +5995,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil) {
+                if (fullImage != nil && [fullImage class] == [UIImage class]) {
                     [cell setFullImage:fullImage];
                 }
-                [cell animateFinishedUploadingImage];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedUploadingImage];
+                }
+                else {
+                    [cell animateFailedUploadingImage];
+                }
             }
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil) {
+                if (fullImage != nil && [fullImage class] == [UIImage class]) {
                     [cell setFullImage:fullImage];
                 }
                 [cell animateFinishedDownloadingImage];
@@ -5785,7 +6018,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadFile];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedDownloadFile];
+                }
+                else {
+                    [cell animateFailedUploadFile];
+                }
             }
             else {
                 //Their Chat
@@ -5797,7 +6035,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadVideo];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedDownloadVideo];
+                }
+                else {
+                    [cell animateFailedUploadVideo];
+                }
                 [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:nil stateType:TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded];
                 [cell setThumbnailImageForVideoWithMessage:currentMessage];
             }
@@ -6605,6 +6848,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
+#ifdef DEBUG
+    NSLog(@"Message model: %@", [message toJSONString]);
+#endif
+    
     if (message.isDeleted || message.isSending || message.isFailedSend || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal)) {
         return;
     }
@@ -6733,19 +6980,42 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
         [self checkAndShowInputAccessoryView];
         // Save to gallery action here
-        NSString *key = [TAPUtil getFileKeyFromMessage:message];
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
         
-        if (![key isEqualToString:@""]) {
+        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        NSString *urlKey = [dataDictionary objectForKey:@"url"];
+        if (urlKey == nil || [urlKey isEqualToString:@""]) {
+            urlKey = [dataDictionary objectForKey:@"fileURL"];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        if (![urlKey isEqualToString:@""]) {
+            urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
             if (message.type == TAPChatMessageTypeImage) {
                 // Save image to gallery
-                [TAPImageView imageFromCacheWithKey:key message:message
+                [TAPImageView imageFromCacheWithKey:urlKey message:message
                 success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
                     UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+                } failure:^(TAPMessageModel *resultMessage) {
+                    [TAPImageView imageFromCacheWithKey:fileID message:message
+                    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                        UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+                    }];
                 }];
             }
             else if (message.type == TAPChatMessageTypeVideo) {
                 //Save video to gallery
-                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:urlKey];
+                if ([filePath isEqualToString:@""] || filePath == nil) {
+                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
+                }
                 if (![filePath isEqualToString:@""] && filePath != nil) {
                     // Video done download, save to gallery
                     UISaveVideoAtPathToSavedPhotosAlbum(filePath, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
@@ -6825,28 +7095,66 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeImage) {
         //check already downloaded or not
+        UIImage *savedImage = nil;
         NSString *roomID = message.room.roomID;
-        NSString *key = [TAPUtil getFileKeyFromMessage:message];
-        if (![key isEqualToString:@""]) {
-            UIImage *savedImage = nil;
-            savedImage = [TAPImageView imageFromCacheWithKey:key];
-            if (savedImage != nil) {
-                //Image exist
-                [alertController addAction:saveToGalleryAction];
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *key = [dataDictionary objectForKey:@"fileID"];
+        key = [TAPUtil nullToEmptyString:key];
+        
+        savedImage = [TAPImageView imageFromCacheWithKey:key];
+        
+        if (savedImage == nil) {
+            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [dataDictionary objectForKey:@"fileURL"];
             }
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            if (![fileURL isEqualToString:@""]) {
+                key = fileURL;
+                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+            }
+            
+            savedImage = [TAPImageView imageFromCacheWithKey:key];
+        }
+        
+        if (savedImage != nil) {
+            //Image exist
+            [alertController addAction:saveToGalleryAction];
         }
     }
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeVideo) {
         //check already downloaded or not
         NSString *roomID = message.room.roomID;
-        NSString *key = [TAPUtil getFileKeyFromMessage:message];
-        if (![key isEqualToString:@""]) {
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
-            if (![filePath isEqualToString:@""] && filePath != nil) {
-                //File exist
-                [alertController addAction:saveToGalleryAction];
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *key = [dataDictionary objectForKey:@"fileID"];
+        key = [TAPUtil nullToEmptyString:key];
+        
+        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+        
+        if (filePath == nil || [filePath isEqualToString:@""]) {
+            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [dataDictionary objectForKey:@"fileURL"];
             }
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            if (![fileURL isEqualToString:@""]) {
+                key = fileURL;
+                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+            }
+            
+            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+        }
+        
+        if (filePath != nil && ![filePath isEqualToString:@""]) {
+            //File exist
+            [alertController addAction:saveToGalleryAction];
         }
     }
     
@@ -6969,25 +7277,47 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)playVideoWithMessage:(TAPMessageModel *)message {
-    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
     
-    if (![key isEqualToString:@""]) {
-        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
-        NSURL *url = [NSURL fileURLWithPath:filePath];
-        AVAsset *asset = [AVAsset assetWithURL:url];
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
         
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
         
-        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
-        AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-        
-        AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-        controller.delegate = self;
-        controller.showsPlaybackControls = YES;
-        [self presentViewController:controller animated:YES completion:nil];
-        controller.player = player;
-        [player play];
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
     }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    AVAsset *asset = [AVAsset assetWithURL:url];
+    
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    
+    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+    AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+    
+    AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+    controller.delegate = self;
+    controller.showsPlaybackControls = YES;
+    [self presentViewController:controller animated:YES completion:nil];
+    controller.player = player;
+    [player play];
 }
 
 #pragma mark Input Accessory View
@@ -7482,6 +7812,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         
                         if (isSendingAnimation) {
                             [cell receiveSentEvent];
+                            
+                            [TAPUtil performBlock:^{
+                                [self fetchImageDataWithMessage:message];
+                            } afterDelay:1.0f];
                         }
                         else if (setAsDelivered) {
                             [cell receiveDeliveredEvent];
@@ -10081,7 +10415,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
 //                    //My Chat
 //                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//                    if (fullImage != nil) {
+//                    if (fullImage != nil && [fullImage class] == [UIImage class]) {
 //                        [cell setFullImage:fullImage];
 //                    }
 //                    [cell animateFinishedUploadingImage];
@@ -10089,7 +10423,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //                else {
 //                    //Their Chat
 //                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//                    if (fullImage != nil) {
+//                    if (fullImage != nil && [fullImage class] == [UIImage class]) {
 //                        [cell setFullImage:fullImage];
 //                    }
 //                    [cell animateFinishedDownloadingImage];

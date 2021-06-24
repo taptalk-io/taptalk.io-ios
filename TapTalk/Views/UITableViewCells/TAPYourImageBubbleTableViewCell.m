@@ -268,9 +268,19 @@
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
     
+    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
+    self.lastProgress = 0.0f;
+    self.progressLayer.strokeEnd = 0.0f;
+    self.progressLayer.strokeStart = 0.0f;
+    [self.progressLayer removeAllAnimations];
+    [self.syncProgressSubView removeFromSuperview];
+    _progressLayer = nil;
+    _syncProgressSubView = nil;
     
     [self showSenderInfo:NO];
     [self showQuoteView:NO];
@@ -643,9 +653,19 @@
         _minWidth = timestampWidthWithMargin;
     }
     
-    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
     
-    if (key == nil || [key isEqualToString:@""]) {
+    NSString *urlKey = [dataDictionary objectForKey:@"url"];
+    if (urlKey == nil || [urlKey isEqualToString:@""]) {
+        urlKey = [dataDictionary objectForKey:@"fileURL"];
+    }
+    urlKey = [TAPUtil nullToEmptyString:urlKey];
+    if (![urlKey isEqualToString:@""]) {
+        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
+    
+    if ((fileID == nil || [fileID isEqualToString:@""]) && (urlKey == nil || [urlKey isEqualToString:@""])) {
         [TAPImageView imageFromCacheWithKey:message.localID message:message
         success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
             [self getImageSizeFromImage:savedImage];
@@ -656,12 +676,8 @@
             [self.bubbleImageView setImage:savedImage];
         }
         failure:^(TAPMessageModel *resultMessage) {
-            NSString *fileURL = [dataDictionary objectForKey:@"url"];
-            if (fileURL == nil || [fileURL isEqualToString:@""]) {
-                fileURL = [dataDictionary objectForKey:@"fileURL"];
-            }
-            if (fileURL != nil || ![fileURL isEqualToString:@""]) {
-                [self.bubbleImageView setImageWithURLString:fileURL];
+            if (urlKey != nil && ![urlKey isEqualToString:@""]) {
+                [self.bubbleImageView setImageWithURLString:[dataDictionary objectForKey:@"url"]];
                 if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
                     self.bubbleImageViewWidthConstraint.constant = 240.0f;
                 }
@@ -671,14 +687,14 @@
                 [self.contentView layoutIfNeeded];
             }
             else {
-                self.bubbleImageViewWidthConstraint.constant = 0.0f;
-                self.bubbleImageViewHeightConstraint.constant = 0.0f;
+                self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+                self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
                 [self.contentView layoutIfNeeded];
             }
         }];
     }
     else {
-        if (self.currentFileKey == nil || ![self.currentFileKey isEqualToString:key]) {
+        if (self.currentFileKey == nil || ![self.currentFileKey isEqualToString:fileID] || ![self.currentFileKey isEqualToString:urlKey]) {
             //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
             self.bubbleImageView.image = nil;
         }
@@ -692,8 +708,14 @@
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+        [self.contentView layoutIfNeeded];
             
-        _currentFileKey = key;
+        if (![urlKey isEqualToString:@""]) {
+            _currentFileKey = urlKey;
+        }
+        else if (![fileID isEqualToString:@""]) {
+            _currentFileKey = fileID;
+        }
     }
     
     NSString *thumbnailImageString = [message.data objectForKey:@"thumbnail"];
@@ -1375,6 +1397,8 @@
     }
 
     self.bubbleImageView.image = image;
+    [self getImageSizeFromImage:image];
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setThumbnailImage:(UIImage *)thumbnailImage {

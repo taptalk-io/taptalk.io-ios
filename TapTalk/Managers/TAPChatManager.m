@@ -620,7 +620,7 @@
     Float64 videoDurationInMilisecondsFloat = videoDurationFloat * 1000; // in miliseconds
     NSInteger videoDurationInteger = (NSInteger)videoDurationInMilisecondsFloat;
     
-    NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+    NSString *thumbnailImageBase64String = [TAPUtil nullToEmptyString:[thumbnailImageData base64EncodedString]];
     
 //    NSURL *videoAssetURL = [(AVURLAsset *)videoAsset URL];
     NSString *videoAssetURLString = [videoAssetURL absoluteString];

@@ -476,53 +476,39 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPMessageModel *message = [self.mediaMessageDataArray objectAtIndex:indexPath.row];
         [cell setImageCollectionViewCellWithMessage:message];
         
+        NSString *roomID = message.room.roomID;
+        NSString *localID = message.localID;
+        NSDictionary *dataDictionary = message.data;
+        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        NSString *urlKey = [dataDictionary objectForKey:@"url"];
+        if (urlKey == nil || [urlKey isEqualToString:@""]) {
+            urlKey = [dataDictionary objectForKey:@"fileURL"];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        if (![urlKey isEqualToString:@""]) {
+            urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
         if (message.type == TAPChatMessageTypeImage) {
-            NSString *roomID = message.room.roomID;
-            NSDictionary *dataDictionary = message.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            fileID = [TAPUtil nullToEmptyString:fileID];
-            
-            [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                NSString *currentRoomID = resultMessage.room.roomID;
-                NSString *currentLocalID = resultMessage.localID;
-                NSDictionary *currentDataDictionary = resultMessage.data;
-                NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
-                currentFileID = [TAPUtil nullToEmptyString:currentFileID];
-                
-                NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
-         
-                //Check image exist in cache
-                if (savedImage != nil) {
-                    //Image exist
-                    //set as downloaded
-                    //set image
-                    [cell setImageCollectionViewCellImageWithImage:savedImage];
-                    [cell setAsDownloaded];
-                    [cell setInfoLabelWithString:@""];
-                }
-                //Check image is downloading
-                else if (progressDictionary != nil) {
-                    
-                    CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
-                    CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
-                    [cell setInitialAnimateDownloadingMedia];
-                    
-                    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-                    [cell setInfoLabelWithString:fileSize];
-                    
-                    [cell animateProgressDownloadingMediaWithProgress:progress total:total];
-                }
-                else {
-                    //Image not exist in cache
-                    //if not show download button
-                    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-                    [cell setInfoLabelWithString:fileSize];
-                    [cell setAsNotDownloaded];
-                }
-            }];
+            if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
+                [TAPImageView imageFromCacheWithKey:urlKey message:message
+                success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                    [self setImageCollectionViewCell:cell image:savedImage message:resultMessage];
+                } failure:^(TAPMessageModel *resultMessage) {
+                    [TAPImageView imageFromCacheWithKey:fileID message:message
+                    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                        [self setImageCollectionViewCell:cell image:savedImage message:resultMessage];
+                    } failure:^(TAPMessageModel *resultMessage) {
+                        [self setImageCollectionViewCell:cell image:nil message:resultMessage];
+                    }];
+                }];
+            }
         }
         else if (message.type == TAPChatMessageTypeVideo) {
-            
             NSNumber *duration = [message.data objectForKey:@"duration"];
             NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
             NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
@@ -530,17 +516,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
             
             //Check video exist in cache
-            NSDictionary *dataDictionary = message.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            NSString *localID = message.localID;
-            NSString *roomID = message.room.roomID;
             
             //Check video is done downloaded or not
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:urlKey];
+            if ([filePath isEqualToString:@""] || filePath == nil) {
+                filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
+            }
             
             NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
        
-            
             if ([filePath isEqualToString:@""] || filePath == nil) {
                 //File not exist, download file
                 [cell setAsNotDownloaded];
@@ -852,33 +836,49 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         if (selectedMessage.type == TAPChatMessageTypeVideo) {
             NSDictionary *dataDictionary = selectedMessage.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            fileID = [TAPUtil nullToEmptyString:fileID];
+            dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
             
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:fileID];
+            NSString *key = [dataDictionary objectForKey:@"fileID"];
+            key = [TAPUtil nullToEmptyString:key];
             
-            if (![fileID isEqualToString:@""] && filePath != nil) {
-                NSURL *url = [NSURL fileURLWithPath:filePath];
-                AVAsset *asset = [AVAsset assetWithURL:url];
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:key];
+            
+            if (filePath == nil || [filePath isEqualToString:@""]) {
+                NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                    fileURL = [dataDictionary objectForKey:@"fileURL"];
+                }
+                fileURL = [TAPUtil nullToEmptyString:fileURL];
                 
-                [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+                if (![fileURL isEqualToString:@""]) {
+                    key = fileURL;
+                    key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                }
                 
-                //        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
-                AVPlayerItem *item = [[AVPlayerItem alloc] initWithAsset:asset];
-                AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-                
-                AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-                controller.delegate = self;
-                controller.showsPlaybackControls = YES;
-                [self presentViewController:controller animated:YES completion:nil];
-                controller.player = player;
-                [player play];
+                filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:key];
             }
+            
+            if (filePath == nil || [filePath isEqualToString:@""]) {
+                return;
+            }
+            
+            NSURL *url = [NSURL fileURLWithPath:filePath];
+            AVAsset *asset = [AVAsset assetWithURL:url];
+            
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+            
+            //        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+            AVPlayerItem *item = [[AVPlayerItem alloc] initWithAsset:asset];
+            AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+            
+            AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+            controller.delegate = self;
+            controller.showsPlaybackControls = YES;
+            [self presentViewController:controller animated:YES completion:nil];
+            controller.player = player;
+            [player play];
         }
-        
     }
-   
-    
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -1471,6 +1471,45 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else {
         self.profileView.editButton.alpha = 0.0f;
+    }
+}
+
+- (void)setImageCollectionViewCell:(TAPImageCollectionViewCell *)cell
+                             image:(UIImage *)image
+                           message:(TAPMessageModel *)message {
+    
+    NSString *currentRoomID = message.room.roomID;
+    NSString *currentLocalID = message.localID;
+    NSDictionary *currentDataDictionary = message.data;
+    
+    NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+
+    //Check image exist in cache
+    if (image != nil) {
+        //Image exist
+        //set as downloaded
+        //set image
+        [cell setImageCollectionViewCellImageWithImage:image];
+        [cell setAsDownloaded];
+        [cell setInfoLabelWithString:@""];
+    }
+    //Check image is downloading
+    else if (progressDictionary != nil) {
+        CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
+        CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
+        [cell setInitialAnimateDownloadingMedia];
+        
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        [cell setInfoLabelWithString:fileSize];
+        
+        [cell animateProgressDownloadingMediaWithProgress:progress total:total];
+    }
+    else {
+        //Image not exist in cache
+        //if not show download button
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        [cell setInfoLabelWithString:fileSize];
+        [cell setAsNotDownloaded];
     }
 }
 
