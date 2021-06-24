@@ -363,7 +363,7 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        placeholderString = NSLocalizedStringFromTableInBundle(@"Add Message...", nil, [TAPUtil currentBundle], @""); //TODO: NOT YET ADDED TO NSLOCALIZED
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Add message...", nil, [TAPUtil currentBundle], @"");
         self.textField.placeholder = placeholderString;
         
         self.containerView.alpha = 1.0f;
@@ -383,7 +383,6 @@
     //TEXTFIELD PLACEHOLDER
     UIColor *textFieldPlaceholderColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.4f];
     UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
-    self.textField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:placeholderString attributes:@{NSForegroundColorAttributeName:textFieldPlaceholderColor, NSFontAttributeName:textFieldPlaceholderFont}];
     
     //AS NOTE -  1TEXTFIELD PLACEHOLDER1 ADDED LETTER SPACING
     NSMutableAttributedString *textFieldPlaceholderAttributedString = [[NSMutableAttributedString alloc] initWithString:placeholderString];
@@ -392,6 +391,11 @@
     [textFieldPlaceholderAttributesDictionary setObject:@(textFieldPlaceholderLetterSpacing) forKey:NSKernAttributeName];
     [textFieldPlaceholderAttributedString addAttributes:textFieldPlaceholderAttributesDictionary
                                            range:NSMakeRange(0, [placeholderString length])];
+    
+    [textFieldPlaceholderAttributedString addAttribute:NSForegroundColorAttributeName
+                                        value:textFieldPlaceholderColor
+                                        range:NSMakeRange(0, [placeholderString length])];
+    
     self.textField.attributedPlaceholder = textFieldPlaceholderAttributedString;
 }
 

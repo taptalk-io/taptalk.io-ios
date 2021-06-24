@@ -584,6 +584,20 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_GOOGLE_PLACES_TOKEN];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    //AS NOTE - CLEAR `receiveMessageDictionary` from AppGroup Share Extension
+    NSUserDefaults *appGroupUserDefaultSTG = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_NAME_STAGING]; //AS NOTE - CONNECT TO APP GROUP `STG`
+    [appGroupUserDefaultSTG removeObjectForKey:@"receiveMessageDictionary"];
+    [appGroupUserDefaultSTG synchronize];
+    
+    NSUserDefaults *appGroupUserDefaultDEV = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_NAME_DEV]; //AS NOTE - CONNECT TO APP GROUP `DEV`
+    [appGroupUserDefaultDEV removeObjectForKey:@"receiveMessageDictionary"];
+    [appGroupUserDefaultDEV synchronize];
+    
+    NSUserDefaults *appGroupUserDefaultRelease = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_NAME_RELEASE]; //AS NOTE - CONNECT TO APP GROUP `RELEASE`
+    [appGroupUserDefaultRelease removeObjectForKey:@"receiveMessageDictionary"];
+    [appGroupUserDefaultRelease synchronize];
+    //END AS NOTE
+    
     //Clear Manager Data
     [[TAPChatManager sharedManager] clearChatManagerData];
     [[TAPContactManager sharedManager] clearContactManagerData];

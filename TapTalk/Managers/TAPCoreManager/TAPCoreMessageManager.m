@@ -417,20 +417,23 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         //Retrieve the video frame at 1 sec to define the video thumbnail
-        AVURLAsset *urlVideoAsset = [[AVURLAsset alloc] initWithURL:videoAssetURL options:nil];
-        AVAssetImageGenerator *assetImageVideoGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlVideoAsset];
-        assetImageVideoGenerator.appliesPreferredTrackTransform = YES;
-        CMTime time = CMTimeMake(1, 1);
-        CGImageRef imageRef = [assetImageVideoGenerator copyCGImageAtTime:time actualTime:NULL error:nil];
+//        AVURLAsset *urlVideoAsset = [[AVURLAsset alloc] initWithURL:videoAssetURL options:nil];
+//        AVAssetImageGenerator *assetImageVideoGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlVideoAsset];
+//        assetImageVideoGenerator.appliesPreferredTrackTransform = YES;
+//        CMTime time = CMTimeMake(1, 1);
+//        CGImageRef imageRef = [assetImageVideoGenerator copyCGImageAtTime:time actualTime:NULL error:nil];
         
         //Finalize video attachment
-        UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
-        NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+//        UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+//        CGImageRelease(imageRef); //AS NOTE - ADDED FOR RELEASE UNUSED MEMORY
+        
+//        NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+        
         //END - Retrieve the video frame at 1 sec to define the video thumbnail
         
         [[TAPChatManager sharedManager] sendVideoMessageWithVideoAssetURL:videoAssetURL
                                                                   caption:caption
-                                                       thumbnailImageData:videoThumbnailImageData
+                                                       thumbnailImageData:nil
                                                                      room:room
                                                    successGenerateMessage:^(TAPMessageModel *message) {
             //Handle block to dictionary

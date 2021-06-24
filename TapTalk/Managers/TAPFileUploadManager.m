@@ -202,7 +202,10 @@
                     NSString *fileID = [responseDataDictionary objectForKey:@"id"];
                     fileID = [TAPUtil nullToEmptyString:fileID];
 
-                    NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                        fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    }
                     fileURL = [TAPUtil nullToEmptyString:fileURL];
                     
                     if ([mediaType hasPrefix:@"image"]) {
@@ -232,7 +235,7 @@
                     
                     [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
                     [resultDataDictionary setObject:fileID forKey:@"fileID"];
-                    [resultDataDictionary setObject:fileURL forKey:@"fileURL"];
+                    [resultDataDictionary setObject:fileURL forKey:@"url"];
                     [resultDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
                     resultMessage.data = resultDataDictionary;
                     
@@ -381,7 +384,10 @@
             NSString *fileID = [responseDataDictionary objectForKey:@"id"];
             fileID = [TAPUtil nullToEmptyString:fileID];
             
-            NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+            NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+            }
             fileURL = [TAPUtil nullToEmptyString:fileURL];
             
             success(fileID, fileURL);
@@ -430,7 +436,10 @@
         NSString *fileID = [responseDataDictionary objectForKey:@"id"];
         fileID = [TAPUtil nullToEmptyString:fileID];
 
-        NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+        NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+        }
         fileURL = [TAPUtil nullToEmptyString:fileURL];
         
         NSString *fileName = dataFile.fileName;
@@ -442,7 +451,7 @@
         
         [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
         [resultDataDictionary setObject:fileID forKey:@"fileID"];
-        [resultDataDictionary setObject:fileURL forKey:@"fileURL"];
+        [resultDataDictionary setObject:fileURL forKey:@"url"];
         [resultDataDictionary setObject:fileName forKey:@"fileName"];
         [resultDataDictionary setObject:sizeNum forKey:@"size"];
         currentMessage.data = resultDataDictionary;
@@ -657,7 +666,10 @@
                     NSString *fileID = [responseDataDictionary objectForKey:@"id"];
                     fileID = [TAPUtil nullToEmptyString:fileID];
 
-                    NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                        fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+                    }
                     fileURL = [TAPUtil nullToEmptyString:fileURL];
                     
                     if ([mediaType hasPrefix:@"image"]) {
@@ -687,7 +699,7 @@
                     
                     [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
                     [resultDataDictionary setObject:fileID forKey:@"fileID"];
-                    [resultDataDictionary setObject:fileURL forKey:@"fileURL"];
+                    [resultDataDictionary setObject:fileURL forKey:@"url"];
                     [resultDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
                     resultMessage.data = resultDataDictionary;
                     
@@ -732,7 +744,7 @@
                         if (nextUploadMessage.type == TAPChatMessageTypeImage) {
                             NSDictionary *dataDictionary = [NSDictionary dictionary];
                             dataDictionary = nextUploadMessage.data;
-        
+
                             //Convert data dictionary to model
                             TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
                             mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
@@ -799,8 +811,47 @@
                 }
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+                                
+                if ([uploadQueueRoomArray count] > 0) {
+                    for (TAPMessageModel *message in uploadQueueRoomArray) {
+                        if ([message.localID isEqualToString:obtainedMesage.localID]) {
+                            [uploadQueueRoomArray removeObject:message];
+                            break;
+                        }
+                    }
+                }
                 
                 [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+                
+                // Check if queue array is exist, run upload again
+                if ([uploadQueueRoomArray count] > 0) {
+                    TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
+                    NSString *nextRoomID = nextUploadMessage.room.roomID;
+
+                    if (nextUploadMessage.type == TAPChatMessageTypeImage) {
+                        NSDictionary *dataDictionary = [NSDictionary dictionary];
+                        dataDictionary = nextUploadMessage.data;
+
+                        //Convert data dictionary to model
+                        TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
+                        mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
+                        
+                        if (mediaData.asset == nil) {
+                            //upload UIImage
+                            [self runUploadImageWithRoomID:nextRoomID];
+                        }
+                        else {
+                            //Upload PHAsset
+                            [self runUploadImageAsAssetWithRoomID:nextRoomID];
+                        }
+                    }
+                    else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
+                        [self runUploadVideoAsAssetWithRoomID:nextRoomID];
+                    }
+                    else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
+                        [self runUploadFileWithRoomID:nextRoomID];
+                    }
+                }
             }];
             
             NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
@@ -821,8 +872,47 @@
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+                
+        if ([uploadQueueRoomArray count] > 0) {
+            for (TAPMessageModel *message in uploadQueueRoomArray) {
+                if ([message.localID isEqualToString:obtainedMesage.localID]) {
+                    [uploadQueueRoomArray removeObject:message];
+                    break;
+                }
+            }
+        }
         
         [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+        
+        // Check if queue array is exist, run upload again
+        if ([uploadQueueRoomArray count] > 0) {
+            TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
+            NSString *nextRoomID = nextUploadMessage.room.roomID;
+
+            if (nextUploadMessage.type == TAPChatMessageTypeImage) {
+                NSDictionary *dataDictionary = [NSDictionary dictionary];
+                dataDictionary = nextUploadMessage.data;
+
+                //Convert data dictionary to model
+                TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
+                mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
+                
+                if (mediaData.asset == nil) {
+                    //upload UIImage
+                    [self runUploadImageWithRoomID:nextRoomID];
+                }
+                else {
+                    //Upload PHAsset
+                    [self runUploadImageAsAssetWithRoomID:nextRoomID];
+                }
+            }
+            else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
+                [self runUploadVideoAsAssetWithRoomID:nextRoomID];
+            }
+            else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
+                [self runUploadFileWithRoomID:nextRoomID];
+            }
+        }
     }];
 }
 
@@ -953,7 +1043,7 @@
 //                        NSString *fileID = [responseDataDictionary objectForKey:@"id"];
 //                        fileID = [TAPUtil nullToEmptyString:fileID];
 //
-//                        NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+//                        NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
 //                        fileURL = [TAPUtil nullToEmptyString:fileURL];
 //
 //                        NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
@@ -969,7 +1059,7 @@
 //
 //                        [appendedDataDictionary setObject:fileNameString forKey:@"fileName"];
 //                        [appendedDataDictionary setObject:fileID forKey:@"fileID"];
-//                        [appendedDataDictionary setObject:fileID forKey:@"fileURL"];
+//                        [appendedDataDictionary setObject:fileID forKey:@"url"];
 //                        [appendedDataDictionary setObject:mediaType forKey:@"mediaType"];
 //                        [appendedDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
 //                        [appendedDataDictionary setObject:sizeNumber forKey:@"size"];
@@ -1193,7 +1283,7 @@
 //                    NSString *fileID = [responseDataDictionary objectForKey:@"id"];
 //                    fileID = [TAPUtil nullToEmptyString:fileID];
 //
-//                    NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+//                    NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
 //                    fileURL = [TAPUtil nullToEmptyString:fileURL];
 //
 //                    NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
@@ -1209,7 +1299,7 @@
 //
 //                    [appendedDataDictionary setObject:fileNameString forKey:@"fileName"];
 //                    [appendedDataDictionary setObject:fileID forKey:@"fileID"];
-//                    [appendedDataDictionary setObject:fileID forKey:@"fileURL"];
+//                    [appendedDataDictionary setObject:fileID forKey:@"url"];
 //                    [appendedDataDictionary setObject:mediaType forKey:@"mediaType"];
 //                    [appendedDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
 //                    [appendedDataDictionary setObject:sizeNumber forKey:@"size"];
@@ -1351,7 +1441,10 @@
     NSString *fileID = [dictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
 
-    NSString *fileURL = [dictionary objectForKey:@"fileURL"];
+    NSString *fileURL = [dictionary objectForKey:@"url"];
+    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+        fileURL = [dictionary objectForKey:@"fileURL"];
+    }
     fileURL = [TAPUtil nullToEmptyString:fileURL];
     
     NSString *mediaType = [dictionary objectForKey:@"mediaType"];
@@ -1419,7 +1512,7 @@
     PHAsset *asset = dataMedia.asset;
     
     [dataDictionary setObject:fileID forKey:@"fileID"];
-    [dataDictionary setObject:fileURL forKey:@"fileURL"];
+    [dataDictionary setObject:fileURL forKey:@"url"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:caption forKey:@"caption"];
     [dataDictionary setObject:imageHeight forKey:@"height"];
@@ -1436,7 +1529,10 @@
     NSString *fileID = [dictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
 
-    NSString *fileURL = [dictionary objectForKey:@"fileURL"];
+    NSString *fileURL = [dictionary objectForKey:@"url"];
+    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+        fileURL = [dictionary objectForKey:@"fileURL"];
+    }
     fileURL = [TAPUtil nullToEmptyString:fileURL];
     
     NSString *fileName = [dictionary objectForKey:@"fileName"];
@@ -1474,7 +1570,7 @@
     NSNumber *size = dataFile.size;
     
     [dataDictionary setObject:fileID forKey:@"fileID"];
-    [dataDictionary setObject:fileID forKey:@"fileURL"];
+    [dataDictionary setObject:fileURL forKey:@"url"];
     [dataDictionary setObject:fileName forKey:@"fileName"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:size forKey:@"size"];
@@ -1725,7 +1821,10 @@
         NSString *fileID = [responseDataDictionary objectForKey:@"id"];
         fileID = [TAPUtil nullToEmptyString:fileID];
 
-        NSString *fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+        NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+        }
         fileURL = [TAPUtil nullToEmptyString:fileURL];
         
         NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
@@ -1737,11 +1836,11 @@
         appendedDataDictionary = [resultMessage.data mutableCopy];
         
         NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
-        NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+        NSString *thumbnailImageBase64String = [TAPUtil nullToEmptyString:[thumbnailImageData base64EncodedString]];
         
         [appendedDataDictionary setObject:fileNameString forKey:@"fileName"];
         [appendedDataDictionary setObject:fileID forKey:@"fileID"];
-        [appendedDataDictionary setObject:fileID forKey:@"fileURL"];
+        [appendedDataDictionary setObject:fileURL forKey:@"url"];
         [appendedDataDictionary setObject:mediaType forKey:@"mediaType"];
         [appendedDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
         [appendedDataDictionary setObject:sizeNumber forKey:@"size"];

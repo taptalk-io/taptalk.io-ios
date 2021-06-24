@@ -98,7 +98,7 @@
         self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.searchBarBackgroundView addSubview:self.separatorView];
         
-        _syncContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactsTableView.frame), CGRectGetWidth(self.bgView.frame), 62.0f + [TAPUtil safeAreaBottomPadding])];
+        _syncContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.contactsTableView.frame) + 46.0f, CGRectGetWidth(self.bgView.frame), 62.0f + [TAPUtil safeAreaBottomPadding])];
         self.syncContactButtonView.backgroundColor = [UIColor whiteColor];
         [self.bgView addSubview:self.syncContactButtonView];
         

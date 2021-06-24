@@ -14,7 +14,8 @@ typedef NS_ENUM(NSInteger, TAPBaseMyBubbleStatus) {
     TAPBaseMyBubbleStatusSending,
     TAPBaseMyBubbleStatusSent,
     TAPBaseMyBubbleStatusDelivered,
-    TAPBaseMyBubbleStatusRead
+    TAPBaseMyBubbleStatusRead,
+    TAPBaseMyBubbleStatusFailed
 };
 
 @protocol TAPBaseMyBubbleTableViewCellDelegate <NSObject>

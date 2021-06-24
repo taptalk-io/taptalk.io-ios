@@ -83,3 +83,8 @@
 #define API_REQUEST_OTP_TYPE_SMS @"sms"
 #define API_REQUEST_OTP_TYPE_WHATSAPP @"whatsapp"
 #define API_REQUEST_OTP_TYPE_WHATSAPP_INVALID_RECIPIENT @"invalid_recipient"
+
+//AppGroupName
+#define APP_GROUP_NAME_DEV @"group.io.taptalk.TapTalk-Dev"
+#define APP_GROUP_NAME_STAGING @"group.io.taptalk.TapTalk-Staging"
+#define APP_GROUP_NAME_RELEASE @"group.io.taptalk.TapTalk"

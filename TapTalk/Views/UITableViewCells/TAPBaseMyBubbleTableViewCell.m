@@ -134,17 +134,8 @@
         }
     }
     else {
-        self.retryIconImageView.alpha = 1.0f;
-        self.retryButton.alpha = 1.0f;
-        self.chatBubbleRightConstraint.constant = 16.0f;
-        
-        NSString *statusString = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
-        self.statusLabel.text = statusString;
-        self.statusLabel.alpha = 1.0f;
-        self.statusLabelTopConstraint.constant = 2.0f;
-        self.statusLabelHeightConstraint.constant = 13.0f;
-        self.replyButton.alpha = 0.0f;
-        self.statusIconImageView.alpha = 0.0f;
+        // Message failed to send
+        [self setStatusIconUIWithStatus:TAPBaseMyBubbleStatusFailed];
     }
     
     self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
@@ -326,8 +317,14 @@
             self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageRead]];
         }
-
+        self.statusLabel.text = @"";
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
         self.statusIconImageView.alpha = 1.0f;
+        self.sendingIconImageView.alpha = 0.0f;
+        self.statusLabel.alpha = 0.0f;
+        self.retryIconImageView.alpha = 0.0f;
+        self.retryButton.alpha = 0.0f;
     }
     else if (status == TAPBaseMyBubbleStatusDelivered) {
         //MESSAGE IS DELIVERED TO RECIPIENT
@@ -335,7 +332,14 @@
         self.chatBubbleRightConstraint.constant = 16.0f;
         self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageDelivered]];
+        self.statusLabel.text = @"";
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
         self.statusIconImageView.alpha = 1.0f;
+        self.sendingIconImageView.alpha = 0.0f;
+        self.statusLabel.alpha = 0.0f;
+        self.retryIconImageView.alpha = 0.0f;
+        self.retryButton.alpha = 0.0f;
     }
     else if (status == TAPBaseMyBubbleStatusSent) {
         //MESSAGE IS SENT
@@ -343,7 +347,14 @@
         self.chatBubbleRightConstraint.constant = 16.0f;
         self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageSent]];
+        self.statusLabel.text = @"";
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
         self.statusIconImageView.alpha = 1.0f;
+        self.sendingIconImageView.alpha = 0.0f;
+        self.statusLabel.alpha = 0.0f;
+        self.retryIconImageView.alpha = 0.0f;
+        self.retryButton.alpha = 0.0f;
     }
     else if (status == TAPBaseMyBubbleStatusSending) {
         //MESSAGE IS BEING SENT
@@ -351,8 +362,27 @@
         self.chatBubbleRightConstraint.constant = 32.0f;
         self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageSent]];
+        self.statusLabel.text = @"";
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
         self.statusIconImageView.alpha = 0.0f;
         self.sendingIconImageView.alpha = 1.0f;
+        self.statusLabel.alpha = 0.0f;
+        self.retryIconImageView.alpha = 0.0f;
+        self.retryButton.alpha = 0.0f;
+    }
+    else if (status == TAPBaseMyBubbleStatusFailed) {
+        self.chatBubbleRightConstraint.constant = 16.0f;
+        self.statusIconImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.statusIconImageView.image = [self.statusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageFailed]];
+        self.statusLabel.text = NSLocalizedStringFromTableInBundle(@"Failed to send, tap to retry", nil, [TAPUtil currentBundle], @"");
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        self.statusIconImageView.alpha = 1.0f;
+        self.sendingIconImageView.alpha = 0.0f;
+        self.statusLabel.alpha = 1.0f;
+        self.retryIconImageView.alpha = 1.0f;
+        self.retryButton.alpha = 1.0f;
     }
 }
 

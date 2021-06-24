@@ -284,9 +284,19 @@
     
     _mentionIndexesArray = nil;
     
+    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
+    self.lastProgress = 0.0f;
+    self.progressLayer.strokeEnd = 0.0f;
+    self.progressLayer.strokeStart = 0.0f;
+    [self.progressLayer removeAllAnimations];
+    [self.syncProgressSubView removeFromSuperview];
+    _progressLayer = nil;
+    _syncProgressSubView = nil;
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -690,7 +700,6 @@
         [self showQuoteView:NO];
     }
     
-
     CGFloat imageTempHeight = [[dataDictionary objectForKey:@"height"] floatValue];
     CGFloat imageTempWidth = [[dataDictionary objectForKey:@"width"] floatValue];
     
@@ -704,6 +713,10 @@
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
 //    }
+    
+    self.retryIconImageView.alpha = 0.0f;
+    self.retryButton.alpha = 0.0f;
+    
     [self.contentView layoutIfNeeded];
     
     [self setThumbnailImageForVideoWithMessage:message];
@@ -1153,7 +1166,10 @@
 
 - (void)setInnerImageStatusIcon {
     if (self.message.isFailedSend) {
-        self.imageStatusIconImageView.alpha = 0.0f;
+        // Set to failed icon
+        self.imageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.imageStatusIconImageView.image = [self.imageStatusIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageDeliveredImage]];
+        self.imageStatusIconImageView.alpha = 1.0f;
     }
     else if (self.message.isRead) {
         // Check if show read status
@@ -1449,7 +1465,7 @@
     [self.progressLayer removeAllAnimations];
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
-    _syncProgressSubView = nil;;
+    _syncProgressSubView = nil;
     
     [self showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded];
 }
@@ -1704,25 +1720,67 @@
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
     NSDictionary *dataDictionary = message.data;
     dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    NSString *key = [TAPUtil getFileKeyFromMessage:message];
     
-    [TAPImageView imageFromCacheWithKey:key message:message
-    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-        [self.bubbleImageView setImage:savedImage];
+    NSString *urlKey = [dataDictionary objectForKey:@"url"];
+    if (urlKey == nil || [urlKey isEqualToString:@""]) {
+        urlKey = [dataDictionary objectForKey:@"fileURL"];
     }
-    failure:^(TAPMessageModel *resultMessage) {
-        // Get from message.data
-        NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
-        thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
-        if ([thumbnailImageBase64String isEqualToString:@""]) {
-            return;
+    urlKey = [TAPUtil nullToEmptyString:urlKey];
+    if (![urlKey isEqualToString:@""]) {
+        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
+    
+    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    
+    if (![urlKey isEqualToString:@""]) {
+        [TAPImageView imageFromCacheWithKey:urlKey message:message
+        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            [self.bubbleImageView setImage:savedImage];
+            [self getImageSizeFromImage:savedImage];
+            [self.contentView layoutIfNeeded];
         }
-        NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
-        UIImage *image = [UIImage imageWithData:thumbnailImageData];
-        if (image != nil) {
-            self.bubbleImageView.image = image;
+        failure:^(TAPMessageModel *resultMessage) {
+            [TAPImageView imageFromCacheWithKey:fileID message:message
+            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                [self.bubbleImageView setImage:savedImage];
+                [self getImageSizeFromImage:savedImage];
+                [self.contentView layoutIfNeeded];
+            }
+            failure:^(TAPMessageModel *resultMessage) {
+                [self setSmallThumbnailFromMessageData:dataDictionary];
+            }];
+        }];
+    }
+    else if (![fileID isEqualToString:@""]) {
+        [TAPImageView imageFromCacheWithKey:fileID message:message
+        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+            [self.bubbleImageView setImage:savedImage];
+            [self getImageSizeFromImage:savedImage];
+            [self.contentView layoutIfNeeded];
         }
-    }];
+        failure:^(TAPMessageModel *resultMessage) {
+            [self setSmallThumbnailFromMessageData:dataDictionary];
+        }];
+    }
+    else {
+        [self setSmallThumbnailFromMessageData:dataDictionary];
+    }
+}
+
+- (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {
+    NSString *thumbnailImageBase64String = [messageDataDictionary objectForKey:@"thumbnail"];
+    thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
+    if ([thumbnailImageBase64String isEqualToString:@""]) {
+        return;
+    }
+    NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    UIImage *image = [UIImage imageWithData:thumbnailImageData];
+    if (image != nil) {
+        self.bubbleImageView.image = image;
+        [self getImageSizeFromImage:image];
+        [self.contentView layoutIfNeeded];
+    }
 }
 
 @end

@@ -668,6 +668,9 @@
 //        self.lastMessageLabel.numberOfLines = 2;
         self.lastMessageLabel.numberOfLines = 1;
         self.lastMessageLabel.text = lastMessage;
+        
+        // Typing View
+        self.typingView.frame = CGRectMake(CGRectGetMinX(self.typingView.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.typingView.frame), CGRectGetHeight(self.typingView.frame));
     }
     
     //Attribute Text for Last Message
@@ -704,6 +707,8 @@
             CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f,
             newLastMessageLabelSize.height
         );
+        
+        self.typingView.frame = CGRectMake(CGRectGetMinX(self.typingView.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.typingView.frame), CGRectGetHeight(self.typingView.frame));
     }
     else if (numberOfUnreadMessage > 0) {
         self.lastMessageLabel.frame = CGRectMake(
@@ -712,6 +717,8 @@
             CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f,
             newLastMessageLabelSize.height
         );
+        
+        self.typingView.frame = CGRectMake(CGRectGetMinX(self.typingView.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.typingView.frame), CGRectGetHeight(self.typingView.frame));
     }
     else {
         self.lastMessageLabel.frame = CGRectMake(
@@ -720,6 +727,8 @@
             CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f,
             newLastMessageLabelSize.height
         );
+        
+        self.typingView.frame = CGRectMake(CGRectGetMinX(self.typingView.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.typingView.frame), CGRectGetHeight(self.typingView.frame));
     }
     
     [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
@@ -794,6 +803,8 @@
     //Resize lastMessageLabel
     CGSize newLastMessageLabelSize = [self.lastMessageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) -16.0f, CGRectGetHeight(self.lastMessageLabel.frame))];
     self.lastMessageLabel.frame = CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f, newLastMessageLabelSize.height);
+    
+    self.typingView.frame = CGRectMake(CGRectGetMinX(self.typingView.frame), CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.typingView.frame), CGRectGetHeight(self.typingView.frame));
 }
 
 - (void)setIsLastCellSeparator:(BOOL)isLastCell {

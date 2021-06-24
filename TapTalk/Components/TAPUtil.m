@@ -1149,6 +1149,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return NO;
 }
 
+// Only used to check if key is empty
 + (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message {
     NSDictionary *dataDictionary = message.data;
     dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
@@ -1162,13 +1163,12 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     
     if (![fileURL isEqualToString:@""]) {
         key = fileURL;
+        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
     }
     else {
         key = [dataDictionary objectForKey:@"fileID"];
         key = [TAPUtil nullToEmptyString:key];
     }
-    
-    key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
     
     return key;
 }
