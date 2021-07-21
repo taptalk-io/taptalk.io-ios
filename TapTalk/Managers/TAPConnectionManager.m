@@ -302,7 +302,7 @@
         formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"https" withString:@"wss"];
     }
     else if ([urlString hasPrefix:@"http"]) {
-        formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"http" withString:@"wss"];
+        formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"http" withString:@"ws"];
     }
     
     _socketURL = [NSString stringWithFormat:@"%@/connect", formattedSocketURLString];

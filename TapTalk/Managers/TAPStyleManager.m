@@ -1266,7 +1266,8 @@
         }
         case TAPDefaultColorIconPrimary:
         {
-            return [TAPUtil getColor:TAP_COLOR_ICON_PRIMARY];
+//            return [TAPUtil getColor:TAP_COLOR_ICON_PRIMARY];
+            return [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             break;
         }
         case TAPDefaultColorIconWhite:
@@ -2009,7 +2010,7 @@
         }
         case TAPComponentColorDefaultRightBubbleBackground:
         {
-            UIColor *color = [TAPUtil getColor:TAP_ORANGE_BUBBLE_BACKGROUND_COLOR];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
