@@ -295,6 +295,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (weak, nonatomic) id openedBubbleCell;
 
+// Textview mention loop index
+@property (nonatomic) NSInteger mentionLoopIndex;
+@property (nonatomic) NSInteger mentionCursorIndex;
+
 //DV Temp
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
 
@@ -1782,49 +1786,54 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSString *username = user.username;
         username = [TAPUtil nullToEmptyString:username];
     
-        NSString *trimmedMessageString = [TAPUtil stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:self.messageTextView.text];
-        NSRange lastSpaceRange = [self.messageTextView.text rangeOfString:@" @" options:NSBackwardsSearch];
-        NSRange lastNewLineRange = [self.messageTextView.text rangeOfString:@"\n@" options:NSBackwardsSearch];
+//        NSString *trimmedMessageString = [TAPUtil stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:self.messageTextView.text];
+//        NSRange lastSpaceRange = [self.messageTextView.text rangeOfString:@" @" options:NSBackwardsSearch];
+//        NSRange lastNewLineRange = [self.messageTextView.text rangeOfString:@"\n@" options:NSBackwardsSearch];
+//
+//        //Detect which one is the last word in sentence
+//        NSInteger lastStartIndex;
+//        if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location == NSNotFound) {
+//            //Not found space or new line
+//            lastStartIndex = -1;
+//        }
+//        else if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location != NSNotFound) {
+//            //Only found new line with following @ ("\n@")
+//            lastStartIndex = lastNewLineRange.location;
+//        }
+//        else if (lastSpaceRange.location != NSNotFound && lastNewLineRange.location == NSNotFound) {
+//            //Only found space with following @ (" @")
+//            lastStartIndex = lastSpaceRange.location;
+//        }
+//        else if (lastSpaceRange.location >= lastNewLineRange.location) {
+//            //Last word is separated by space
+//            lastStartIndex = lastSpaceRange.location;
+//        }
+//        else {
+//            //Last word is separated by newline
+//            lastStartIndex = lastNewLineRange.location;
+//        }
+//
+//        NSString *replacedString;
+//        NSArray *wordArray = [self.messageTextView.text componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+//        if ([wordArray count] > 1 && lastStartIndex != -1) {
+//            NSInteger totalReplacedWordLength = [trimmedMessageString length] - lastStartIndex;
+//            NSRange replacedRange = NSMakeRange(lastStartIndex, totalReplacedWordLength);
+//            replacedString = [trimmedMessageString stringByReplacingCharactersInRange:replacedRange withString:@""];
+//            //Adding space in the end of the username
+//            replacedString = [replacedString stringByAppendingString:[NSString stringWithFormat:@" @%@ ", username]];
+//        }
+//        else {
+//            //Adding space in the end of the username
+//            replacedString = [NSString stringWithFormat:@"@%@ ", username];
+//        }
+//        [self.messageTextView setText:replacedString];
         
-        //Detect which one is the last word in sentence
-        NSInteger lastStartIndex;
-        if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location == NSNotFound) {
-            //Not found space or new line
-            lastStartIndex = -1;
+        NSString *text = self.messageTextView.text;
+        if ([self.messageTextView.text length] >= self.mentionCursorIndex) {
+            // Append username to typed text
+            self.messageTextView.text = [self.messageTextView.text stringByReplacingCharactersInRange:NSMakeRange(self.mentionLoopIndex + 1, self.mentionCursorIndex - self.mentionLoopIndex - 1) withString:[NSString stringWithFormat:@"%@ ", username]];
+            [self showMentionListView:NO animated:YES];
         }
-        else if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location != NSNotFound) {
-            //Only found new line with following @ ("\n@")
-            lastStartIndex = lastNewLineRange.location;
-        }
-        else if (lastSpaceRange.location != NSNotFound && lastNewLineRange.location == NSNotFound) {
-            //Only found space with following @ (" @")
-            lastStartIndex = lastSpaceRange.location;
-        }
-        else if (lastSpaceRange.location >= lastNewLineRange.location) {
-            //Last word is separated by space
-            lastStartIndex = lastSpaceRange.location;
-        }
-        else {
-            //Last word is separated by newline
-            lastStartIndex = lastNewLineRange.location;
-        }
-        
-        NSString *replacedString;
-        NSArray *wordArray = [self.messageTextView.text componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        if ([wordArray count] > 1 && lastStartIndex != -1) {
-            NSInteger totalReplacedWordLength = [trimmedMessageString length] - lastStartIndex;
-            NSRange replacedRange = NSMakeRange(lastStartIndex, totalReplacedWordLength);
-            replacedString = [trimmedMessageString stringByReplacingCharactersInRange:replacedRange withString:@""];
-            //Adding space in the end of the username
-            replacedString = [replacedString stringByAppendingString:[NSString stringWithFormat:@" @%@ ", username]];
-        }
-        else {
-            //Adding space in the end of the username
-            replacedString = [NSString stringWithFormat:@"@%@ ", username];
-        }
-        
-        [self.messageTextView setText:replacedString];
-        [self showMentionListView:NO animated:YES];
     }
 }
 
@@ -4909,19 +4918,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         return;
     }
     
-    [self filterMentionListWithKeyword:selectedWord];
-    if ([self.filteredMentionListArray count] == 0) {
-        [self showMentionListView:NO animated:YES];
-        [self.mentionListTableView reloadData];
-    }
-    else {
-        if (self.mentionListTableView.alpha != 1.0f) {
-            [self showMentionListView:YES animated:YES];
-        }
-        
-        [self.mentionListTableView reloadData];
-        [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
-    }
+//    [self filterMentionListWithKeyword:selectedWord];
+//    if ([self.filteredMentionListArray count] == 0) {
+//        [self showMentionListView:NO animated:YES];
+//        [self.mentionListTableView reloadData];
+//    }
+//    else {
+//        if (self.mentionListTableView.alpha != 1.0f) {
+//            [self showMentionListView:YES animated:YES];
+//        }
+//
+//        [self.mentionListTableView reloadData];
+//        [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
+//    }
+    [self checkAndSearchUserMentionList:newText isErasing:isErasing];
 }
 
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
@@ -4933,6 +4943,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.inputMessageAccessoryView layoutIfNeeded];
         [self.view layoutIfNeeded];
     }];
+#ifdef DEBUG
+    NSLog(@">>>> growingTextViewShouldChangeHeight messageTextViewHeight: %f", height);
+    NSLog(@">>>> growingTextViewShouldChangeHeight messageViewHeightConstraint: %f", self.messageViewHeightConstraint.constant);
+#endif
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
@@ -7242,12 +7256,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     else {
         
+//        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+//            [self.quoteImageView setImageWithURLString:quote.imageURL];
+//        }
+//        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+//            [self.quoteImageView setImageWithURLString:quote.fileID];
+//        }
+        
         if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.imageURL];
         }
-        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+        if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
+        
         self.quoteFileView.alpha = 0.0f;
         self.quoteImageView.alpha = 1.0f;
     }
@@ -8981,56 +9003,56 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
-- (void)filterMentionListWithKeyword:(NSString *)keyword {
-    _filteredMentionListArray = [[NSMutableArray alloc] init];
-
-    if ([keyword length] == 0 || ![keyword hasPrefix:@"@"]) {
-        return;
-    }
-    
-    if ([keyword hasPrefix:@"@"] && [keyword length] != 1) {
-        keyword = [keyword substringFromIndex:1];
-    }
-    
-    
-    if ([keyword isEqualToString:@"@"]) {
-        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
-        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
-        self.filteredMentionListArray = [resultArray mutableCopy];
-    }
-    else {
-        
-        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
-        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
-        self.filteredMentionListArray = [resultArray mutableCopy];
-    }
-    
-    if ([self.filteredMentionListArray count] > 0) {
-        CGFloat tableViewHeight = 0.0f;
-        if ([self.filteredMentionListArray count] >= 4) {
-            tableViewHeight = 4 * 54.0f;
-        }
-        else {
-            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
-        }
-        
-        self.mentionListTableViewHeightConstraint.constant = tableViewHeight + 10.0f; //10.0f for table view header height
-        
-        self.mentionListTableView.clipsToBounds = YES;
-        self.mentionListTableView.layer.cornerRadius = 15.0f;
-        self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
-        
-        self.mentionTableBackgroundView.clipsToBounds = YES;
-        self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
-        self.mentionTableBackgroundView.layer.shadowRadius = 20.0f;
-        self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
-        self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-        self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
-        self.mentionTableBackgroundView.layer.masksToBounds = NO;
-    }
-}
+//- (void)filterMentionListWithKeyword:(NSString *)keyword {
+//    _filteredMentionListArray = [[NSMutableArray alloc] init];
+//
+//    if ([keyword length] == 0 || ![keyword hasPrefix:@"@"]) {
+//        return;
+//    }
+//
+//    if ([keyword hasPrefix:@"@"] && [keyword length] != 1) {
+//        keyword = [keyword substringFromIndex:1];
+//    }
+//
+//
+//    if ([keyword isEqualToString:@"@"]) {
+//        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+//        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
+//        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+//        self.filteredMentionListArray = [resultArray mutableCopy];
+//    }
+//    else {
+//
+//        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+//        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
+//        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+//        self.filteredMentionListArray = [resultArray mutableCopy];
+//    }
+//
+//    if ([self.filteredMentionListArray count] > 0) {
+//        CGFloat tableViewHeight = 0.0f;
+//        if ([self.filteredMentionListArray count] >= 4) {
+//            tableViewHeight = 4 * 54.0f;
+//        }
+//        else {
+//            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+//        }
+//
+//        self.mentionListTableViewHeightConstraint.constant = tableViewHeight + 10.0f; //10.0f for table view header height
+//
+//        self.mentionListTableView.clipsToBounds = YES;
+//        self.mentionListTableView.layer.cornerRadius = 15.0f;
+//        self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+//
+//        self.mentionTableBackgroundView.clipsToBounds = YES;
+//        self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
+//        self.mentionTableBackgroundView.layer.shadowRadius = 20.0f;
+//        self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+//        self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+//        self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
+//        self.mentionTableBackgroundView.layer.masksToBounds = NO;
+//    }
+//}
 
 - (void)showMentionListView:(BOOL)show animated:(BOOL)animated {
     if (![[TapUI sharedInstance] isMentionUsernameEnabled]) {
@@ -9041,11 +9063,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.mentionTableBackgroundView.alpha = 1.0f;
                 self.mentionListTableView.alpha = 1.0f;
+                [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
             }];
         }
         else {
             self.mentionTableBackgroundView.alpha = 1.0f;
             self.mentionListTableView.alpha = 1.0f;
+            [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
         }
     }
     else {
@@ -9059,7 +9083,67 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             self.mentionTableBackgroundView.alpha = 0.0f;
             self.mentionListTableView.alpha = 0.0f;
         }
+        _mentionLoopIndex = 0;
+        _mentionCursorIndex = 0;
     }
+    [self.mentionListTableView reloadData];
+}
+
+- (void)checkAndSearchUserMentionList:(NSString *)text isErasing:(BOOL)isErasing {
+    if (![[TapUI sharedInstance] isMentionUsernameEnabled] || [self.participantListDictionary count] == 0) {
+        [self showMentionListView:NO animated:YES];
+        [self.mentionListTableView reloadData];
+        return;
+    }
+    
+    if (![text containsString:@"@"]) {
+        // Return if text does not contain @
+        [self showMentionListView:NO animated:YES];
+        return;
+    }
+    
+    NSInteger cursorIndex = [self.messageTextView.textView selectedRange].location + 1 - (isErasing * 2);
+    NSInteger loopIndex = [self.messageTextView.textView selectedRange].location + 1 - (isErasing * 2);
+    
+    while (loopIndex > 0) {
+        // Loop text from cursor index to the left
+        loopIndex--;
+        char c = [text characterAtIndex:loopIndex];
+        if (c == ' ' || c == '\n') {
+            // Found space before @, return
+            [self showMentionListView:NO animated:YES];
+            return;
+        }
+        if (c == '@') {
+            // Found @, start searching user
+            if (cursorIndex - loopIndex <= 1) {
+//            if ([keyword length] == 0) {
+                // Show all participants
+                NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
+                NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+                self.filteredMentionListArray = [resultArray mutableCopy];
+            }
+            else {
+                // Search participants from keyword
+                NSString *keyword = [[text substringWithRange:NSMakeRange(loopIndex + 1, cursorIndex - loopIndex - 1)] lowercaseString];
+                NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
+                NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+                self.filteredMentionListArray = [resultArray mutableCopy];
+            }
+            if ([self.filteredMentionListArray count] > 0) {
+            [self showMentionListView:YES animated:YES];
+                _mentionLoopIndex = loopIndex;
+                _mentionCursorIndex = cursorIndex;
+            }
+            else {
+                [self showMentionListView:NO animated:YES];
+            }
+            return;
+        }
+    }
+    [self showMentionListView:NO animated:YES];
 }
 
 - (void)tapTalkUserMentionTappedWithRoom:(TAPRoomModel *)room

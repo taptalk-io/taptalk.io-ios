@@ -114,24 +114,27 @@
         case TAPDefaultFontItalic:
         {
             UIFont *font = [UIFont fontWithName:TAP_FONT_FAMILY_ITALIC size:[UIFont systemFontSize]];
-            return font;
-            break;
-        }
-        case TAPDefaultFontRegular:
-        {
-            UIFont *font = [UIFont fontWithName:TAP_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont italicSystemFontOfSize:[UIFont systemFontSize]];
+            }
             return font;
             break;
         }
         case TAPDefaultFontMedium:
         {
             UIFont *font = [UIFont fontWithName:TAP_FONT_FAMILY_MEDIUM size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont systemFontOfSize:[UIFont systemFontSize] weight:UIFontWeightMedium];
+            }
             return font;
             break;
         }
         case TAPDefaultFontBold:
         {
             UIFont *font = [UIFont fontWithName:TAP_FONT_FAMILY_BOLD size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+            }
             return font;
             break;
         }
@@ -139,6 +142,9 @@
         {
             //Set default font to prevent crash
             UIFont *font = [UIFont fontWithName:TAP_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+            }
             return font;
             break;
         }

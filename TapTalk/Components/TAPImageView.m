@@ -90,11 +90,15 @@
     }
     
     _imageURLString = urlString;
+    NSString *key = urlString;
+    if ([urlString hasPrefix:@"http"]) {
+        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    [imageCache diskImageExistsWithKey:urlString completion:^(BOOL isInCache) {
+    [imageCache diskImageExistsWithKey:key completion:^(BOOL isInCache) {
         if (isInCache) {
             //Image exist in disk, load from disk
-            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:urlString];
+            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:key];
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.image = savedImage;
                 

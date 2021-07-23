@@ -58,7 +58,7 @@
     if ([quote.imageURL isEqualToString:@""]) {
         quote.imageURL = [TAPUtil nullToEmptyString:[message.data objectForKey:@"fileURL"]];
     }
-    else if ([quote.imageURL isEqualToString:@""]) {
+    if ([quote.imageURL isEqualToString:@""]) {
         quote.imageURL = [TAPUtil nullToEmptyString:[message.data objectForKey:@"imageURL"]];
     }
     
