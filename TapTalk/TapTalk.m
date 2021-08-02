@@ -18,6 +18,7 @@
 @interface TapTalk () <TAPNotificationManagerDelegate>
 
 @property (nonatomic) TapTalkImplentationType implementationType;
+@property (nonatomic) BOOL isInitialized;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
 @property (strong, nonatomic) NSString *clientCustomUserAgent;
@@ -427,6 +428,17 @@
             appKeySecret:(NSString *_Nonnull)appKeySecret
             apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType {
+    
+    [self initWithAppKeyID:appKeyID appKeySecret:appKeySecret apiURLString:apiURLString implementationType:tapTalkImplementationType success:^{
+            
+    }];
+}
+
+- (void)initWithAppKeyID:(NSString *_Nonnull)appKeyID
+            appKeySecret:(NSString *_Nonnull)appKeySecret
+            apiURLString:(NSString *_Nonnull)apiURLString
+      implementationType:(TapTalkImplentationType)tapTalkImplementationType
+                 success:(void (^)(void))success {
         
     [[TAPNetworkManager sharedManager] setAppKeyWithID:appKeyID secret:appKeySecret];
     [[TAPAPIManager sharedManager] setBaseAPIURLString:apiURLString];
@@ -443,6 +455,14 @@
     
 //    //Validate and refresh access token
 //    [[TAPConnectionManager sharedManager] validateToken];
+    
+    _isInitialized = YES;
+    
+    success();
+}
+
+- (BOOL)checkTapTalkInitialized {
+    return self.isInitialized;
 }
 
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {

@@ -39,8 +39,8 @@
 
 - (void)initialization {
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    imageCache.config.maxDiskAge = kMaxDiskCountLimit;
-    imageCache.config.maxDiskSize = kMaxCacheAge;
+    imageCache.config.maxDiskAge = kMaxCacheAge;
+    imageCache.config.maxDiskSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheAge = kMaxCacheAge;
     
@@ -195,7 +195,14 @@
         [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (image == nil) {
-                    failure(receivedMessage);
+                    [[SDImageCache sharedImageCache] queryImageForKey:key options:nil context:nil cacheType:cacheType completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+                            if (image == nil) {
+                                failure(receivedMessage);
+                            }
+                            else {
+                                success(image, receivedMessage);
+                            }
+                    }];
                 }
                 else {
                     success(image, receivedMessage);

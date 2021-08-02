@@ -163,6 +163,12 @@
         return;
     }
     
+    NSString *accessToken = [TAPDataManager getAccessToken];
+
+    if (accessToken == nil || [accessToken isEqualToString:@""]) {
+        return;
+    }
+    
     _tapConnectionStatus = TAPConnectionManagerStatusTypeConnecting;
     _isShouldReconnect = kSocketAutomaticallyReconnect;
     
@@ -176,12 +182,6 @@
     
     _webSocket.delegate = nil;
     _webSocket = nil;
-    
-    NSString *accessToken = [TAPDataManager getAccessToken];
-
-    if (accessToken == nil || [accessToken isEqualToString:@""]) {
-        return;
-    }
     
     [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:^{
 #ifdef DEBUG
@@ -209,7 +209,9 @@
         webSocket.delegate = self;
         [webSocket open];
     } failure:^(NSError *error) {
-
+        if (self.tapConnectionStatus != TAPConnectionManagerStatusTypeConnected) {
+            _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
+        }
     }];
 }
 

@@ -57,7 +57,8 @@ static NSString * const kAPIVersionString = @"v1";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     else if (type == TAPAPIManagerTypeValidateAccessToken) {
-        NSString *formattedAPIBaseURL = [self.APIBaseURL stringByReplacingOccurrencesOfString:@"api" withString:@""];
+//        NSString *formattedAPIBaseURL = [self.APIBaseURL stringByReplacingOccurrencesOfString:@"api" withString:@""];
+        NSString *formattedAPIBaseURL = self.APIBaseURL;
         NSString *apiPath = @"/connect?check=1";
         return [NSString stringWithFormat:@"%@%@", formattedAPIBaseURL, apiPath];
     }

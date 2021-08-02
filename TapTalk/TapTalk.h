@@ -215,6 +215,14 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
             apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType;
 
+- (void)initWithAppKeyID:(NSString *_Nonnull)appKeyID
+            appKeySecret:(NSString *_Nonnull)appKeySecret
+            apiURLString:(NSString *_Nonnull)apiURLString
+      implementationType:(TapTalkImplentationType)tapTalkImplementationType
+                 success:(void (^)(void))success;
+
+- (BOOL)checkTapTalkInitialized;
+
 /**
  Obtain the implementation type of TapTalk.io set by user
  

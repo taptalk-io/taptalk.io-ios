@@ -662,7 +662,45 @@
         filePath = [downloadedFilePathPerRoomDictionary objectForKey:fileID];
     }
     
-    return filePath;
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return @"";
+    }
+    
+#ifdef DEBUG
+    // Remove scheme for simulator
+    if ([filePath hasPrefix:@"file://"]) {
+        filePath = [filePath stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+    }
+#endif
+    
+    NSArray<NSString *> *allDirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDir = [allDirs firstObject];
+    
+    NSRange obtainedApplicationRange = [documentsDir rangeOfString:@"/Application/"];
+    NSRange pathApplicationRange = [filePath rangeOfString:@"/Application/"];
+        
+    if ((obtainedApplicationRange.location > documentsDir.length && obtainedApplicationRange.length == 0) ||
+        (pathApplicationRange.location > filePath.length && pathApplicationRange.length == 0)
+    ) {
+        // Application directory not found, return file path as is
+        return filePath;
+    }
+    
+    // Fix file path due to changing directory after app is restarted
+    NSInteger uuidIndex = obtainedApplicationRange.location + obtainedApplicationRange.length;
+    
+    if (uuidIndex >= [documentsDir length]) {
+        return filePath;
+    }
+
+    NSString *currentUUID = [documentsDir substringFromIndex:obtainedApplicationRange.location + obtainedApplicationRange.length];
+        
+    currentUUID = [[currentUUID componentsSeparatedByString:@"/"] objectAtIndex:0];
+        
+    NSString *fixedPath = [filePath stringByReplacingCharactersInRange:NSMakeRange(pathApplicationRange.location + pathApplicationRange.length, currentUUID.length) withString:currentUUID];
+    fixedPath = [TAPUtil nullToEmptyString:fixedPath];
+    
+    return fixedPath;
 }
 
 - (void)fetchDownloadedFilePathFromPreference {
