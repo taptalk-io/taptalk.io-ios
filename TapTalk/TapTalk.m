@@ -625,6 +625,11 @@
     [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
     [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
+    
+    // Disconnect socket connection
+    [self disconnectWithCompletionHandler:^{
+        
+    }];
 }
 
 /**
