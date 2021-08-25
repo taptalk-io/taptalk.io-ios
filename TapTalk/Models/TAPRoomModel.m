@@ -80,6 +80,8 @@
     [encoder encodeObject:self.deleted forKey:@"deleted"];
     [encoder encodeObject:self.participants forKey:@"participants"];
     [encoder encodeObject:self.admins forKey:@"admins"];
+    [encoder encodeObject:self.unreadCount forKey:@"unreadCount"];
+    [encoder encodeObject:self.lockedTime forKey:@"lockedTime"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -96,6 +98,8 @@
         self.deleted = [decoder decodeObjectForKey:@"deleted"];
         self.participants = [decoder decodeObjectForKey:@"participants"];
         self.admins = [decoder decodeObjectForKey:@"admins"];
+        self.unreadCount = [decoder decodeObjectForKey:@"unreadCount"];
+        self.lockedTime = [decoder decodeObjectForKey:@"lockedTime"];
     }
     return self;
 }

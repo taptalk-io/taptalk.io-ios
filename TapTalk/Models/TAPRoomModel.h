@@ -27,7 +27,9 @@ typedef NS_ENUM(NSInteger, RoomType) {
 @property (nonatomic, strong) NSString *color;
 @property (nonatomic) BOOL isDeleted;
 @property (nonatomic) BOOL isLocked;
+@property (strong, nonatomic) NSNumber *unreadCount;
 @property (strong, nonatomic) NSNumber *deleted;
+@property (strong, nonatomic) NSNumber *lockedTime;
 @property (strong, nonatomic) NSArray <TAPUserModel *> *participants;
 @property (strong, nonatomic) NSArray *admins;
 

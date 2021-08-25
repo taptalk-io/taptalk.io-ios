@@ -113,8 +113,14 @@
     BOOL roomIsLocked = [[dictionary objectForKey:@"roomIsLocked"] boolValue];
     room.isLocked = roomIsLocked;
     
+    NSInteger roomUnreadCount = [[dictionary objectForKey:@"roomUnreadCount"] integerValue];
+    room.unreadCount = [NSNumber numberWithInteger:roomUnreadCount];
+
     NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
+
+    NSInteger roomLockedTime = [[dictionary objectForKey:@"roomLockedTime"] integerValue];
+    room.lockedTime = [NSNumber numberWithInteger:roomLockedTime];
     
     message.room = room;
     
@@ -203,6 +209,30 @@
     NSNumber *requireChangePassword = [dictionary objectForKey:@"requireChangePassword"];
     requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
     user.requireChangePassword = [requireChangePassword boolValue];
+    
+    NSNumber *isRequestPending = [dictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    user.isRequestPending = [isRequestPending boolValue];
+
+    NSNumber *isRequestAccepted = [dictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    user.isRequestAccepted = [isRequestAccepted boolValue];
+
+    NSNumber *isContact = [dictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    user.isContact = [isContact boolValue];
+
+    NSNumber *isOnline = [dictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    user.isOnline = [isOnline boolValue];
+
+    NSNumber *isEmailVerified = [dictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    user.isEmailVerified = [isEmailVerified boolValue];
+
+    NSNumber *isPhoneVerified = [dictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    user.isPhoneVerified = [isPhoneVerified boolValue];
     
     NSNumber *userCreated = [dictionary objectForKey:@"userCreated"];
     userCreated = [TAPUtil nullToEmptyNumber:userCreated];
@@ -363,8 +393,14 @@
     BOOL roomIsLocked = [[roomDictionary objectForKey:@"isLocked"] boolValue];
     room.isLocked = roomIsLocked;
     
+    NSInteger roomUnreadCount = [[roomDictionary objectForKey:@"unreadCount"] integerValue];
+    room.unreadCount = [NSNumber numberWithInteger:roomUnreadCount];
+
     NSInteger roomDeleted = [[roomDictionary objectForKey:@"deleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
+
+    NSInteger roomLockedTime = [[roomDictionary objectForKey:@"lockedTime"] integerValue];
+    room.lockedTime = [NSNumber numberWithInteger:roomLockedTime];
     
     message.room = room;
         
@@ -639,8 +675,33 @@
     lastActivity = [TAPUtil nullToEmptyNumber:lastActivity];
     user.lastActivity = lastActivity;
     
-    BOOL requireChangePassword = [[dictionary objectForKey:@"requireChangePassword"] boolValue];
-    user.requireChangePassword = requireChangePassword;
+    NSNumber *requireChangePassword = [dictionary objectForKey:@"requireChangePassword"];
+    requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
+    user.requireChangePassword = [requireChangePassword boolValue];
+
+    NSNumber *isRequestPending = [dictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    user.isRequestPending = [isRequestPending boolValue];
+
+    NSNumber *isRequestAccepted = [dictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    user.isRequestAccepted = [isRequestAccepted boolValue];
+
+    NSNumber *isContact = [dictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    user.isContact = [isContact boolValue];
+
+    NSNumber *isOnline = [dictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    user.isOnline = [isOnline boolValue];
+
+    NSNumber *isEmailVerified = [dictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    user.isEmailVerified = [isEmailVerified boolValue];
+
+    NSNumber *isPhoneVerified = [dictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    user.isPhoneVerified = [isPhoneVerified boolValue];
     
     NSNumber *created = [dictionary objectForKey:@"created"];
     created = [TAPUtil nullToEmptyNumber:created];
@@ -705,8 +766,14 @@
     BOOL roomIsLocked = [[dictionary objectForKey:@"roomIsLocked"] boolValue];
     room.isLocked = roomIsLocked;
     
+    NSInteger roomUnreadCount = [[dictionary objectForKey:@"roomUnreadCount"] integerValue];
+    room.unreadCount = [NSNumber numberWithInteger:roomUnreadCount];
+    
     NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
+
+    NSInteger roomLockedTime = [[dictionary objectForKey:@"roomLockedTime"] integerValue];
+    room.lockedTime = [NSNumber numberWithInteger:roomLockedTime];
     
     recentSearch.room = room;
     
@@ -962,9 +1029,17 @@
     roomIsLocked = [TAPUtil nullToEmptyNumber:roomIsLocked];
     [messageMutableDictionary setValue:roomIsLocked forKey:@"roomIsLocked"];
     
+    NSNumber *roomUnreadCount = [roomDicitonary objectForKey:@"unreadCount"];
+    roomUnreadCount = [TAPUtil nullToEmptyNumber:roomUnreadCount];
+    [messageMutableDictionary setValue:roomUnreadCount forKey:@"roomUnreadCount"];
+    
     NSNumber *roomDeleted = [roomDicitonary objectForKey:@"deleted"];
     roomDeleted = [TAPUtil nullToEmptyNumber:roomDeleted];
     [messageMutableDictionary setValue:roomDeleted forKey:@"roomDeleted"];
+
+    NSNumber *roomLockedTime = [roomDicitonary objectForKey:@"lockedTime"];
+    roomLockedTime = [TAPUtil nullToEmptyNumber:roomLockedTime];
+    [messageMutableDictionary setValue:roomLockedTime forKey:@"roomLockedTime"];
     
     [messageMutableDictionary removeObjectForKey:@"room"];
     
@@ -1008,6 +1083,30 @@
     NSNumber *requireChangePassword = [userDictionary objectForKey:@"requireChangePassword"];
     requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
     [messageMutableDictionary setValue:requireChangePassword forKey:@"requireChangePassword"];
+    
+    NSNumber *isRequestPending = [userDictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    [messageMutableDictionary setValue:isRequestPending forKey:@"isRequestPending"];
+
+    NSNumber *isRequestAccepted = [userDictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    [messageMutableDictionary setValue:isRequestAccepted forKey:@"isRequestAccepted"];
+
+    NSNumber *isContact = [userDictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    [messageMutableDictionary setValue:isContact forKey:@"isContact"];
+
+    NSNumber *isOnline = [userDictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    [messageMutableDictionary setValue:isOnline forKey:@"isOnline"];
+
+    NSNumber *isEmailVerified = [userDictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    [messageMutableDictionary setValue:isEmailVerified forKey:@"isEmailVerified"];
+
+    NSNumber *isPhoneVerified = [userDictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    [messageMutableDictionary setValue:isPhoneVerified forKey:@"isPhoneVerified"];
     
     NSNumber *userCreated = [userDictionary objectForKey:@"created"];
     userCreated = [TAPUtil nullToEmptyNumber:userCreated];
@@ -1191,6 +1290,30 @@
     NSNumber *requireChangePassword = [userDictionary objectForKey:@"requireChangePassword"];
     requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
     [userMutableDictionary setValue:requireChangePassword forKey:@"requireChangePassword"];
+    
+    NSNumber *isRequestPending = [userDictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    [userMutableDictionary setValue:isRequestPending forKey:@"isRequestPending"];
+
+    NSNumber *isRequestAccepted = [userDictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    [userMutableDictionary setValue:isRequestAccepted forKey:@"isRequestAccepted"];
+
+    NSNumber *isContact = [userDictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    [userMutableDictionary setValue:isContact forKey:@"isContact"];
+
+    NSNumber *isOnline = [userDictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    [userMutableDictionary setValue:isOnline forKey:@"isOnline"];
+
+    NSNumber *isEmailVerified = [userDictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    [userMutableDictionary setValue:isEmailVerified forKey:@"isEmailVerified"];
+
+    NSNumber *isPhoneVerified = [userDictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    [userMutableDictionary setValue:isPhoneVerified forKey:@"isPhoneVerified"];
     
     NSNumber *created = [userDictionary objectForKey:@"created"];
     created = [TAPUtil nullToEmptyNumber:created];

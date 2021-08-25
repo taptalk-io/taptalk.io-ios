@@ -35,5 +35,7 @@
 @property (nonatomic) BOOL isRequestAccepted;
 @property (nonatomic) BOOL isContact;
 @property (nonatomic) BOOL isOnline;
+@property (nonatomic) BOOL isEmailVerified;
+@property (nonatomic) BOOL isPhoneVerified;
 
 @end
