@@ -108,7 +108,7 @@
                 }];
             }
             else {
-                failure([NSError errorWithDomain:@"Image data not found." code:99999 userInfo:nil], message);
+                [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
             }
         }];
     }

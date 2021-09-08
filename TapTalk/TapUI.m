@@ -68,7 +68,7 @@
     self = [super init];
     
     if (self) {
-        _roomListViewController = [[TapUIRoomListViewController alloc] init];
+//        _roomListViewController = [[TapUIRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
     }
@@ -78,6 +78,9 @@
 
 #pragma mark - Property
 - (TapUIRoomListViewController *)roomListViewController {
+    if (_roomListViewController == nil) {
+        _roomListViewController = [[TapUIRoomListViewController alloc] init];
+    }
     return _roomListViewController;
 }
 
