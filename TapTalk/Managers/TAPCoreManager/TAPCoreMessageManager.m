@@ -120,8 +120,8 @@
         return;
     }
     
-    void (^handler)(CGFloat, CGFloat) = [blockTypeDictionary objectForKey:@"progressBlock"];
-    handler(progress, total);
+    void (^handler)(TAPMessageModel *, CGFloat, CGFloat) = [blockTypeDictionary objectForKey:@"progressBlock"];
+    handler(obtainedMessage, progress, total);
 }
 
 - (void)fileUploadManagerFailureNotification:(NSNotification *)notification {
@@ -220,7 +220,7 @@
                  caption:(nullable NSString *)caption
                     room:(TAPRoomModel *)room
                    start:(void (^)(TAPMessageModel *message))start
-                progress:(void (^)(CGFloat progress, CGFloat total))progress
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
                  failure:(void (^)(NSError *error))failure {
     NSString *captionString = @"";
@@ -241,7 +241,7 @@
         //Handle block to dictionary
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
         
-        void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+        void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
         [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
         
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
@@ -261,7 +261,7 @@
                  caption:(nullable NSString *)caption
                     room:(TAPRoomModel *)room
                    start:(void (^)(TAPMessageModel *message))start
-                progress:(void (^)(CGFloat progress, CGFloat total))progress
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
                  failure:(void (^)(NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
@@ -272,7 +272,7 @@
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure {
     NSString *captionString = @"";
@@ -292,7 +292,7 @@
     [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption room:room successGenerateMessage:^(TAPMessageModel *message) {
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
         
-        void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+        void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
         [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
         
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
@@ -312,7 +312,7 @@
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
@@ -323,7 +323,7 @@
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure {
     NSString *captionString = @"";
@@ -362,7 +362,7 @@
                             //Handle block to dictionary
                             NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
                             
-                            void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+                            void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
                             [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
                             
                             void (^handlerSuccess)(TAPMessageModel *) = [success copy];
@@ -387,7 +387,7 @@
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
@@ -398,7 +398,7 @@
                                   caption:(nullable NSString *)caption
                                      room:(TAPRoomModel *)room
                                     start:(void (^)(TAPMessageModel *message))start
-                                 progress:(void (^)(CGFloat progress, CGFloat total))progress
+                                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                                   success:(void (^)(TAPMessageModel *message))success
                                   failure:(void (^)(NSError *error))failure {
     NSString *captionString = @"";
@@ -439,7 +439,7 @@
             //Handle block to dictionary
             NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
             
-            void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+            void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
             [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
             
             void (^handlerSuccess)(TAPMessageModel *) = [success copy];
@@ -455,10 +455,23 @@
     });
 }
 
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                            quotedMessage:(TAPMessageModel *)quotedMessage
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                                    start:(void (^)(TAPMessageModel *message))start
+                                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                                  success:(void (^)(TAPMessageModel *message))success
+                                  failure:(void (^)(NSError *error))failure {
+    
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    [self sendVideoMessageWithVideoAssetURL:videoAssetURL caption:caption room:room start:start progress:progress success:success failure:failure];
+}
+
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start
-                          progress:(void (^)(CGFloat progress, CGFloat total))progress
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(NSError *error))failure {
     NSError *error = nil;
@@ -499,7 +512,7 @@
             [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
                 NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
                 
-                void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+                void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
                 [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
                 
                 void (^handlerSuccess)(TAPMessageModel *) = [success copy];
@@ -520,7 +533,7 @@
                      quotedMessage:(TAPMessageModel *)quotedMessage
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start
-                          progress:(void (^)(CGFloat progress, CGFloat total))progress
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
@@ -530,7 +543,7 @@
 - (void)sendForwardedMessage:(TAPMessageModel *)messageToForward
                         room:(TAPRoomModel *)room
                        start:(void (^)(TAPMessageModel *message))start
-                    progress:(void (^)(CGFloat progress, CGFloat total))progress
+                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                      success:(void (^)(TAPMessageModel *message))success
                      failure:(void (^)(NSError *error))failure {
     if (messageToForward.type == TAPChatMessageTypeFile || messageToForward.type == TAPChatMessageTypeVideo) {
@@ -712,14 +725,14 @@
 
 - (void)downloadMessageFile:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
-                   progress:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                   progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                     success:(void (^)(NSData *fileData))successBlock
                     failure:(void (^)(NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeFile) {
         [[TAPFileDownloadManager sharedManager] receiveFileDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
-            progressBlock(progress, total);
+            progressBlock(receivedMessage, progress, total);
         } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
             successBlock(fileData);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
@@ -735,14 +748,14 @@
 
 - (void)downloadMessageImage:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
-                   progress:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                   progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                     success:(void (^)(NSData *fileData))successBlock
                     failure:(void (^)(NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeImage) {
         [[TAPFileDownloadManager sharedManager] receiveImageDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
-            progressBlock(progress, total);
+            progressBlock(receivedMessage, progress, total);
         } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
             successBlock(fullImage);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
@@ -758,14 +771,14 @@
 
 - (void)downloadMessageVideo:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
-                    progress:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                      success:(void (^)(NSData *fileData))successBlock
                      failure:(void (^)(NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeVideo) {
         [[TAPFileDownloadManager sharedManager] receiveVideoDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
-            progressBlock(progress, total);
+            progressBlock(receivedMessage, progress, total);
         } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
             successBlock(fileData);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {

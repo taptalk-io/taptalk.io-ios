@@ -102,38 +102,42 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
         return nil;
     }
     
-    NSString *substringLocalID = [localID substringWithRange:NSMakeRange(8, 16)];
-    NSMutableString *reversedSubstringLocalID = [NSMutableString string];
-    NSInteger charIndex = [substringLocalID length];
-    while (charIndex > 0) {
-        charIndex--;
-        NSRange subStrRange = NSMakeRange(charIndex, 1);
-        [reversedSubstringLocalID appendString:[substringLocalID substringWithRange:subStrRange]];
-    }
-    
-    //password is generated based on 16 first characters of kKeyPasswordEncryptor + reversedSubstringLocalID
-    NSString *substringKeyPassword = [kKeyPasswordEncryptor substringWithRange:NSMakeRange(0, 16)];
-    NSString *password = [NSString stringWithFormat:@"%@%@", substringKeyPassword, reversedSubstringLocalID];
-    
-    NSString *encryptedStringWithSalt = encryptedString;
-    NSInteger encryptedStringLength = [encryptedStringWithSalt length] - 2; //-2 for removing random number and salt character
-    
-    NSString *randomNumberString = [encryptedStringWithSalt substringWithRange:NSMakeRange(0, 1)];
-    NSInteger randomNumber = [randomNumberString integerValue];
-    NSInteger saltCharIndexPosition = (((encryptedStringLength + randomNumber) * randomNumber) % encryptedStringLength);
-    
-    NSString *encryptedStringModified = [encryptedStringWithSalt stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
-    //CS NOTE - check if index position exist in range to  prevent crash
-    if (saltCharIndexPosition < [encryptedStringModified length]) {
-        encryptedStringModified = [encryptedStringModified stringByReplacingCharactersInRange:NSMakeRange(saltCharIndexPosition, 1) withString:@""];
-    }
-    else {
+    @try {
+        NSString *substringLocalID = [localID substringWithRange:NSMakeRange(8, 16)];
+        NSMutableString *reversedSubstringLocalID = [NSMutableString string];
+        NSInteger charIndex = [substringLocalID length];
+        while (charIndex > 0) {
+            charIndex--;
+            NSRange subStrRange = NSMakeRange(charIndex, 1);
+            [reversedSubstringLocalID appendString:[substringLocalID substringWithRange:subStrRange]];
+        }
+        
+        //password is generated based on 16 first characters of kKeyPasswordEncryptor + reversedSubstringLocalID
+        NSString *substringKeyPassword = [kKeyPasswordEncryptor substringWithRange:NSMakeRange(0, 16)];
+        NSString *password = [NSString stringWithFormat:@"%@%@", substringKeyPassword, reversedSubstringLocalID];
+        
+        NSString *encryptedStringWithSalt = encryptedString;
+        NSInteger encryptedStringLength = [encryptedStringWithSalt length] - 2; //-2 for removing random number and salt character
+        
+        NSString *randomNumberString = [encryptedStringWithSalt substringWithRange:NSMakeRange(0, 1)];
+        NSInteger randomNumber = [randomNumberString integerValue];
+        NSInteger saltCharIndexPosition = (((encryptedStringLength + randomNumber) * randomNumber) % encryptedStringLength);
+        
+        NSString *encryptedStringModified = [encryptedStringWithSalt stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
+        //CS NOTE - check if index position exist in range to  prevent crash
+        if (saltCharIndexPosition < [encryptedStringModified length]) {
+            encryptedStringModified = [encryptedStringModified stringByReplacingCharactersInRange:NSMakeRange(saltCharIndexPosition, 1) withString:@""];
+        }
+        else {
+            return nil;
+        }
+        
+        NSString *decryptedString = [AESCrypt decrypt:encryptedStringModified password:password];
+        
+        return decryptedString;
+    } @catch (NSException *exception) {
         return nil;
     }
-    
-    NSString *decryptedString = [AESCrypt decrypt:encryptedStringModified password:password];
-    
-    return decryptedString;
 }
 
 + (NSDictionary *)encryptToDictionaryFromMessageModel:(TAPMessageModel *)message {

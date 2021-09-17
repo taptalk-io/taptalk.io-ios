@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
                  caption:(nullable NSString *)caption
                     room:(TAPRoomModel *)room
                    start:(void (^)(TAPMessageModel *message))start
-                progress:(void (^)(CGFloat progress, CGFloat total))progress
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
                  failure:(void (^)(NSError *error))failure;
 - (void)sendImageMessage:(UIImage *)image
@@ -61,14 +61,14 @@ NS_ASSUME_NONNULL_BEGIN
                  caption:(nullable NSString *)caption
                     room:(TAPRoomModel *)room
                    start:(void (^)(TAPMessageModel *message))start
-                progress:(void (^)(CGFloat progress, CGFloat total))progress
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
                  failure:(void (^)(NSError *error))failure;
 - (void)sendImageMessageWithAsset:(PHAsset *)asset
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure;
 - (void)sendImageMessageWithAsset:(PHAsset *)asset
@@ -76,14 +76,14 @@ NS_ASSUME_NONNULL_BEGIN
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure;
 - (void)sendVideoMessageWithAsset:(PHAsset *)asset
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure;
 - (void)sendVideoMessageWithAsset:(PHAsset *)asset
@@ -91,7 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
                             start:(void (^)(TAPMessageModel *message))start
-                         progress:(void (^)(CGFloat progress, CGFloat total))progress
+                         progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure;
 /**
@@ -103,26 +103,34 @@ NS_ASSUME_NONNULL_BEGIN
                                   caption:(nullable NSString *)caption
                                      room:(TAPRoomModel *)room
                                     start:(void (^)(TAPMessageModel *message))start
-                                 progress:(void (^)(CGFloat progress, CGFloat total))progress
+                                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                                  success:(void (^)(TAPMessageModel *message))success
+                                  failure:(void (^)(NSError *error))failure;
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                            quotedMessage:(TAPMessageModel *)quotedMessage
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                                    start:(void (^)(TAPMessageModel *message))start
+                                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                                   success:(void (^)(TAPMessageModel *message))success
                                   failure:(void (^)(NSError *error))failure;
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start
-                          progress:(void (^)(CGFloat progress, CGFloat total))progress
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(NSError *error))failure;
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                      quotedMessage:(TAPMessageModel *)quotedMessage
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start
-                          progress:(void (^)(CGFloat progress, CGFloat total))progress
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(NSError *error))failure;
 - (void)sendForwardedMessage:(TAPMessageModel *)messageToForward
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start
-                          progress:(void (^)(CGFloat progress, CGFloat total))progress
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(NSError *error))failure;
 - (TAPMessageModel *)constructTapTalkMessageModelWithRoom:(TAPRoomModel *)room
@@ -166,17 +174,17 @@ NS_ASSUME_NONNULL_BEGIN
                         failure:(void (^)(NSError *error))failure;
 - (void)downloadMessageFile:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
-                   progress:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                   progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                     success:(void (^)(NSData *fileData))successBlock
                     failure:(void (^)(NSError *error))failureBlock;
 - (void)downloadMessageImage:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
-                    progress:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                      success:(void (^)(UIImage *fullImage))successBlock
                      failure:(void (^)(NSError *error))failureBlock;
 - (void)downloadMessageVideo:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
-                    progress:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                      success:(void (^)(NSData *fileData))successBlock
                      failure:(void (^)(NSError *error))failureBlock;
 - (void)cancelMessageFileDownload:(TAPMessageModel *)message
