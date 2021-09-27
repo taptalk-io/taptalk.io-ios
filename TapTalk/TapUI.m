@@ -13,6 +13,7 @@
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 @property (nonatomic) BOOL isDisableActivateInAppNotification;
+@property (nonatomic) BOOL isChangeProfilePictureButtonHidden;
 @property (nonatomic) BOOL isLogoutButtonVisible;
 @property (nonatomic) BOOL isSearchBarRoomListViewHidden;
 @property (nonatomic) BOOL isLeftBarItemRoomListViewHidden;
@@ -342,6 +343,22 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
     success(chatViewController);
+}
+
+/**
+Show or hide change profile picture button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setChangeProfilePictureButtonVisible:(BOOL)isVisible {
+    _isChangeProfilePictureButtonHidden = !isVisible;
+}
+
+/**
+Get current visibility state of change profile picture button
+*/
+- (BOOL)getChangeProfilePictureButtonVisibleState {
+    return !self.isChangeProfilePictureButtonHidden;
 }
 
 /**

@@ -60,10 +60,13 @@
     self.myAccountView.emailTextField.delegate = self;
     self.myAccountView.continueButtonView.delegate = self;
     
-    [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
+    if ([[TapUI sharedInstance] getChangeProfilePictureButtonVisibleState]) {
+        [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
+
     if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
         //Handle only when logout is visible
         [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];

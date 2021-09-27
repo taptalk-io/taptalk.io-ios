@@ -726,69 +726,69 @@
 - (void)downloadMessageFile:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                    success:(void (^)(NSData *fileData))successBlock
-                    failure:(void (^)(NSError *error))failureBlock {
+                    success:(void (^)(TAPMessageModel *message, NSData *fileData, NSString *filePath))successBlock
+                    failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeFile) {
         [[TAPFileDownloadManager sharedManager] receiveFileDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
             progressBlock(receivedMessage, progress, total);
-        } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
-            successBlock(fileData);
+        } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
+            successBlock(receivedMessage, fileData, filePath);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-            failureBlock(localizedError);
+            failureBlock(receivedMessage, localizedError);
         }];
     }
     else {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90305 errorMessage:@"Invalid message type. Allowed type is file (1004)"];
-        failureBlock(localizedError);
+        failureBlock(message, localizedError);
     }
 }
 
 - (void)downloadMessageImage:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                    success:(void (^)(NSData *fileData))successBlock
-                    failure:(void (^)(NSError *error))failureBlock {
+                    success:(void (^)(TAPMessageModel *message, UIImage *fullImage))successBlock
+                    failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeImage) {
         [[TAPFileDownloadManager sharedManager] receiveImageDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
             progressBlock(receivedMessage, progress, total);
         } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
-            successBlock(fullImage);
+            successBlock(receivedMessage, fullImage);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-            failureBlock(localizedError);
+            failureBlock(receivedMessage, localizedError);
         }];
     }
     else {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90305 errorMessage:@"Invalid message type. Allowed type is image (1002)"];
-        failureBlock(localizedError);
+        failureBlock(message, localizedError);
     }
 }
 
 - (void)downloadMessageVideo:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                     success:(void (^)(NSData *fileData))successBlock
-                     failure:(void (^)(NSError *error))failureBlock {
+                     success:(void (^)(TAPMessageModel *message, NSData *fileData, NSString *filePath))successBlock
+                     failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeVideo) {
         [[TAPFileDownloadManager sharedManager] receiveVideoDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
             progressBlock(receivedMessage, progress, total);
-        } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
-            successBlock(fileData);
+        } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
+            successBlock(receivedMessage, fileData, filePath);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-            failureBlock(localizedError);
+            failureBlock(receivedMessage, localizedError);
         }];
     }
     else {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90305 errorMessage:@"Invalid message type. Allowed type is video (1003)"];
-        failureBlock(localizedError);
+        failureBlock(message, localizedError);
     }
 }
 

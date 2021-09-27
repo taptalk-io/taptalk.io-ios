@@ -236,7 +236,7 @@
 - (void)receiveFileDataWithMessage:(TAPMessageModel *)message
                              start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                           progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                           success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                           success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage, NSString *filePath))success
                            failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
     NSDictionary *currentDataDictionary = message.data;
     NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
@@ -281,7 +281,7 @@
             NSData *downloadedData = [NSData dataWithContentsOfURL:filePath];
             if (downloadedData != nil) {
                 NSString *key = [[currentFileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-                [self saveDownloadedData:downloadedData andThumbnailWithKey:key message:message success:success failure:failure];
+                [self saveDownloadedData:downloadedData andThumbnailWithKey:key message:message success:success];
             }
             else {
                 [self handleFileDownloadError:error message:message];
@@ -298,8 +298,7 @@
         [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
                                                roomID:message.room.roomID
         completionBlock:^(NSData *downloadedData) {
-            [self saveDownloadedData:downloadedData message:message key:currentFileID];
-            success(downloadedData, message);
+            [self saveDownloadedData:downloadedData message:message key:currentFileID success:success];
         }
         progressBlock:^(CGFloat progress, CGFloat total) {
             [self updateDownloadProgress:progress total:total message:message];
@@ -315,7 +314,7 @@
 - (void)receiveVideoDataWithMessage:(TAPMessageModel *)message
                               start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                            success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                            success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage, NSString *filePath))success
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
         
     NSDictionary *currentDataDictionary = message.data;
@@ -361,7 +360,7 @@
             NSData *downloadedData = [NSData dataWithContentsOfURL:filePath];
             if (downloadedData != nil) {
                 NSString *key = [[currentFileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-                [self saveDownloadedData:downloadedData andThumbnailWithKey:key message:message success:success failure:failure];
+                [self saveDownloadedData:downloadedData andThumbnailWithKey:key message:message success:success];
             }
             else {
                 [self handleFileDownloadError:error message:message];
@@ -378,7 +377,7 @@
         [TAPDataManager callAPIDownloadFileWithFileID:currentFileID
                                                roomID:message.room.roomID
         completionBlock:^(NSData *downloadedData) {
-            [self saveDownloadedData:downloadedData andThumbnailWithKey:currentFileID message:message success:success failure:failure];
+            [self saveDownloadedData:downloadedData andThumbnailWithKey:currentFileID message:message success:success];
         }
         progressBlock:^(CGFloat progress, CGFloat total) {
             [self updateDownloadProgress:progress total:total message:message];
@@ -421,7 +420,8 @@
 
 - (void)saveDownloadedData:(NSData *)data
                    message:(TAPMessageModel *)message
-                       key:(NSString *)key {
+                       key:(NSString *)key
+                   success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage, NSString *filePath))success {
     
     // Save file message data
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -459,10 +459,13 @@
     
     [data writeToFile:destinationFileString atomically:YES];
 
+    // TODO: ADD FILE PATH SUCCESS CALLBACK (?)
     [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:key];
      [self.failedDownloadDictionary removeObjectForKey:message.localID];
     
     [self.downloadProgressDictionary removeObjectForKey:message.localID];
+    
+    success(data, message, [self getDownloadedFilePathWithRoomID:message.room.roomID fileID:key]);
     
     CGFloat progress = 1.0f;
     CGFloat total = 1.0f;
@@ -477,8 +480,7 @@
 - (void)saveDownloadedData:(NSData *)data
        andThumbnailWithKey:(NSString *)key
                    message:(TAPMessageModel *)message
-                   success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
-                   failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+                   success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage, NSString *filePath))success {
     
     // Save video message data
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -528,7 +530,7 @@
             [TAPImageView saveImageToCache:thumbnailVideoImage withKey:key];
         }
  
-        success(data, message);
+        success(data, message, [self getDownloadedFilePathWithRoomID:message.room.roomID fileID:key]);
         
         [self.downloadProgressDictionary removeObjectForKey:message.localID];
         
@@ -637,7 +639,7 @@
     if (self.downloadedFilePathDictionary == nil) {
         self.downloadedFilePathDictionary = [[NSMutableDictionary alloc] init];
     }
-    
+        
     NSMutableDictionary *downloadedFilePathPerRoomDictionary = [[self.downloadedFilePathDictionary objectForKey:roomID] mutableCopy];
     
     if (downloadedFilePathPerRoomDictionary == nil || [downloadedFilePathPerRoomDictionary count] == 0) {

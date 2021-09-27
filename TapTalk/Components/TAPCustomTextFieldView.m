@@ -235,6 +235,7 @@
         placeholderString = NSLocalizedStringFromTableInBundle(@"e.g Bernama", nil, [TAPUtil currentBundle], @"");
         self.textField.placeholder = placeholderString;
         
+        self.textField.alpha = 0.4f;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
@@ -261,6 +262,7 @@
         self.textField.placeholder = placeholderString;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        self.textField.alpha = 0.4f;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
@@ -294,6 +296,7 @@
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         placeholderString = NSLocalizedStringFromTableInBundle(@"e.g example@work.com", nil, [TAPUtil currentBundle], @"");
         self.textField.placeholder = placeholderString;
+        self.textField.alpha = 0.4f;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];

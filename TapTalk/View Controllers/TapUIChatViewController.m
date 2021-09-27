@@ -6462,7 +6462,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Already Handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
-    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
         //Already Handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
@@ -6474,7 +6474,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Already Handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
-    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
         //Already Handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification

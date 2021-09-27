@@ -210,6 +210,13 @@
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMinY(self.emailTextField.frame), CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         [self.scrollView addSubview:self.emailTextField];
 
+        if (![[TapUI sharedInstance] getChangeProfilePictureButtonVisibleState]) {
+            self.changeIconImageView.alpha = 0.0f;
+            self.changeLabel.alpha = 0.0f;
+            self.changeProfilePictureButton.alpha = 0.0f;
+            self.removeProfilePictureButton.alpha = 0.0f;
+        }
+
         if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
             _logoutView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 50.0f)];
             self.logoutView.alpha = 1.0f;

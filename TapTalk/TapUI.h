@@ -256,6 +256,18 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 //                      My Account View
 //==========================================================
 /**
+Show or hide change profile picture button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setChangeProfilePictureButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of change profile picture button
+*/
+- (BOOL)getChangeProfilePictureButtonVisibleState;
+
+/**
 Show or hide logout button in MyAccount view
  
 @param isVisible (BOOL) boolean to indicating is visible or not

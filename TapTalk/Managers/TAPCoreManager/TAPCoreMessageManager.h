@@ -175,18 +175,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)downloadMessageFile:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                    success:(void (^)(NSData *fileData))successBlock
-                    failure:(void (^)(NSError *error))failureBlock;
+                    success:(void (^)(TAPMessageModel *message, NSData *fileData, NSString *filePath))successBlock
+                    failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock;
 - (void)downloadMessageImage:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                     success:(void (^)(UIImage *fullImage))successBlock
-                     failure:(void (^)(NSError *error))failureBlock;
+                     success:(void (^)(TAPMessageModel *message, UIImage *fullImage))successBlock
+                     failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock;
 - (void)downloadMessageVideo:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                     success:(void (^)(NSData *fileData))successBlock
-                     failure:(void (^)(NSError *error))failureBlock;
+                     success:(void (^)(TAPMessageModel *message, NSData *fileData, NSString *filePath))successBlock
+                     failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock;
 - (void)cancelMessageFileDownload:(TAPMessageModel *)message
                           success:(void (^)(void))success
                           failure:(void (^)(NSError *error))failure;

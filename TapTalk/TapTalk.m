@@ -566,10 +566,16 @@
         [[TapTalk sharedInstance] clearAllTapTalkData];
         [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
         }];
+        if ([self.delegate respondsToSelector:@selector(userLogout)]) {
+            [self.delegate userLogout];
+        }
     } failure:^(NSError *error) {
         [[TapTalk sharedInstance] clearAllTapTalkData];
         [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
         }];
+        if ([self.delegate respondsToSelector:@selector(userLogout)]) {
+            [self.delegate userLogout];
+        }
     }];
 }
 
