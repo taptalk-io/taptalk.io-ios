@@ -319,6 +319,30 @@
     [self sendImageMessageWithAsset:asset caption:caption room:room start:start progress:progress success:success failure:failure];
 }
 
+- (void)sendImageMessageWithURL:(NSURL *)imageURL
+                        caption:(nullable NSString *)caption
+                           room:(TAPRoomModel *)room
+                          start:(void (^)(TAPMessageModel *message))start
+                       progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                        success:(void (^)(TAPMessageModel *message))success
+                        failure:(void (^)(NSError *error))failure {
+    UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageURL]];
+    [self sendImageMessage:image caption:caption room:room start:start progress:progress success:success failure:failure];
+}
+
+- (void)sendImageMessageWithURL:(NSURL *)imageURL
+                  quotedMessage:(TAPMessageModel *)quotedMessage
+                        caption:(nullable NSString *)caption
+                           room:(TAPRoomModel *)room
+                          start:(void (^)(TAPMessageModel *message))start
+                       progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                        success:(void (^)(TAPMessageModel *message))success
+                        failure:(void (^)(NSError *error))failure {
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageURL]];
+    [self sendImageMessage:image caption:caption room:room start:start progress:progress success:success failure:failure];
+}
+
 - (void)sendVideoMessageWithAsset:(PHAsset *)asset
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room

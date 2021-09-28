@@ -79,6 +79,21 @@ NS_ASSUME_NONNULL_BEGIN
                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(NSError *error))failure;
+- (void)sendImageMessageWithURL:(NSURL *)imageURL
+                        caption:(nullable NSString *)caption
+                           room:(TAPRoomModel *)room
+                          start:(void (^)(TAPMessageModel *message))start
+                       progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                        success:(void (^)(TAPMessageModel *message))success
+                        failure:(void (^)(NSError *error))failure;
+- (void)sendImageMessageWithURL:(NSURL *)imageURL
+                  quotedMessage:(TAPMessageModel *)quotedMessage
+                        caption:(nullable NSString *)caption
+                           room:(TAPRoomModel *)room
+                          start:(void (^)(TAPMessageModel *message))start
+                       progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                        success:(void (^)(TAPMessageModel *message))success
+                        failure:(void (^)(NSError *error))failure;
 - (void)sendVideoMessageWithAsset:(PHAsset *)asset
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
