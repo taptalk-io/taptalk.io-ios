@@ -59,6 +59,7 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)addContactWithUserModel:(TAPUserModel *)user saveToDatabase:(BOOL)save saveActiveUser:(BOOL)saveActiveUser {
     TAPUserModel *savedUser = [self.contactUserDictionary objectForKey:user.userID];
     if(savedUser != nil && savedUser.isContact) {
@@ -222,6 +223,27 @@
     [self.phoneUserDictionary removeAllObjects];
     self.userCountryCode = @"";
     _contactSyncPermissionAsked = NO;
+}
+
+- (void)removeFromContactsWithUserID:(NSString *)userID {
+    if (userID == nil || [userID isEqualToString:@""]) {
+        return;
+    }
+    TAPUserModel *user = [self.contactUserDictionary objectForKey:userID];
+    if (user == nil) {
+        return;
+    }
+    //Set isContact to NO
+    user.isContact = NO;
+    //Update dictionary
+    [self.contactUserDictionary setObject:user forKey:userID];
+    [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
+    //Update database
+    [TAPDataManager updateOrInsertDatabaseContactWithData:@[user] success:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
 }
 
 @end

@@ -923,7 +923,8 @@
 
 - (void)receiveContactUpdatedFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:dataDictionary error:nil];
-    [[TAPContactCacheManager sharedManager] shouldUpdateUserWithData:user isTriggerDelegate:YES];
+//    [[TAPContactCacheManager sharedManager] shouldUpdateUserWithData:user isTriggerDelegate:YES];
+    [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
 }
 
 - (void)receiveOnlineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {

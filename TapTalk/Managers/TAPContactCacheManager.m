@@ -107,7 +107,14 @@
 }
 
 - (void)removeFromContactsWithUserID:(NSString *)userID {
+    if (userID == nil || [userID isEqualToString:@""]) {
+        return;
+    }
     TAPUserModel *user = [self.contactDictionary objectForKey:userID];
+    // FIXME: contactDictionary is always EMPTY
+    if (user == nil) {
+        return;
+    }
     //Set isContact to NO
     user.isContact = NO;
     //Update dictionary

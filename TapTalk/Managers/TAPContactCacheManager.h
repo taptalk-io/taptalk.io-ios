@@ -6,6 +6,10 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
+/**
+ * NOTE 2021/09/30: UNUSED MANAGER
+ */
+
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN

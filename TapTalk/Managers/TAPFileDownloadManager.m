@@ -261,6 +261,10 @@
 
         NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request
         progress:^(NSProgress * _Nonnull downloadProgress) {
+            if ([self.urlDownloadTaskDictionary objectForKey:message.localID] == nil) {
+                // Download was cancelled
+                return;
+            }
             progressBlock(downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, message);
             [self updateDownloadProgress:downloadProgress.completedUnitCount total:downloadProgress.totalUnitCount message:message];
         }
@@ -273,6 +277,13 @@
             return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
         }
         completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            if ([self.urlDownloadTaskDictionary objectForKey:message.localID] == nil) {
+                // Download was cancelled
+                NSError *error = [NSError errorWithDomain:@"Download was cancelled" code:90308 userInfo:nil];
+                [self handleFileDownloadError:error message:message];
+                failure(error, message);
+                return;
+            }
             if (error != nil) {
                 [self handleFileDownloadError:error message:message];
                 failure(error, message);
@@ -340,6 +351,10 @@
 
         NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request
         progress:^(NSProgress * _Nonnull downloadProgress) {
+            if ([self.urlDownloadTaskDictionary objectForKey:message.localID] == nil) {
+                // Download was cancelled
+                return;
+            }
             progressBlock(downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, message);
             [self updateDownloadProgress:downloadProgress.completedUnitCount total:downloadProgress.totalUnitCount message:message];
         }
@@ -352,6 +367,13 @@
             return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
         }
         completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            if ([self.urlDownloadTaskDictionary objectForKey:message.localID] == nil) {
+                // Download was cancelled
+                NSError *error = [NSError errorWithDomain:@"Download was cancelled" code:90308 userInfo:nil];
+                [self handleFileDownloadError:error message:message];
+                failure(error, message);
+                return;
+            }
             if (error != nil) {
                 [self handleFileDownloadError:error message:message];
                 failure(error, message);
@@ -731,7 +753,7 @@
     // Cancel url download
     NSURLSessionDownloadTask *downloadTask = [self.urlDownloadTaskDictionary objectForKey:message.localID];
     if (downloadTask != nil) {
-        [downloadTask cancel];
+        [downloadTask cancel]; // FIXME: CANCEL DOWNLOAD TASK NOT WORKING
         [self.urlDownloadTaskDictionary removeObjectForKey:message.localID];
     }
 }

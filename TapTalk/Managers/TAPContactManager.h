@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)getUserCountryCode;
 - (BOOL)checkUserExistWithPhoneNumber:(NSString *)phoneNumberWithCode;
 - (void)clearContactManagerData;
+- (void)removeFromContactsWithUserID:(NSString *)userID;
 
 @end
 

@@ -113,7 +113,7 @@
                                     success:(void (^)(NSString *successMessage))success
                                     failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIRemoveContactWithUserID:userID success:^(NSString *message) {
-        [[TAPContactCacheManager sharedManager] removeFromContactsWithUserID:userID];
+        [[TAPContactManager sharedManager] removeFromContactsWithUserID:userID];
         success(message);
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];

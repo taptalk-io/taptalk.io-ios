@@ -824,19 +824,8 @@
         failure(localizedError);
     }
     
-    //Cancel uploading task
-    [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
-    
-    //Remove from WaitingUploadDictionary in ChatManager
-    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
-    
-    //Remove message from database
-    [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
-        success();
-    } failure:^(NSError *error) {
-        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-        failure(localizedError);
-    }];
+    [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:message];
+    success;
 }
 
 - (void)markMessageAsRead:(TAPMessageModel *)message {

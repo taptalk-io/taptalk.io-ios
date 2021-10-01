@@ -615,10 +615,11 @@
         [self dismissViewControllerAnimated:NO completion:nil];
         [self.myAccountView showLogoutLoadingView:NO];
         
-        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
-            [tapTalkDelegate userLogout];
-        }
+        // KR NOTE: USER LOGOUT DELEGATE MOVED TO logoutAndClearAllTapTalkData
+//        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+//        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+//            [tapTalkDelegate userLogout];
+//        }
     }
 }
 
