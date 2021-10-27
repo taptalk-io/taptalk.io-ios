@@ -205,6 +205,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cancelMessageFileDownload:(TAPMessageModel *)message
                           success:(void (^)(void))success
                           failure:(void (^)(NSError *error))failure;
+- (void)markMessageAsDelivered:(TAPMessageModel *)message;
 - (void)markMessageAsRead:(TAPMessageModel *)message;
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID
                            success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success

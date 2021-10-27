@@ -92,6 +92,9 @@
     [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {
         //Converting to TAPRoomListModel
         NSMutableArray *roomListResultArray = [[NSMutableArray alloc] init];
+        NSMutableDictionary *unreadMentionDataDictionary = [NSMutableDictionary dictionary];
+        __block NSInteger countedMessage = 0;
+        
         for (TAPMessageModel *message in resultArray) {
             TAPRoomModel *room = message.room;
             NSString *roomID = room.roomID;
@@ -101,9 +104,49 @@
             roomList.lastMessage = message;
             
             [roomListResultArray addObject:roomList];
+            
+            // Calculate unread message & mention count
+            NSString *username = [TAPDataManager getActiveUser].username;
+            username = [TAPUtil nullToEmptyString:username];
+            NSString *activeUserID = [TAPDataManager getActiveUser].userID;
+            activeUserID = [TAPUtil nullToEmptyString:activeUserID];
+            
+            [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:username roomID:roomID activeUserID:activeUserID success:^(NSArray *unreadMentionMessages) {
+                NSInteger totalUnreadMention = [unreadMentionMessages count];
+                [unreadMentionDataDictionary setObject:[NSNumber numberWithInteger:totalUnreadMention] forKey:roomID];
+                
+                [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomID activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
+                    //Set number of unread messages to array and dictionary
+                    NSInteger numberOfUnreadMessages = [unreadMessages count];
+                    NSInteger numberOfUnreadMentions = [[unreadMentionDataDictionary objectForKey:roomID] integerValue];
+                    roomList.numberOfUnreadMessages = numberOfUnreadMessages;
+                    roomList.numberOfUnreadMentions = numberOfUnreadMentions;
+                    
+                    if (roomList.numberOfUnreadMessages < 0) {
+                        roomList.numberOfUnreadMessages = 0;
+                    }
+                    
+                    if (roomList.numberOfUnreadMentions < 0) {
+                        roomList.numberOfUnreadMentions = 0;
+                    }
+                    
+                    countedMessage++;
+                    if (countedMessage >= resultArray.count) {
+                        success([roomListResultArray copy]);
+                    }
+                } failure:^(NSError *error) {
+                    countedMessage++;
+                    if (countedMessage >= resultArray.count) {
+                        success([roomListResultArray copy]);
+                    }
+                }];
+            } failure:^(NSError *error) {
+                countedMessage++;
+                if (countedMessage >= resultArray.count) {
+                    success([roomListResultArray copy]);
+                }
+            }];
         }
-        
-        success([roomListResultArray copy]);
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
@@ -112,16 +155,17 @@
 
 - (void)getUpdatedRoomListWithSuccess:(void (^)(NSArray <TAPRoomListModel *> *roomListArray))success
                               failure:(void (^)(NSError *error))failure {
+    
+    TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+    NSString *userID = activeUser.userID;
+    userID = [TAPUtil nullToEmptyString:userID];
+    if ([userID isEqualToString:@""]) {
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"Current active user is not found.", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Current active user is not found.", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+    }
     [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {
         if ([resultArray count] == 0) {
             //Data is empty
-            TAPUserModel *activeUser = [TAPDataManager getActiveUser];
-            NSString *userID = activeUser.userID;
-            userID = [TAPUtil nullToEmptyString:userID];
-            if ([userID isEqualToString:@""]) {
-                NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"Current active user is not found...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Current active user is not found...", nil, [TAPUtil currentBundle], @"")}];
-                failure(localizedError);
-            }
             
             //Get data from API
             [TAPDataManager callAPIGetMessageRoomListAndUnreadWithUserID:userID success:^(NSArray *messageArray) {

@@ -828,13 +828,21 @@
     success;
 }
 
-- (void)markMessageAsRead:(TAPMessageModel *)message {
-    BOOL isRead = message.isRead;
-    if(isRead) {
+- (void)markMessageAsDelivered:(TAPMessageModel *)message {
+    if (message.isDelivered) {
         return;
     }
 
-     message.isRead = YES;
+    message.isDelivered = YES;
+    [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
+}
+
+- (void)markMessageAsRead:(TAPMessageModel *)message {
+    if (message.isRead) {
+        return;
+    }
+
+    message.isRead = YES;
     [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
 }
 

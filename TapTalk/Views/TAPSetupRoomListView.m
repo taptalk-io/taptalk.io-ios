@@ -108,6 +108,10 @@
 
 #pragma mark - Custom Method
 - (void)showSetupViewWithType:(TAPSetupRoomListViewType)type {
+    if ([[TAPDataManager getAccessToken] isEqualToString:@""] || [TAPDataManager getAccessToken] == nil) {
+        // Do not show if user is not logged in
+        return;
+    }
     
     BOOL isHide = [[TapUI sharedInstance] getSetupLoadingFlowHiddenState];
     if (isHide) {

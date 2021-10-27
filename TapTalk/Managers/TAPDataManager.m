@@ -3052,6 +3052,9 @@
             //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO saveActiveUser:NO];
             
+            // Mark as delivered
+            [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:decryptedMessage];
+            
             [messageResultArray addObject:decryptedMessage];
             
         }
@@ -3145,6 +3148,9 @@
 
             //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO saveActiveUser:NO];
+            
+            // Mark as delivered
+            [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:decryptedMessage];
 
             [messageResultArray addObject:decryptedMessage];
             
@@ -3249,6 +3255,9 @@
             if ([preferenceLastUpdated longLongValue] < [decryptedMessage.updated longLongValue]) {
                 preferenceLastUpdated = [NSNumber numberWithLongLong:[decryptedMessage.updated longLongValue]];
             }
+            
+            // Mark as delivered
+            [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:decryptedMessage];
         }
         
         if (needToSaveLastUpdatedTimestamp) {
