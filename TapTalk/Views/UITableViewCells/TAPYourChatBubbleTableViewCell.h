@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated;
+- (void)showBubbleHighlight;
 
 @end
 

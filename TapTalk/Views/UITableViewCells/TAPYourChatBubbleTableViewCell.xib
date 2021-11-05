@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -366,6 +366,10 @@
                             <constraint firstAttribute="height" constant="30" id="TIX-9Q-itK"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oYK-OX-P8O" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="50" y="0.0" width="98" height="163"/>
+                        <color key="backgroundColor" red="0.36862745098039218" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -376,25 +380,30 @@
                     <constraint firstItem="3Nk-OP-Hbp" firstAttribute="leading" secondItem="dnm-L1-3kp" secondAttribute="trailing" constant="-28" id="LHg-Wf-xga"/>
                     <constraint firstItem="J0O-5e-F2z" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="LsH-Zo-aqt"/>
                     <constraint firstAttribute="bottom" secondItem="sLI-nG-1KB" secondAttribute="bottom" constant="8" id="ThV-y7-ZtU"/>
+                    <constraint firstItem="dnm-L1-3kp" firstAttribute="bottom" secondItem="oYK-OX-P8O" secondAttribute="bottom" id="WMf-6e-2MC"/>
                     <constraint firstAttribute="trailing" secondItem="sLI-nG-1KB" secondAttribute="trailing" constant="16" id="YCy-sF-t1s"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="leading" secondItem="J0O-5e-F2z" secondAttribute="trailing" constant="4" id="Yb4-jZ-eJl"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="bottom" secondItem="J0O-5e-F2z" secondAttribute="bottom" id="bR8-9W-AUt"/>
                     <constraint firstItem="SCD-aS-weg" firstAttribute="top" secondItem="J0O-5e-F2z" secondAttribute="top" id="cDz-og-Nab"/>
                     <constraint firstItem="sLI-nG-1KB" firstAttribute="leading" secondItem="dnm-L1-3kp" secondAttribute="leading" id="d9C-AH-gm6"/>
                     <constraint firstItem="J0O-5e-F2z" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="exP-ko-9jV"/>
+                    <constraint firstItem="dnm-L1-3kp" firstAttribute="leading" secondItem="oYK-OX-P8O" secondAttribute="leading" id="gOO-eb-sDK"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="gRM-9a-ajL"/>
                     <constraint firstItem="SCD-aS-weg" firstAttribute="leading" secondItem="J0O-5e-F2z" secondAttribute="leading" id="gnH-H0-TkW"/>
                     <constraint firstItem="oiF-E4-Y7P" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="n9I-6n-Fkd"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="leading" secondItem="J0O-5e-F2z" secondAttribute="leading" id="niU-lg-B6B"/>
                     <constraint firstItem="oiF-E4-Y7P" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="-46" id="pqC-44-bm2"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="top" secondItem="J0O-5e-F2z" secondAttribute="top" id="q2N-Yc-ROS"/>
+                    <constraint firstItem="dnm-L1-3kp" firstAttribute="top" secondItem="oYK-OX-P8O" secondAttribute="top" id="wDU-GA-hja"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="dnm-L1-3kp" secondAttribute="trailing" constant="80" id="wkm-KN-kQD"/>
                     <constraint firstItem="J0O-5e-F2z" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="zTh-Vc-jI1"/>
+                    <constraint firstItem="dnm-L1-3kp" firstAttribute="trailing" secondItem="oYK-OX-P8O" secondAttribute="trailing" id="zhV-C0-sUC"/>
                     <constraint firstItem="SCD-aS-weg" firstAttribute="trailing" secondItem="J0O-5e-F2z" secondAttribute="trailing" id="znn-Ub-3oW"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="oYK-OX-P8O" id="s3w-sm-IM8"/>
                 <outlet property="bubbleLabel" destination="a8I-Kn-plq" id="6TZ-Cf-Asw"/>
                 <outlet property="bubbleView" destination="dnm-L1-3kp" id="9XT-kZ-iTs"/>
                 <outlet property="chatBubbleButton" destination="I5e-iw-lrB" id="l7C-l5-eC1"/>

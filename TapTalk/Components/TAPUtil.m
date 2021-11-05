@@ -159,12 +159,7 @@ static const char kBundleKey = 0;
 
 #pragma mark - Color
 + (UIColor *)getColor:(NSString *)hexColor {
-    
-    if ([hexColor isEqualToString:@""]){
-        return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
-        
-    }
-    else {
+    if ([hexColor length] == 6) {
         unsigned int red, green, blue;
         
         NSRange range;
@@ -181,6 +176,30 @@ static const char kBundleKey = 0;
         [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&blue];
         
         return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:1.0f];
+    }
+    else if ([hexColor length] == 8) {
+        unsigned int alpha, red, green, blue;
+        
+        NSRange range;
+        
+        range.length = 2;
+        
+        range.location = 0;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&alpha];
+        
+        range.location = 2;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&red];
+        
+        range.location = 4;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&green];
+        
+        range.location = 6;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&blue];
+        
+        return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:(float)(alpha/255.0f)];
+    }
+    else {
+        return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
     }
 }
 

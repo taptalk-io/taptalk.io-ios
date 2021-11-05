@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -549,6 +549,10 @@
                             <constraint firstItem="Ks8-jL-Dk5" firstAttribute="centerY" secondItem="ey6-uk-rbm" secondAttribute="centerY" id="tkX-d8-Zkz"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aqx-Rj-P0j" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="253" y="0.0" width="106" height="198"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -557,7 +561,9 @@
                     <constraint firstItem="wQr-8O-AHa" firstAttribute="leading" secondItem="EqY-PT-fA3" secondAttribute="leading" id="C8O-2m-P3D"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rCz-VI-RDG" secondAttribute="leading" constant="80" id="Hzk-Qh-ppx"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="wQr-8O-AHa" secondAttribute="trailing" constant="2" id="KIy-a7-qBp"/>
+                    <constraint firstItem="mMI-m8-7pV" firstAttribute="bottom" secondItem="aqx-Rj-P0j" secondAttribute="bottom" id="Lhf-cx-vpy"/>
                     <constraint firstItem="wQr-8O-AHa" firstAttribute="top" secondItem="EqY-PT-fA3" secondAttribute="top" id="OA0-ds-Hgy"/>
+                    <constraint firstItem="mMI-m8-7pV" firstAttribute="trailing" secondItem="aqx-Rj-P0j" secondAttribute="trailing" id="Trr-mh-SKR"/>
                     <constraint firstItem="QFo-Q6-kr0" firstAttribute="leading" secondItem="rCz-VI-RDG" secondAttribute="leading" constant="16" id="URw-OH-W4Y"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="bottom" secondItem="wQr-8O-AHa" secondAttribute="bottom" constant="2" id="UaO-zo-6O4"/>
                     <constraint firstItem="Cqb-8p-hPG" firstAttribute="bottom" secondItem="mMI-m8-7pV" secondAttribute="bottom" constant="-5" id="VvA-Xf-pab"/>
@@ -565,16 +571,19 @@
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="trailing" secondItem="QFo-Q6-kr0" secondAttribute="trailing" id="YdS-pZ-Vpt"/>
                     <constraint firstAttribute="trailing" secondItem="mMI-m8-7pV" secondAttribute="trailing" constant="16" id="bAQ-fn-e3m"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="width" secondItem="wQr-8O-AHa" secondAttribute="width" id="cgA-R7-ntK"/>
+                    <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="aqx-Rj-P0j" secondAttribute="leading" id="dx7-l8-9wL"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="izc-Hi-fO1"/>
                     <constraint firstItem="ey6-uk-rbm" firstAttribute="leading" secondItem="rCz-VI-RDG" secondAttribute="leadingMargin" constant="-46" id="nSm-GE-HYi"/>
                     <constraint firstAttribute="bottom" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="8" id="o4a-wI-ijd"/>
                     <constraint firstItem="ey6-uk-rbm" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="uOP-H3-3rB"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="height" secondItem="wQr-8O-AHa" secondAttribute="height" id="wvO-Kn-8s9"/>
+                    <constraint firstItem="mMI-m8-7pV" firstAttribute="top" secondItem="aqx-Rj-P0j" secondAttribute="top" id="xv6-Ty-CPm"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="IEc-jH-68R" secondAttribute="trailing" constant="2" id="z2s-Yx-4iR"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="aqx-Rj-P0j" id="wKm-pD-vDq"/>
                 <outlet property="bubbleLabel" destination="njX-Xn-ryd" id="qkA-tZ-gpE"/>
                 <outlet property="bubbleView" destination="mMI-m8-7pV" id="nAs-1C-Igb"/>
                 <outlet property="cancelButton" destination="PMM-iq-sYG" id="fPd-kF-csx"/>

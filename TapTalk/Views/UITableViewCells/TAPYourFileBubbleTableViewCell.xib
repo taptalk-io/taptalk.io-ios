@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -243,7 +243,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="86" height="64"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
-                                            <action selector="replyButtonDidTapped:" destination="Wgf-FI-fQG" eventType="touchUpInside" id="gvI-2B-R4v"/>
+                                            <action selector="quoteButtonDidTapped:" destination="Wgf-FI-fQG" eventType="touchUpInside" id="sEj-uQ-qE1"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -562,6 +562,10 @@
                             <constraint firstItem="e74-MM-wnj" firstAttribute="centerY" secondItem="TIC-sc-SMr" secondAttribute="centerY" id="fin-Cc-SKo"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FYf-Cu-YeY" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="50" y="0.0" width="106" height="216"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -580,17 +584,22 @@
                     <constraint firstItem="TIC-sc-SMr" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="topMargin" id="YeW-9O-7B7"/>
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="bottom" secondItem="H1d-AO-jhD" secondAttribute="bottom" id="ag4-Go-zws"/>
                     <constraint firstItem="u5V-oM-bLv" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="leading" id="bzv-6e-sPp"/>
+                    <constraint firstItem="FYf-Cu-YeY" firstAttribute="top" secondItem="6yA-Ee-rcg" secondAttribute="top" id="g4n-cL-zM7"/>
                     <constraint firstItem="4O7-Tz-qVj" firstAttribute="bottom" secondItem="H1d-AO-jhD" secondAttribute="bottom" id="gqq-tX-TZJ"/>
                     <constraint firstItem="4O7-Tz-qVj" firstAttribute="trailing" secondItem="H1d-AO-jhD" secondAttribute="trailing" id="hOR-6c-t8r"/>
+                    <constraint firstItem="FYf-Cu-YeY" firstAttribute="trailing" secondItem="6yA-Ee-rcg" secondAttribute="trailing" id="i0q-yY-iUf"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="6yA-Ee-rcg" secondAttribute="trailing" constant="80" id="jEl-9V-kGa"/>
                     <constraint firstAttribute="bottom" secondItem="u5V-oM-bLv" secondAttribute="bottom" constant="8" id="llx-VW-Kpc"/>
+                    <constraint firstItem="FYf-Cu-YeY" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="leading" id="lzY-B6-lUN"/>
                     <constraint firstItem="6yA-Ee-rcg" firstAttribute="leading" secondItem="H1d-AO-jhD" secondAttribute="trailing" constant="4" id="vl4-8H-3eQ"/>
                     <constraint firstItem="4O7-Tz-qVj" firstAttribute="top" secondItem="H1d-AO-jhD" secondAttribute="top" id="vnh-39-V9y"/>
+                    <constraint firstItem="FYf-Cu-YeY" firstAttribute="bottom" secondItem="6yA-Ee-rcg" secondAttribute="bottom" id="vts-ic-MN4"/>
                     <constraint firstItem="6yA-Ee-rcg" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="wxA-iA-QYG"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="FYf-Cu-YeY" id="TVM-9z-u8V"/>
                 <outlet property="bubbleLabel" destination="J4M-Xo-U5R" id="Ejr-qe-68b"/>
                 <outlet property="bubbleView" destination="6yA-Ee-rcg" id="Ha3-be-kuh"/>
                 <outlet property="cancelButton" destination="fyf-cV-rY4" id="F2j-7L-fx3"/>

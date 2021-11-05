@@ -1065,6 +1065,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1100,6 +1104,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     [cell showStatusLabel:YES];
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1154,6 +1162,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1250,6 +1262,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1340,6 +1356,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1441,6 +1461,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1474,6 +1498,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     [cell showStatusLabel:YES animated:NO];
@@ -1513,6 +1541,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1584,6 +1616,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1649,6 +1685,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -10182,17 +10222,29 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)scrollToMessageAndLoadDataWithLocalID:(NSString *)localID {
+    self.tappedMessageLocalID = localID;
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
     if (currentMessage) {
         NSArray *messageArray = [self.messageArray copy];
         NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-        
-        self.tappedMessageLocalID = @"";
+//        self.tappedMessageLocalID = @"";
         
         if (!currentMessage.isDeleted && !currentMessage.isHidden) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:currentRowIndex inSection:0];
             [TAPUtil performBlock:^{
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+                [self.tableView reloadData];
+                [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
             } afterDelay:0.2f];
+        }
+        else {
+            self.tappedMessageLocalID = @"";
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedStringFromTableInBundle(@"Could not find message.", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }];
+
+            [alertController addAction:okAction];
+            [self presentViewController:alertController animated:YES completion:nil];
         }
         [TAPUtil performBlock:^{
              [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
@@ -10204,7 +10256,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
         }
         
-        self.tappedMessageLocalID = localID;
         [self retrieveExistingMessages];
     }
 }

@@ -302,25 +302,24 @@
 #ifdef DEBUG
             NSLog(@"%@", error);
 #endif
-            NSInteger errorCode = error.code;
-            if (errorCode == 40401) {
-                //USER NOT FOUND
-                [self.addNewContactView setSearchViewLayoutWithType:LayoutTypeDefault];
-                [self.addNewContactView showNoInternetView:NO];
-                _searchedUser = nil;
-                [self.addNewContactView isShowEmptyState:YES];
-                
-                [self.addNewContactView showLoading:NO];
-            }
-            else if (errorCode == 199 || errorCode == 1009) {
+            NSInteger errorCode = [NSNumber numberWithDouble:fabs(error.code)].intValue;
+                        
+            if (errorCode == 199 || errorCode == 1009) {
                 //NO INTERNET CONNECTION
                 _wasFailedGetData = YES;
-                _searchedUser = nil;
                 
-                [self.addNewContactView setSearchViewLayoutWithType:LayoutTypeDefault];
                 [self.addNewContactView isShowEmptyState:NO];
                 [self.addNewContactView showNoInternetView:YES];
             }
+            else { //if (errorCode == 40401) {
+                //USER NOT FOUND
+                [self.addNewContactView showNoInternetView:NO];
+                [self.addNewContactView isShowEmptyState:YES];
+            }
+            
+            [self.addNewContactView setSearchViewLayoutWithType:LayoutTypeDefault];
+            _searchedUser = nil;
+            [self.addNewContactView showLoading:NO];
         }];
     }
 }

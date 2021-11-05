@@ -18,6 +18,7 @@
 @property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
@@ -109,11 +110,16 @@
     
     self.statusLabel.alpha = 0.0f;
 //    self.statusIconImageView.alpha = 0.0f;
-    self.sendingIconImageView.alpha = 0.0f;    
-    self.bubbleView.clipsToBounds = YES;
+    self.sendingIconImageView.alpha = 0.0f;
     
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleView.clipsToBounds = YES;
+    
+    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
+    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleHighlightView.clipsToBounds = YES;
+    
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
     
@@ -820,6 +826,21 @@
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(latitude, longitude);
     MKCoordinateRegion mapRegion = MKCoordinateRegionMakeWithDistance(coordinate, 1000, 1000);
     [self.mapView setRegion:mapRegion animated:NO];
+}
+
+- (void)showBubbleHighlight {
+    self.bubbleHighlightView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bubbleHighlightView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [TAPUtil performBlock:^{
+                [UIView animateWithDuration:0.75f animations:^{
+                    self.bubbleHighlightView.alpha = 0.0f;
+                }];
+            } afterDelay:1.0f];
+        }];
+    } afterDelay:0.2f];
 }
 
 @end

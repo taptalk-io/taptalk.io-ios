@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -125,6 +125,9 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="S4X-5F-btv">
                                         <rect key="frame" x="0.0" y="0.0" width="234" height="64"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <action selector="quoteViewButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="QPh-oM-9Eg"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.90980392160000001" green="0.44705882349999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -203,6 +206,9 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jKg-pf-pPY">
                                         <rect key="frame" x="0.0" y="0.0" width="234" height="64"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <action selector="quoteViewButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="BAb-ZS-ytB"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -462,6 +468,10 @@
                             <constraint firstItem="l3W-RB-3us" firstAttribute="centerY" secondItem="Wdu-3n-1bT" secondAttribute="centerY" id="yAN-6q-0C3"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lDI-oh-BtR" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="50" y="0.0" width="254" height="418.5"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -469,10 +479,14 @@
                     <constraint firstItem="vpz-Pu-2L3" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="trailing" constant="4" id="2yM-iX-kfC"/>
                     <constraint firstItem="Ekn-LS-eHd" firstAttribute="leading" secondItem="mOj-ZL-6Kr" secondAttribute="trailing" constant="2" id="Clz-FG-6Ce"/>
                     <constraint firstAttribute="trailing" secondItem="cYf-Yd-bYy" secondAttribute="trailing" constant="16" id="DVI-2b-mbe"/>
+                    <constraint firstItem="lDI-oh-BtR" firstAttribute="top" secondItem="Ekn-LS-eHd" secondAttribute="top" id="Kqe-fa-6e8"/>
+                    <constraint firstItem="lDI-oh-BtR" firstAttribute="trailing" secondItem="Ekn-LS-eHd" secondAttribute="trailing" id="NCC-G2-ynN"/>
                     <constraint firstItem="Wdu-3n-1bT" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="Qbd-AO-hr0"/>
                     <constraint firstAttribute="trailing" secondItem="Ekn-LS-eHd" secondAttribute="trailing" constant="16" id="Sfa-UL-VDP"/>
                     <constraint firstItem="cYf-Yd-bYy" firstAttribute="top" secondItem="Ekn-LS-eHd" secondAttribute="bottom" priority="999" constant="2" id="Zsq-z4-4fl"/>
+                    <constraint firstItem="lDI-oh-BtR" firstAttribute="bottom" secondItem="Ekn-LS-eHd" secondAttribute="bottom" id="aEL-Lt-oDp"/>
                     <constraint firstAttribute="bottom" secondItem="cYf-Yd-bYy" secondAttribute="bottom" constant="8" id="lGO-RV-4UG"/>
+                    <constraint firstItem="lDI-oh-BtR" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" id="nvD-Ng-6ct"/>
                     <constraint firstItem="Wdu-3n-1bT" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="-46" id="uNa-Ty-TOD"/>
                     <constraint firstItem="Ekn-LS-eHd" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="wR4-1H-9q9"/>
                     <constraint firstItem="Ekn-LS-eHd" firstAttribute="bottom" secondItem="mOj-ZL-6Kr" secondAttribute="bottom" constant="2" id="wfQ-wy-os0"/>
@@ -481,6 +495,7 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="lDI-oh-BtR" id="PYV-Gn-q6d"/>
                 <outlet property="bubbleImageView" destination="f4S-1d-CLr" id="SdF-Lr-tBo"/>
                 <outlet property="bubbleImageViewHeightConstraint" destination="xOq-yb-L9x" id="ntt-Jw-3yc"/>
                 <outlet property="bubbleImageViewWidthConstraint" destination="dy0-rG-qIq" id="Bgz-Si-xpZ"/>

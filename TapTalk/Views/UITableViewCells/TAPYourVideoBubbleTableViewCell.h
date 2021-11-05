@@ -71,6 +71,7 @@ typedef NS_ENUM(NSInteger, TAPYourVideoBubbleTableViewCellStateType) {
 - (void)showVideoBubbleStatusWithType:(TAPYourVideoBubbleTableViewCellStateType)type;
 - (void)setVideoDurationAndSizeProgressViewWithMessage:(TAPMessageModel *)message progress:(NSNumber *)progress stateType:(TAPYourVideoBubbleTableViewCellStateType)type;
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message;
+- (void)showBubbleHighlight;
 
 @end
 

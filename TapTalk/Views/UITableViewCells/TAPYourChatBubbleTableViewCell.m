@@ -20,6 +20,7 @@
 @property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
 @property (strong, nonatomic) IBOutlet ZSWTappableLabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
@@ -102,10 +103,14 @@
     [self.contentView layoutIfNeeded];
     self.statusLabel.alpha = 0.0f;
     
-    self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.bubbleView.clipsToBounds = YES;
+    
+    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
+    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.bubbleHighlightView.clipsToBounds = YES;
     
     self.replyView.layer.cornerRadius = 4.0f;
     self.replyView.clipsToBounds = YES;
@@ -182,6 +187,7 @@
 
     self.mentionIndexesArray = nil;
     self.statusLabel.alpha = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
     [self showSenderInfo:NO];
 }
 
@@ -919,6 +925,21 @@
         self.forwardTitleTopConstraint.constant = 0.0f;
     }
     [self.contentView layoutIfNeeded];
+}
+
+- (void)showBubbleHighlight {
+    self.bubbleHighlightView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bubbleHighlightView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [TAPUtil performBlock:^{
+                [UIView animateWithDuration:0.75f animations:^{
+                    self.bubbleHighlightView.alpha = 0.0f;
+                }];
+            } afterDelay:1.0f];
+        }];
+    } afterDelay:0.2f];
 }
 
 @end

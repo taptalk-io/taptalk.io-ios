@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
+- (void)showBubbleHighlight;
 
 @end
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -348,12 +348,17 @@
                             <constraint firstItem="ITu-rs-gBS" firstAttribute="centerY" secondItem="TI4-tV-cjV" secondAttribute="centerY" id="h8m-tJ-5mQ"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9hP-6n-zxl" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="261" y="0.0" width="98" height="303"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="iM8-gR-PXe" firstAttribute="bottom" secondItem="GBq-4A-GJ7" secondAttribute="bottom" constant="-5" id="4pT-qj-qtO"/>
                     <constraint firstItem="fpH-0H-kQw" firstAttribute="leading" secondItem="vWG-OV-8Uo" secondAttribute="leading" id="67e-2F-Lfy"/>
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="leading" secondItem="Gjw-fa-TSr" secondAttribute="trailing" constant="-28" id="6vT-dz-4yM"/>
+                    <constraint firstItem="GBq-4A-GJ7" firstAttribute="bottom" secondItem="9hP-6n-zxl" secondAttribute="bottom" id="Bdd-th-ILU"/>
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="80" id="DfS-ZZ-vtc"/>
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="bottom" secondItem="Gjw-fa-TSr" secondAttribute="bottom" constant="2" id="MK4-e5-d4D"/>
                     <constraint firstItem="GBq-4A-GJ7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="Oti-hB-JBd"/>
@@ -363,17 +368,21 @@
                     <constraint firstItem="vWG-OV-8Uo" firstAttribute="width" secondItem="fpH-0H-kQw" secondAttribute="width" id="ZeG-QB-nsP"/>
                     <constraint firstItem="vWG-OV-8Uo" firstAttribute="height" secondItem="fpH-0H-kQw" secondAttribute="height" id="ao8-XG-PLC"/>
                     <constraint firstAttribute="bottomMargin" secondItem="aVb-7h-z4S" secondAttribute="bottom" constant="-6" id="bzx-ta-SS8"/>
+                    <constraint firstItem="GBq-4A-GJ7" firstAttribute="leading" secondItem="9hP-6n-zxl" secondAttribute="leading" id="c0M-sr-4QE"/>
                     <constraint firstItem="TI4-tV-cjV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="-46" id="eHN-1x-FKf"/>
                     <constraint firstItem="iM8-gR-PXe" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="trailing" constant="4" id="iNa-6B-vAX"/>
                     <constraint firstAttribute="trailing" secondItem="GBq-4A-GJ7" secondAttribute="trailing" constant="16" id="mVW-oN-ID9"/>
                     <constraint firstItem="aVb-7h-z4S" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="bottom" constant="2" id="ouc-ri-3gb"/>
+                    <constraint firstItem="GBq-4A-GJ7" firstAttribute="trailing" secondItem="9hP-6n-zxl" secondAttribute="trailing" id="rSl-uM-MpM"/>
                     <constraint firstItem="aVb-7h-z4S" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="16" id="ta1-sX-54H"/>
                     <constraint firstItem="TI4-tV-cjV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="wHE-ZK-VKf"/>
+                    <constraint firstItem="GBq-4A-GJ7" firstAttribute="top" secondItem="9hP-6n-zxl" secondAttribute="top" id="xIQ-Pw-kkf"/>
                     <constraint firstItem="fpH-0H-kQw" firstAttribute="top" secondItem="vWG-OV-8Uo" secondAttribute="top" id="yGx-By-qJ4"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="9hP-6n-zxl" id="s0j-q1-Tw2"/>
                 <outlet property="bubbleLabel" destination="HId-QA-OEm" id="abv-ke-43f"/>
                 <outlet property="bubbleView" destination="GBq-4A-GJ7" id="mf1-eN-u3j"/>
                 <outlet property="chatBubbleButton" destination="5YI-Ih-9ho" id="vPe-52-Uml"/>

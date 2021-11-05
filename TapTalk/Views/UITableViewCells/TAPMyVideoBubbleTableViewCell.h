@@ -67,6 +67,7 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message;
+- (void)showBubbleHighlight;
 
 - (void)showProgressUploadView:(BOOL)show;
 - (void)showDownloadedState:(BOOL)isShow;

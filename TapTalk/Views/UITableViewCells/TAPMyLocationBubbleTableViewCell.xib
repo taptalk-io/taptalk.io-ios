@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -368,6 +368,10 @@
                             <constraint firstItem="kVD-0Z-1w2" firstAttribute="centerX" secondItem="s95-Gc-wdp" secondAttribute="centerX" id="a6k-ho-8CT"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BXH-N6-hKy" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="95" y="0.0" width="264" height="324"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -375,6 +379,7 @@
                     <constraint firstItem="QDJ-Gg-cCw" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="bottom" priority="999" id="1jy-rv-8AG"/>
                     <constraint firstItem="QLT-aC-en2" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="trailing" constant="4" id="4ir-wY-b1t"/>
                     <constraint firstItem="dUK-q7-mCR" firstAttribute="leading" secondItem="w1X-VA-DO6" secondAttribute="leading" id="BXB-d7-gW3"/>
+                    <constraint firstItem="BXH-N6-hKy" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" id="Dp2-vX-RH8"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" secondItem="pQB-wV-S4C" secondAttribute="trailing" constant="2" id="LU2-6h-1do"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="R69-3q-Chx" secondAttribute="leading" constant="80" id="MRu-jd-3M7"/>
                     <constraint firstItem="w1X-VA-DO6" firstAttribute="height" secondItem="dUK-q7-mCR" secondAttribute="height" id="RAd-48-rBZ"/>
@@ -382,9 +387,12 @@
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="top" id="ahh-sE-86n"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="bottom" secondItem="dUK-q7-mCR" secondAttribute="bottom" constant="2" id="c3P-ri-xBw"/>
                     <constraint firstItem="QLT-aC-en2" firstAttribute="bottom" secondItem="Wd0-cM-7U7" secondAttribute="bottom" constant="-5" id="cYr-uH-xnE"/>
+                    <constraint firstItem="BXH-N6-hKy" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" id="cqc-Bt-BKr"/>
+                    <constraint firstItem="BXH-N6-hKy" firstAttribute="bottom" secondItem="Wd0-cM-7U7" secondAttribute="bottom" id="dNp-Lr-9ph"/>
                     <constraint firstAttribute="bottom" secondItem="QDJ-Gg-cCw" secondAttribute="bottom" constant="8" id="fro-xF-qPb"/>
                     <constraint firstAttribute="trailing" secondItem="Wd0-cM-7U7" secondAttribute="trailing" constant="16" id="g8v-8e-t3q"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" secondItem="dUK-q7-mCR" secondAttribute="trailing" constant="2" id="gna-lV-ol6"/>
+                    <constraint firstItem="BXH-N6-hKy" firstAttribute="trailing" secondItem="Wd0-cM-7U7" secondAttribute="trailing" id="l8x-fZ-au7"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="trailing" secondItem="QDJ-Gg-cCw" secondAttribute="trailing" id="lBs-m9-kgx"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="bottom" secondItem="pQB-wV-S4C" secondAttribute="bottom" constant="2" id="qej-h9-Be2"/>
                     <constraint firstItem="QDJ-Gg-cCw" firstAttribute="leading" secondItem="R69-3q-Chx" secondAttribute="leading" constant="16" id="scR-MI-z6Z"/>
@@ -394,6 +402,7 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="BXH-N6-hKy" id="5Zb-f3-02v"/>
                 <outlet property="bubbleLabel" destination="VRr-qr-gF5" id="jPw-4t-zg6"/>
                 <outlet property="bubbleView" destination="Wd0-cM-7U7" id="sRm-l6-f0w"/>
                 <outlet property="centerMarkerLocationImageView" destination="YxV-Bw-fl5" id="OK9-0F-KRe"/>

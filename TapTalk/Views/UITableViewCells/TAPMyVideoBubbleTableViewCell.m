@@ -22,6 +22,7 @@
 @property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *imageTimestampStatusContainerView;
+@property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
 @property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
@@ -174,6 +175,10 @@
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
+    
+    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
+    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleHighlightView.clipsToBounds = YES;
     
     self.imageTimestampStatusContainerView.layer.cornerRadius = 10.0f;
     self.imageTimestampStatusContainerView.clipsToBounds = YES;
@@ -1781,6 +1786,21 @@
         [self getImageSizeFromImage:image];
         [self.contentView layoutIfNeeded];
     }
+}
+
+- (void)showBubbleHighlight {
+    self.bubbleHighlightView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bubbleHighlightView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [TAPUtil performBlock:^{
+                [UIView animateWithDuration:0.75f animations:^{
+                    self.bubbleHighlightView.alpha = 0.0f;
+                }];
+            } afterDelay:1.0f];
+        }];
+    } afterDelay:0.2f];
 }
 
 @end

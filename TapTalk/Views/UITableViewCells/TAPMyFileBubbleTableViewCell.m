@@ -17,6 +17,7 @@
 @property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionSizePlaceholderLabel;
@@ -163,10 +164,15 @@
     
     _isDownloaded = NO;
     
-    self.bubbleView.clipsToBounds = YES;
     
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleView.clipsToBounds = YES;
+    
+    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
+    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleHighlightView.clipsToBounds = YES;
+    
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
     
@@ -1099,6 +1105,21 @@
         self.statusLabel.text = self.statusLabelTimeString;
         [self showStatusLabel:NO];
     }
+}
+
+- (void)showBubbleHighlight {
+    self.bubbleHighlightView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bubbleHighlightView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [TAPUtil performBlock:^{
+                [UIView animateWithDuration:0.75f animations:^{
+                    self.bubbleHighlightView.alpha = 0.0f;
+                }];
+            } afterDelay:1.0f];
+        }];
+    } afterDelay:0.2f];
 }
 
 @end

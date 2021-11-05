@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -575,6 +575,10 @@
                             <constraint firstAttribute="height" constant="30" id="l1C-of-jqH"/>
                         </constraints>
                     </view>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rS6-Wz-vrK" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="50" y="0.0" width="254" height="440.5"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -585,9 +589,13 @@
                     <constraint firstItem="ODG-45-PuS" firstAttribute="leading" secondItem="eS9-eE-7iP" secondAttribute="trailing" constant="2" id="EeP-gL-NfK"/>
                     <constraint firstItem="pLh-xA-KN1" firstAttribute="top" secondItem="UgJ-tS-80I" secondAttribute="top" id="FJE-hm-nka"/>
                     <constraint firstItem="pLh-xA-KN1" firstAttribute="bottom" secondItem="UgJ-tS-80I" secondAttribute="bottom" id="IHj-ih-6SD"/>
+                    <constraint firstItem="rS6-Wz-vrK" firstAttribute="top" secondItem="eS9-eE-7iP" secondAttribute="top" id="MuJ-LK-tHd"/>
                     <constraint firstItem="HI8-sI-SJg" firstAttribute="top" secondItem="eS9-eE-7iP" secondAttribute="bottom" priority="999" constant="2" id="NuN-VY-X2E"/>
+                    <constraint firstItem="rS6-Wz-vrK" firstAttribute="bottom" secondItem="eS9-eE-7iP" secondAttribute="bottom" id="OGL-zZ-BKt"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="top" secondItem="UgJ-tS-80I" secondAttribute="top" id="Ph4-jg-bU6"/>
+                    <constraint firstItem="rS6-Wz-vrK" firstAttribute="leading" secondItem="eS9-eE-7iP" secondAttribute="leading" id="PxK-lV-jBF"/>
                     <constraint firstItem="HI8-sI-SJg" firstAttribute="leading" secondItem="eS9-eE-7iP" secondAttribute="leading" id="U08-ae-ID6"/>
+                    <constraint firstItem="rS6-Wz-vrK" firstAttribute="trailing" secondItem="eS9-eE-7iP" secondAttribute="trailing" id="UUW-Av-Y3l"/>
                     <constraint firstItem="pLh-xA-KN1" firstAttribute="leading" secondItem="UgJ-tS-80I" secondAttribute="leading" id="Xtz-e7-PkJ"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="leading" secondItem="UgJ-tS-80I" secondAttribute="leading" id="YgY-4D-6bd"/>
                     <constraint firstItem="pLh-xA-KN1" firstAttribute="trailing" secondItem="UgJ-tS-80I" secondAttribute="trailing" id="Zmn-Ek-KYY"/>
@@ -604,6 +612,7 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bubbleHighlightView" destination="rS6-Wz-vrK" id="DhE-af-yRX"/>
                 <outlet property="bubbleImageView" destination="aud-LS-c8o" id="LdH-rG-bWo"/>
                 <outlet property="bubbleImageViewHeightConstraint" destination="pUb-b6-Djc" id="o1M-Gj-LhW"/>
                 <outlet property="bubbleImageViewWidthConstraint" destination="p14-rY-btA" id="zo4-hb-oCB"/>
