@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)tapTalkDidReceiveNewMessage:(TAPMessageModel *)message;
 - (void)tapTalkDidReceiveUpdatedMessage:(TAPMessageModel *)message;
+- (void)tapTalkDidDeleteMessage:(TAPMessageModel *)message;
 
 @end
 
@@ -178,6 +179,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      start:(void (^)(TAPMessageModel *message))start
                                    success:(void (^)(TAPMessageModel *message))success
                                    failure:(void (^)(NSError *error))failure;
+- (void)deleteMessage:(TAPMessageModel *)message
+              success:(void (^)(void))success
+              failure:(void (^)(NSError *error))failure;
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID
               success:(void (^)(void))success
               failure:(void (^)(NSError *error))failure;
@@ -195,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)downloadMessageImage:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                     success:(void (^)(TAPMessageModel *message, UIImage *fullImage))successBlock
+                     success:(void (^)(TAPMessageModel *message, UIImage *fullImage, NSString * _Nullable filePath))successBlock
                      failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock;
 - (void)downloadMessageVideo:(TAPMessageModel *)message
                        start:(void (^)(void))startBlock

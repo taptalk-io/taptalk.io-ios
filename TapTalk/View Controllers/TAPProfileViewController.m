@@ -1406,7 +1406,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //Already handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already handled via Notification
-    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nullable filePath) {
         //Already handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already handled via Notification

@@ -18,12 +18,6 @@
 @property (strong, nonatomic) NSMutableDictionary *failedDownloadDictionary;
 @property (strong, nonatomic) NSMutableDictionary<NSString *, NSURLSessionDownloadTask*> *urlDownloadTaskDictionary;
 
-- (void)runDownloadImageWithRoomID:(NSString *)roomID
-                           message:(TAPMessageModel *)message
-                          progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *currentDownloadMessage))progressBlock
-                           success:(void (^)(UIImage *fullImage, TAPMessageModel *currentDownloadMessage))success
-                           failure:(void(^)(NSError *error, TAPMessageModel *currentDownloadMessage))failure;
-
 // DV NOTE - Uncomment this function to use API Thumbnail image
 //- (void)runDownloadImageWithRoomID:(NSString *)roomID
 //                           message:(TAPMessageModel *)message
@@ -71,7 +65,7 @@
 - (void)receiveImageDataWithMessage:(TAPMessageModel *)message
                               start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                            success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
+                            success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage, NSString * _Nullable filePath))success
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
     
     NSString *roomID = message.room.roomID;
@@ -94,15 +88,15 @@
                                        message:message
                                          start:startProgress
                                       progress:progressBlock
-                                       success:success
+                                       success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) { success(fullImage, receivedMessage, @""); }
                                        failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             
             if (![fileID isEqualToString:@""]) {
-                [self receiveImageDataFromCacheWithKey:fileID
+                [self receiveImageDataFromCacheWithKey:urlKey
                                                message:message
                                                  start:startProgress
                                               progress:progressBlock
-                                               success:success
+                                               success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) { success(fullImage, receivedMessage, @""); }
                                                failure:^(NSError *error, TAPMessageModel *receivedMessage) {
                     [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
                 }];
@@ -113,11 +107,11 @@
         }];
     }
     else if (![fileID isEqualToString:@""]) {
-        [self receiveImageDataFromCacheWithKey:fileID
+        [self receiveImageDataFromCacheWithKey:urlKey
                                        message:message
                                          start:startProgress
                                       progress:progressBlock
-                                       success:success
+                                       success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) { success(fullImage, receivedMessage, @""); }
                                        failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
         }];
@@ -157,7 +151,7 @@
 - (void)downloadImageDataWithMessage:(TAPMessageModel *)message
                                start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                             progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                             success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
+                             success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage, NSString * _Nullable filePath))success
                              failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
     
     NSString *key = message.localID;
@@ -184,7 +178,7 @@
         [self updateDownloadProgress:progress total:total message:currentDownloadMessage];
         
         progressBlock(progress, total, message);
-    } success:^(UIImage *fullImage, TAPMessageModel *currentDownloadMessage) {
+    } success:^(UIImage *fullImage, TAPMessageModel *currentDownloadMessage, NSString * _Nullable filePath) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSString *roomID = currentDownloadMessage.room.roomID;
             NSString *localID = currentDownloadMessage.localID;
@@ -211,7 +205,7 @@
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
                 
-                success(fullImage, currentDownloadMessage);
+                success(fullImage, currentDownloadMessage, filePath);
             }
         });
     } failure:^(NSError *error, TAPMessageModel *currentDownloadMessage) {
@@ -570,7 +564,7 @@
 - (void)runDownloadImageWithRoomID:(NSString *)roomID
                            message:(TAPMessageModel *)message
                           progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *currentDownloadMessage))progressBlock
-                           success:(void (^)(UIImage *fullImage, TAPMessageModel *currentDownloadMessage))success
+                           success:(void (^)(UIImage *fullImage, TAPMessageModel *currentDownloadMessage, NSString * _Nullable filePath))success
                            failure:(void(^)(NSError *error, TAPMessageModel *currentDownloadMessage))failure {
     
     NSDictionary *currentDataDictionary = message.data;
@@ -606,6 +600,7 @@
 //                    NSString *homeDirectoryPath = [paths objectAtIndex: 0];
 //                    NSString *filePathString = [NSString stringWithFormat:@"%@/%@", homeDirectoryPath, filePath.relativeString];
 
+                    NSLog(@">>>> download image file path: %@", filePath);
                     NSString *filePathString = filePath.relativeString;
 //                    UIImage *image = [UIImage imageWithContentsOfFile:filePathString];
                     UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:filePath]];
@@ -616,7 +611,7 @@
                         [TAPImageView saveImageToCache:image withKey:key];
                         
                         // Send back success download image
-                        success(image, message);
+                        success(image, message, filePath);
                     }
                     else {
                         NSString *errorMessage = @"Unable to retrieve image from url.";
@@ -642,7 +637,7 @@
             [TAPImageView saveImageToCache:downloadedImage withKey:currentFileID];
             
             //Send back success download image
-            success(downloadedImage, message);
+            success(downloadedImage, message, @"");
             
         } progressBlock:^(CGFloat progress, CGFloat total) {
             progressBlock(progress, total, message);

@@ -258,7 +258,7 @@
             //upload Image
             [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
                 
-                NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+                NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
                 
                 [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
                     [self.myAccountView setAsLoading:NO];
@@ -631,7 +631,7 @@
         
         [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
             
-            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
             
             [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
                 [self.myAccountView setAsLoading:NO];

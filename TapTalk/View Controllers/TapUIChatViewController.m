@@ -5092,7 +5092,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             //Send using PHAsset
             UIImage *thumbnailImage = mediaPreview.thumbnailImage;
-            NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, 1.0f);
+            NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
             
             if (asset.mediaType == PHAssetMediaTypeImage) {
                 [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption];
@@ -5182,7 +5182,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         PHAsset *asset = mediaPreview.asset;
         
         UIImage *thumbnailImage = mediaPreview.thumbnailImage;
-        NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, 1.0f);
+        NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
         
         NSString *caption = mediaPreview.caption;
         caption = [TAPUtil nullToEmptyString:caption];
@@ -6490,7 +6490,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Already Handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
-    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nullable filePath) {
         //Already Handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
@@ -10402,6 +10402,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self checkAndShowInputAccessoryView];
     //Temporary delete for everyone
     //Delete For Everyone
+    
     [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
         
     } failure:^(NSError *error) {

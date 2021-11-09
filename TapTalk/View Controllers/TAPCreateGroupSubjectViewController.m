@@ -383,7 +383,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if (self.selectedImage != nil) {
                 //has image, upload image
                 UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
-                NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+                NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -454,7 +454,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if (self.selectedImage != nil) {
                 //has image, upload image
                 UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
-                NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+                NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:self.roomModel.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -507,7 +507,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 if (self.selectedImage != nil) {
                     //has image, upload image
                     UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
-                    NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+                    NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
                     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];

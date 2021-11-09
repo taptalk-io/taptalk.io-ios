@@ -80,14 +80,28 @@
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
-        [self.delegate tapTalkDidReceiveUpdatedMessage:message];
+    if (message.isDeleted) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessage:)]) {
+            [self.delegate tapTalkDidDeleteMessage:message];
+        }
+    }
+    else {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
+            [self.delegate tapTalkDidReceiveUpdatedMessage:message];
+        }
     }
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
-        [self.delegate tapTalkDidReceiveUpdatedMessage:message];
+    if (message.isDeleted) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessage:)]) {
+            [self.delegate tapTalkDidDeleteMessage:message];
+        }
+    }
+    else {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
+            [self.delegate tapTalkDidReceiveUpdatedMessage:message];
+        }
     }
 }
 
@@ -699,6 +713,17 @@
     start(constructedMessage);
 }
 
+- (void)deleteMessage:(TAPMessageModel *)message
+              success:(void (^)(void))success
+              failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIDeleteMessageWithMessageIDs:@[message.messageID] roomID:message.room.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
+        success;
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure {
@@ -773,15 +798,15 @@
 - (void)downloadMessageImage:(TAPMessageModel *)message
                       start:(void (^)(void))startBlock
                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
-                    success:(void (^)(TAPMessageModel *message, UIImage *fullImage))successBlock
+                    success:(void (^)(TAPMessageModel *message, UIImage *fullImage, NSString * _Nullable filePath))successBlock
                     failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeImage) {
         [[TAPFileDownloadManager sharedManager] receiveImageDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
         } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
             progressBlock(receivedMessage, progress, total);
-        } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
-            successBlock(receivedMessage, fullImage);
+        } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nullable filePath) {
+            successBlock(receivedMessage, fullImage, filePath);
         } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
             failureBlock(receivedMessage, localizedError);

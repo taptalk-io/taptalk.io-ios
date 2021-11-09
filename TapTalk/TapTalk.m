@@ -21,6 +21,7 @@
 @property (nonatomic) BOOL isInitialized;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
+@property (nonatomic) CGFloat imageCompressionQuality;
 @property (strong, nonatomic) NSString *clientCustomUserAgent;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
@@ -55,6 +56,7 @@
         _coreConfigsDictionary = [[NSDictionary alloc] init];
         _customConfigsDictionary = [[NSDictionary alloc] init];
         _clientCustomUserAgent = @"";
+        _imageCompressionQuality = TAP_DEFAULT_IMAGE_COMPRESSION_QUALITY;
         
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
@@ -682,6 +684,22 @@
 - (BOOL)isAutoContactSyncEnabled {
     BOOL isDisabled = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED valid:nil];
     return !isDisabled;
+}
+
+- (void)setImageCompressionQuality:(CGFloat)imageCompressionQuality {
+    if (imageCompressionQuality < 0.1f) {
+        _imageCompressionQuality = 0.1f;
+    }
+    else if (imageCompressionQuality > 1.0f) {
+        _imageCompressionQuality = 1.0f;
+    }
+    else {
+        _imageCompressionQuality = imageCompressionQuality;
+    }
+}
+
+- (CGFloat)getImageCompressionQuality {
+    return self.imageCompressionQuality;
 }
 
 @end

@@ -279,6 +279,16 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 */
 - (BOOL)obtainGooglePlacesAPIInitializeState;
 
+/**
+ Set default image compression quality for upload and download, range is 0.1f to 1.0f
+*/
+- (void)setImageCompressionQuality:(CGFloat)imageCompressionQuality;
+
+/**
+ Get image compression quality
+*/
+- (CGFloat)getImageCompressionQuality;
+
 //==========================================================
 //                 Language & Localization
 //==========================================================

@@ -177,7 +177,7 @@
             [TAPImageView saveImageToCache:resizedImage withKey:resultMessage.localID];
             
             //Convert dummy image to image data
-            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 0.6f);
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
             
             //Call API Upload File
             NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
@@ -370,7 +370,7 @@
     // Resize image
     [self resizeImage:image maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
         // Convert image to data
-        NSData *imageData = UIImageJPEGRepresentation(resizedImage, 0.6f);
+        NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
 
         [TAPDataManager callAPIUploadFileWithFileData:imageData
                                                roomID:@""
@@ -645,7 +645,7 @@
             [TAPImageView saveImageToCache:resizedImage withKey:resultMessage.localID];
             
             //Convert dummy image to image data
-            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 0.6f);
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
             
             //Call API Upload File
             NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:imageData roomID:currentMessage.room.roomID fileName:@"images.png" fileType:@"image" mimeType:@"image/jpeg" caption:captionString completionBlock:^(NSDictionary *responseObject) {

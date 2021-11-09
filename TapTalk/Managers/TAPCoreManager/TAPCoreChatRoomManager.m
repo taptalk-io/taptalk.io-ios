@@ -164,7 +164,7 @@
         if (profilePictureImage != nil) {
             //has image, upload image
             UIImage *imageToSend = [self rotateImage:profilePictureImage];
-            NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+            NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
             [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                 //Update to group cache
                 TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -225,7 +225,7 @@
              progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
               failureBlock:(void (^)(NSError *error))failureBlock {
     UIImage *imageToSend = [self rotateImage:groupPictureImage];
-    NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+    NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:roomID completionBlock:^(TAPRoomModel *room) {
         //Update to group cache
         TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
