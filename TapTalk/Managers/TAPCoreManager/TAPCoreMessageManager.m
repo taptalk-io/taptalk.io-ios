@@ -469,27 +469,60 @@
         
         //END - Retrieve the video frame at 1 sec to define the video thumbnail
         
-        [[TAPChatManager sharedManager] sendVideoMessageWithVideoAssetURL:videoAssetURL
-                                                                  caption:caption
-                                                       thumbnailImageData:nil
-                                                                     room:room
-                                                   successGenerateMessage:^(TAPMessageModel *message) {
-            //Handle block to dictionary
-            NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
-            
-            void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
-            [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
-            
-            void (^handlerSuccess)(TAPMessageModel *) = [success copy];
-            [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
-            
-            void (^handlerFailure)(NSError *) = [failure copy];
-            [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
-            
-            [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
-            
-            start(message);
-        }];
+        AVAsset *videoAsset = [AVAsset assetWithURL:videoAssetURL];
+        
+        AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+        generator.appliesPreferredTrackTransform = YES;
+        CMTime thumbTime = CMTimeMake(1, 1);
+//        CGFloat videoLength = ((float) videoAsset.duration.value) / ((float) videoAsset.duration.timescale);
+//        CMTime thumbTime = CMTimeMakeWithSeconds(videoLength, 2.0);
+        
+        //Handle block to dictionary
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+
+        void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
+        [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
+
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+
+        void (^handlerFailure)(NSError *) = [failure copy];
+        [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
+
+        AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
+            if (result != AVAssetImageGeneratorSucceeded) {
+                // Error when generating thumbnail
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[TAPChatManager sharedManager] sendVideoMessageWithVideoAssetURL:videoAssetURL
+                                                                              caption:caption
+                                                                   thumbnailImageData:nil
+                                                                                 room:room
+                                                               successGenerateMessage:^(TAPMessageModel *message) {
+                        
+                        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+                        start(message);
+                    }];
+                });
+            }
+            else {
+                // Thumbnail generated
+                UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+                NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[TAPChatManager sharedManager] sendVideoMessageWithVideoAssetURL:videoAssetURL
+                                                                              caption:caption
+                                                                   thumbnailImageData:videoThumbnailImageData
+                                                                                 room:room
+                                                               successGenerateMessage:^(TAPMessageModel *message) {
+                        
+                        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+                        start(message);
+                    }];
+                });
+            }
+        };
+
+        [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
     });
 }
 
@@ -584,6 +617,7 @@
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                      success:(void (^)(TAPMessageModel *message))success
                      failure:(void (^)(NSError *error))failure {
+    
     if (messageToForward.type == TAPChatMessageTypeFile || messageToForward.type == TAPChatMessageTypeVideo) {
         NSDictionary *dataDictionary = messageToForward.data;
         NSString *fileID = [dataDictionary objectForKey:@"fileID"];
@@ -595,9 +629,45 @@
         }
     }
     
-    [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:room.roomID];
-    [[TAPChatManager sharedManager] saveToQuotedMessage:messageToForward userInfo:[NSDictionary dictionary] roomID:room.roomID];
-    [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:room];
+    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser
+                                                                 room:room
+                                                                 body:messageToForward.body
+                                                                 type:messageToForward.type
+                                                          messageData:nil];
+    
+    message.data = messageToForward.data;
+    message.quote = messageToForward.quote;
+    message.replyTo = messageToForward.replyTo;
+    
+    if (messageToForward.forwardFrom.localID != nil && ![messageToForward.forwardFrom.localID isEqualToString:@""]) {
+        //Obtain existing forward from model
+        message.forwardFrom = messageToForward.forwardFrom;
+    }
+    else {
+        //Create forward from model
+        TAPForwardFromModel *forwardFrom = [TAPForwardFromModel new];
+        forwardFrom.userID = messageToForward.user.userID;
+        forwardFrom.xcUserID = messageToForward.user.xcUserID;
+        forwardFrom.fullname = messageToForward.user.fullname;
+        forwardFrom.messageID = messageToForward.messageID;
+        forwardFrom.localID = messageToForward.localID;
+        message.forwardFrom = forwardFrom;
+    }
+    
+    [self sendCustomMessageWithMessageModel:message
+    start:^(TAPMessageModel * _Nonnull message) {
+        start(message);
+    }
+    success:^(TAPMessageModel * _Nonnull message) {
+        success(message);
+    }
+    failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+    
+//    [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:room.roomID];
+//    [[TAPChatManager sharedManager] saveToQuotedMessage:messageToForward userInfo:[NSDictionary dictionary] roomID:room.roomID];
+//    [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:room];
 }
 
 - (TAPMessageModel *)constructTapTalkMessageModelWithRoom:(TAPRoomModel *)room
@@ -687,12 +757,12 @@
                                     start:(void (^)(TAPMessageModel *message))start
                                   success:(void (^)(TAPMessageModel *message))success
                                   failure:(void (^)(NSError *error))failure {
-    [[TAPChatManager sharedManager] sendCustomMessage:customMessage];
     void (^handlerSuccess)(TAPMessageModel *) = [success copy];
     NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
     [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
     [self.blockDictionary setObject:blockTypeDictionary forKey:customMessage.localID];
     start(customMessage);
+    [[TAPChatManager sharedManager] sendCustomMessage:customMessage];
 }
 
 - (void)sendProductMessageWithProductArray:(NSArray <NSDictionary*> *)productArray
@@ -705,21 +775,25 @@
     
     TAPMessageModel *constructedMessage = [self constructTapTalkMessageModelWithRoom:room messageBody:@"Product List" messageType:TAPChatMessageTypeProduct messageData:dataDictionary];
     
-    [[TAPChatManager sharedManager] sendProductMessage:constructedMessage];
     void (^handlerSuccess)(TAPMessageModel *) = [success copy];
     NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
     [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
     [self.blockDictionary setObject:blockTypeDictionary forKey:constructedMessage.localID];
     start(constructedMessage);
+    [[TAPChatManager sharedManager] sendProductMessage:constructedMessage];
 }
 
 - (void)deleteMessage:(TAPMessageModel *)message
               success:(void (^)(void))success
               failure:(void (^)(NSError *error))failure {
     
-    [TAPDataManager callAPIDeleteMessageWithMessageIDs:@[message.messageID] roomID:message.room.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
-        success;
-    } failure:^(NSError *error) {
+    [TAPDataManager callAPIDeleteMessageWithMessageIDs:@[message.messageID]
+                                                roomID:message.room.roomID
+                                  isDeletedForEveryone:YES
+    success:^(NSArray *deletedMessageIDArray) {
+        success();
+    }
+    failure:^(NSError *error) {
         failure(error);
     }];
 }
@@ -1062,6 +1136,44 @@
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
+    }];
+}
+
+- (void)getUnreadMessagesFromRoom:(NSString *)roomID
+                          success:(void (^)(NSArray<TAPMessageModel *> *unreadMessageArray))success
+                          failure:(void (^)(NSError *error))failure {
+
+    [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomID
+                                                 activeUserID:[[TapTalk sharedInstance] getTapTalkActiveUser].userID
+    success:^(NSArray *unreadMessages) {
+        success(unreadMessages);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getMediaMessagesFromRoom:(NSString *)roomID
+                   lastTimestamp:(NSNumber *)lastTimestamp
+                    numberOfItem:(NSInteger)numberOfItem
+                         success:(void (^)(NSArray<TAPMessageModel *> *mediaMessageArray))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    NSString *lastTimestampString;
+    if ([lastTimestamp longValue] <= 0L) {
+        lastTimestampString = @"";
+    }
+    else {
+        lastTimestampString = [lastTimestamp stringValue];
+    }
+    [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:roomID
+                                               lastTimestamp:lastTimestampString
+                                                numberOfItem:numberOfItem
+    success:^(NSArray *mediaMessages) {
+        success(mediaMessages);
+    }
+    failure:^(NSError *error) {
+        failure(error);
     }];
 }
 

@@ -2955,6 +2955,12 @@
             return color;
             break;
         }
+        case TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconDestructive];
+            return color;
+            break;
+        }
     //Media / Image Detail Preview
         case TAPComponentColorIconMediaPreviewAdd:
         {

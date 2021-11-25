@@ -574,7 +574,12 @@
     }];
 }
 
-- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                                  caption:(NSString *)caption
+                       thumbnailImageData:(NSData *)thumbnailImageData
+                                     room:(TAPRoomModel *)room
+                   successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     

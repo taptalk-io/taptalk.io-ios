@@ -170,6 +170,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuRemoveMember, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup, //Chat / Group Profile Page
     TAPComponentColorIconMediaPreviewAdd, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewWarning, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewThumbnailWarning,//Media / Image Detail Preview

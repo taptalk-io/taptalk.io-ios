@@ -47,6 +47,7 @@
 @property (nonatomic) BOOL isAddToContactsButtonInChatRoomHidden;
 @property (nonatomic) BOOL isAddToContactsButtonInChatProfileHidden;
 @property (nonatomic) BOOL isAddContactDisabled;
+@property (nonatomic) BOOL isReportButtonInChatProfileVisible;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -812,6 +813,20 @@ Get current status of adding contacts & contact list
 */
 - (BOOL)isAddContactEnabled {
     return !self.isAddContactDisabled;
+}
+
+/**
+Show or hide report button in user/group profile page
+*/
+- (void)setReportButtonInChatProfileVisible:(BOOL)isVisible {
+    _isReportButtonInChatProfileVisible = isVisible;
+}
+
+/**
+ Get current visibility state of report button in user/group profile page
+*/
+- (BOOL)getReportButtonInChatProfileVisibleState {
+    return self.isReportButtonInChatProfileVisible;
 }
 
 @end

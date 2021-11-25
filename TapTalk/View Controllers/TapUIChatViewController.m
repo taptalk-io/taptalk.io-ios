@@ -7083,7 +7083,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
                                               [self checkAndShowInputAccessoryView];
-                                              [self showDeleteMessageActionWithMessageArray:@[message.messageID]];
+                                              [self showDeleteMessageActionWithMessageArray:@[message]];
                                           }];
     
     UIAlertAction *cancelAction = [UIAlertAction
@@ -10397,15 +10397,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
-- (void)showDeleteMessageActionWithMessageArray:(NSString *)deletedMessageIDArray {
+- (void)showDeleteMessageActionWithMessageArray:(NSArray<TAPMessageModel *> *)deletedMessageArray {
 
     [self checkAndShowInputAccessoryView];
     //Temporary delete for everyone
     //Delete For Everyone
     
-    [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
+    TAPMessageModel *message = [deletedMessageArray objectAtIndex:0];
+    [[TAPCoreMessageManager sharedManager] deleteMessage:message success:^{
         
-    } failure:^(NSError *error) {
+    } failure:^(NSError * _Nonnull error) {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Failed to delete message, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
     

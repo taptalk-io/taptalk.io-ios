@@ -233,6 +233,14 @@ NS_ASSUME_NONNULL_BEGIN
                                            NSArray <TAPMessageModel *> *olderMessagesArray,
                                            NSArray <TAPMessageModel *> *newerMessagesArray))successAllMessages
                          failure:(void (^)(NSError *error))failure;
+- (void)getUnreadMessagesFromRoom:(NSString *)roomID
+                          success:(void (^)(NSArray<TAPMessageModel *> *unreadMessageArray))success
+                          failure:(void (^)(NSError *error))failure;
+- (void)getMediaMessagesFromRoom:(NSString *)roomID
+                   lastTimestamp:(NSNumber *)lastTimestamp
+                    numberOfItem:(NSInteger)numberOfItem
+                         success:(void (^)(NSArray<TAPMessageModel *> *mediaMessageArray))success
+                         failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

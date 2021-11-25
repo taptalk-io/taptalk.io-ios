@@ -234,6 +234,29 @@
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         CGFloat height = 56.0f;
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+            if (self.room.type == RoomTypePersonal) {
+                if (indexPath.row == 0) {
+                    //add to contacts
+                    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                    TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                    if (![[TapUI sharedInstance] isAddContactEnabled] ||
+                        ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState] ||
+                        user != nil && user.isContact ||
+                        [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
+                    ) {
+                        // Hide if add to contacts menu is disabled in TapUI or user is already a contact
+                        height = 0.0f;
+                    }
+                }
+                else if (indexPath.row == 1) {
+                    // Report user
+                    if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
+                        height = 0.0f;
+                    }
+                }
+            }
+        }
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
             if (indexPath.row == 0) {
@@ -262,6 +285,12 @@
                     height = 0.0f;
                 }
             }
+            else if (indexPath.row == 4) {
+                // Report member
+                if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
+                    height = 0.0f;
+                }
+            }
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
@@ -273,6 +302,12 @@
                     [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
                 ) {
                     // Hide if add to contacts menu is disabled in TapUI or user is already a contact
+                    height = 0.0f;
+                }
+            }
+            else if (indexPath.row == 1) {
+                // Report member
+                if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
                     height = 0.0f;
                 }
             }
@@ -339,17 +374,20 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
             //DV Note
             //Temporary Hidden For V1 because features is not complete (25 Mar 2019)
-            //        return 4;
+            //        return 5;
             //END DV Note
-            if (self.room.type == RoomTypeGroup) {
+            if (self.room.type == RoomTypePersonal) {
                 return 2;
+            }
+            else if (self.room.type == RoomTypeGroup) {
+                return 3;
             }
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
-            return 4; //add to contact, send message, appoint as admin, remove member
+            return 5; //add to contact, send message, appoint as admin, remove member, report
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
-            return 2; //add to contact, send message
+            return 3; //add to contact, send message, report
         }
         return 0;
     }
@@ -389,7 +427,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //END DV Note
         
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
-            if (self.room.type == RoomTypeGroup) {
+            if (self.room.type == RoomTypePersonal) {
+                NSString *cellID = @"TAPProfileCollectionViewCell";
+                [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
+                TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+                if (indexPath.item == 0) {
+                    //add contact
+                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeAddContacts];
+                    [cell showSeparatorView:YES];
+                }
+                else if (indexPath.item == 1) {
+                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+                    [cell showSeparatorView:YES];
+                }
+                return cell;
+            }
+            else if (self.room.type == RoomTypeGroup) {
                 NSString *cellID = @"TAPProfileCollectionViewCell";
                 [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
                 TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
@@ -407,6 +460,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeLeaveGroup];
                     }
                     
+                    [cell showSeparatorView:YES];
+                }
+                else if (indexPath.item == 2) {
+                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportGroup];
                     [cell showSeparatorView:YES];
                 }
                 
@@ -444,6 +501,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeRemoveMember];
                 [cell showSeparatorView:YES];
             }
+            else if (indexPath.item == 4) {
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+                [cell showSeparatorView:YES];
+            }
             
             return cell;
         }
@@ -460,6 +521,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else if (indexPath.item == 1) {
                 //send message
                 [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeSendMessage];
+                [cell showSeparatorView:YES];
+            }
+            else if (indexPath.item == 2) {
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
                 [cell showSeparatorView:YES];
             }
             
@@ -645,7 +710,50 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
-            if (self.room.type == RoomTypeGroup) {
+            if (self.room.type == RoomTypePersonal) {
+                if (indexPath.row == 0) {
+                    //add to contacts
+                    [self.profileView showLoadingView:YES];
+                    [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeAddToContact];
+                    NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                    currentUserID = [TAPUtil nullToEmptyString:currentUserID];
+                    
+                    if ([currentUserID isEqualToString:self.user.userID]) {
+                        //Add theirselves
+                        [self removeLoadingView];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Can't add yourself as contact", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    }
+                    else {
+                        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                        [TAPDataManager callAPIAddContactWithUserID:obtainedUser.userID success:^(NSString *message, TAPUserModel *user) {
+                            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
+                            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAddToContact];
+                            
+                            [TAPUtil performBlock:^{
+                                [self.navigationController popViewControllerAnimated:YES];
+                            } afterDelay:1.2f];
+                            
+                        } failure:^(NSError *error) {
+    #ifdef DEBUG
+                            NSLog(@"%@", error);
+    #endif
+                            
+                            [self removeLoadingView];
+                        }];
+                    }
+                }
+                else if (indexPath.row == 1) {
+                    // Report user
+                    id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                    if ([chatProfileDelegate respondsToSelector:@selector(reportUserButtonDidTapped:room:user:)]) {
+                        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                        [chatProfileDelegate reportUserButtonDidTapped:self room:self.room user:obtainedUser];
+                    }
+                }
+            }
+            else if (self.room.type == RoomTypeGroup) {
                 if (indexPath.row == 0) {
                     //view group members
                     _isLeaveFromGroupProfilePage = YES;
@@ -665,6 +773,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     else {
                         //leave group
                         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedStringFromTableInBundle(@"Leave Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"All messages and shared medias from this room will be inaccessible. Are you sure you want to leave?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Leave", nil, [TAPUtil currentBundle], @"")];
+                    }
+                }
+                else if (indexPath.row == 2) {
+                    // Report group
+                    id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                    if ([chatProfileDelegate respondsToSelector:@selector(reportGroupButtonDidTapped:room:)]) {
+                        [chatProfileDelegate reportGroupButtonDidTapped:self room:self.room];
                     }
                 }
             }
@@ -743,6 +858,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //remove member
                  [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Remove Member" title:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to remove this member?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
             }
+            else if (indexPath.row == 4) {
+                // Report member
+                id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                if ([chatProfileDelegate respondsToSelector:@selector(reportUserButtonDidTapped:room:user:)]) {
+                    [chatProfileDelegate reportUserButtonDidTapped:self room:self.room user:self.user];
+                }
+            }
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
             if (indexPath.row == 0) {
@@ -783,6 +905,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     chatViewController.hidesBottomBarWhenPushed = YES;
                     [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
                 }];
+            }
+            else if (indexPath.row == 2) {
+                // Report user
+                id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                if ([chatProfileDelegate respondsToSelector:@selector(reportUserButtonDidTapped:room:user:)]) {
+                    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                    TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                    [chatProfileDelegate reportUserButtonDidTapped:self room:self.room user:obtainedUser];
+                }
             }
         }
     }

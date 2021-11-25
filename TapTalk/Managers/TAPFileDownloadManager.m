@@ -475,7 +475,6 @@
     
     [data writeToFile:destinationFileString atomically:YES];
 
-    // TODO: ADD FILE PATH SUCCESS CALLBACK (?)
     [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:message.room.roomID fileID:key];
      [self.failedDownloadDictionary removeObjectForKey:message.localID];
     

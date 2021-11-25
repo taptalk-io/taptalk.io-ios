@@ -150,7 +150,7 @@ Called when user click mention in the bubble chat.
  Called when user click the profile button on the top left side of room list view.
  
  @param currentViewController (UIViewController *) current shown view controller
- @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
  */
 - (void)tapTalkAccountButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
@@ -159,10 +159,38 @@ Called when user click mention in the bubble chat.
  Called when user click the new chat button on the top right side of room list view.
  
  @param currentViewController (UIViewController *) current shown view controller
- @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
  */
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
+@end
+
+//==========================================================
+//                 TapUIChatProfileDelegate
+//==========================================================
+@protocol TapUIChatProfileDelegate <NSObject>
+@optional
+
+/**
+ Called when user taps the Report User button in chat profile
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param room (TAPRoomModel *) chat room details of the reported user
+ @param reportedUser (TapUserModel *) details of the reported user
+ */
+- (void)reportUserButtonDidTapped:(UIViewController *)currentViewController
+                             room:(TAPRoomModel *)room
+                             user:(TAPUserModel *)reportedUser;
+
+/**
+ Called when user taps the Report Group button in chat profile
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param room (TAPRoomModel *) chat room details of the reported group
+ */
+- (void)reportGroupButtonDidTapped:(UIViewController *)currentViewController
+                              room:(TAPRoomModel *)room;
+
 @end
 
 //==========================================================
@@ -203,6 +231,7 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 @property (weak, nonatomic) UIWindow *activeWindow;
 @property (weak, nonatomic) id<TapUIChatRoomDelegate> chatRoomDelegate;
 @property (weak, nonatomic) id<TapUIRoomListDelegate> roomListDelegate;
+@property (weak, nonatomic) id<TapUIChatProfileDelegate> chatProfileDelegate;
 @property (weak, nonatomic) id<TapUICustomKeyboardDelegate> customKeyboardDelegate;
 
 //Initalization
@@ -690,6 +719,15 @@ Enable or disable adding contacts & contact list
 Get current status of adding contacts & contact list
 */
 - (BOOL)isAddContactEnabled;
+
+/**
+Show or hide report button in user/group profile page
+*/
+- (void)setReportButtonInChatProfileVisible:(BOOL)isVisible;
+/**
+ Get current visibility state of report button in user/group profile page
+*/
+- (BOOL)getReportButtonInChatProfileVisibleState;
 
 @end
 

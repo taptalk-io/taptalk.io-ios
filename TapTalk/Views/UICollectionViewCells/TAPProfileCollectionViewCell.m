@@ -228,6 +228,27 @@
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
     }
+    else if (type == profileCollectionViewCellTypeReportUser) {
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup]];
+        
+        self.titleLabel.textColor = titleLabelDestructiveColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Report User", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 0.0f;
+    }
+    else if (type == profileCollectionViewCellTypeReportGroup) {
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup]];
+        
+        self.titleLabel.textColor = titleLabelDestructiveColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Report Group", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 0.0f;
+    }
+    
 }
 
 - (void)switchValueChanged:(id)sender {
