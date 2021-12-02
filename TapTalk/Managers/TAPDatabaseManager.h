@@ -70,6 +70,10 @@
                            tableName:(NSString *)tableName
                              success:(void (^)(void))success
                              failure:(void (^)(NSError *error))failure;
++ (void)deleteMessageInDatabaseWithRoomID:(NSString *)roomID
+                                tableName:(NSString *)tableName
+                                  success:(void (^)(void))success
+                                  failure:(void (^)(NSError *error))failure;
 + (void)deleteDataInDatabaseInMainThreadWithData:(NSArray *)dataArray
                                        tableName:(NSString *)tableName
                                          success:(void (^)(void))success

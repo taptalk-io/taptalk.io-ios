@@ -109,6 +109,13 @@
         return;
     }
     
+    if (message.type == TAPChatMessageTypeSystemMessage &&
+        [message.action isEqualToString:@"room/addParticipant"] &&
+        ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+    ) {
+        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:message.room.roomID];
+    }
+    
     //Insert message to database
     [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[message] success:^{
         //Update application badge

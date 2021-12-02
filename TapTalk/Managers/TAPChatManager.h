@@ -105,6 +105,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)runEnterBackgroundSequenceWithApplication:(UIApplication *)application;
 - (void)removeAllBackgroundSequenceTaskWithApplication:(UIApplication *)application;
 - (void)updateSendingMessageToFailed;
+- (void)removeMessagesFromPendingMessagesArrayWithRoomID:(NSString *)roomID;
 - (void)saveNewMessageToDatabase;
 - (void)saveAllUnsentMessage;
 - (void)saveAllUnsentMessageInMainThread;

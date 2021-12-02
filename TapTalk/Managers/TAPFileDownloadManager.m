@@ -599,7 +599,6 @@
 //                    NSString *homeDirectoryPath = [paths objectAtIndex: 0];
 //                    NSString *filePathString = [NSString stringWithFormat:@"%@/%@", homeDirectoryPath, filePath.relativeString];
 
-                    NSLog(@">>>> download image file path: %@", filePath);
                     NSString *filePathString = filePath.relativeString;
 //                    UIImage *image = [UIImage imageWithContentsOfFile:filePathString];
                     UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:filePath]];

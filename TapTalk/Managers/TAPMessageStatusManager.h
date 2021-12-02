@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)getReadCountAndClearDictionaryForRoomID:(NSString *)roomID;
 - (void)clearReadCountDictionary;
 - (NSInteger)getReadMentionCountAndClearDictionaryForRoomID:(NSString *)roomID;
+- (void)removeMessagesFromMessageQueueArrayWithRoomID:(NSString *)roomID;
 - (void)clearReadMentionCountDictionary;
 - (void)clearMessageStatusManagerData;
 

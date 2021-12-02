@@ -109,19 +109,19 @@
 - (void)getGroupChatRoomWithGroupRoomID:(NSString *)groupRoomID
                                 success:(void (^)(TAPRoomModel *room))success
                                 failure:(void (^)(NSError *error))failure {
-    TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
-    if (obtainedRoom == nil) {
-        [TAPDataManager callAPIGetRoomWithRoomID:groupRoomID success:^(TAPRoomModel *room) {
-            [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
-            success(room);
-        } failure:^(NSError *error) {
+    [TAPDataManager callAPIGetRoomWithRoomID:groupRoomID success:^(TAPRoomModel *room) {
+        [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
+        success(room);
+    } failure:^(NSError *error) {
+        TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
+        if (obtainedRoom == nil) {
+            success(obtainedRoom);
+        }
+        else {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
             failure(localizedError);
-        }];
-    }
-    else {
-        success(obtainedRoom);
-    }
+        }
+    }];
 }
 
 - (void)getChatRoomByXCRoomID:(NSString *)xcRoomID

@@ -557,6 +557,33 @@
     });
 }
 
++ (void)deleteMessageInDatabaseWithRoomID:(NSString *)roomID
+                                tableName:(NSString *)tableName
+                                  success:(void (^)(void))success
+                                  failure:(void (^)(NSError *error))failure {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        @autoreleasepool {
+            RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+            
+            NSString *predicateString = [NSString stringWithFormat:@"roomID LIKE '%@'", roomID];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateString];
+            RLMResults *results = [TAPMessageRealmModel allObjectsInRealm:realm];
+            results = [results objectsWithPredicate:predicate];
+            [realm beginWriteTransaction];
+            [realm deleteObjects:results];
+            [realm commitWriteTransaction];
+            
+            [[TAPChatManager sharedManager] removeMessagesFromPendingMessagesArrayWithRoomID:roomID];
+            [[TAPMessageStatusManager sharedManager] removeMessagesFromMessageQueueArrayWithRoomID:roomID];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                success();
+            });
+        }
+    });
+}
+
 + (void)deleteDataInDatabaseInMainThreadWithData:(NSArray *)dataArray
                                        tableName:(NSString *)tableName
                                          success:(void (^)(void))success

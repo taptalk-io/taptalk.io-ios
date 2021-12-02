@@ -1077,21 +1077,25 @@
                 [allMessages addObjectsFromArray:filteredMessages];
                 [newerMessages addObjectsFromArray:filteredMessages];
                 
-                // Sort message array
-                NSMutableArray *currentMessageArray = [NSMutableArray arrayWithArray:allMessages];
-                NSMutableArray *sortedArray;
-                
-                sortedArray = [currentMessageArray sortedArrayUsingComparator:^NSComparisonResult(id message1, id message2) {
-                    TAPMessageModel *messageModel1 = (TAPMessageModel *)message1;
-                    TAPMessageModel *messageModel2 = (TAPMessageModel *)message2;
+                [self getLocalMessagesWithRoomID:roomID success:^(NSArray<TAPMessageModel *> * _Nonnull messageArray) {
+                    successAllMessages(messageArray, olderMessages, newerMessages);
+                } failure:^(NSError * _Nonnull error) {
+                    // Sort message array
+                    NSMutableArray *currentMessageArray = [NSMutableArray arrayWithArray:allMessages];
+                    NSMutableArray *sortedArray;
                     
-                    NSNumber *message1CreatedDate = messageModel1.created;
-                    NSNumber *message2CreatedDate = messageModel2.created;
+                    sortedArray = [currentMessageArray sortedArrayUsingComparator:^NSComparisonResult(id message1, id message2) {
+                        TAPMessageModel *messageModel1 = (TAPMessageModel *)message1;
+                        TAPMessageModel *messageModel2 = (TAPMessageModel *)message2;
+                        
+                        NSNumber *message1CreatedDate = messageModel1.created;
+                        NSNumber *message2CreatedDate = messageModel2.created;
+                        
+                        return [message2CreatedDate compare:message1CreatedDate];
+                    }];
                     
-                    return [message2CreatedDate compare:message1CreatedDate];
+                    successAllMessages(sortedArray, olderMessages, newerMessages);
                 }];
-                
-                successAllMessages(sortedArray, olderMessages, newerMessages);
             } failure:^(NSError * _Nonnull error) {
                 NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
                 failure(localizedError);

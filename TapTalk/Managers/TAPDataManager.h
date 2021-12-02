@@ -156,6 +156,9 @@
 + (void)deleteDatabaseMessageWithData:(NSArray *)dataArray
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure;
++ (void)deleteDatabaseMessageWithRoomID:(NSString *)roomID
+                                success:(void (^)(void))success
+                                failure:(void (^)(NSError *error))failure;
 + (void)deleteDatabaseMessageWithPredicateString:(NSString *)predicateString
                                          success:(void (^)(void))success
                                          failure:(void (^)(NSError *error))failure;
@@ -328,5 +331,8 @@
                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetProjectConfigsWithSuccess:(void (^)(NSDictionary *projectConfigsDictionary))success
                                     failure:(void (^)(NSError *error))failure;
+
+// Used to prevent inserting message to deleted chat room
+@property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 
 @end

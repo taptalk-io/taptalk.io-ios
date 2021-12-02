@@ -42,6 +42,7 @@
     if (self) {
         //Add delegate to Connection Manager here
         _refreshTokenLock = [NSLock new];
+        _deletedRoomIDArray = [NSMutableArray array];
     }
     
     return self;
@@ -1707,7 +1708,7 @@
         //Delete message & physical data of image/video/file
         [TAPDataManager deletePhysicalFileAndMessageSequenceWithMessageArray:messageArray success:^{
             //Delete all message
-            [TAPDataManager deleteDatabaseMessageWithData:allMessageArray success:^{
+            [TAPDataManager deleteDatabaseMessageWithRoomID:roomID success:^{
                 success();
             } failure:^(NSError *error) {
                 //failure delete message from database
@@ -2346,7 +2347,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager insertDataToDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
@@ -2369,7 +2372,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2392,7 +2397,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseInMainThreadWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2465,8 +2472,10 @@
         
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
-        
-        [messageDictionaryArray addObject:messageDictionary];
+     
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2493,7 +2502,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2520,6 +2531,22 @@
     }
     
     [TAPDatabaseManager deleteDataInDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
+        success();
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)deleteDatabaseMessageWithRoomID:(NSString *)roomID
+                                success:(void (^)(void))success
+                                failure:(void (^)(NSError *error))failure {
+    if (roomID == nil || [roomID isEqualToString:@""]) {
+        success();
+        return;
+    }
+    
+    [TAPDatabaseManager deleteMessageInDatabaseWithRoomID:roomID tableName:kDatabaseTableMessage success:^{
+        [[TAPDataManager sharedManager].deletedRoomIDArray addObject:roomID];
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -3267,12 +3294,10 @@
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
-            
+            success(messageResultArray);
         } failure:^(NSError *error) {
-            
+            success(messageResultArray);
         }];
-        
-        success(messageResultArray);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
@@ -3356,12 +3381,10 @@
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
-            
+            success(messageResultArray, hasMore);
         } failure:^(NSError *error) {
-            
+            success(messageResultArray, hasMore);
         }];
-        
-        success(messageResultArray, hasMore);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

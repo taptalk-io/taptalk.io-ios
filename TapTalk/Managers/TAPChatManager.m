@@ -924,6 +924,13 @@
         //DV Temp
         //TODO Notification Manager Handle New Message
     }
+    
+    if (decryptedMessage.type == TAPChatMessageTypeSystemMessage &&
+        [decryptedMessage.action isEqualToString:@"room/addParticipant"] &&
+        ([decryptedMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+    ) {
+        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:decryptedMessage.room.roomID];
+    }
 }
 
 - (void)receiveContactUpdatedFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
@@ -999,6 +1006,19 @@
 - (void)stopTimerSaveNewMessage {
     [self.saveNewMessageTimer invalidate];
     _saveNewMessageTimer = nil;
+}
+
+- (void)removeMessagesFromPendingMessagesArrayWithRoomID:(NSString *)roomID {
+    for (TAPMessageModel *message in self.incomingMessageArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.incomingMessageArray removeObject:message];
+        }
+    }
+    for (TAPMessageModel *message in self.pendingMessageArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.pendingMessageArray removeObject:message];
+        }
+    }
 }
 
 - (void)saveNewMessageToDatabase {

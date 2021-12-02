@@ -321,6 +321,24 @@
     return countInteger;
 }
 
+- (void)removeMessagesFromMessageQueueArrayWithRoomID:(NSString *)roomID {
+    for (TAPMessageModel *message in self.readMessageQueueArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.readMessageQueueArray removeObject:message];
+        }
+    }
+    for (TAPMessageModel *message in self.deliveryMessageQueueArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.deliveryMessageQueueArray removeObject:message];
+        }
+    }
+    for (TAPMessageModel *message in self.filteredBulkDeliveryMessageArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.filteredBulkDeliveryMessageArray removeObject:message];
+        }
+    }
+}
+
 - (void)clearReadMentionCountDictionary {
     [self.readCountMentionDictionary removeAllObjects];
 }
