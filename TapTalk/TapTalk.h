@@ -309,6 +309,8 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  Refresh latest active user data from the server
  */
 - (void)refreshActiveUser;
+- (void)refreshActiveUserWithSuccess:(void (^)(void))success
+                             failure:(void (^)(NSError *error))failure;
 
 /**
  Obtain active user data

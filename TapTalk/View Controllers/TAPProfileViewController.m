@@ -1220,30 +1220,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.profileView showLoadingView:YES];
         [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeLeaveGroup];
         [TAPDataManager callAPILeaveRoomWithRoomID:self.room.roomID success:^{
-            
-            //Remove from group preference
-            [[TAPGroupManager sharedManager] removeRoomWithRoomID:self.room.roomID];
-            
-            //add sequence to delete message and physical files
-            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
+            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeLeaveGroup];
 
-                [self showFinishLoadingStateWithType:TAPProfileLoadingTypeLeaveGroup];
-
-                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
-                    [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
-                }
-                
-                //Throw view to room list
-                [TAPUtil performBlock:^{
-                    [self.navigationController popToRootViewControllerAnimated:YES];
-                } afterDelay:1.2f];
-                
-            } failure:^(NSError *error) {
-                [self removeLoadingView];
-                NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-                errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-            }];
+            if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
+                [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
+            }
+            
+            //Throw view to room list
+            [TAPUtil performBlock:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            } afterDelay:1.2f];
         } failure:^(NSError *error) {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -1256,31 +1242,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDeleteGroup];
         
         [TAPDataManager callAPIDeleteRoomWithRoom:self.room success:^{
+            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeDeleteGroup];
             
-            //Remove from group preference
-            [[TAPGroupManager sharedManager] removeRoomWithRoomID:self.room.roomID];
+            if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
+                [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
+            }
             
-            //add sequence to delete message and physical files
-            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
-                
-                [self showFinishLoadingStateWithType:TAPProfileLoadingTypeDeleteGroup];
-                
-                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
-                    [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
-                }
-                
-                //Throw view to room list
-                [TAPUtil performBlock:^{
-                    [self.navigationController popToRootViewControllerAnimated:YES];
-                } afterDelay:1.2f];
-                
-            } failure:^(NSError *error) {
-                [self removeLoadingView];
-                NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-                errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-            }];
-            
+            //Throw view to room list
+            [TAPUtil performBlock:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            } afterDelay:1.2f];
         } failure:^(NSError *error) {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];

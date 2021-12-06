@@ -479,9 +479,22 @@
 }
 
 - (void)refreshActiveUser {
+    [self refreshActiveUserWithSuccess:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)refreshActiveUserWithSuccess:(void (^)(void))success
+                             failure:(void (^)(NSError *error))failure {
+    
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     
     if (currentUser == nil) {
+        NSString *errorMessage =  NSLocalizedStringFromTableInBundle(@"Active user not found", nil, [TAPUtil currentBundle], @"");
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90001 errorMessage:errorMessage];
+        failure(error);
         return;
     }
     
@@ -490,9 +503,10 @@
         if (user != nil) {
             //Save to prefs
             [TAPDataManager setActiveUser:user];
+            success();
         }
     } failure:^(NSError *error) {
-        
+        failure(error);
     }];
 }
 

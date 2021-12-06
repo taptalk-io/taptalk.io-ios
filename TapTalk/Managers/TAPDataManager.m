@@ -1709,6 +1709,8 @@
         [TAPDataManager deletePhysicalFileAndMessageSequenceWithMessageArray:messageArray success:^{
             //Delete all message
             [TAPDataManager deleteDatabaseMessageWithRoomID:roomID success:^{
+                // Remove from group preference
+                [[TAPGroupManager sharedManager] removeRoomWithRoomID:roomID];
                 success();
             } failure:^(NSError *error) {
                 //failure delete message from database
@@ -6025,7 +6027,12 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
             return;
         }
         
@@ -6035,7 +6042,12 @@
         BOOL successBool = [successNumber boolValue];
         
         if (successBool) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
         }
         else {
             NSString *errorMessage = [dataDictionary objectForKey:@"message"];
@@ -6107,7 +6119,12 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:room.roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
             return;
         }
         
@@ -6117,7 +6134,12 @@
         BOOL successBool = [successNumber boolValue];
         
         if (successBool) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:room.roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
         }
         else {
             NSString *errorMessage = [dataDictionary objectForKey:@"message"];

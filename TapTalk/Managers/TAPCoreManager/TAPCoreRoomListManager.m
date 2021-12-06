@@ -95,6 +95,11 @@
         NSMutableDictionary *unreadMentionDataDictionary = [NSMutableDictionary dictionary];
         __block NSInteger countedMessage = 0;
         
+        if ([resultArray count] == 0) {
+            success(resultArray);
+            return;
+        }
+        
         for (TAPMessageModel *message in resultArray) {
             TAPRoomModel *room = message.room;
             NSString *roomID = room.roomID;

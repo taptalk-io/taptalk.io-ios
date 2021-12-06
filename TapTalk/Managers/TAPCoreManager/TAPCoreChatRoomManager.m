@@ -247,12 +247,20 @@
     }];
 }
 
+- (void)deleteLocalGroupChatRoomWithRoomID:(NSString *)roomID
+                                   success:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure {
+    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+        success();
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 - (void)deleteGroupChatRoom:(TAPRoomModel *)room
                     success:(void (^)(void))success
                     failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIDeleteRoomWithRoom:room success:^{
-        //Remove from group preference
-        [[TAPGroupManager sharedManager] removeRoomWithRoomID:room.roomID];
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -264,8 +272,6 @@
                              success:(void (^)(void))success
                              failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPILeaveRoomWithRoomID:roomID success:^{
-        //Remove from group preference
-        [[TAPGroupManager sharedManager] removeRoomWithRoomID:roomID];        
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
