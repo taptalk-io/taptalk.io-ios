@@ -149,8 +149,8 @@
     if (blockTypeDictionary == nil || [blockTypeDictionary count] == 0) {
         return;
     }
-    void (^handler)(NSError *) = [blockTypeDictionary objectForKey:@"failureBlock"];
-    handler(localizedError);
+    void (^handler)(TAPMessageModel * _Nullable, NSError *) = [blockTypeDictionary objectForKey:@"failureBlock"];
+    handler(obtainedMessage, localizedError);
 }
 
 - (void)fileUploadManagerStartNotification:(NSNotification *)notification {
@@ -176,7 +176,7 @@
                    room:(TAPRoomModel *)room
                   start:(void (^)(TAPMessageModel *message))start
                 success:(void (^)(TAPMessageModel *message))success
-                failure:(void (^)(NSError *error))failure {
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] sendTextMessage:message room:room successGenerateMessage:^(TAPMessageModel *message) {
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
@@ -191,7 +191,7 @@
                    room:(TAPRoomModel *)room
                   start:(void (^)(TAPMessageModel *message))start
                 success:(void (^)(TAPMessageModel *message))success
-                failure:(void (^)(NSError *error))failure {
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendTextMessage:message room:room start:start success:success failure:failure];
 }
@@ -202,7 +202,7 @@
                                    room:(TAPRoomModel *)room
                                   start:(void (^)(TAPMessageModel *message))start
                                 success:(void (^)(TAPMessageModel *message))success
-                                failure:(void (^)(NSError *error))failure {
+                                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *addressString = @"";
     if (address != nil) {
         addressString = address;
@@ -225,7 +225,7 @@
                                    room:(TAPRoomModel *)room
                                   start:(void (^)(TAPMessageModel *message))start
                                 success:(void (^)(TAPMessageModel *message))success
-                                failure:(void (^)(NSError *error))failure {
+                                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendLocationMessageWithLatitude:latitude longitude:longitude address:address room:room start:start success:success failure:failure];
 }
@@ -236,7 +236,7 @@
                    start:(void (^)(TAPMessageModel *message))start
                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
-                 failure:(void (^)(NSError *error))failure {
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *captionString = @"";
     if (caption != nil) {
         captionString = caption;                        
@@ -247,7 +247,7 @@
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-        failure(error);
+        failure(nil, error);
         return;
     }
     
@@ -261,7 +261,7 @@
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
         [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
         
-        void (^handlerFailure)(NSError *) = [failure copy];
+        void (^handlerFailure)(TAPMessageModel * _Nullable, NSError *) = [failure copy];
         [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
         
         [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
@@ -277,7 +277,7 @@
                    start:(void (^)(TAPMessageModel *message))start
                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
-                 failure:(void (^)(NSError *error))failure {
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendImageMessage:image caption:caption room:room start:start progress:progress success:success failure:failure];
 }
@@ -288,7 +288,7 @@
                             start:(void (^)(TAPMessageModel *message))start
                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
-                          failure:(void (^)(NSError *error))failure {
+                          failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *captionString = @"";
     if (caption != nil) {
         captionString = caption;
@@ -299,7 +299,7 @@
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-        failure(error);
+        failure(nil, error);
         return;
     }
     
@@ -312,7 +312,7 @@
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
         [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
         
-        void (^handlerFailure)(NSError *) = [failure copy];
+        void (^handlerFailure)(TAPMessageModel * _Nullable, NSError *) = [failure copy];
         [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
         
         [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
@@ -328,7 +328,7 @@
                             start:(void (^)(TAPMessageModel *message))start
                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
-                          failure:(void (^)(NSError *error))failure {
+                          failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendImageMessageWithAsset:asset caption:caption room:room start:start progress:progress success:success failure:failure];
 }
@@ -339,7 +339,7 @@
                           start:(void (^)(TAPMessageModel *message))start
                        progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                         success:(void (^)(TAPMessageModel *message))success
-                        failure:(void (^)(NSError *error))failure {
+                        failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageURL]];
     [self sendImageMessage:image caption:caption room:room start:start progress:progress success:success failure:failure];
 }
@@ -351,7 +351,7 @@
                           start:(void (^)(TAPMessageModel *message))start
                        progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                         success:(void (^)(TAPMessageModel *message))success
-                        failure:(void (^)(NSError *error))failure {
+                        failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageURL]];
     [self sendImageMessage:image caption:caption room:room start:start progress:progress success:success failure:failure];
@@ -363,7 +363,7 @@
                             start:(void (^)(TAPMessageModel *message))start
                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
-                          failure:(void (^)(NSError *error))failure {
+                          failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *captionString = @"";
     if (caption != nil) {
         captionString = caption;
@@ -374,7 +374,7 @@
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-        failure(error);
+        failure(nil, error);
         return;
     }
     
@@ -406,7 +406,7 @@
                             void (^handlerSuccess)(TAPMessageModel *) = [success copy];
                             [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
                             
-                            void (^handlerFailure)(NSError *) = [failure copy];
+                            void (^handlerFailure)(TAPMessageModel * _Nullable, NSError *) = [failure copy];
                             [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
                             
                             [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
@@ -427,7 +427,7 @@
                             start:(void (^)(TAPMessageModel *message))start
                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
-                          failure:(void (^)(NSError *error))failure {
+                          failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendVideoMessageWithAsset:asset caption:caption room:room start:start progress:progress success:success failure:failure];
 }
@@ -438,7 +438,7 @@
                                     start:(void (^)(TAPMessageModel *message))start
                                  progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                                   success:(void (^)(TAPMessageModel *message))success
-                                  failure:(void (^)(NSError *error))failure {
+                                  failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *captionString = @"";
     if (caption != nil) {
         captionString = caption;
@@ -449,7 +449,7 @@
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-        failure(error);
+        failure(nil, error);
         return;
     }
     
@@ -486,7 +486,7 @@
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
         [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
 
-        void (^handlerFailure)(NSError *) = [failure copy];
+        void (^handlerFailure)(TAPMessageModel * _Nullable, NSError *) = [failure copy];
         [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
 
         AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
@@ -533,7 +533,7 @@
                                     start:(void (^)(TAPMessageModel *message))start
                                  progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                                   success:(void (^)(TAPMessageModel *message))success
-                                  failure:(void (^)(NSError *error))failure {
+                                  failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendVideoMessageWithVideoAssetURL:videoAssetURL caption:caption room:room start:start progress:progress success:success failure:failure];
@@ -544,7 +544,7 @@
                              start:(void (^)(TAPMessageModel *message))start
                           progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
-                           failure:(void (^)(NSError *error))failure {
+                           failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSError *error = nil;
     NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     [coordinator coordinateReadingItemAtURL:fileURI options:NSFileCoordinatorReadingImmediatelyAvailableMetadataOnly error:&error byAccessor:^(NSURL *newURL) {
@@ -553,7 +553,7 @@
         if(![fileURI getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
             NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"Unable to get file data from URI", nil, [TAPUtil currentBundle], @"");
             NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90301 errorMessage:errorMessage];
-            failure(error);
+            failure(nil, error);
             return;
         } else {
             TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
@@ -563,7 +563,7 @@
                 //File size is larger than max file size
                 NSString *errorMessage = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"Selected file exceeded %ld MB maximum", nil, [TAPUtil currentBundle], @""), (long)maxFileSizeInMB];
                 NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90302 errorMessage:errorMessage];
-                failure(error);
+                failure(nil, error);
                 return;
             }
             
@@ -589,7 +589,7 @@
                 void (^handlerSuccess)(TAPMessageModel *) = [success copy];
                 [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
                 
-                void (^handlerFailure)(NSError *) = [failure copy];
+                void (^handlerFailure)(TAPMessageModel * _Nullable, NSError *) = [failure copy];
                 [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
                 
                 [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
@@ -606,7 +606,7 @@
                              start:(void (^)(TAPMessageModel *message))start
                           progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
-                           failure:(void (^)(NSError *error))failure {
+                           failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendFileMessageWithFileURI:fileURI room:room start:start progress:progress success:success failure:failure];
 }
@@ -616,7 +616,7 @@
                        start:(void (^)(TAPMessageModel *message))start
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                      success:(void (^)(TAPMessageModel *message))success
-                     failure:(void (^)(NSError *error))failure {
+                     failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
     if (messageToForward.type == TAPChatMessageTypeFile || messageToForward.type == TAPChatMessageTypeVideo) {
         NSDictionary *dataDictionary = messageToForward.data;
@@ -661,8 +661,8 @@
     success:^(TAPMessageModel * _Nonnull message) {
         success(message);
     }
-    failure:^(NSError * _Nonnull error) {
-        failure(error);
+    failure:^(TAPMessageModel *message, NSError * _Nonnull error) {
+        failure(message, error);
     }];
     
 //    [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:room.roomID];
@@ -756,7 +756,7 @@
 - (void)sendCustomMessageWithMessageModel:(TAPMessageModel *)customMessage
                                     start:(void (^)(TAPMessageModel *message))start
                                   success:(void (^)(TAPMessageModel *message))success
-                                  failure:(void (^)(NSError *error))failure {
+                                  failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     void (^handlerSuccess)(TAPMessageModel *) = [success copy];
     NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
     [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
@@ -769,7 +769,7 @@
                                       room:(TAPRoomModel *)room
                                      start:(void (^)(TAPMessageModel *message))start
                                    success:(void (^)(TAPMessageModel *message))success
-                                   failure:(void (^)(NSError *error))failure {
+                                   failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
     [dataDictionary setObject:productArray forKey:@"items"];
     
@@ -785,7 +785,7 @@
 
 - (void)deleteMessage:(TAPMessageModel *)message
               success:(void (^)(void))success
-              failure:(void (^)(NSError *error))failure {
+              failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
     [TAPDataManager callAPIDeleteMessageWithMessageIDs:@[message.messageID]
                                                 roomID:message.room.roomID
@@ -794,13 +794,13 @@
         success();
     }
     failure:^(NSError *error) {
-        failure(error);
+        failure(message, error);
     }];
 }
 
 - (void)deleteLocalMessageWithLocalID:(NSString *)localID
                               success:(void (^)(void))success
-                              failure:(void (^)(NSError *error))failure {
+                              failure:(void (^)(NSString *localID, NSError *error))failure {
     TAPMessageModel *message = [TAPMessageModel new];
     message.localID = localID;
     
@@ -808,7 +808,7 @@
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-        failure(localizedError);
+        failure(localID, localizedError);
     }];
 }
 
@@ -825,10 +825,10 @@
 
 - (void)cancelMessageFileUpload:(TAPMessageModel *)message
                         success:(void (^)(void))success
-                        failure:(void (^)(NSError *error))failure {
+                        failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     if (message.type != TAPChatMessageTypeFile && message.type != TAPChatMessageTypeImage && message.type != TAPChatMessageTypeVideo) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90305 errorMessage:@"Invalid message type. Allowed types are image (1002), video (1003), or file (1004)"];
-        failure(localizedError);
+        failure(message, localizedError);
     }
     
     //Cancel uploading task
@@ -842,7 +842,7 @@
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-        failure(localizedError);
+        failure(message, localizedError);
     }];
 }
 
@@ -850,7 +850,7 @@
                       start:(void (^)(void))startBlock
                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                     success:(void (^)(TAPMessageModel *message, NSData *fileData, NSString *filePath))successBlock
-                    failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
+                    failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeFile) {
         [[TAPFileDownloadManager sharedManager] receiveFileDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
@@ -873,7 +873,7 @@
                       start:(void (^)(void))startBlock
                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                     success:(void (^)(TAPMessageModel *message, UIImage *fullImage, NSString * _Nullable filePath))successBlock
-                    failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
+                    failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeImage) {
         [[TAPFileDownloadManager sharedManager] receiveImageDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
@@ -896,7 +896,7 @@
                        start:(void (^)(void))startBlock
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progressBlock
                      success:(void (^)(TAPMessageModel *message, NSData *fileData, NSString *filePath))successBlock
-                     failure:(void (^)(TAPMessageModel *message, NSError *error))failureBlock {
+                     failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failureBlock {
     if (message.type == TAPChatMessageTypeVideo) {
         [[TAPFileDownloadManager sharedManager] receiveVideoDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
             startBlock();
@@ -917,10 +917,10 @@
 
 - (void)cancelMessageFileDownload:(TAPMessageModel *)message
                           success:(void (^)(void))success
-                          failure:(void (^)(NSError *error))failure {
+                          failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     if (message.type != TAPChatMessageTypeFile && message.type != TAPChatMessageTypeImage && message.type != TAPChatMessageTypeVideo) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90305 errorMessage:@"Invalid message type. Allowed types are image (1002), video (1003), or file (1004)"];
-        failure(localizedError);
+        failure(message, localizedError);
     }
     
     [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:message];
@@ -1177,6 +1177,17 @@
         success(mediaMessages);
     }
     failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)searchLocalMessageWithKeyword:(NSString *)keyword
+                              success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                              failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager searchMessageWithString:keyword sortBy:@"created" success:^(NSArray *resultArray) {
+        success(resultArray);
+    } failure:^(NSError *error) {
         failure(error);
     }];
 }

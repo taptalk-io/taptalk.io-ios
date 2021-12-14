@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeFromTapTalkContactsWithUserID:(NSString *)userID
                                     success:(void (^)(NSString *successMessage))success
                                     failure:(void (^)(NSError *error))failure;
+- (void)searchLocalContactsByName:(NSString *)keyword
+                          success:(void (^)(NSArray <TAPUserModel *>*userArray))success
+                          failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

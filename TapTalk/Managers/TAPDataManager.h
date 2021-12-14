@@ -47,6 +47,7 @@
                                                  failure:(void (^)(NSError *error))failure;
 
 //Convert from dictionary to model or model to dictionary
++ (TAPMessageModel *)messageModelFromDictionary:(NSDictionary *)dictionary;
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
 + (TAPCountryModel *)countryModelFromDictionary:(NSDictionary *)dictionary;
 + (TAPUserModel *)userModelFromDictionary:(NSDictionary *)dictionary;

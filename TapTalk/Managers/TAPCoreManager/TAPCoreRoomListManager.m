@@ -9,13 +9,6 @@
 #import "TAPCoreRoomListManager.h"
 #import "TAPRoomListModel.h"
 
-@interface TAPCoreRoomListManager ()
-
-- (void)fetchNewMessagesWithSuccess:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
-                            failure:(void (^)(NSError *error))failure;
-
-@end
-
 @implementation TAPCoreRoomListManager
 #pragma mark - Lifecycle
 + (TAPCoreRoomListManager *)sharedManager {
@@ -101,8 +94,7 @@
         }
         
         for (TAPMessageModel *message in resultArray) {
-            TAPRoomModel *room = message.room;
-            NSString *roomID = room.roomID;
+            NSString *roomID = message.room.roomID;
             roomID = [TAPUtil nullToEmptyString:roomID];
             
             TAPRoomListModel *roomList = [TAPRoomListModel new];
@@ -233,6 +225,90 @@
         //Failure get room list
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
+    }];
+}
+
+- (void)searchLocalRoomListWithKeyword:(NSString *)keyword
+                               success:(void (^)(NSArray <TAPRoomListModel *> *roomListArray))success
+                               failure:(void (^)(NSError *error))failure {
+    
+    NSString __block *queryClause = [NSString stringWithFormat:@"roomName CONTAINS[c] \'%@\'", keyword];
+    [TAPDatabaseManager loadDataFromTableName:@"TAPMessageRealmModel"
+                             whereClauseQuery:queryClause
+                             sortByColumnName:@""
+                                  isAscending:YES
+                                   distinctBy:@"roomID"
+                                      success:^(NSArray *resultArray) {
+        
+        NSArray *databaseArray = [NSArray array];
+        databaseArray = resultArray;
+        
+        NSMutableArray <TAPRoomListModel *> *searchResultArray = [NSMutableArray array];
+        NSMutableDictionary *unreadMentionDataDictionary = [NSMutableDictionary dictionary];
+        __block NSInteger countedMessage = 0;
+        
+        for (NSInteger count = 0; count < [databaseArray count]; count++) {
+            NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[databaseArray objectAtIndex:count]];
+            
+            TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            
+            NSString *roomID = messageModel.room.roomID;
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            TAPRoomListModel *roomList = [TAPRoomListModel new];
+            roomList.lastMessage = messageModel;
+            
+            [searchResultArray addObject:roomList];
+            
+            // Calculate unread message & mention count
+            NSString *username = [TAPDataManager getActiveUser].username;
+            username = [TAPUtil nullToEmptyString:username];
+            NSString *activeUserID = [TAPDataManager getActiveUser].userID;
+            activeUserID = [TAPUtil nullToEmptyString:activeUserID];
+            
+            [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:username roomID:roomID activeUserID:activeUserID success:^(NSArray *unreadMentionMessages) {
+                NSInteger totalUnreadMention = [unreadMentionMessages count];
+                [unreadMentionDataDictionary setObject:[NSNumber numberWithInteger:totalUnreadMention] forKey:roomID];
+                
+                TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:roomID];
+                if (obtainedRoom != nil) {
+                    roomList.lastMessage.room = obtainedRoom;
+                }
+                
+                [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomID activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
+                    //Set number of unread messages to array and dictionary
+                    NSInteger numberOfUnreadMessages = [unreadMessages count];
+                    NSInteger numberOfUnreadMentions = [[unreadMentionDataDictionary objectForKey:roomID] integerValue];
+                    roomList.numberOfUnreadMessages = numberOfUnreadMessages;
+                    roomList.numberOfUnreadMentions = numberOfUnreadMentions;
+                    
+                    if (roomList.numberOfUnreadMessages < 0) {
+                        roomList.numberOfUnreadMessages = 0;
+                    }
+                    
+                    if (roomList.numberOfUnreadMentions < 0) {
+                        roomList.numberOfUnreadMentions = 0;
+                    }
+                    
+                    countedMessage++;
+                    if (countedMessage >= resultArray.count) {
+                        success([searchResultArray copy]);
+                    }
+                } failure:^(NSError *error) {
+                    countedMessage++;
+                    if (countedMessage >= resultArray.count) {
+                        success([searchResultArray copy]);
+                    }
+                }];
+            } failure:^(NSError *error) {
+                countedMessage++;
+                if (countedMessage >= resultArray.count) {
+                    success([searchResultArray copy]);
+                }
+            }];
+        }
+    } failure:^(NSError *error) {
+        failure(error);
     }];
 }
 

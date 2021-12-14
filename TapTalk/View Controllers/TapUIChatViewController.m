@@ -10406,7 +10406,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TAPMessageModel *message = [deletedMessageArray objectAtIndex:0];
     [[TAPCoreMessageManager sharedManager] deleteMessage:message success:^{
         
-    } failure:^(NSError * _Nonnull error) {
+    } failure:^(TAPMessageModel * _Nullable message, NSError * _Nonnull error) {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Failed to delete message, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
     
