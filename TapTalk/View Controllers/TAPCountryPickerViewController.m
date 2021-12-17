@@ -66,6 +66,10 @@
     
     self.title = NSLocalizedStringFromTableInBundle(@"Select Country", nil, [TAPUtil currentBundle], @"");
     
+    if (@available(iOS 15.0, *)) {
+        [self.countryPickerView.searchResultTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.countryPickerView.searchBarView.delegate = self;
     self.countryPickerView.tableView.delegate = self;
     self.countryPickerView.tableView.dataSource = self;

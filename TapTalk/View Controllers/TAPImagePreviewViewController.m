@@ -78,6 +78,10 @@
     self.imagePreviewView.thumbnailCollectionView.delegate = self;
     self.imagePreviewView.thumbnailCollectionView.dataSource = self;
     
+    if (@available(iOS 15.0, *)) {
+        [self.imagePreviewView.mentionTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.imagePreviewView.mentionTableView.delegate = self;
     self.imagePreviewView.mentionTableView.dataSource = self;
     

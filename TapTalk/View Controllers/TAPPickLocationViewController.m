@@ -78,6 +78,10 @@
     _isFirstLoad = YES;
     _hideSearchResult = NO;
     
+    if (@available(iOS 15.0, *)) {
+        [self.pickLocationView.searchTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.pickLocationView.searchTableView.dataSource = self;
     self.pickLocationView.searchTableView.delegate = self;
     self.pickLocationView.searchBarView.delegate = self;

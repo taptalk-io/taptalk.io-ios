@@ -3183,6 +3183,12 @@
 
             [messageResultArray addObject:decryptedMessage];
             
+            if (decryptedMessage.type == TAPChatMessageTypeSystemMessage &&
+                [decryptedMessage.action isEqualToString:@"room/addParticipant"] &&
+                ([decryptedMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+            ) {
+                [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:decryptedMessage.room.roomID];
+            }
         }
         
         if([tempRecipientIDArray count] > 0) {

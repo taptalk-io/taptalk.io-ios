@@ -46,6 +46,11 @@
     _searchView = [[TAPSearchView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.searchView];
     
+    if (@available(iOS 15.0, *)) {
+        [self.searchView.recentSearchTableView setSectionHeaderTopPadding:0.0f];
+        [self.searchView.searchResultTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.searchView.recentSearchTableView.delegate = self;
     self.searchView.recentSearchTableView.dataSource = self;
     self.searchView.searchResultTableView.delegate = self;

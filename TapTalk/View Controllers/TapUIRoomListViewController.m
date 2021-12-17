@@ -124,6 +124,12 @@
     )];
     [self setUpNavigationBar];
     
+    self.roomListView.roomListTableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    
+    if (@available(iOS 15.0, *)) {
+        [self.roomListView.roomListTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
     self.roomListView.roomListTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);

@@ -56,6 +56,11 @@
     
     self.title = NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"");
     
+    if (@available(iOS 15.0, *)) {
+        [self.forwardListView.recentChatTableView setSectionHeaderTopPadding:0.0f];
+        [self.forwardListView.searchResultTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.forwardListView.searchBarView.delegate = self;
     self.forwardListView.recentChatTableView.delegate = self;
     self.forwardListView.recentChatTableView.dataSource = self;

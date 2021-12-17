@@ -60,6 +60,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if (@available(iOS 15.0, *)) {
+        [self.addNewChatView.contactsTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.addNewChatView.contactsTableView.delegate = self;
     self.addNewChatView.contactsTableView.dataSource = self;
     

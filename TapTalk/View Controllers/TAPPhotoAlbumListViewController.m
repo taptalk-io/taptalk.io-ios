@@ -52,6 +52,10 @@
     self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton];
     [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     
+    if (@available(iOS 15.0, *)) {
+        [self.photoAlbumListView.tableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.photoAlbumListView.tableView.dataSource = self;
     self.photoAlbumListView.tableView.delegate = self;
     

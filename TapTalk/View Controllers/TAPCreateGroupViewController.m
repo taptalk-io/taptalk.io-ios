@@ -71,6 +71,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    if (@available(iOS 15.0, *)) {
+        [self.createGroupView.contactsTableView setSectionHeaderTopPadding:0.0f];
+        [self.createGroupView.searchResultTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.createGroupView.searchBarView.delegate = self;
     
     self.createGroupView.contactsTableView.delegate = self;

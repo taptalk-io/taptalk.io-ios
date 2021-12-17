@@ -29,6 +29,10 @@
     
     self.title = NSLocalizedStringFromTableInBundle(@"Blocked List", nil, [TAPUtil currentBundle], @"");
     [self showCustomBackButton];
+    
+    if (@available(iOS 15.0, *)) {
+        [self.blockedListView.tableView setSectionHeaderTopPadding:0.0f];
+    }
 
     self.blockedListView.tableView.delegate = self;
     self.blockedListView.tableView.dataSource = self;

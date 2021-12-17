@@ -647,6 +647,7 @@
     [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
     [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
+    [[TAPDataManager sharedManager].deletedRoomIDArray removeAllObjects];
     
     // Disconnect socket connection
     [self disconnectWithCompletionHandler:^{
