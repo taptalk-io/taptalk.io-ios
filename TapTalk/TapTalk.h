@@ -289,6 +289,16 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 */
 - (CGFloat)getImageCompressionQuality;
 
+/**
+ Set max caption length for sending media messages
+*/
+- (void)setMaxCaptionLength:(NSInteger)maxCaptionLength;
+
+/**
+ Get caption length limit
+*/
+- (NSInteger)getMaxCaptionLength;
+
 //==========================================================
 //                 Language & Localization
 //==========================================================

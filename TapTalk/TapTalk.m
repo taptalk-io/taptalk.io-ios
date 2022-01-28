@@ -22,6 +22,7 @@
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
 @property (nonatomic) CGFloat imageCompressionQuality;
+@property (nonatomic) NSInteger maxCaptionLength;
 @property (strong, nonatomic) NSString *clientCustomUserAgent;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
@@ -57,6 +58,7 @@
         _customConfigsDictionary = [[NSDictionary alloc] init];
         _clientCustomUserAgent = @"";
         _imageCompressionQuality = TAP_DEFAULT_IMAGE_COMPRESSION_QUALITY;
+        _maxCaptionLength = TAP_LIMIT_OF_CAPTION_CHARACTER;
         
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
@@ -715,6 +717,19 @@
 
 - (CGFloat)getImageCompressionQuality {
     return self.imageCompressionQuality;
+}
+
+- (void)setMaxCaptionLength:(NSInteger)maxCaptionLength {
+    if (maxCaptionLength < 0) {
+        _maxCaptionLength = 0;
+    }
+    else {
+        _maxCaptionLength = maxCaptionLength;
+    }
+}
+
+- (NSInteger)getMaxCaptionLength {
+    return self.maxCaptionLength;
 }
 
 @end

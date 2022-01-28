@@ -242,8 +242,8 @@
         captionString = caption;                        
     }
     
-    //Check if caption is more than 100 words, failed
-    NSInteger maxCaptionCharacterLength = 100;
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
@@ -294,8 +294,8 @@
         captionString = caption;
     }
     
-    //Check if caption is more than 100 words, failed
-    NSInteger maxCaptionCharacterLength = 100;
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
@@ -369,8 +369,8 @@
         captionString = caption;
     }
     
-    //Check if caption is more than 100 words, failed
-    NSInteger maxCaptionCharacterLength = 100;
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
@@ -444,8 +444,8 @@
         captionString = caption;
     }
     
-    //Check if caption is more than 100 words, failed
-    NSInteger maxCaptionCharacterLength = 100;
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
     if ([captionString length] > maxCaptionCharacterLength) {
         NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
         NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];

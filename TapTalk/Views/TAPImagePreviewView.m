@@ -130,7 +130,7 @@
         CGFloat wordCountLabelWidth = 50.0f;
         CGFloat captionTextViewWidth = CGRectGetWidth(self.captionView.frame) - 16.0f - 16.0f - 8.0f - wordCountLabelWidth;
         _captionTextView = [[TAPCustomGrowingTextView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, captionTextViewWidth, 22.0f)];
-        [self.captionTextView setCharacterCountLimit:TAP_LIMIT_OF_CAPTION_CHARACTER];
+        [self.captionTextView setCharacterCountLimit:[[TapTalk sharedInstance] getMaxCaptionLength]];
         [self.captionTextView setFont:captionTextViewFont];
         [self.captionTextView setTextColor:captionTextViewColor];
         [self.captionTextView setPlaceholderColor:captionPlaceholderTextViewColor];
@@ -227,7 +227,7 @@
 }
 
 - (void)setCurrentWordCountWithCurrentCharCount:(NSInteger)charCount {
-    NSString *wordCountString = [NSString stringWithFormat:@"%ld/100", charCount];
+    NSString *wordCountString = [NSString stringWithFormat:@"%ld/%ld", charCount, [[TapTalk sharedInstance] getMaxCaptionLength]];
     self.wordCountLabel.text = wordCountString;
 }
 

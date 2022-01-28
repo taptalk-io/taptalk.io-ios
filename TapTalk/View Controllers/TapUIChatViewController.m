@@ -852,7 +852,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [super presentViewController:viewControllerToPresent animated:flag completion:completion];
 }
 
-- (void)dealloc {
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:nil];
@@ -865,6 +867,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_USER_PROFILE_CHANGES object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:nil];
+}
+
+- (void)dealloc {
     
     id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
     if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidClose:otherUser:currentViewController:currentShownNavigationController:)]) {
