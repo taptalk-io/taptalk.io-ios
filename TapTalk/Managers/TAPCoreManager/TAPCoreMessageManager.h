@@ -210,7 +210,10 @@ NS_ASSUME_NONNULL_BEGIN
                           success:(void (^)(void))success
                           failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
 - (void)markMessageAsDelivered:(TAPMessageModel *)message;
+- (void)markMessagesAsDelivered:(NSArray<TAPMessageModel *> *)messageArray;
 - (void)markMessageAsRead:(TAPMessageModel *)message;
+- (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray;
+- (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID;
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID
                            success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                            failure:(void (^)(NSError *error))failure;

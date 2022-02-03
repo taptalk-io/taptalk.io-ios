@@ -936,13 +936,35 @@
     [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
 }
 
+- (void)markMessagesAsDelivered:(NSArray<TAPMessageModel *> *)messageArray {
+    for (TAPMessageModel *message in messageArray) {
+        [self markMessageAsDelivered:message];
+    }
+}
+
 - (void)markMessageAsRead:(TAPMessageModel *)message {
     if (message.isRead) {
         return;
     }
-
     message.isRead = YES;
     [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
+}
+
+- (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray {
+    for (TAPMessageModel *message in messageArray) {
+        [self markMessageAsRead:message];
+    }
+}
+
+- (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID {
+    [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomID
+                                                 activeUserID:[TAPChatManager sharedManager].activeUser.userID
+    success:^(NSArray *unreadMessages) {
+        [self markMessagesAsRead:unreadMessages];
+    }
+    failure:^(NSError *error) {
+        
+    }];
 }
 
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID
