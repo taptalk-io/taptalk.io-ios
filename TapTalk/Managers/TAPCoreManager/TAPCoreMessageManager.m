@@ -956,6 +956,20 @@
     }
 }
 
+- (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray
+                   success:(void (^)(NSArray <NSString *> *updatedMessageIDs))success
+                   failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:messageArray
+    success:^(NSArray *updatedMessageIDsArray, NSArray *originMessageArray) {
+        [[TAPChatManager sharedManager] updateReadMessageToDatabaseQueueWithArray:originMessageArray];
+        success(updatedMessageIDsArray);
+    }
+    failure:^(NSError *error, NSArray *messageArray) {
+        failure(error);
+    }];
+}
+
 - (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID {
     [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomID
                                                  activeUserID:[TAPChatManager sharedManager].activeUser.userID
@@ -964,6 +978,20 @@
     }
     failure:^(NSError *error) {
         
+    }];
+}
+
+- (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID
+                                      success:(void (^)(NSArray <NSString *> *updatedMessageIDs))success
+                                      failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomID
+                                                 activeUserID:[TAPChatManager sharedManager].activeUser.userID
+    success:^(NSArray *unreadMessages) {
+        [self markMessagesAsRead:unreadMessages success:success failure:failure];
+    }
+    failure:^(NSError *error) {
+        failure(error);
     }];
 }
 

@@ -213,7 +213,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)markMessagesAsDelivered:(NSArray<TAPMessageModel *> *)messageArray;
 - (void)markMessageAsRead:(TAPMessageModel *)message;
 - (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray;
+- (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray
+                   success:(void (^)(NSArray <NSString *> *updatedMessageIDs))success
+                   failure:(void (^)(NSError *error))failure;
 - (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID;
+- (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID
+                                      success:(void (^)(NSArray <NSString *> *updatedMessageIDs))success
+                                      failure:(void (^)(NSError *error))failure;
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID
                            success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                            failure:(void (^)(NSError *error))failure;
