@@ -1,4 +1,4 @@
-framework module AFNetworking {
+module AFNetworking {
   umbrella header "AFNetworking-umbrella.h"
 
   export *

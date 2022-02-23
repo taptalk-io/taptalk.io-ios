@@ -1,4 +1,4 @@
-framework module JSONModel {
+module JSONModel {
   umbrella header "JSONModel-umbrella.h"
 
   export *
