@@ -11,6 +11,12 @@
 @interface TAPCoreMessageManager () <TAPChatManagerDelegate>
 
 @property (strong, nonatomic) NSMutableDictionary *blockDictionary;
+@property (strong, nonatomic) NSMutableArray<TAPMessageModel *> *pendingCallbackNewMessages;
+@property (strong, nonatomic) NSMutableArray<TAPMessageModel *> *pendingCallbackUpdatedMessages;
+@property (strong, nonatomic) NSMutableArray<TAPMessageModel *> *pendingCallbackDeletedMessages;
+@property (strong, nonatomic) NSTimer *messageListenerBulkCallbackTimer;
+@property (strong, nonatomic) NSTimer *updatedMessageListenerBulkCallbackTimer;
+@property (strong, nonatomic) NSTimer *deletedMessageListenerBulkCallbackTimer;
 
 - (void)fileUploadManagerProgressNotification:(NSNotification *)notification;
 - (void)fileUploadManagerStartNotification:(NSNotification *)notification;
@@ -45,6 +51,10 @@
         [[TAPChatManager sharedManager] addDelegate:self];
         
         _blockDictionary = [[NSMutableDictionary alloc] init];
+        _pendingCallbackNewMessages = [[NSMutableArray alloc] init];
+        _pendingCallbackUpdatedMessages = [[NSMutableArray alloc] init];
+        _pendingCallbackDeletedMessages = [[NSMutableArray alloc] init];
+        _messageDelegateBulkCallbackDelay = 0.0f;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerProgressNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerStartNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_START object:nil];
@@ -68,41 +78,48 @@
 #pragma mark - Delegate
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessage:)]) {
-        [self.delegate tapTalkDidReceiveNewMessage:message];
+    if (self.messageDelegateBulkCallbackDelay == 0.0f) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessage:)]) {
+            [self.delegate tapTalkDidReceiveNewMessage:message];
+        }
+    }
+    else {
+        [self.pendingCallbackNewMessages addObject:message];
+        [self startNewMessageDelegateBulkCallbackTimer];
     }
 }
 
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
-    if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessage:)]) {
-        [self.delegate tapTalkDidReceiveNewMessage:message];
-    }
+    [self chatManagerDidReceiveNewMessageInActiveRoom:message];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
     if (message.isDeleted) {
-        if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessage:)]) {
-            [self.delegate tapTalkDidDeleteMessage:message];
+        if (self.messageDelegateBulkCallbackDelay == 0.0f) {
+            if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessage:)]) {
+                [self.delegate tapTalkDidDeleteMessage:message];
+            }
+        }
+        else {
+            [self.pendingCallbackDeletedMessages addObject:message];
+            [self startDeletedMessageDelegateBulkCallbackTimer];
         }
     }
     else {
-        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
-            [self.delegate tapTalkDidReceiveUpdatedMessage:message];
+        if (self.messageDelegateBulkCallbackDelay == 0.0f) {
+            if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
+                [self.delegate tapTalkDidReceiveUpdatedMessage:message];
+            }
+        }
+        else {
+            [self.pendingCallbackUpdatedMessages addObject:message];
+            [self startUpdatedMessageDelegateBulkCallbackTimer];
         }
     }
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
-    if (message.isDeleted) {
-        if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessage:)]) {
-            [self.delegate tapTalkDidDeleteMessage:message];
-        }
-    }
-    else {
-        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
-            [self.delegate tapTalkDidReceiveUpdatedMessage:message];
-        }
-    }
+    [self chatManagerDidReceiveUpdateMessageInActiveRoom:message];
 }
 
 - (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message {
@@ -1240,6 +1257,85 @@
     } failure:^(NSError *error) {
         failure(error);
     }];
+}
+
+- (void)searchLocalRoomMessageWithKeyword:(NSString *)keyword
+                                   roomID:(NSString *)roomID
+                                  success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                                  failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager searchMessageWithString:keyword roomID:roomID sortBy:@"created" success:^(NSArray *resultArray) {
+        success(resultArray);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)startNewMessageDelegateBulkCallbackTimer {
+    if (self.messageListenerBulkCallbackTimer != nil) {
+        [self.messageListenerBulkCallbackTimer invalidate];
+    }
+    self.messageListenerBulkCallbackTimer = [NSTimer scheduledTimerWithTimeInterval:self.messageDelegateBulkCallbackDelay target:self selector:@selector(newMessageDelegateBulkCallbackTimerFired) userInfo:nil repeats:NO];
+}
+
+- (void)newMessageDelegateBulkCallbackTimerFired {
+    if ([self.pendingCallbackNewMessages count] > 1) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessages:)]) {
+            [self.delegate tapTalkDidReceiveNewMessages:self.pendingCallbackNewMessages];
+        }
+    }
+    if ([self.pendingCallbackNewMessages count] == 1) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveNewMessage:)]) {
+            [self.delegate tapTalkDidReceiveNewMessage:[self.pendingCallbackNewMessages firstObject]];
+        }
+    }
+    [self.pendingCallbackNewMessages removeAllObjects];
+    [self.messageListenerBulkCallbackTimer invalidate];
+}
+
+- (void)startUpdatedMessageDelegateBulkCallbackTimer {
+    if (self.updatedMessageListenerBulkCallbackTimer != nil) {
+        [self.updatedMessageListenerBulkCallbackTimer invalidate];
+    }
+    self.updatedMessageListenerBulkCallbackTimer = [NSTimer scheduledTimerWithTimeInterval:self.messageDelegateBulkCallbackDelay target:self selector:@selector(updatedMessageDelegateBulkCallbackTimerFired) userInfo:nil repeats:NO];
+}
+
+- (void)updatedMessageDelegateBulkCallbackTimerFired {
+    if ([self.pendingCallbackUpdatedMessages count] > 1) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessages:)]) {
+            [self.delegate tapTalkDidReceiveUpdatedMessages:self.pendingCallbackUpdatedMessages];
+        }
+    }
+    if ([self.pendingCallbackUpdatedMessages count] == 1) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedMessage:)]) {
+            [self.delegate tapTalkDidReceiveUpdatedMessage:[self.pendingCallbackUpdatedMessages firstObject]];
+        }
+    }
+    [self.pendingCallbackUpdatedMessages removeAllObjects];
+    [self.updatedMessageListenerBulkCallbackTimer invalidate];
+}
+
+- (void)startDeletedMessageDelegateBulkCallbackTimer {
+    if (self.deletedMessageListenerBulkCallbackTimer != nil) {
+        [self.deletedMessageListenerBulkCallbackTimer invalidate];
+        //self.deletedMessageListenerBulkCallbackTimer = nil;
+    }
+    self.deletedMessageListenerBulkCallbackTimer = [NSTimer scheduledTimerWithTimeInterval:self.messageDelegateBulkCallbackDelay target:self selector:@selector(deletedMessageDelegateBulkCallbackTimerFired) userInfo:nil repeats:NO];
+}
+
+- (void)deletedMessageDelegateBulkCallbackTimerFired {
+    if ([self.pendingCallbackDeletedMessages count] > 1) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessages:)]) {
+            [self.delegate tapTalkDidDeleteMessages:self.pendingCallbackDeletedMessages];
+        }
+    }
+    if ([self.pendingCallbackDeletedMessages count] == 1) {
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteMessage:)]) {
+            [self.delegate tapTalkDidDeleteMessage:[self.pendingCallbackDeletedMessages firstObject]];
+        }
+    }
+    [self.pendingCallbackDeletedMessages removeAllObjects];
+    [self.deletedMessageListenerBulkCallbackTimer invalidate];
 }
 
 @end

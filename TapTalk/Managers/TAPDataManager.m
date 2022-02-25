@@ -1804,6 +1804,29 @@
     }];
 }
 
++ (void)searchMessageWithString:(NSString *)searchString
+                         roomID:(NSString *)roomID
+                         sortBy:(NSString *)columnName
+                        success:(void (^)(NSArray *resultArray))success
+                        failure:(void (^)(NSError *error))failure {
+    
+    searchString = [TAPDataManager escapedDatabaseStringFromString:searchString];
+    
+    NSString *queryClause = [NSString stringWithFormat:@"body CONTAINS[c] \'%@\' AND roomID LIKE '%@' AND type != 9001", searchString, roomID];
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryClause sortByColumnName:columnName isAscending:NO success:^(NSArray *resultArray) {
+        NSMutableArray *modelArray = [NSMutableArray array];
+        for (NSInteger count = 0; count < [resultArray count]; count++) {
+            NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[resultArray objectAtIndex:count]];
+            
+            TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            [modelArray addObject:messageModel];
+        }
+        success(modelArray);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 + (void)getMessageWithRoomID:(NSString *)roomID
         lastMessageTimeStamp:(NSNumber *)timeStamp
                    limitData:(NSInteger)limit

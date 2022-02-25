@@ -13,14 +13,19 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPCoreMessageManagerDelegate <NSObject>
 
 - (void)tapTalkDidReceiveNewMessage:(TAPMessageModel *)message;
+- (void)tapTalkDidReceiveNewMessages:(NSArray <TAPMessageModel *> *)messages;
 - (void)tapTalkDidReceiveUpdatedMessage:(TAPMessageModel *)message;
+- (void)tapTalkDidReceiveUpdatedMessages:(NSArray <TAPMessageModel *> *)messages;
 - (void)tapTalkDidDeleteMessage:(TAPMessageModel *)message;
+- (void)tapTalkDidDeleteMessages:(NSArray <TAPMessageModel *> *)messages;
 
 @end
 
 @interface TAPCoreMessageManager : NSObject
 
 @property (weak, nonatomic) id<TAPCoreMessageManagerDelegate> delegate;
+
+@property (nonatomic) CGFloat messageDelegateBulkCallbackDelay;
 
 + (TAPCoreMessageManager *)sharedManager;
 
@@ -253,6 +258,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)searchLocalMessageWithKeyword:(NSString *)keyword
                               success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                               failure:(void (^)(NSError *error))failure;
+- (void)searchLocalRoomMessageWithKeyword:(NSString *)keyword
+                                   roomID:(NSString *)roomID
+                                  success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                                  failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

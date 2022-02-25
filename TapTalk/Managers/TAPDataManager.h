@@ -63,6 +63,11 @@
                          sortBy:(NSString *)columnName
                         success:(void (^)(NSArray *resultArray))success
                         failure:(void (^)(NSError *error))failure;
++ (void)searchMessageWithString:(NSString *)searchString
+                         roomID:(NSString *)roomID
+                         sortBy:(NSString *)columnName
+                        success:(void (^)(NSArray *resultArray))success
+                        failure:(void (^)(NSError *error))failure;
 + (void)getMessageWithRoomID:(NSString *)roomID
         lastMessageTimeStamp:(NSNumber *)timeStamp
                    limitData:(NSInteger)limit

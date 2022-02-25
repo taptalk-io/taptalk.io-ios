@@ -12,6 +12,7 @@
 #import "TAPProfileViewController.h"
 #import "TAPCustomNotificationAlertViewController.h"
 #import "TAPCustomKeyboardItemModel.h"
+#import "TAPProductModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
