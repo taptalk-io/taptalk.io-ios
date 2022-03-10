@@ -507,6 +507,7 @@
     else {
         self.textField.textColor = textFieldPlaceholderColor;
         self.textField.userInteractionEnabled = NO;
+        self.containerView.backgroundColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.1f];
     }
 }
 

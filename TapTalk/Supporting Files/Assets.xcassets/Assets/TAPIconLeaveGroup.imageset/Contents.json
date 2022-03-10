@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "TAPIconGroupMembers.png",
+      "filename" : "upload.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "TAPIconGroupMembers@2x.png",
+      "filename" : "upload@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "TAPIconGroupMembers@3x.png",
+      "filename" : "upload@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

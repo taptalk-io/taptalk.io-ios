@@ -37,5 +37,6 @@
 @property (nonatomic) BOOL isOnline;
 @property (nonatomic) BOOL isEmailVerified;
 @property (nonatomic) BOOL isPhoneVerified;
+@property (nonatomic, strong) NSString *bio;
 
 @end

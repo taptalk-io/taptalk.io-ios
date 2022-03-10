@@ -51,6 +51,10 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeLeaveRoom,
     TAPAPIManagerTypeDeleteRoom,
     TAPAPIManagerTypeGetProjectConfigs,
+    TAPAPIManagerTypeUpdateBio,
+    TAPAPIManagerTypeGetPhotoList,
+    TAPAPIManagerTypeSetProfilePhotoAsMain,
+    TAPAPIManagerTypeRemoveProfilePhoto,
 };
 
 @interface TAPAPIManager : NSObject

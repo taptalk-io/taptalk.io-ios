@@ -16,9 +16,18 @@
 
 @property (strong, nonatomic) UIView *loadingBackgroundView;
 @property (strong, nonatomic) UIView *loadingView;
+@property (strong, nonatomic) UIView *separatorView;
 @property (strong, nonatomic) UIImageView *loadingImageView;
 @property (strong, nonatomic) UILabel *loadingLabel;
 @property (strong, nonatomic) UIButton *loadingButton;
+
+@property (strong, nonatomic) UIView *saveLoadingBackgroundView;
+@property (strong, nonatomic) UIView *saveLoadingView;
+@property (strong, nonatomic) UIImageView *saveLoadingImageView;
+@property (strong, nonatomic) UILabel *saveLoadingLabel;
+@property (strong, nonatomic) UIButton *saveLoadingButton;
+
+@property (strong, nonatomic) UILabel *initialNameLabel;
 
 - (void)animateSaveLoading:(BOOL)isAnimate;
 
@@ -34,13 +43,12 @@
         _profileImageHeight = CGRectGetWidth(self.frame) / 375.0f * 347.0f; //375.0f and 347.0f are width and height on design.
         CGFloat topPadding = 0.0f;
         if (IS_IPHONE_X_FAMILY) {
-            topPadding = [TAPUtil currentDeviceStatusBarHeight];
+            //topPadding = [TAPUtil currentDeviceStatusBarHeight];
         }
         
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), self.profileImageHeight)];
-        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.profileImageView.clipsToBounds = YES;
-        [self addSubview:self.profileImageView];
         
         _gradientImageView = [[UIView alloc] initWithFrame:self.profileImageView.frame];
         self.gradientImageView.backgroundColor = [UIColor clearColor];
@@ -50,7 +58,7 @@
         gradient.startPoint = CGPointMake(0.0f, 0.0f);
         gradient.endPoint = CGPointMake(0.0f, 1.0f);
         [self.gradientImageView.layer insertSublayer:gradient atIndex:0];
-        [self addSubview:self.gradientImageView];
+        //[self addSubview:self.gradientImageView];
         
         UIFont *chatProfileRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatProfileRoomNameLabel];
         UIColor *chatProfileRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileRoomNameLabel];
@@ -60,23 +68,66 @@
         _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, self.nameLabelYPosition, CGRectGetWidth(self.frame) - 16.0f - 16.0f, self.nameLabelHeight)];
         self.nameLabel.textColor = chatProfileRoomNameLabelColor;
         self.nameLabel.font = chatProfileRoomNameLabelFont;
-        [self addSubview:self.nameLabel];
+        //[self addSubview:self.nameLabel];
         
         UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
         collectionLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - [TAPUtil safeAreaBottomPadding]) collectionViewLayout:collectionLayout];
-        self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight - [TAPUtil currentDeviceStatusBarHeight] + topPadding, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
+        //self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight - [TAPUtil currentDeviceStatusBarHeight] + topPadding, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
+        self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight + topPadding + 25.0f, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
         self.collectionView.backgroundColor = [UIColor clearColor];
         self.collectionView.showsVerticalScrollIndicator = NO;
         self.collectionView.showsHorizontalScrollIndicator = NO;
         self.collectionView.bounces = NO;
         [self addSubview:self.collectionView];
         
+        //CollectionView Header
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), self.profileImageHeight)];
+        self.initialNameView.alpha = 0.0f;
+        //self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.collectionView addSubview:self.initialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarExtraLargeLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarExtraLargeLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
+        
+        self.profileImageView.frame = CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), self.profileImageHeight);
+        [self.collectionView addSubview:self.profileImageView];
+        UICollectionViewFlowLayout *collectionLayoutProfilImage = [[UICollectionViewFlowLayout alloc] init];
+        collectionLayoutProfilImage.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        
+        _profilImageCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), 360.0f) collectionViewLayout:collectionLayoutProfilImage];
+        self.profilImageCollectionView.backgroundColor = [UIColor clearColor];
+        self.profilImageCollectionView.pagingEnabled = YES;
+        self.profilImageCollectionView.showsVerticalScrollIndicator = NO;
+        self.profilImageCollectionView.showsHorizontalScrollIndicator = NO;
+        [self.collectionView addSubview:self.profilImageCollectionView];
+        
+        UICollectionViewFlowLayout *collectionLayoutPageIndicator = [[UICollectionViewFlowLayout alloc] init];
+        collectionLayoutPageIndicator.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        _pageIndicatorCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 1.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), 3.0f) collectionViewLayout:collectionLayoutPageIndicator];
+        self.pageIndicatorCollectionView.backgroundColor = [UIColor clearColor];
+        self.pageIndicatorCollectionView.pagingEnabled = YES;
+        self.pageIndicatorCollectionView.showsVerticalScrollIndicator = NO;
+        self.pageIndicatorCollectionView.showsHorizontalScrollIndicator = NO;
+        [self.collectionView addSubview:self.pageIndicatorCollectionView];
+        _saveProfileImageButton = [[UIButton alloc]initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), self.profileImageHeight)];
+        //[self.collectionView addSubview:self.saveProfileImageButton];
+        
+        _separatorView = [[UIView alloc]initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.profileImageView.frame), CGRectGetWidth([UIScreen mainScreen].bounds), 25.0f)];
+        self.separatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+        [self.collectionView addSubview:self.separatorView];
+        
         _navigationBarHeight = 44.0f + [TAPUtil currentDeviceStatusBarHeight];
         _navigationBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, -self.navigationBarHeight + topPadding, CGRectGetWidth([UIScreen mainScreen].bounds), self.navigationBarHeight)];
         self.navigationBarView.clipsToBounds = YES;
         self.navigationBarView.backgroundColor = [UIColor whiteColor];
-        [self addSubview:self.navigationBarView];
+        //[self addSubview:self.navigationBarView];
         
         CGFloat navigationBackButtonBottomGap = 2.0f;
         _navigationBackButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetHeight(self.navigationBarView.frame) - navigationBackButtonBottomGap - 40.0f, 40.0f, 40.0f)];
@@ -111,13 +162,13 @@
         buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconTransparentBackgroundBackButton]];
         [self.backButton setImage:buttonImage forState:UIControlStateNormal];
         self.backButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
-        [self addSubview:self.backButton];
+        //[self addSubview:self.backButton];
         
         _editButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 40.0f - 16.0f, self.navigationBarHeight - navigationBackButtonBottomGap - 40.0f, 40.0f, 40.0f)];
         UIImage *editButtonImage = [UIImage imageNamed:@"TAPIconEdit" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.editButton setImage:editButtonImage forState:UIControlStateNormal];
         self.editButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
-        [self addSubview:self.editButton];
+        //[self addSubview:self.editButton];
         
         //Save Loading View
         _loadingBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
@@ -151,6 +202,9 @@
         self.loadingButton.alpha = 0.0f;
         self.loadingButton.userInteractionEnabled = NO;
         [self.loadingBackgroundView addSubview:self.loadingButton];
+        
+        //image save loading view
+        
 
     }
     
@@ -183,6 +237,29 @@
     }
     else {
         [self.loadingImageView.layer removeAnimationForKey:@"FirstLoadSpinAnimation"];
+    }
+}
+
+- (void)hideHeaderSeperatorView{
+    self.separatorView.alpha = 0.0f;
+    self.separatorView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+- (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName{
+    if (imageURL ==  nil || [imageURL isEqualToString:@""]) {
+        self.profileImageView.alpha = 0.0f;
+        self.initialNameView.alpha = 1.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:userFullName];
+        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:userFullName isGroup:NO];
+        self.profilImageCollectionView.alpha = 0.0f;
+        self.pageIndicatorCollectionView.alpha = 0.0f;
+    }
+    else {
+        self.profileImageView.alpha = 1.0f;
+        self.initialNameView.alpha = 0.0f;
+        [self.profileImageView setImageWithURLString:imageURL];
+        self.profilImageCollectionView.alpha = 1.0f;
+        self.pageIndicatorCollectionView.alpha = 1.0f;
     }
 }
 
@@ -234,6 +311,12 @@
             doneLoadingString = @"";
             break;
         }
+        case TAPProfileLoadingTypeImageSaveLoading:
+        {
+            loadingString = NSLocalizedStringFromTableInBundle(@"Saving...", nil, [TAPUtil currentBundle], @"");
+            doneLoadingString = NSLocalizedStringFromTableInBundle(@"Image Saved", nil, [TAPUtil currentBundle], @"");
+            break;
+        }
         default:
         {
             loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
@@ -259,5 +342,7 @@
         self.loadingButton.userInteractionEnabled = YES;
     }
 }
+
+
 
 @end

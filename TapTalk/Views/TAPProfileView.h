@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
     TAPProfileLoadingTypeLeaveGroup,
     TAPProfileLoadingTypeDeleteGroup,
     TAPProfileLoadingTypeDoneLoading,
+    TAPProfileLoadingTypeImageSaveLoading,
 };
 
 @interface TAPProfileView : TAPBaseView
@@ -31,6 +32,7 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
 @property (strong, nonatomic) UIButton *editButton;
 @property (strong, nonatomic) UIButton *navigationBackButton;
 @property (strong, nonatomic) UIButton *navigationEditButton;
+@property (strong, nonatomic) UIButton *saveProfileImageButton;
 
 @property (nonatomic) CGFloat nameLabelHeight;
 @property (nonatomic) CGFloat nameLabelBottomPadding;
@@ -40,8 +42,15 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
 @property (nonatomic) CGFloat navigationNameLabelYPosition;
 @property (nonatomic) CGFloat navigationBarHeight;
 
+@property (strong, nonatomic) UICollectionView *profilImageCollectionView;
+@property (strong, nonatomic) UICollectionView *pageIndicatorCollectionView;
+@property (strong, nonatomic) UIView *initialNameView;
+
+
 - (void)showLoadingView:(BOOL)isShow;
 - (void)setAsLoadingState:(BOOL)isLoading withType:(TAPProfileLoadingType)type;
+- (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName;
+- (void)hideHeaderSeperatorView;
 
 @end
 

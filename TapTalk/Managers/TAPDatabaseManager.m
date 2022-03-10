@@ -309,6 +309,26 @@
 //    });
 }
 
++ (void)loadMessageWithRoomID:(NSString *)roomID
+                numberOfItems:(NSInteger)numberOfItems
+                    ascending:(BOOL)ascending
+                      success:(void (^)(NSArray *resultArray))success
+                      failure:(void (^)(NSError *error))failure {
+    
+    RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+    RLMResults *results = [TAPMessageRealmModel allObjectsInRealm:realm];
+    results = [results objectsWhere:[NSString stringWithFormat:@"roomID == '%@'", roomID]];
+    results = [results sortedResultsUsingKeyPath:@"created" ascending:ascending];
+    if ([results count] == 0) {
+        success([NSArray array]);
+    }
+    else {
+        NSArray *resultArray = [NSArray array];
+        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+        success(resultArray);
+    }
+}
+
 + (void)loadRoomListSuccess:(void (^)(NSArray *resultArray))success
                     failure:(void (^)(NSError *error))failure {
     

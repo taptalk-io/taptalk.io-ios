@@ -12,6 +12,7 @@
 #import "TAPCountryModel.h"
 #import "TAPProjectConfigsModel.h"
 #import "TAPCoreConfigsModel.h"
+#import "TAPPhotoListModel.h"
 
 @import AFNetworking;
 
@@ -119,6 +120,9 @@
 + (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
                                            success:(void (^)(NSInteger unreadRoomCount))success
                                            failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseOldestCreatedTimeFromRoom:(NSString *)roomID
+                                     success:(void (^)(NSNumber *createdTime))success
+                                     failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseContactSearchKeyword:(NSString *)keyword
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success
@@ -337,7 +341,18 @@
                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetProjectConfigsWithSuccess:(void (^)(NSDictionary *projectConfigsDictionary))success
                                     failure:(void (^)(NSError *error))failure;
++ (void)callAPIUpdateBio:(NSString *)bioContent
+                            success:(void (^)(TAPUserModel *user))success
+                 failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetPhotoList:(NSString *)userID success:(void (^)(NSMutableArray<TAPPhotoListModel *> * photoListArray))success
+                      failure:(void (^)(NSError *error))failure;
 
++ (void)callAPISetProfilePhotoAsMain:(NSInteger)userID
+                            success:(void (^)())success
+                             failure:(void (^)(NSError *error))failure;
++ (void)callAPIRemovePhotoProfile:(NSInteger)userID createdTime:(long)createdTime
+                            success:(void (^)())success
+                          failure:(void (^)(NSError *error))failure;
 // Used to prevent inserting message to deleted chat room
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 

@@ -171,6 +171,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuRemoveMember, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileSearchChat, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileEditGroup, //Chat / Group Profile Page
     TAPComponentColorIconMediaPreviewAdd, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewWarning, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewThumbnailWarning,//Media / Image Detail Preview
@@ -263,6 +265,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorNewChatMenuLabel,
     TAPTextColorChatProfileRoomNameLabel,
     TAPTextColorChatProfileMenuLabel,
+    TAPTextColorChatProfileDetailTitleLabel,
     TAPTextColorChatProfileMenuDestructiveLabel,
     TAPTextColorSearchNewContactResultName,
     TAPTextColorSearchNewContactResultUsername,
@@ -398,6 +401,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontNewChatMenuLabel,
     TAPComponentFontChatProfileRoomNameLabel,
     TAPComponentFontChatProfileMenuLabel,
+    TAPComponentFontChatProfileTitleLabelStyle,
     TAPComponentFontChatProfileMenuDestructiveLabel,
     TAPComponentFontSearchNewContactResultName,
     TAPComponentFontSearchNewContactResultUsername,

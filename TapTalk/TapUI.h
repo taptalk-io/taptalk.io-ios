@@ -730,6 +730,44 @@ Show or hide report button in user/group profile page
 */
 - (BOOL)getReportButtonInChatProfileVisibleState;
 
+/**
+Show or hide username label in user/group profile page
+*/
+- (void)setUsernameInChatProfileVisible:(BOOL)isVisible;
+/**
+ Get current visibility state of username label in user/group profile page
+*/
+- (BOOL)getUsernameInChatProfileVisible;
+
+/**
+Show or hide mobile number label in user/group profile page
+*/
+- (void)setMobileNumberInChatProfileVisible:(BOOL)isVisible;
+/**
+ Get current visibility state of mobile number label in user/group profile page
+*/
+- (BOOL)getMobileNumberInChatProfileVisible;
+
+/**
+Show or hide email label in user/group profile page
+*/
+- (void)setEmailAddressInChatProfileVisible:(BOOL)isVisible;
+/**
+ Get current visibility state of email label in user/group profile page
+*/
+- (BOOL)getEmailAddressInChatProfileVisible;
+
+
+/**
+Show or hide bio in user/group profile page
+*/
+- (void)setEditBioTextFieldVisible:(BOOL)isVisible;
+
+/**
+ Get current visibility state of bio in user/group profile page and my account page
+*/
+- (BOOL)getEditBioTextFieldVisible;
+
 @end
 
 NS_ASSUME_NONNULL_END

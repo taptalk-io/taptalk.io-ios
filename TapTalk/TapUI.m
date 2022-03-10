@@ -48,6 +48,10 @@
 @property (nonatomic) BOOL isAddToContactsButtonInChatProfileHidden;
 @property (nonatomic) BOOL isAddContactDisabled;
 @property (nonatomic) BOOL isReportButtonInChatProfileVisible;
+@property (nonatomic) BOOL isUsernameInChatProfileHidden;
+@property (nonatomic) BOOL isMobileNumberInChatProfileHidden;
+@property (nonatomic) BOOL isEmailAddressInChatProfileVisible;
+@property (nonatomic) BOOL isEditBioTextFieldHidden;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -828,5 +832,64 @@ Show or hide report button in user/group profile page
 - (BOOL)getReportButtonInChatProfileVisibleState {
     return self.isReportButtonInChatProfileVisible;
 }
+
+/**
+Show or hide username label in user/group profile page
+*/
+- (void)setUsernameInChatProfileVisible:(BOOL)isVisible {
+    _isUsernameInChatProfileHidden = !isVisible;
+}
+
+/**
+ Get current visibility state of username label in user/group profile page
+*/
+- (BOOL)getUsernameInChatProfileVisible {
+    return !self.isUsernameInChatProfileHidden;
+}
+
+/**
+Show or hide mobile number label in user/group profile page
+*/
+- (void)setMobileNumberInChatProfileVisible:(BOOL)isVisible {
+    _isMobileNumberInChatProfileHidden = !isVisible;
+}
+
+/**
+ Get current visibility state of mobile number label in user/group profile page
+*/
+- (BOOL)getMobileNumberInChatProfileVisible {
+    return !self.isMobileNumberInChatProfileHidden;
+}
+
+/**
+Show or hide email label in user/group profile page
+*/
+- (void)setEmailAddressInChatProfileVisible:(BOOL)isVisible {
+    _isEmailAddressInChatProfileVisible = isVisible;
+}
+
+/**
+ Get current visibility state of email label in user/group profile page and my account page
+*/
+- (BOOL)getEmailAddressInChatProfileVisible {
+    return self.isEmailAddressInChatProfileVisible;
+}
+
+/**
+Show or hide bio in user/group profile page
+*/
+- (void)setEditBioTextFieldVisible:(BOOL)isVisible {
+    _isEditBioTextFieldHidden = !isVisible;
+}
+
+/**
+ Get current visibility state of bio in user/group profile page and my account page
+*/
+- (BOOL)getEditBioTextFieldVisible {
+    return !self.isEditBioTextFieldHidden;
+}
+
+
+
 
 @end

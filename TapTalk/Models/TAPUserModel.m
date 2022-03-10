@@ -37,6 +37,7 @@
     [encoder encodeBool:self.isOnline forKey:@"isOnline"];
     [encoder encodeBool:self.isEmailVerified forKey:@"isEmailVerified"];
     [encoder encodeBool:self.isPhoneVerified forKey:@"isPhoneVerified"];
+    [encoder encodeObject:self.bio forKey:@"bio"];
 
 }
 
@@ -67,6 +68,7 @@
         self.isOnline = [decoder decodeBoolForKey:@"isOnline"];
         self.isEmailVerified = [decoder decodeBoolForKey:@"isEmailVerified"];
         self.isPhoneVerified = [decoder decodeBoolForKey:@"isPhoneVerified"];
+        self.bio = [decoder decodeObjectForKey:@"bio"];
     }
     return self;
 }

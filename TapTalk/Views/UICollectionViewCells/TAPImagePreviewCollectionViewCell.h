@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, TAPImagePreviewCollectionViewCellType) {
     TAPImagePreviewCollectionViewCellTypeImage = 0,
-    TAPImagePreviewCollectionViewCellTypeVideo = 1
+    TAPImagePreviewCollectionViewCellTypeVideo = 1,
+    TAPImagePreviewCollectionViewCellTypeProfileImage = 2
 };
 
 typedef NS_ENUM(NSInteger, TAPImagePreviewCollectionViewCellStateType) {
@@ -23,6 +24,7 @@ typedef NS_ENUM(NSInteger, TAPImagePreviewCollectionViewCellStateType) {
 @protocol TAPImagePreviewCollectionViewCellDelegate <NSObject>
 
 - (void)imagePreviewCollectionViewCellDidPlayVideoButtonDidTappedWithMediaPreview:(TAPMediaPreviewModel *)mediaPreview indexPath:(NSIndexPath *)indexPath;
+- (void)saveImageButtonDidLongpressWithIndex:(TAPImageView *)currentImageView;
 
 @end
 
@@ -34,14 +36,17 @@ typedef NS_ENUM(NSInteger, TAPImagePreviewCollectionViewCellStateType) {
 @property (nonatomic) TAPImagePreviewCollectionViewCellType imagePreviewCollectionViewCellType;
 @property (nonatomic) TAPImagePreviewCollectionViewCellStateType imagePreviewCollectionViewCellStateType;
 @property (nonatomic) BOOL isExceededMaxFileSize;
+@property (strong, nonatomic) TAPImageView *selectedPictureImageView;
 
 - (void)setImagePreviewImage:(UIImage *)image;
+- (void)setImagePreviewImageWithUrl:(NSString *)imageUrl;
 - (void)setImagePreviewCollectionViewCellType:(TAPImagePreviewCollectionViewCellType)imagePreviewCollectionViewCellType;
 - (void)setImagePreviewCollectionViewCellStateType:(TAPImagePreviewCollectionViewCellStateType)imagePreviewCollectionViewCellStateType;
 - (void)animateProgressMediaWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)showProgressView:(BOOL)show animated:(BOOL)isAnimated;
 - (void)animateFinishedDownload;
 - (void)showPlayButton:(BOOL)show animated:(BOOL)isAnimated;
+- (void)setPageIndicatorActive:(BOOL)isActive;
 
 @end
 

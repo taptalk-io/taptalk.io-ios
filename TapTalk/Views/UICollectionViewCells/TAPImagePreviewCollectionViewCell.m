@@ -10,8 +10,9 @@
 
 @interface TAPImagePreviewCollectionViewCell ()
 
-@property (strong, nonatomic) UIImageView *selectedPictureImageView;
+
 @property (strong, nonatomic) UIImageView *playVideoButtonImageView;
+@property (strong, nonatomic) TAPImageView *profilPictureImageView;
 @property (strong, nonatomic) UIButton *playVideoButton;
 @property (strong, nonatomic) UIView *progressBackgroundView;
 @property (strong, nonatomic) UIView *progressBarView;
@@ -25,6 +26,7 @@
 @property (nonatomic) CGFloat pathWidth;
 @property (nonatomic) CGFloat newProgress;
 @property (nonatomic) NSInteger updateInterval;
+@property (strong, nonatomic) UIButton *saveImageButton;
 
 - (void)playVideoButtonDidTapped;
 
@@ -37,10 +39,24 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _selectedPictureImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
+        _selectedPictureImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
         self.selectedPictureImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.selectedPictureImageView.clipsToBounds = YES;
         [self.contentView addSubview:self.selectedPictureImageView];
+        
+        _saveImageButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
+        self.saveImageButton.alpha = 0.0f;
+        self.saveImageButton.userInteractionEnabled = YES;
+        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(saveImageButtonDidTapped)];
+        [self.saveImageButton addGestureRecognizer:longPress];
+        //[self.saveImageButton addTarget:self action:@selector(saveImageButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:self.saveImageButton];
+        
+        _profilPictureImageView= [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
+        self.profilPictureImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.profilPictureImageView.clipsToBounds = YES;
+        self.profilPictureImageView.alpha = 0.0f;
+        //[self.contentView addSubview:self.profilPictureImageView];
         
         CGFloat imagePreviewCollectionViewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
         if (IS_IPHONE_X_FAMILY) {
@@ -101,14 +117,30 @@
     [self.progressBarView addSubview:self.syncProgressSubView];
     _progressLayer = [CAShapeLayer layer];
     _lastProgress = 0.0f;
+    self.profilPictureImageView.alpha = 0.0f;
     
     [self showPlayButton:NO animated:NO];
 }
 
 #pragma mark - Custom Method
+- (void)setPageIndicatorActive:(BOOL)isActive{
+    self.selectedPictureImageView.alpha = 0.0f;
+    if(isActive){
+        self.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+    }
+    else{
+        self.backgroundColor = [TAPUtil getColor:@"FFF2E5"];
+    }
+}
+
 - (void)setImagePreviewImage:(UIImage *)image {
     self.selectedPictureImageView.image = image;
 }
+
+- (void)setImagePreviewImageWithUrl:(NSString *)imageUrl {
+    [self.selectedPictureImageView setImageWithURLString:imageUrl];
+}
+
 
 - (void)setImagePreviewCollectionViewCellType:(TAPImagePreviewCollectionViewCellType)imagePreviewCollectionViewCellType {
     _imagePreviewCollectionViewCellType = imagePreviewCollectionViewCellType;
@@ -119,6 +151,11 @@
     else if (self.imagePreviewCollectionViewCellType == TAPImagePreviewCollectionViewCellTypeVideo) {
         [self showPlayButton:YES animated:NO];
     }
+    else if (self.imagePreviewCollectionViewCellType == TAPImagePreviewCollectionViewCellTypeProfileImage) {
+        //self.selectedPictureImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.saveImageButton.alpha = 1.0f;
+    }
+    
 }
 
 - (void)setImagePreviewCollectionViewCellStateType:(TAPImagePreviewCollectionViewCellStateType)imagePreviewCollectionViewCellStateType {
@@ -260,6 +297,12 @@
 - (void)playVideoButtonDidTapped {
     if ([self.delegate respondsToSelector:@selector(imagePreviewCollectionViewCellDidPlayVideoButtonDidTappedWithMediaPreview:indexPath:)]) {
         [self.delegate imagePreviewCollectionViewCellDidPlayVideoButtonDidTappedWithMediaPreview:self.mediaPreviewData indexPath:self.currentIndexPath];
+    }
+}
+
+- (void)saveImageButtonDidTapped {
+    if ([self.delegate respondsToSelector:@selector(saveImageButtonDidLongpressWithIndex:)]) {
+        [self.delegate saveImageButtonDidLongpressWithIndex:self.selectedPictureImageView];
     }
 }
 

@@ -716,9 +716,10 @@
     else {
         TAPMyAccountViewController *myAccountViewController = [[TAPMyAccountViewController alloc] init];
         myAccountViewController.delegate = self;
-        myAccountViewController.presentationController.delegate = self;
-        UINavigationController *myAccountNavigationController = [[UINavigationController alloc] initWithRootViewController:myAccountViewController];
-        [self presentViewController:myAccountNavigationController animated:YES completion:nil];
+        //myAccountViewController.presentationController.delegate = self;
+        //UINavigationController *myAccountNavigationController = [[UINavigationController alloc] initWithRootViewController:myAccountViewController];
+       // [self presentViewController:myAccountNavigationController animated:YES completion:nil];
+        [self.navigationController pushViewController:myAccountViewController animated:YES];
     }
 }
 

@@ -80,6 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   roomID:(NSString *)roomID
                                  success:(void (^)(TAPRoomModel *room))success
                                  failure:(void (^)(NSError *error))failure;
+
 - (void)sendStartTypingEmitWithRoomID:(NSString *)roomID;
 - (void)sendStopTypingEmitWithRoomID:(NSString *)roomID;
 

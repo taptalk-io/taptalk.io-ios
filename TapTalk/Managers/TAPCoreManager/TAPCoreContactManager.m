@@ -144,4 +144,16 @@
     }];
 }
 
+- (void)updateActiveUserBio:(NSString *)bio
+                    success:(void (^)())success
+                    failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIUpdateBio:bio success:^(TAPUserModel *user) {
+        
+        success(user);
+    } failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
 @end

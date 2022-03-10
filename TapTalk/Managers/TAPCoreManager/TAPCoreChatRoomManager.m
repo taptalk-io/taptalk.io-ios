@@ -113,13 +113,24 @@
         [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
         success(room);
     } failure:^(NSError *error) {
-        TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
-        if (obtainedRoom == nil) {
-            success(obtainedRoom);
+        if (error.code == 40301) {
+            // Permission denied
+            failure(error);
+        }
+        if (error.code == 40401) {
+            // Room not found
+            [[TAPGroupManager sharedManager] removeRoomWithRoomID:groupRoomID];
+            failure(error);
         }
         else {
-            NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
-            failure(localizedError);
+            TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
+            if (obtainedRoom != nil) {
+                success(obtainedRoom);
+            }
+            else {
+                NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+                failure(localizedError);
+            }
         }
     }];
 }

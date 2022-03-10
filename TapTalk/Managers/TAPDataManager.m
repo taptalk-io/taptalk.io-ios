@@ -2138,7 +2138,7 @@
 
 + (void)getDatabaseAllUnreadMessagesWithSuccess:(void (^)(NSArray *unreadMessages))success
                                         failure:(void (^)(NSError *error))failure {
-    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:@"isRead == 0 && isHidden == 0 && isDeleted == 0" sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:@"isRead == 0" sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
         
         NSMutableArray *obtainedArray = [NSMutableArray array];
@@ -2159,7 +2159,7 @@
                                           success:(void (^)(NSArray *))success
                                           failure:(void (^)(NSError *))failure {
     
-    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && !(userID LIKE '%@')", roomID, activeUserID];
+    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && roomID LIKE '%@' && !(userID LIKE '%@')", roomID, activeUserID];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
@@ -2200,7 +2200,7 @@
     
     NSString *subQueryMentionValidationString = [NSString stringWithFormat:@"(body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@')", firstPredicateString, secondPredicateString, thirdPredicateString, fourthPredicateString, fifthPredicateString, sixthPredicateString, seventhPredicateString, eighthPredicateString, ninthPredicateString];
     
-    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && isHidden == 0 && isDeleted == 0 && roomID LIKE '%@' && !(userID LIKE '%@') && (type == %ld || type == %ld || type == %ld) && %@", roomID, activeUserID, TAPChatMessageTypeText, TAPChatMessageTypeImage, TAPChatMessageTypeVideo, subQueryMentionValidationString];
+    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && roomID LIKE '%@' && !(userID LIKE '%@') && (type == %ld || type == %ld || type == %ld) && %@", roomID, activeUserID, TAPChatMessageTypeText, TAPChatMessageTypeImage, TAPChatMessageTypeVideo, subQueryMentionValidationString];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
@@ -2262,6 +2262,33 @@
         success([resultArray count]);
         
     } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)getDatabaseOldestCreatedTimeFromRoom:(NSString *)roomID
+                                     success:(void (^)(NSNumber *createdTime))success
+                                     failure:(void (^)(NSError *error))failure {
+    
+    [TAPDatabaseManager loadMessageWithRoomID:roomID
+                                numberOfItems:1
+                                    ascending:YES
+    success:^(NSArray *resultArray) {
+        NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
+        
+        if ([messageArray count] == 0) {
+            NSTimeInterval currentTimeInterval = [[NSDate date] timeIntervalSince1970];
+            NSNumber *currentTime = [NSNumber numberWithDouble: currentTimeInterval];
+            success(currentTime);
+            return;
+        }
+        else {
+            NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray firstObject]];
+            TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            success(messageModel.created);
+        }
+    }
+    failure:^(NSError *error) {
         failure(error);
     }];
 }
@@ -6257,6 +6284,308 @@
         
         success(projectConfigsDictionary);
         
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIUpdateBio:(NSString *)bioContent
+                            success:(void (^)(TAPUserModel *user))success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateBio];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:bioContent forKey:@"bio"];
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIUpdateBio:bioContent success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            TAPUserModel *user = [TAPUserModel new];
+            success(user);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        
+        NSDictionary *userDictionary = [dataDictionary objectForKey:@"user"];
+        userDictionary = [TAPUtil nullToEmptyDictionary:userDictionary];
+        TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:userDictionary error:nil];
+        [TAPDataManager setActiveUser:user];
+        success(user);
+        
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIGetPhotoList:(NSString *)userID success:(void (^)(NSMutableArray<TAPPhotoListModel *> * photoListArray))success
+                      failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetPhotoList];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:userID forKey:@"userID"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            /**
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIGetPh:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            */
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success([NSArray array]);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        NSArray *photoArray = [dataDictionary objectForKey:@"photos"];
+        photoArray = [TAPUtil nullToEmptyArray:photoArray];
+        
+        for(NSString *key in [dataDictionary allKeys]) {
+          //NSLog(@"==== %@",[dataDictionary objectForKey:key]);
+        }
+        NSMutableArray<TAPPhotoListModel *> *photoResultArray = [NSMutableArray array];
+        for (NSDictionary *photoDictionary in photoArray) {
+            //NSDictionary *obtainedUserDictionary = [userDictionary objectForKey:@"user"];
+            //obtainedUserDictionary = [TAPUtil nullToEmptyDictionary:obtainedUserDictionary];
+            
+            TAPPhotoListModel *photo = [TAPPhotoListModel new];
+            
+            NSString *userID = [photoDictionary objectForKey:@"id"];
+            userID = [TAPUtil nullToEmptyString:userID];
+            photo.userID = userID;
+            
+            NSString *thumbnailImageURL = [photoDictionary objectForKey:@"thumbnailImageURL"];
+            thumbnailImageURL = [TAPUtil nullToEmptyString:thumbnailImageURL];
+            photo.thumbnailImageURL = thumbnailImageURL;
+            
+            NSString *fullsizeImageURL = [photoDictionary objectForKey:@"fullsizeImageURL"];
+            fullsizeImageURL = [TAPUtil nullToEmptyString:fullsizeImageURL];
+            photo.fullsizeImageURL = fullsizeImageURL;
+            
+            NSString *createdTime = [photoDictionary objectForKey:@"createdTime"];
+            createdTime = [TAPUtil nullToEmptyString:createdTime];
+            photo.createdTime = createdTime;
+            
+            [photoResultArray addObject:photo];
+        }
+        
+        success(photoResultArray);
+        /**
+        //Insert To Database
+        [TAPDataManager updateOrInsertDatabaseContactWithData:photoResultArray success:^{
+            success(photoResultArray);
+        } failure:^(NSError *error) {
+            
+        }];
+        */
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPISetProfilePhotoAsMain:(NSInteger)userID
+                            success:(void (^)())success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeSetProfilePhotoAsMain];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:@(userID) forKey:@"id"];
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPISetProfilePhotoAsMain:@(userID) success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        success();
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIRemovePhotoProfile:(NSInteger)userID createdTime:(long)createdTime
+                            success:(void (^)())success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRemoveProfilePhoto];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:@(userID) forKey:@"id"];
+    [parameterDictionary setObject:@(createdTime) forKey:@"createdTime"];
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPISetProfilePhotoAsMain:@(userID) success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        success();
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         

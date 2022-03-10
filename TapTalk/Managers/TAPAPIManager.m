@@ -210,6 +210,22 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/project_configs";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeUpdateBio) {
+        NSString *apiPath = @"client/user/update_bio";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPhotoList) {
+        NSString *apiPath = @"client/user/photo/get_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeSetProfilePhotoAsMain) {
+        NSString *apiPath = @"client/user/photo/set_main";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRemoveProfilePhoto) {
+        NSString *apiPath = @"client/user/photo/delete";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }

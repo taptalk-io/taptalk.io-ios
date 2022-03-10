@@ -10,8 +10,16 @@
 #import "TAPCustomTextFieldView.h"
 #import "TAPCustomButtonView.h"
 #import "TAPImageView.h"
+#import "TAPCustomLabelView.h"
+#import "TAPCustomGrowingTextView.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSInteger, TAPMyAccountLoadingType) {
+    TAPMyAccountLoadingTypeSetProfilPicture,
+    TAPMyAccountLoadingTypeUpadating,
+    TAPMyAccountLoadingTypeSaveImage,
+};
 
 @interface TAPMyAccountView : TAPBaseView
 
@@ -36,6 +44,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIButton *removeProfilePictureButton;
 @property (strong, nonatomic) UIButton *changeProfilePictureButton;
+@property (strong, nonatomic) TAPCustomGrowingTextView *bioTextView;
+
+@property (strong, nonatomic) TAPCustomLabelView *bioLabelField;
+@property (strong, nonatomic) TAPCustomLabelView *usernameLabelField;
+@property (strong, nonatomic) TAPCustomLabelView *mobileNumberLabelField;
+@property (strong, nonatomic) TAPCustomLabelView *emailLabelField;
+
+@property (strong, nonatomic) UILabel *bioWordCounterLabel;
+
+@property (strong, nonatomic) UICollectionView *profilImageCollectionView;
+@property (strong, nonatomic) UICollectionView *pageIndicatorCollectionView;
+
+@property (strong, nonatomic) UIView *editViewContainer;
 
 - (void)refreshViewPosition;
 - (void)setContinueButtonEnabled:(BOOL)enable;
@@ -49,6 +70,14 @@ NS_ASSUME_NONNULL_BEGIN
 //END DV Note
 - (void)setProfilePictureWithImage:(UIImage *)image userFullName:(NSString *)userFullName;
 - (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName;
+- (void)showAccountDetailView;
+- (void)showEditAccountView;
+- (void)updateGrowingTextViewPosition:(CGFloat)textViewHeight;
+- (void)showMultipleProfilePicture;
+- (void)setAsLoadingState:(BOOL)isLoading withType:(TAPMyAccountLoadingType)type;
+- (void)showLoadingView:(BOOL)isShow;
+- (void)setCurrentWordCountWithCurrentCharCount:(NSInteger)charCount;
+- (void)setEditPorfilPictureButtonVisible:(BOOL) isVisible;
 
 
 @end

@@ -43,6 +43,11 @@
                 numberOfItems:(NSInteger)numberOfItems
                       success:(void (^)(NSArray *resultArray))success
                       failure:(void (^)(NSError *error))failure;
++ (void)loadMessageWithRoomID:(NSString *)roomID
+                numberOfItems:(NSInteger)numberOfItems
+                    ascending:(BOOL)ascending
+                      success:(void (^)(NSArray *resultArray))success
+                      failure:(void (^)(NSError *error))failure;
 + (void)loadRoomListSuccess:(void (^)(NSArray *resultArray))success
                     failure:(void (^)(NSError *error))failure;
 + (void)insertDataToDatabaseWithData:(NSArray *)dataArray
