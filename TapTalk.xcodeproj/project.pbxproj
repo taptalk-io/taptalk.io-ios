@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A1640B027D9D71C007FACEE /* TAPPhotoListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640AE27D9D71B007FACEE /* TAPPhotoListModel.m */; };
+		0A1640B127D9D71C007FACEE /* TAPPhotoListModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A1640AF27D9D71C007FACEE /* TAPPhotoListModel.h */; };
+		0A1640BA27D9E94B007FACEE /* TAPCustomLabelView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A1640B227D9E94A007FACEE /* TAPCustomLabelView.h */; };
+		0A1640BB27D9E94B007FACEE /* TAPCustomTextFieldView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A1640B327D9E94A007FACEE /* TAPCustomTextFieldView.h */; };
+		0A1640BC27D9E94B007FACEE /* TAPCustomTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640B427D9E94A007FACEE /* TAPCustomTextView.m */; };
+		0A1640BD27D9E94B007FACEE /* TAPCustomPhoneNumberPickerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A1640B527D9E94A007FACEE /* TAPCustomPhoneNumberPickerView.h */; };
+		0A1640BE27D9E94B007FACEE /* TAPCustomPhoneNumberPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640B627D9E94A007FACEE /* TAPCustomPhoneNumberPickerView.m */; };
+		0A1640BF27D9E94B007FACEE /* TAPCustomTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A1640B727D9E94B007FACEE /* TAPCustomTextView.h */; };
+		0A1640C027D9E94B007FACEE /* TAPCustomLabelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640B827D9E94B007FACEE /* TAPCustomLabelView.m */; };
+		0A1640C127D9E94B007FACEE /* TAPCustomTextFieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */; };
 		6E49DA7C511A492F4B7D60D1 /* libPods-TapTalk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E70D8AB2D3B87EBE824DA6A /* libPods-TapTalk.a */; };
 		A97EC5C925BEF17B0068E2D4 /* TapUI.h in Headers */ = {isa = PBXBuildFile; fileRef = A97EC5C725BEF17B0068E2D4 /* TapUI.h */; };
 		A97EC5CA25BEF17B0068E2D4 /* TapUI.m in Sources */ = {isa = PBXBuildFile; fileRef = A97EC5C825BEF17B0068E2D4 /* TapUI.m */; };
@@ -409,6 +419,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A1640AE27D9D71B007FACEE /* TAPPhotoListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPPhotoListModel.m; sourceTree = "<group>"; };
+		0A1640AF27D9D71C007FACEE /* TAPPhotoListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPPhotoListModel.h; sourceTree = "<group>"; };
+		0A1640B227D9E94A007FACEE /* TAPCustomLabelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomLabelView.h; sourceTree = "<group>"; };
+		0A1640B327D9E94A007FACEE /* TAPCustomTextFieldView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomTextFieldView.h; sourceTree = "<group>"; };
+		0A1640B427D9E94A007FACEE /* TAPCustomTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomTextView.m; sourceTree = "<group>"; };
+		0A1640B527D9E94A007FACEE /* TAPCustomPhoneNumberPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomPhoneNumberPickerView.h; sourceTree = "<group>"; };
+		0A1640B627D9E94A007FACEE /* TAPCustomPhoneNumberPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomPhoneNumberPickerView.m; sourceTree = "<group>"; };
+		0A1640B727D9E94B007FACEE /* TAPCustomTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPCustomTextView.h; sourceTree = "<group>"; };
+		0A1640B827D9E94B007FACEE /* TAPCustomLabelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomLabelView.m; sourceTree = "<group>"; };
+		0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomTextFieldView.m; sourceTree = "<group>"; };
 		1F750616D290AB6FEF6E124E /* Pods-TapTalk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalk.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TapTalk/Pods-TapTalk.debug.xcconfig"; sourceTree = "<group>"; };
 		9E70D8AB2D3B87EBE824DA6A /* libPods-TapTalk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TapTalk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A97EC5C725BEF17B0068E2D4 /* TapUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapUI.h; sourceTree = "<group>"; };
@@ -949,7 +969,9 @@
 				D77B5E6A2158BABB00253BDC /* TAPImageView.m */,
 				D77B5E6B2158BABB00253BDC /* TAPUtil.h */,
 				D77B5E682158BABB00253BDC /* TAPUtil.m */,
+				0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */,
 				D7796588215B3D4300756A38 /* TAPCustomTextView.h */,
+				0A1640B727D9E94B007FACEE /* TAPCustomTextView.h */,
 				D779658C215B3D4400756A38 /* TAPCustomTextView.m */,
 				D7796592215B3F1300756A38 /* TAPConnectionStatusView.h */,
 				D7796593215B3F1300756A38 /* TAPConnectionStatusView.m */,
@@ -958,6 +980,12 @@
 				D779658B215B3D4400756A38 /* TAPGrowingTextView.xib */,
 				D7F95BD821CB885B00885FC6 /* TAPCustomGrowingTextView.h */,
 				D7F95BD921CB885B00885FC6 /* TAPCustomGrowingTextView.m */,
+				0A1640B227D9E94A007FACEE /* TAPCustomLabelView.h */,
+				0A1640B827D9E94B007FACEE /* TAPCustomLabelView.m */,
+				0A1640B527D9E94A007FACEE /* TAPCustomPhoneNumberPickerView.h */,
+				0A1640B627D9E94A007FACEE /* TAPCustomPhoneNumberPickerView.m */,
+				0A1640B327D9E94A007FACEE /* TAPCustomTextFieldView.h */,
+				0A1640B427D9E94A007FACEE /* TAPCustomTextView.m */,
 				D7111BA4215CC11C00D9225D /* TAPGradientView.h */,
 				D7111BA5215CC11C00D9225D /* TAPGradientView.m */,
 				D79A3E66216C72B2004525CE /* TAPSearchBarView.h */,
@@ -1052,6 +1080,8 @@
 				D72F395C2240A14C00F4FC38 /* TAPMediaPreviewModel.m */,
 				D77B5EBF2158BB6D00253BDC /* TAPMessageModel.h */,
 				D77B5ECD2158BB6E00253BDC /* TAPMessageModel.m */,
+				0A1640AF27D9D71C007FACEE /* TAPPhotoListModel.h */,
+				0A1640AE27D9D71B007FACEE /* TAPPhotoListModel.m */,
 				DFA598FD21B7B17D0082C5F3 /* TAPOnlineStatusModel.h */,
 				DFA598FE21B7B17D0082C5F3 /* TAPOnlineStatusModel.m */,
 				D73E2E8B220088550083E997 /* TAPProductModel.h */,
@@ -1433,6 +1463,7 @@
 				D7F986E92251BB1B0087B652 /* TAPCustomTextFieldView.h in Headers */,
 				DF343D0D22F2C6A7004D54F5 /* TAPMediaDetailPreviewViewController.h in Headers */,
 				DF343D1122F2C6DB004D54F5 /* TAPCreateGroupViewController.h in Headers */,
+				0A1640BB27D9E94B007FACEE /* TAPCustomTextFieldView.h in Headers */,
 				DF343D0522F2C642004D54F5 /* TAPMediaDetailView.h in Headers */,
 				D77B5F282158BB9500253BDC /* TAPCreateGroupView.h in Headers */,
 				D77B5F562158BBEA00253BDC /* TAPBlockedListViewController.h in Headers */,
@@ -1474,6 +1505,7 @@
 				D77B5F372158BB9500253BDC /* TAPAddNewChatView.h in Headers */,
 				D781081F227DBB7500B41034 /* TAPMyAccountViewController.h in Headers */,
 				D7CAADFF2251FE1A005493D9 /* TAPCountryModel.h in Headers */,
+				0A1640BA27D9E94B007FACEE /* TAPCustomLabelView.h in Headers */,
 				D73D85A5246BB52A008ABEB9 /* TAPMentionListTableViewCell.h in Headers */,
 				D70DA27C2225275500824E86 /* TAPForwardListViewController.h in Headers */,
 				D747AB6A2357229C00E1B443 /* TapUIChatViewController.h in Headers */,
@@ -1481,6 +1513,7 @@
 				D7111BA6215CC11C00D9225D /* TAPGradientView.h in Headers */,
 				D7244BCC21D8841A000BEEEE /* TAPPhotoAlbumListViewController.h in Headers */,
 				D7FB9EE321C8D3FF00E26FC7 /* TAPImagePreviewCollectionViewCell.h in Headers */,
+				0A1640BD27D9E94B007FACEE /* TAPCustomPhoneNumberPickerView.h in Headers */,
 				D77B5EA12158BB4000253BDC /* TAPDatabaseManager.h in Headers */,
 				D77B5F6B2158BBEA00253BDC /* TAPBaseViewController.h in Headers */,
 				D7E26BE1225E042200B50506 /* TAPYourVideoBubbleTableViewCell.h in Headers */,
@@ -1498,6 +1531,7 @@
 				A97EC5C925BEF17B0068E2D4 /* TapUI.h in Headers */,
 				DFA6365222D42B4900B9CB99 /* TAPGroupManager.h in Headers */,
 				DFFEFEA72227E66000017739 /* TAPWebViewViewController.h in Headers */,
+				0A1640B127D9D71C007FACEE /* TAPPhotoListModel.h in Headers */,
 				D7D3B43B22F0374400D1DFF7 /* TAPCoreChatRoomManager.h in Headers */,
 				D77B5EE52158BB7E00253BDC /* TAPContactCollectionViewCell.h in Headers */,
 				D71582FB217EFAEC00649C70 /* TAPCustomNotificationAlertView.h in Headers */,
@@ -1573,6 +1607,7 @@
 				D77B5EBD2158BB6300253BDC /* TAPMessageRealmModel.h in Headers */,
 				D781081B227DBB6500B41034 /* TAPMyAccountView.h in Headers */,
 				D77B5F612158BBEA00253BDC /* TAPScanQRCodeViewController.h in Headers */,
+				0A1640BF27D9E94B007FACEE /* TAPCustomTextView.h in Headers */,
 				D7244BC821D883A1000BEEEE /* TAPPhotoAlbumListView.h in Headers */,
 				F55913DF2175EF9D004A81EC /* TAPSearchResultMessageTableViewCell.h in Headers */,
 				DF2513CF21E61BE3000D165A /* TAPForwardFromModel.h in Headers */,
@@ -1790,6 +1825,7 @@
 				D778FAA1221D7FA3000E3A00 /* TAPLocationSearchBarView.m in Sources */,
 				D77B5F252158BB9500253BDC /* TAPPopUpInfoView.m in Sources */,
 				D7D3B43822F0373700D1DFF7 /* TAPCoreContactManager.m in Sources */,
+				0A1640B027D9D71C007FACEE /* TAPPhotoListModel.m in Sources */,
 				F5301EF7217A2209007227D2 /* TAPContactRealmModel.m in Sources */,
 				DF343D0B22F2C67D004D54F5 /* TAPMediaDetailPreviewView.m in Sources */,
 				D7115365222E54A90033C082 /* TAPDataFileModel.m in Sources */,
@@ -1854,6 +1890,7 @@
 				D77B5E722158BABB00253BDC /* TAPImageView.m in Sources */,
 				F5E0B26E215B7BBB0040163B /* TAPMyChatBubbleTableViewCell.m in Sources */,
 				D79533512450005400C4F90D /* TAPLanguageManager.m in Sources */,
+				0A1640C127D9E94B007FACEE /* TAPCustomTextFieldView.m in Sources */,
 				D77B5ED62158BB6E00253BDC /* TAPGroupModel.m in Sources */,
 				A97EC5CA25BEF17B0068E2D4 /* TapUI.m in Sources */,
 				D70DA27D2225275500824E86 /* TAPForwardListViewController.m in Sources */,
@@ -1861,6 +1898,7 @@
 				D7358CB4227AD28400C65C67 /* TAPCountryPickerTableViewCell.m in Sources */,
 				D74600A82163274600CE5EEC /* TAPSetupRoomListView.m in Sources */,
 				DFFEFEA42227E64400017739 /* TAPWebViewView.m in Sources */,
+				0A1640C027D9E94B007FACEE /* TAPCustomLabelView.m in Sources */,
 				D77B5EA92158BB4000253BDC /* TAPAPIManager.m in Sources */,
 				D795E134222CF1D7008E7B99 /* TAPYourFileBubbleTableViewCell.m in Sources */,
 				D7244BD421D888BD000BEEEE /* TAPImageSelectView.m in Sources */,
@@ -1927,9 +1965,11 @@
 				F524EF1F217DE9970087D956 /* TAPSearchResultChatTableViewCell.m in Sources */,
 				D774A95722E974C8005CAD5D /* TAPCoreMessageManager.m in Sources */,
 				D778FA9D221D7E4F000E3A00 /* TAPPinLocationSearchResultTableViewCell.m in Sources */,
+				0A1640BC27D9E94B007FACEE /* TAPCustomTextView.m in Sources */,
 				D7F95BDB21CB885B00885FC6 /* TAPCustomGrowingTextView.m in Sources */,
 				D709F857229E2FDA00EB81C2 /* TAPYourChatDeletedBubbleTableViewCell.m in Sources */,
 				D7358CAC227AD02200C65C67 /* TAPCountryPickerView.m in Sources */,
+				0A1640BE27D9E94B007FACEE /* TAPCustomPhoneNumberPickerView.m in Sources */,
 				D77B5EBA2158BB6300253BDC /* TAPMessageRealmModel.m in Sources */,
 				DFA5990421B7D3A30082C5F3 /* TAPContactManager.m in Sources */,
 				D798F6A72301351D0001CC16 /* TAPCoreErrorManager.m in Sources */,

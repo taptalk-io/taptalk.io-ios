@@ -120,24 +120,24 @@
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if(collectionView == self.myAccountView.pageIndicatorCollectionView){
+    if (collectionView == self.myAccountView.pageIndicatorCollectionView) {
         CGSize cellSize = CGSizeMake((CGRectGetWidth([UIScreen mainScreen].bounds) / self.photoListArray.count) - 1, 3.0f);
         return cellSize;
     }
-    else if(collectionView == self.myAccountView.profilImageCollectionView){
+    else if (collectionView == self.myAccountView.profilImageCollectionView) {
         CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 360.0f);
         return cellSize;
     }
-    
+    return CGSizeMake(0.0f, 0.0f);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView
                    layout:(UICollectionViewLayout *)collectionViewLayout
 minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
-    if(collectionView == self.myAccountView.pageIndicatorCollectionView){
+    if (collectionView == self.myAccountView.pageIndicatorCollectionView) {
         return 1.0f;
     }
-    else if(collectionView == self.myAccountView.profilImageCollectionView){
+    else {//if (collectionView == self.myAccountView.profilImageCollectionView) {
         return 0.0f;
     }
 }
@@ -145,10 +145,10 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
 - (CGFloat)collectionView:(UICollectionView *)collectionView
                    layout:(UICollectionViewLayout*)collectionViewLayout
 minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-    if(collectionView == self.myAccountView.pageIndicatorCollectionView){
+    if (collectionView == self.myAccountView.pageIndicatorCollectionView) {
         return 1.0f;
     }
-    else if(collectionView == self.myAccountView.profilImageCollectionView){
+    else {//if (collectionView == self.myAccountView.profilImageCollectionView) {
         return 0.0f;
     }
 }
