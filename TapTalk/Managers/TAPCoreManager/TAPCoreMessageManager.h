@@ -228,6 +228,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID
                            success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                            failure:(void (^)(NSError *error))failure;
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+                     excludeHidden:(BOOL)excludeHidden
+                           success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                           failure:(void (^)(NSError *error))failure;
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+               maxCreatedTimestamp:(NSNumber *)maxCreatedTimestamp
+                     numberOfItems:(NSInteger)numberOfItems
+                           success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                           failure:(void (^)(NSError *error))failure;
+- (void)getLocalMessageWithLocalID:(NSString *)localID
+                           success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                           failure:(void (^)(NSError *error))failure;
+- (void)getLocalMessageWithLocalIDs:(NSArray<NSString *> *)localIDs
+                            success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                            failure:(void (^)(NSError *error))failure;
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+               maxCreatedTimestamp:(NSNumber *)maxCreatedTimestamp
+                     numberOfItems:(NSInteger)numberOfItems
+                     excludeHidden:(BOOL)excludeHidden
+                           success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                           failure:(void (^)(NSError *error))failure;
 - (void)getOlderMessagesBeforeTimestamp:(NSNumber *)timestamp
                                  roomID:(NSString *)roomID
                           numberOfItems:(NSNumber *)numberOfItems
@@ -270,6 +291,34 @@ NS_ASSUME_NONNULL_BEGIN
                                    roomID:(NSString *)roomID
                                   success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                                   failure:(void (^)(NSError *error))failure;
+- (void)getStarredMessagesWithRoomID:(NSString *)roomID
+                          pageNumber:(NSInteger)pageNumber
+                       numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSArray<TAPMessageModel *> *starredMessagesArray,BOOL hasMoreData))success
+                             failure:(void (^)(NSError *error))failure;
+- (void)getStarredMessageIDsWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                               failure:(void (^)(NSError *error))failure;
+- (void)starMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID;
+- (void)starMessageWithMessageID:(NSString *)messageID
+                          roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure;
+- (void)starMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID;
+- (void)starMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                           failure:(void (^)(NSError *error))failure;
+- (void)unstarMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID;
+- (void)unstarMessageWithMessageID:(NSString *)messageID
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                           failure:(void (^)(NSError *error))failure;
+- (void)unstarMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID;
+- (void)unstarMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray<NSString *> *unstarredMessagesIDs))success
+                             failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

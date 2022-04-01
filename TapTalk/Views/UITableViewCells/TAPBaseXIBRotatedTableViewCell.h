@@ -9,5 +9,5 @@
 #import "TAPBaseXIBTableViewCell.h"
 
 @interface TAPBaseXIBRotatedTableViewCell : TAPBaseXIBTableViewCell
-
+- (void)setRotaionToDefault;
 @end

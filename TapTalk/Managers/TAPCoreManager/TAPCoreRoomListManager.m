@@ -312,4 +312,34 @@
     }];
 }
 
+- (void)markChatRoomAsUnreadWithRoomID:(NSString *)roomID
+                               success:(void (^)())success
+                               failure:(void (^)(NSError *error))failure {
+    
+    NSArray *roomIDs = @[roomID];
+    [self markChatRoomsAsUnreadWithRoomID:roomIDs success:success failure:failure];
+}
+
+- (void)markChatRoomsAsUnreadWithRoomID:(NSArray<NSString *> *)roomIDs
+                                success:(void (^)())success
+                                failure:(void (^)(NSError *error))failure {
+
+    [TAPDataManager callAPIMarkChatRoomAsUnread:roomIDs
+    success:^(NSArray *unreadRoomIDs) {
+        success();
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getMarkedAsUnreadChatRoomListWithSuccess:(void (^)(NSArray *unreadRoomIDs))success failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray *unreadRoomIDs) {
+        success(unreadRoomIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 @end

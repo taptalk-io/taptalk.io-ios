@@ -41,6 +41,10 @@
 @property (strong, nonatomic) IBOutlet UIImageView *imageStatusIconImageView;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconBottomImageView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidth;
 
 @property (strong, nonatomic) IBOutlet UIView *progressBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *progressBarView;
@@ -99,6 +103,10 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -215,6 +223,8 @@
     self.statusLabel.alpha = 0.0f;
     self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
+    self.starIconImageView.alpha = 0.0f;
+    self.starIconBottomImageView.alpha = 0.0f;
     [self.contentView layoutIfNeeded];
     
     [self showReplyView:NO withMessage:nil];
@@ -277,7 +287,12 @@
     self.downloadView.alpha = 0.0f;
     self.doneDownloadView.alpha = 0.0f;
     self.retryDownloadView.alpha = 0.0f;
+    self.starIconImageView.alpha = 0.0f;
+    self.starIconBottomImageView.alpha = 0.0f;
 
+    self.starImageViewWidth.constant = 0.0f;
+    self.starImageViewLeadingConstraint.constant = 4.0f;
+    
     [self.contentView layoutIfNeeded];
 
     [self showForwardView:NO];
@@ -1093,6 +1108,7 @@
         self.timestampLabel.alpha = 0.0f;
         self.imageStatusIconImageView.alpha = 0.0f;
         self.imageTimestampStatusContainerView.alpha = 1.0f;
+        self.starIconBottomImageView.alpha = 0.0f;
         self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
         
         [self setInnerImageStatusIcon];
@@ -1801,6 +1817,33 @@
             } afterDelay:1.0f];
         }];
     } afterDelay:0.2f];
+}
+
+- (void)showStarMessageView {
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+        self.starImageViewWidth.constant = 12.0f;
+        self.starImageViewLeadingConstraint.constant = 8.0f;
+        if(self.imageTimestampStatusContainerView.alpha == 0){
+            self.starIconBottomImageView.alpha = 1.0f;
+        }
+        
+    }
+    else{
+        self.starImageViewWidth.constant = 0.0f;
+        self.starImageViewLeadingConstraint.constant = 4.0f;
+        self.starIconImageView.alpha = 0.0f;
+        self.starIconBottomImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.seperatorViewTopConstraint.constant = 16.0f;
+    self.seperatorViewBottomConstraint.constant = 13.0f;
+    self.seperatorViewHeightConstraint.constant = 1.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
 }
 
 @end

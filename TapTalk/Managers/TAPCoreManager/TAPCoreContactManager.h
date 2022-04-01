@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)getAllUserContactsWithSuccess:(void (^)(NSArray <TAPUserModel *>*userArray))success
                               failure:(void (^)(NSError *error))failure;
+- (TAPUserModel *)getLocalUserDataWithUserID:(NSString *)userID;
 - (void)getUserDataWithUserID:(NSString *)userID
                       success:(void (^)(TAPUserModel *user))success
                       failure:(void (^)(NSError *error))failure;

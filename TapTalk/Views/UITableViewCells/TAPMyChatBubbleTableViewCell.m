@@ -36,6 +36,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -63,6 +64,11 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardTitleLabelLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *forwardFromLabelLeadingConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstarint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
+
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
@@ -128,6 +134,8 @@
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
     
+    self.starIconImageView.alpha = 0;
+    
     UIImage *swipeReplyImage;
     if (IS_BELOW_IOS_13) {
         swipeReplyImage = [UIImage imageNamed:@"TAPIconReplyChatOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -189,6 +197,7 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     self.mentionIndexesArray = nil;
+    self.starIconImageView.alpha = 0;
     [self.contentView layoutIfNeeded];
 }
 
@@ -742,6 +751,24 @@
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
     [self.contentView layoutIfNeeded];
+}
+
+- (void)showStarMessageIconView{
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+    }
+    else{
+        self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.seperatorViewHeightConstarint.constant = 1.0f;
+    self.seperatorViewTopConstraint.constant = 16.0f;
+    self.seperatorViewBottomConstraint.constant = 6.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {

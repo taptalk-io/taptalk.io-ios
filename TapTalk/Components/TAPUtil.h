@@ -12,6 +12,8 @@
 #import <CoreLocation/CoreLocation.h>
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#import "TAPMessageModel.h"
+#import "TAPUserModel.h"
 
 #pragma mark - Math
 #define DEGREES_TO_RADIANS(x) (M_PI * x / 180.0f)

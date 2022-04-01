@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -257,7 +257,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AjF-HY-hwC" userLabel="Timestamp Label">
-                                <rect key="frame" x="10" y="298" width="224" height="16"/>
+                                <rect key="frame" x="234" y="298" width="0.0" height="16"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="mRQ-RB-CiU"/>
@@ -273,6 +273,20 @@
                                     <constraint firstAttribute="height" constant="16" id="gPC-GQ-OWU"/>
                                 </constraints>
                             </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="TUC-Lx-lNS">
+                                <rect key="frame" x="216" y="300" width="12" height="12"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="12" id="YFp-SL-b95"/>
+                                    <constraint firstAttribute="width" constant="12" id="miG-xH-s53"/>
+                                </constraints>
+                            </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cyd-22-nPc">
+                                <rect key="frame" x="10" y="301" width="206" height="10"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="10" id="PmY-Dn-AnY"/>
+                                </constraints>
+                            </view>
                             <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HLV-s5-iUh">
                                 <rect key="frame" x="0.0" y="0.0" width="264" height="324"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -284,9 +298,10 @@
                         <color key="backgroundColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
+                            <constraint firstItem="cyd-22-nPc" firstAttribute="centerY" secondItem="TUC-Lx-lNS" secondAttribute="centerY" id="0Do-y0-5fk"/>
+                            <constraint firstItem="TUC-Lx-lNS" firstAttribute="leading" secondItem="cyd-22-nPc" secondAttribute="trailing" id="298-c1-LuO"/>
                             <constraint firstItem="YxV-Bw-fl5" firstAttribute="centerX" secondItem="o4h-r7-Vhc" secondAttribute="centerX" id="2EJ-2j-qkF"/>
                             <constraint firstItem="1th-ab-Lvj" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="2O2-vv-yyp"/>
-                            <constraint firstItem="AjF-HY-hwC" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="3FQ-G3-hEU"/>
                             <constraint firstItem="1th-ab-Lvj" firstAttribute="top" secondItem="36F-Ej-VDx" secondAttribute="bottom" constant="6" id="4oF-D8-xbj"/>
                             <constraint firstItem="HLV-s5-iUh" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" id="83a-Dm-53e"/>
                             <constraint firstAttribute="trailing" secondItem="EDs-Vh-gBM" secondAttribute="trailing" constant="10" id="8hM-an-ibi"/>
@@ -298,6 +313,7 @@
                             <constraint firstItem="AjF-HY-hwC" firstAttribute="top" secondItem="VRr-qr-gF5" secondAttribute="bottom" constant="2" id="IQR-mV-dSj"/>
                             <constraint firstItem="78u-Dl-gHW" firstAttribute="leading" secondItem="AjF-HY-hwC" secondAttribute="trailing" constant="4" id="IcB-3l-NVe"/>
                             <constraint firstItem="36F-Ej-VDx" firstAttribute="top" secondItem="K9C-Yu-vpf" secondAttribute="bottom" id="OHY-rC-kvc"/>
+                            <constraint firstItem="cyd-22-nPc" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="OTM-IK-oJT"/>
                             <constraint firstItem="K9C-Yu-vpf" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" constant="10" id="Ss9-H1-fPU"/>
                             <constraint firstAttribute="bottom" secondItem="HLV-s5-iUh" secondAttribute="bottom" id="TA6-Qu-O2Q"/>
                             <constraint firstAttribute="trailing" secondItem="o4h-r7-Vhc" secondAttribute="trailing" constant="10" id="U1Q-Zk-fmV"/>
@@ -311,10 +327,12 @@
                             <constraint firstItem="K9C-Yu-vpf" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="kgt-97-uAn"/>
                             <constraint firstItem="36F-Ej-VDx" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="ncw-9C-qQ4"/>
                             <constraint firstAttribute="trailing" secondItem="36F-Ej-VDx" secondAttribute="trailing" constant="10" id="oGW-rq-8PA"/>
+                            <constraint firstItem="TUC-Lx-lNS" firstAttribute="centerY" secondItem="AjF-HY-hwC" secondAttribute="centerY" id="oJ9-sn-D29"/>
                             <constraint firstItem="YxV-Bw-fl5" firstAttribute="centerY" secondItem="o4h-r7-Vhc" secondAttribute="centerY" constant="-10" id="pCE-1n-lJV"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="rgI-WR-fNp"/>
                             <constraint firstItem="o4h-r7-Vhc" firstAttribute="top" secondItem="1th-ab-Lvj" secondAttribute="bottom" constant="4" id="smg-hX-yXw"/>
                             <constraint firstItem="HLV-s5-iUh" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" id="zKD-Aw-WBm"/>
+                            <constraint firstItem="AjF-HY-hwC" firstAttribute="leading" secondItem="TUC-Lx-lNS" secondAttribute="trailing" constant="6" id="zmx-a1-5co"/>
                             <constraint firstAttribute="trailing" secondItem="1th-ab-Lvj" secondAttribute="trailing" constant="10" id="zy0-WA-rWx"/>
                         </constraints>
                     </view>
@@ -372,6 +390,13 @@
                         <rect key="frame" x="95" y="0.0" width="264" height="324"/>
                         <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i08-Bg-GYY" userLabel="Seperator View">
+                        <rect key="frame" x="16" y="311" width="331" height="0.0"/>
+                        <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                        <constraints>
+                            <constraint firstAttribute="height" id="crQ-Fi-uV3"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -380,16 +405,19 @@
                     <constraint firstItem="QLT-aC-en2" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="trailing" constant="4" id="4ir-wY-b1t"/>
                     <constraint firstItem="dUK-q7-mCR" firstAttribute="leading" secondItem="w1X-VA-DO6" secondAttribute="leading" id="BXB-d7-gW3"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" id="Dp2-vX-RH8"/>
+                    <constraint firstItem="i08-Bg-GYY" firstAttribute="leading" secondItem="R69-3q-Chx" secondAttribute="leading" constant="16" id="G5Y-av-vsL"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" secondItem="pQB-wV-S4C" secondAttribute="trailing" constant="2" id="LU2-6h-1do"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="R69-3q-Chx" secondAttribute="leading" constant="80" id="MRu-jd-3M7"/>
                     <constraint firstItem="w1X-VA-DO6" firstAttribute="height" secondItem="dUK-q7-mCR" secondAttribute="height" id="RAd-48-rBZ"/>
                     <constraint firstItem="dUK-q7-mCR" firstAttribute="top" secondItem="w1X-VA-DO6" secondAttribute="top" id="Szl-y5-dlM"/>
+                    <constraint firstItem="i08-Bg-GYY" firstAttribute="top" secondItem="QDJ-Gg-cCw" secondAttribute="bottom" constant="16" id="Ta3-dK-IEW"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="top" id="ahh-sE-86n"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="bottom" secondItem="dUK-q7-mCR" secondAttribute="bottom" constant="2" id="c3P-ri-xBw"/>
                     <constraint firstItem="QLT-aC-en2" firstAttribute="bottom" secondItem="Wd0-cM-7U7" secondAttribute="bottom" constant="-5" id="cYr-uH-xnE"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" id="cqc-Bt-BKr"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="bottom" secondItem="Wd0-cM-7U7" secondAttribute="bottom" id="dNp-Lr-9ph"/>
                     <constraint firstAttribute="bottom" secondItem="QDJ-Gg-cCw" secondAttribute="bottom" constant="8" id="fro-xF-qPb"/>
+                    <constraint firstItem="QLT-aC-en2" firstAttribute="leading" secondItem="i08-Bg-GYY" secondAttribute="trailing" constant="16" id="g7Z-Uc-Fs4"/>
                     <constraint firstAttribute="trailing" secondItem="Wd0-cM-7U7" secondAttribute="trailing" constant="16" id="g8v-8e-t3q"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" secondItem="dUK-q7-mCR" secondAttribute="trailing" constant="2" id="gna-lV-ol6"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="trailing" secondItem="Wd0-cM-7U7" secondAttribute="trailing" id="l8x-fZ-au7"/>
@@ -450,8 +478,11 @@
                 <outlet property="sendingIconBottomConstraint" destination="cYr-uH-xnE" id="r6P-QF-kZ8"/>
                 <outlet property="sendingIconImageView" destination="QLT-aC-en2" id="D5T-Lm-SEX"/>
                 <outlet property="sendingIconLeftConstraint" destination="4ir-wY-b1t" id="cbK-G1-A09"/>
+                <outlet property="seperatorViewHeightConstraint" destination="crQ-Fi-uV3" id="jeX-FD-XGX"/>
+                <outlet property="starIconImageView" destination="TUC-Lx-lNS" id="R22-h9-wZJ"/>
                 <outlet property="statusIconImageView" destination="78u-Dl-gHW" id="gaF-Ug-idu"/>
                 <outlet property="statusLabel" destination="QDJ-Gg-cCw" id="ejE-fG-pJG"/>
+                <outlet property="statusLabelBottomConstraint" destination="fro-xF-qPb" id="k3U-QZ-4Bt"/>
                 <outlet property="statusLabelHeightConstraint" destination="KYh-yY-y48" id="GWJ-jl-cww"/>
                 <outlet property="statusLabelTopConstraint" destination="1jy-rv-8AG" id="t9C-4C-QLN"/>
                 <outlet property="swipeReplyImageView" destination="4JB-qV-XDV" id="mzm-dp-aVv"/>
@@ -468,6 +499,10 @@
         <image name="TAPIconLocationSelect" width="34" height="52"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>
+        <image name="TAPIconStarChatBubble" width="12" height="12"/>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

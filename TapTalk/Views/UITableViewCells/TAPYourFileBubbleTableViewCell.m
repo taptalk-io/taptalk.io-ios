@@ -58,6 +58,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *doneDownloadButton;
 @property (strong, nonatomic) IBOutlet UIButton *doneDownloadTitleAndDescriptionButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryDownloadButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -94,6 +95,9 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -191,6 +195,8 @@
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
     
+    self.starIconImageView.alpha = 0.0f;
+    
     UIImage *swipeReplyImage;
     if (IS_BELOW_IOS_13) {
         swipeReplyImage = [UIImage imageNamed:@"TAPIconReplyChatOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -241,6 +247,8 @@
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
     _syncProgressSubView = nil;
+    
+    self.starIconImageView.alpha = 0.0f;
     
     [self showSenderInfo:NO];
 }
@@ -1147,6 +1155,23 @@
             } afterDelay:1.0f];
         }];
     } afterDelay:0.2f];
+}
+
+- (void)showStarMessageView {
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+    }
+    else{
+        self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.seperatorViewHeightConstraint.constant = 1.0f;
+    self.statusLabelBottomConstraint.constant = 33.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
 }
 
 @end

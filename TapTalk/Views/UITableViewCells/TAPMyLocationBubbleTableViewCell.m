@@ -38,6 +38,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -71,6 +72,10 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
+
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -122,6 +127,8 @@
     
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
+    
+    self.starIconImageView.alpha = 0.0f;
     
     self.replyView.layer.cornerRadius = 4.0f;
     self.replyView.clipsToBounds = YES;
@@ -192,6 +199,7 @@
     self.sendingIconBottomConstraint.constant = -5.0f;
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
+    self.starIconImageView.alpha = 0.0f;
     
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
@@ -841,6 +849,23 @@
             } afterDelay:1.0f];
         }];
     } afterDelay:0.2f];
+}
+
+- (void)showStarMessageView {
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+    }
+    else{
+        self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.statusLabelBottomConstraint.constant = 33.0f;
+    self.seperatorViewHeightConstraint.constant = 1.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
 }
 
 @end

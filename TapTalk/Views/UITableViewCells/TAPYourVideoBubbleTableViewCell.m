@@ -53,6 +53,8 @@
 @property (strong, nonatomic) IBOutlet UIButton *downloadFileButton;
 @property (strong, nonatomic) IBOutlet UIButton *doneDownloadButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryDownloadButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconBottomImageView;
 
 @property (strong, nonatomic) IBOutlet UIView *videoDurationAndSizeView;
 @property (strong, nonatomic) IBOutlet UILabel *videoDurationAndSizeLabel;
@@ -101,6 +103,13 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeight;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -225,6 +234,9 @@
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
     
+    self.starIconImageView.alpha = 0.0f;
+    self.starIconBottomImageView.alpha = 0.0f;
+    
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
     [self showForwardView:NO];
@@ -284,6 +296,9 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    self.starImageViewLeadingConstraint.constant = 4.0f;
+    self.starImageViewWidthConstraint.constant = 0.0f;
+    
     [self showSenderInfo:NO];
     [self showForwardView:NO];
     [self showReplyView:NO withMessage:nil];
@@ -301,6 +316,9 @@
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
     _syncProgressSubView = nil;
+    
+    self.starIconImageView.alpha = 0.0f;
+    self.starIconBottomImageView.alpha = 0.0f;
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -1138,6 +1156,7 @@
         
         self.timestampLabel.alpha = 0.0f;
         self.imageTimestampContainerView.alpha = 1.0f;
+        self.starIconBottomImageView.alpha = 0.0f;
         self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
     }
     [self.contentView layoutIfNeeded];
@@ -1776,6 +1795,33 @@
             } afterDelay:1.0f];
         }];
     } afterDelay:0.2f];
+}
+
+- (void)showStarMessageView {
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+        self.starImageViewLeadingConstraint.constant = 8.0f;
+        self.starImageViewWidthConstraint.constant = 12.0f;
+        if(self.imageTimestampContainerView.alpha == 0){
+            self.starIconBottomImageView.alpha = 1.0f;
+        }
+        
+    }
+    else{
+        self.starIconImageView.alpha = 0.0f;
+        self.starIconBottomImageView.alpha = 0.0f;
+        self.starImageViewLeadingConstraint.constant = 4.0f;
+        self.starImageViewWidthConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.seperatorViewHeight.constant = 1.0f;
+    self.seperatorViewTopConstraint.constant = 16.0f;
+    self.seperatorViewBottomConstraint.constant = 6.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
 }
 
 @end

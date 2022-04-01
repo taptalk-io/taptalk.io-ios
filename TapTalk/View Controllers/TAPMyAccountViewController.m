@@ -494,6 +494,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.myAccountView.profilImageCollectionView reloadData];
             [self.myAccountView.pageIndicatorCollectionView reloadData];
             self.lastPageIndicatorIndex = 0;
+            if(photoListArray.count == 1){
+                self.myAccountView.pageIndicatorCollectionView.alpha = 0.0f;
+            }
             [self.myAccountView.profilImageCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
             [self.myAccountView.pageIndicatorCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
             

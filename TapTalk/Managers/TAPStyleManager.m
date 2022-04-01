@@ -2851,6 +2851,12 @@
             return color;
             break;
         }
+        case TAPComponentColorRoomListSwipeButtonBackground:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
     //Room List Setup
         case TAPComponentColorIconRoomListSettingUp:
         {
@@ -2916,7 +2922,7 @@
         }
         case TAPComponentColorIconChatProfileMenuBlockUser:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconDestructive];
             return color;
             break;
         }

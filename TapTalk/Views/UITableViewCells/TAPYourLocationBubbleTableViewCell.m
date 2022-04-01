@@ -34,6 +34,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *centerMarkerLocationImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 
 @property (strong, nonatomic) IBOutlet UIView *senderInitialView;
 @property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
@@ -76,6 +77,10 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
+
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -122,6 +127,8 @@
     [self.contentView layoutIfNeeded];
 
     self.statusLabel.alpha = 0.0f;
+    
+    self.starIconImageView.alpha = 0.0f;
     
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
@@ -211,6 +218,7 @@
     [self.contentView layoutIfNeeded];
 
     self.statusLabel.alpha = 0.0f;
+    self.starIconImageView.alpha = 0.0f;
 }
 
 #pragma mark - Delegate
@@ -916,6 +924,24 @@
             } afterDelay:1.0f];
         }];
     } afterDelay:0.2f];
+}
+
+- (void)showStarMessageView {
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+    }
+    else{
+        self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.seperatorViewHeightConstraint.constant = 1.0f;
+    self.statusLabelBottomConstraint.constant = 33.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
+    
 }
 
 @end

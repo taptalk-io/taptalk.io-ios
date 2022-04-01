@@ -34,11 +34,14 @@
 @property (strong, nonatomic) UIButton *closeButton;
 @property (strong, nonatomic) UIButton *myAccountButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
+@property (strong, nonatomic) NSMutableArray *unreadRoomIDs;
 
 @property (strong, nonatomic) NSMutableDictionary *unreadMentionDictionary;
 
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
+@property (strong, nonatomic) NSString *readUnreadStateString;
+@property (strong, nonatomic) UIImage *readUnreadStateImage;
 
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
 @property (nonatomic) BOOL isShowMyAccountView;
@@ -96,6 +99,8 @@
     //Add chat manager delegate
     [[TAPChatManager sharedManager] addDelegate:self];
     
+    _unreadRoomIDs = [NSMutableArray array];
+    
     _setupRoomListView = [[TAPSetupRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.navigationController.view addSubview:self.setupRoomListView];
     [self.navigationController.view bringSubviewToFront:self.setupRoomListView];
@@ -149,6 +154,9 @@
     }
     
     [self.setupRoomListView.retryButton addTarget:self action:@selector(viewLoadedSequence) forControlEvents:UIControlEventTouchUpInside];
+    
+    //fetch pref
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
     
     //View appear sequence
     [self viewLoadedSequence];
@@ -366,6 +374,96 @@
     }
 }
 
+
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    UIContextualAction *archivedAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self.view endEditing:YES];
+        completionHandler(YES);
+        
+        TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+        TAPMessageModel *selectedMessage = roomList.lastMessage;
+        TAPRoomModel *selectedRoom = selectedMessage.room;
+        
+        if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+            roomList.numberOfUnreadMessages = 0;
+            roomList.isMarkedAsUnread = NO;
+            [self.unreadRoomIDs removeObject:selectedRoom.roomID];
+            self.roomListArray[indexPath.row] = roomList;
+            //[self.roomListView.roomListTableView reloadData];
+            NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+            NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+            [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+            
+            [[TAPCoreMessageManager sharedManager] markAllMessagesInRoomAsReadWithRoomID:selectedRoom.roomID];
+          //  [[TAPCoreMessageManager sharedManager] markMessageAsRead:selectedMessage];
+            
+            NSArray<TAPMessageModel *> *selectedMessageArray = @[selectedMessage];
+            
+            [[TAPCoreMessageManager sharedManager] markMessagesAsRead:selectedMessageArray success:^(NSArray<NSString *> *updatedMessageIDs){
+                //[self callApiGetMarkedUnreadIDs];
+             } failure:^(NSError *error) {
+                 
+             }];
+        }
+        else{
+            [self.unreadRoomIDs addObject:selectedRoom.roomID];
+            roomList.isMarkedAsUnread = YES;
+            [[TAPCoreRoomListManager sharedManager] markChatRoomAsUnreadWithRoomID:selectedRoom.roomID success:^{
+                // TODO: SAVE UNREAD IDS TO PREFERENCE
+            }
+            failure:^(NSError * _Nonnull error) {
+                
+            }];
+            
+           // [self.roomListView.roomListTableView reloadData];
+            self.roomListArray[indexPath.row] = roomList;
+            NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+            NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+            [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+            
+        }
+        TAPRoomListModel *tt = [self.roomListArray objectAtIndex:indexPath.row];
+        NSLog(@"===== isMarked:%ld", tt.isMarkedAsUnread);
+        [TAPDataManager setUnreadRoomIDs:self.unreadRoomIDs];
+        [self getAndUpdateNumberOfUnreadToDelegate];
+    }];
+    
+    if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && ![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+        
+        return nil;
+        
+    }
+    
+    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+    if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+        if(![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+            return nil;
+            
+        }
+        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Read", nil, [TAPUtil currentBundle], @"");
+        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
+            return nil;
+            
+        }
+        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Unread", nil, [TAPUtil currentBundle], @"");
+        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkUnread" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    
+    UIImage *imageRendered = [self createImageFromView:[self addedUIViewSwipeAction]];
+    archivedAction.image = imageRendered;
+    archivedAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
+    
+    NSArray *rowActionArray = @[archivedAction];
+    
+    return [UISwipeActionsConfiguration configurationWithActions:rowActionArray];
+}
+
+//- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath
+
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
     [self processMessageFromSocket:message isNewMessage:YES];
@@ -502,6 +600,12 @@
         roomList.numberOfUnreadMentions = 0;
     }
     
+    TAPMessageModel *selectedMessage = roomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
+    roomList.isMarkedAsUnread = NO;
+    [self.unreadRoomIDs removeObject:selectedRoom.roomID];
+    [self callApiGetMarkedUnreadIDs];
+    
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
@@ -510,8 +614,13 @@
 - (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
     //Force mark unread bubble and unread mention to 0
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+    TAPMessageModel *selectedMessage = roomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
     roomList.numberOfUnreadMessages = 0;
     roomList.numberOfUnreadMentions = 0;
+    roomList.isMarkedAsUnread = NO;
+    [self.unreadRoomIDs removeObject:selectedRoom.roomID];
+    [self callApiGetMarkedUnreadIDs];
         
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
@@ -752,6 +861,8 @@
     _roomListDictionary = [[NSMutableDictionary alloc] init];
     _roomListArray = [[NSMutableArray alloc] init];
     
+    NSArray *unreadRoomArray = [self.unreadRoomIDs copy];
+    
     for (TAPMessageModel *message in messageArray) {
         TAPRoomModel *room = message.room;
         NSString *roomID = room.roomID;
@@ -759,9 +870,15 @@
         
         TAPRoomListModel *roomList = [TAPRoomListModel new];
         roomList.lastMessage = message;
+        if([unreadRoomArray containsObject:room.roomID]){
+            roomList.isMarkedAsUnread = YES;
+        }
         
         [self insertRoomListToArrayAndDictionary:roomList atIndex:[self.roomListArray count]];
     }
+    
+    [self getAndUpdateNumberOfUnreadToDelegate];
+    
 }
 
 - (void)insertRoomListToArrayAndDictionary:(TAPRoomListModel *)roomList atIndex:(NSInteger)index {
@@ -827,7 +944,7 @@
                 
                 [self refreshViewAndQueryUnreadLogicWithMessageArray:resultArray animateReloadData:isShouldAnimate];
                 
-                //Call API Get Room List
+                
                 [self fetchDataFromAPI];
             });
         } failure:^(NSError *error) {
@@ -836,6 +953,8 @@
             });
         }];
     });
+    
+    
 }
 
 - (void)fetchDataFromAPI {
@@ -848,12 +967,14 @@
         //First setup, run get room list and unread message
         [self showLoadingSetupView];
         [TAPDataManager callAPIGetMessageRoomListAndUnreadWithUserID:userID success:^(NSArray *messageArray) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-            });
-            
-            [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
+            //Call API Get Unread Room List
+            [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
+                //handle pref
+                [TAPDataManager setUnreadRoomIDs:roomIDs];
+                [self handleRommlistAndUnreadSuccess:messageArray];
+            } failure:^(NSError *error) {
+                [self handleRommlistAndUnreadSuccess:messageArray];
+            }];
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.isShouldNotLoadFromAPI = NO;
@@ -867,33 +988,54 @@
     
     //Not first setup, get new and updated message
     [TAPDataManager callAPIGetNewAndUpdatedMessageSuccess:^(NSArray *messageArray) {
-        [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
-        
-        //Update self profile
-        [self checkAndUpdateActiveUserProfile];
-        
-        //Update leftover message status to delivered
-        if ([messageArray count] != 0) {
-            [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
-        }
-        
-        //Delete physical files when isDeleted = 1 (message is deleted)
-        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(queue, ^{
-            for (TAPMessageModel *message in messageArray) {
-                if (message.isDeleted) {
-                    [TAPDataManager deletePhysicalFilesInBackgroundWithMessage:message success:^{
-                        
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                }
-            }
-        });
+       
+        [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray<NSString *> *roomIDs){
+            //handle pref
+            [TAPDataManager setUnreadRoomIDs:roomIDs];
+            [self handleNewAndUpdatedSuccess:messageArray];
+        } failure:^(NSError *error) {
+            //handle pref
+            [self handleNewAndUpdatedSuccess:messageArray];
+        }];
         
     } failure:^(NSError *error) {
         self.isShouldNotLoadFromAPI = NO;
     }];
+}
+
+- (void)handleRommlistAndUnreadSuccess:(NSArray *)messageArray{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    });
+    
+    [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
+}
+
+- (void)handleNewAndUpdatedSuccess:(NSArray *)messageArray{
+    [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
+    
+    //Update self profile
+    [self checkAndUpdateActiveUserProfile];
+    
+    //Update leftover message status to delivered
+    if ([messageArray count] != 0) {
+        [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
+    }
+    
+    //Delete physical files when isDeleted = 1 (message is deleted)
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        for (TAPMessageModel *message in messageArray) {
+            if (message.isDeleted) {
+                [TAPDataManager deletePhysicalFilesInBackgroundWithMessage:message success:^{
+                    
+                } failure:^(NSError *error) {
+                    
+                }];
+            }
+        }
+    });
 }
 
 - (void)insertReloadMessageAndUpdateUILogicWithMessageArray:(NSArray *)messageArray {
@@ -1314,12 +1456,15 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         NSInteger unreadRoomCount = 0;
-        
+        NSArray *unreadRoomArray = [self.unreadRoomIDs copy];
         for(TAPRoomListModel *roomList in self.roomListArray) {
-            if(roomList.numberOfUnreadMessages > 0) {
+            TAPMessageModel *selectedMessage = roomList.lastMessage;
+            TAPRoomModel *room = selectedMessage.room;
+            if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
                 unreadRoomCount++;
             }
         }
+        
         
         dispatch_async(dispatch_get_main_queue(), ^{
             //Send delegate to be used to client side, update to delegate after check unread database
@@ -1327,6 +1472,7 @@
                 [[TapTalk sharedInstance].delegate tapTalkUnreadChatRoomBadgeCountUpdated:unreadRoomCount];
             }
         });
+        
     });
 }
 
@@ -1381,6 +1527,52 @@
 
 - (void)hideSetupView {
     [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeSuccess];
+}
+
+- (UIImage *)createImageFromView:(UIView *)view {
+    //AS NOTE - THIS METHOD CONVERT UIVIEW INTO UIIMAGE
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, 0.0f);
+
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];;
+
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
+}
+
+- (UIView *)addedUIViewSwipeAction {
+    //Create UIVIEW as you want view for Action Button
+    NSString *descriptionActionString = @"";
+    
+    descriptionActionString = self.readUnreadStateString;
+    
+    UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 74.0f, 86.0f)];
+    containerView.backgroundColor = [UIColor clearColor];
+    
+    UIImageView *iconImageview = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(containerView.frame) - 32.0f) / 2.0f, (CGRectGetHeight(containerView.frame) - 32.0f - 6.0f - 16.0f) / 2.0f, 32.0f, 32.0f)];
+    iconImageview.contentMode = UIViewContentModeScaleAspectFit;
+    iconImageview.backgroundColor = [UIColor clearColor];
+    iconImageview.image = self.readUnreadStateImage;
+    [containerView addSubview:iconImageview];
+    
+    UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(iconImageview.frame) + 6.0f, CGRectGetWidth(containerView.frame), 16.0f)];
+    descriptionLabel.text = descriptionActionString;
+    descriptionLabel.textColor = [UIColor whiteColor]; //AS NOTE - default 793DA0
+    UIFont *descriptionLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListTime];
+    //descriptionLabel.font = descriptionLabelFont;
+    descriptionLabel.textAlignment = NSTextAlignmentCenter;
+    [containerView addSubview:descriptionLabel];
+    
+    return containerView;
+}
+
+- (void)callApiGetMarkedUnreadIDs{
+    [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
+        //handle pref
+        [TAPDataManager setUnreadRoomIDs:roomIDs];
+    } failure:^(NSError *error) {
+    }];
 }
 
 @end

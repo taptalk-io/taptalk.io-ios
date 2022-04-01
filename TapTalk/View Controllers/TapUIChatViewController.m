@@ -302,6 +302,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //DV Temp
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
 
+@property (strong, atomic) NSMutableArray *starMessageIDArray;
+
 
 //Custom Method
 - (void)setupNavigationViewData;
@@ -467,6 +469,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForegroundNotification:) name:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:nil];
     
+ //   [[TAPCoreMessageManager sharedManager] markAllMessagesInRoomAsReadWithRoomID:self.currentRoom.roomID];
+    
     [[TAPChatManager sharedManager] addDelegate:self];
     self.navigationController.delegate = self;
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
@@ -490,6 +494,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _safeAreaBottomPadding = [TAPUtil safeAreaBottomPadding];
     _selectedMessage = nil;
     _mentionIndexesDictionary = [[NSMutableDictionary alloc] init];
+    _starMessageIDArray = [[NSMutableArray alloc] init];
     
     if (self.tappedMessageLocalID == nil) {
         _tappedMessageLocalID = @"";
@@ -722,6 +727,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
     }
+    
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -783,6 +790,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self checkAndRefreshOnlineStatus];
     [self setKeyboardStateDefault];
+    
+    [TAPDataManager callAPIGetStarredMessageIDs:self.currentRoom.roomID success:^(NSMutableArray *starredMessageID) {
+        self.starMessageIDArray = [starredMessageID mutableCopy];;
+        [self.tableView reloadData];
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -1060,6 +1076,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageIconView];
+                    }
+                    
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                         if ([mentionArray count] > 0) {
@@ -1097,6 +1118,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
+                    
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                         if ([mentionArray count] > 0) {
@@ -1114,6 +1136,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             _tappedMessageLocalID = @"";
                         }
                         [cell setMessage:message];
+                        
+                        if([self.starMessageIDArray containsObject:message.messageID]){
+                            //Show star icon on message bubble
+                            [cell showStarMessageView];
+                        }
                     }
                     
                     if (message.isFailedSend) {
@@ -1172,6 +1199,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             _tappedMessageLocalID = @"";
                         }
                         [cell setMessage:message];
+                        if([self.starMessageIDArray containsObject:message.messageID]){
+                            //Show star icon on message bubble
+                            [cell showStarMessageView];
+                        }
                     }
                     
                     if (message != nil) {
@@ -1266,6 +1297,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.delegate = self;
                     cell.message = message;
                     
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -1359,6 +1395,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
                     cell.message = message;
+                    
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
                     
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
@@ -1456,6 +1497,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
+                    
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                         if ([mentionArray count] > 0) {
@@ -1493,6 +1539,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
+                    
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                         if ([mentionArray count] > 0) {
@@ -1508,6 +1555,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             _tappedMessageLocalID = @"";
                         }
                         [cell setMessage:message];
+                        
+                        if([self.starMessageIDArray containsObject:message.messageID]){
+                            //Show star icon on message bubble
+                            [cell showStarMessageView];
+                        }
                     }
                     [cell showStatusLabel:YES animated:NO];
                     
@@ -1535,6 +1587,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
+                
                     
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
@@ -1551,6 +1604,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             _tappedMessageLocalID = @"";
                         }
                         [cell setMessage:message];
+                        
+                        if([self.starMessageIDArray containsObject:message.messageID]){
+                            //Show star icon on message bubble
+                            [cell showStarMessageView];
+                        }
                     }
                     
                     if (message != nil) {
@@ -1620,6 +1678,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.delegate = self;
                     cell.message = message;
                     
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -1688,6 +1751,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     cell.delegate = self;
                     cell.message = message;
+                    
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
                     
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
@@ -2149,6 +2217,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     
+}
+
+- (void)starMessageBubbleCliked:(TAPMessageModel *)message{
+    [self scrollToMessageAndLoadDataWithLocalID:message.localID];
 }
 
 #pragma mark TAPChatManager
@@ -6915,6 +6987,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         return;
     }
     
+    BOOL isStarred = NO;
+    if([self.starMessageIDArray containsObject:message.messageID]){
+        isStarred = YES;
+    }
+    
     [TAPUtil tapticImpactFeedbackGenerator];
     //handle message long pressed
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
@@ -7032,6 +7109,25 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      }
                                  }];
     
+    NSString *starMenuString;
+    UIImage *starMenuImage;
+    if(isStarred){
+        starMenuString = NSLocalizedStringFromTableInBundle(@"Unstar", nil, [TAPUtil currentBundle], @"");
+        starMenuImage = [UIImage imageNamed:@"TAPIconStarActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }else{
+        starMenuString = NSLocalizedStringFromTableInBundle(@"Star", nil, [TAPUtil currentBundle], @"");
+        starMenuImage = [UIImage imageNamed:@"TAPIconStarInactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    
+    UIAlertAction *starAction = [UIAlertAction
+                                 actionWithTitle:starMenuString
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+                                     [self checkAndShowInputAccessoryView];
+                                     [self callApiStarUnstarMessage:isStarred roomID:self.currentRoom.roomID message:message];
+                                     
+                                 }];
+    
     UIAlertAction *saveToGalleryAction = [UIAlertAction
                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Save", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
@@ -7112,6 +7208,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     copyActionImage = [copyActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
     [copyAction setValue:[copyActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
+    UIImage *starActionImage = starMenuImage;
+    starActionImage = [starActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [starAction setValue:[starActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
     UIImage *saveToGalleryActionImage = [UIImage imageNamed:@"TAPIconSaveOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     saveToGalleryActionImage = [saveToGalleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetGallery]]; //DV Temp Icon
     [saveToGalleryAction setValue:[saveToGalleryActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
@@ -7123,6 +7223,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [replyAction setValue:@0 forKey:@"titleTextAlignment"];
     [forwardAction setValue:@0 forKey:@"titleTextAlignment"];
     [copyAction setValue:@0 forKey:@"titleTextAlignment"];
+    [starAction setValue:@0 forKey:@"titleTextAlignment"];
     [saveToGalleryAction setValue:@0 forKey:@"titleTextAlignment"];
     [deleteMessageAction setValue:@0 forKey:@"titleTextAlignment"];
     
@@ -7133,6 +7234,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [replyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [forwardAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [starAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [saveToGalleryAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [deleteMessageAction setValue:actionSheetDestructiveColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
@@ -7150,6 +7252,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && message.type == TAPChatMessageTypeText) {
         //Show copy action for chat type text only
         [alertController addAction:copyAction];
+    }
+    
+    //Star message menu
+    if ([[TapUI sharedInstance] isStarMessageMenuEnabled] && message.type != TAPChatMessageTypeProduct){
+        [alertController addAction:starAction];
     }
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeImage) {
@@ -8563,6 +8670,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)processAllPreviousMessageAsRead {
+    if(self.messageArray.count > 0){
+        NSArray<TAPMessageModel *> *selectedMessageArray = @[[self.messageArray objectAtIndex:0]];
+        
+        [[TAPCoreMessageManager sharedManager] markMessagesAsRead:selectedMessageArray success:^(NSArray<NSString *> *updatedMessageIDs){
+         } failure:^(NSError *error) {
+             
+         }];
+    }
+    
     if ([self.delegate respondsToSelector:@selector(chatViewControllerShouldClearUnreadBubbleForRoomID:)]) {
         [self.delegate chatViewControllerShouldClearUnreadBubbleForRoomID:self.currentRoom.roomID];
     }
@@ -9646,6 +9762,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self setKeyboardStateDefault];
     
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    otherUserID = [TAPUtil nullToEmptyString:otherUserID];
     TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     //CS NOTE - add resign first responder before every pushVC to handle keyboard height
     [self.messageTextView resignFirstResponder];
@@ -9660,7 +9777,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
             profileViewController.room = self.currentRoom;
-            profileViewController.otherUserID = otherUser.userID;
+            profileViewController.otherUserID = otherUserID;
             profileViewController.delegate = self;
             [self.navigationController pushViewController:profileViewController animated:YES];
         }
@@ -9673,7 +9790,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
             profileViewController.room = self.currentRoom;
-            profileViewController.otherUserID = otherUser.userID;
+            profileViewController.otherUserID = otherUserID;
             profileViewController.delegate = self;
             [self.navigationController pushViewController:profileViewController animated:YES];
         }
@@ -10198,6 +10315,82 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }];
         }
     }
+}
+
+
+- (void)callApiStarUnstarMessage:(BOOL)isStarred roomID:(NSString *)roomID message:(TAPMessageModel *)message{
+    NSArray<NSString *> *messageIDs = @[message.messageID];
+    if(!isStarred){
+        [self.starMessageIDArray addObject:message.messageID];
+        [TAPDataManager callAPIStarMessage:roomID messageID: messageIDs success:^(NSArray *starredMessageIDs) {
+            
+        } failure:^(NSError *error) {
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    }
+    else{
+        [self.starMessageIDArray removeObject:message.messageID];
+        [TAPDataManager callAPIUnStarMessage:roomID messageID: messageIDs success:^(NSArray *starredMessageIDs) {
+            
+        } failure:^(NSError *error) {
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    }
+    
+    NSInteger *currentRowIndex = [self.messageArray indexOfObject:message];
+    
+    if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+        if (message.type == TAPChatMessageTypeText) {
+            TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageIconView];
+        }
+        else if (message.type == TAPChatMessageTypeImage) {
+            TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeVideo) {
+            TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeFile) {
+            TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeLocation) {
+            TAPMyLocationBubbleTableViewCell *cell = (TAPMyLocationBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        
+        
+    }
+    else{
+        if (message.type == TAPChatMessageTypeText) {
+            TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeImage) {
+            TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeVideo) {
+            TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeFile) {
+            TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeLocation) {
+            TAPYourLocationBubbleTableViewCell *cell = (TAPYourLocationBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        
+    }
+    
 }
 
 - (void)fetchUnreadMessagesDataWithSuccess:(void (^)(NSArray *unreadMessages))success

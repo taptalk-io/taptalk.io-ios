@@ -55,6 +55,14 @@
     }];
 }
 
+- (TAPUserModel *)getLocalUserDataWithUserID:(NSString *)userID {
+    TAPUserModel *activeUser = [[TapTalk sharedInstance] getTapTalkActiveUser];
+    if ([userID isEqualToString:activeUser.userID]) {
+        return  activeUser;
+    }
+    return [[TAPContactManager sharedManager] getUserWithUserID:userID];
+}
+
 - (void)getUserDataWithUserID:(NSString *)userID
                       success:(void (^)(TAPUserModel *user))success
                       failure:(void (^)(NSError *error))failure {

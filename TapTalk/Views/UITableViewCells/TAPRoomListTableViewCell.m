@@ -168,6 +168,7 @@
         [self.typingLabel sizeToFit];
         self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
         [self.typingView addSubview:self.typingLabel];
+        
     }
     
     return self;
@@ -201,6 +202,7 @@
     
     NSInteger numberOfUnreadMessage = roomList.numberOfUnreadMessages;
     NSInteger numberOfUnreadMention = roomList.numberOfUnreadMentions;
+    BOOL isMarkedAsUnread = roomList.isMarkedAsUnread;
     
     TAPRoomModel *currentRoom = message.room;
     
@@ -505,7 +507,7 @@
         self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageDeleted]];
         
-        if (numberOfUnreadMessage > 0) {
+        if (numberOfUnreadMessage > 0 || isMarkedAsUnread) {
             self.messageStatusImageView.alpha = 0.0f;
             self.bubbleUnreadView.alpha = 1.0f;
         }
@@ -566,7 +568,7 @@
             numberOfUnreadMention = 0;
         }
         
-        if (numberOfUnreadMessage == 0) {
+        if (numberOfUnreadMessage == 0 && !isMarkedAsUnread) {
             self.bubbleUnreadView.alpha = 0.0f;
             self.bubbleUnreadView.frame = CGRectMake(CGRectGetMinX(self.messageStatusImageView.frame), CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.messageStatusImageView.frame), CGRectGetHeight(self.bubbleUnreadView.frame));
             self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
@@ -577,6 +579,13 @@
             }
             else {
                 self.numberOfUnreadMessageLabel.text = [NSString stringWithFormat:@"%ld", (long)numberOfUnreadMessage];
+            }
+            
+            if(isMarkedAsUnread && numberOfUnreadMessage == 0){
+                self.numberOfUnreadMessageLabel.alpha = 0.0f;
+            }
+            else{
+                self.numberOfUnreadMessageLabel.alpha = 1.0f;
             }
             
             //Bubble Number

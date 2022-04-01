@@ -151,6 +151,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconDeletedRightMessageBubble, //Chat Room
     TAPComponentColorIconRoomListMuted, //Room List
     TAPComponentColorIconStartNewChatButton, //RoomList
+    TAPComponentColorRoomListSwipeButtonBackground, //RoomList
     TAPComponentColorIconRoomListSettingUp, //Room List Setup
     TAPComponentColorIconRoomListSetUpSuccess, //Room List Setup
     TAPComponentColorIconRoomListSetUpFailure, //Room List Setup

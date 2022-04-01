@@ -22,6 +22,7 @@ typedef NS_ENUM( NSInteger, TAPProfileViewControllerType) {
 
 - (void)profileViewControllerUpdatedRoom:(TAPRoomModel *)room;
 - (void)profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room;
+- (void)starMessageBubbleCliked:(TAPMessageModel *)message;
 
 @end
 

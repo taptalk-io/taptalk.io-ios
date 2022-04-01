@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, TAPProfileCollectionViewCellType) {
     profileCollectionViewCellTypeSearchChat = 15,
     profileCollectionViewCellTypeEditGroup = 16,
     profileCollectionViewCellTypeUserDetail = 17,
+    profileCollectionViewCellTypeStarMessage = 18,
 };
 
 @interface TAPProfileCollectionViewCell : TAPBaseCollectionViewCell

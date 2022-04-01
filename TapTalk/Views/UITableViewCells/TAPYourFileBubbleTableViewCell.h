@@ -48,6 +48,8 @@ typedef NS_ENUM(NSInteger, TAPYourFileBubbleTableViewCellStateType) {
 - (void)animateProgressDownloadingFileWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)showFileBubbleStatusWithType:(TAPYourFileBubbleTableViewCellStateType)type;
 - (void)showBubbleHighlight;
+- (void)showStarMessageView;
+- (void)showSeperator;
 
 @end
 

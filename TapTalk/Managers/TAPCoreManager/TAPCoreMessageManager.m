@@ -1017,18 +1017,84 @@
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID
                            success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
                            failure:(void (^)(NSError *error))failure {
+
+    [self getLocalMessagesWithRoomID:roomID excludeHidden:NO success:success failure:failure];
+}
+
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+                     excludeHidden:(BOOL)excludeHidden
+                           success:(void (^)(NSArray <TAPMessageModel *> *messageArray))success
+                           failure:(void (^)(NSError *error))failure {
     
     [TAPDataManager getAllMessageWithRoomID:roomID
                                   sortByKey:@"created"
                                   ascending:NO
+                              excludeHidden:excludeHidden
     success:^(NSArray<TAPMessageModel *> *messageArray) {
         success(messageArray);
     }
     failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
-        }];
+    }];
+}
+
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+               maxCreatedTimestamp:(NSNumber *)maxCreatedTimestamp
+                     numberOfItems:(NSInteger)numberOfItems
+                           success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                           failure:(void (^)(NSError *error))failure {
+
+    [self getLocalMessagesWithRoomID:roomID maxCreatedTimestamp:maxCreatedTimestamp numberOfItems:numberOfItems excludeHidden:NO success:success failure:failure];
+}
+
+- (void)getLocalMessageWithLocalID:(NSString *)localID
+                           success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                           failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager getMessageFromDatabaseWithLocalID:localID
+    success:^(NSArray<TAPMessageModel *> *resultArray) {
+        success(resultArray);
     }
+    failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
+- (void)getLocalMessageWithLocalIDs:(NSArray<NSString *> *)localIDs
+                            success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                            failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager getMessageFromDatabaseWithLocalIDs:localIDs
+    success:^(NSArray<TAPMessageModel *> *resultArray) {
+        success(resultArray);
+    }
+    failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
+- (void)getLocalMessagesWithRoomID:(NSString *)roomID
+               maxCreatedTimestamp:(NSNumber *)maxCreatedTimestamp
+                     numberOfItems:(NSInteger)numberOfItems
+                     excludeHidden:(BOOL)excludeHidden
+                           success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                           failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager getMessageWithRoomID:roomID
+                    lastMessageTimeStamp:maxCreatedTimestamp
+                               limitData:numberOfItems
+                           excludeHidden:excludeHidden
+    success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+        success(obtainedMessageArray);
+    }
+    failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
 
 - (void)getOlderMessagesBeforeTimestamp:(NSNumber *)timestamp
                                  roomID:(NSString *)roomID
@@ -1068,9 +1134,11 @@
         else {
             minCreated = [NSNumber numberWithInteger:0];
         }
-        
-        NSNumber *lastUpdatedFromPreference = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
-        [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated lastUpdated:lastUpdatedFromPreference needToSaveLastUpdatedTimestamp:YES success:^(NSArray *messageArray) {
+        NSNumber *lastUpdated = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
+        if ([lastUpdated longValue] == 0L) {
+            lastUpdated = minCreated;
+        }
+        [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:minCreated lastUpdated:lastUpdated needToSaveLastUpdatedTimestamp:YES success:^(NSArray *messageArray) {
             success(messageArray);
         } failure:^(NSError *error) {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -1381,6 +1449,116 @@
     }
     [self.pendingCallbackDeletedMessages removeAllObjects];
     [self.deletedMessageListenerBulkCallbackTimer invalidate];
+}
+
+- (void)getStarredMessagesWithRoomID:(NSString *)roomID
+                          pageNumber:(NSInteger)pageNumber
+                       numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSArray<TAPMessageModel *> *starredMessagesArray,BOOL hasMoreData))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetStarredMessages:roomID pageNumber:pageNumber numberOfItems:numberOfItems
+    success:^(NSArray *starredMessagesArray,BOOL hasMore) {
+        success(starredMessagesArray,hasMore);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getStarredMessageIDsWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetStarredMessageIDs:roomID
+    success:^(NSArray *starredMessagesIDs) {
+        success(starredMessagesIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)starMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{
+    [self starMessageWithMessageID:messageID roomID:roomID
+    success:^(NSArray<NSString *> *starredMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)starMessageWithMessageID:(NSString *)messageID
+                          roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    NSArray<NSString *> *messageIDs = @[messageID];
+    [self starMessagesWithMessageIDs:messageIDs roomID:roomID success:success failure:failure];
+}
+
+- (void)starMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID {
+    [self starMessagesWithMessageIDs:messageIDs roomID:roomID
+    success:^(NSArray<NSString *> *starredMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)starMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIStarMessage:roomID messageID:messageIDs
+    success:^(NSArray *starredMessageIDs) {
+        success(starredMessageIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)unstarMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{
+    [self unstarMessageWithMessageID:messageID roomID:roomID
+    success:^(NSArray<NSString *> *starredMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)unstarMessageWithMessageID:(NSString *)messageID
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *starredMessagesIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    NSArray<NSString *> *messageIDs = @[messageID];
+    [self unstarMessagesWithMessageIDs:messageIDs roomID:roomID success:success failure:failure];
+}
+
+- (void)unstarMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID {
+    [self unstarMessagesWithMessageIDs:messageIDs roomID:roomID
+    success:^(NSArray<NSString *> *starredMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)unstarMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray<NSString *> *unstarredMessagesIDs))success
+                             failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIUnStarMessage:roomID messageID:messageIDs
+    success:^(NSArray *starredMessageIDs) {
+        success(starredMessageIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
 }
 
 @end

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="PTRootUI-Bold.ttf">
+            <string>PTRootUI-Bold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TAPStarredMessageViewController">
+            <connections>
+                <outlet property="emptyStateDescpLabel" destination="yOH-Eo-0ie" id="kBd-y7-ssI"/>
+                <outlet property="emptyStateTitleLabel" destination="dKy-xG-nhS" id="UnY-ZV-f4D"/>
+                <outlet property="emptyStateView" destination="jAl-k9-IvG" id="ubL-h9-gxn"/>
+                <outlet property="loadMoreMessageLoadingHeightConstraint" destination="nbf-dW-ObL" id="PRU-9B-g6W"/>
+                <outlet property="loadMoreMessageLoadingLabel" destination="wzc-8l-NDu" id="Aym-8M-Sd7"/>
+                <outlet property="loadMoreMessageLoadingView" destination="tBg-L4-Djk" id="Kjg-AN-Wbf"/>
+                <outlet property="loadMoreMessageLoadingViewImageView" destination="k6s-IQ-Iy3" id="7ww-6O-cYN"/>
+                <outlet property="tableView" destination="5Ed-BU-njh" id="YxN-3R-hQ6"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="5Ed-BU-njh">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                </tableView>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tBg-L4-Djk" userLabel="Load More Message Loading View">
+                    <rect key="frame" x="0.0" y="69" width="414" height="0.0"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xeO-FU-hS0" userLabel="Inner Container View">
+                            <rect key="frame" x="190" y="0.0" width="34" height="0.0"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzc-8l-NDu">
+                                    <rect key="frame" x="0.0" y="-10" width="0.0" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="Xwj-54-Tlc"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="12"/>
+                                    <color key="textColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconLoadingShareExtension" translatesAutoresizingMaskIntoConstraints="NO" id="k6s-IQ-Iy3">
+                                    <rect key="frame" x="4" y="-15" width="30" height="30"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="30" id="6RM-cv-8Wq"/>
+                                        <constraint firstAttribute="width" constant="30" id="cns-kE-06d"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstItem="wzc-8l-NDu" firstAttribute="centerY" secondItem="xeO-FU-hS0" secondAttribute="centerY" id="3VR-fJ-VqY"/>
+                                <constraint firstAttribute="trailing" secondItem="k6s-IQ-Iy3" secondAttribute="trailing" id="3aQ-F2-SH4"/>
+                                <constraint firstItem="k6s-IQ-Iy3" firstAttribute="leading" secondItem="wzc-8l-NDu" secondAttribute="trailing" constant="4" id="CZg-af-ZxO"/>
+                                <constraint firstItem="k6s-IQ-Iy3" firstAttribute="centerY" secondItem="xeO-FU-hS0" secondAttribute="centerY" id="H7r-eV-RE6"/>
+                                <constraint firstItem="wzc-8l-NDu" firstAttribute="leading" secondItem="xeO-FU-hS0" secondAttribute="leading" id="vMa-fA-yhy"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <viewLayoutGuide key="safeArea" id="YR1-5Y-em4"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="xeO-FU-hS0" secondAttribute="bottom" id="Aq6-mE-isA"/>
+                        <constraint firstItem="xeO-FU-hS0" firstAttribute="centerX" secondItem="tBg-L4-Djk" secondAttribute="centerX" id="Gi8-mM-cq9"/>
+                        <constraint firstItem="xeO-FU-hS0" firstAttribute="top" secondItem="tBg-L4-Djk" secondAttribute="top" id="T3F-kz-z85"/>
+                        <constraint firstAttribute="height" id="nbf-dW-ObL"/>
+                    </constraints>
+                </view>
+                <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jAl-k9-IvG" userLabel="Empty State View">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconEmptyStarredMessage" translatesAutoresizingMaskIntoConstraints="NO" id="M0G-ns-aR6">
+                            <rect key="frame" x="132" y="221" width="150" height="150"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="150" id="9Ap-um-Ssw"/>
+                                <constraint firstAttribute="height" constant="150" id="DIJ-1h-jcP"/>
+                            </constraints>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Starred Messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dKy-xG-nhS">
+                            <rect key="frame" x="25" y="397" width="364" height="24"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="24" id="7YH-OK-udH"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap and hold on any messages and add star to find important text later. " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yOH-Eo-0ie">
+                            <rect key="frame" x="25" y="433" width="364" height="41"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="yOH-Eo-0ie" firstAttribute="top" secondItem="dKy-xG-nhS" secondAttribute="bottom" constant="12" id="73r-E7-OsO"/>
+                        <constraint firstAttribute="trailing" secondItem="dKy-xG-nhS" secondAttribute="trailing" constant="25" id="MQd-RR-8HR"/>
+                        <constraint firstItem="dKy-xG-nhS" firstAttribute="leading" secondItem="jAl-k9-IvG" secondAttribute="leading" constant="25" id="TMx-oQ-veI"/>
+                        <constraint firstItem="dKy-xG-nhS" firstAttribute="centerX" secondItem="jAl-k9-IvG" secondAttribute="centerX" id="Vjq-nQ-dAm"/>
+                        <constraint firstItem="dKy-xG-nhS" firstAttribute="centerY" secondItem="jAl-k9-IvG" secondAttribute="centerY" id="WAV-rP-Irc"/>
+                        <constraint firstItem="dKy-xG-nhS" firstAttribute="top" secondItem="M0G-ns-aR6" secondAttribute="bottom" constant="26" id="fqh-mx-GLF"/>
+                        <constraint firstItem="M0G-ns-aR6" firstAttribute="centerX" secondItem="jAl-k9-IvG" secondAttribute="centerX" id="gmq-Ja-PuS"/>
+                        <constraint firstAttribute="trailing" secondItem="yOH-Eo-0ie" secondAttribute="trailing" constant="25" id="p06-63-Np1"/>
+                        <constraint firstItem="yOH-Eo-0ie" firstAttribute="leading" secondItem="jAl-k9-IvG" secondAttribute="leading" constant="25" id="ulF-4O-r5J"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="jAl-k9-IvG" secondAttribute="trailing" id="0lE-CZ-jY6"/>
+                <constraint firstItem="jAl-k9-IvG" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="3ZA-O0-abq"/>
+                <constraint firstItem="tBg-L4-Djk" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="9jW-cY-N0D"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="5Ed-BU-njh" secondAttribute="bottom" id="Iy3-Le-yuB"/>
+                <constraint firstItem="5Ed-BU-njh" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="Xpc-wc-akd"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="5Ed-BU-njh" secondAttribute="trailing" id="aN4-5O-u8Y"/>
+                <constraint firstItem="tBg-L4-Djk" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="25" id="cV2-dt-Gd5"/>
+                <constraint firstItem="jAl-k9-IvG" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="kAR-fL-yTg"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="jAl-k9-IvG" secondAttribute="bottom" id="mJE-Zp-JrI"/>
+                <constraint firstItem="5Ed-BU-njh" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="pgc-th-F3h"/>
+                <constraint firstAttribute="trailing" secondItem="tBg-L4-Djk" secondAttribute="trailing" id="yoh-mQ-LfI"/>
+            </constraints>
+            <point key="canvasLocation" x="131.8840579710145" y="80.357142857142847"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="TAPIconEmptyStarredMessage" width="150" height="150"/>
+        <image name="TAPIconLoadingShareExtension" width="64" height="64"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

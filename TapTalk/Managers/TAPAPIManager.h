@@ -55,6 +55,12 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeGetPhotoList,
     TAPAPIManagerTypeSetProfilePhotoAsMain,
     TAPAPIManagerTypeRemoveProfilePhoto,
+    TAPAPIManagerTypeMarkAsUnread,
+    TAPAPIManagerTypeGetUnreadRommIDs,
+    TAPAPIManagerTypeStarMessage,
+    TAPAPIManagerTypeUnStarMessage,
+    TAPAPIManagerTypeGetStarredMessages,
+    TAPAPIManagerTypeGetStarredMessagesIDs,
 };
 
 @interface TAPAPIManager : NSObject

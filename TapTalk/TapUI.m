@@ -52,6 +52,10 @@
 @property (nonatomic) BOOL isMobileNumberInChatProfileHidden;
 @property (nonatomic) BOOL isEmailAddressInChatProfileVisible;
 @property (nonatomic) BOOL isEditBioTextFieldHidden;
+@property (nonatomic) BOOL isMarkAsReadRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isMarkAsUnreadRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isStarMessageMenuDisabled;
+
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -889,7 +893,49 @@ Show or hide bio in user/group profile page
     return !self.isEditBioTextFieldHidden;
 }
 
+/**
+<<<<<<< HEAD
+Enable or disable mark as read swipe in chat room list
+*/
+- (void)setMarkAsReadRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isMarkAsReadRoomListSwipeMenuDisabled = !isEnabled;
+}
 
+/**
+ Get current isEnabled state of mark as read swipe in chat room list
+*/
+- (BOOL)getMarkAsReadRoomListSwipeMenuEnabled {
+    return !self.isMarkAsReadRoomListSwipeMenuDisabled;
+}
+
+/**
+ Enable or disable mark as unread swipe in chat room list
+*/
+- (void)setMarkAsUnreadRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isMarkAsUnreadRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of mark as unread swipe in chat room list
+*/
+- (BOOL)getMarkAsUnreadRoomListSwipeMenuEnabled {
+    return !self.isMarkAsUnreadRoomListSwipeMenuDisabled;
+}
+
+/**
+Show or hide star message menu from message bubble long press & chat profile
+*/
+- (void)setStarMessageMenuEnabled:(BOOL)isEnabled {
+    _isStarMessageMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of star message menu from message bubble long press & chat profile
+*/
+- (BOOL)isStarMessageMenuEnabled {
+    return !self.isStarMessageMenuDisabled;
+}
 
 
 @end

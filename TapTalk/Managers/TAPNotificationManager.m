@@ -219,16 +219,33 @@
     }
 }
 
+
+
 - (void)updateApplicationBadgeCount {
-    [TAPDataManager getDatabaseUnreadRoomCountWithActiveUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSInteger unreadRoomCount) {
+    [TAPDataManager getDatabaseUnreadRoomCountWithActiveUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadRoomIDs) {
+        NSInteger unreadRoomCount = unreadRoomIDs.count;
         if(unreadRoomCount < 0) {
             unreadRoomCount = 0;
+        }
+        //fetch pref mark as unread
+        NSArray *markUnreadRoomIDs= [TAPDataManager getUnreadRoomIDs];
+        NSInteger markAsUnreadCount = markUnreadRoomIDs.count;
+        
+        NSInteger totalCount = markAsUnreadCount;
+        for(NSDictionary *messageDictionary in unreadRoomIDs){
+            NSString *room = [messageDictionary objectForKey:@"roomID"];
+            BOOL isread = [messageDictionary objectForKey:@"isRead"];
+            if(![markUnreadRoomIDs containsObject:room]){
+                totalCount += 1;
+            }
+            
         }
         
         //Send delegate to be used to client side
         if ([[TapTalk sharedInstance].delegate respondsToSelector:@selector(tapTalkUnreadChatRoomBadgeCountUpdated:)]) {
-            [[TapTalk sharedInstance].delegate tapTalkUnreadChatRoomBadgeCountUpdated:unreadRoomCount];
+            [[TapTalk sharedInstance].delegate tapTalkUnreadChatRoomBadgeCountUpdated:totalCount];
         }
+        
         
     } failure:^(NSError *error) {
         

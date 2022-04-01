@@ -768,6 +768,38 @@ Show or hide bio in user/group profile page
 */
 - (BOOL)getEditBioTextFieldVisible;
 
+/**
+<<<<<<< HEAD
+Enable or disable mark as read swipe in chat room list
+*/
+- (void)setMarkAsReadRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of mark as read swipe in chat room list
+*/
+- (BOOL)getMarkAsReadRoomListSwipeMenuEnabled;
+
+/**
+ Enable or disable mark as unread swipe in chat room list
+*/
+- (void)setMarkAsUnreadRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of mark as unread swipe in chat room list
+*/
+- (BOOL)getMarkAsUnreadRoomListSwipeMenuEnabled;
+
+
+/**
+Show or hide star message menu from message bubble long press & chat profile
+*/
+- (void)setStarMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of star message menu from message bubble long press & chat profile
+*/
+- (BOOL)isStarMessageMenuEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

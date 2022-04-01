@@ -61,7 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setInitialAnimateDownloadingImage;
 - (void)setFullImage:(UIImage *)image;
 - (void)setThumbnailImage:(UIImage *)thumbnailImage;
-
+- (void)showStarMessageView;
+- (void)showSeperator;
 @end
 
 NS_ASSUME_NONNULL_END

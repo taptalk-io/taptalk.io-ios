@@ -39,6 +39,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
+@property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -71,6 +72,9 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
+
 
 @property (strong, nonatomic) NSString *currentProfileImageURLString;
 
@@ -122,6 +126,8 @@
     self.quoteImageView.delegate = self;
     
     self.fileBackgroundView.layer.cornerRadius = 24.0f;
+    
+    self.starIconImageView.alpha = 0.0f;
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -188,6 +194,7 @@
     self.mentionIndexesArray = nil;
     self.statusLabel.alpha = 0.0f;
     self.bubbleHighlightView.alpha = 0.0f;
+    self.starIconImageView.alpha = 0.0f;
     [self showSenderInfo:NO];
 }
 
@@ -940,6 +947,23 @@
             } afterDelay:1.0f];
         }];
     } afterDelay:0.2f];
+}
+
+- (void)showStarMessageView {
+    if(self.starIconImageView.alpha == 0){
+        self.starIconImageView.alpha = 1.0f;
+    }
+    else{
+        self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showSeperator {
+    self.seperatorViewHeightConstraint.constant = 1.0f;
+    self.statusLabelBottomConstraint.constant = 33.0f;
+    for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
+        [self.contentView removeGestureRecognizer:recognizer];
+    }
 }
 
 @end

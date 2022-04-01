@@ -26,7 +26,6 @@
     [UIView setAnimationDuration:0.0];
     [UIView setAnimationDelay:0.0];
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
-    
     [self setTransform:CGAffineTransformMakeRotation(M_PI)];
     
     [UIView commitAnimations];
@@ -45,12 +44,19 @@
     [UIView setAnimationDuration:0.0];
     [UIView setAnimationDelay:0.0];
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
-    
     [self setTransform:CGAffineTransformMakeRotation(M_PI)];
     
     [UIView commitAnimations];
 }
 
 #pragma mark - Custom Method
-
+- (void)setRotaionToDefault{
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.0];
+    [UIView setAnimationDelay:0.0];
+    [UIView setAnimationCurve:UIViewAnimationCurveLinear];
+    [self setTransform:CGAffineTransformMakeRotation(0)];
+    
+    [UIView commitAnimations];
+}
 @end
