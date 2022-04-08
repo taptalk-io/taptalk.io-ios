@@ -1131,7 +1131,9 @@
         }];
     }
     
-    [self disconnect];
+    if ([[TapTalk sharedInstance] getTapTalkSocketConnectionMode] != TapTalkSocketConnectionModeAlwaysOn) {
+        [self disconnect];
+    }
 }
 
 - (void)saveUnsentMessageAndDisconnect {

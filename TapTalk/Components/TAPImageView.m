@@ -119,14 +119,14 @@
             
             SDWebImageDownloader *imageDownloader = [SDWebImageDownloader sharedDownloader];
             [imageDownloader downloadImageWithURL:imageURL options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-#ifdef DEBUG
-                NSLog(@"Image Download: %ld of %ld", (long)receivedSize, (long)expectedSize);
-#endif
+//#ifdef DEBUG
+//                NSLog(@"Image Download: %ld of %ld", (long)receivedSize, (long)expectedSize);
+//#endif
             } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                 if (finished && image != nil) {
-#ifdef DEBUG
-                    NSLog(@"Image Download Completed");
-#endif
+//#ifdef DEBUG
+//                    NSLog(@"Image Download Completed");
+//#endif
                     //            [imageCache storeImage:image forKey:urlString];
                     [imageCache storeImage:image forKey:urlString completion:^{
                     }];
@@ -141,9 +141,9 @@
                     }
                 }
                 else {
-#ifdef DEBUG
-                    NSLog(@"Image Download Failed: %@", [error description]);
-#endif
+//#ifdef DEBUG
+//                    NSLog(@"Image Download Failed: %@", [error description]);
+//#endif
                     dispatch_async(dispatch_get_main_queue(), ^{
                         self.image = nil;
                         if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {

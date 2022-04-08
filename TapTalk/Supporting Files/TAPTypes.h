@@ -57,4 +57,14 @@ typedef NS_ENUM(NSInteger, TAPChatMessageType) {
     TAPChatMessageTypeUnreadMessageIdentifier = 9002,
 };
 
+/*
+ enum TapTalkSocketConnectionMode
+ used change socket reconnection behavior
+ */
+typedef NS_ENUM(NSInteger, TapTalkSocketConnectionMode) {
+    TapTalkSocketConnectionModeDefault,
+    TapTalkSocketConnectionModeAlwaysOn,
+    TapTalkSocketConnectionModeConnectIfNeeded
+};
+
 #endif /* TAPTypes_h */

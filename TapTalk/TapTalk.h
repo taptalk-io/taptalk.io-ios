@@ -328,4 +328,14 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  */
 - (TAPUserModel *_Nonnull)getTapTalkActiveUser;
 
+/**
+ Modify TapTalk's socket connection mode
+ */
+- (void)setTapTalkSocketConnectionMode:(TapTalkSocketConnectionMode)tapTalkSocketConnectionMode;
+
+/**
+ Obtain the currently active socket connection mode
+ */
+- (TapTalkSocketConnectionMode)getTapTalkSocketConnectionMode;
+
 @end

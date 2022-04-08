@@ -18,6 +18,7 @@
 @interface TapTalk () <TAPNotificationManagerDelegate>
 
 @property (nonatomic) TapTalkImplentationType implementationType;
+@property (nonatomic) TapTalkSocketConnectionMode socketConnectionMode;
 @property (nonatomic) BOOL isInitialized;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
@@ -271,7 +272,11 @@
     if ([TAPChatManager sharedManager].activeUser != nil) {
         //User active
         BOOL isAutoConnectEnabled = [[TapTalk sharedInstance] isAutoConnectEnabled];
-        if (isAutoConnectEnabled) {
+        TapTalkSocketConnectionMode socketConnectionMode = [[TapTalk sharedInstance] getTapTalkSocketConnectionMode];
+        if (isAutoConnectEnabled &&
+            (socketConnectionMode == TapTalkSocketConnectionModeDefault ||
+             socketConnectionMode == TapTalkSocketConnectionModeAlwaysOn)
+        ) {
             [[TAPChatManager sharedManager] connect];
         }
         
@@ -730,6 +735,14 @@
 
 - (NSInteger)getMaxCaptionLength {
     return self.maxCaptionLength;
+}
+
+- (void)setTapTalkSocketConnectionMode:(TapTalkSocketConnectionMode)tapTalkSocketConnectionMode {
+    self.socketConnectionMode = tapTalkSocketConnectionMode;
+}
+
+- (TapTalkSocketConnectionMode)getTapTalkSocketConnectionMode {
+    return self.socketConnectionMode;
 }
 
 @end

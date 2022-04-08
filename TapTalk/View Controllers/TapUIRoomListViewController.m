@@ -190,6 +190,14 @@
     else {
         [self.navigationController setNavigationBarHidden:NO animated:YES];
     }
+    
+    if ([[TapTalk sharedInstance] getTapTalkSocketConnectionMode] == TapTalkSocketConnectionModeConnectIfNeeded) {
+        [[TapTalk sharedInstance] connectWithSuccess:^{
+                    
+        } failure:^(NSError * _Nonnull error) {
+            
+        }];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -202,6 +210,12 @@
     
     if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerViewWillDisappear)]) {
         [self.lifecycleDelegate TapUIRoomListViewControllerViewWillDisappear];
+    }
+    
+    if ([[TapTalk sharedInstance] getTapTalkSocketConnectionMode] == TapTalkSocketConnectionModeConnectIfNeeded) {
+        [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
+            
+        }];
     }
 }
 
