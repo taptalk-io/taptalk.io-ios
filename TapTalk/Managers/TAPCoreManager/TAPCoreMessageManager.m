@@ -998,6 +998,7 @@
     failure:^(NSError *error) {
         
     }];
+    [self markLastMessageInRoomAsReadWithRoomID:roomID];
 }
 
 - (void)markAllMessagesInRoomAsReadWithRoomID:(NSString *)roomID
@@ -1012,6 +1013,28 @@
     failure:^(NSError *error) {
         failure(error);
     }];
+    [self markLastMessageInRoomAsReadWithRoomID:roomID];
+}
+
+- (void)markLastMessageInRoomAsReadWithRoomID:(NSString *)roomID {
+    NSMutableArray *unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+    if ([unreadRoomIDs containsObject:roomID]) {
+        [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[TAPUtil currentTimeInMillis] limitData:1 success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+            
+            if ([obtainedMessageArray count] > 0) {
+                NSArray<TAPMessageModel *> *selectedMessageArray = @[[obtainedMessageArray objectAtIndex:0]];
+                [[TAPCoreMessageManager sharedManager] markMessagesAsRead:selectedMessageArray success:^(NSArray<NSString *> *updatedMessageIDs){
+                    
+                 } failure:^(NSError *error) {
+                     
+                 }];
+                [unreadRoomIDs removeObject:roomID];
+                [TAPDataManager setUnreadRoomIDs:unreadRoomIDs];
+            }
+        } failure:^(NSError *error) {
+            
+        }];
+    }
 }
 
 - (void)getLocalMessagesWithRoomID:(NSString *)roomID

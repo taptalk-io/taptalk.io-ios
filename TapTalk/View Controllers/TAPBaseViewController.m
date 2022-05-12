@@ -61,6 +61,11 @@
     //End Note
     
     self.navigationController.navigationBar.translucent = NO;
+    
+    // FIXME: OVERRIDE STYLE TO LIGHT (DARK MODE UI NOT HANDLED)
+    if (@available(iOS 13, *)) {
+        self.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+    }
 }
 
 - (void)viewDidUnload {

@@ -795,9 +795,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         self.starMessageIDArray = [starredMessageID mutableCopy];;
         [self.tableView reloadData];
     } failure:^(NSError *error) {
-        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        
     }];
 }
 
@@ -947,6 +945,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             //Unread message identifier UI
             return 42.0f;
         }
+        // FIXME: TEMPORARY FIX FOR MEETTALK BUBBLE
+        else if (currentMessage.type == 8001 &&
+                 ([currentMessage.action isEqualToString:@"conference/info"] ||
+                  [currentMessage.action isEqualToString:@"call/answer"])
+        ) {
+            return 0.0f;
+        }
         else {
             tableView.estimatedRowHeight = 70.0f;
             return UITableViewAutomaticDimension;
@@ -1059,8 +1064,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 cell.contentView.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
+                cell.type = TAPMyChatDeletedBubbleTableViewCellTypeDefault;
                 cell.delegate = self;
                 [cell showStatusLabel:NO animated:NO updateStatusIcon:NO message:message];
+                [cell setMessage:message];
                 
                 return cell;
             }
@@ -1447,7 +1454,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //check if custom bubble available
                     NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
                     
-                    if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                    if ([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
                         //if custom bubble from client available
                         NSString *cellName = [cellDataDictionary objectForKey:@"name"];
                         id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
@@ -1464,6 +1471,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         }
                         return cell;
                     }
+                    else {
+                        // Unsupported message type
+                        [tableView registerNib:[TAPMyChatDeletedBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyChatDeletedBubbleTableViewCell description]];
+                        TAPMyChatDeletedBubbleTableViewCell *cell = (TAPMyChatDeletedBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatDeletedBubbleTableViewCell description] forIndexPath:indexPath];
+                        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                        cell.tag = indexPath.row;
+                        cell.contentView.tag = indexPath.row;
+                        cell.userInteractionEnabled = YES;
+                        cell.contentView.userInteractionEnabled = YES;
+                        cell.type = TAPMyChatDeletedBubbleTableViewCellTypeUnsupported;
+                        cell.delegate = self;
+                        [cell showStatusLabel:NO animated:NO updateStatusIcon:NO message:message];
+                        [cell setMessage:message];
+                        
+                        return cell;
+                    }
                 }
             }
         }
@@ -1478,6 +1501,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 cell.contentView.tag = indexPath.row;
                 cell.userInteractionEnabled = YES;
                 cell.contentView.userInteractionEnabled = YES;
+                cell.type = TAPYourChatDeletedBubbleTableViewCellTypeDefault;
                 cell.delegate = self;
                 [cell setMessage:message];
                 [cell showStatusLabel:NO animated:NO];
@@ -1798,7 +1822,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     //check if custom bubble available
                     NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
                     
-                    if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                    if ([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
                         //if custom bubble from client available
                         NSString *cellName = [cellDataDictionary objectForKey:@"name"];
                         id userDelegate = [cellDataDictionary objectForKey:@"delegate"];
@@ -1813,6 +1837,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         if (!message.isHidden) {
                             [cell setMessage:message];
                         }
+                        return cell;
+                    }
+                    else {
+                        // Unsupported message type
+                        [tableView registerNib:[TAPYourChatDeletedBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatDeletedBubbleTableViewCell description]];
+                        TAPYourChatDeletedBubbleTableViewCell *cell = (TAPYourChatDeletedBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatDeletedBubbleTableViewCell description] forIndexPath:indexPath];
+                        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                        cell.tag = indexPath.row;
+                        cell.contentView.tag = indexPath.row;
+                        cell.userInteractionEnabled = YES;
+                        cell.contentView.userInteractionEnabled = YES;
+                        cell.type = TAPYourChatDeletedBubbleTableViewCellTypeUnsupported;
+                        cell.delegate = self;
+                        [cell setMessage:message];
+                        [cell showStatusLabel:NO animated:NO];
+                        
                         return cell;
                     }
                 }

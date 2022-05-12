@@ -410,15 +410,6 @@
             [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
             
             [[TAPCoreMessageManager sharedManager] markAllMessagesInRoomAsReadWithRoomID:selectedRoom.roomID];
-          //  [[TAPCoreMessageManager sharedManager] markMessageAsRead:selectedMessage];
-            
-            NSArray<TAPMessageModel *> *selectedMessageArray = @[selectedMessage];
-            
-            [[TAPCoreMessageManager sharedManager] markMessagesAsRead:selectedMessageArray success:^(NSArray<NSString *> *updatedMessageIDs){
-                //[self callApiGetMarkedUnreadIDs];
-             } failure:^(NSError *error) {
-                 
-             }];
         }
         else{
             [self.unreadRoomIDs addObject:selectedRoom.roomID];

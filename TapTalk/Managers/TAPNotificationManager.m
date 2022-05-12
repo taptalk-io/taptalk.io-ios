@@ -213,6 +213,10 @@
 
 - (void)handleTappedNotificationWithUserInfo:(NSDictionary *)userInfo {
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:userInfo];
+    
+    if (message == nil) {
+        return;
+    }
 
     if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
         [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];

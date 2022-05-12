@@ -1236,7 +1236,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
         else if(indexPath.section == 1 || indexPath.section == 2 || indexPath.section == 3){
 
-            NSString *headerID = @"ShareMediaHeaderView";
+            NSString *headerID = @"headerView";
             [collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kind withReuseIdentifier:headerID];
             
             UICollectionReusableView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:headerID forIndexPath:indexPath];

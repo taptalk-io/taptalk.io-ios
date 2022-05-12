@@ -65,6 +65,7 @@
 #pragma mark - Time
 + (NSString *)stringFromTimeInterval:(NSTimeInterval)interval;
 + (NSString *)getMessageTimestampText:(NSNumber *)createdTime;
++ (NSNumber *)currentTimeInMillis;
 
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value;

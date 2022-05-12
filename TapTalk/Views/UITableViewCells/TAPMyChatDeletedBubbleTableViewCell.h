@@ -10,6 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, TAPMyChatDeletedBubbleTableViewCellType) {
+    TAPMyChatDeletedBubbleTableViewCellTypeDefault = 0,
+    TAPMyChatDeletedBubbleTableViewCellTypeUnsupported = 1,
+};
+
 @protocol TAPMyChatDeletedBubbleTableViewCellDelegate <NSObject>
 
 - (void)myChatDeletedBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
@@ -20,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id<TAPMyChatDeletedBubbleTableViewCellDelegate> delegate;
 @property (strong, nonatomic) TAPMessageModel *message;
+@property (nonatomic) TAPMyChatDeletedBubbleTableViewCellType type;
 
 - (void)setMessage:(TAPMessageModel *)message;
 - (void)receiveSentEvent;

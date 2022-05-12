@@ -30,6 +30,8 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewTrailingConstraint;
 
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender;
@@ -70,11 +72,13 @@
     [super prepareForReuse];
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
-    [self.contentView layoutIfNeeded];
-
     self.statusLabel.alpha = 0.0f;
-    
+    self.deletedIconImageViewWidthConstraint.constant = 0.0f;
+    self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
+    self.bubbleLabel.text = @"";
+    [self setBubbleCellStyle];
     [self showSenderInfo:NO];
+    [self.contentView layoutIfNeeded];
 }
 
 #pragma mark - Custom Method
@@ -108,9 +112,6 @@
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
     
-    UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedLeftMessageBubble]];
-    self.deletedIconImageView.image = deletedImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -120,7 +121,26 @@
     
     _message = message;
     
-    self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
+    if (self.type == TAPYourChatDeletedBubbleTableViewCellTypeDefault) {
+        UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedLeftMessageBubble]];
+        self.deletedIconImageView.image = deletedImage;
+        self.deletedIconImageViewWidthConstraint.constant = 16.0f;
+        self.deletedIconImageViewTrailingConstraint.constant = 4.0f;
+        self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
+    }
+    else if (self.type == TAPYourChatDeletedBubbleTableViewCellTypeUnsupported) {
+        self.deletedIconImageView.image = nil;
+        self.deletedIconImageViewWidthConstraint.constant = 0.0f;
+        self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
+        self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message type is unsupported in the current app version.", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        self.deletedIconImageView.image = nil;
+        self.deletedIconImageViewWidthConstraint.constant = 0.0f;
+        self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
+        self.bubbleLabel.text = @"";
+    }
     
     //CS NOTE - check chat room type, show sender info if group type
     if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {

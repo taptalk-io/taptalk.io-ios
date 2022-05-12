@@ -25,6 +25,8 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconBottomConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconBottomConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconRightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewTrailingConstraint;
 
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (void)setBubbleCellStyle;
@@ -61,9 +63,14 @@
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
+    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     self.sendingIconLeftConstraint.constant = 4.0f;
     self.sendingIconBottomConstraint.constant = -5.0f;
+    self.deletedIconImageViewWidthConstraint.constant = 0.0f;
+    self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
+    self.bubbleLabel.text = @"";
+    [self setBubbleCellStyle];
     [self.contentView layoutIfNeeded];
 }
 
@@ -90,12 +97,8 @@
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
     
-    UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    self.sendingIconImageView.image = sendingImage;
-    
-    UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedRightMessageBubble]];
-    self.deletedIconImageView.image = deletedImage;
+//    UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+//    self.sendingIconImageView.image = sendingImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -105,20 +108,39 @@
 
     //    _message = message;
     [super setMessage:message];
-
-    self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
+    
+    if (self.type == TAPMyChatDeletedBubbleTableViewCellTypeDefault) {
+        UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedRightMessageBubble]];
+        self.deletedIconImageView.image = deletedImage;
+        self.deletedIconImageViewWidthConstraint.constant = 16.0f;
+        self.deletedIconImageViewTrailingConstraint.constant = 4.0f;
+        self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
+    }
+    else if (self.type == TAPMyChatDeletedBubbleTableViewCellTypeUnsupported) {
+        self.deletedIconImageView.image = nil;
+        self.deletedIconImageViewWidthConstraint.constant = 0.0f;
+        self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
+        self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message type is unsupported in the current app version.", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        self.deletedIconImageView.image = nil;
+        self.deletedIconImageViewWidthConstraint.constant = 0.0f;
+        self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
+        self.bubbleLabel.text = @"";
+    }
 }
 
 - (void)receiveSentEvent {
-    [super receiveSentEvent];
+//    [super receiveSentEvent];
 }
 
 - (void)receiveDeliveredEvent {
-    [super receiveDeliveredEvent];
+//    [super receiveDeliveredEvent];
 }
 
 - (void)receiveReadEvent {
-    [super receiveReadEvent];
+//    [super receiveReadEvent];
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated updateStatusIcon:(BOOL)updateStatusIcon message:(TAPMessageModel *)message {

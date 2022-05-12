@@ -108,6 +108,10 @@ static const char kBundleKey = 0;
     return messageDateString;
 }
 
++ (NSNumber *)currentTimeInMillis {
+    return [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970] * 1000.0f];
+}
+
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value {
     NSString *emptyString = @"";
