@@ -619,6 +619,8 @@
     }];
 }
 
+
+
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                      quotedMessage:(TAPMessageModel *)quotedMessage
                               room:(TAPRoomModel *)room
@@ -628,6 +630,78 @@
                            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendFileMessageWithFileURI:fileURI room:room start:start progress:progress success:success failure:failure];
+}
+
+- (void)sendVoiceMessageWithFileURI:(NSURL *)fileURI
+                              room:(TAPRoomModel *)room
+                             start:(void (^)(TAPMessageModel *message))start
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                           success:(void (^)(TAPMessageModel *message))success
+                           failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSError *error = nil;
+    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+    [coordinator coordinateReadingItemAtURL:fileURI options:NSFileCoordinatorReadingImmediatelyAvailableMetadataOnly error:&error byAccessor:^(NSURL *newURL) {
+        NSError *err = nil;
+        NSNumber *fileSize;
+        if(![fileURI getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
+            NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"Unable to get file data from URI", nil, [TAPUtil currentBundle], @"");
+            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90301 errorMessage:errorMessage];
+            failure(nil, error);
+            return;
+        } else {
+            TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+            NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
+            NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024;
+            if ([fileSize doubleValue] > [maxFileSize doubleValue]) {
+                //File size is larger than max file size
+                NSString *errorMessage = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"Selected file exceeded %ld MB maximum", nil, [TAPUtil currentBundle], @""), (long)maxFileSizeInMB];
+                NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90302 errorMessage:errorMessage];
+                failure(nil, error);
+                return;
+            }
+            
+            NSString *filePath = [fileURI absoluteString];
+            NSString *encodedFileName = [filePath lastPathComponent];
+            NSString *decodedFileName = [encodedFileName stringByRemovingPercentEncoding];
+            NSString *fileExtension = [fileURI pathExtension];
+            NSString *mimeType = [TAPUtil mimeTypeForFileWithExtension:fileExtension];
+            NSData *fileData = [NSData dataWithContentsOfURL:fileURI];
+            
+            TAPDataFileModel *dataFile = [TAPDataFileModel new];
+            dataFile.fileName = decodedFileName;
+            dataFile.mediaType = mimeType;
+            dataFile.size = fileSize;
+            dataFile.fileData = fileData;
+            
+            [[TAPChatManager sharedManager] sendVoiceMessageWithVoiceAssetURL:dataFile filePath:filePath fileURL:fileURI room:room successGenerateMessage:^(TAPMessageModel *message) {
+                NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+                
+                void (^handlerProgress)(TAPMessageModel *, CGFloat, CGFloat) = [progress copy];
+                [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
+                
+                void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+                [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+                
+                void (^handlerFailure)(TAPMessageModel * _Nullable, NSError *) = [failure copy];
+                [blockTypeDictionary setObject:handlerFailure forKey:@"failureBlock"];
+                
+                [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+                
+                start(message);
+            }];
+        }
+    }];
+}
+
+- (void)sendVoiceMessageWithFileURI:(NSURL *)fileURI
+                     quotedMessage:(TAPMessageModel *)quotedMessage
+                              room:(TAPRoomModel *)room
+                             start:(void (^)(TAPMessageModel *message))start
+                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                           success:(void (^)(TAPMessageModel *message))success
+                           failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    [self sendVoiceMessageWithFileURI:fileURI room:room start:start progress:progress success:success failure:failure];
 }
 
 - (void)sendForwardedMessage:(TAPMessageModel *)messageToForward

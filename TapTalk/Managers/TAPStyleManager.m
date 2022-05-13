@@ -791,6 +791,15 @@
             return font;
             break;
         }
+        case TAPComponentFontRightVoiceBubbleDuration:
+        {
+            
+//            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+//            font = [font fontWithSize:TAP_RIGHT_FILE_BUBBLE_NAME_FONTSIZE_STYLE];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_VOICE_BUBBLE_DURATION_FONTSIZE_STYLE weight:UIFontWeightRegular];
+            return font;
+            break;
+        }
         case TAPComponentFontLeftBubbleSenderName:
         {
             
@@ -1999,6 +2008,11 @@
             return color;
             break;
         }
+        case TAPTextColorRecordingTimeLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TAPUtil getColor:@"9B9B9B"];
@@ -2246,6 +2260,12 @@
         case TAPComponentColorRightFileButtonBackground:
         {
             UIColor *color = [TAPUtil getColor:@"FFFFFF"];
+            return color;
+            break;
+        }
+        case TAPComponentColorRightVoiceNoteButtonBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_RIGHT_BUBBLE_VOICE_NOTE_BUTTON_COLOR];
             return color;
             break;
         }

@@ -31,6 +31,8 @@
 + (TAPCoreConfigsModel *)getCoreConfigs;
 + (void)setUnreadRoomIDs:(NSArray *)roomIDs;
 + (NSArray *)getUnreadRoomIDs;
++ (void)setCurrentVoicePlayingFilePath:(NSString *)message;
++ (NSString *)getCurrentVoicePlayingFilePath;
 
 
 + (void)updateMessageToFailedWhenClosedInDatabase;

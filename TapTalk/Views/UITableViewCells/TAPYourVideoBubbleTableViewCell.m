@@ -695,7 +695,11 @@
             self.senderNameTopConstraint.constant = 11.0f;
         }
 
-        if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        if([message.quote.content isEqualToString:@"🎤 Voice"]){
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];

@@ -9,6 +9,7 @@
 #import "TAPChatManager.h"
 #import "TAPConnectionManager.h"
 #import <TapTalk/Base64.h>
+#import <CoreServices/UTType.h>
 
 #define kCharacterLimit 4000
 #define kMaximumRetryAttempt 10
@@ -662,6 +663,143 @@
     
     [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+}
+
+- (void)sendVoiceMessageWithVoiceAssetURL:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath fileURL:(NSURL *)fileURL {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendVoiceMessageWithVoiceAssetURL:dataFile filePath:filePath fileURL:fileURL room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
+}
+
+- (void)sendVoiceMessageWithVoiceAssetURL:(TAPDataFileModel *)dataFile
+                                 filePath:(NSString *)filePath
+                                 fileURL:(NSURL *)fileURL
+                                     room:(TAPRoomModel *)room
+                   successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    /**
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🎥 Video", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
+    }
+    
+    AVAsset *videoAsset = [AVAsset assetWithURL:videoAssetURL]; //AS NOTE - get AVAsset via videoURLAsset
+    
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+    
+    //AS NOTE - GET FILE SIZE
+    NSNumber *fileSizeValue = nil;
+    NSError *fileSizeError = nil;
+    NSNumber *videoAssetURLFileSize = nil;
+    [videoAssetURL getResourceValue:&fileSizeValue forKey:NSURLFileSizeKey
+                         error:(&fileSizeError)];
+    
+    if (fileSizeValue) {
+        NSLog(@"value for %@ is %@", videoAssetURL, fileSizeValue);
+        videoAssetURLFileSize = fileSizeValue;
+    }
+    else {
+        NSLog(@"error getting size for url %@ error was %@", videoAssetURL, fileSizeError);
+        videoAssetURLFileSize = [NSNumber numberWithFloat:0.0f];
+    }
+    
+    
+    Float64 voiceDurationFloat = floorf(CMTimeGetSeconds(videoAsset.duration));
+    Float64 voiceDurationInMilisecondsFloat = voiceDurationFloat * 1000; // in miliseconds
+    NSInteger voiceDurationInteger = (NSInteger)voiceDurationInMilisecondsFloat;
+    
+//    NSURL *videoAssetURL = [(AVURLAsset *)videoAsset URL];
+    NSString *voiceAssetURLString = [videoAssetURL absoluteString];
+    voiceAssetURLString = [TAPUtil nullToEmptyString:voiceAssetURLString];
+    
+    NSString *fileNameString = [voiceAssetURLString lastPathComponent];
+    fileNameString = [TAPUtil nullToEmptyString:fileNameString];
+    
+    NSString *assetIdentifier = fileNameString;
+    assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+    
+    //Save asset to dictionary
+    [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAVAsset:videoAsset];
+    //AS NOTE - GET MIME TYPE
+    NSString *mimeType = @"audio/m4a"; //AS NOTE - DEFAULT mimeType
+    NSString *extension = [videoAssetURL pathExtension];
+    NSString *exportedUTI = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)extension, NULL);
+    NSString *mimeTypeUTI = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)exportedUTI, kUTTagClassMIMEType);
+    
+    if (mimeTypeUTI != nil && ![mimeTypeUTI isEqualToString:@""]) {
+        mimeType = mimeTypeUTI;
+    }
+
+    [dataDictionary setObject:videoAssetURLFileSize forKey:@"size"];
+    [dataDictionary setObject:fileNameString forKey:@"fileName"];
+    [dataDictionary setObject:voiceAssetURLString forKey:@"filePath"];
+    [dataDictionary setObject:mimeType forKey:@"mediaType"];
+//    [dataDictionary setObject:asset forKey:@"asset"];
+    //[dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
+    //[dataDictionary setObject:voiceAssetURLString forKey:@"videoAssetURLString"];
+    //[dataDictionary setObject:caption forKey:@"caption"];
+    
+    [dataDictionary setObject:[NSNumber numberWithInteger:voiceDurationInteger] forKey:@"duration"];
+    
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeVoice
+                                                    messageData:dataDictionary];
+    
+    successGenerateMessage(message);
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    */
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    NSString *fileName = dataFile.fileName;
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    NSString *mediaType = dataFile.mediaType;
+    mediaType = [TAPUtil nullToEmptyString:mediaType];
+    
+    NSNumber *size = dataFile.size;
+    
+    NSString *messageBodyString = [NSString stringWithFormat:@"🎤 Voice"];
+    
+    AVAsset *videoAsset = [AVAsset assetWithURL:fileURL]; //AS NOTE - get AVAsset via videoURLAsset
+    Float64 voiceDurationFloat = floorf(CMTimeGetSeconds(videoAsset.duration));
+    Float64 voiceDurationInMilisecondsFloat = voiceDurationFloat * 1000; // in miliseconds
+    NSInteger voiceDurationInteger = (NSInteger)voiceDurationInMilisecondsFloat;
+    NSNumber *voiceDurationNumber = [NSNumber numberWithInteger:voiceDurationInteger];
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+
+    [dataDictionary setObject:filePath forKey:@"filePath"];
+    [dataDictionary setObject:fileName forKey:@"fileName"];
+    [dataDictionary setObject:mediaType forKey:@"mediaType"];
+    [dataDictionary setObject:size forKey:@"size"];
+    [dataDictionary setObject:voiceDurationNumber forKey:@"duration"];
+    
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyString
+                                                           type:TAPChatMessageTypeVoice
+                                                    messageData:dataDictionary];
+    
+    //Call block in TAPCoreMessageManager to handle things in TAPCore
+    successGenerateMessage(message);
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+    
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
 }
 
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address {

@@ -1484,6 +1484,17 @@
     return roomIDs;
 }
 
++ (void)setCurrentVoicePlayingFilePath:(TAPMessageModel *)message{
+    [[NSUserDefaults standardUserDefaults] setSecureObject:message forKey:TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (TAPMessageModel *)getCurrentVoicePlayingFilePath{
+    TAPMessageModel *message =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING valid:nil];
+    
+    return message;
+}
+
 
 + (void)setActiveUser:(TAPUserModel *)user {
     if (user != nil) {
@@ -4617,6 +4628,39 @@
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:roomID forKey:@"roomID"];
     [parameterDictionary setObject:fileType forKey:@"fileType"];
+    
+    if (caption != nil && ![caption isEqualToString:@""]) {
+        [parameterDictionary setObject:caption forKey:@"caption"];
+    }
+
+    NSURLSessionUploadTask *uploadTask = [[TAPNetworkManager sharedManager] upload:requestURL fileData:fileData fileName:fileName fileType:fileType mimeType:mimeType parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        CGFloat progress = uploadProgress.fractionCompleted;
+        progressBlock(progress, 1.0f);
+    } success:^(NSDictionary *responseObject) {
+        successBlock(responseObject);
+    } failure:^(NSError *error) {
+        failureBlock(error);
+    }];
+    
+    return uploadTask;
+}
+
++ (NSURLSessionUploadTask *)callAPIUploadVoiceWithFileData:(NSData *)fileData
+                                                   roomID:(NSString *)roomID
+                                                 fileName:(NSString *)fileName
+                                                 fileType:(NSString *)fileType
+                                                  duration:(NSString *)duration
+                                                 mimeType:(NSString *)mimeType
+                                                  caption:(NSString *)caption
+                                          completionBlock:(void (^)(NSDictionary *responseObject))successBlock
+                                            progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                                             failureBlock:(void(^)(NSError *error))failureBlock {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUploadFile];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:fileType forKey:@"fileType"];
+    [parameterDictionary setObject:duration forKey:@"duration"];
     
     if (caption != nil && ![caption isEqualToString:@""]) {
         [parameterDictionary setObject:caption forKey:@"caption"];

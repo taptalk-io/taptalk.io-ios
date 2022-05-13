@@ -39,11 +39,14 @@
 #import "TAPMyChatDeletedBubbleTableViewCell.h"
 #import "TAPYourChatDeletedBubbleTableViewCell.h"
 #import "TAPMentionListXIBTableViewCell.h"
+#import "TAPMyVoiceNoteBubbleTableViewCell.h"
+#import "TAPYourVoiceNoteBubbleTableViewCell.h"
 
 #import "TAPProductListBubbleTableViewCell.h"
 #import "TAPUnreadMessagesBubbleTableViewCell.h"
 #import "TAPLoadingTableViewCell.h"
 #import "TAPSystemMessageTableViewCell.h"
+#import "TAPAudioManager.h"
 
 #import "TAPQuoteModel.h"
 
@@ -74,7 +77,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TopFloatingIndicatorViewTypeLoading = 1
 };
 
-@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate>
+@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -104,6 +107,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIImageView *keyboardOptionButtonImageView;
 @property (strong, nonatomic) IBOutlet UIButton *keyboardOptionButton;
 @property (strong, nonatomic) IBOutlet UIView *quoteStandingSeparatorView;
+@property (weak, nonatomic) IBOutlet UIButton *voiceNoteButton;
+
 
 @property (strong, nonatomic) IBOutlet UIView *dummyNavigationBarView;
 @property (strong, nonatomic) IBOutlet UILabel *dummyNavigationBarTitleLabel;
@@ -219,6 +224,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageMessageLabel;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *inputAccessoryExtensionHeightConstraint;
 @property (nonatomic) InputAccessoryExtensionType inputAccessoryExtensionType;
+@property (weak, nonatomic) IBOutlet UIView *inputAccessoryExtensionView;
+@property (weak, nonatomic) IBOutlet UIView *extensionSeperatorView;
+
+
 
 //Load More Message Loading View
 @property (strong, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
@@ -267,6 +276,31 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)addContactButtonDidTapped:(id)sender;
 - (IBAction)closeAddContactButtonDidTapped:(id)sender;
 
+//Voice Note
+@property (weak, nonatomic) IBOutlet UIView *recordingCircleView;
+@property (weak, nonatomic) IBOutlet UILabel *recordingTimeLabel;
+@property (weak, nonatomic) IBOutlet UIView *recordingContainerView;
+@property (weak, nonatomic) IBOutlet UILabel *slideLeftToCancelLabel;
+@property (weak, nonatomic) IBOutlet UIButton *cancelRecordingButton;
+@property (weak, nonatomic) IBOutlet UIView *lockRecordingView;
+@property (weak, nonatomic) IBOutlet UIImageView *lockRecordingIconImageView;
+@property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
+@property (weak, nonatomic) IBOutlet UIView *voiceNoteContainerView;
+@property (strong, nonatomic) UILongPressGestureRecognizer *voiceNoteViewLongPressGestureRecognizer;
+@property (weak, nonatomic) IBOutlet UIView *voiceNoteDragView;
+@property (weak, nonatomic) IBOutlet UIImageView *micIconImageView;
+@property (weak, nonatomic) IBOutlet UIView *stopView;
+@property (weak, nonatomic) IBOutlet UIButton *stopButton;
+@property (weak, nonatomic) IBOutlet UIImageView *playIconImageView;
+@property (weak, nonatomic) IBOutlet UIButton *playIconButton;
+@property (weak, nonatomic) IBOutlet UISlider *voiceNoteAudioSlider;
+@property (nonatomic) BOOL isPlayerSliding;
+@property (strong, nonatomic) NSTimer *seekBarUpdateTimer;
+@property (strong, nonatomic) NSTimer *recorderCircleBlinkTimer;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceContraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceConstraint2;
+
+
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *anchorMentionMessageDictionary;
 @property (strong, nonatomic) NSMutableArray *anchorMentionMessageArray;
@@ -290,6 +324,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isOtherUserIsContact;
 
 @property (strong, nonatomic) NSString *unreadLocalID;
+@property (strong, nonatomic) NSURL *voiceNoteUrl;
+@property (nonatomic) BOOL isRecording;
+@property (nonatomic) BOOL isComposerAudioPlaying;
+@property (nonatomic) BOOL isMessageAudioPlaying;
+@property (nonatomic) BOOL isYourMessageAudioPlaying;
+@property (nonatomic) NSInteger currentVoiceMessageIndex;
+@property (nonatomic) NSInteger recordingTimeCounter;
+@property (strong, nonatomic) TAPMessageModel *currentVoiceNoteMessage;
 @property (nonatomic) NSInteger numberOfUnreadMessages;
 @property (nonatomic) BOOL isShowingUnreadMessageIdentifier;
 
@@ -402,7 +444,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @end
 
 @implementation TapUIChatViewController
-
+CGPoint _priorPoint;
+CGPoint center;
 #pragma mark - Lifecycle
 - (instancetype)initWithOtherUser:(TAPUserModel *)otherUser {
     if (self = [super initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]]) {
@@ -580,6 +623,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     self.inputMessageAccessoryDocumentsImageView.image = [self.inputMessageAccessoryDocumentsImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     
+    //Voice note button long press
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(pictureLongPressClicked)];
+    [self.voiceNoteButton addGestureRecognizer:longPress];
+    
     //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
@@ -728,7 +775,123 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
     }
     
+    //setup voice note ui
+    UIColor *recordingTimeColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRecordingTimeLabel];
+    UIColor *slideLeftLabelColor = [[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField]colorWithAlphaComponent:0.6f];
+    UIFont *chatComposerFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextField];
     
+    [self.stopButton addTarget:self action:@selector(stopButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.playIconButton addTarget:self action:@selector(playVoiceNoteAudio) forControlEvents:UIControlEventTouchUpInside];
+    [self.cancelRecordingButton addTarget:self action:@selector(cancelRecordingButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.stopView.layer.cornerRadius = 2.0f;
+    
+    self.recordingTimeLabel.textColor = recordingTimeColor;
+    self.recordingTimeLabel.font = chatComposerFont;
+    self.slideLeftToCancelLabel.textColor = slideLeftLabelColor;
+    self.slideLeftToCancelLabel.font = chatComposerFont;
+    
+    self.micIconImageView.image = [self.micIconImageView.image setImageTintColor:[UIColor blackColor]];
+   // self.playIconImageView.image = [self.playIconImageView.image setImageTintColor:recordingTimeColor];
+    
+    
+    self.recordingCircleView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+    self.recordingCircleView.layer.cornerRadius = CGRectGetWidth(self.recordingCircleView.frame) / 2;
+    self.recordingCircleView.alpha = 0.0f;
+    
+    
+    self.lockRecordingView.layer.cornerRadius = 20.0f;
+    self.lockRecordingView.layer.borderWidth = 1.0f;
+    self.lockRecordingView.layer.borderColor = [[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField]colorWithAlphaComponent:0.1f].CGColor;
+    self.lockRecordingView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+    
+    self.voiceNoteAudioSlider.maximumTrackTintColor = [TAPUtil getColor:@"FFCB99"];
+    self.voiceNoteAudioSlider.minimumTrackTintColor = [TAPUtil getColor:@"FF7E00"];
+    self.voiceNoteAudioSlider.thumbTintColor = [TAPUtil getColor:@"FF7E00"];
+    
+    //_voiceNoteViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleVoiceNoteViewLongPress:)];
+    //self.voiceNoteViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    //self.voiceNoteViewLongPressGestureRecognizer.delegate = self;
+    //self.voiceNoteContainerView.userInteractionEnabled = YES;
+    //[self.voiceNoteContainerView addGestureRecognizer:self.voiceNoteViewLongPressGestureRecognizer];
+    
+    center = self.voiceNoteDragView.center;
+    
+    [TAPAudioManager sharedManager].delegate = self;
+    
+    UILongPressGestureRecognizer *gestureRecognizer = [[UILongPressGestureRecognizer alloc] init];
+    [gestureRecognizer addTarget:self action:@selector(handleVoiceNoteViewLongPress:)];
+    //gestureRecognizer.delegate = self;
+    self.voiceNoteDragView.userInteractionEnabled = YES;
+    [self.voiceNoteDragView addGestureRecognizer: gestureRecognizer];
+    
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] init];
+    [tapGestureRecognizer addTarget:self action:@selector(handleVoiceNoteViewTap:)];
+    //gestureRecognizer.delegate = self;
+    [self.voiceNoteDragView addGestureRecognizer: tapGestureRecognizer];
+    
+    _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureAction:)];
+    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+    [panGestureRecognizer addTarget:self action:@selector(handlePanGestureAction:)];
+  //  panGestureRecognizer.delegate = self;
+    //[self.voiceNoteContainerView addGestureRecognizer:panGestureRecognizer];
+    
+    if (![[TapUI sharedInstance] isSendVoiceNoteMenuEnabled]){
+        self.voiceNoteDragView.alpha = 0.0f;
+        self.voiceNoteContainerView.alpha = 0.0f;
+        self.voiceNoteSpaceContraint.constant = 13.0f;
+        self.voiceNoteSpaceConstraint2.constant = 25.0f;
+    }
+    
+    
+}
+
+- (void)seekBarUpdate{
+    if(self.isComposerAudioPlaying){
+        NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
+        self.voiceNoteAudioSlider.value = currentTime;
+        self.recordingTimeLabel.text = [self secondToMinuteString:currentTime];
+    }
+    else if(self.isMessageAudioPlaying){
+        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
+            NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
+            if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                
+                [cell setAudioSliderMaximumValue:[[TAPAudioManager sharedManager] getPlayerDuration]];
+                [cell setAudioSliderValue:currentTime];
+                [cell setVoiceNoteDurationLabel:[self secondToMinuteString:currentTime]];
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                
+                [cell setAudioSliderMaximumValue:[[TAPAudioManager sharedManager] getPlayerDuration]];
+                [cell setAudioSliderValue:currentTime];
+                [cell setVoiceNoteDurationLabel:[self secondToMinuteString:currentTime]];
+            }
+        }
+
+    }
+}
+
+- (void)recordingCircleBlink{
+   
+    if(!self.isRecording){
+        self.recordingCircleView.alpha = 0.0f;
+        return;
+    }
+    
+    self.recordingTimeCounter += 1;
+    self.recordingTimeLabel.text = [self secondToMinuteString:self.recordingTimeCounter];
+    
+    [UIView animateWithDuration:1.0f animations:^{
+        self.recordingCircleView.alpha = self.recordingCircleView.alpha == 1.0 ? 0.0 : 1.0;
+    }completion:^(BOOL finished) {
+        
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -847,7 +1010,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [super viewDidDisappear:animated];
     
     _isViewDidAppeared = NO;
-    
+    [[TAPAudioManager sharedManager] stopPlayer];
+    [[TAPAudioManager sharedManager] stopRecordAudio];
     [self.navigationController.interactivePopGestureRecognizer removeTarget:self action:@selector(handleNavigationPopGesture:)];
     
     //stop typing animation sequence
@@ -1096,7 +1260,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
 
                     cell.message = message;
-                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -1111,6 +1274,126 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     else {
                         [cell showStatusLabel:NO animated:NO updateStatusIcon:NO message:message];
                     }
+                    
+                    return cell;
+                    
+                   
+                }
+                else if(message.type == TAPChatMessageTypeVoice){
+                    [tableView registerNib:[TAPMyVoiceNoteBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyVoiceNoteBubbleTableViewCell description]];
+                    TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyVoiceNoteBubbleTableViewCell description] forIndexPath:indexPath];
+                    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                    cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
+                    cell.userInteractionEnabled = YES;
+                    cell.contentView.userInteractionEnabled = YES;
+                    cell.delegate = self;
+                    cell.message = message;
+                    [cell setAudioSliderValue:0.0f];
+                    
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
+                    
+                    if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
+                        [cell setMessage:message];
+                    }
+                    
+                    if (message != nil) {
+                        NSDictionary *dataDictionary = message.data;
+                        NSString *localID = message.localID;
+                        NSString *roomID = message.room.roomID;
+                        
+                        if (message.isFailedSend) {
+                            //Update view to failed send
+                            [cell animateFailedUploadFile];
+                        }
+                        else {
+                            NSInteger status = [[TAPFileUploadManager sharedManager] obtainUploadStatusWithMessage:message];
+                            // 0 is not found
+                            // 1 is uploading
+                            // 2 is waiting for upload
+                            if (status != 0) {
+                                //Set current progress
+                                NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                                [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
+                                if (uploadProgressDictionary == nil) {
+                                    CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
+                                    CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
+                                    
+                                    [cell animateProgressUploadingFileWithProgress:progress total:total];
+                                }
+                            }
+                            else {
+                                //Check file is done downloaded or not
+                                NSDictionary *dataDictionary = message.data;
+                                dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+                                
+                                NSString *key = [dataDictionary objectForKey:@"fileID"];
+                                key = [TAPUtil nullToEmptyString:key];
+                                
+                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+                                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                        fileURL = [dataDictionary objectForKey:@"fileURL"];
+                                    }
+                                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+                                    
+                                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                        return cell;
+                                   }
+                                    
+                                    if (![fileURL isEqualToString:@""]) {
+                                        key = fileURL;
+                                        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                                    }
+                                    
+                                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                }
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                                    if (downloadProgressDictionary != nil) {
+                                        // Show downloading in progress
+                                        CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                        CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                        
+                                        [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeDownloading];
+                                        [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                                    }
+                                    else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                                        //previous download fail, show retry
+                                        [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeRetryDownload];
+                                    }
+                                    else {
+                                        //show download
+                                        [cell showDownloadedState:NO];
+                                        
+                                        NSDictionary *currentDataDictionary = message.data;
+                                        NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
+                                        if (currentFileID != nil) {
+                                            [self fetchFileDataWithMessage:message];
+                                        }
+                                        
+                                    }
+                                }
+                                else {
+                                    //File exist, show downloaded file
+                                    [cell showDownloadedState:YES];
+                                }
+                            }
+                        }
+                    }
+                    
+                  
                     
                     return cell;
                 }
@@ -1510,7 +1793,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             }
             else {
                 if (message.type == TAPChatMessageTypeText) {
-                    
                     //Their Chat Message
                     [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
                     TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
@@ -1548,6 +1830,92 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
                     else {
                         [cell showStatusLabel:NO animated:NO];
+                    }
+                    
+                    return cell;
+                    
+                }
+                else if (message.type == TAPChatMessageTypeVoice) {
+                    [tableView registerNib:[TAPYourVoiceNoteBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourVoiceNoteBubbleTableViewCell description]];
+                    TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourVoiceNoteBubbleTableViewCell description] forIndexPath:indexPath];
+                    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                    cell.tag = indexPath.row;
+                    cell.contentView.tag = indexPath.row;
+                    cell.userInteractionEnabled = YES;
+                    cell.contentView.userInteractionEnabled = YES;
+                    cell.delegate = self;
+                    cell.message = message;
+                    [cell setAudioSliderValue:0.0f];
+                    
+                    if([self.starMessageIDArray containsObject:message.messageID]){
+                        //Show star icon on message bubble
+                        [cell showStarMessageView];
+                    }
+                    
+                    if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
+                        [cell setMessage:message];
+                    }
+                    
+                    if (message != nil) {
+                        NSDictionary *dataDictionary = message.data;
+                        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+                        NSString *localID = message.localID;
+                        NSString *roomID = message.room.roomID;
+                        
+                        //Check file is done downloaded or not
+                        NSString *key = [dataDictionary objectForKey:@"fileID"];
+                        key = [TAPUtil nullToEmptyString:key];
+                        
+                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                            fileURL = [TAPUtil nullToEmptyString:fileURL];
+                             if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                fileURL = [dataDictionary objectForKey:@"fileURL"];
+                            }
+                            fileURL = [TAPUtil nullToEmptyString:fileURL];
+                            
+                            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                return cell;
+                           }
+                            
+                            if (![fileURL isEqualToString:@""]) {
+                                key = fileURL;
+                                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                            }
+                            
+                            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        }
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                            if (downloadProgressDictionary != nil) {
+                                // Show downloading in progress
+                                CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                
+                                [cell showFileBubbleStatusWithType:TAPYourVoiceNoteBubbleTableViewCellStateTypeDownloading];
+                                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                            }
+                            else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                                //previous download fail, show retry
+                                [cell showFileBubbleStatusWithType:TAPYourVoiceNoteBubbleTableViewCellStateTypeRetry];
+                            }
+                            else {
+                                //show download
+                                [cell showDownloadedState:NO];
+                                [self fetchFileDataWithMessage:message];
+                            }
+                        }
+                        else {
+                            //File exist, show downloaded file
+                            [cell showDownloadedState:YES];
+                        }
                     }
                     
                     return cell;
@@ -2200,12 +2568,92 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+#pragma mark UISliderDelegate
+- (IBAction)playerSliderDidChanged:(id)sender {
+    if([[TAPAudioManager sharedManager] isPlaying]){
+        [[TAPAudioManager sharedManager] setPlayerCurrentTime:self.voiceNoteAudioSlider.value];
+        NSInteger currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
+        self.recordingTimeLabel.text = [self secondToMinuteString:currentTime];
+    }
+    else{
+        self.voiceNoteAudioSlider.value = 0.0f;
+    }
+    
+}
+
+#pragma mark TAPAudioManagerDelegate
+- (void)finishAudioRecord:(NSURL *)url AVRecorder:(AVAudioRecorder *)avrecorder{
+    [self.recorderCircleBlinkTimer invalidate];
+    self.recordingCircleView.alpha = 0.0f;
+    self.voiceNoteUrl = url;
+    [[TAPAudioManager sharedManager] setupPlayerAudio:self.voiceNoteUrl.path];
+}
+- (void)startAudioPlay:(NSTimeInterval)duration{
+    self.seekBarUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:0.0001f target:self selector:@selector(seekBarUpdate) userInfo:nil repeats:YES];
+    if(self.isComposerAudioPlaying){
+        self.voiceNoteAudioSlider.maximumValue = duration;
+    }
+    else if(self.isMessageAudioPlaying){
+        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
+            if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                [cell setAudioSliderMaximumValue:duration];
+                [cell setPlayingState:YES];
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                [cell setAudioSliderMaximumValue:duration];
+                [cell setPlayingState:YES];
+               
+            }
+        }
+    }
+    
+}
+- (void)finishAudioPlay{
+    [self.seekBarUpdateTimer invalidate];
+    self.isComposerAudioPlaying = NO;
+    self.isYourMessageAudioPlaying = NO;
+    self.voiceNoteAudioSlider.value = 0.0f;
+    self.playIconImageView.image = [UIImage imageNamed:@"TAPIconPlayComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.recordingTimeLabel.text = [self secondToMinuteString:self.recordingTimeCounter];
+    
+    if(!self.isPlayerSliding){
+        self.isMessageAudioPlaying = NO;
+    }
+    
+    if(self.currentVoiceNoteMessage != nil){
+        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
+            if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                
+                [cell setAudioSliderValue:0.0f];
+                [cell setPlayingState:NO];
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                
+                [cell setAudioSliderValue:0.0f];
+                [cell setPlayingState:NO];
+            }
+        }
+        
+    }
+   
+   
+}
 #pragma mark UIDocumentPicker
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     
     NSError *error = nil;
     NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-    
+    NSLog(@"url file test:%@",[urls firstObject]);
     [coordinator coordinateReadingItemAtURL:[urls firstObject] options:NSFileCoordinatorReadingImmediatelyAvailableMetadataOnly error:&error byAccessor:^(NSURL *newURL) {
         
         NSError *err = nil;
@@ -3181,6 +3629,243 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }];
 }
 
+#pragma mark TAPMyVoiceBubbleTableViewCell
+- (void)myVoiceNoteBubblePlayerSliderDidChange:(NSTimeInterval)currentTime message:(TAPMessageModel *)message{
+    if([[TAPAudioManager sharedManager] isPlaying]){
+        [[TAPAudioManager sharedManager] setPlayerCurrentTime:currentTime];
+        self.isPlayerSliding = YES;
+    }
+    else{
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+       //My Chat
+        TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+        [cell setAudioSliderValue:0.0f];
+    }
+    
+}
+
+- (void)myVoiceNoteBubblePlayerSliderDidEnd{
+    self.isPlayerSliding = NO;
+}
+- (void)myVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
+    
+    NSString *roomID = tappedMessage.room.roomID;
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
+    if(self.currentVoiceNoteMessage == tappedMessage && [filePath isEqualToString:[[TAPAudioManager sharedManager] getPlayerCurrentFilePath]]){
+        if([[TAPAudioManager sharedManager] isPlaying]){
+            [[TAPAudioManager sharedManager] pausePlayer];
+            [self voiceMessagePlayingStae:NO];
+            self.isMessageAudioPlaying = NO;
+        }
+        else{
+            [[TAPAudioManager sharedManager] resumePlayer];
+            [self voiceMessagePlayingStae:YES];
+            self.isMessageAudioPlaying = YES;
+        }
+        return;
+    }
+    
+    
+    
+    [self resetMessageAudioSlider];
+    self.isMessageAudioPlaying = YES;
+    self.currentVoiceNoteMessage = tappedMessage;
+    [[TAPAudioManager sharedManager] playAudio:filePath];
+}
+
+- (void)myVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
+}
+
+- (void)myVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    
+    if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
+        return;
+    }
+    
+    TAPMessageModel *quotedMessageModel = [tappedMessage copy];
+    
+    [self showInputAccessoryExtensionView:NO];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+    [self showInputAccessoryExtensionView:YES];
+    
+    //convert to quote model
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
+    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+    
+    quotedMessageModel.quote = quote;
+    
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    
+    //remove selectedMessage
+    self.selectedMessage = nil;
+}
+
+- (void)myVoiceNoteBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    [self handleLongPressedWithMessage:longPressedMessage];
+}
+
+- (void)myVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    if (key == nil || [key isEqualToString:@""]) {
+        return;
+    }
+    [self fetchFileDataWithMessage:tappedMessage];
+}
+
+- (void)myVoiceNoteRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
+    
+    NSDictionary *dataDictionary = tappedMessage.data;
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    
+    if ([key isEqualToString:@""]) {
+        //Remove from waiting upload dictionary in ChatManager
+        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
+        
+        //File exist, retry upload file
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            
+            [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
+            
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+            
+            NSString *fileName = [tappedMessage.data objectForKey:@"fileName"];
+            fileName = [TAPUtil nullToEmptyString:fileName];
+            
+            NSString *mediaType = [tappedMessage.data objectForKey:@"mediaType"];
+            mediaType = [TAPUtil nullToEmptyString:mediaType];
+            
+            NSString *size = [tappedMessage.data objectForKey:@"size"];
+            size = [TAPUtil nullToEmptyString:size];
+            
+            TAPDataFileModel *dataFile = [TAPDataFileModel new];
+            dataFile.fileName = fileName;
+            dataFile.mediaType = mediaType;
+            dataFile.size = size;
+            
+            NSString *filePath = [dataDictionary objectForKey:@"filePath"];
+            filePath = [TAPUtil nullToEmptyString:filePath];
+            
+            NSURL *newURL = [NSURL URLWithString:filePath];
+            NSData *fileData = [NSData dataWithContentsOfURL:newURL];
+            dataFile.fileData = fileData;
+            
+            //NSString *finalURLString =[finalURLString1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSURL *url = [NSURL URLWithString:filePath];
+            
+            //[[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
+            [[TAPChatManager sharedManager] sendVoiceMessageWithVoiceAssetURL:dataFile filePath:filePath fileURL:url];
+            
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+    else if (tappedMessage.isFailedSend) {
+        // File already uploaded, resend message
+        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:tappedMessage.user room:tappedMessage.room body:tappedMessage.body type:tappedMessage.type quote:tappedMessage.quote messageData:tappedMessage.data];
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+            
+            [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+    else {
+        //File not exist, retry download file
+        [self fetchFileDataWithMessage:tappedMessage];
+    }
+}
+
+- (void)myVoiceNoteCancelButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    NSDictionary *dataDictionary = tappedMessage.data;
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    
+    if ([key isEqualToString:@""]) {
+        //File exist, uploading file state
+        //Cancel uploading task
+        [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:tappedMessage];
+        
+        //Remove message from array and dictionary in ChatViewController
+        TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:tappedMessage.localID];
+        NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
+        [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
+        
+        //Remove from WaitingUploadDictionary in ChatManager
+        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
+        
+        //Remove message from database
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            
+        } failure:^(NSError *error) {
+            
+        }];
+        
+        //Update chat room UI
+        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+        } completion:^(BOOL finished) {
+        }];
+    }
+    else {
+        //File not exist, download file
+        //Cancel downloading task
+        [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:tappedMessage];
+    }
+}
+
+- (void)myVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
 
 #pragma mark TAPMyFileBubbleTableViewCell
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
@@ -4509,7 +5194,152 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }];
     }];
 }
+#pragma mark TAPYourVoiceBubbleTableViewCell
+- (void)yourVoiceNoteBubblePlayerSliderDidChange:(NSTimeInterval)currentTime message:(TAPMessageModel *)message{
+    if([[TAPAudioManager sharedManager] isPlaying]){
+        [[TAPAudioManager sharedManager] setPlayerCurrentTime:currentTime];
+        self.isPlayerSliding = YES;
+    }
+    else{
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+       //My Chat
+        TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+        [cell setAudioSliderValue:0.0f];
+    }
+}
 
+- (void)yourVoiceNoteBubblePlayerSliderDidEnd{
+    self.isPlayerSliding = NO;
+}
+
+- (void)yourVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
+    NSString *roomID = tappedMessage.room.roomID;
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
+    
+    
+    if(self.currentVoiceNoteMessage == tappedMessage && [filePath isEqualToString:[[TAPAudioManager sharedManager] getPlayerCurrentFilePath]]){
+        if([[TAPAudioManager sharedManager] isPlaying]){
+            [[TAPAudioManager sharedManager] pausePlayer];
+            [self voiceMessagePlayingStae:NO];
+            self.isMessageAudioPlaying = NO;
+        }
+        else{
+            [[TAPAudioManager sharedManager] resumePlayer];
+            [self voiceMessagePlayingStae:YES];
+            self.isMessageAudioPlaying = YES;
+        }
+        return;
+    }
+    
+    
+    [self resetMessageAudioSlider];
+    self.isMessageAudioPlaying = YES;
+    self.currentVoiceNoteMessage = tappedMessage;
+    
+    [[TAPAudioManager sharedManager] playAudio:filePath];
+}
+
+- (void)yourVoiceNoteBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
+    
+}
+
+- (void)yourVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
+}
+
+- (void)yourVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage {
+    
+    if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
+        return;
+    }
+    
+    TAPMessageModel *quotedMessageModel = [tappedMessage copy];
+    
+    //WK Note : Do reply here later.
+    [self showInputAccessoryExtensionView:NO];
+    [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+    [self showInputAccessoryExtensionView:YES];
+    
+    NSString *fileName = [quotedMessageModel.data objectForKey:@"fileName"];
+    fileName = [TAPUtil nullToEmptyString:fileName];
+    
+    NSString *fileExtension  = [[fileName pathExtension] uppercaseString];
+    
+    fileName = [fileName stringByDeletingPathExtension];
+    
+    if ([fileExtension isEqualToString:@""]) {
+        fileExtension = [quotedMessageModel.data objectForKey:@"mediaType"];
+        fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+        fileExtension = [fileExtension lastPathComponent];
+        fileExtension = [fileExtension uppercaseString];
+    }
+    
+    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+    
+    //convert to quote model
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
+    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+    
+    quotedMessageModel.quote = quote;
+    
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    
+    //remove selectedMessage
+    self.selectedMessage = nil;
+}
+
+- (void)yourVoiceNoteBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
+    [self handleLongPressedWithMessage:longPressedMessage];
+}
+
+- (void)yourVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    if (key == nil || [key isEqualToString:@""]) {
+        return;
+    }
+    [self fetchFileDataWithMessage:tappedMessage];
+}
+
+- (void)yourVoiceNoteRetryDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    [self fetchFileDataWithMessage:tappedMessage];
+}
+
+- (void)yourVoiceNoteCancelButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    //Cancel downloading task
+    [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:tappedMessage];
+}
+- (void)yourVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
+    [self processSwipeToReplyWithMessage:message];
+}
 
 #pragma mark TAPYourFileBubbleTableViewCell
 - (void)yourFileBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
@@ -5829,6 +6659,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         cell.message = obtainedMessage;
         [cell animateProgressUploadingVideoWithProgress:progress total:total];
     }
+    else if (type == TAPChatMessageTypeVoice) {
+        TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+        [cell animateProgressUploadingFileWithProgress:progress total:total];
+    }
 }
 
 - (void)fileUploadManagerStartNotification:(NSNotification *)notification {
@@ -5866,6 +6700,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.tableView performBatchUpdates:^{
             //changing beginUpdates and endUpdates with this because of deprecation
             [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
+        } completion:^(BOOL finished) {
+        }];
+    }
+    else if (type == TAPChatMessageTypeVoice) {
+        TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+        
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell showFileBubbleStatusWithType:TAPMyVoiceNoteBubbleTableViewCellStateTypeUploading];
         } completion:^(BOOL finished) {
         }];
     }
@@ -5909,6 +6752,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
       }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+
+        [self.tableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [cell animateFinishedUploadFile];
+        } completion:^(BOOL finished) {
+        }];
+    }
+    else if (type == TAPChatMessageTypeVoice) {
+        TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
 
         [self.tableView performBatchUpdates:^{
             //changing beginUpdates and endUpdates with this because of deprecation
@@ -5969,6 +6821,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
         else if (type == TAPChatMessageTypeFile) {
             TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadFile];
+            } completion:^(BOOL finished) {
+            }];
+        }
+        else if (type == TAPChatMessageTypeVoice) {
+            TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell setMessage:currentMessage];
             
             [self.tableView performBatchUpdates:^{
@@ -6061,6 +6923,18 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:[NSNumber numberWithFloat:progress/total] stateType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
             }
         }
+        else if (type == TAPChatMessageTypeVoice) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+            }
+        }
     });
 }
 
@@ -6118,6 +6992,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 //Their Chat
                 TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDownloading];
+            }
+        }
+        else if (type == TAPChatMessageTypeVoice) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                
+                [cell showFileBubbleStatusWithType:TAPMyVoiceNoteBubbleTableViewCellStateTypeDownloading];
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                [cell showFileBubbleStatusWithType:TAPYourVoiceNoteBubbleTableViewCellStateTypeDownloading];
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
@@ -6199,6 +7086,23 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             else {
                 //Their Chat
                 TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                [cell animateFinishedDownloadFile];
+            }
+        }
+        else if (type == TAPChatMessageTypeVoice) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedDownloadFile];
+                }
+                else {
+                    [cell animateFailedUploadFile];
+                }
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell animateFinishedDownloadFile];
             }
         }
@@ -6295,6 +7199,42 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 else {
                     //Their Chat
                     TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell animateFailedDownloadFile];
+                }
+            }
+            
+        }
+        else if (type == TAPChatMessageTypeVoice) {
+            if (error.code == NSURLErrorCancelled) {
+                // canceled
+                if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    //My Chat
+                    TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateCancelDownloadFile];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+                else {
+                    //Their Chat
+                    TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateCancelDownloadFile];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+            } else {
+                // failed
+                if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                    //My Chat
+                    TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+                    [cell animateFailedDownloadFile];
+                }
+                else {
+                    //Their Chat
+                    TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                     [cell animateFailedDownloadFile];
                 }
             }
@@ -6694,6 +7634,87 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+- (void)playVoiceNoteAudio{
+    if(![self.voiceNoteUrl.path isEqualToString:[[TAPAudioManager sharedManager] getPlayerCurrentFilePath]]){
+        [[TAPAudioManager sharedManager] setupPlayerAudio:self.voiceNoteUrl.path];
+        self.voiceNoteAudioSlider.value = 0.0f;
+        
+    }
+    if([[TAPAudioManager sharedManager] isPlaying]){
+        [[TAPAudioManager sharedManager] pausePlayer];
+        self.isComposerAudioPlaying = NO;
+        self.playIconImageView.image = [UIImage imageNamed:@"TAPIconPlayComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        self.isComposerAudioPlaying = YES;
+        [[TAPAudioManager sharedManager] resumePlayer];
+        self.playIconImageView.image = [UIImage imageNamed:@"TAPIconPauseComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    
+    
+}
+
+- (void)cancelRecordingButtonDidTapped{
+    [[TAPAudioManager sharedManager] stopRecordAudio];
+    [self showInputAccessoryRecordView:NO];
+    [self setSendButtonActive:NO];
+    self.voiceNoteUrl = nil;
+}
+
+- (void)uploadSendVoiceNote:(NSURL*)url{
+    NSError *error = nil;
+    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+    [coordinator coordinateReadingItemAtURL:url options:NSFileCoordinatorReadingImmediatelyAvailableMetadataOnly error:&error byAccessor:^(NSURL *newURL) {
+        
+        NSError *err = nil;
+        NSNumber *fileSize;
+        
+        if(![url getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
+            NSLog(@"Failed error: %@", error);
+            return;
+        }
+            TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+            NSNumber *maxFileSize = coreConfigs.chatMediaMaxFileSize;
+            NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
+            if ([fileSize doubleValue] > [maxFileSize doubleValue]) {
+                //File size is larger than max file size
+                NSString *subjectMessage = NSLocalizedStringFromTableInBundle(@"Maximum file size is ", nil, [TAPUtil currentBundle], @"");
+                NSString *errorMessage = [NSString stringWithFormat:@"%@ %ld MB.",subjectMessage, (long)maxFileSizeInMB];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error File Size Excedeed" title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                return;
+            }
+            
+            NSString *filePath = [url absoluteString];
+            NSString *encodedFileName = [filePath lastPathComponent];
+            NSString *decodedFileName = [encodedFileName stringByRemovingPercentEncoding];
+            
+            //Get Mimetype
+            NSString *fileExtension = [newURL pathExtension];
+            NSString *mimeType = [TAPUtil mimeTypeForFileWithExtension:fileExtension];
+            NSData *fileData = [NSData dataWithContentsOfURL:newURL];
+            
+            TAPDataFileModel *dataFile = [TAPDataFileModel new];
+            dataFile.fileName = decodedFileName;
+            dataFile.mediaType = mimeType;
+            dataFile.size = fileSize;
+            dataFile.fileData = fileData;
+            
+#ifdef DEBUG
+            NSLog(@"FileName: %@ \nMimeType:%@ \nFileSize: %ld",decodedFileName, mimeType, [fileSize doubleValue]);
+#endif
+            [[TAPChatManager sharedManager] sendVoiceMessageWithVoiceAssetURL:dataFile filePath:filePath fileURL:url];
+            
+            [TAPUtil performBlock:^{
+                if ([self.messageArray count] != 0) {
+                    [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
+                }
+            } afterDelay:0.2f];
+        
+    }];
+    [self setSendButtonActive:NO];
+    [self showInputAccessoryRecordView:NO];
+}
+
 #pragma mark Bubble Chat
 - (void)handleLongPressedWithURL:(NSURL *)url originalString:(NSString *)originalString {
     [TAPUtil tapticImpactFeedbackGenerator];
@@ -7042,8 +8063,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                   handler:^(UIAlertAction * action) {
                                       //Reply Action Here
                                       
-                                      [self checkAndShowInputAccessoryView];
-                                      
+                                    [self checkAndShowInputAccessoryView];
                                       if (message.type == TAPChatMessageTypeText) {
                                           [self showInputAccessoryExtensionView:NO];
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -7122,6 +8142,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           quotedMessageModel.quote = quote;
                                           
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+                                      }
+                                      else if (message.type == TAPChatMessageTypeVoice) {
+                                          [self showInputAccessoryExtensionView:NO];
+                                          [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+                                          [self setReplyMessageWithMessage:message];
+                                          [self showInputAccessoryExtensionView:YES];
+                                          
+                                          TAPMessageModel *quotedMessageModel = [message copy];
+                                          [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
                                       }
                                   }];
     
@@ -7557,6 +8586,102 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+- (void)handleVoiceNoteViewTap:(UITapGestureRecognizer *)recognizer{
+    if (recognizer.state == UIGestureRecognizerStateEnded)
+    {
+        [self displayToastWithMessage:@"Long press mic to record."];
+    }
+}
+
+- (void)handleVoiceNoteViewLongPress:(UILongPressGestureRecognizer *)recognizer {
+    UIView *view =(UIView*) recognizer.view;
+    CGPoint point = [recognizer locationInView:view.superview];
+    
+        if (recognizer.state == UIGestureRecognizerStateBegan)
+        {
+            BOOL isGrantedPermission = [[TAPAudioManager sharedManager] checkAudioPermissionAndSetup];
+            
+            if(isGrantedPermission){
+                [self showInputAccessoryRecordView:YES];
+                [self resetMessageAudioSlider];
+                self.voiceNoteAudioSlider.value = 0.0f;
+                self.recordingTimeCounter = 0;
+                self.recordingTimeLabel.text = [self secondToMinuteString:self.recordingTimeCounter];
+                self.playIconImageView.image = [UIImage imageNamed:@"TAPIconPlayComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+                
+                self.recorderCircleBlinkTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(recordingCircleBlink) userInfo:nil repeats:YES];
+                [[TAPAudioManager sharedManager] starRecordAudio];
+                self.isRecording = YES;
+            }
+            else{
+                
+            }
+    
+        }
+        else if (recognizer.state == UIGestureRecognizerStateChanged) {
+            CGPoint center = view.center;
+            center.x += point.x - _priorPoint.x;
+            center.y += point.y - _priorPoint.y;
+            view.center = center;
+            //NSLog(@"---y %ld", [recognizer inView]);
+        }
+        else if (recognizer.state == UIGestureRecognizerStateEnded)
+        {
+            if(self.isRecording){
+                self.voiceNoteDragView.center = center;
+                self.stopView.alpha = 1.0;
+                self.stopButton.alpha = 1.0f;
+                self.voiceNoteDragView.alpha = 0.0f;
+                self.micIconImageView.alpha = 0.0f;
+                //[[TAPAudioManager sharedManager] stopRecordAudio];
+            }
+            
+        }
+    _priorPoint = point;
+    
+    NSLog(@"---y %ld", [self.voiceNoteDragView convertPoint:center toView:nil].y);
+    
+}
+
+-(void)stopButtonDidTapped{
+    [[TAPAudioManager sharedManager] stopRecordAudio];
+    
+    self.voiceNoteAudioSlider.alpha = 1.0f;
+    self.voiceNoteAudioSlider.value = 0.0f;
+    
+    self.isRecording = NO;
+    self.playIconButton.alpha = 1.0f;
+    self.playIconImageView.alpha = 1.0f;
+    self.stopView.alpha = 0.0f;
+    self.stopButton.alpha = 0.0f;
+    [self setSendButtonActive:YES];
+}
+
+- (void)showInputAccessoryRecordView:(BOOL)show {
+    if(show){
+        self.recordingContainerView.alpha = 1.0;
+        self.textViewBorderView.alpha = 0.0f;
+        UIColor *micPrimaryColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary];
+        self.micIconImageView.image = [self.micIconImageView.image setImageTintColor:micPrimaryColor];
+        
+    }
+    else{
+        self.recordingContainerView.alpha = 0.0;
+        self.textViewBorderView.alpha = 1.0f;
+        self.micIconImageView.image = [self.micIconImageView.image setImageTintColor:[UIColor blackColor]];
+        self.micIconImageView.alpha = 1.0;
+        self.voiceNoteDragView.alpha = 1.0f;
+        self.stopButton.alpha = 0.0f;
+        self.playIconButton.alpha = 0.0f;
+        self.playIconImageView.alpha = 0.0f;
+        self.stopView.alpha = 0.0f;
+        self.voiceNoteAudioSlider.alpha = 0.0f;
+        self.isRecording = NO;
+       
+       
+    }
+}
+
 - (void)showInputAccessoryExtensionView:(BOOL)show {
     if (show) {
         _currentInputAccessoryExtensionHeight = kInputMessageAccessoryExtensionViewDefaultHeight;
@@ -7973,7 +9098,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             if (setAsDeleted) {
                 //Delete physical file if exist
-                if (currentMessage.type == TAPChatMessageTypeImage || currentMessage.type == TAPChatMessageTypeVideo || currentMessage.type == TAPChatMessageTypeFile) {
+                if (currentMessage.type == TAPChatMessageTypeImage || currentMessage.type == TAPChatMessageTypeVideo || currentMessage.type == TAPChatMessageTypeFile || currentMessage.type == TAPChatMessageTypeVoice) {
                     [TAPDataManager deletePhysicalFilesWithMessage:currentMessage success:^{
                         
                     } failure:^(NSError *error) {
@@ -8077,6 +9202,27 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 else if (currentMessage.type == TAPChatMessageTypeFile) {
                     if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                         TAPMyFileBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                        
+                        if (isSendingAnimation) {
+                            [cell receiveSentEvent];
+                        }
+                        else if (setAsDelivered) {
+                            [cell receiveDeliveredEvent];
+                        }
+                        else if (setAsRead) {
+                            [cell receiveReadEvent];
+                        }
+                        else {
+                            [cell setMessage:message];
+                            
+                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                            //        [self.tableView reloadData];
+                        }
+                    }
+                }
+                else if (currentMessage.type == TAPChatMessageTypeVoice) {
+                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                        TAPMyVoiceNoteBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                         
                         if (isSendingAnimation) {
                             [cell receiveSentEvent];
@@ -9472,6 +10618,51 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 ////    }
 }
 
+#pragma mark UIGestureRecognizer
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+        CGPoint velocity = [panGestureRecognizer velocityInView:self.voiceNoteContainerView];
+        NSLog(@"--> vertical : %d", velocity.y );
+        NSLog(@"--> horizontal : %d", velocity.x );
+        if (fabs(velocity.x) > fabs(velocity.y)) {
+            return YES;
+        }
+        
+    }
+    else{
+        UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+        CGPoint velocity = [panGestureRecognizer velocityInView:self.voiceNoteContainerView];
+        NSLog(@"--> vertical : %d", panGestureRecognizer.view.center.y);
+    }
+
+    return YES;
+}
+
+
+
+- (void)handlePanGestureAction:(UIPanGestureRecognizer *)recognizer {
+    if (recognizer.state == UIGestureRecognizerStateBegan)
+    {
+        [self showInputAccessoryRecordView:YES];
+        
+    }
+    else if (recognizer.state == UIGestureRecognizerStateChanged) {
+        CGPoint translation = [recognizer translationInView:self.voiceNoteContainerView];
+        NSLog(@"start moving %@", translation.y);
+    }
+    else if (recognizer.state == UIGestureRecognizerStateEnded)
+    {
+        [self showInputAccessoryRecordView:NO];
+        self.voiceNoteDragView.center = center;
+    }
+    else if(recognizer.state == UIGestureRecognizerStateRecognized){
+        [self showInputAccessoryRecordView:YES];
+    }
+    
+}
+
+
 #pragma mark Others
 - (void)setChatViewControllerType:(TapUIChatViewControllerType)chatViewControllerType {
     _chatViewControllerType = chatViewControllerType;
@@ -9718,6 +10909,28 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     } completion:^(BOOL finished) {
         //completion
     }];
+    
+    if(self.playIconImageView.alpha == 1.0f){
+        [[TAPAudioManager sharedManager] stopPlayer];
+        [self uploadSendVoiceNote:self.voiceNoteUrl];
+        
+        [self showInputAccessoryExtensionView:NO];
+        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+        
+        if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
+            //        Only scroll if table view is at bottom
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        }
+        
+        self.lastNumberOfWordArrayForShowMention = 0;
+        self.lastTypingWordArrayStartIndex = 0;
+        self.lastTypingWordString = @"";
+        [self.filteredMentionListArray removeAllObjects];
+        
+        [self checkEmptyState];
+        [[TAPChatManager sharedManager] stopTyping];
+        return;
+    }
     
     //remove selectedMessage
     self.selectedMessage = [TAPMessageModel new];
@@ -10400,6 +11613,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showStarMessageView];
         }
+        else if (message.type == TAPChatMessageTypeVoice) {
+            TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
         else if (message.type == TAPChatMessageTypeLocation) {
             TAPMyLocationBubbleTableViewCell *cell = (TAPMyLocationBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showStarMessageView];
@@ -10422,6 +11639,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
         else if (message.type == TAPChatMessageTypeFile) {
             TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell showStarMessageView];
+        }
+        else if (message.type == TAPChatMessageTypeVoice) {
+            TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showStarMessageView];
         }
         else if (message.type == TAPChatMessageTypeLocation) {
@@ -11102,6 +12323,66 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
+- (void)voiceMessagePlayingStae:(BOOL)isPlaying{
+    if(self.currentVoiceNoteMessage != nil){
+        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
+            if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                [cell setPlayingState:isPlaying];
+                
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                [cell setPlayingState:isPlaying];
+               
+            }
+        }
+    }
+}
+
+- (void)resetMessageAudioSlider{
+    if(self.currentVoiceNoteMessage != nil){
+        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
+            if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                //My Chat
+                TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                [cell setAudioSliderValue:0.0f];
+                [cell setPlayingState:NO];
+                
+            }
+            else {
+                //Their Chat
+                TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
+                [cell setAudioSliderValue:0.0f];
+                [cell setPlayingState:NO];
+               
+            }
+        }
+    }
+}
+
+- (NSString *)secondToMinuteString:(NSInteger)second{
+    NSInteger minute = second/60;
+    NSInteger sec = second - (minute * 60);
+    
+    NSString *minuteString = [@(minute) stringValue];
+    NSString *secondString = [@(sec) stringValue];;
+    if(minute < 10){
+        minuteString = [NSString stringWithFormat:@"0%ld", minute];
+    }
+    if(sec < 10){
+        secondString = [NSString stringWithFormat:@"0%ld", sec];
+    }
+    
+    return [NSString stringWithFormat:@"%@.%@", minuteString, secondString];
+}
+
+
+
 //Add to Contacts View
 - (IBAction)blockUserButtonDidTapped:(id)sender {
     //DV TODO - Add block user method here
@@ -11174,7 +12455,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
            return;
     }
     
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) {
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeVoice) {
         //Type Text and Location
         [self showInputAccessoryExtensionView:NO];
         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -11234,6 +12515,42 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //DV Note
     //Add another type here for later
+}
+
+- (void)displayToastWithMessage:(NSString *)toastMessage
+{
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
+        UIWindow * keyWindow = [[UIApplication sharedApplication] keyWindow];
+        UILabel *toastView = [[UILabel alloc] init];
+        toastView.text = toastMessage;
+        UIFont *toastFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
+        toastView.font = toastFont;
+        toastView.textColor = [UIColor whiteColor];
+        toastView.backgroundColor = [TAPUtil getColor:@"666666"];
+        toastView.textAlignment = NSTextAlignmentCenter;
+        if(self.isKeyboardShowed){
+            toastView.frame = CGRectMake((keyWindow.frame.size.width/2) - 100.0, keyWindow.frame.size.height - 430.0f, 200.0f, 20.0f);
+        }
+        else{
+            toastView.frame = CGRectMake((keyWindow.frame.size.width/2) - 100.0, keyWindow.frame.size.height - 120.0f, 200.0f, 20.0f);
+        }
+        
+        toastView.layer.cornerRadius = 10;
+        toastView.layer.masksToBounds = YES;
+
+        [keyWindow addSubview:toastView];
+
+        [UIView animateWithDuration: 3.0f
+                          delay: 0.0
+                        options: UIViewAnimationOptionCurveEaseOut
+                     animations: ^{
+                         toastView.alpha = 0.0;
+                     }
+                     completion: ^(BOOL finished) {
+                         [toastView removeFromSuperview];
+                     }
+         ];
+    }];
 }
 
 @end

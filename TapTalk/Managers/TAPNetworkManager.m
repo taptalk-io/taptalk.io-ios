@@ -452,7 +452,24 @@ refreshToken:(NSString *)refreshToken
             NSData *fileTypeData = [fileTypeString dataUsingEncoding:NSUTF8StringEncoding];
             [formData appendPartWithFormData:fileTypeData name:@"fileType"];
         }
-        
+        else if ([filetype isEqualToString:@"audio"]) {
+            [formData appendPartWithFileData:fileData name:@"file" fileName:fileName mimeType:mimeType];
+            
+            NSData *roomIDData = [[parameters objectForKey:@"roomID"] dataUsingEncoding:NSUTF8StringEncoding];
+            [formData appendPartWithFormData:roomIDData name:@"roomID"];
+            
+            NSString *fileTypeString = [parameters objectForKey:@"fileType"];
+            fileTypeString = [TAPUtil nullToEmptyString:fileTypeString];
+            NSData *fileTypeData = [fileTypeString dataUsingEncoding:NSUTF8StringEncoding];
+            [formData appendPartWithFormData:fileTypeData name:@"fileType"];
+            
+            NSString *durationTypeString = [parameters objectForKey:@"duration"];
+            durationTypeString = [TAPUtil nullToEmptyString:durationTypeString];
+            NSData *durationTypeData = [durationTypeString dataUsingEncoding:NSUTF8StringEncoding];
+            [formData appendPartWithFormData:durationTypeData name:@"duration"];
+            
+            
+        }
     } error:nil];
     
     [request setTimeoutInterval:20000];

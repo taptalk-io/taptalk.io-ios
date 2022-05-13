@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TAPMessageModel.h"
 
 static const NSInteger kMaxCacheAge = 60 * 60 * 24 * 7; // 1 Week in Seconds
 static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B

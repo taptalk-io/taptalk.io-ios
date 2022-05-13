@@ -511,7 +511,11 @@
         //reply to exists
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
-        if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        if([message.quote.content isEqualToString:@"🎤 Voice"]){
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];

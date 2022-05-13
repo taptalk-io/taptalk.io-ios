@@ -16,10 +16,12 @@
 #import "TAPYourLocationBubbleTableViewCell.h"
 #import "TAPMyVideoBubbleTableViewCell.h"
 #import "TAPYourVideoBubbleTableViewCell.h"
+#import "TAPMyVoiceNoteBubbleTableViewCell.h"
+#import "TAPYourVoiceNoteBubbleTableViewCell.h"
 #import "TAPMyChatDeletedBubbleTableViewCell.h"
 #import "TAPYourChatDeletedBubbleTableViewCell.h"
 #import "TAPMentionListXIBTableViewCell.h"
-@interface TAPStarredMessageViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate>
+@interface TAPStarredMessageViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, atomic) NSMutableArray *messageArray;
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
@@ -332,6 +334,30 @@
             }
             return cell;
         }
+        else if (message.type == TAPChatMessageTypeVoice) {
+            //My Chat File Message
+            [tableView registerNib:[TAPMyVoiceNoteBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyVoiceNoteBubbleTableViewCell description]];
+            TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyVoiceNoteBubbleTableViewCell description] forIndexPath:indexPath];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.tag = indexPath.row;
+            cell.contentView.tag = indexPath.row;
+            cell.userInteractionEnabled = YES;
+            cell.contentView.userInteractionEnabled = YES;
+            cell.delegate = self;
+            cell.message = message;
+            [cell setRotaionToDefault];
+            [cell showStarMessageView];
+            [cell showSeperator];
+            [cell setAudioSliderValue:0.0f];
+            
+            if (!message.isHidden) {
+                [cell setMessage:message];
+            }
+            
+            [cell showDownloadedState:YES];
+            
+            return cell;
+        }
         else if (message.type == TAPChatMessageTypeFile) {
             //My Chat File Message
             [tableView registerNib:[TAPMyFileBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyFileBubbleTableViewCell description]];
@@ -591,6 +617,30 @@
             }
             return cell;
         }
+        else if (message.type == TAPChatMessageTypeVoice) {
+            //Their File Message
+            [tableView registerNib:[TAPYourVoiceNoteBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourVoiceNoteBubbleTableViewCell description]];
+            TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourVoiceNoteBubbleTableViewCell description] forIndexPath:indexPath];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.tag = indexPath.row;
+            cell.contentView.tag = indexPath.row;
+            cell.userInteractionEnabled = YES;
+            cell.contentView.userInteractionEnabled = YES;
+            cell.delegate = self;
+            cell.message = message;
+            [cell setRotaionToDefault];
+            [cell showStarMessageView];
+            [cell showSeperator];
+            [cell setAudioSliderValue:0.0f];
+            
+            if (!message.isHidden) {
+                [cell setMessage:message];
+            }
+            
+            [cell showDownloadedState:YES];
+            
+            return cell;
+        }
         else if (message.type == TAPChatMessageTypeFile) {
             //Their File Message
             [tableView registerNib:[TAPYourFileBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourFileBubbleTableViewCell description]];
@@ -768,6 +818,53 @@
         [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
     }];
 }
+
+- (void)myVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
+    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+    }];
+  
+}
+
+- (void)myVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+    }];
+}
+
+
+- (void)myVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+    }];
+}
+
+- (void)yourVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
+    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+    }];
+  
+}
+
+- (void)yourVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+    }];
+}
+
+
+- (void)yourVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+    }];
+}
+
 
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage{
     [self.navigationController popToRootViewControllerAnimated:NO];

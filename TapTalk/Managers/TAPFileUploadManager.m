@@ -108,6 +108,10 @@
             //Upload File
             [self runUploadFileWithRoomID:message.room.roomID];
         }
+        else if (message.type == TAPChatMessageTypeVoice){
+            //Upload Voice
+            [self runUploadVoiceAsAssetWithRoomID:message.room.roomID];
+        }
     }
 }
 
@@ -139,6 +143,10 @@
         else if (message.type == TAPChatMessageTypeVideo) {
             //Upload Video
             [self runUploadVideoAsAssetWithRoomID:message.room.roomID];
+        }
+        else if (message.type == TAPChatMessageTypeVoice){
+            //Upload Voice
+            [self runUploadVoiceAsAssetWithRoomID:message.room.roomID];
         }
     }
 }
@@ -1433,6 +1441,412 @@
             return;
         }
     }];
+}
+
+- (void)runUploadVoiceAsAssetWithRoomID:(NSString *)roomID {
+    //Function for upload video from PHAsset source
+    
+    NSMutableArray *uploadQueueRoomArray = [self.uploadQueueDictionary objectForKey:roomID];
+    if ([uploadQueueRoomArray count] == 0 || uploadQueueRoomArray == nil) {
+        return;
+    }
+    
+    //Obtain first object from queue array
+    TAPMessageModel *currentMessage = [uploadQueueRoomArray firstObject];
+    NSDictionary *dataDictionary = [NSDictionary dictionary];
+    dataDictionary = currentMessage.data;
+    
+    //Convert data dictionary to model
+    TAPDataFileModel *dataFile = [TAPDataFileModel new];
+    dataFile = [self convertDictionaryToDataFileModel:dataDictionary];
+    
+    
+    NSString *filePath = [dataDictionary objectForKey:@"filePath"];
+    NSURL *fileUrl = [NSURL URLWithString:filePath];
+    NSData *fileData = [NSData dataWithContentsOfURL:fileUrl];
+    NSNumber *duration = [dataDictionary objectForKey:@"duration"];
+    
+    //Call API Upload File
+    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+    [objectDictionary setObject:currentMessage forKey:@"message"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_START object:objectDictionary];
+
+    NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:fileData roomID:currentMessage.room.roomID fileName:dataFile.fileName fileType:@"audio" mimeType:dataFile.mediaType caption:@"" completionBlock:^(NSDictionary *responseObject) {
+        
+        NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
+        
+        NSMutableDictionary *resultDataDictionary = [NSMutableDictionary dictionary];
+        
+        NSString *mediaType = [responseDataDictionary objectForKey:@"mediaType"];
+        mediaType = [TAPUtil nullToEmptyString:mediaType];
+        
+        NSString *fileID = [responseDataDictionary objectForKey:@"id"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+
+        NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        NSString *fileName = dataFile.fileName;
+        
+        NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
+        sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
+        CGFloat size = [sizeRaw doubleValue];
+        NSNumber *sizeNum = [NSNumber numberWithDouble:size];
+        
+        [resultDataDictionary setObject:mediaType forKey:@"mediaType"];
+        [resultDataDictionary setObject:fileID forKey:@"fileID"];
+        [resultDataDictionary setObject:fileURL forKey:@"url"];
+        [resultDataDictionary setObject:fileName forKey:@"fileName"];
+        [resultDataDictionary setObject:sizeNum forKey:@"size"];
+        [resultDataDictionary setObject:duration forKey:@"duration"];
+        currentMessage.data = resultDataDictionary;
+
+        //Remove from waiting upload dictionary in ChatManager
+        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
+
+        //Save file path to cache
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
+        
+        //Send emit
+        [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
+
+        //Remove first object
+        [uploadQueueRoomArray removeObjectAtIndex:0];
+
+        if ([uploadQueueRoomArray count] == 0) {
+            [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
+        }
+        else {
+            [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
+        }
+
+        CGFloat progress = 1.0f;
+        CGFloat total = 1.0f;
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:currentMessage forKey:@"message"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+
+        [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
+
+        // Check if queue array is exist, run upload again
+        if ([uploadQueueRoomArray count] > 0) {
+            TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
+            NSString *nextRoomID = nextUploadMessage.room.roomID;
+            
+            if (nextUploadMessage.type == TAPChatMessageTypeImage) {
+                NSDictionary *dataDictionary = [NSDictionary dictionary];
+                dataDictionary = nextUploadMessage.data;
+                
+                //Convert data dictionary to model
+                TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
+                mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
+                
+                if (mediaData.asset == nil) {
+                    //upload UIImage
+                    [self runUploadImageWithRoomID:nextRoomID];
+                }
+                else {
+                    //Upload PHAsset
+                    [self runUploadImageAsAssetWithRoomID:nextRoomID];
+                }
+            }
+            else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
+                [self runUploadVideoAsAssetWithRoomID:nextRoomID];
+            }
+            else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
+                [self runUploadFileWithRoomID:nextRoomID];
+            }
+            else if (nextUploadMessage.type == TAPChatMessageTypeVoice) {
+                [self runUploadVoiceAsAssetWithRoomID:nextRoomID];
+            }
+
+        }
+        
+    } progressBlock:^(CGFloat progress, CGFloat total) {
+        NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+        obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+        if (obtainedDictionary == nil) {
+            obtainedDictionary = [NSMutableDictionary dictionary];
+        }
+        
+        [obtainedDictionary setObject:currentMessage forKey:@"message"];
+        [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+        [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+        [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
+        
+    } failureBlock:^(NSError *error) {
+        
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:currentMessage forKey:@"message"];
+        [objectDictionary setObject:error forKey:@"error"];
+        
+        TAPMessageModel *obtainedMesage = [[TAPChatManager sharedManager] getMessageFromWaitingUploadDictionaryWithKey:currentMessage.localID];
+        if (obtainedMesage != nil) {
+            
+            //Update isFailedSend to 1 and isSending to 0
+            [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
+            
+            //Remove first object
+            if ([uploadQueueRoomArray count] > 0) {
+                [uploadQueueRoomArray removeObjectAtIndex:0];
+                
+                if ([uploadQueueRoomArray count] == 0) {
+                    [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
+                }
+                else {
+                    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
+                }
+            }
+        }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+        
+        [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
+    }];
+    
+    NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+    obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+    if (obtainedDictionary == nil) {
+        obtainedDictionary = [NSMutableDictionary dictionary];
+    }
+    [obtainedDictionary setObject:uploadTask forKey:@"uploadTask"];
+    [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+    
+    
+    /**
+    //Convert data dictionary to model
+    TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
+    mediaData = [self convertDictionaryToDataMediaModel:obtainedDataDictionary];
+        
+        //Notify start upload flow
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_START object:objectDictionary];
+        
+        if (mediaData.asset == nil && mediaData.avAsset != nil) {
+            //Fetch video from AVAsset
+            
+            //AS NOTE - Convert AVAsset to NSData
+            NSURL *fileURL = [(AVURLAsset *)mediaData.avAsset URL];
+            
+            NSString *filePathString = [fileURL absoluteString];
+            filePathString = [TAPUtil nullToEmptyString:filePathString];
+            
+            NSString *fileName = [filePathString lastPathComponent];
+            fileName = [TAPUtil nullToEmptyString:fileName];
+            
+            //AS NOTE - GET MIME TYPE
+            NSString *mimeType = @"audio/m4a"; //AS NOTE - DEFAULT mimeType
+            NSString *extension = [fileURL pathExtension];
+            NSString *exportedUTI = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)extension, NULL);
+            NSString *mimeTypeUTI = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)exportedUTI, kUTTagClassMIMEType);
+            
+            if (mimeTypeUTI != nil && ![mimeTypeUTI isEqualToString:@""]) {
+                mimeType = mimeTypeUTI;
+            }
+            
+            __block NSData *assetData = nil;
+            AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mediaData.avAsset presetName:AVAssetExportPresetHighestQuality];
+            exportSession.outputURL = fileURL;
+            exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+            
+            [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                assetData = [NSData dataWithContentsOfURL:fileURL];
+                
+                //Call API Upload File
+                [self callAPIUploadFileWithUploadQueueRoomArray:uploadQueueRoomArray
+                                                 currentMessage:currentMessage
+                                                  resultMessage:currentMessage
+                                                   resizedImage:nil
+                                                 filePathString:filePathString
+                                                      AssetData:assetData
+                                                   roomIDString:currentMessage.room.roomID
+                                                       fileName:fileName
+                                                 fileTypeString:@"audio"
+                                                 mimeTypeString:mimeType
+                                                  captionString:captionString];
+//                [self callAPIUploadFileWithAssetData:assetData
+//                                        roomIDString:resultMessage.room.roomID
+//                                            fileName:fileName fileTypeString:@"video"
+//                                      mimeTypeString:mimeType
+//                                       captionString:captionString];
+//                NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:assetData
+//                                                                                            roomID:resultMessage.room.roomID
+//                                                                                          fileName:fileName
+//                                                                                          fileType:@"video"
+//                                                                                          mimeType:mimeType
+//                                                                                           caption:captionString
+//                                                                                   completionBlock:^(NSDictionary *responseObject) {
+//
+//                    NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
+//
+//                    NSString *fileNameString = fileName;
+//
+//                    NSString *caption = [responseDataDictionary objectForKey:@"caption"];
+//                    caption = [TAPUtil nullToEmptyString:caption];
+//
+//                    NSString *mediaType = [responseDataDictionary objectForKey:@"mediaType"];
+//                    mediaType = [TAPUtil nullToEmptyString:mediaType];
+//
+//                    NSString *fileID = [responseDataDictionary objectForKey:@"id"];
+//                    fileID = [TAPUtil nullToEmptyString:fileID];
+//
+//                    NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+//                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+//
+//                    NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
+//                    sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
+//                    NSString *sizeString = [NSString stringWithFormat:@"%f", [sizeRaw floatValue]];
+//                    NSNumber *sizeNumber = [NSNumber numberWithFloat:[sizeString floatValue]];
+//
+//                    NSMutableDictionary *appendedDataDictionary = [[NSMutableDictionary alloc] init];
+//                    appendedDataDictionary = [resultMessage.data mutableCopy];
+//
+//                    NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+//                    NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+//
+//                    [appendedDataDictionary setObject:fileNameString forKey:@"fileName"];
+//                    [appendedDataDictionary setObject:fileID forKey:@"fileID"];
+//                    [appendedDataDictionary setObject:fileID forKey:@"url"];
+//                    [appendedDataDictionary setObject:mediaType forKey:@"mediaType"];
+//                    [appendedDataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
+//                    [appendedDataDictionary setObject:sizeNumber forKey:@"size"];
+//                    [appendedDataDictionary setObject:caption forKey:@"caption"];
+//
+////                    [appendedDataDictionary removeObjectForKey:@"asset"];
+//                    resultMessage.data = [appendedDataDictionary copy];
+//
+//                    //Remove from waiting upload dictionary in ChatManager
+//                    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
+//
+//                    //Save video file path to cache
+//                    [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:fileID];
+//
+//                    //Save video thumbnail image to cache
+//                    UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:filePathString];
+//                    [TAPImageView saveImageToCache:thumbnailVideoImage withKey:fileID];
+//
+//                    //Send emit
+//                    [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+//
+//                    //Remove first object
+//                    [uploadQueueRoomArray removeObjectAtIndex:0];
+//
+//                    if ([uploadQueueRoomArray count] == 0) {
+//                        [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
+//                    }
+//                    else {
+//                        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
+//                    }
+//
+//                    CGFloat progress = 1.0f;
+//                    CGFloat total = 1.0f;
+//                    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+//                    [objectDictionary setObject:resultMessage forKey:@"message"];
+//                    [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+//                    [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+//
+//                    [self.uploadProgressDictionary removeObjectForKey:resultMessage.localID];
+//
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
+//
+//                    // Check if queue array is exist, run upload again
+//                    if ([uploadQueueRoomArray count] > 0) {
+//                        TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
+//                        NSString *nextRoomID = nextUploadMessage.room.roomID;
+//
+//                        if (nextUploadMessage.type == TAPChatMessageTypeImage) {
+//                            NSDictionary *dataDictionary = [NSDictionary dictionary];
+//                            dataDictionary = nextUploadMessage.data;
+//
+//                            //Convert data dictionary to model
+//                            TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
+//                            mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
+//
+//                            if (mediaData.asset == nil) {
+//                                //upload UIImage
+//                                [self runUploadImageWithRoomID:nextRoomID];
+//                            }
+//                            else {
+//                                //Upload PHAsset
+//                                [self runUploadImageAsAssetWithRoomID:nextRoomID];
+//                            }
+//                        }
+//                        else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
+//                            [self runUploadVideoAsAssetWithRoomID:nextRoomID];
+//                        }
+//                        else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
+//                            [self runUploadFileWithRoomID:nextRoomID];
+//                        }
+//                    }
+//                } progressBlock:^(CGFloat progress, CGFloat total) {
+//
+//                    //upload image progress is max 80% of total progress (20% for fetch asset)
+//                    CGFloat uploadDataProgress = 0.2f + (CGFloat)(progress * 80 / 100);
+//
+//                    NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+//                    obtainedDictionary = [self.uploadProgressDictionary objectForKey:resultMessage.localID];
+//                    if (obtainedDictionary == nil) {
+//                        obtainedDictionary = [NSMutableDictionary dictionary];
+//                    }
+//
+//                    [obtainedDictionary setObject:resultMessage forKey:@"message"];
+//                    [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", uploadDataProgress] forKey:@"progress"];
+//                    [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+//
+//                    [self.uploadProgressDictionary setObject:obtainedDictionary forKey:resultMessage.localID];
+//
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
+//
+//                } failureBlock:^(NSError *error) {
+//
+//                    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+//                    [objectDictionary setObject:resultMessage forKey:@"message"];
+//                    [objectDictionary setObject:error forKey:@"error"];
+//
+//                    TAPMessageModel *obtainedMesage = [[TAPChatManager sharedManager] getMessageFromWaitingUploadDictionaryWithKey:resultMessage.localID];
+//                    if (obtainedMesage != nil) {
+//
+//                        //Update isFailedSend to 1 and isSending to 0
+//                        [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
+//
+//                        if ([uploadQueueRoomArray count] > 0) {
+//                            //Remove first object
+//                            [uploadQueueRoomArray removeObjectAtIndex:0];
+//
+//                            if ([uploadQueueRoomArray count] == 0) {
+//                                [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
+//                            }
+//                            else {
+//                                [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
+//                            }
+//                        }
+//                    }
+//
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
+//
+//                    [self.uploadProgressDictionary removeObjectForKey:resultMessage.localID];
+//                }];
+//
+//                NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+//                if (obtainedDictionary == nil) {
+//                    obtainedDictionary = [NSMutableDictionary dictionary];
+//                }
+//                [obtainedDictionary setObject:uploadTask forKey:@"uploadTask"];
+//                [self.uploadProgressDictionary setObject:obtainedDictionary forKey:resultMessage.localID];
+            }];
+        }
+        else {
+            //AS NOTE - DO NOTHING?
+            return;
+        }
+    */
 }
 
 - (TAPDataMediaModel *)convertDictionaryToDataMediaModel:(NSDictionary *)dictionary {

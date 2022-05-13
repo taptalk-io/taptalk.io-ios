@@ -509,7 +509,11 @@
         }
         [self.contentView layoutIfNeeded];
         
-        if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        if([message.quote.content isEqualToString:@"🎤 Voice"]){
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];
@@ -813,7 +817,7 @@
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
     
     NSString *initialAppendedFullnameString = NSLocalizedStringFromTableInBundle(@"From: ", nil, [TAPUtil currentBundle], @"");
-    NSString *appendedFullnameString = [NSString stringWithFormat:@"%@%@", forwardData.fullname];
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"%@", forwardData.fullname];
     
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {

@@ -800,6 +800,16 @@ Get current status of star message menu from message bubble long press & chat pr
 */
 - (BOOL)isStarMessageMenuEnabled;
 
+/**
+Show or hide voice note menu from message bubble long press & chat profile
+*/
+- (void)setSendVoiceNoteMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of voice noite menu from message bubble long press & chat profile
+*/
+- (BOOL)isSendVoiceNoteMenuEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -1067,10 +1067,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSInteger maxFileSizeInMB = [maxFileSize integerValue] / 1024 / 1024; //Convert to MB
         
         
-        NSString *errorTitleInfoString = NSLocalizedStringFromTableInBundle(@"Video thumbnails that are marked with th icon ‘ ! ‘ have exceeded the ", nil, [TAPUtil currentBundle], @"");
+        NSString *errorTitleInfoString = NSLocalizedStringFromTableInBundle(@"Video thumbnails that are marked with the ‘ ! ‘ icon have exceeded the ", nil, [TAPUtil currentBundle], @"");
         NSString *errorTitleInfoEndString = NSLocalizedStringFromTableInBundle(@" upload limit and won’t be sent.", nil, [TAPUtil currentBundle], @"");
         
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedStringFromTableInBundle(@"Some files may not send", nil, [TAPUtil currentBundle], @"") detailInformation:[NSString stringWithFormat:@"%@%ldMB%@",errorTitleInfoString, (long)maxFileSizeInMB, errorTitleInfoEndString] leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Image Size Excedeed"  title:NSLocalizedStringFromTableInBundle(@"Some files may not be sent", nil, [TAPUtil currentBundle], @"") detailInformation:[NSString stringWithFormat:@"%@%ldMB%@",errorTitleInfoString, (long)maxFileSizeInMB, errorTitleInfoEndString] leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
     }
     else {
         if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
@@ -1103,9 +1103,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
         }
         
-        //    if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
-        //        [self.delegate imagePreviewDidTapSendButtonWithData:filteredDataArray];
-        //    }
+        if (filteredDataArray.count > 0) {
+            if ([self.delegate respondsToSelector:@selector(imagePreviewDidTapSendButtonWithData:)]) {
+                [self.delegate imagePreviewDidTapSendButtonWithData:filteredDataArray];
+            }
+            
+            self.lastNumberOfWordArrayForShowMention = 0;
+            self.lastTypingWordArrayStartIndex = 0;
+            self.lastTypingWordString = @"";
+            [self.filteredMentionListArray removeAllObjects];
+            
+            [self dismissViewControllerAnimated:YES completion:^{
+                if ([self.delegate respondsToSelector:@selector(imagePreviewDidSendDataAndCompleteDismissView)]) {
+                    [self.delegate imagePreviewDidSendDataAndCompleteDismissView];
+                }
+            }];
+        }
         
         [self dismissViewControllerAnimated:YES completion:nil];
     }

@@ -74,6 +74,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorRightBubbleQuoteBackground,
     TAPComponentColorLeftFileButtonBackground,
     TAPComponentColorRightFileButtonBackground,
+    TAPComponentColorRightVoiceNoteButtonBackground,
     TAPComponentColorSystemMessageBackground,
     TAPComponentColorSystemMessageBackgroundShadow,
     TAPComponentColorFileProgressBackgroundPrimary,
@@ -353,6 +354,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorInitialProfileNameSendToContactLabel,
     TAPTextColorShareExtensionCollectionViewCellHeaderLabel,
     TAPTextColorTableViewProfileNameSendToContactLabel,
+    TAPTextColorRecordingTimeLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -444,6 +446,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontUnreadMessageButtonLabel,
     TAPComponentFontDeletedChatRoomInfoTitleLabel,
     TAPComponentFontDeletedChatRoomInfoContentLabel,
+    TAPComponentFontRightVoiceBubbleDuration,
     TAPComponentFontLocationPickerTextField,
     TAPComponentFontLocationPickerTextFieldPlaceholder,
     TAPComponentFontLocationPickerClearButton,
