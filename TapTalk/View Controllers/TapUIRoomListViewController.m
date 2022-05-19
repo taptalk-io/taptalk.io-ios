@@ -975,7 +975,6 @@
             //Call API Get Unread Room List
             [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
                 //handle pref
-                [TAPDataManager setUnreadRoomIDs:roomIDs];
                 [self handleRommlistAndUnreadSuccess:messageArray];
             } failure:^(NSError *error) {
                 [self handleRommlistAndUnreadSuccess:messageArray];
@@ -996,7 +995,6 @@
        
         [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray<NSString *> *roomIDs){
             //handle pref
-            [TAPDataManager setUnreadRoomIDs:roomIDs];
             [self handleNewAndUpdatedSuccess:messageArray];
         } failure:^(NSError *error) {
             //handle pref
@@ -1574,9 +1572,9 @@
 
 - (void)callApiGetMarkedUnreadIDs{
     [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
-        //handle pref
-        [TAPDataManager setUnreadRoomIDs:roomIDs];
-    } failure:^(NSError *error) {
+        // Saved to preference
+    }
+    failure:^(NSError *error) {
     }];
 }
 

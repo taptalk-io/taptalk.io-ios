@@ -1296,6 +1296,17 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(message == self.currentVoiceNoteMessage){
+                        [cell setPlayingState:YES];
+                        NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
+                        [cell setAudioSliderMaximumValue:[[TAPAudioManager sharedManager] getPlayerDuration]];
+                        [cell setAudioSliderValue:currentTime];
+                        [cell setVoiceNoteDurationLabel:[self secondToMinuteString:currentTime]];
+                    }
+                    else{
+                        [cell setPlayingState:NO];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -1850,6 +1861,17 @@ CGPoint center;
                     if([self.starMessageIDArray containsObject:message.messageID]){
                         //Show star icon on message bubble
                         [cell showStarMessageView];
+                    }
+                    
+                    if(message == self.currentVoiceNoteMessage){
+                        [cell setPlayingState:YES];
+                        NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
+                        [cell setAudioSliderMaximumValue:[[TAPAudioManager sharedManager] getPlayerDuration]];
+                        [cell setAudioSliderValue:currentTime];
+                        [cell setVoiceNoteDurationLabel:[self secondToMinuteString:currentTime]];
+                    }
+                    else{
+                        [cell setPlayingState:NO];
                     }
                     
                     if (!message.isHidden) {
@@ -2627,6 +2649,13 @@ CGPoint center;
     
     if(self.currentVoiceNoteMessage != nil){
         NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        
+        NSDictionary *dataDictionary = self.currentVoiceNoteMessage.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        NSNumber *vnDuration = [dataDictionary objectForKey:@"duration"];
+        NSInteger durationInt = [vnDuration integerValue];
+        durationInt /= 1000;
+        
         if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
             if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
@@ -2634,6 +2663,7 @@ CGPoint center;
                 
                 [cell setAudioSliderValue:0.0f];
                 [cell setPlayingState:NO];
+                [cell setVoiceNoteDurationLabel:[self secondToMinuteString:durationInt]];
             }
             else {
                 //Their Chat
@@ -2641,8 +2671,10 @@ CGPoint center;
                 
                 [cell setAudioSliderValue:0.0f];
                 [cell setPlayingState:NO];
+                [cell setVoiceNoteDurationLabel:[self secondToMinuteString:durationInt]];
             }
         }
+        self.currentVoiceNoteMessage = nil;
         
     }
    
@@ -5261,7 +5293,6 @@ CGPoint center;
     [self resetMessageAudioSlider];
     self.isMessageAudioPlaying = YES;
     self.currentVoiceNoteMessage = tappedMessage;
-    
     [[TAPAudioManager sharedManager] playAudio:filePath];
 }
 
@@ -12346,12 +12377,18 @@ CGPoint center;
 - (void)resetMessageAudioSlider{
     if(self.currentVoiceNoteMessage != nil){
         NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        NSDictionary *dataDictionary = self.currentVoiceNoteMessage.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        NSNumber *vnDuration = [dataDictionary objectForKey:@"duration"];
+        NSInteger durationInt = [vnDuration integerValue];
+        durationInt /= 1000;
         if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
             if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
                 [cell setAudioSliderValue:0.0f];
                 [cell setPlayingState:NO];
+                [cell setVoiceNoteDurationLabel:[self secondToMinuteString:durationInt]];
                 
             }
             else {
@@ -12359,6 +12396,7 @@ CGPoint center;
                 TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
                 [cell setAudioSliderValue:0.0f];
                 [cell setPlayingState:NO];
+                [cell setVoiceNoteDurationLabel:[self secondToMinuteString:durationInt]];
                
             }
         }

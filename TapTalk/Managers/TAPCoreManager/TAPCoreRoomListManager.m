@@ -333,6 +333,109 @@
     }];
 }
 
+- (void)removeUnreadMarkFromChatRoom:(NSString *)roomID
+                             success:(void (^)())success
+                             failure:(void (^)(NSError *error))failure {
+    
+    NSMutableArray<NSString *> *unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+    if ([unreadRoomIDs containsObject:roomID]) {
+        [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[TAPUtil currentTimeInMillis] limitData:1 success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+            
+            if ([obtainedMessageArray count] > 0) {
+                NSArray<TAPMessageModel *> *selectedMessageArray = @[[obtainedMessageArray objectAtIndex:0]];
+                [[TAPCoreMessageManager sharedManager] markMessagesAsRead:selectedMessageArray
+                success:^(NSArray<NSString *> *updatedMessageIDs) {
+                    [unreadRoomIDs removeObject:roomID];
+                    [TAPDataManager setUnreadRoomIDs:unreadRoomIDs];
+                    success();
+                }
+                failure:^(NSError *error) {
+                    failure(error);
+                }];
+            }
+            else {
+                NSError *localizedError = [NSError errorWithDomain:@"Chat Room Not Found"
+                                                              code:90404
+                                                          userInfo:@{@"message": @"The selected chat room is not marked as unread."}];
+                failure(localizedError);
+            }
+        } failure:^(NSError *error) {
+            failure(error);
+        }];
+    }
+    else {
+        NSError *localizedError = [NSError errorWithDomain:@"Chat Room Not Found"
+                                                      code:90404
+                                                  userInfo:@{@"message": @"The selected chat room is not marked as unread."}];
+        failure(localizedError);
+    }
+}
+
+- (void)removeUnreadMarkFromChatRooms:(NSArray<NSString *> *)roomIDs
+                              success:(void (^)())success
+                              failure:(void (^)(NSError *error))failure {
+    
+    NSMutableArray<NSString *> *unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+    NSMutableArray<TAPMessageModel *> *unreadRoomMessages = [NSMutableArray array];
+    __block NSInteger count = 0;
+    for (NSString *roomID in roomIDs) {
+        if ([unreadRoomIDs containsObject:roomID]) {
+            [TAPDataManager getMessageWithRoomID:roomID lastMessageTimeStamp:[TAPUtil currentTimeInMillis] limitData:1 success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+                
+                if ([obtainedMessageArray count] > 0) {
+                    [unreadRoomMessages addObject:[obtainedMessageArray objectAtIndex:0]];
+                }
+                if (++count == [roomIDs count]) {
+                    [self markUnreadChatRoomMessagesAsRead:unreadRoomMessages unreadRoomIDs:unreadRoomIDs success:^{
+                        success();
+                    } failure:^(NSError *error) {
+                        failure(error);
+                    }];
+                }
+            } failure:^(NSError *error) {
+                if (++count == [roomIDs count]) {
+                    [self markUnreadChatRoomMessagesAsRead:unreadRoomMessages unreadRoomIDs:unreadRoomIDs success:^{
+                        success();
+                    } failure:^(NSError *error) {
+                        failure(error);
+                    }];
+                }
+            }];
+        }
+        else if (++count == [roomIDs count]) {
+            [self markUnreadChatRoomMessagesAsRead:unreadRoomMessages unreadRoomIDs:unreadRoomIDs success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
+        }
+    }
+}
+
+- (void)markUnreadChatRoomMessagesAsRead:(NSArray<TAPMessageModel *> *)unreadList
+                           unreadRoomIDs:(NSMutableArray<NSString *> *)unreadRoomIDs
+                                 success:(void (^)())success
+                                 failure:(void (^)(NSError *error))failure {
+    
+    if ([unreadList count] > 0) {
+        [[TAPCoreMessageManager sharedManager] markMessagesAsRead:unreadList
+        success:^(NSArray<NSString *> *updatedMessageIDs) {
+            [unreadRoomIDs removeObjectsInArray:unreadList];
+            [TAPDataManager setUnreadRoomIDs:unreadRoomIDs];
+            success();
+        }
+        failure:^(NSError *error) {
+            failure(error);
+        }];
+    }
+    else {
+        NSError *localizedError = [NSError errorWithDomain:@"Chat Room Not Found"
+                                                      code:90404
+                                                  userInfo:@{@"message": @"The selected chat rooms are not marked as unread."}];
+        failure(localizedError);
+    }
+}
+
 - (void)getMarkedAsUnreadChatRoomListWithSuccess:(void (^)(NSArray *unreadRoomIDs))success failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray *unreadRoomIDs) {
         success(unreadRoomIDs);

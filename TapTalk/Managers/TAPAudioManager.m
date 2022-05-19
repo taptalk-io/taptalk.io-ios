@@ -43,7 +43,6 @@
 }
 
 - (void) audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag{
-    [TAPDataManager setCurrentVoicePlayingFilePath:@""];
     if ([self.delegate respondsToSelector:@selector(finishAudioPlay)]) {
         [self.delegate finishAudioPlay];
     }
@@ -78,7 +77,6 @@
 }
 
 - (void)stopPlayer {
-    [TAPDataManager setCurrentVoicePlayingFilePath:@""];
     [self.player stop];
 }
 
@@ -87,12 +85,10 @@
 }
 
 - (void)pausePlayer {
-    [TAPDataManager setCurrentVoicePlayingFilePath:@""];
     [self.player pause];
 }
 
 - (void)resumePlayer {
-    [TAPDataManager setCurrentVoicePlayingFilePath:self.filePath];
     if ([self.delegate respondsToSelector:@selector(startAudioPlay:)]) {
         [self.delegate startAudioPlay:self.player.duration];
     }
@@ -101,7 +97,6 @@
 
 - (void)playAudio:(NSString *)filePath {
     self.filePath = filePath;
-    [TAPDataManager setCurrentVoicePlayingFilePath:filePath];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     
     AVAudioSession *session = [AVAudioSession sharedInstance];
@@ -120,7 +115,6 @@
 
 - (void)setupPlayerAudio:(NSString *)filePath {
     self.filePath = filePath;
-    [TAPDataManager setCurrentVoicePlayingFilePath:filePath];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     
     AVAudioSession *session = [AVAudioSession sharedInstance];

@@ -18,7 +18,7 @@
 //Prefs Key
 #define TAP_PREFS_ACTIVE_USER @"Prefs.TapTalkActiveUser"
 #define TAP_PREFS_UNREAD_ROOMIDS @"Prefs.TapTalkUnreadRoomIDs"
-#define TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING @"Prefs.TapTalkCurrentVoiceNotePlaying"
+#define TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING @"Prefs.TapTalkCurrentVoiceNoteMessagePlaying"
 #define TAP_PREFS_PUSH_TOKEN @"Prefs.TapTalkPushToken"
 #define TAP_PREFS_ACCESS_TOKEN @"Prefs.TapTalkAccessToken"
 #define TAP_PREFS_REFRESH_TOKEN @"Prefs.TapTalkRefreshToken"

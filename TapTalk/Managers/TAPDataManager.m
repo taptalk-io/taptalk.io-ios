@@ -1484,18 +1484,6 @@
     return roomIDs;
 }
 
-+ (void)setCurrentVoicePlayingFilePath:(TAPMessageModel *)message{
-    [[NSUserDefaults standardUserDefaults] setSecureObject:message forKey:TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-+ (TAPMessageModel *)getCurrentVoicePlayingFilePath{
-    TAPMessageModel *message =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING valid:nil];
-    
-    return message;
-}
-
-
 + (void)setActiveUser:(TAPUserModel *)user {
     if (user != nil) {
         NSDictionary *userDictionary = [user toDictionary];
@@ -6793,6 +6781,14 @@
         NSArray<NSString *> *unreadRoomIDs  = [NSArray array];
         unreadRoomIDs = [dataDictionary objectForKey:@"unreadRoomIDs"];
         
+        NSMutableArray<NSString *> *unreadRoomListIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+        for (NSString *unreadID in unreadRoomIDs) {
+            if (![unreadRoomListIDs containsObject:unreadID]) {
+                [unreadRoomListIDs addObject:unreadID];
+            }
+        }
+        [TAPDataManager setUnreadRoomIDs:unreadRoomListIDs];
+        
         success(unreadRoomIDs);
 
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
@@ -6843,9 +6839,6 @@
                 return;
             }
 
-             
-
-            
             NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
             
             if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
@@ -6860,6 +6853,8 @@
         NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
 
         NSArray<NSString *> *unreadRoomIDs = [dataDictionary objectForKey:@"unreadRoomIDs"];
+        
+        [TAPDataManager setUnreadRoomIDs:unreadRoomIDs];
         
         success(unreadRoomIDs);
 

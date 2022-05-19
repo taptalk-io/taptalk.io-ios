@@ -275,37 +275,10 @@
     self.bubbleLabel.text = @"";
     self.statusLabel.text = @"";
     
-    NSString *currentPlaingFilePath = [TAPDataManager getCurrentVoicePlayingFilePath];
-    currentPlaingFilePath = [TAPUtil nullToEmptyString:currentPlaingFilePath];
-   
-    NSDictionary *dataDictionary = self.message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *fileURL = [dataDictionary objectForKey:@"url"];
-    if (fileURL == nil || [fileURL isEqualToString:@""]) {
-        fileURL = [dataDictionary objectForKey:@"fileURL"];
-    }
-    fileURL = [TAPUtil nullToEmptyString:fileURL];
-    if(![fileURL isEqualToString:@""]){
-        if(currentPlaingFilePath == fileURL){
-            UIImage *documentsImage = [UIImage imageNamed:@"TAPIconPauseMessageBubble" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
-            self.voiceNoteImageView.image = documentsImage;
-            self.doneDownloadImageView.image = documentsImage;
-        }
-        else{
-            UIImage *documentsImage = [UIImage imageNamed:@"TAPIconPlayMessageBubble" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
-            self.voiceNoteImageView.image = documentsImage;
-            self.doneDownloadImageView.image = documentsImage;
-        }
-    }
-    else{
-        UIImage *documentsImage = [UIImage imageNamed:@"TAPIconPlayMessageBubble" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
-        self.voiceNoteImageView.image = documentsImage;
-        self.doneDownloadImageView.image = documentsImage;
-    }
+    UIImage *documentsImage = [UIImage imageNamed:@"TAPIconPlayMessageBubble" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
+    self.voiceNoteImageView.image = documentsImage;
+    self.doneDownloadImageView.image = documentsImage;
     
 }
 

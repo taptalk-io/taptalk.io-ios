@@ -28,8 +28,14 @@ NS_ASSUME_NONNULL_BEGIN
                                success:(void (^)(void))success
                                failure:(void (^)(NSError *error))failure;
 - (void)markChatRoomsAsUnreadWithRoomID:(NSArray<NSString *> *)roomIDs
-                                success:(void (^)())success
+                                success:(void (^)(void))success
                                 failure:(void (^)(NSError *error))failure;
+- (void)removeUnreadMarkFromChatRoom:(NSString *)roomID
+                             success:(void (^)(void))success
+                             failure:(void (^)(NSError *error))failure;
+- (void)removeUnreadMarkFromChatRooms:(NSArray<NSString *> *)roomIDs
+                              success:(void (^)(void))success
+                              failure:(void (^)(NSError *error))failure;
 - (void)getMarkedAsUnreadChatRoomListWithSuccess:(void (^)(NSArray *unreadRoomIDs))success
                                          failure:(void (^)(NSError *error))failure;
 
