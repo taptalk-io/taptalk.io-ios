@@ -228,6 +228,24 @@
           needToSaveLastUpdatedTimestamp:(BOOL)needToSaveLastUpdatedTimestamp
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure;
++ (void)callAPISendCustomMessageToPersonalRoomWithRecipientUserID:(NSString *)recipientUserID
+                                                          localID:(NSString *)localID
+                                                      messageType:(NSInteger)messageType
+                                                             body:(NSString *)body
+                                                             data:(NSString *)data
+                                                         filterID:(NSString *)filterID
+                                                         isHidden:(BOOL)isHidden
+                                                          success:(void (^)(void))success
+                                                          failure:(void (^)(NSError *error))failure;
++ (void)callAPISendCustomMessageWithRoomID:(NSString *)roomID
+                                   localID:(NSString *)localID
+                               messageType:(NSInteger)messageType
+                                      body:(NSString *)body
+                                      data:(NSString *)data
+                                  filterID:(NSString *)filterID
+                                  isHidden:(BOOL)isHidden
+                                   success:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)callAPIDeleteMessageWithMessageIDs:(NSArray *)messageIDArray
                                     roomID:(NSString *)roomID
                       isDeletedForEveryone:(BOOL)isDeletedForEveryone

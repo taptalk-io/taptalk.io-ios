@@ -78,6 +78,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/new_and_updated";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeSendCustomMessage) {
+        NSString *apiPath = @"chat/message/send/custom";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     else if (type == TAPAPIManagerTypeLogout) {
         NSString *apiPath = @"client/logout";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];

@@ -142,6 +142,7 @@
 + (CGFloat)safeAreaTopPadding;
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
++ (UIViewController *_Nullable) topViewController;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;
