@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, TAPYourVoiceNoteBubbleTableViewCellStateType) {
 
 @protocol TAPYourVoiceNoteBubbleTableViewCellDelegate <NSObject>
 
+- (void)yourVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourVoiceNoteBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage;
@@ -54,7 +55,8 @@ typedef NS_ENUM(NSInteger, TAPYourVoiceNoteBubbleTableViewCellStateType) {
 - (void)setAudioSliderMaximumValue:(NSTimeInterval)duration;
 - (void)setPlayingState:(BOOL)isPlay;
 - (void)setVoiceNoteDurationLabel:(NSString *)duration;
-
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
 
 @end
 

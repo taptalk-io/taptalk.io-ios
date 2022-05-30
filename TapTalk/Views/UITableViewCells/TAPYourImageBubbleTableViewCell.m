@@ -51,6 +51,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconBottomImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+@property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *captionLabelBottomConstraint;
@@ -97,6 +100,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstaint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstant;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -304,7 +308,10 @@
     
     self.starIconImageView.alpha = 0.0f;
     self.starIconBottomImageView.alpha = 0.0f;
+    self.checkMarkIconImageView.alpha = 0.0f;
+    self.forwardCheckmarkButton.alpha = 0.0f;
     
+    self.senderImageViewLeadingConstraint.constant = 16.0;
     self.starImageViewWidthConstaint.constant = 0.0f;
     self.starImageViewLeadingConstant.constant = 4.0f;
     _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
@@ -629,6 +636,13 @@
     self.fileImageView.image = documentsImage;
 }
 
+
+- (IBAction)forwardCheckmarkButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourImageCheckmarkDidTappedWithMessage:)]) {
+        [self.delegate yourImageCheckmarkDidTappedWithMessage:self.message];
+    }
+}
+
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourImageBubbleDidTappedProfilePictureWithMessage:)]) {
         [self.delegate yourImageBubbleDidTappedProfilePictureWithMessage:self.message];
@@ -891,6 +905,25 @@
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];
+    
+    //remove animation
+    [self.bubbleView.layer removeAllAnimations];
+    [self.timestampLabel.layer removeAllAnimations];
+    [self.quoteView.layer removeAllAnimations];
+    [self.quoteDecorationView.layer removeAllAnimations];
+    [self.replyView.layer removeAllAnimations];
+    [self.replyDecorationView.layer removeAllAnimations];
+    [self.replyNameLabel.layer removeAllAnimations];
+    [self.replyMessageLabel.layer removeAllAnimations];
+    [self.replyInnerView.layer removeAllAnimations];
+    [self.forwardFromLabel.layer removeAllAnimations];
+    [self.forwardTitleLabel.layer removeAllAnimations];
+    [self.senderNameLabel.layer removeAllAnimations];
+    [self.senderImageView.layer removeAllAnimations];
+    [self.bubbleImageView.layer removeAllAnimations];
+    [self.thumbnailBubbleImageView.layer removeAllAnimations];
+    [self.captionLabel.layer removeAllAnimations];
+    [self.quoteImageView.layer removeAllAnimations];
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
@@ -1676,6 +1709,33 @@
         self.starIconBottomImageView.alpha = 0.0f;
         self.starImageViewWidthConstaint.constant = 0.0f;
         self.starImageViewLeadingConstant.constant = 4.0f;
+    }
+}
+
+- (void)showCheckMarkIcon:(BOOL)isShow {
+    if(isShow){
+        self.checkMarkIconImageView.alpha = 1.0f;
+        self.senderImageViewLeadingConstraint.constant = 40.0f;
+        self.panGestureRecognizer.enabled = NO;
+        self.bubbleViewLongPressGestureRecognizer.enabled = NO;
+        self.forwardCheckmarkButton.alpha = 1.0f;
+    }
+    else{
+        self.checkMarkIconImageView.alpha = 0.0f;
+        self.senderImageViewLeadingConstraint.constant = 16.0f;
+        self.panGestureRecognizer.enabled = YES;
+        self.bubbleViewLongPressGestureRecognizer.enabled = YES;
+        self.forwardCheckmarkButton.alpha = 0.0f;
+    }
+}
+
+- (void)setCheckMarkState:(BOOL)isSelected {
+    if(isSelected){
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
     }
 }
 

@@ -384,6 +384,25 @@
                             <constraint firstAttribute="height" constant="30" id="TIX-9Q-itK"/>
                         </constraints>
                     </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3CL-KB-7tw" userLabel="Checkmark View">
+                        <rect key="frame" x="10" y="0.0" width="30" height="30"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconUnselected" translatesAutoresizingMaskIntoConstraints="NO" id="OKO-3K-BjD">
+                                <rect key="frame" x="7" y="0.0" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="16" id="hNf-Wl-u7H"/>
+                                    <constraint firstAttribute="height" constant="16" id="rJw-Og-6H5"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="OKO-3K-BjD" firstAttribute="centerX" secondItem="3CL-KB-7tw" secondAttribute="centerX" id="5fe-mx-t3b"/>
+                            <constraint firstAttribute="height" constant="30" id="MrB-Ce-xzT"/>
+                            <constraint firstAttribute="width" constant="30" id="emF-pO-W6K"/>
+                            <constraint firstItem="OKO-3K-BjD" firstAttribute="top" secondItem="3CL-KB-7tw" secondAttribute="top" id="irl-Ms-tzY"/>
+                        </constraints>
+                    </view>
                     <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oYK-OX-P8O" userLabel="Bubble Highlight View">
                         <rect key="frame" x="50" y="0.0" width="98" height="163"/>
                         <color key="backgroundColor" red="0.36862745098039218" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
@@ -395,10 +414,19 @@
                             <constraint firstAttribute="height" id="8EB-tA-oay"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yGR-HN-Nbq">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="138"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="forwardCheckmarkButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Y21-Q8-IEw"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
+                    <constraint firstAttribute="bottom" secondItem="yGR-HN-Nbq" secondAttribute="bottom" id="4kc-ER-ZCi"/>
                     <constraint firstItem="SCD-aS-weg" firstAttribute="bottom" secondItem="J0O-5e-F2z" secondAttribute="bottom" id="651-K1-yd9"/>
+                    <constraint firstItem="3CL-KB-7tw" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="69s-b6-knp"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="bottom" secondItem="3Nk-OP-Hbp" secondAttribute="bottom" constant="2" id="8NO-ia-hLZ"/>
                     <constraint firstItem="sLI-nG-1KB" firstAttribute="top" secondItem="dnm-L1-3kp" secondAttribute="bottom" priority="999" id="CZT-LY-VJW"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="trailing" secondItem="J0O-5e-F2z" secondAttribute="trailing" id="HYG-c1-Kt2"/>
@@ -407,6 +435,7 @@
                     <constraint firstItem="J0O-5e-F2z" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="LsH-Zo-aqt"/>
                     <constraint firstAttribute="bottom" secondItem="sLI-nG-1KB" secondAttribute="bottom" constant="8" id="ThV-y7-ZtU"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="bottom" secondItem="oYK-OX-P8O" secondAttribute="bottom" id="WMf-6e-2MC"/>
+                    <constraint firstAttribute="trailing" secondItem="yGR-HN-Nbq" secondAttribute="trailing" id="X4n-kp-lgu"/>
                     <constraint firstAttribute="trailing" secondItem="sLI-nG-1KB" secondAttribute="trailing" constant="16" id="YCy-sF-t1s"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="leading" secondItem="J0O-5e-F2z" secondAttribute="trailing" constant="4" id="Yb4-jZ-eJl"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="bottom" secondItem="J0O-5e-F2z" secondAttribute="bottom" id="bR8-9W-AUt"/>
@@ -416,11 +445,14 @@
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="leading" secondItem="oYK-OX-P8O" secondAttribute="leading" id="gOO-eb-sDK"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="gRM-9a-ajL"/>
                     <constraint firstItem="SCD-aS-weg" firstAttribute="leading" secondItem="J0O-5e-F2z" secondAttribute="leading" id="gnH-H0-TkW"/>
+                    <constraint firstItem="yGR-HN-Nbq" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="h25-ZS-9Ol"/>
                     <constraint firstAttribute="trailing" secondItem="URi-XD-W5c" secondAttribute="trailing" constant="16" id="hSY-89-h7j"/>
                     <constraint firstItem="oiF-E4-Y7P" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="n9I-6n-Fkd"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="leading" secondItem="J0O-5e-F2z" secondAttribute="leading" id="niU-lg-B6B"/>
+                    <constraint firstItem="3CL-KB-7tw" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="oip-gA-N5I"/>
                     <constraint firstItem="oiF-E4-Y7P" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="-46" id="pqC-44-bm2"/>
                     <constraint firstItem="FPK-75-vzL" firstAttribute="top" secondItem="J0O-5e-F2z" secondAttribute="top" id="q2N-Yc-ROS"/>
+                    <constraint firstItem="yGR-HN-Nbq" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="sh3-6R-zWd"/>
                     <constraint firstItem="URi-XD-W5c" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="v9L-mK-elf"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="top" secondItem="oYK-OX-P8O" secondAttribute="top" id="wDU-GA-hja"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="dnm-L1-3kp" secondAttribute="trailing" constant="80" id="wkm-KN-kQD"/>
@@ -435,8 +467,10 @@
                 <outlet property="bubbleLabel" destination="a8I-Kn-plq" id="6TZ-Cf-Asw"/>
                 <outlet property="bubbleView" destination="dnm-L1-3kp" id="9XT-kZ-iTs"/>
                 <outlet property="chatBubbleButton" destination="I5e-iw-lrB" id="l7C-l5-eC1"/>
+                <outlet property="checkMarkIconImageView" destination="OKO-3K-BjD" id="qMg-vV-Feo"/>
                 <outlet property="fileBackgroundView" destination="rkH-ox-FY3" id="kbF-pG-cpW"/>
                 <outlet property="fileImageView" destination="mME-P6-9Yw" id="Gep-B0-2xJ"/>
+                <outlet property="forwardCheckmarkButton" destination="yGR-HN-Nbq" id="tUU-ci-e9O"/>
                 <outlet property="forwardFromLabel" destination="2bz-e4-LIp" id="JcM-hW-89C"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="sdG-AQ-3zw" id="lgT-4z-6Kg"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="RDG-nS-9r4" id="MIe-lk-Byu"/>
@@ -469,6 +503,7 @@
                 <outlet property="replyViewHeightContraint" destination="tpi-DJ-6EV" id="WWM-U1-686"/>
                 <outlet property="replyViewInnerViewLeadingContraint" destination="KiF-o4-PQP" id="QhB-qS-X9K"/>
                 <outlet property="senderImageView" destination="J0O-5e-F2z" id="qMx-hf-bZ7"/>
+                <outlet property="senderImageViewLeadingConstraint" destination="zTh-Vc-jI1" id="w0S-if-mHG"/>
                 <outlet property="senderImageViewTrailingConstraint" destination="Yb4-jZ-eJl" id="Bcn-6J-DKq"/>
                 <outlet property="senderImageViewWidthConstraint" destination="0e1-L5-LNv" id="RTM-uu-9TO"/>
                 <outlet property="senderInitialLabel" destination="kwH-Q6-Kje" id="6S7-yi-EtC"/>
@@ -495,7 +530,8 @@
     </objects>
     <resources>
         <image name="TAPIconDocuments" width="24" height="24"/>
-        <image name="TAPIconStarGrayChatBubble" width="12" height="13"/>
+        <image name="TAPIconStarGrayChatBubble" width="12" height="12"/>
+        <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

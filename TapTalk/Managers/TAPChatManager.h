@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 @property (strong, nonatomic) TAPRoomModel *activeRoom;
 @property (strong, nonatomic) NSMutableDictionary *messageDraftDictionary;
 @property (strong, nonatomic) NSMutableDictionary *quotedMessageDictionary;
+@property (strong, nonatomic) NSMutableDictionary *forwardedMessageDictionary;
 @property (strong, nonatomic) NSMutableDictionary *quoteActionTypeDictionary;
 @property (strong, nonatomic) NSMutableDictionary *userInfoDictionary; //contains user info from custom quote
 @property (strong, nonatomic) NSMutableDictionary *filePathStoredDictionary;
@@ -103,7 +104,9 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (NSString *)getMessageFromDraftWithRoomID:(NSString *)roomID;
 - (void)saveToQuotedMessage:(id)quotedMessageObject userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID; //Object could be TAPMessageModel or TAPQuoteModel
 - (void)saveToQuoteActionWithType:(TAPChatManagerQuoteActionType)type roomID:(NSString *)roomID;//save to quoteActionTypeDictionary to identify whether it is reply or forward
-
+- (void)saveToForwardedMessages:(NSArray *)forwardMessageArray userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID;
+- (NSArray *)getForwardedMessagestWithRoomID:(NSString *)roomID;
+- (void)removeForwardedMessageObjectWithRoomID:(NSString *)roomID;
 - (id)getQuotedMessageObjectWithRoomID:(NSString *)roomID; //Object could be TAPMessageModel or TAPQuoteModel
 - (TAPChatManagerQuoteActionType)getQuoteActionTypeWithRoomID:(NSString *)roomID;
 - (void)removeQuotedMessageObjectWithRoomID:(NSString *)roomID;

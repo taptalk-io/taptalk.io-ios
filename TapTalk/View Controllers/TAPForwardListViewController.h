@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPForwardListViewController : TAPBaseViewController
 
 @property (weak, nonatomic) UINavigationController *currentNavigationController;
-@property (strong, nonatomic) TAPMessageModel *forwardedMessage;
+@property (strong, nonatomic) NSArray *forwardedMessages;
 
 @end
 

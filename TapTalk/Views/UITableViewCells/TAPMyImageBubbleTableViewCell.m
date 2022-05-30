@@ -51,6 +51,8 @@
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconBottomImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconBottomConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -97,9 +99,11 @@
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstarint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstarint;
+@property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 
 
 
+@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
@@ -242,6 +246,10 @@
     swipeReplyImage = [swipeReplyImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconPrimary]];
     self.swipeReplyImageView.image = swipeReplyImage;
     
+    _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewTap:)];
+    [self.contentView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
+    
     _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
                                                                                           action:@selector(handleBubbleViewLongPress:)];
     self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
@@ -274,6 +282,7 @@
     
     self.starIconImageView.alpha = 0.0f;
     self.starIconBottomImageView.alpha = 0.0f;
+    self.checkMarkIconImageView.alpha = 0.0f;
     
     self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
     self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
@@ -415,6 +424,14 @@
     }
 
     return NO;
+}
+
+- (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
+    [super handleBubbleViewTap:recognizer];
+    NSLog(@"tapped");
+ //   if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
+  //      [self.delegate myChatBubbleViewDidTapped:self.message];
+   // }
 }
 
 - (void)handlePanGestureAction:(UIPanGestureRecognizer *)recognizer {
@@ -813,6 +830,24 @@
     if (self.cellWidth == 0.0f || self.cellHeight == 0.0f) {
         [self showStatusLabel:NO];
     }
+    
+    //remove animation
+    [self.bubbleView.layer removeAllAnimations];
+    [self.timestampLabel.layer removeAllAnimations];
+    [self.quoteView.layer removeAllAnimations];
+    [self.quoteDecorationView.layer removeAllAnimations];
+    [self.replyView.layer removeAllAnimations];
+    [self.replyDecorationView.layer removeAllAnimations];
+    [self.replyNameLabel.layer removeAllAnimations];
+    [self.replyMessageLabel.layer removeAllAnimations];
+    [self.replyInnerView.layer removeAllAnimations];
+    [self.statusIconImageView.layer removeAllAnimations];
+    [self.forwardFromLabel.layer removeAllAnimations];
+    [self.forwardTitleLabel.layer removeAllAnimations];
+    [self.quoteImageView.layer removeAllAnimations];
+    [self.bubbleImageView.layer removeAllAnimations];
+    [self.thumbnailBubbleImageView.layer removeAllAnimations];
+    [self.captionLabel.layer removeAllAnimations];
 }
 
 - (void)receiveSentEvent {
@@ -1658,6 +1693,13 @@
     self.quoteSubtitleLabel.text = [TAPUtil nullToEmptyString:quote.content];
 }
 
+- (IBAction)forwardCheckmarkButtonDiTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(myImageCheckmarkDidTappedWithMessage:)]) {
+        [self.delegate myImageCheckmarkDidTappedWithMessage:self.message];
+    }
+}
+
+
 - (IBAction)quoteViewButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myImageQuoteDidTappedWithMessage:)]) {
         [self.delegate myImageQuoteDidTappedWithMessage:self.message];
@@ -1714,7 +1756,32 @@
     }
 }
 
-- (void)showSeperatorView{
+- (void)showCheckMarkIcon:(BOOL)isShow {
+    if(isShow){
+        self.checkMarkIconImageView.alpha = 1.0f;
+        self.panGestureRecognizer.enabled = NO;
+        self.bubbleViewLongPressGestureRecognizer.enabled = NO;
+        self.forwardCheckmarkButton.alpha = 1.0f;
+    }
+    else{
+        self.checkMarkIconImageView.alpha = 0.0f;
+        self.panGestureRecognizer.enabled = YES;
+        self.bubbleViewLongPressGestureRecognizer.enabled = YES;
+        self.forwardCheckmarkButton.alpha = 0.0f;
+    }
+}
+
+- (void)setCheckMarkState:(BOOL)isSelected {
+    if(isSelected){
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
+    }
+}
+
+- (void)showSeperatorView {
     self.seperatorViewTopConstraint.constant = 16.0f;
     self.seperatorViewBottomConstraint.constant = 13.0f;
     self.seperatorViewConstraintHeight.constant = 1.0f;

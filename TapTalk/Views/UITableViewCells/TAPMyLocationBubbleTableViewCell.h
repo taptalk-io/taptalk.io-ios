@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 
@@ -33,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showBubbleHighlight;
 - (void)showStarMessageView;
 - (void)showSeperator;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
 
 @end
 

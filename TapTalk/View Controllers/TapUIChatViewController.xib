@@ -80,6 +80,7 @@
                 <outlet property="loadMoreMessageLoadingLabel" destination="4jR-XS-ylY" id="pib-Sa-gDx"/>
                 <outlet property="loadMoreMessageLoadingView" destination="tGk-j5-N3W" id="YpL-Md-1BW"/>
                 <outlet property="loadMoreMessageLoadingViewImageView" destination="hJb-Mh-tLA" id="ePg-3k-bfW"/>
+                <outlet property="maxSelectedForwardLabel" destination="K4k-os-Iuj" id="smV-Ul-uJl"/>
                 <outlet property="mentionAnchorBackgroundView" destination="5JX-bE-np9" id="UD9-VH-Y5L"/>
                 <outlet property="mentionAnchorBackgroundViewBottomConstrait" destination="6ue-D7-vT7" id="o7X-a1-8cU"/>
                 <outlet property="mentionAnchorBackgroundViewHeightConstrait" destination="vzZ-Wc-YOc" id="Aq5-wM-M0M"/>
@@ -104,6 +105,8 @@
                 <outlet property="messageViewHeightConstraint" destination="kgV-JJ-v3H" id="sxC-fv-cK2"/>
                 <outlet property="messageViewLeftConstraint" destination="FuL-NA-fsn" id="Rni-J3-Zg5"/>
                 <outlet property="micIconImageView" destination="KaA-j8-cin" id="of2-O4-wXD"/>
+                <outlet property="multipleForwardComposerView" destination="iBv-e7-Cs7" id="Pbu-Ty-IFA"/>
+                <outlet property="numberSelectedForwardLabel" destination="8tV-Fi-5yk" id="P6Q-Z1-you"/>
                 <outlet property="playIconButton" destination="w35-D2-ugh" id="SYv-4H-SOq"/>
                 <outlet property="playIconImageView" destination="twl-eK-1Pf" id="2x7-7M-DLs"/>
                 <outlet property="quoteFileView" destination="Iea-Lj-Mbr" id="pkR-IK-s75"/>
@@ -123,9 +126,11 @@
                 <outlet property="replyMessageNameLabel" destination="9UL-EA-0Nq" id="NYR-Om-7Jr"/>
                 <outlet property="replyMessageView" destination="rmT-cT-x5x" id="tsh-p5-iOh"/>
                 <outlet property="secondaryTextField" destination="QeJ-a5-K4g" id="Q01-ew-2fO"/>
+                <outlet property="selectedForwardTextLabel" destination="chb-NW-p75" id="RFe-rn-ZgY"/>
                 <outlet property="sendButton" destination="0IG-Fu-FyX" id="l9w-KL-Khc"/>
                 <outlet property="sendButtonImageView" destination="LK3-f5-qkl" id="u0n-Qz-c5g"/>
                 <outlet property="sendButtonView" destination="jKu-C6-ws0" id="dYo-5m-avw"/>
+                <outlet property="sendForwardButton" destination="g4k-2B-eFg" id="XkZ-q2-jfV"/>
                 <outlet property="senderImageView" destination="n5l-Jp-CPL" id="XcP-N5-vpF"/>
                 <outlet property="senderInitialNameLabel" destination="3pT-oB-EhG" id="JCh-me-5Yb"/>
                 <outlet property="senderInitialNameView" destination="l6Q-e1-4ln" id="xBA-qG-RQ1"/>
@@ -1393,18 +1398,76 @@
                         <constraint firstItem="0IG-Fu-FyX" firstAttribute="leading" secondItem="bIM-9m-lUi" secondAttribute="trailing" constant="38" id="vtf-HB-ptb"/>
                     </constraints>
                 </view>
+                <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iBv-e7-Cs7" userLabel="Seleceted Forward View">
+                    <rect key="frame" x="0.0" y="68" width="375" height="52"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconForward" translatesAutoresizingMaskIntoConstraints="NO" id="uEN-HB-2ka">
+                            <rect key="frame" x="335" y="14" width="24" height="24"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="24" id="0gb-fc-mb7"/>
+                                <constraint firstAttribute="width" constant="24" id="cF1-vc-twV"/>
+                            </constraints>
+                        </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g4k-2B-eFg">
+                            <rect key="frame" x="320" y="0.0" width="52" height="52"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="52" id="o7j-4g-YwK"/>
+                                <constraint firstAttribute="height" constant="52" id="uMH-03-OmA"/>
+                            </constraints>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <connections>
+                                <action selector="sendForwardButtonDidTapped:" destination="-1" eventType="touchUpInside" id="ZJm-Kf-FYx"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Selected" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chb-NW-p75">
+                            <rect key="frame" x="174" y="17.5" width="57" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="/30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K4k-os-Iuj">
+                            <rect key="frame" x="150.5" y="17.5" width="21.5" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8tV-Fi-5yk">
+                            <rect key="frame" x="143" y="17.5" width="6.5" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="K4k-os-Iuj" firstAttribute="centerY" secondItem="chb-NW-p75" secondAttribute="centerY" id="1Le-SG-l8r"/>
+                        <constraint firstItem="chb-NW-p75" firstAttribute="centerY" secondItem="iBv-e7-Cs7" secondAttribute="centerY" id="Cf6-iu-oaI"/>
+                        <constraint firstItem="chb-NW-p75" firstAttribute="leading" secondItem="K4k-os-Iuj" secondAttribute="trailing" constant="2" id="Io6-ib-4RA"/>
+                        <constraint firstItem="K4k-os-Iuj" firstAttribute="leading" secondItem="8tV-Fi-5yk" secondAttribute="trailing" constant="1" id="NTP-2d-5et"/>
+                        <constraint firstItem="uEN-HB-2ka" firstAttribute="centerY" secondItem="iBv-e7-Cs7" secondAttribute="centerY" id="XfU-on-80I"/>
+                        <constraint firstItem="g4k-2B-eFg" firstAttribute="centerY" secondItem="iBv-e7-Cs7" secondAttribute="centerY" id="fAO-p4-imh"/>
+                        <constraint firstItem="chb-NW-p75" firstAttribute="centerX" secondItem="iBv-e7-Cs7" secondAttribute="centerX" constant="15" id="iYL-dH-yiJ"/>
+                        <constraint firstAttribute="trailing" secondItem="g4k-2B-eFg" secondAttribute="trailing" constant="3" id="kjq-3Q-HmU"/>
+                        <constraint firstAttribute="trailing" secondItem="uEN-HB-2ka" secondAttribute="trailing" constant="16" id="waS-VY-mVx"/>
+                        <constraint firstItem="8tV-Fi-5yk" firstAttribute="centerY" secondItem="K4k-os-Iuj" secondAttribute="centerY" id="yFW-Ep-PVT"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="eF0-OU-q21"/>
             <constraints>
                 <constraint firstItem="7v0-pf-yvN" firstAttribute="trailing" secondItem="eF0-OU-q21" secondAttribute="trailing" id="0dr-Gj-Cj3"/>
+                <constraint firstItem="iBv-e7-Cs7" firstAttribute="height" secondItem="cZU-YD-4j9" secondAttribute="height" id="CZ3-lB-d1b"/>
+                <constraint firstItem="iBv-e7-Cs7" firstAttribute="centerY" secondItem="cZU-YD-4j9" secondAttribute="centerY" id="HGa-6D-BjJ"/>
                 <constraint firstItem="7v0-pf-yvN" firstAttribute="leading" secondItem="eF0-OU-q21" secondAttribute="leading" id="JnB-S9-Ccb"/>
                 <constraint firstAttribute="trailing" secondItem="cZU-YD-4j9" secondAttribute="trailing" id="Nv7-Fh-Jy3"/>
+                <constraint firstItem="iBv-e7-Cs7" firstAttribute="centerX" secondItem="cZU-YD-4j9" secondAttribute="centerX" id="PYv-xd-XbY"/>
                 <constraint firstItem="plO-IC-w7u" firstAttribute="leading" secondItem="CSi-i0-D86" secondAttribute="leading" id="Zfg-vG-sL9"/>
                 <constraint firstItem="plO-IC-w7u" firstAttribute="top" secondItem="eF0-OU-q21" secondAttribute="top" id="eIb-dm-2pc"/>
                 <constraint firstItem="cZU-YD-4j9" firstAttribute="leading" secondItem="CSi-i0-D86" secondAttribute="leading" id="fxo-R6-cx7"/>
                 <constraint firstAttribute="trailing" secondItem="plO-IC-w7u" secondAttribute="trailing" id="iCv-LN-Ng2"/>
                 <constraint firstItem="cZU-YD-4j9" firstAttribute="top" secondItem="7v0-pf-yvN" secondAttribute="bottom" id="rFp-9t-zjD"/>
                 <constraint firstItem="cZU-YD-4j9" firstAttribute="bottom" secondItem="eF0-OU-q21" secondAttribute="bottom" id="ug8-pw-4ZV"/>
+                <constraint firstItem="iBv-e7-Cs7" firstAttribute="width" secondItem="cZU-YD-4j9" secondAttribute="width" id="ukr-0d-tUC"/>
                 <constraint firstItem="7v0-pf-yvN" firstAttribute="top" secondItem="eF0-OU-q21" secondAttribute="top" id="xPh-yS-qWy"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -1418,6 +1481,7 @@
         <image name="TAPIconClose" width="24" height="24"/>
         <image name="TAPIconDemote" width="24" height="24"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
+        <image name="TAPIconForward" width="32" height="32"/>
         <image name="TAPIconHamburger" width="28" height="28"/>
         <image name="TAPIconHistory" width="14" height="14"/>
         <image name="TAPIconLoadingSmall" width="14" height="14"/>

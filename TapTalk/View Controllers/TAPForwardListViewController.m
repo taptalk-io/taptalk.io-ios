@@ -253,20 +253,23 @@
         }];
     }
     
-    if (self.forwardedMessage.type == TAPChatMessageTypeFile || self.forwardedMessage.type == TAPChatMessageTypeVideo) {
-        NSDictionary *dataDictionary = self.forwardedMessage.data;
-        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-        
-        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:self.forwardedMessage.room.roomID fileID:fileID];
-        filePath = [TAPUtil nullToEmptyString:filePath];
-        
-        if (![filePath isEqualToString:@""]) {
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:currentSelectedRoomID fileID:fileID];
+    for(TAPMessageModel *forwardedMessage in self.forwardedMessages){
+        if (forwardedMessage.type == TAPChatMessageTypeFile || forwardedMessage.type == TAPChatMessageTypeVideo) {
+            NSDictionary *dataDictionary = forwardedMessage.data;
+            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+            
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:forwardedMessage.room.roomID fileID:fileID];
+            filePath = [TAPUtil nullToEmptyString:filePath];
+            
+            if (![filePath isEqualToString:@""]) {
+                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:currentSelectedRoomID fileID:fileID];
+            }
         }
+        
     }
     
     [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:currentSelectedRoomID];
-    [[TAPChatManager sharedManager] saveToQuotedMessage:self.forwardedMessage userInfo:[NSDictionary dictionary] roomID:currentSelectedRoomID];
+    [[TAPChatManager sharedManager] saveToForwardedMessages:self.forwardedMessages userInfo:[NSDictionary dictionary] roomID:currentSelectedRoomID];
 }
 
 #pragma mark UIScrollView

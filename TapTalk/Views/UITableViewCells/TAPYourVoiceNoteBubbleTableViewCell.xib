@@ -624,6 +624,20 @@
                             <constraint firstAttribute="height" id="yOQ-2p-Jdn"/>
                         </constraints>
                     </view>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconUnselected" translatesAutoresizingMaskIntoConstraints="NO" id="hYT-H4-4cq">
+                        <rect key="frame" x="16" y="0.0" width="16" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="16" id="MlL-wT-AAI"/>
+                            <constraint firstAttribute="height" constant="16" id="p1G-Vp-ULA"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bJr-fR-dYw">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="207"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="forwardCheckmarkButtonDidTapped:" destination="t8I-EM-RaM" eventType="touchUpInside" id="KIL-Uw-B5T"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -631,18 +645,23 @@
                     <constraint firstItem="hH4-qV-lup" firstAttribute="top" secondItem="ZM1-bK-Zvx" secondAttribute="bottom" constant="16" id="22e-NN-hrS"/>
                     <constraint firstItem="ZM1-bK-Zvx" firstAttribute="top" secondItem="MtB-vS-a4J" secondAttribute="bottom" priority="999" constant="2" id="2LA-WW-i2W"/>
                     <constraint firstItem="Rru-fN-OEl" firstAttribute="leading" secondItem="5cv-3e-PC2" secondAttribute="leading" constant="16" id="4YI-K4-fbh"/>
+                    <constraint firstAttribute="trailing" secondItem="bJr-fR-dYw" secondAttribute="trailing" id="4z7-bM-cIp"/>
                     <constraint firstAttribute="bottom" secondItem="ZM1-bK-Zvx" secondAttribute="bottom" constant="8" id="6At-PV-Cg0"/>
                     <constraint firstItem="MtB-vS-a4J" firstAttribute="top" secondItem="5cv-3e-PC2" secondAttribute="top" id="7Oc-rC-CPT"/>
+                    <constraint firstItem="hYT-H4-4cq" firstAttribute="leading" secondItem="5cv-3e-PC2" secondAttribute="leading" constant="16" id="9iz-Hu-N6K"/>
                     <constraint firstItem="4U0-d4-E5i" firstAttribute="top" secondItem="5cv-3e-PC2" secondAttribute="topMargin" id="AJs-3N-mVg"/>
                     <constraint firstItem="uQ6-PN-b2Q" firstAttribute="bottom" secondItem="MtB-vS-a4J" secondAttribute="bottom" id="BEf-Z8-LNF"/>
+                    <constraint firstItem="bJr-fR-dYw" firstAttribute="leading" secondItem="5cv-3e-PC2" secondAttribute="leading" id="CMb-6y-4cD"/>
                     <constraint firstItem="prT-vR-S2t" firstAttribute="trailing" secondItem="Rru-fN-OEl" secondAttribute="trailing" id="Ds0-at-ZnV"/>
                     <constraint firstAttribute="trailing" secondItem="ZM1-bK-Zvx" secondAttribute="trailing" constant="16" id="Frh-73-ZQJ"/>
                     <constraint firstItem="Rru-fN-OEl" firstAttribute="width" secondItem="prT-vR-S2t" secondAttribute="width" id="KW0-4c-f5u"/>
+                    <constraint firstAttribute="bottom" secondItem="bJr-fR-dYw" secondAttribute="bottom" id="NMX-oq-fN8"/>
                     <constraint firstItem="J3B-UE-Sps" firstAttribute="trailing" secondItem="Rru-fN-OEl" secondAttribute="trailing" id="PIQ-Bd-70o"/>
                     <constraint firstItem="J3B-UE-Sps" firstAttribute="leading" secondItem="Rru-fN-OEl" secondAttribute="leading" id="QLR-Gv-tfr"/>
                     <constraint firstAttribute="trailing" secondItem="hH4-qV-lup" secondAttribute="trailing" constant="16" id="U8o-Am-hPf"/>
                     <constraint firstItem="uQ6-PN-b2Q" firstAttribute="leading" secondItem="MtB-vS-a4J" secondAttribute="leading" id="Uh3-nf-gNu"/>
                     <constraint firstItem="prT-vR-S2t" firstAttribute="bottom" secondItem="Rru-fN-OEl" secondAttribute="bottom" id="XsS-Un-WaA"/>
+                    <constraint firstItem="bJr-fR-dYw" firstAttribute="top" secondItem="5cv-3e-PC2" secondAttribute="top" id="ZB8-wn-YIv"/>
                     <constraint firstItem="Rru-fN-OEl" firstAttribute="top" secondItem="5cv-3e-PC2" secondAttribute="top" id="bYJ-fI-aza"/>
                     <constraint firstItem="hH4-qV-lup" firstAttribute="leading" secondItem="5cv-3e-PC2" secondAttribute="leading" constant="16" id="br2-h1-Sp9"/>
                     <constraint firstItem="prT-vR-S2t" firstAttribute="top" secondItem="Rru-fN-OEl" secondAttribute="top" id="cKs-RU-mjf"/>
@@ -655,6 +674,7 @@
                     <constraint firstItem="Rru-fN-OEl" firstAttribute="height" secondItem="prT-vR-S2t" secondAttribute="height" id="njW-5g-Yeq"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="MtB-vS-a4J" secondAttribute="trailing" constant="80" id="s5M-Ot-1qV"/>
                     <constraint firstItem="uQ6-PN-b2Q" firstAttribute="top" secondItem="MtB-vS-a4J" secondAttribute="top" id="wmO-Yi-C1q"/>
+                    <constraint firstItem="hYT-H4-4cq" firstAttribute="top" secondItem="Rru-fN-OEl" secondAttribute="top" id="wsC-TI-iII"/>
                     <constraint firstItem="J3B-UE-Sps" firstAttribute="top" secondItem="Rru-fN-OEl" secondAttribute="top" id="zjS-cg-6hw"/>
                 </constraints>
             </tableViewCellContentView>
@@ -668,6 +688,7 @@
                 <outlet property="cancelButton" destination="bbL-Wk-2UE" id="EE8-aa-bVH"/>
                 <outlet property="cancelImageView" destination="YqZ-Wi-dXP" id="042-dA-O7C"/>
                 <outlet property="cancelView" destination="7lK-iu-N6D" id="ZlW-YQ-qrs"/>
+                <outlet property="checkMarkIconImageView" destination="hYT-H4-4cq" id="YTX-dQ-fGM"/>
                 <outlet property="doneDownloadButton" destination="lmV-Pg-raq" id="IhR-xu-gIe"/>
                 <outlet property="doneDownloadImageView" destination="fy0-Kc-Ms3" id="M4O-hT-dfl"/>
                 <outlet property="doneDownloadTitleAndDescriptionButton" destination="9oz-oW-oEp" id="BVo-nJ-DvS"/>
@@ -677,6 +698,7 @@
                 <outlet property="downloadView" destination="uiR-fX-0ne" id="bIv-tF-Xfs"/>
                 <outlet property="fileBackgroundView" destination="fKx-8L-1aR" id="vOi-lx-C6F"/>
                 <outlet property="fileImageView" destination="gT7-3q-kUN" id="RbN-JN-ezX"/>
+                <outlet property="forwardCheckmarkButton" destination="bJr-fR-dYw" id="G8Z-w6-jFy"/>
                 <outlet property="forwardFromLabel" destination="1Uk-1v-PIZ" id="nLT-jH-O1N"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="WtY-Hv-E3i" id="FTM-SM-Shm"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="LQj-ci-x1m" id="8Jt-2D-XRR"/>
@@ -719,6 +741,7 @@
                 <outlet property="retryDownloadImageView" destination="c1i-jk-pUx" id="Rbj-9g-HN7"/>
                 <outlet property="retryDownloadView" destination="K37-Rt-KNv" id="1s4-BZ-Xep"/>
                 <outlet property="senderImageView" destination="Rru-fN-OEl" id="8iW-ga-xj1"/>
+                <outlet property="senderImageViewLeadingConstraint" destination="4YI-K4-fbh" id="oXu-Yx-Ofu"/>
                 <outlet property="senderImageViewTrailingConstraint" destination="j0e-Sv-U1k" id="vBp-2J-ChZ"/>
                 <outlet property="senderImageViewWidthConstraint" destination="zTd-fa-evB" id="f4V-gG-lk6"/>
                 <outlet property="senderInitialLabel" destination="el9-mY-rfA" id="Mqi-mk-rYg"/>
@@ -751,6 +774,7 @@
         <image name="TAPIconReplyChatOrange" width="32" height="32"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconStarGrayChatBubble" width="12" height="12"/>
+        <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

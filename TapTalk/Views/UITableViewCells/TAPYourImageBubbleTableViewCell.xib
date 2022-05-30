@@ -273,7 +273,7 @@
                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jFV-u9-bL6">
                                 <rect key="frame" x="10" y="138" width="234" height="253.5"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="07i-1z-6eX">
-                                    <rect key="frame" x="0.0" y="0.0" width="234" height="253"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="234" height="253.5"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <visualEffectView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CdT-Mj-UHM">
@@ -508,13 +508,29 @@
                             <constraint firstAttribute="height" id="YFQ-qQ-kSO"/>
                         </constraints>
                     </view>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconUnselected" translatesAutoresizingMaskIntoConstraints="NO" id="iIg-27-DQs">
+                        <rect key="frame" x="16" y="0.0" width="16" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="64l-W7-X8B"/>
+                            <constraint firstAttribute="width" constant="16" id="oN9-5J-NWt"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GGB-Vl-p1h">
+                        <rect key="frame" x="0.0" y="0.0" width="306" height="446.5"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="forwardCheckmarkButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Cr1-yB-m8R"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
                     <constraint firstItem="Ruq-Mt-UE7" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="leading" id="3g8-6q-5ZO"/>
                     <constraint firstItem="xDZ-oV-2II" firstAttribute="top" secondItem="Jff-OV-cJx" secondAttribute="top" id="4Bf-nT-Sbe"/>
+                    <constraint firstItem="KHb-vd-3KC" firstAttribute="top" secondItem="GGB-Vl-p1h" secondAttribute="bottom" id="Aaz-hl-A7S"/>
                     <constraint firstItem="KHb-vd-3KC" firstAttribute="top" secondItem="Ruq-Mt-UE7" secondAttribute="bottom" constant="8" id="Auc-rF-MtG"/>
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="height" secondItem="meb-Tz-SWq" secondAttribute="height" id="BYY-3D-H0f"/>
+                    <constraint firstItem="pAP-ue-Z6c" firstAttribute="leading" secondItem="GGB-Vl-p1h" secondAttribute="trailing" id="CSC-dk-G8l"/>
                     <constraint firstItem="xDZ-oV-2II" firstAttribute="leading" secondItem="Jff-OV-cJx" secondAttribute="leading" id="DFD-QI-BFU"/>
                     <constraint firstItem="xDZ-oV-2II" firstAttribute="bottom" secondItem="Jff-OV-cJx" secondAttribute="bottom" id="FtK-TU-Elb"/>
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="H0r-rf-zF2"/>
@@ -522,7 +538,9 @@
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="PPn-nr-ddL"/>
                     <constraint firstItem="meb-Tz-SWq" firstAttribute="trailing" secondItem="Jff-OV-cJx" secondAttribute="trailing" id="Psy-gs-Iys"/>
                     <constraint firstItem="Mbn-YM-uZm" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="-46" id="RgH-Wn-Hm5"/>
+                    <constraint firstItem="iIg-27-DQs" firstAttribute="top" secondItem="Jff-OV-cJx" secondAttribute="top" id="T2I-Ft-75J"/>
                     <constraint firstItem="Jff-OV-cJx" firstAttribute="width" secondItem="meb-Tz-SWq" secondAttribute="width" id="VJY-UE-TOW"/>
+                    <constraint firstItem="GGB-Vl-p1h" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="VsQ-hb-lKC"/>
                     <constraint firstItem="fFX-ZN-0he" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="leading" id="YV0-1K-Erp"/>
                     <constraint firstItem="xDZ-oV-2II" firstAttribute="trailing" secondItem="Jff-OV-cJx" secondAttribute="trailing" id="Yci-MR-EJe"/>
                     <constraint firstItem="KHb-vd-3KC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="Z03-dR-xdb"/>
@@ -532,7 +550,9 @@
                     <constraint firstAttribute="trailing" secondItem="KHb-vd-3KC" secondAttribute="trailing" constant="16" id="eDE-fG-uPd"/>
                     <constraint firstItem="pAP-ue-Z6c" firstAttribute="leading" secondItem="Pdc-VM-5SJ" secondAttribute="trailing" constant="2" id="f6H-82-JWi"/>
                     <constraint firstItem="Mbn-YM-uZm" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="h3n-bn-yO5"/>
+                    <constraint firstItem="GGB-Vl-p1h" firstAttribute="leading" secondItem="Mbn-YM-uZm" secondAttribute="trailing" id="iVc-df-gAF"/>
                     <constraint firstItem="meb-Tz-SWq" firstAttribute="leading" secondItem="Jff-OV-cJx" secondAttribute="leading" id="ktP-eY-BaT"/>
+                    <constraint firstItem="iIg-27-DQs" firstAttribute="leading" secondItem="Mbn-YM-uZm" secondAttribute="trailing" constant="16" id="mRw-2j-wFK"/>
                     <constraint firstItem="Pdc-VM-5SJ" firstAttribute="bottom" secondItem="pAP-ue-Z6c" secondAttribute="bottom" constant="2" id="pQ0-hG-Y9R"/>
                     <constraint firstItem="fFX-ZN-0he" firstAttribute="top" secondItem="Pdc-VM-5SJ" secondAttribute="top" id="qCg-Da-b6z"/>
                     <constraint firstItem="fFX-ZN-0he" firstAttribute="trailing" secondItem="Pdc-VM-5SJ" secondAttribute="trailing" id="uQR-Vm-oxT"/>
@@ -553,9 +573,11 @@
                 <outlet property="captionLabelBottomConstraint" destination="KDi-jN-xZ0" id="JcY-W2-W6J"/>
                 <outlet property="captionLabelHeightConstraint" destination="THu-Ud-XpM" id="Gce-T8-Fnv"/>
                 <outlet property="captionLabelTopConstraint" destination="HBf-QT-Xl8" id="qI4-7k-ICd"/>
+                <outlet property="checkMarkIconImageView" destination="iIg-27-DQs" id="Rdj-XS-ryv"/>
                 <outlet property="downloadImageView" destination="615-F2-3pn" id="G4X-I8-hyV"/>
                 <outlet property="fileBackgroundView" destination="BJu-tC-xnO" id="or2-ef-b29"/>
                 <outlet property="fileImageView" destination="Ms7-a8-71A" id="64k-jO-1Js"/>
+                <outlet property="forwardCheckmarkButton" destination="GGB-Vl-p1h" id="5Gc-5W-e3B"/>
                 <outlet property="forwardFromLabel" destination="FrY-Of-z8h" id="Vut-f8-4bP"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="tMa-cb-udA" id="cLZ-kF-xFc"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="15q-mu-897" id="b7j-lW-lga"/>
@@ -598,6 +620,7 @@
                 <outlet property="replyViewTopConstraint" destination="QOc-8w-qd8" id="qaX-Pp-Meu"/>
                 <outlet property="replyViewTrailingConstraint" destination="B7C-Y8-ObE" id="2aa-yA-OXq"/>
                 <outlet property="senderImageView" destination="Jff-OV-cJx" id="w4D-YY-RPF"/>
+                <outlet property="senderImageViewLeadingConstraint" destination="H0r-rf-zF2" id="ji1-uL-cVk"/>
                 <outlet property="senderImageViewTrailingConstraint" destination="bBH-Qc-BXu" id="scD-iJ-eu9"/>
                 <outlet property="senderImageViewWidthConstraint" destination="Eu4-Fo-o3M" id="E9b-0X-F3h"/>
                 <outlet property="senderInitialLabel" destination="DsT-4k-cbH" id="GMr-KI-ugM"/>
@@ -634,6 +657,7 @@
         <image name="TAPIconDownload" width="24" height="24"/>
         <image name="TAPIconStarChatBubble" width="12" height="12"/>
         <image name="TAPIconStarGrayChatBubble" width="12" height="12"/>
+        <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

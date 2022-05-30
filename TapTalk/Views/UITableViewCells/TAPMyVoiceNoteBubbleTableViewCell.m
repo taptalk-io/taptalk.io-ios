@@ -55,6 +55,8 @@
 @property (strong, nonatomic) IBOutlet UIButton *retryDownloadButton;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UISlider *audioSlider;
+@property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+@property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 
 
 
@@ -254,6 +256,7 @@
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
     self.starIconImageView.alpha = 0.0f;
+    self.checkMarkIconImageView.alpha = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -672,6 +675,22 @@
     NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
     self.statusLabelTimeString = statusString;
     self.statusLabel.text = self.statusLabelTimeString;
+    
+    //remove animation
+    [self.bubbleView.layer removeAllAnimations];
+    [self.timestampLabel.layer removeAllAnimations];
+    [self.quoteView.layer removeAllAnimations];
+    [self.quoteDecorationView.layer removeAllAnimations];
+    [self.replyView.layer removeAllAnimations];
+    [self.replyDecorationView.layer removeAllAnimations];
+    [self.bubbleLabel.layer removeAllAnimations];
+    [self.replyNameLabel.layer removeAllAnimations];
+    [self.replyMessageLabel.layer removeAllAnimations];
+    [self.replyInnerView.layer removeAllAnimations];
+    [self.statusIconImageView.layer removeAllAnimations];
+    [self.forwardFromLabel.layer removeAllAnimations];
+    [self.forwardTitleLabel.layer removeAllAnimations];
+    [self.quoteImageView.layer removeAllAnimations];
 }
 
 - (void)setAudioSliderValue:(NSTimeInterval)currentTime{
@@ -733,6 +752,11 @@
             [self.contentView layoutIfNeeded];
     }
 }
+- (IBAction)forwardCheckmarkButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(myVoiceNoteCheckmarkDidTapped:)]) {
+        [self.delegate myVoiceNoteCheckmarkDidTapped:self.message];
+    }
+}
 
 - (IBAction)replyButtonDidTapped:(id)sender {
     [super replyButtonDidTapped:sender];
@@ -762,14 +786,14 @@
 }
 
 - (IBAction)doneDownloadButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(myVoiceNoteOpenFileButtonDidTapped:)]) {
-        [self.delegate myVoiceNoteOpenFileButtonDidTapped:self.message];
+    if ([self.delegate respondsToSelector:@selector(myVoiceNotePlayPauseButtonDidTapped:)]) {
+        [self.delegate myVoiceNotePlayPauseButtonDidTapped:self.message];
     }
 }
 
 - (IBAction)doneDownloadTitleAndDescriptionButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(myVoiceNoteOpenFileButtonDidTapped:)]) {
-        [self.delegate myVoiceNoteOpenFileButtonDidTapped:self.message];
+    if ([self.delegate respondsToSelector:@selector(myVoiceNotePlayPauseButtonDidTappedmyVoiceNotePlayPauseButtonDidTappedmyVoiceNotePlayPauseButtonDidTapped:)]) {
+        [self.delegate myVoiceNotePlayPauseButtonDidTapped:self.message];
     }
 }
 
@@ -890,7 +914,8 @@
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
     
     NSString *initialAppendedFullnameString = NSLocalizedStringFromTableInBundle(@"From: ", nil, [TAPUtil currentBundle], @"");
-    NSString *appendedFullnameString = [NSString stringWithFormat:@"%@%@", forwardData.fullname];
+    NSString *initialNameString = NSLocalizedStringFromTableInBundle(@"From: ", nil, [TAPUtil currentBundle], @"");
+    NSString *appendedFullnameString = [NSString stringWithFormat:@"%@%@", initialNameString, forwardData.fullname];
     
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([forwardData.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
@@ -1213,6 +1238,31 @@
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showCheckMarkIcon:(BOOL)isShow {
+    if(isShow){
+        self.checkMarkIconImageView.alpha = 1.0f;
+        self.panGestureRecognizer.enabled = NO;
+        self.bubbleViewLongPressGestureRecognizer.enabled = NO;
+        self.forwardCheckmarkButton.alpha = 1.0f;
+    }
+    else{
+        self.checkMarkIconImageView.alpha = 0.0f;
+        self.panGestureRecognizer.enabled = YES;
+        self.bubbleViewLongPressGestureRecognizer.enabled = YES;
+        self.forwardCheckmarkButton.alpha = 0.0f; 
+    }
+}
+
+- (void)setCheckMarkState:(BOOL)isSelected {
+    if(isSelected){
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
     }
 }
 

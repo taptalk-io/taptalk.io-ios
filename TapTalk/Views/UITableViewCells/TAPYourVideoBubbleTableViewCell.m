@@ -64,6 +64,8 @@
 @property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+@property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -110,6 +112,7 @@
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -319,6 +322,10 @@
     
     self.starIconImageView.alpha = 0.0f;
     self.starIconBottomImageView.alpha = 0.0f;
+    self.checkMarkIconImageView.alpha = 0.0f;
+    self.forwardCheckmarkButton.alpha = 0.0f;
+    self.senderImageViewLeadingConstraint.constant = 16.0f;
+    
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -815,6 +822,29 @@
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];
+    
+    //remove animation
+    [self.bubbleView.layer removeAllAnimations];
+    [self.timestampLabel.layer removeAllAnimations];
+    [self.quoteView.layer removeAllAnimations];
+    [self.quoteDecorationView.layer removeAllAnimations];
+    [self.replyView.layer removeAllAnimations];
+    [self.replyDecorationView.layer removeAllAnimations];
+    [self.replyNameLabel.layer removeAllAnimations];
+    [self.replyMessageLabel.layer removeAllAnimations];
+    [self.replyInnerView.layer removeAllAnimations];
+    [self.forwardFromLabel.layer removeAllAnimations];
+    [self.forwardTitleLabel.layer removeAllAnimations];
+    [self.senderNameLabel.layer removeAllAnimations];
+    [self.senderImageView.layer removeAllAnimations];
+    [self.quoteImageView.layer removeAllAnimations];
+}
+
+
+- (IBAction)forwardCheckmarkButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourVideoCheckmarkDidTappedWithMessage:)]) {
+        [self.delegate yourVideoCheckmarkDidTappedWithMessage:self.message];
+    }
 }
 
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender {
@@ -1816,6 +1846,33 @@
         self.starIconBottomImageView.alpha = 0.0f;
         self.starImageViewLeadingConstraint.constant = 4.0f;
         self.starImageViewWidthConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showCheckMarkIcon:(BOOL)isShow {
+    if(isShow){
+        self.checkMarkIconImageView.alpha = 1.0f;
+        self.senderImageViewLeadingConstraint.constant = 40.0f;
+        self.panGestureRecognizer.enabled = NO;
+        self.bubbleViewLongPressGestureRecognizer.enabled = NO;
+        self.forwardCheckmarkButton.alpha = 1.0f;
+    }
+    else{
+        self.checkMarkIconImageView.alpha = 0.0f;
+        self.senderImageViewLeadingConstraint.constant = 16.0f;
+        self.panGestureRecognizer.enabled = YES;
+        self.bubbleViewLongPressGestureRecognizer.enabled = YES;
+        self.forwardCheckmarkButton.alpha = 0.0f;
+    }
+}
+
+- (void)setCheckMarkState:(BOOL)isSelected {
+    if(isSelected){
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
     }
 }
 

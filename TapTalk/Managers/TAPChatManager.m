@@ -74,6 +74,7 @@
         _waitingUploadDictionary = [[NSMutableDictionary alloc] init];
         _messageDraftDictionary = [[NSMutableDictionary alloc] init];
         _quotedMessageDictionary = [[NSMutableDictionary alloc] init];
+        _forwardedMessageDictionary = [[NSMutableDictionary alloc] init];
         _quoteActionTypeDictionary = [[NSMutableDictionary alloc] init];
         _userInfoDictionary = [[NSMutableDictionary alloc] init];
         _filePathStoredDictionary = [[NSMutableDictionary alloc] init];
@@ -1299,6 +1300,29 @@
     return draftMessage;
 }
 
+- (void)saveToForwardedMessages:(NSArray *)forwardMessageArray userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID { //Object could be TAPMessageModel or TAPQuoteModel
+    if(forwardMessageArray != nil) {
+        
+        [[TAPChatManager sharedManager].forwardedMessageDictionary setObject:forwardMessageArray forKey:roomID];
+    }
+    
+    if(userInfo != nil) {
+        [[TAPChatManager sharedManager].userInfoDictionary setObject:userInfo forKey:roomID];
+    }
+}
+
+- (NSArray *)getForwardedMessagestWithRoomID:(NSString *)roomID { //Object could be TAPMessageModel or TAPQuoteModel
+     roomID = [TAPUtil nullToEmptyString:roomID];
+    NSArray *array =  [[TAPChatManager sharedManager].forwardedMessageDictionary objectForKey:roomID];
+    return array;
+}
+
+- (void)removeForwardedMessageObjectWithRoomID:(NSString *)roomID {
+    roomID = [TAPUtil nullToEmptyString:roomID];
+    [[TAPChatManager sharedManager].forwardedMessageDictionary removeObjectForKey:roomID];
+    [[TAPChatManager sharedManager].userInfoDictionary removeObjectForKey:roomID];
+}
+
 - (void)saveToQuotedMessage:(id)quotedMessageObject userInfo:(NSDictionary *)userInfo roomID:(NSString *)roomID { //Object could be TAPMessageModel or TAPQuoteModel
     if(quotedMessageObject != nil) {
         
@@ -1396,36 +1420,43 @@
     NSNumber *quoteActionTypeNumber = [self.quoteActionTypeDictionary objectForKey:room.roomID];
     TAPChatManagerQuoteActionType type = [quoteActionTypeNumber integerValue];
     
-    TAPMessageModel *existingMessage = [self.quotedMessageDictionary objectForKey:room.roomID];
+    NSArray *forwaredMessageArray = [self.forwardedMessageDictionary objectForKey:room.roomID];
     
-    if (type == TAPChatManagerQuoteActionTypeForward) {
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:existingMessage.body type:existingMessage.type messageData:nil];
-        
-        message.data = existingMessage.data;
-        message.quote = existingMessage.quote;
-        message.replyTo = existingMessage.replyTo;
-        
-        if (existingMessage.forwardFrom.localID != nil && ![existingMessage.forwardFrom.localID isEqualToString:@""]) {
-            //Obtain existing forward from model
-            message.forwardFrom = existingMessage.forwardFrom;
+    for (TAPMessageModel *forwardedMessage in forwaredMessageArray){
+        if (type == TAPChatManagerQuoteActionTypeForward) {
+            
+            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:forwardedMessage.body type:forwardedMessage.type messageData:nil];
+            
+            message.data = forwardedMessage.data;
+            message.quote = forwardedMessage.quote;
+            message.replyTo = forwardedMessage.replyTo;
+            
+            if (forwardedMessage.forwardFrom.localID != nil && ![forwardedMessage.forwardFrom.localID isEqualToString:@""]) {
+                //Obtain existing forward from model
+                message.forwardFrom = forwardedMessage.forwardFrom;
+            }
+            else {
+                //Create forward from model
+                TAPForwardFromModel *forwardFrom = [TAPForwardFromModel new];
+                forwardFrom.userID = forwardedMessage.user.userID;
+                forwardFrom.xcUserID = forwardedMessage.user.xcUserID;
+                forwardFrom.fullname = forwardedMessage.user.fullname;
+                forwardFrom.messageID = forwardedMessage.messageID;
+                forwardFrom.localID = forwardedMessage.localID;
+                message.forwardFrom = forwardFrom;
+            }
+            
+            [self sendMessage:message notifyDelegate:YES];
+            
+            //Remove from dictionary
+            [self.quoteActionTypeDictionary removeObjectForKey:room.roomID];
+            [self.forwardedMessageDictionary removeObjectForKey:room.roomID];
         }
-        else {
-            //Create forward from model
-            TAPForwardFromModel *forwardFrom = [TAPForwardFromModel new];
-            forwardFrom.userID = existingMessage.user.userID;
-            forwardFrom.xcUserID = existingMessage.user.xcUserID;
-            forwardFrom.fullname = existingMessage.user.fullname;
-            forwardFrom.messageID = existingMessage.messageID;
-            forwardFrom.localID = existingMessage.localID;
-            message.forwardFrom = forwardFrom;
-        }
-        
-        [self sendMessage:message notifyDelegate:YES];
-        
-        //Remove from dictionary
-        [self.quoteActionTypeDictionary removeObjectForKey:room.roomID];
-        [self.quotedMessageDictionary removeObjectForKey:room.roomID];
     }
+    
+    //TAPMessageModel *existingMessage = [self.quotedMessageDictionary objectForKey:room.roomID];
+    
+   
 }
 
 - (void)saveFilePathToDictionaryWithPath:(NSString *)path

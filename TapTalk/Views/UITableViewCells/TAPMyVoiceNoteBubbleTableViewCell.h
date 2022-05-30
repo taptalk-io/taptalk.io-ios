@@ -22,11 +22,12 @@ typedef NS_ENUM(NSInteger, TAPMyVoiceNoteBubbleTableViewCellStateType) {
 
 - (void)myVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myVoiceNoteRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
-- (void)myVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myVoiceNotePlayPauseButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 - (void)myVoiceNoteBubblePlayerSliderDidChange:(NSTimeInterval)currentTime message:(TAPMessageModel *)message;
 - (void)myVoiceNoteBubblePlayerSliderDidEnd;
@@ -59,6 +60,9 @@ typedef NS_ENUM(NSInteger, TAPMyVoiceNoteBubbleTableViewCellStateType) {
 - (void)setAudioSliderMaximumValue:(NSTimeInterval)duration;
 - (void)setPlayingState:(BOOL)isPlay;
 - (void)setVoiceNoteDurationLabel:(NSString *)duration;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
+
 @end
 
 NS_ASSUME_NONNULL_END

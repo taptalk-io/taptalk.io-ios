@@ -593,6 +593,20 @@
                             <constraint firstAttribute="height" id="aJa-re-WCW"/>
                         </constraints>
                     </view>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconUnselected" translatesAutoresizingMaskIntoConstraints="NO" id="tLl-DI-yDw">
+                        <rect key="frame" x="16" y="11" width="16" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="16" id="d8N-am-DEC"/>
+                            <constraint firstAttribute="height" constant="16" id="qpj-iI-nZq"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xDf-QH-NPn">
+                        <rect key="frame" x="16" y="11" width="288" height="419.5"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="forwardCheckmarkButtonDidTapped:" destination="bFI-lI-EW1" eventType="touchUpInside" id="B5d-5a-Pt6"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -600,6 +614,7 @@
                     <constraint firstItem="MJ5-an-u7g" firstAttribute="bottom" secondItem="kau-oU-53h" secondAttribute="bottom" id="1tQ-oF-RmM"/>
                     <constraint firstItem="idr-Ld-l85" firstAttribute="bottom" secondItem="kUz-GB-fdM" secondAttribute="bottom" id="2UV-y8-kmc"/>
                     <constraint firstItem="d3O-ZY-lz8" firstAttribute="top" secondItem="MuH-gq-RYu" secondAttribute="bottom" constant="8" id="2oG-JO-520"/>
+                    <constraint firstItem="tLl-DI-yDw" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="topMargin" id="2tE-ZT-j6Q"/>
                     <constraint firstItem="Aqq-vh-MYF" firstAttribute="bottom" secondItem="kau-oU-53h" secondAttribute="bottom" constant="-5" id="3oP-7h-eqe"/>
                     <constraint firstItem="d3O-ZY-lz8" firstAttribute="leading" secondItem="bE4-ty-KZj" secondAttribute="leading" constant="16" id="3xD-MZ-6GE"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="leading" secondItem="kqB-yN-cYJ" secondAttribute="trailing" constant="2" id="5kk-ss-c8K"/>
@@ -607,6 +622,9 @@
                     <constraint firstItem="Aqq-vh-MYF" firstAttribute="leading" secondItem="kau-oU-53h" secondAttribute="trailing" constant="4" id="GRY-du-YH8"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="bottom" secondItem="kqB-yN-cYJ" secondAttribute="bottom" constant="2" id="GTW-3V-7ME"/>
                     <constraint firstItem="MJ5-an-u7g" firstAttribute="top" secondItem="kau-oU-53h" secondAttribute="top" id="Gdh-i9-1ly"/>
+                    <constraint firstItem="tLl-DI-yDw" firstAttribute="leading" secondItem="V5z-UB-Xve" secondAttribute="trailing" constant="16" id="L62-qj-SYm"/>
+                    <constraint firstItem="xDf-QH-NPn" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="topMargin" id="MIP-dd-Pnf"/>
+                    <constraint firstItem="xDf-QH-NPn" firstAttribute="leading" secondItem="bE4-ty-KZj" secondAttribute="leadingMargin" id="Nlc-cH-FT0"/>
                     <constraint firstItem="idr-Ld-l85" firstAttribute="trailing" secondItem="kUz-GB-fdM" secondAttribute="trailing" id="PTN-zm-ZJD"/>
                     <constraint firstItem="idr-Ld-l85" firstAttribute="top" secondItem="kUz-GB-fdM" secondAttribute="top" id="SEb-BE-YoV"/>
                     <constraint firstAttribute="trailing" secondItem="MuH-gq-RYu" secondAttribute="trailing" constant="16" id="TuH-84-lli"/>
@@ -614,11 +632,13 @@
                     <constraint firstItem="MJ5-an-u7g" firstAttribute="leading" secondItem="kau-oU-53h" secondAttribute="leading" id="YBc-gf-TVj"/>
                     <constraint firstAttribute="trailing" secondItem="kau-oU-53h" secondAttribute="trailing" constant="16" id="ZbF-4m-p1v"/>
                     <constraint firstAttribute="bottomMargin" secondItem="d3O-ZY-lz8" secondAttribute="bottom" id="a8P-gx-Kaa"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="xDf-QH-NPn" secondAttribute="trailing" id="bQj-Hy-qWm"/>
                     <constraint firstItem="MJ5-an-u7g" firstAttribute="trailing" secondItem="kau-oU-53h" secondAttribute="trailing" id="buG-aB-Fmu"/>
                     <constraint firstItem="V5z-UB-Xve" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="topMargin" id="f4z-bn-ZIV"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="top" secondItem="bE4-ty-KZj" secondAttribute="top" id="gDh-p4-b6e"/>
                     <constraint firstItem="MuH-gq-RYu" firstAttribute="top" secondItem="kau-oU-53h" secondAttribute="bottom" priority="999" constant="2" id="jVy-i7-ioI"/>
                     <constraint firstItem="V5z-UB-Xve" firstAttribute="leading" secondItem="bE4-ty-KZj" secondAttribute="leadingMargin" constant="-46" id="kec-c2-udK"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="xDf-QH-NPn" secondAttribute="bottom" id="miL-38-d7L"/>
                     <constraint firstItem="kau-oU-53h" firstAttribute="leading" secondItem="idr-Ld-l85" secondAttribute="trailing" constant="2" id="p0d-IE-2S2"/>
                     <constraint firstAttribute="trailing" secondItem="d3O-ZY-lz8" secondAttribute="trailing" constant="16" id="uN6-Kg-EAA"/>
                 </constraints>
@@ -638,6 +658,7 @@
                 <outlet property="captionLabelHeightConstraint" destination="qhB-S5-W6R" id="6Te-YE-F9I"/>
                 <outlet property="captionLabelTopConstraint" destination="zht-O8-huy" id="NDv-QK-NRB"/>
                 <outlet property="chatBubbleRightConstraint" destination="ZbF-4m-p1v" id="eTm-TC-9OW"/>
+                <outlet property="checkMarkIconImageView" destination="tLl-DI-yDw" id="A1a-xj-TQh"/>
                 <outlet property="doneDownloadButton" destination="nKU-jE-LCG" id="AYC-3F-C9c"/>
                 <outlet property="doneDownloadImageView" destination="Rn1-vA-iwh" id="LHf-kB-s17"/>
                 <outlet property="doneDownloadView" destination="WWa-B2-giG" id="CeO-aW-GTJ"/>
@@ -646,6 +667,7 @@
                 <outlet property="downloadView" destination="cQc-8b-fdE" id="8IV-zs-gK4"/>
                 <outlet property="fileBackgroundView" destination="dv5-Bn-6GR" id="ODw-wn-lJX"/>
                 <outlet property="fileImageView" destination="dOe-RI-VPg" id="CH0-JU-XJS"/>
+                <outlet property="forwardCheckmarkButton" destination="xDf-QH-NPn" id="H6q-AK-aYk"/>
                 <outlet property="forwardFromLabel" destination="Hc4-Hr-AgP" id="6wi-lB-MoB"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="dN3-Ws-QLB" id="UHI-EV-0br"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="TQ6-bK-1WE" id="Yd5-sw-ADN"/>
@@ -726,6 +748,7 @@
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>
         <image name="TAPIconStarChatBubble" width="12" height="12"/>
+        <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

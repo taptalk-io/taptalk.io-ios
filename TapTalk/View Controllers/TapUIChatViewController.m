@@ -229,6 +229,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 
 
+
 //Load More Message Loading View
 @property (strong, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
 @property (strong, nonatomic) IBOutlet UILabel *loadMoreMessageLoadingLabel;
@@ -300,6 +301,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceContraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceConstraint2;
 
+//Multiple Forward
+@property (weak, nonatomic) IBOutlet UIButton *sendForwardButton;
+@property (weak, nonatomic) IBOutlet UILabel *numberSelectedForwardLabel;
+@property (weak, nonatomic) IBOutlet UILabel *maxSelectedForwardLabel;
+@property (weak, nonatomic) IBOutlet UILabel *selectedForwardTextLabel;
+@property (weak, nonatomic) IBOutlet UIView *multipleForwardComposerView;
+@property (nonatomic) BOOL isSelectingForwardMessage;
 
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *anchorMentionMessageDictionary;
@@ -307,6 +315,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMentionArray;
 @property (strong, nonatomic) NSMutableArray *filteredMentionListArray;
+@property (strong, nonatomic) NSMutableArray *selectedForwardMessageArray;
 
 @property (nonatomic) BOOL isOnScrollPendingChecking;
 @property (nonatomic) BOOL isNeedRefreshOnNetworkDown;
@@ -319,6 +328,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) NSInteger lastNumberOfWordArrayForShowMention;
 @property (nonatomic) NSInteger lastTypingWordArrayStartIndex;
 @property (strong, nonatomic) NSString *lastTypingWordString;
+
+@property (nonatomic) NSInteger selectedMessasgeCounter;
 
 @property (strong, nonatomic) TAPUserModel *otherUser;
 @property (nonatomic) BOOL isOtherUserIsContact;
@@ -529,6 +540,7 @@ CGPoint center;
     _scrolledPendingMessageArray = [[NSMutableArray alloc] init];
     _scrolledPendingMentionArray = [[NSMutableArray alloc] init];
     _filteredMentionListArray = [[NSMutableArray alloc] init];
+    _selectedForwardMessageArray = [[NSMutableArray alloc] init];
     _otherUser = nil;
     _isKeyboardWasShowed = NO;
     _isKeyboardShowed = NO;
@@ -774,11 +786,21 @@ CGPoint center;
         
         [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
     }
+    //setup multiple forward ui
+    UIFont *chatComposerFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextField];
+    UIColor *chatComposerColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField];
+    
+    self.numberSelectedForwardLabel.font = chatComposerFont;
+    self.maxSelectedForwardLabel.font = chatComposerFont;
+    self.selectedForwardTextLabel.font = chatComposerFont;
+    
+    self.numberSelectedForwardLabel.textColor = chatComposerColor;
+    self.maxSelectedForwardLabel.textColor = chatComposerColor;
+    self.selectedForwardTextLabel.textColor = chatComposerColor;
     
     //setup voice note ui
     UIColor *recordingTimeColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRecordingTimeLabel];
     UIColor *slideLeftLabelColor = [[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField]colorWithAlphaComponent:0.6f];
-    UIFont *chatComposerFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextField];
     
     [self.stopButton addTarget:self action:@selector(stopButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.playIconButton addTarget:self action:@selector(playVoiceNoteAudio) forControlEvents:UIControlEventTouchUpInside];
@@ -949,6 +971,7 @@ CGPoint center;
     else {
         [self setSendButtonActive:NO];
         [self checkIsContainQuoteMessage];
+        [self checkIsContainForwardMessage];
     }
     
     [self checkAndRefreshOnlineStatus];
@@ -956,7 +979,7 @@ CGPoint center;
     
     [TAPDataManager callAPIGetStarredMessageIDs:self.currentRoom.roomID success:^(NSMutableArray *starredMessageID) {
         self.starMessageIDArray = [starredMessageID mutableCopy];;
-        [self.tableView reloadData];
+       // [self.tableView reloadData];
     } failure:^(NSError *error) {
         
     }];
@@ -1252,6 +1275,20 @@ CGPoint center;
                         [cell showStarMessageIconView];
                     }
                     
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
+                    }
+                    
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                         if ([mentionArray count] > 0) {
@@ -1296,6 +1333,20 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
+                    }
                     if(message == self.currentVoiceNoteMessage){
                         [cell setPlayingState:YES];
                         NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
@@ -1305,6 +1356,7 @@ CGPoint center;
                     }
                     else{
                         [cell setPlayingState:NO];
+
                     }
                     
                     if (!message.isHidden) {
@@ -1442,6 +1494,20 @@ CGPoint center;
                             //Show star icon on message bubble
                             [cell showStarMessageView];
                         }
+                        
+                        if(self.isSelectingForwardMessage){
+                            [cell showCheckMarkIcon:YES];
+                        }
+                        else{
+                            [cell showCheckMarkIcon:NO];
+                        }
+                        
+                        if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                            [cell setCheckMarkState:NO];
+                        }
+                        else{
+                            [cell setCheckMarkState:YES];
+                        }
                     }
                     
                     if (message.isFailedSend) {
@@ -1503,6 +1569,20 @@ CGPoint center;
                         if([self.starMessageIDArray containsObject:message.messageID]){
                             //Show star icon on message bubble
                             [cell showStarMessageView];
+                        }
+                        
+                        if(self.isSelectingForwardMessage){
+                            [cell showCheckMarkIcon:YES];
+                        }
+                        else{
+                            [cell showCheckMarkIcon:NO];
+                        }
+                        
+                        if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                            [cell setCheckMarkState:NO];
+                        }
+                        else{
+                            [cell setCheckMarkState:YES];
                         }
                     }
                     
@@ -1603,6 +1683,20 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -1700,6 +1794,20 @@ CGPoint center;
                     if([self.starMessageIDArray containsObject:message.messageID]){
                         //Show star icon on message bubble
                         [cell showStarMessageView];
+                    }
+                    
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
                     }
                     
                     if (!message.isHidden) {
@@ -1819,6 +1927,22 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
+                    }
+                    
+                    
+                    
                     if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
                         NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
                         if ([mentionArray count] > 0) {
@@ -1863,6 +1987,20 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
+                    }
                     if(message == self.currentVoiceNoteMessage){
                         [cell setPlayingState:YES];
                         NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
@@ -1872,6 +2010,7 @@ CGPoint center;
                     }
                     else{
                         [cell setPlayingState:NO];
+
                     }
                     
                     if (!message.isHidden) {
@@ -1974,6 +2113,20 @@ CGPoint center;
                             //Show star icon on message bubble
                             [cell showStarMessageView];
                         }
+                        
+                        if(self.isSelectingForwardMessage){
+                            [cell showCheckMarkIcon:YES];
+                        }
+                        else{
+                            [cell showCheckMarkIcon:NO];
+                        }
+                        
+                        if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                            [cell setCheckMarkState:NO];
+                        }
+                        else{
+                            [cell setCheckMarkState:YES];
+                        }
                     }
                     [cell showStatusLabel:YES animated:NO];
                     
@@ -2023,6 +2176,21 @@ CGPoint center;
                             //Show star icon on message bubble
                             [cell showStarMessageView];
                         }
+                        
+                        if(self.isSelectingForwardMessage){
+                            [cell showCheckMarkIcon:YES];
+                        }
+                        else{
+                            [cell showCheckMarkIcon:NO];
+                        }
+                        
+                        if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                            [cell setCheckMarkState:NO];
+                        }
+                        else{
+                            [cell setCheckMarkState:YES];
+                        }
+                        
                     }
                     
                     if (message != nil) {
@@ -2097,6 +2265,20 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -2169,6 +2351,20 @@ CGPoint center;
                     if([self.starMessageIDArray containsObject:message.messageID]){
                         //Show star icon on message bubble
                         [cell showStarMessageView];
+                    }
+                    
+                    if(self.isSelectingForwardMessage){
+                        [cell showCheckMarkIcon:YES];
+                    }
+                    else{
+                        [cell showCheckMarkIcon:NO];
+                    }
+                    
+                    if([self.selectedForwardMessageArray indexOfObject:message] >= 1000){
+                        [cell setCheckMarkState:NO];
+                    }
+                    else{
+                        [cell setCheckMarkState:YES];
                     }
                     
                     if (!message.isHidden) {
@@ -2898,6 +3094,25 @@ CGPoint center;
 }
 
 #pragma mark TAPMyChatBubbleTableViewCell
+- (void)myChatCheckmarkDidTapped:(TAPMessageModel *)tappedMessage {
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
 - (void)myChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
@@ -2918,6 +3133,23 @@ CGPoint center;
         }];
     }
     else if (!tappedMessage.isSending) {
+        if(self.isSelectingForwardMessage){
+            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            
+            TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+            if([self.selectedForwardMessageArray indexOfObject:tappedMessage] >= 1000){
+                [self.selectedForwardMessageArray addObject:tappedMessage];
+                [cell setCheckMarkState:YES];
+                self.selectedMessasgeCounter += 1;
+            }
+            else{
+                [self.selectedForwardMessageArray removeObject:tappedMessage];
+                [cell setCheckMarkState:NO];
+                self.selectedMessasgeCounter -= 1;
+            }
+            
+        }
         if (tappedMessage == self.selectedMessage) {
             //select message that had been selected
             self.selectedMessage = nil;
@@ -3314,6 +3546,26 @@ CGPoint center;
 
 
 #pragma mark TAPMyImageBubbleTableViewCell
+- (void)myImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:message]){
+            [self.selectedForwardMessageArray addObject:message];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:message];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message {
     
     //Cancel uploading task
@@ -3662,6 +3914,26 @@ CGPoint center;
 }
 
 #pragma mark TAPMyVoiceBubbleTableViewCell
+- (void)myVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)myVoiceNoteBubblePlayerSliderDidChange:(NSTimeInterval)currentTime message:(TAPMessageModel *)message{
     if([[TAPAudioManager sharedManager] isPlaying]){
         [[TAPAudioManager sharedManager] setPlayerCurrentTime:currentTime];
@@ -3679,7 +3951,7 @@ CGPoint center;
 - (void)myVoiceNoteBubblePlayerSliderDidEnd{
     self.isPlayerSliding = NO;
 }
-- (void)myVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
+- (void)myVoiceNotePlayPauseButtonDidTapped:(TAPMessageModel *)tappedMessage{
     
     NSString *roomID = tappedMessage.room.roomID;
     NSDictionary *dataDictionary = tappedMessage.data;
@@ -3900,6 +4172,25 @@ CGPoint center;
 }
 
 #pragma mark TAPMyFileBubbleTableViewCell
+- (void)myFileCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
     [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
@@ -4101,6 +4392,26 @@ CGPoint center;
 }
 
 #pragma mark TAPMyLocationBubbleTableViewCell
+- (void)myLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
@@ -4226,6 +4537,26 @@ CGPoint center;
 }
 
 #pragma mark TAPMyVideoBubbleTableViewCell
+- (void)myVideoCheckmarkDidTappedWithMessage:(TAPMessageModel *)message{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:message]){
+            [self.selectedForwardMessageArray addObject:message];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:message];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)myVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message {
     [self messageBubbleQuoteViewDidTapped:message];
 }
@@ -4567,8 +4898,44 @@ CGPoint center;
 }
 
 #pragma mark TAPYourChatBubbleTableViewCell
+- (void)yourChatCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
+        if(self.isSelectingForwardMessage){
+            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            
+            TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+            if([self.selectedForwardMessageArray indexOfObject:tappedMessage] >= 1000){
+                [self.selectedForwardMessageArray addObject:tappedMessage];
+                [cell setCheckMarkState:YES];
+                self.selectedMessasgeCounter += 1;
+            }
+            else{
+                [self.selectedForwardMessageArray removeObject:tappedMessage];
+                [cell setCheckMarkState:NO];
+                self.selectedMessasgeCounter -= 1;
+            }
+            
+        }
         if (tappedMessage == self.selectedMessage) {
             //select message that had been selected
             self.selectedMessage = nil;
@@ -4972,6 +5339,26 @@ CGPoint center;
 }
 
 #pragma mark TAPYourImageBubbleTableViewCell
+- (void)yourImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:message]){
+            [self.selectedForwardMessageArray addObject:message];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:message];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
     
     if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
@@ -5227,6 +5614,25 @@ CGPoint center;
     }];
 }
 #pragma mark TAPYourVoiceBubbleTableViewCell
+- (void)yourVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)message{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:message]){
+            [self.selectedForwardMessageArray addObject:message];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:message];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
 - (void)yourVoiceNoteBubblePlayerSliderDidChange:(NSTimeInterval)currentTime message:(TAPMessageModel *)message{
     if([[TAPAudioManager sharedManager] isPlaying]){
         [[TAPAudioManager sharedManager] setPlayerCurrentTime:currentTime];
@@ -5373,6 +5779,26 @@ CGPoint center;
 }
 
 #pragma mark TAPYourFileBubbleTableViewCell
+- (void)yourFileCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)yourFileBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     
 }
@@ -5486,6 +5912,25 @@ CGPoint center;
 }
 
 #pragma mark TAPYourLocationBubbleTableViewCell
+- (void)yourLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage {
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:tappedMessage]){
+            [self.selectedForwardMessageArray addObject:tappedMessage];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:tappedMessage];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
 - (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     NSDictionary *dataDictionary = tappedMessage.data;
     dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
@@ -5587,6 +6032,26 @@ CGPoint center;
 }
 
 #pragma mark TAPYourVideoBubbleTableViewCell
+- (void)yourVideoCheckmarkDidTappedWithMessage:(TAPMessageModel *)message {
+    if(self.isSelectingForwardMessage){
+        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        
+        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
+        if(![self.selectedForwardMessageArray containsObject:message]){
+            [self.selectedForwardMessageArray addObject:message];
+            [cell setCheckMarkState:YES];
+            self.selectedMessasgeCounter += 1;
+        }
+        else{
+            [self.selectedForwardMessageArray removeObject:message];
+            [cell setCheckMarkState:NO];
+            self.selectedMessasgeCounter -= 1;
+        }
+        
+    }
+}
+
 - (void)yourVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message {
     [self messageBubbleQuoteViewDidTapped:message];
 }
@@ -6374,10 +6839,10 @@ CGPoint center;
     }
     
     //Left Bar Button
-    UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
+    UIImage *backButtonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button setImage:backButtonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
@@ -6412,6 +6877,48 @@ CGPoint center;
     
     self.attachmentButton.imageView.image = [self.attachmentButton.imageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerAttach]];
 
+}
+
+- (void)checkIsContainForwardMessage {
+    NSArray *forwardMessageArray = [[TAPChatManager sharedManager] getForwardedMessagestWithRoomID:self.currentRoom.roomID];
+    if (forwardMessageArray != nil && forwardMessageArray.count > 0) {
+        [self showInputAccessoryExtensionView:YES];
+        if (forwardMessageArray.count == 1) {
+            _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
+            TAPMessageModel *forwardMessageModel = [forwardMessageArray objectAtIndex:0];
+            
+            //if reply exists check if image in quote exists
+            //if image exists change view to Quote View
+            if((forwardMessageModel.quote.fileID && ![forwardMessageModel.quote.fileID isEqualToString:@""]) || (forwardMessageModel.quote.imageURL && ![forwardMessageModel.quote.imageURL isEqualToString:@""])) {
+                [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+                [self setQuoteWithQuote:forwardMessageModel.quote userID:forwardMessageModel.user.userID];
+            }
+            else {
+                [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+                [self setReplyMessageWithMessage:forwardMessageModel];
+                
+                //Set send button to active when forward model is available
+                TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+                if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
+                    [self setSendButtonActive:YES];
+                }
+            }
+        }else{
+            TAPMessageModel *forwardMessageModel = [forwardMessageArray objectAtIndex:0];
+            [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+            [self setMultipleForwardWithMessage:forwardMessageArray forwardMessageCount:forwardMessageArray.count];
+            
+            //Set send button to active when forward model is available
+            TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+            if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
+                [self setSendButtonActive:YES];
+            }
+        }
+    }
+    else {
+        [self showInputAccessoryExtensionView:NO];
+        [self setSendButtonActive:NO];
+    }
 }
 
 - (void)checkIsContainQuoteMessage {
@@ -6477,6 +6984,7 @@ CGPoint center;
     self.quoteFileView.layer.cornerRadius = CGRectGetHeight(self.quoteImageView.frame)/2.0f;
     
     [self checkIsContainQuoteMessage];
+   // [self checkIsContainForwardMessage];
 }
 
 - (void)setupDeletedRoomView {
@@ -8185,18 +8693,26 @@ CGPoint center;
                                       }
                                   }];
     
-    UIAlertAction *forwardAction = [UIAlertAction
-                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"")
-                                    style:UIAlertActionStyleDefault
-                                    handler:^(UIAlertAction * action) {
-                                        [self checkAndShowInputAccessoryView];
-                                        //Forward Action Here
-                                        TAPForwardListViewController *forwardListViewController = [[TAPForwardListViewController alloc] init];
-                                        forwardListViewController.currentNavigationController = self.navigationController;
-                                        forwardListViewController.forwardedMessage = message;
-                                        UINavigationController *forwardListNavigationController = [[UINavigationController alloc] initWithRootViewController:forwardListViewController];
-                                        [self presentViewController:forwardListNavigationController animated:YES completion:nil];
-                                    }];
+    UIAlertAction *forwardAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+        [self checkAndShowInputAccessoryView];
+        self.multipleForwardComposerView.alpha = 1.0f;
+        self.isSelectingForwardMessage = YES;
+        [self.selectedForwardMessageArray removeAllObjects];
+        [self.selectedForwardMessageArray addObject:message];
+        self.selectedMessasgeCounter = 1;
+        
+        //Left Bar Button
+        UIImage *backButtonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
+        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+        [button setImage:backButtonImage forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        [self.navigationItem setLeftBarButtonItem:barButtonItem];
+        
+        [self.tableView reloadData];
+                                     
+    }];
     
     UIAlertAction *copyAction = [UIAlertAction
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
@@ -8343,7 +8859,7 @@ CGPoint center;
         [alertController addAction:replyAction];
     }
     
-    if ([[TapUI sharedInstance] isForwardMessageMenuEnabled] && ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) && message.room.type != RoomTypeTransaction)) {
+    if ([[TapUI sharedInstance] isForwardMessageMenuEnabled] && ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo || message.type == TAPChatMessageTypeFile || message.type == TAPChatMessageTypeVoice) && message.room.type != RoomTypeTransaction)) {
         //DV Temp
         //Show forward action for text and location only (temporary)
         [alertController addAction:forwardAction];
@@ -8464,7 +8980,7 @@ CGPoint center;
         }
         else {
             //check id message sender is equal to active user id, if yes change the title to "You"
-            if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+            if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && [message.forwardFrom.fullname isEqualToString:[TAPDataManager getActiveUser].fullname]) {
                 self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
             }
             else {
@@ -8475,7 +8991,6 @@ CGPoint center;
         self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
     }
     else {
-        
         //check id message sender is equal to active user id, if yes change the title to "You"
         if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
             self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
@@ -8486,6 +9001,85 @@ CGPoint center;
         
         self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
     }
+}
+
+- (void)setMultipleForwardWithMessage:(NSArray *)messageArray forwardMessageCount :(NSInteger)forwardMessageCount {
+    
+    TAPChatManagerQuoteActionType type = [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+    NSMutableString *originalSenderName = [NSMutableString stringWithString:@""];
+    NSMutableArray *usernameArray = [[NSMutableArray alloc] init];
+    [usernameArray removeAllObjects];
+    for(TAPMessageModel *message in messageArray){
+        if (type == TAPChatManagerQuoteActionTypeForward) {
+            
+            if ([message.forwardFrom.localID isEqualToString:@""] && [message.forwardFrom.fullname isEqualToString:@""]) {
+                
+                if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                    if(![usernameArray containsObject:NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"")]){
+                        if(usernameArray.count > 0){
+                            [originalSenderName appendString:NSLocalizedStringFromTableInBundle(@", You", nil, [TAPUtil currentBundle], @"")];
+                        }
+                        else{
+                            [originalSenderName appendString:NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"")];
+                        }
+                        
+                        [usernameArray addObject:NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"")];
+                    }
+                }
+                else {
+                    if(![usernameArray containsObject:[TAPUtil nullToEmptyString:message.user.fullname]]){
+                        NSString *firstWord = [[message.user.fullname componentsSeparatedByString:@" "] objectAtIndex:0];
+                        if(usernameArray.count > 0){
+                            NSString *withComma = [NSString stringWithFormat:@", %@", [TAPUtil nullToEmptyString:firstWord]];
+                            [originalSenderName appendString: withComma];
+                        }
+                        else{
+                            [originalSenderName appendString:[TAPUtil nullToEmptyString:firstWord]];
+                        }
+                       
+                        [usernameArray addObject:[TAPUtil nullToEmptyString:message.user.fullname]];
+                    }
+                }
+            }
+            else {
+                //check id message sender is equal to active user id, if yes change the title to "You"
+                if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && [message.forwardFrom.fullname isEqualToString:[TAPDataManager getActiveUser].fullname]) {
+                    if(![usernameArray containsObject:NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"")]){
+                        if(usernameArray.count > 0){
+                            [originalSenderName appendString:NSLocalizedStringFromTableInBundle(@", You", nil, [TAPUtil currentBundle], @"")];
+                        }
+                        else{
+                            [originalSenderName appendString:NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"")];
+                        };
+                        [usernameArray addObject:NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"")];
+                    }
+                }
+                else {
+                    if(![usernameArray containsObject:[TAPUtil nullToEmptyString:message.forwardFrom.fullname]]){
+                        NSString *firstWord = [[message.forwardFrom.fullname componentsSeparatedByString:@" "] objectAtIndex:0];
+                        if(usernameArray.count > 0){
+                            NSString *withComma = [NSString stringWithFormat:@", %@", [TAPUtil nullToEmptyString:firstWord]];
+                            [originalSenderName appendString: withComma];
+                        }
+                        else{
+                            [originalSenderName appendString:[TAPUtil nullToEmptyString:firstWord]];
+                        }
+                        
+                        [usernameArray addObject:[TAPUtil nullToEmptyString:message.forwardFrom.fullname]];
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    NSString *multipleForwardString = [NSString stringWithFormat:@"Forward %ld Messages",forwardMessageCount];
+    self.replyMessageNameLabel.text = multipleForwardString;
+    
+    NSString *fromString = NSLocalizedStringFromTableInBundle(@"From", nil, [TAPUtil currentBundle], @"");
+    
+    self.replyMessageMessageLabel.text = [NSString stringWithFormat:@"%@: %@", fromString, originalSenderName];
+   
 }
 
 - (void)setQuoteWithQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
@@ -8792,6 +9386,7 @@ CGPoint center;
 - (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender {
     [self showInputAccessoryExtensionView:NO];
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+    [[TAPChatManager sharedManager] removeForwardedMessageObjectWithRoomID:self.currentRoom.roomID];
 }
 
 - (void)checkAndShowInputAccessoryView {
@@ -9733,9 +10328,12 @@ CGPoint center;
     NSNumber *lastUpdatedFromPreference = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
     [TAPDataManager callAPIGetMessageAfterWithRoomID:roomID minCreated:self.minCreatedMessage lastUpdated:lastUpdatedFromPreference needToSaveLastUpdatedTimestamp:YES success:^(NSArray *messageArray) {
         
+       
+        
         //Delete physical files when isDeleted = 1 (message is deleted)
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_async(queue, ^{
+            
 
             for (TAPMessageModel *message in messageArray) {
                 
@@ -10947,6 +11545,7 @@ CGPoint center;
         
         [self showInputAccessoryExtensionView:NO];
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+        [[TAPChatManager sharedManager] removeForwardedMessageObjectWithRoomID:self.currentRoom.roomID];
         
         if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
             //        Only scroll if table view is at bottom
@@ -10960,6 +11559,16 @@ CGPoint center;
         
         [self checkEmptyState];
         [[TAPChatManager sharedManager] stopTyping];
+        
+        //Check if forward message exist, send forward message
+        TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
+        
+        if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
+            [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:self.currentRoom];
+        }
+        
+        self.messageTextView.text = @"";
+        
         return;
     }
     
@@ -11005,6 +11614,7 @@ CGPoint center;
     
     [self showInputAccessoryExtensionView:NO];
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+    [[TAPChatManager sharedManager] removeForwardedMessageObjectWithRoomID:self.currentRoom.roomID];
     
     if(self.tableView.contentOffset.y != 0 && [self.messageArray count] != 0) {
         //        Only scroll if table view is at bottom
@@ -11020,7 +11630,38 @@ CGPoint center;
     [[TAPChatManager sharedManager] stopTyping];
 }
 
+- (IBAction)sendForwardButtonDidTapped:(id)sender {
+    if(self.selectedForwardMessageArray.count > 0){
+        //Forward Action Here
+        TAPForwardListViewController *forwardListViewController = [[TAPForwardListViewController alloc] init];
+        forwardListViewController.currentNavigationController = self.navigationController;
+        forwardListViewController.forwardedMessages = [self.selectedForwardMessageArray copy];
+        UINavigationController *forwardListNavigationController = [[UINavigationController alloc] initWithRootViewController:forwardListViewController];
+        [self presentViewController:forwardListNavigationController animated:YES completion:nil];
+    }
+
+}
+
+
 - (void)backButtonDidTapped {
+    if(self.isSelectingForwardMessage){
+        [self checkAndShowInputAccessoryView];
+        self.multipleForwardComposerView.alpha = 0.0f;
+        self.isSelectingForwardMessage = NO;
+        self.selectedMessasgeCounter = 0;
+        
+        //Left Bar Button
+        UIImage *backButtonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
+        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+        [button setImage:backButtonImage forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        [self.navigationItem setLeftBarButtonItem:barButtonItem];
+        
+        [self.tableView reloadData];
+        return;
+    }
     [self.lastSeenTimer invalidate];
     _lastSeenTimer = nil;
     [self destroySequence];
@@ -11033,9 +11674,9 @@ CGPoint center;
 }
 
 - (void)profileImageDidTapped {
-    
+
     //reject if deletedRoomView exist
-    if (self.deletedRoomView.alpha == 1.0f || self.kickedGroupRoomBackgroundView.alpha == 1.0f) {
+    if (self.deletedRoomView.alpha == 1.0f || self.kickedGroupRoomBackgroundView.alpha == 1.0f || self.isSelectingForwardMessage) {
         return;
     }
     
@@ -12352,6 +12993,11 @@ CGPoint center;
             [self showInputAccessoryView];
         }
     }
+}
+
+- (void)setSelectedMessasgeCounter:(NSInteger)selectedMessasgeCounter{
+    _selectedMessasgeCounter = selectedMessasgeCounter;
+    self.numberSelectedForwardLabel.text = [@(selectedMessasgeCounter) stringValue];
 }
 
 - (void)voiceMessagePlayingStae:(BOOL)isPlaying{

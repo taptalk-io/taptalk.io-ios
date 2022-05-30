@@ -39,6 +39,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+@property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -200,6 +203,7 @@
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
     self.starIconImageView.alpha = 0.0f;
+    self.checkMarkIconImageView.alpha = 0.0f;
     
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
@@ -510,6 +514,22 @@
 //        self.mapView.layer.cornerRadius = 8.0f;
 //        self.mapView.layer.maskedCorners = kCALayerMinXMinYCorner;
 //    }
+    
+    //remove animation
+    [self.bubbleView.layer removeAllAnimations];
+    [self.timestampLabel.layer removeAllAnimations];
+    [self.quoteView.layer removeAllAnimations];
+    [self.quoteDecorationView.layer removeAllAnimations];
+    [self.replyView.layer removeAllAnimations];
+    [self.replyDecorationView.layer removeAllAnimations];
+    [self.bubbleLabel.layer removeAllAnimations];
+    [self.replyNameLabel.layer removeAllAnimations];
+    [self.replyMessageLabel.layer removeAllAnimations];
+    [self.replyInnerView.layer removeAllAnimations];
+    [self.statusIconImageView.layer removeAllAnimations];
+    [self.forwardFromLabel.layer removeAllAnimations];
+    [self.forwardTitleLabel.layer removeAllAnimations];
+    [self.quoteImageView.layer removeAllAnimations];
 }
 
 - (void)receiveSentEvent {
@@ -642,6 +662,12 @@
 //        self.chatBubbleButton.userInteractionEnabled = YES;
 //    }
 //}
+
+- (IBAction)forwardCheckmarkButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(myLocationCheckmarkDidTapped:)]) {
+        [self.delegate myLocationCheckmarkDidTapped:self.message];
+    }
+}
 
 - (IBAction)replyButtonDidTapped:(id)sender {
     [super replyButtonDidTapped:sender];
@@ -861,6 +887,31 @@
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showCheckMarkIcon:(BOOL)isShow {
+    if(isShow){
+        self.checkMarkIconImageView.alpha = 1.0f;
+        self.panGestureRecognizer.enabled = NO;
+        self.bubbleViewLongPressGestureRecognizer.enabled = NO;
+        self.forwardCheckmarkButton.alpha = 1.0f;
+    }
+    else{
+        self.checkMarkIconImageView.alpha = 0.0f;
+        self.panGestureRecognizer.enabled = YES;
+        self.bubbleViewLongPressGestureRecognizer.enabled = YES;
+        self.forwardCheckmarkButton.alpha = 0.0f;
+    }
+}
+
+- (void)setCheckMarkState:(BOOL)isSelected {
+    if(isSelected){
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        
     }
 }
 

@@ -591,6 +591,20 @@
                             <constraint firstAttribute="height" id="fVu-mW-Qq4"/>
                         </constraints>
                     </view>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconUnselected" translatesAutoresizingMaskIntoConstraints="NO" id="IML-Bn-xs0">
+                        <rect key="frame" x="16" y="0.0" width="16" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="16" id="1Zp-HR-6Uf"/>
+                            <constraint firstAttribute="height" constant="16" id="Az2-Bv-IA6"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JdN-o9-9Zu">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="207"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="forwardCheckmarkButtonDidTapped:" destination="Wgf-FI-fQG" eventType="touchUpInside" id="Pte-UM-3aF"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
@@ -598,7 +612,10 @@
                     <constraint firstItem="TIC-sc-SMr" firstAttribute="leading" secondItem="qj8-8w-hdL" secondAttribute="leadingMargin" constant="-46" id="Ajf-PG-pfR"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="height" secondItem="4O7-Tz-qVj" secondAttribute="height" id="DyN-ES-fOS"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="G1T-11-PY8"/>
+                    <constraint firstAttribute="bottom" secondItem="JdN-o9-9Zu" secondAttribute="bottom" id="IYd-52-yNp"/>
+                    <constraint firstItem="JdN-o9-9Zu" firstAttribute="leading" secondItem="qj8-8w-hdL" secondAttribute="leading" id="Kjt-8p-gBm"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="width" secondItem="4O7-Tz-qVj" secondAttribute="width" id="MVE-UY-S7F"/>
+                    <constraint firstItem="IML-Bn-xs0" firstAttribute="top" secondItem="H1d-AO-jhD" secondAttribute="top" id="Oiz-HX-fpM"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="leading" secondItem="qj8-8w-hdL" secondAttribute="leading" constant="16" id="RI5-Om-moa"/>
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="top" secondItem="H1d-AO-jhD" secondAttribute="top" id="SJj-9Y-4kZ"/>
                     <constraint firstItem="H1d-AO-jhD" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="Taz-qv-3Qw"/>
@@ -607,6 +624,7 @@
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="leading" secondItem="H1d-AO-jhD" secondAttribute="leading" id="XBc-8N-Ejc"/>
                     <constraint firstAttribute="trailing" secondItem="u5V-oM-bLv" secondAttribute="trailing" constant="16" id="XD3-uj-GXx"/>
                     <constraint firstItem="TIC-sc-SMr" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="topMargin" id="YeW-9O-7B7"/>
+                    <constraint firstAttribute="trailing" secondItem="JdN-o9-9Zu" secondAttribute="trailing" id="Z7P-7V-ItF"/>
                     <constraint firstItem="FZe-cp-wFm" firstAttribute="bottom" secondItem="H1d-AO-jhD" secondAttribute="bottom" id="ag4-Go-zws"/>
                     <constraint firstItem="TJa-HP-Na8" firstAttribute="top" secondItem="u5V-oM-bLv" secondAttribute="bottom" constant="16" id="bik-CI-Xjy"/>
                     <constraint firstItem="u5V-oM-bLv" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="leading" id="bzv-6e-sPp"/>
@@ -619,10 +637,12 @@
                     <constraint firstItem="FYf-Cu-YeY" firstAttribute="leading" secondItem="6yA-Ee-rcg" secondAttribute="leading" id="lzY-B6-lUN"/>
                     <constraint firstItem="TJa-HP-Na8" firstAttribute="leading" secondItem="qj8-8w-hdL" secondAttribute="leading" constant="16" id="myF-1k-dB7"/>
                     <constraint firstAttribute="trailing" secondItem="TJa-HP-Na8" secondAttribute="trailing" constant="16" id="rqk-KE-jLg"/>
+                    <constraint firstItem="JdN-o9-9Zu" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="vMM-Ll-xPK"/>
                     <constraint firstItem="6yA-Ee-rcg" firstAttribute="leading" secondItem="H1d-AO-jhD" secondAttribute="trailing" constant="4" id="vl4-8H-3eQ"/>
                     <constraint firstItem="4O7-Tz-qVj" firstAttribute="top" secondItem="H1d-AO-jhD" secondAttribute="top" id="vnh-39-V9y"/>
                     <constraint firstItem="FYf-Cu-YeY" firstAttribute="bottom" secondItem="6yA-Ee-rcg" secondAttribute="bottom" id="vts-ic-MN4"/>
                     <constraint firstItem="6yA-Ee-rcg" firstAttribute="top" secondItem="qj8-8w-hdL" secondAttribute="top" id="wxA-iA-QYG"/>
+                    <constraint firstItem="IML-Bn-xs0" firstAttribute="leading" secondItem="TIC-sc-SMr" secondAttribute="trailing" constant="16" id="yAk-hK-a6d"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -633,6 +653,7 @@
                 <outlet property="cancelButton" destination="fyf-cV-rY4" id="F2j-7L-fx3"/>
                 <outlet property="cancelImageView" destination="ASN-ez-Kor" id="1cM-5a-23G"/>
                 <outlet property="cancelView" destination="bFd-Zv-17g" id="jjM-H9-C1V"/>
+                <outlet property="checkMarkIconImageView" destination="IML-Bn-xs0" id="488-1H-pkS"/>
                 <outlet property="doneDownloadButton" destination="fBK-yH-guJ" id="sWR-ho-Lgs"/>
                 <outlet property="doneDownloadImageView" destination="W5J-xp-2O1" id="1Gl-xS-faf"/>
                 <outlet property="doneDownloadTitleAndDescriptionButton" destination="tt6-a3-DD7" id="Rr2-7f-sFM"/>
@@ -644,6 +665,7 @@
                 <outlet property="fileDescriptionLabel" destination="jZS-MG-OpQ" id="p3f-h9-e0a"/>
                 <outlet property="fileDescriptionSizePlaceholderLabel" destination="9OW-SB-qa6" id="Snv-Wu-YsB"/>
                 <outlet property="fileImageView" destination="Cz9-ae-onE" id="EeY-yv-iCw"/>
+                <outlet property="forwardCheckmarkButton" destination="JdN-o9-9Zu" id="BaE-ZL-cWu"/>
                 <outlet property="forwardFromLabel" destination="iLw-Gy-lXq" id="wcB-3g-ClL"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="EMj-wZ-HGI" id="9II-nB-uoQ"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="kDy-lH-a3h" id="95j-cX-SQ4"/>
@@ -686,6 +708,7 @@
                 <outlet property="retryDownloadImageView" destination="zbX-6f-mib" id="hd1-hb-60B"/>
                 <outlet property="retryDownloadView" destination="shL-hM-kwK" id="Luz-Tq-y1U"/>
                 <outlet property="senderImageView" destination="H1d-AO-jhD" id="S7Q-6a-ZNF"/>
+                <outlet property="senderImageViewLeadingConstraint" destination="RI5-Om-moa" id="zXs-YL-k4g"/>
                 <outlet property="senderImageViewTrailingConstraint" destination="vl4-8H-3eQ" id="tua-fZ-OA4"/>
                 <outlet property="senderImageViewWidthConstraint" destination="5h9-eW-vg8" id="5iJ-GW-b6F"/>
                 <outlet property="senderInitialLabel" destination="RyY-KM-MVE" id="5nc-oN-XjC"/>
@@ -717,6 +740,7 @@
         <image name="TAPIconReplyChatOrange" width="32" height="32"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconStarGrayChatBubble" width="12" height="12"/>
+        <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

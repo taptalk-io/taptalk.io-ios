@@ -819,7 +819,7 @@
     }];
 }
 
-- (void)myVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
+- (void)myVoiceNotePlayPauseButtonDidTapped:(TAPMessageModel *)tappedMessage{
     [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
         chatViewController.hidesBottomBarWhenPushed = YES;
         [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];

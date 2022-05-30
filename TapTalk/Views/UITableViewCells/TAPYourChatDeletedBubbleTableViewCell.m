@@ -188,6 +188,7 @@
         self.senderImageView.image = nil;
         self.senderNameLabel.text = @"";
     }
+    
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {

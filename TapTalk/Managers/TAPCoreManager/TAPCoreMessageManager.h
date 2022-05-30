@@ -167,6 +167,12 @@ NS_ASSUME_NONNULL_BEGIN
                           progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendForwardedMessageWithMessageArray:(NSArray<TAPMessageModel*> *) messageArray
+                        room:(TAPRoomModel *)room
+                       start:(void (^)(TAPMessageModel *message))start
+                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                     success:(void (^)(TAPMessageModel *message))success
+                                     failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
 - (TAPMessageModel *)constructTapTalkMessageModelWithRoom:(TAPRoomModel *)room
                                  messageBody:(NSString *)messageBody
                                  messageType:(NSInteger)messageType

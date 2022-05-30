@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPYourLocationBubbleTableViewCellDelegate <NSObject>
 
+- (void)yourLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourLocationReplyDidTapped:(TAPMessageModel *)tappedMessage;
@@ -32,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showBubbleHighlight;
 - (void)showStarMessageView;
 - (void)showSeperator;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
 
 @end
 

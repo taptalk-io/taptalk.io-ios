@@ -397,6 +397,20 @@
                             <constraint firstAttribute="height" id="crQ-Fi-uV3"/>
                         </constraints>
                     </view>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconUnselected" translatesAutoresizingMaskIntoConstraints="NO" id="aGl-RH-M8y">
+                        <rect key="frame" x="16" y="11" width="16" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="br4-X7-hvt"/>
+                            <constraint firstAttribute="width" constant="16" id="nGR-2p-Qxz"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xSV-MI-em6">
+                        <rect key="frame" x="16" y="11" width="343" height="281"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="forwardCheckmarkButtonDidTapped:" destination="I8s-QR-CXF" eventType="touchUpInside" id="hWg-2g-6KC"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -405,13 +419,17 @@
                     <constraint firstItem="QLT-aC-en2" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="trailing" constant="4" id="4ir-wY-b1t"/>
                     <constraint firstItem="dUK-q7-mCR" firstAttribute="leading" secondItem="w1X-VA-DO6" secondAttribute="leading" id="BXB-d7-gW3"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" id="Dp2-vX-RH8"/>
+                    <constraint firstItem="xSV-MI-em6" firstAttribute="leading" secondItem="R69-3q-Chx" secondAttribute="leadingMargin" id="EfG-lO-JVf"/>
                     <constraint firstItem="i08-Bg-GYY" firstAttribute="leading" secondItem="R69-3q-Chx" secondAttribute="leading" constant="16" id="G5Y-av-vsL"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" secondItem="pQB-wV-S4C" secondAttribute="trailing" constant="2" id="LU2-6h-1do"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="R69-3q-Chx" secondAttribute="leading" constant="80" id="MRu-jd-3M7"/>
                     <constraint firstItem="w1X-VA-DO6" firstAttribute="height" secondItem="dUK-q7-mCR" secondAttribute="height" id="RAd-48-rBZ"/>
                     <constraint firstItem="dUK-q7-mCR" firstAttribute="top" secondItem="w1X-VA-DO6" secondAttribute="top" id="Szl-y5-dlM"/>
                     <constraint firstItem="i08-Bg-GYY" firstAttribute="top" secondItem="QDJ-Gg-cCw" secondAttribute="bottom" constant="16" id="Ta3-dK-IEW"/>
+                    <constraint firstItem="aGl-RH-M8y" firstAttribute="leading" secondItem="s95-Gc-wdp" secondAttribute="trailing" constant="16" id="Ugk-4r-R3n"/>
+                    <constraint firstItem="xSV-MI-em6" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="topMargin" id="WHD-gc-e1D"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="top" id="ahh-sE-86n"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="xSV-MI-em6" secondAttribute="trailing" id="biD-SD-1Dj"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="bottom" secondItem="dUK-q7-mCR" secondAttribute="bottom" constant="2" id="c3P-ri-xBw"/>
                     <constraint firstItem="QLT-aC-en2" firstAttribute="bottom" secondItem="Wd0-cM-7U7" secondAttribute="bottom" constant="-5" id="cYr-uH-xnE"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" id="cqc-Bt-BKr"/>
@@ -420,6 +438,8 @@
                     <constraint firstItem="QLT-aC-en2" firstAttribute="leading" secondItem="i08-Bg-GYY" secondAttribute="trailing" constant="16" id="g7Z-Uc-Fs4"/>
                     <constraint firstAttribute="trailing" secondItem="Wd0-cM-7U7" secondAttribute="trailing" constant="16" id="g8v-8e-t3q"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" secondItem="dUK-q7-mCR" secondAttribute="trailing" constant="2" id="gna-lV-ol6"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="xSV-MI-em6" secondAttribute="bottom" id="jWb-8w-AKD"/>
+                    <constraint firstItem="aGl-RH-M8y" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="topMargin" id="jbE-HW-E1D"/>
                     <constraint firstItem="BXH-N6-hKy" firstAttribute="trailing" secondItem="Wd0-cM-7U7" secondAttribute="trailing" id="l8x-fZ-au7"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="trailing" secondItem="QDJ-Gg-cCw" secondAttribute="trailing" id="lBs-m9-kgx"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="bottom" secondItem="pQB-wV-S4C" secondAttribute="bottom" constant="2" id="qej-h9-Be2"/>
@@ -436,8 +456,10 @@
                 <outlet property="centerMarkerLocationImageView" destination="YxV-Bw-fl5" id="OK9-0F-KRe"/>
                 <outlet property="chatBubbleButton" destination="HLV-s5-iUh" id="ppI-WH-fjI"/>
                 <outlet property="chatBubbleRightConstraint" destination="g8v-8e-t3q" id="gdc-8L-f4s"/>
+                <outlet property="checkMarkIconImageView" destination="aGl-RH-M8y" id="UP4-xP-HfN"/>
                 <outlet property="fileBackgroundView" destination="f3y-dC-ud9" id="rE3-n0-Ymo"/>
                 <outlet property="fileImageView" destination="yKX-6J-ktr" id="ODf-Mp-1bo"/>
+                <outlet property="forwardCheckmarkButton" destination="xSV-MI-em6" id="GCl-jU-WFA"/>
                 <outlet property="forwardFromLabel" destination="36F-Ej-VDx" id="WMs-nX-5w7"/>
                 <outlet property="forwardFromLabelHeightConstraint" destination="tpX-kw-03F" id="WGu-xP-eGN"/>
                 <outlet property="forwardFromLabelLeadingConstraint" destination="ncw-9C-qQ4" id="DMd-Fn-5yY"/>
@@ -500,6 +522,7 @@
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>
         <image name="TAPIconStarChatBubble" width="12" height="12"/>
+        <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

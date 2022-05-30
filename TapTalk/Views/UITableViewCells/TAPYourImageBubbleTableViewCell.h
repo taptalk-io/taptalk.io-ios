@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPYourImageBubbleTableViewCellDelegate <NSObject>
 
 - (void)yourImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)yourImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell;
 - (void)yourImageDidTappedUrl:(NSURL *)url
@@ -63,6 +64,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setThumbnailImage:(UIImage *)thumbnailImage;
 - (void)showStarMessageView;
 - (void)showSeperator;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
+
 @end
 
 NS_ASSUME_NONNULL_END

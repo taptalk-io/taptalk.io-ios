@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPYourChatBubbleTableViewCellDelegate <NSObject>
 
+- (void)yourChatCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourChatReplyDidTapped;
@@ -48,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showBubbleHighlight;
 - (void)showStarMessageView;
 - (void)showSeperator;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
 
 @end
 

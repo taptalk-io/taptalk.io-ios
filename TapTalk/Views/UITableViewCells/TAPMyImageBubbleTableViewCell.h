@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)myImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell;
 - (void)myImageDidTappedUrl:(NSURL *)url
                     originalString:(NSString*)originalString;
@@ -67,6 +68,8 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)showBubbleHighlight;
 - (void)showStarMessageView;
 - (void)showSeperatorView;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
 
 - (void)showProgressUploadView:(BOOL)show;
 - (void)animateFailedUploadingImage;
