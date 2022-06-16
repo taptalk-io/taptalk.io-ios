@@ -76,6 +76,7 @@
 #define kTAPEventUpdateMessage @"chat/updateMessage"
 #define kTAPEventStartTyping @"chat/startTyping"
 #define kTAPEventStopTyping @"chat/stopTyping"
+#define kTAPEventEditMessage @"chat/editMessage"
 #define kTAPEventUserOnline @"user/status"
 #define kTAPEventUserUpdated @"user/updated"
 

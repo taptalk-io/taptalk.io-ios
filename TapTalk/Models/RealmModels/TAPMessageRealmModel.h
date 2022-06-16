@@ -23,6 +23,7 @@
 @property (nonatomic, strong) NSNumber<RLMBool> *isDelivered;
 @property (nonatomic, strong) NSNumber<RLMBool> *isHidden;
 @property (nonatomic, strong) NSNumber<RLMBool> *isDeleted;
+@property (nonatomic, strong) NSNumber<RLMBool> *isMessageEdited;
 @property (nonatomic, strong) NSNumber<RLMBool> *isSending;
 @property (nonatomic, strong) NSNumber<RLMBool> *isFailedSend;
 

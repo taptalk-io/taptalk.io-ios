@@ -342,7 +342,7 @@
     groupTarget.targetName = groupTargetName;
     message.target = groupTarget;
 
-    
+    NSLog(@"---body :%@, isEdited:%ld",message.body, [NSNumber numberWithBool:message.isMessageEdited].longValue);
     return message;
 }
 

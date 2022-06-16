@@ -669,16 +669,16 @@
                     <rect key="frame" x="0.0" y="623" width="375" height="0.0"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kgs-QW-Obm">
-                            <rect key="frame" x="104.5" y="5" width="166.5" height="20.5"/>
+                            <rect key="frame" x="105" y="5" width="165" height="19"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is a chat history" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="des-jS-dAa">
-                                    <rect key="frame" x="18" y="0.0" width="148.5" height="20.5"/>
+                                    <rect key="frame" x="18" y="0.0" width="147" height="19"/>
                                     <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="16"/>
                                     <color key="textColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconHistory" translatesAutoresizingMaskIntoConstraints="NO" id="bpC-bi-dD5">
-                                    <rect key="frame" x="0.0" y="3.5" width="14" height="14"/>
+                                    <rect key="frame" x="0.0" y="2.5" width="14" height="14"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="14" id="OXm-vh-Q17"/>
                                         <constraint firstAttribute="width" constant="14" id="cb8-OR-nQR"/>
@@ -696,13 +696,13 @@
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This user is no longer available" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DuO-ux-hS4">
-                            <rect key="frame" x="90.5" y="25.5" width="194" height="18"/>
+                            <rect key="frame" x="90.5" y="24" width="194" height="18"/>
                             <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="14"/>
                             <color key="textColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tdB-BH-VFB" customClass="TAPCustomButtonView">
-                            <rect key="frame" x="0.0" y="43.5" width="375" height="74"/>
+                            <rect key="frame" x="0.0" y="42" width="375" height="74"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uGB-H3-Pan">
                                     <rect key="frame" x="16" y="15" width="343" height="44"/>
@@ -770,7 +770,7 @@
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XjO-iQ-SLk">
-                            <rect key="frame" x="0.0" y="43.5" width="375" height="74"/>
+                            <rect key="frame" x="0.0" y="42" width="375" height="74"/>
                             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <state key="normal">
                                 <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1481,7 +1481,7 @@
         <image name="TAPIconClose" width="24" height="24"/>
         <image name="TAPIconDemote" width="24" height="24"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
-        <image name="TAPIconForward" width="32" height="32"/>
+        <image name="TAPIconForward" width="24" height="24"/>
         <image name="TAPIconHamburger" width="28" height="28"/>
         <image name="TAPIconHistory" width="14" height="14"/>
         <image name="TAPIconLoadingSmall" width="14" height="14"/>
@@ -1489,7 +1489,7 @@
         <image name="TAPIconPlayComposer" width="34" height="35"/>
         <image name="TAPIconSend" width="20" height="20"/>
         <image name="TAPIconTrash" width="32" height="32"/>
-        <image name="TAPIconTrashChatComposer" width="34" height="34"/>
+        <image name="TAPIconTrashChatComposer" width="24" height="24"/>
         <systemColor name="groupTableViewBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

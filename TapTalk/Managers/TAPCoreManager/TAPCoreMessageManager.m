@@ -1736,4 +1736,48 @@
     }];
 }
 
+- (void)editMessage:(TAPMessageModel *)message
+        updatedText:(NSString *)updatedText
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    
+    if (message.type == TAPChatMessageTypeText) {
+        message.body = updatedText;
+    }
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo){
+        NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
+        dataDictionary = [message.data mutableCopy];
+        dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
+        [dataDictionary setObject:updatedText forKey:@"caption"];
+        
+        message.data = dataDictionary;
+        
+        if (message.type == TAPChatMessageTypeImage) {
+            if ([updatedText isEqualToString:@""]) {
+                message.body = @"🖼 Photo";
+            }
+            else {
+                message.body = [NSString stringWithFormat:@"🖼 %@", updatedText];
+            }
+        }
+        else if (message.type == TAPChatMessageTypeVideo) {
+            if ([updatedText isEqualToString:@""]) {
+                message.body = @"🎥 Video";
+            }
+            else {
+                message.body = [NSString stringWithFormat:@"🎥 %@", updatedText];
+            }
+        }
+    }
+    
+    start(message);
+    
+    [[TAPChatManager sharedManager] sendEmitWithEditedMessage:message];
+    void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+    [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+    [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+}
+
 @end

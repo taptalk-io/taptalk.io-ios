@@ -254,7 +254,7 @@
     }
     
     for(TAPMessageModel *forwardedMessage in self.forwardedMessages){
-        if (forwardedMessage.type == TAPChatMessageTypeFile || forwardedMessage.type == TAPChatMessageTypeVideo) {
+        if (forwardedMessage.type == TAPChatMessageTypeFile || forwardedMessage.type == TAPChatMessageTypeVideo || forwardedMessage.type == TAPChatMessageTypeVoice) {
             NSDictionary *dataDictionary = forwardedMessage.data;
             NSString *fileID = [dataDictionary objectForKey:@"fileID"];
             

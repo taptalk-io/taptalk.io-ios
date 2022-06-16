@@ -682,7 +682,7 @@
     }
     else {
         CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
-        timestampWidthWithMargin = timestampTextSize.width;
+        timestampWidthWithMargin = timestampTextSize.width + 50.0f;
     }
     if (self.minWidth < timestampWidthWithMargin) {
         _minWidth = timestampWidthWithMargin;
@@ -901,7 +901,13 @@
         self.senderNameLabel.text = @"";
     }
     
-    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    if(message.isMessageEdited){
+        NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+        self.timestampLabel.text = editedMessageString;
+    }
+    else{
+        self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    }
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];
@@ -924,7 +930,11 @@
     [self.thumbnailBubbleImageView.layer removeAllAnimations];
     [self.captionLabel.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
+    [self.imageTimestampContainerView.layer removeAllAnimations];
+    [self.imageTimestampLabel.layer removeAllAnimations];
+    [self.checkMarkIconImageView.layer removeAllAnimations];
 }
+
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
 //    self.chatBubbleButton.userInteractionEnabled = NO;
@@ -1017,7 +1027,14 @@
         self.timestampLabel.alpha = 0.0f;
         self.imageTimestampContainerView.alpha = 1.0f;
         self.starIconBottomImageView.alpha = 0.0f;
-        self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        
+        if(self.message.isMessageEdited){
+            NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+            self.imageTimestampLabel.text = editedMessageString;
+        }
+        else{
+            self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        }
     }
     [self.contentView layoutIfNeeded];
 }

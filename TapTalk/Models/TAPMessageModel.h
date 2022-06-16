@@ -41,6 +41,7 @@
 @property (nonatomic) BOOL isRead;
 @property (nonatomic) BOOL isDelivered;
 @property (nonatomic) BOOL isHidden;
+@property (nonatomic) BOOL isMessageEdited;
 //If add new property, don't forget to update copyMessageModel method
 
 + (instancetype)createMessageWithUser:(TAPUserModel *)user room:(TAPRoomModel *)room body:(NSString *)body type:(TAPChatMessageType)type messageData:(NSDictionary * _Nullable)messageData;

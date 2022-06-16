@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "_tt-download.png",
       "idiom" : "universal",
-      "filename" : "TAPIconSaveOrange.png",
       "scale" : "1x"
     },
     {
+      "filename" : "_tt-download@2x.png",
       "idiom" : "universal",
-      "filename" : "TAPIconSaveOrange@2x.png",
       "scale" : "2x"
     },
     {
+      "filename" : "_tt-download@3x.png",
       "idiom" : "universal",
-      "filename" : "TAPIconSaveOrange@3x.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }
