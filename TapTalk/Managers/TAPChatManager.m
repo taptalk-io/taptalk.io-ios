@@ -33,6 +33,7 @@
 
 @property (strong, nonatomic) NSMutableArray *delegatesArray;
 @property (strong, nonatomic) NSMutableArray *pendingMessageArray;
+@property (strong, nonatomic) NSMutableArray *pendingEditedMessageArray;
 @property (strong, nonatomic) NSMutableArray *incomingMessageArray;
 @property (strong, nonatomic) NSMutableArray *toBeMarkAsReadMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *waitingResponseDictionary;
@@ -68,6 +69,7 @@
         //Add delegate to Connection Manager here
         _delegatesArray = [[NSMutableArray alloc] init];
         _pendingMessageArray = [[NSMutableArray alloc] init];
+        _pendingEditedMessageArray = [[NSMutableArray alloc] init];
         _incomingMessageArray = [[NSMutableArray alloc] init];
         _toBeMarkAsReadMessageArray = [[NSMutableArray alloc] init];
         _waitingResponseDictionary = [[NSMutableDictionary alloc] init];
@@ -120,6 +122,7 @@
 - (void)connectionManagerDidConnected {
     //Send pending queue array
     [self checkAndSendPendingMessage];
+    [self checkAndSendPendingEditedMessage];
 }
 
 - (void)connectionManagerDidReceiveError:(NSError *)error {
@@ -293,6 +296,12 @@
     }
 }
 
+- (void)saveMessageToPendingEditedMessageArray:(TAPMessageModel *)message {
+    if (message != nil) {
+        [self.pendingEditedMessageArray addObject:message];
+    }
+}
+
 - (void)sendEmitWithMessage:(TAPMessageModel *)message {
     TAPConnectionManagerStatusType statusType = [[TAPConnectionManager sharedManager] getSocketConnectionStatus];
     if (statusType != TAPConnectionManagerStatusTypeConnected) {
@@ -321,6 +330,44 @@
         [parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
         
         [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:parameterDictionary];
+        
+        //Send event to TAPCoreMessageManager
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidFinishSendEmitMessage:)]) {
+                [delegate chatManagerDidFinishSendEmitMessage:message];
+            }
+        }
+    }
+}
+
+- (void)sendEmitWithEditedMessage:(TAPMessageModel *)message {
+    TAPConnectionManagerStatusType statusType = [[TAPConnectionManager sharedManager] getSocketConnectionStatus];
+    if (statusType != TAPConnectionManagerStatusTypeConnected) {
+        //When socket is not connected
+        [self.pendingEditedMessageArray addObject:message];
+        return;
+    }
+    else {
+        //When socket is connected
+        
+        //Add message to waiting response array
+        [self.waitingResponseDictionary setObject:message forKey:message.localID];
+        
+        //Encrypt message
+        NSDictionary *encryptedParametersDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModel:message];
+
+        //Convert CountryID from string to integer (because server only accept countryID as integer)
+        NSMutableDictionary *parameterDictionary = [[NSMutableDictionary alloc] init];
+        parameterDictionary = [encryptedParametersDictionary mutableCopy];
+        NSMutableDictionary *userDictionary = [[parameterDictionary objectForKey:@"user"] mutableCopy];
+        
+        NSString *countryIDString = [userDictionary valueForKeyPath:@"countryID"];
+        NSInteger countryIDInteger = [countryIDString integerValue];
+        NSNumber *countryIDNumber = [NSNumber numberWithInteger:countryIDInteger];
+        [userDictionary setObject:countryIDNumber forKey:@"countryID"];
+        [parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
+        
+        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventUpdateMessage parameters:parameterDictionary];
         
         //Send event to TAPCoreMessageManager
         for (id delegate in self.delegatesArray) {
@@ -924,6 +971,18 @@
     [self performSelector:@selector(checkAndSendPendingMessage) withObject:nil afterDelay:0.05f];
 }
 
+- (void)checkAndSendPendingEditedMessage {
+    if ([self.pendingEditedMessageArray count] == 0) {
+        return;
+    }
+    
+    TAPMessageModel *messageToBeSend = [self.pendingEditedMessageArray objectAtIndex:0];
+    [self runSendMessageSequenceWithMessage:messageToBeSend];
+    [self.pendingEditedMessageArray removeObjectAtIndex:0];
+    
+    [self performSelector:@selector(checkAndSendPendingEditedMessage) withObject:nil afterDelay:0.05f];
+}
+
 - (void)updateSendingMessageToFailed {
     [TAPDataManager updateMessageToFailedWhenClosedInDatabase];
 }
@@ -932,7 +991,7 @@
     BOOL isPendingMessageExist = NO;
     BOOL isFileUploadProgressExist = NO;
     
-    if ([self.pendingMessageArray count] > 0) {
+    if ([self.pendingMessageArray count] > 0 || [self.pendingEditedMessageArray count] > 0) {
         //Pending message exist
         isPendingMessageExist = YES;
     }
@@ -1156,6 +1215,11 @@
     for (TAPMessageModel *message in self.pendingMessageArray) {
         if ([message.room.roomID isEqualToString:roomID]) {
             [self.pendingMessageArray removeObject:message];
+        }
+    }
+    for (TAPMessageModel *message in self.pendingEditedMessageArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.pendingEditedMessageArray removeObject:message];
         }
     }
 }

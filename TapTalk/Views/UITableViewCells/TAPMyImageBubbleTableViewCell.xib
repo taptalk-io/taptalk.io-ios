@@ -329,7 +329,7 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ngx-BR-Wg7" userLabel="Timestamp Label">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ngx-BR-Wg7" userLabel="Timestamp Label">
                                 <rect key="frame" x="224" y="392.5" width="0.0" height="16"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -444,7 +444,7 @@
                             <constraint firstItem="QyT-DU-suG" firstAttribute="top" secondItem="JhP-ae-g3f" secondAttribute="bottom" constant="4" id="voX-XX-ZaA"/>
                             <constraint firstAttribute="trailing" secondItem="f4S-1d-CLr" secondAttribute="trailing" constant="10" id="wcl-AQ-xWh"/>
                             <constraint firstItem="JhP-ae-g3f" firstAttribute="top" secondItem="tgc-Q3-xu5" secondAttribute="bottom" constant="-1" id="y2a-c0-uAV"/>
-                            <constraint firstItem="f4S-1d-CLr" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" priority="500" constant="10" id="yzP-fF-ne1"/>
+                            <constraint firstItem="f4S-1d-CLr" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="yzP-fF-ne1"/>
                             <constraint firstAttribute="trailing" secondItem="aBL-bd-0Oe" secondAttribute="trailing" constant="10" id="z5e-cW-8p1"/>
                         </constraints>
                     </view>

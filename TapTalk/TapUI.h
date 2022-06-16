@@ -810,6 +810,16 @@ Get current status of voice noite menu from message bubble long press & chat pro
 */
 - (BOOL)isSendVoiceNoteMenuEnabled;
 
+/**
+Show or hide edit message menu from message bubble long press & chat profile
+*/
+- (void)setEditMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of voice noite menu from message bubble long press & chat profile
+*/
+- (BOOL)isEditMessageMenuEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

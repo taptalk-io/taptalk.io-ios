@@ -60,6 +60,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleImageViewHeightConstraint;
 
 - (void)setMessage:(TAPMessageModel *)message;
+- (void)editMessage:(TAPMessageModel *)message;
 - (void)receiveSentEvent;
 - (void)receiveDeliveredEvent;
 - (void)receiveReadEvent;

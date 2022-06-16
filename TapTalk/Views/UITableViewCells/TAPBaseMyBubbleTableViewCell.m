@@ -138,7 +138,15 @@
         [self setStatusIconUIWithStatus:TAPBaseMyBubbleStatusFailed];
     }
     
-    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    
+    if(message.isMessageEdited){
+        NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+        self.timestampLabel.text = editedMessageString;
+    }
+    else{
+        self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    }
+    
 }
 
 - (void)receiveSentEvent {

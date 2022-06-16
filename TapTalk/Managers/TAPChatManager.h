@@ -98,6 +98,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sendCustomMessage:(TAPMessageModel *)customMessage;
 - (void)saveMessageToPendingMessageArray:(TAPMessageModel *)message;
 - (void)sendEmitWithMessage:(TAPMessageModel *)message;
+- (void)sendEmitWithEditedMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
 
 - (void)saveMessageToDraftWithMessage:(NSString *)message roomID:(NSString *)roomID;

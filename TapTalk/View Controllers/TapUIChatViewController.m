@@ -346,6 +346,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) NSInteger numberOfUnreadMessages;
 @property (nonatomic) BOOL isShowingUnreadMessageIdentifier;
 
+@property (nonatomic) BOOL isEditingMessage;
+@property (strong, nonatomic) NSString *currentEditingMessageString;
+@property (strong, nonatomic) TAPMessageModel *currentEditingMessage;
+
 @property (weak, nonatomic) id openedBubbleCell;
 
 // Textview mention loop index
@@ -1488,12 +1492,14 @@ CGPoint center;
                             [cell showBubbleHighlight];
                             _tappedMessageLocalID = @"";
                         }
-                        [cell setMessage:message];
+                        
                         
                         if([self.starMessageIDArray containsObject:message.messageID]){
                             //Show star icon on message bubble
                             [cell showStarMessageView];
                         }
+                        
+                        [cell setMessage:message];
                         
                         if(self.isSelectingForwardMessage){
                             [cell showCheckMarkIcon:YES];
@@ -6345,9 +6351,31 @@ CGPoint center;
                                replacementText:(NSString *)text
                                        newText:(NSString *)newText {
     
+    if(self.isEditingMessage){
+        NSString *captionString;
+        if(self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo){
+            NSDictionary *dataDictionary = self.currentEditingMessage.data;
+            dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+            captionString = [dataDictionary objectForKey:@"caption"];
+            captionString = [TAPUtil nullToEmptyString:captionString];
+        }
+        else if(self.currentEditingMessage.type == TAPChatMessageTypeText){
+            captionString = self.currentEditingMessage.body;
+        }
+        
+        if([captionString isEqualToString:newText]){
+            [self setSendButtonActive:NO];
+        }
+        else{
+            [self setSendButtonActive:YES];
+        }
+    }
+    
+    
     if (self.currentRoom.type == RoomTypePersonal) {
         return;
     }
+    
     
     if ([newText isEqualToString:@""]) {
         self.lastNumberOfWordArrayForShowMention = 0;
@@ -6455,7 +6483,10 @@ CGPoint center;
 }
 
 - (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView {
-    [self setSendButtonActive:YES];
+    if(!self.isEditingMessage){
+        [self setSendButtonActive:YES];
+    }
+    
     if (self.isCustomKeyboardAvailable) {
         [UIView animateWithDuration:0.2f animations:^{
             self.keyboardOptionButtonView.alpha = 0.0f;
@@ -6471,7 +6502,14 @@ CGPoint center;
 }
 
 - (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView {
-    [self setSendButtonActive:NO];
+    if(self.isEditingMessage && (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo)){
+        [self setSendButtonActive:YES];
+    }
+    else{
+        [self setSendButtonActive:NO];
+    }
+    
+    
     if (self.isCustomKeyboardAvailable) {
         [UIView animateWithDuration:0.2f animations:^{
             self.keyboardOptionButtonView.alpha = 1.0f;
@@ -8744,6 +8782,49 @@ CGPoint center;
                                      
                                  }];
     
+    UIAlertAction *editAction = [UIAlertAction
+                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Edit", nil, [TAPUtil currentBundle], @"")
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action) {
+        [self checkAndShowInputAccessoryView];
+          if (message.type == TAPChatMessageTypeText) {
+              [self showInputAccessoryExtensionView:NO];
+              [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
+              [self setEditMessageWithMessage:message];
+              [self showInputAccessoryExtensionView:YES];
+        
+              TAPMessageModel *quotedMessageModel = [message copy];
+          }
+          else if (message.type == TAPChatMessageTypeImage) {
+              TAPMessageModel *quotedMessageModel = [message copy];
+              
+              [self showInputAccessoryExtensionView:NO];
+              [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+              [self showInputAccessoryExtensionView:YES];
+              [self setEditMessageWithMessage:message];
+              //convert to quote model
+              TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
+              //[self setEditMessageWithQuote:quote];
+              quotedMessageModel.quote = quote;
+          }
+          else if (message.type == TAPChatMessageTypeVideo) {
+              TAPMessageModel *quotedMessageModel = [message copy];
+              
+              [self showInputAccessoryExtensionView:NO];
+              [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+              [self showInputAccessoryExtensionView:YES];
+              [self setEditMessageWithMessage:message];
+              //convert to quote model
+              TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
+             // [self setEditMessageWithQuote:quote];
+              
+              quotedMessageModel.quote = quote;
+          }
+        
+        self.currentEditingMessage = message;
+        
+    }];
+    
     UIAlertAction *saveToGalleryAction = [UIAlertAction
                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Save", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
@@ -8828,11 +8909,15 @@ CGPoint center;
     starActionImage = [starActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
     [starAction setValue:[starActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
+    UIImage *editActionImage = [UIImage imageNamed:@"TAPIconEditMessage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
+    editActionImage = [editActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetCopy]];
+    [editAction setValue:[editActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+    
     UIImage *saveToGalleryActionImage = [UIImage imageNamed:@"TAPIconSaveOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     saveToGalleryActionImage = [saveToGalleryActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetGallery]]; //DV Temp Icon
     [saveToGalleryAction setValue:[saveToGalleryActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
-    UIImage *deleteMessageActionImage = [UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *deleteMessageActionImage = [UIImage imageNamed:@"TAPIconTrashChatComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     deleteMessageActionImage = [deleteMessageActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconActionSheetTrash]];
     [deleteMessageAction setValue:[deleteMessageActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
     
@@ -8840,6 +8925,7 @@ CGPoint center;
     [forwardAction setValue:@0 forKey:@"titleTextAlignment"];
     [copyAction setValue:@0 forKey:@"titleTextAlignment"];
     [starAction setValue:@0 forKey:@"titleTextAlignment"];
+    [editAction setValue:@0 forKey:@"titleTextAlignment"];
     [saveToGalleryAction setValue:@0 forKey:@"titleTextAlignment"];
     [deleteMessageAction setValue:@0 forKey:@"titleTextAlignment"];
     
@@ -8851,6 +8937,7 @@ CGPoint center;
     [forwardAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [starAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [editAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [saveToGalleryAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [deleteMessageAction setValue:actionSheetDestructiveColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
@@ -8940,12 +9027,29 @@ CGPoint center;
         }
     }
     
+    if([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && ([message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom == nil) && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) && [[TapUI sharedInstance] isEditMessageMenuEnabled]){
+        //Show edit message for our bubble (my bubble) only and non forward
+        
+        long messageTimeStamp = message.created.longLongValue;
+        long currentTimeStamp = [TAPUtil currentTimeInMillis].longLongValue;
+        long timeGap = currentTimeStamp - messageTimeStamp;
+        long timeGapSeconds = timeGap / 1000;
+        
+        if(timeGapSeconds <= 172800){
+            //long messageTimeStamp
+            [alertController addAction:editAction];
+        }
+        
+    }
+    
+    
     if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && [message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending && self.isShowAccessoryView) {
         //Show delete message for our bubble (my bubble) only
         [alertController addAction:deleteMessageAction];
     }
     
     [alertController addAction:cancelAction];
+    
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
         self.isKeyboardWasShowed = YES;
@@ -8965,11 +9069,71 @@ CGPoint center;
     }];
 }
 
+- (void)setEditMessageWithMessage:(TAPMessageModel *)message {
+    if(message.type == TAPChatMessageTypeText){
+        self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
+        self.messageTextView.text = [TAPUtil nullToEmptyString:message.body];
+        self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"Edit Message", nil, [TAPUtil currentBundle], @"");
+    }
+    else if(message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo){
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        NSString *captionString = [dataDictionary objectForKey:@"caption"];
+        captionString = [TAPUtil nullToEmptyString:captionString];
+        
+        self.messageTextView.text = [TAPUtil nullToEmptyString:captionString];
+        
+        TAPMessageModel *quotedMessageModel = [message copy];
+        //convert to quote model
+        TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
+        [self setEditMessageWithQuote:quote];
+    }
+    
+    self.isEditingMessage = YES;
+    [self setSendButtonActive:NO];
+    
+}
+
+- (void)setEditMessageWithQuote:(TAPQuoteModel *)quote {
+    self.quoteTitleLabel.text = NSLocalizedStringFromTableInBundle(@"Edit Message", nil, [TAPUtil currentBundle], @"");
+    
+    self.quoteSubtitleLabel.text = quote.content;
+    
+    self.quoteImageView.image = nil;
+    
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
+        //TYPE FILE
+        self.quoteFileView.alpha = 1.0f;
+        self.quoteImageView.alpha = 0.0f;
+    }
+    else {
+        
+//        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+//            [self.quoteImageView setImageWithURLString:quote.imageURL];
+//        }
+//        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+//            [self.quoteImageView setImageWithURLString:quote.fileID];
+//        }
+        
+        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.imageURL];
+        }
+        if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+            [self.quoteImageView setImageWithURLString:quote.fileID];
+        }
+        
+        self.quoteFileView.alpha = 0.0f;
+        self.quoteImageView.alpha = 1.0f;
+    }
+    self.isEditingMessage = YES;
+    [self setSendButtonActive:NO];
+}
+
 - (void)setReplyMessageWithMessage:(TAPMessageModel *)message {
     
     TAPChatManagerQuoteActionType type = [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
     if (type == TAPChatManagerQuoteActionTypeForward) {
-        if ([message.forwardFrom.localID isEqualToString:@""] && [message.forwardFrom.fullname isEqualToString:@""]) {
+        if (([message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom == nil) && ([message.forwardFrom.fullname isEqualToString:@""] || message.forwardFrom == nil)) {
             
             if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
                 self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
@@ -9385,6 +9549,11 @@ CGPoint center;
 
 - (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender {
     [self showInputAccessoryExtensionView:NO];
+    if(self.isEditingMessage){
+        self.isEditingMessage = NO;
+        self.messageTextView.text = @"";
+    }
+    
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     [[TAPChatManager sharedManager] removeForwardedMessageObjectWithRoomID:self.currentRoom.roomID];
 }
@@ -9765,6 +9934,32 @@ CGPoint center;
                             //        [self.tableView reloadData];
                         }
                     }
+                    else{
+                        TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                        
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
+                        
+                        [cell setMessage:message];
+                        
+                        if (isSendingAnimation) {
+                            //[cell receiveSentEvent];
+                        }
+                        else if (setAsDelivered) {
+                          //  [cell receiveDeliveredEvent];
+                        }
+                        else if (setAsRead) {
+                            //[cell receiveReadEvent];
+                        }
+                        else {
+                           // [cell setMessage:message];
+                            
+                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                            //        [self.tableView reloadData];
+                        }
+                    }
                 }
                 else if (currentMessage.type == TAPChatMessageTypeImage) {
                     if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
@@ -9789,11 +9984,23 @@ CGPoint center;
                             [cell receiveReadEvent];
                         }
                         else {
-                            [cell setMessage:message];
+                            if(message.isMessageEdited){
+                                [cell editMessage:message];
+                            }
+                            else{
+                                [cell setMessage:message];
+                            }
+                            
                             
                             //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
                             //        [self.tableView reloadData];
                         }
+                    }
+                    else{
+                        TAPYourImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                       
+                        [cell setMessage:message];
+                        
                     }
                 }
                 else if (currentMessage.type == TAPChatMessageTypeVideo) {
@@ -9823,6 +10030,10 @@ CGPoint center;
                             //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
                             //        [self.tableView reloadData];
                         }
+                    }
+                    else{
+                        TAPYourVideoBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                        [cell setMessage:message];
                     }
                 }
                 else if (currentMessage.type == TAPChatMessageTypeFile) {
@@ -9915,6 +10126,10 @@ CGPoint center;
                         } completion:^(BOOL finished) {
                         }];
                     }
+                }
+                
+                if(message.isMessageEdited){
+                    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
                 }
             }
         }
@@ -10418,6 +10633,7 @@ CGPoint center;
     currentMessage.isDeleted = message.isDeleted;
     currentMessage.isSending = message.isSending;
     currentMessage.isFailedSend = message.isFailedSend;
+    currentMessage.isMessageEdited = message.isMessageEdited;
     currentMessage.data = message.data;
     
     if(!currentMessage.isDelivered) {
@@ -11500,9 +11716,10 @@ CGPoint center;
 }
 
 - (IBAction)sendButtonDidTapped:(id)sender {
-    if ([self.messageArray count] != 0) {
+    if ([self.messageArray count] != 0 && !self.isEditingMessage) {
         [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
     }
+
     
     //Remove unread button
     [TAPUtil performBlock:^{
@@ -11570,6 +11787,53 @@ CGPoint center;
         self.messageTextView.text = @"";
         
         return;
+    }
+    
+    if(self.isEditingMessage){
+        [self showInputAccessoryExtensionView:NO];
+        self.isEditingMessage = NO;
+        NSString *currentMessage = [TAPUtil nullToEmptyString:self.messageTextView.text];
+        currentMessage = [currentMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if(self.currentEditingMessage.type == TAPChatMessageTypeText){
+            self.currentEditingMessage.body = currentMessage;
+        }
+        else if(self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo){
+            NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
+            dataDictionary = [self.currentEditingMessage.data mutableCopy];
+            dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
+            [dataDictionary setObject:currentMessage forKey:@"caption"];
+            
+            self.currentEditingMessage.data = dataDictionary;
+            
+            if (self.currentEditingMessage.type == TAPChatMessageTypeImage) {
+                if ([currentMessage isEqualToString:@""]) {
+                    self.currentEditingMessage.body = @"🖼 Photo";
+                }
+                else {
+                    self.currentEditingMessage.body = [NSString stringWithFormat:@"🖼 %@", currentMessage];
+                }
+            }
+            else if (self.currentEditingMessage.type == TAPChatMessageTypeVideo) {
+                if ([currentMessage isEqualToString:@""]) {
+                    self.currentEditingMessage.body = @"🎥 Video";
+                }
+                else {
+                    self.currentEditingMessage.body = [NSString stringWithFormat:@"🎥 %@", currentMessage];
+                }
+            }
+        }
+        
+        self.lastNumberOfWordArrayForShowMention = 0;
+        self.lastTypingWordArrayStartIndex = 0;
+        self.lastTypingWordString = @"";
+        [self.filteredMentionListArray removeAllObjects];
+        
+        [self checkEmptyState];
+        [[TAPChatManager sharedManager] stopTyping];
+        [[TAPChatManager sharedManager] sendEmitWithEditedMessage:self.currentEditingMessage];
+        self.messageTextView.text = @"";
+        return;
+        
     }
     
     //remove selectedMessage

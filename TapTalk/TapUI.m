@@ -56,6 +56,7 @@
 @property (nonatomic) BOOL isMarkAsUnreadRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isStarMessageMenuDisabled;
 @property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
+@property (nonatomic) BOOL isEditMessageMenuDisabled;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -947,10 +948,25 @@ Show or hide voice note menu from message bubble long press & chat profile
 
 
 /**
-Get current status of voice noite menu from message bubble long press & chat profile
+Get current status of edit message menu from message bubble long press & chat profile
 */
 - (BOOL)isSendVoiceNoteMenuEnabled{
     return !self.isSendVoiceNoteMenuDisabled;
+}
+
+/**
+Show or hide edit message menu from message bubble long press & chat profile
+*/
+- (void)setEditMessageMenuEnabled:(BOOL)isEnabled {
+    _isEditMessageMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of voice noite menu from message bubble long press & chat profile
+*/
+- (BOOL)isEditMessageMenuEnabled{
+    return !self.isEditMessageMenuDisabled;
 }
 
 

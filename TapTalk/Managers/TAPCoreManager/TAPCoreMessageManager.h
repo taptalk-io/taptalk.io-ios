@@ -338,6 +338,12 @@ NS_ASSUME_NONNULL_BEGIN
                               roomID:(NSString *)roomID
                              success:(void (^)(NSArray<NSString *> *unstarredMessagesIDs))success
                              failure:(void (^)(NSError *error))failure;
+
+- (void)editMessage:(TAPMessageModel *)message
+        updatedText:(NSString *)updatedText
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel *message))failure;
 @end
 
 NS_ASSUME_NONNULL_END

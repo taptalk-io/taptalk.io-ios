@@ -582,7 +582,13 @@
         self.senderNameLabel.text = @"";
     }
     
-    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    if(message.isMessageEdited){
+        NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+        self.timestampLabel.text = editedMessageString;
+    }
+    else{
+        self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    }
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];

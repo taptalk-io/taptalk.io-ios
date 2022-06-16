@@ -164,7 +164,7 @@
     
     _maxWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) * 2.0f / 3.0f) - 16.0f; //two third of screen, and 16.0f is right padding.
     _maxHeight = self.maxWidth / 234.0f * 300.0f; //234.0f and 300.0f are width and height constraint on design
-    _minWidth = (self.maxWidth / 3.0f); //one third of max Width
+    _minWidth = (self.maxWidth / 2.0f); //one third of max Width
     _minHeight = self.minWidth / 78.0f * 100.0f; //78.0f and 100.0f are width and height constraint on design
     
     self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
@@ -644,7 +644,7 @@
     }
     else {
         CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
-        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame);
+        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame) + 50.0f;
     }
     if (self.minWidth < timestampWidthWithMargin) {
         _minWidth = timestampWidthWithMargin;
@@ -736,6 +736,18 @@
         success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
             [self getImageSizeFromImage:savedImage];
             
+            CGFloat minWidth = 150.0f;
+            
+            if(message.isMessageEdited){
+                
+            }
+            
+            if(self.cellWidth < minWidth){
+                //self.bubbleImageViewWidthConstraint.constant = minWidth;
+            }
+            else{
+               // self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+            }
             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
             [self.contentView layoutIfNeeded];
@@ -815,6 +827,12 @@
         CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
         CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
         [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
+        if(self.cellWidth < 150.0f){
+            //self.bubbleImageViewWidthConstraint.constant = 150.0f;
+        }
+        else{
+            //self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+        }
         self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
         self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
         [self.contentView layoutIfNeeded];
@@ -848,6 +866,107 @@
     [self.bubbleImageView.layer removeAllAnimations];
     [self.thumbnailBubbleImageView.layer removeAllAnimations];
     [self.captionLabel.layer removeAllAnimations];
+    [self.imageTimestampStatusContainerView.layer removeAllAnimations];
+    [self.imageTimestampLabel.layer removeAllAnimations];
+    [self.checkMarkIconImageView.layer removeAllAnimations];
+    [self.imageStatusIconImageView.layer removeAllAnimations];
+}
+
+- (void)editMessage:(TAPMessageModel *)message {
+    if (message == nil) {
+        return;
+    }
+    
+//    _message = message;
+    [super setMessage:message];
+    
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+
+    NSString *captionString = [dataDictionary objectForKey:@"caption"];
+    captionString = [TAPUtil nullToEmptyString:captionString];
+    
+    [self setImageCaptionWithString:captionString];
+    
+    CGFloat timestampWidthWithMargin = 0.0f;
+    if ([captionString isEqual:@""]) {
+        timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampStatusContainerView.frame) + (6.0f * 2);
+    }
+    else {
+        CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame) + 50.0f;
+    }
+    if (self.minWidth < timestampWidthWithMargin) {
+        _minWidth = timestampWidthWithMargin;
+    }
+    
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+        _isShowForwardView = YES;
+    }
+    else {
+        [self showForwardView:NO];
+        _isShowForwardView = NO;
+    }
+    
+    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
+        //reply to exists
+        
+        //if reply exists check if image in quote exists
+        //if image exists  change view to Quote View
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        [self.contentView layoutIfNeeded];
+        
+        if([message.quote.content isEqualToString:@"🎤 Voice"]){
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+            [self showReplyView:NO withMessage:nil];
+            [self showQuoteView:YES];
+            [self setQuote:message.quote userID:message.replyTo.userID];
+        }
+        else {
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+    }
+    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
+        //quote exists
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        [self.contentView layoutIfNeeded];
+        
+        [self showReplyView:NO withMessage:nil];
+        [self setQuote:message.quote userID:@""];
+        [self showQuoteView:YES];
+    }
+    else {
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 0.0f;
+        }
+        [self.contentView layoutIfNeeded];
+        
+        [self showReplyView:NO withMessage:nil];
+        [self showQuoteView:NO];
+    }
+    
 }
 
 - (void)receiveSentEvent {
@@ -1417,7 +1536,14 @@
         self.imageStatusIconImageView.alpha = 0.0f;
         self.imageTimestampStatusContainerView.alpha = 1.0f;
         self.starIconBottomImageView.alpha = 0.0f;
-        self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        
+        if(self.message.isMessageEdited){
+            NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+            self.imageTimestampLabel.text = editedMessageString;
+        }
+        else{
+            self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        }
         
         [self setInnerImageStatusIcon];
     }

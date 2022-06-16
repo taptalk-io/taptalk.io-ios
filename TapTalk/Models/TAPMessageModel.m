@@ -31,6 +31,7 @@
     messageForReturn.isRead = NO;
     messageForReturn.isDelivered = NO;
     messageForReturn.isHidden = NO;
+    messageForReturn.isMessageEdited = NO;
     messageForReturn.data = messageData;
 
     //Obtain other user ID
@@ -191,6 +192,7 @@
     newModel.isRead = self.isRead;
     newModel.isDelivered = self.isDelivered;
     newModel.isHidden = self.isHidden;
+    newModel.isMessageEdited = self.isMessageEdited;
     
     return newModel;
 }

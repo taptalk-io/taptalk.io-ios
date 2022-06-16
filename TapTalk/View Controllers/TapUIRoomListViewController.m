@@ -1319,6 +1319,8 @@
             roomLastMessage.isRead = message.isRead;
             roomLastMessage.isDelivered = message.isDelivered;
             roomLastMessage.isHidden = message.isHidden;
+            roomLastMessage.body = message.body;
+            
             
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
