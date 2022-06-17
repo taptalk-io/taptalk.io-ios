@@ -15,6 +15,7 @@
 #import "TAPCustomAccessoryView.h"
 #import "TAPGradientView.h"
 #import "TAPCustomButtonView.h"
+//#import "TAPCustomTextView.h"
 
 #import "TAPConnectionStatusViewController.h"
 #import "TAPKeyboardViewController.h"
@@ -77,7 +78,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TopFloatingIndicatorViewTypeLoading = 1
 };
 
-@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate>
+@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -6346,36 +6347,74 @@ CGPoint center;
     }
 }
 
+/**
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
+    NSInteger textLength = [newString length];
+    if(self.isEditingMessage && (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo)){
+        if (textLength > [[TapTalk sharedInstance] getMaxCaptionLength]) {
+            return NO;
+        }
+        
+    }
+    
+    if (textLength > 4000) {
+        return NO;
+    }
+    
+    return YES;
+    
+}
+*/
 #pragma mark TAPGrowingTextView
 - (void)growingTextViewShouldChangeTextInRange:(NSRange)range
                                replacementText:(NSString *)text
                                        newText:(NSString *)newText {
-    
-    if(self.isEditingMessage){
+    NSInteger textLength = [newText length];
+    if (self.isEditingMessage) {
         NSString *captionString;
-        if(self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo){
+        NSString *updatedNewText = newText;
+        if (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo) {
             NSDictionary *dataDictionary = self.currentEditingMessage.data;
             dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
             captionString = [dataDictionary objectForKey:@"caption"];
             captionString = [TAPUtil nullToEmptyString:captionString];
+            if (textLength >= [[TapTalk sharedInstance] getMaxCaptionLength]) {
+                updatedNewText = [newText substringToIndex:[[TapTalk sharedInstance] getMaxCaptionLength]];
+                self.messageTextView.text = updatedNewText;
+                [self.messageTextView setTypingEnabled:NO];
+            }
+            else{
+                [self.messageTextView setTypingEnabled:YES];
+            }
+            
         }
-        else if(self.currentEditingMessage.type == TAPChatMessageTypeText){
+        else if (self.currentEditingMessage.type == TAPChatMessageTypeText) {
             captionString = self.currentEditingMessage.body;
+            if (textLength >= kCharacterLimit) {
+                updatedNewText = [newText substringToIndex:kCharacterLimit];
+                self.messageTextView.text = updatedNewText;
+                [self.messageTextView setTypingEnabled:NO];
+            }
+            else {
+                [self.messageTextView setTypingEnabled:YES];
+            }
         }
         
-        if([captionString isEqualToString:newText]){
+        if ([captionString isEqualToString:updatedNewText]) {
             [self setSendButtonActive:NO];
         }
-        else{
+        else {
             [self setSendButtonActive:YES];
         }
     }
-    
+    else {
+        [self.messageTextView setTypingEnabled:YES];
+    }
     
     if (self.currentRoom.type == RoomTypePersonal) {
         return;
     }
-    
     
     if ([newText isEqualToString:@""]) {
         self.lastNumberOfWordArrayForShowMention = 0;
@@ -10130,6 +10169,22 @@ CGPoint center;
                 
                 if(message.isMessageEdited){
                     [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    
+                    
+                    if (self.isKeyboardShowed) {
+                        _keyboardHeight = self.safeAreaBottomPadding + self.initialKeyboardHeight;
+                    }
+                    else {
+                        _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+                    }
+                    
+                    if (self.isKeyboardShowed) {
+                        [self keyboardWillShowWithHeight:self.keyboardHeight];
+                    }
+                    else {
+                        [self keyboardWillHideWithHeight:self.keyboardHeight];
+                    }
+                    
                 }
             }
         }
@@ -11794,34 +11849,18 @@ CGPoint center;
         self.isEditingMessage = NO;
         NSString *currentMessage = [TAPUtil nullToEmptyString:self.messageTextView.text];
         currentMessage = [currentMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        if(self.currentEditingMessage.type == TAPChatMessageTypeText){
-            self.currentEditingMessage.body = currentMessage;
+        
+        [[TAPCoreMessageManager sharedManager] editMessage:self.currentEditingMessage
+                                               updatedText:currentMessage
+        start:^(TAPMessageModel * _Nonnull message) {
         }
-        else if(self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo){
-            NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
-            dataDictionary = [self.currentEditingMessage.data mutableCopy];
-            dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
-            [dataDictionary setObject:currentMessage forKey:@"caption"];
-            
-            self.currentEditingMessage.data = dataDictionary;
-            
-            if (self.currentEditingMessage.type == TAPChatMessageTypeImage) {
-                if ([currentMessage isEqualToString:@""]) {
-                    self.currentEditingMessage.body = @"🖼 Photo";
-                }
-                else {
-                    self.currentEditingMessage.body = [NSString stringWithFormat:@"🖼 %@", currentMessage];
-                }
-            }
-            else if (self.currentEditingMessage.type == TAPChatMessageTypeVideo) {
-                if ([currentMessage isEqualToString:@""]) {
-                    self.currentEditingMessage.body = @"🎥 Video";
-                }
-                else {
-                    self.currentEditingMessage.body = [NSString stringWithFormat:@"🎥 %@", currentMessage];
-                }
-            }
+        success:^(TAPMessageModel * _Nonnull message) {
         }
+        failure:^(TAPMessageModel * _Nullable message, NSError *error) {
+            if (error.code == 90306) {
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Unable to Edit Message", nil, [TAPUtil currentBundle], @"") detailInformation:error.localizedDescription leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            }
+        }];
         
         self.lastNumberOfWordArrayForShowMention = 0;
         self.lastTypingWordArrayStartIndex = 0;

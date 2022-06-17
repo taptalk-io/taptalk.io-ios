@@ -11,7 +11,6 @@
 #import <TapTalk/Base64.h>
 #import <CoreServices/UTType.h>
 
-#define kCharacterLimit 4000
 #define kMaximumRetryAttempt 10
 #define kDelayTime 60.0f
 
@@ -319,17 +318,17 @@
         NSDictionary *encryptedParametersDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModel:message];
 
         //Convert CountryID from string to integer (because server only accept countryID as integer)
-        NSMutableDictionary *parameterDictionary = [[NSMutableDictionary alloc] init];
-        parameterDictionary = [encryptedParametersDictionary mutableCopy];
-        NSMutableDictionary *userDictionary = [[parameterDictionary objectForKey:@"user"] mutableCopy];
+        //NSMutableDictionary *parameterDictionary = [[NSMutableDictionary alloc] init];
+        //parameterDictionary = [encryptedParametersDictionary mutableCopy];
+        //NSMutableDictionary *userDictionary = [[parameterDictionary objectForKey:@"user"] mutableCopy];
+        //
+        //NSString *countryIDString = [userDictionary valueForKeyPath:@"countryID"];
+        //NSInteger countryIDInteger = [countryIDString integerValue];
+        //NSNumber *countryIDNumber = [NSNumber numberWithInteger:countryIDInteger];
+        //[userDictionary setObject:countryIDNumber forKey:@"countryID"];
+        //[parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
         
-        NSString *countryIDString = [userDictionary valueForKeyPath:@"countryID"];
-        NSInteger countryIDInteger = [countryIDString integerValue];
-        NSNumber *countryIDNumber = [NSNumber numberWithInteger:countryIDInteger];
-        [userDictionary setObject:countryIDNumber forKey:@"countryID"];
-        [parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
-        
-        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:parameterDictionary];
+        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventNewMessage parameters:encryptedParametersDictionary];
         
         //Send event to TAPCoreMessageManager
         for (id delegate in self.delegatesArray) {
@@ -355,19 +354,8 @@
         
         //Encrypt message
         NSDictionary *encryptedParametersDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModel:message];
-
-        //Convert CountryID from string to integer (because server only accept countryID as integer)
-        NSMutableDictionary *parameterDictionary = [[NSMutableDictionary alloc] init];
-        parameterDictionary = [encryptedParametersDictionary mutableCopy];
-        NSMutableDictionary *userDictionary = [[parameterDictionary objectForKey:@"user"] mutableCopy];
         
-        NSString *countryIDString = [userDictionary valueForKeyPath:@"countryID"];
-        NSInteger countryIDInteger = [countryIDString integerValue];
-        NSNumber *countryIDNumber = [NSNumber numberWithInteger:countryIDInteger];
-        [userDictionary setObject:countryIDNumber forKey:@"countryID"];
-        [parameterDictionary setObject:[userDictionary copy] forKey:@"user"];
-        
-        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventUpdateMessage parameters:parameterDictionary];
+        [[TAPConnectionManager sharedManager] sendEmit:kTAPEventUpdateMessage parameters:encryptedParametersDictionary];
         
         //Send event to TAPCoreMessageManager
         for (id delegate in self.delegatesArray) {

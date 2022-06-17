@@ -14,6 +14,7 @@
 #define TAP_DEFAULT_MAX_CHANNEL_PARTICIPANTS 5000
 #define TAP_UPDATED_TIME_LIMIT 24 * 60 * 60 //1 day (in seconds)
 #define TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE 50
+#define kCharacterLimit 4000
 
 //Prefs Key
 #define TAP_PREFS_ACTIVE_USER @"Prefs.TapTalkActiveUser"

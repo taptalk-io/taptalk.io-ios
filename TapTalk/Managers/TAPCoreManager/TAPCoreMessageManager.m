@@ -1743,9 +1743,23 @@
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
     if (message.type == TAPChatMessageTypeText) {
+        if (updatedText.length > kCharacterLimit) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Message exceeds the %ld character limit", (long)kCharacterLimit];
+            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+            failure(message, error);
+            return;
+        }
         message.body = updatedText;
     }
-    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo){
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+        NSInteger length = updatedText.length;
+        NSInteger max = [[TapTalk sharedInstance] getMaxCaptionLength];
+        if (updatedText.length > [[TapTalk sharedInstance] getMaxCaptionLength]) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Caption exceeds the %ld character limit", (long)[[TapTalk sharedInstance] getMaxCaptionLength]];
+            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+            failure(message, error);
+            return;
+        }
         NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
         dataDictionary = [message.data mutableCopy];
         dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
@@ -1769,6 +1783,12 @@
                 message.body = [NSString stringWithFormat:@"🎥 %@", updatedText];
             }
         }
+    }
+    else {
+        NSString *errorMessage = @"Invalid message type. Allowed types are text (1001), image (1002), video (1003)";
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90309 errorMessage:errorMessage];
+        failure(message, error);
+        return;
     }
     
     start(message);
