@@ -71,6 +71,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstarint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
@@ -203,6 +205,8 @@
     self.starIconImageView.alpha = 0;
     self.checkMarkIconImageView.alpha = 0.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
+    self.starIconLeadingConstraint.constant = 0.0f;
+    self.starIconWidthConstraint.constant = 0.0f;
     [self.contentView layoutIfNeeded];
 }
 
@@ -788,9 +792,13 @@
 - (void)showStarMessageIconView{
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
+        self.starIconLeadingConstraint.constant = 6.0f;
+        self.starIconWidthConstraint.constant = 12.0f;
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+        self.starIconLeadingConstraint.constant = 0.0f;
+        self.starIconWidthConstraint.constant = 0.0f;
     }
 }
 

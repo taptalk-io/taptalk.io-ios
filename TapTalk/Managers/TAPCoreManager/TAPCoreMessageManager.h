@@ -343,7 +343,7 @@ NS_ASSUME_NONNULL_BEGIN
         updatedText:(NSString *)updatedText
             start:(void (^)(TAPMessageModel *message))start
             success:(void (^)(TAPMessageModel *message))success
-            failure:(void (^)(TAPMessageModel *message))failure;
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

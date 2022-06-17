@@ -10,6 +10,7 @@
 
 @interface TAPGrowingTextView () <UITextViewDelegate>
 
+@property (nonatomic) BOOL isTypingEnabled;
 - (void)xibSetup;
 - (void)checkHeight;
 
@@ -50,7 +51,7 @@
 }
 
 - (void)xibSetup {
-
+    self.isTypingEnabled = NO;
     self.backgroundColor = [UIColor clearColor];
     UIView *currentView = [[[TAPUtil currentBundle] loadNibNamed:[[self class] description] owner:self options:nil] lastObject];
     
@@ -200,7 +201,7 @@ shouldChangeTextInRange:(NSRange)range
         }
     }
     
-    return YES;
+    return self.isTypingEnabled;
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -219,6 +220,10 @@ shouldChangeTextInRange:(NSRange)range
     
     self.textView.font = font;
     self.placeholderLabel.font = font;
+}
+
+- (void)setTypingEnabled:(BOOL)isEnabled{
+    self.isTypingEnabled = isEnabled;
 }
 
 - (void)setText:(NSString *)text {

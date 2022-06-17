@@ -266,14 +266,14 @@
                                 </constraints>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="RCV-w0-21d">
-                                <rect key="frame" x="52" y="273" width="12" height="12"/>
+                                <rect key="frame" x="70" y="273" width="0.0" height="12"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="12" id="j0s-9z-Gwn"/>
+                                    <constraint firstAttribute="width" id="j0s-9z-Gwn"/>
                                     <constraint firstAttribute="height" constant="12" id="wP4-4r-cOd"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P6K-or-v0K">
-                                <rect key="frame" x="10" y="274" width="42" height="10"/>
+                                <rect key="frame" x="10" y="274" width="60" height="10"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="9RU-m8-0He"/>
@@ -295,7 +295,7 @@
                             <constraint firstAttribute="trailing" secondItem="stb-Nf-ld4" secondAttribute="trailing" constant="10" id="R9f-aD-xty"/>
                             <constraint firstAttribute="bottom" secondItem="xBZ-Oa-CNb" secondAttribute="bottom" constant="10" id="Rkf-3d-9TA"/>
                             <constraint firstItem="RCV-w0-21d" firstAttribute="centerY" secondItem="dkH-P5-52g" secondAttribute="centerY" id="S7S-ml-fTI"/>
-                            <constraint firstItem="xBZ-Oa-CNb" firstAttribute="leading" secondItem="RCV-w0-21d" secondAttribute="trailing" constant="6" id="TDo-nl-UK8"/>
+                            <constraint firstItem="xBZ-Oa-CNb" firstAttribute="leading" secondItem="RCV-w0-21d" secondAttribute="trailing" id="TDo-nl-UK8"/>
                             <constraint firstAttribute="trailing" secondItem="FpM-fx-qIk" secondAttribute="trailing" constant="10" id="URw-C8-8Yo"/>
                             <constraint firstItem="5YI-Ih-9ho" firstAttribute="top" secondItem="GBq-4A-GJ7" secondAttribute="top" id="VHj-dp-dEh"/>
                             <constraint firstItem="HId-QA-OEm" firstAttribute="leading" secondItem="GBq-4A-GJ7" secondAttribute="leading" constant="10" id="XAP-a9-e2N"/>
@@ -489,6 +489,8 @@
                 <outlet property="seperatorViewHeightConstarint" destination="Yx9-1R-3Ku" id="fQH-XE-MSk"/>
                 <outlet property="seperatorViewTopConstraint" destination="6AT-cB-f4O" id="qV2-79-dWj"/>
                 <outlet property="starIconImageView" destination="RCV-w0-21d" id="xEW-L8-fgC"/>
+                <outlet property="starIconLeadingConstraint" destination="TDo-nl-UK8" id="aUa-0a-mgz"/>
+                <outlet property="starIconWidthConstraint" destination="j0s-9z-Gwn" id="odt-pF-kBO"/>
                 <outlet property="statusIconImageView" destination="dkH-P5-52g" id="V53-y8-tzz"/>
                 <outlet property="statusLabel" destination="aVb-7h-z4S" id="2do-oE-YWD"/>
                 <outlet property="statusLabelHeightConstraint" destination="Ey5-yg-y7M" id="Tei-DM-wQk"/>

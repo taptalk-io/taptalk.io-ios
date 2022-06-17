@@ -78,6 +78,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
 
 
 @property (strong, nonatomic) NSString *currentProfileImageURLString;
@@ -202,6 +204,8 @@
     self.checkMarkIconImageView.alpha = 0.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
     self.senderImageViewLeadingConstraint.constant = 16.0f;
+    self.starIconWidthConstraint.constant = 0.0f;
+    self.starIconLeadingConstraint.constant = 0.0f;
     [self showSenderInfo:NO];
 }
 
@@ -993,9 +997,13 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
+        self.starIconWidthConstraint.constant = 12.0f;
+        self.starIconLeadingConstraint.constant = 6.0f;
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+        self.starIconWidthConstraint.constant = 0.0f;
+        self.starIconLeadingConstraint.constant = 0.0f;
     }
 }
 

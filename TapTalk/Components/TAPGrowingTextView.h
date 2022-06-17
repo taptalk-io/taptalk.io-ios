@@ -46,5 +46,6 @@
 - (void)setInitialText:(NSString *)text;
 
 - (void)setInputView:(UIView *)inputView;
+- (void)setTypingEnabled:(BOOL)isEnabled;
 
 @end

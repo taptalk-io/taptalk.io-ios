@@ -166,6 +166,13 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     
     [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
     
+    // Remove unused fields for socket emit
+    [parametersDictionary removeObjectForKey:@"user"];
+    NSMutableDictionary *roomDictionary = [[parametersDictionary objectForKey:@"room"] mutableCopy];
+    [roomDictionary removeObjectForKey:@"participants"];
+    [roomDictionary removeObjectForKey:@"unreadCount"];
+    [parametersDictionary setObject:roomDictionary forKey:@"room"];
+    
     return parametersDictionary;
 }
 
