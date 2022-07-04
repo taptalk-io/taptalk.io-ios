@@ -57,6 +57,7 @@
 @property (nonatomic) BOOL isStarMessageMenuDisabled;
 @property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
 @property (nonatomic) BOOL isEditMessageMenuDisabled;
+@property (nonatomic) BOOL isDeleteAccountButtonVisible;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -967,6 +968,20 @@ Get current status of voice noite menu from message bubble long press & chat pro
 */
 - (BOOL)isEditMessageMenuEnabled{
     return !self.isEditMessageMenuDisabled;
+}
+
+/**
+Show or hide delete account button in my account
+*/
+- (void)setDeleteAccountButtonVisible:(BOOL)isVisible {
+    _isDeleteAccountButtonVisible = isVisible;
+}
+
+/**
+Get current visibility state of  delete account button in my account 
+*/
+- (BOOL)getDeleteAccountButtonVisible {
+    return self.isDeleteAccountButtonVisible;
 }
 
 

@@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, TAPDefaultColor) {
     TAPDefaultColorPrimaryDark,
     TAPDefaultColorSuccess,
     TAPDefaultColorError,
+    TAPDefaultWarningColor,
     TAPDefaultColorTextLight,
     TAPDefaultColorTextMedium,
     TAPDefaultColorTextDark,
@@ -53,6 +54,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorButtonInactiveBackgroundGradientDark,
     TAPComponentColorButtonInactiveBorder,
     TAPComponentColorButtonDestructiveBackground,
+    TAPComponentColorButtonWarningBackground,
     TAPComponentColorSwitchActiveBackground,
     TAPComponentColorSwitchInactiveBackground,
     TAPComponentColorPopupDialogPrimaryButtonSuccessBackground,
@@ -355,6 +357,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorShareExtensionCollectionViewCellHeaderLabel,
     TAPTextColorTableViewProfileNameSendToContactLabel,
     TAPTextColorRecordingTimeLabel,
+    TAPTextColorWarningLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -491,6 +494,8 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontShareExtensionCollectionViewCellHeaderLabel,
     TAPComponentFontTableViewInitialProfileNameSendToContactLabel,
     TAPComponentFontTableViewProfileNameSendToContactLabel,
+    TAPComponentFontDeleteAccountTitleLabel,
+    TAPComponentFontDeleteAccountWarningLabel,
 };
 
 @interface TAPStyleManager : NSObject

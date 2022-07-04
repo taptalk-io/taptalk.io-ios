@@ -206,11 +206,22 @@
     NSInteger numberOfUnreadMessage = [unreadMessageCount integerValue];
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        //No photo found, get the initial
-        self.initialNameView.alpha = 1.0f;
-        self.profileImageView.alpha = 0.0f;
-        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
-        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
+        if(room.deleted.longValue > 0){
+            //set deleted account profil pict
+            self.initialNameView.alpha = 1.0f;
+            self.profileImageView.alpha = 1.0f;
+            self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
+            self.initialNameLabel.text = @"";
+            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
+        else{
+            //No photo found, get the initial
+            self.initialNameView.alpha = 1.0f;
+            self.profileImageView.alpha = 0.0f;
+            self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
+            self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
+        }
+        
     }
     else {
         self.initialNameView.alpha = 0.0f;

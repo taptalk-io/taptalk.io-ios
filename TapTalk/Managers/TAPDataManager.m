@@ -1584,11 +1584,8 @@
                                success:(void (^)(void))success
                                failure:(void (^)(NSError *error))failure {
     if (message.type == TAPChatMessageTypeImage) {
-        NSDictionary *dataDictionary = message.data;
-        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-        
         //Remove image
-        [TAPImageView removeImageFromCacheWithKey:fileID];
+        [self removeImageFromCacheWithMessage:message];
         
         success();
     }
@@ -1598,7 +1595,7 @@
         NSString *fileID = [dataDictionary objectForKey:@"fileID"];
         
         //Remove thumbnail image
-        [TAPImageView removeImageFromCacheWithKey:fileID];
+        [self removeImageFromCacheWithMessage:message];
         
         //Remove video
         NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
@@ -1627,11 +1624,8 @@
                                            success:(void (^)(void))success
                                            failure:(void (^)(NSError *error))failure {
     if (message.type == TAPChatMessageTypeImage) {
-        NSDictionary *dataDictionary = message.data;
-        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-        
         //Remove image
-        [TAPImageView removeImageFromCacheWithKey:fileID];
+        [self removeImageFromCacheWithMessage:message];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             success();
@@ -1643,7 +1637,7 @@
         NSString *fileID = [dataDictionary objectForKey:@"fileID"];
         
         //Remove thumbnail image
-        [TAPImageView removeImageFromCacheWithKey:fileID];
+        [self removeImageFromCacheWithMessage:message];
         
         //Remove video
         NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
@@ -1736,6 +1730,23 @@
         //failure get all message in room
         failure(error);
     }];
+}
+
++ (void)removeImageFromCacheWithMessage:(TAPMessageModel *)message {
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    NSString *url = [dataDictionary objectForKey:@"url"];
+    if (url == nil || [url isEqualToString:@""]) {
+        url = [dataDictionary objectForKey:@"fileURL"];
+    }
+    url = [[url componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    url = [TAPUtil nullToEmptyString:url];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    
+    [TAPImageView removeImageFromCacheWithKey:message.localID];
+    [TAPImageView removeImageFromCacheWithKey:url];
+    [TAPImageView removeImageFromCacheWithKey:fileID];
 }
 
 + (NSString *)escapedDatabaseStringFromString:(NSString *)string {

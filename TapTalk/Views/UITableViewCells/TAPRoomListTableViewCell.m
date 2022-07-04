@@ -47,128 +47,6 @@
     
     if (self) {
         _isShouldForceUpdateUnreadBubble = YES;
-        
-        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 74.0f)];
-        [self.contentView addSubview:self.bgView];
-        
-        CGFloat leftPadding = 16.0f;
-        CGFloat rightPadding = 16.0f;
-        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
-        self.initialNameView.alpha = 0.0f;
-        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
-        self.initialNameView.clipsToBounds = YES;
-        [self.bgView addSubview:self.initialNameView];
-        
-        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
-        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
-        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
-        self.initialNameLabel.font = initialNameLabelFont;
-        self.initialNameLabel.textColor = initialNameLabelColor;
-        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
-        [self.initialNameView addSubview:self.initialNameLabel];
-        
-        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
-        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
-        self.profileImageView.backgroundColor = [UIColor clearColor];
-        self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
-        self.profileImageView.clipsToBounds = YES;
-        [self.bgView addSubview:self.profileImageView];
-        
-        _expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 22.0f, CGRectGetMaxY(self.profileImageView.frame) - 22.0f, 22.0f, 22.0f)];
-        self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconExpert" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.expertIconImageView.alpha = 0.0f;
-        [self.bgView addSubview:self.expertIconImageView];
-        
-        UIFont *roomListTimeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListTime];
-        UIColor *roomListTimeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListTime];
-        _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - rightPadding, CGRectGetMinY(self.profileImageView.frame) + 4.0f, 0.0f, 16.0f)];
-        self.timeLabel.textColor = roomListTimeLabelColor;
-        self.timeLabel.font = roomListTimeLabelFont;
-        [self.bgView addSubview:self.timeLabel];
-        
-        _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
-        self.muteImageView.alpha = 0.0f;
-        self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.muteImageView.image = [self.muteImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMuted]];
-        [self.bgView addSubview:self.muteImageView];
-
-        UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
-        UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
-        _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 8.0f, CGRectGetMinX(self.muteImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 20.0f)];
-        self.roomNameLabel.textColor = roomListNameLabelColor;
-        self.roomNameLabel.font = roomListNameLabelFont;
-        [self.bgView addSubview:self.roomNameLabel];
-        self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
-        
-//        UIFont *lastSenderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontGroupRoomListSenderName];
-//        UIColor *lastSenderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorGroupRoomListSenderName];
-//        _lastSenderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.roomNameLabel.frame), 16.0f)];
-//        self.lastSenderLabel.textColor = lastSenderLabelColor;
-//        self.lastSenderLabel.font = lastSenderLabelFont;
-//        [self.bgView addSubview:self.lastSenderLabel];
-        
-        _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 20.0f, 20.0f, 20.0f)];
-        self.messageStatusImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.messageStatusImageView.alpha = 0.0f;
-        [self.bgView addSubview:self.messageStatusImageView];
-        
-        _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 0.0f, 20.0f)];
-        self.bubbleUnreadView.clipsToBounds = YES;
-        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
-        self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
-        [self.bgView addSubview:self.bubbleUnreadView];
-        
-        UIFont *roomListUnreadBadgeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListUnreadBadgeLabel];
-        UIColor *roomListUnreadBadgeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListUnreadBadgeLabel];
-        _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
-        self.numberOfUnreadMessageLabel.textColor = roomListUnreadBadgeLabelColor;
-        self.numberOfUnreadMessageLabel.textAlignment = NSTextAlignmentCenter;
-        self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
-        [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
-        
-        _unreadMentionView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 20.0f, 20.0f)];
-        self.unreadMentionView.clipsToBounds = YES;
-        self.unreadMentionView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
-        self.unreadMentionView.layer.cornerRadius = CGRectGetHeight(self.unreadMentionView.frame) / 2.0f;
-        self.unreadMentionView.alpha = 0.0f;
-        [self.bgView addSubview:self.unreadMentionView];
-
-        _unreadMentionImageView = [[UIImageView alloc] initWithFrame:CGRectMake(3.0f, 3.0f, 14.0f, 14.0f)];
-        self.unreadMentionImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.unreadMentionImageView.image = [self.unreadMentionImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
-        [self.unreadMentionView addSubview:self.unreadMentionImageView];
-        
-        UIFont *roomListMessageLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListMessage];
-        UIColor *roomListMessageLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListMessage];
-        _lastMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame) - 50.0f - 4.0f, 42.0f)];
-        self.lastMessageLabel.textColor = roomListMessageLabelColor;
-        self.lastMessageLabel.font = roomListMessageLabelFont;
-        self.lastMessageLabel.numberOfLines = 2;
-        [self.bgView addSubview:self.lastMessageLabel];
-        
-        _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
-        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
-        [self.bgView addSubview:self.separatorView];
-        
-        _typingView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame) + 2.0f, CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
-        self.typingView.backgroundColor = [UIColor clearColor];
-        self.typingView.alpha = 0.0f;
-        [self.bgView addSubview:self.typingView];
-        
-        _typingAnimationImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 16.0f, 16.0f)];
-        self.typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
-        self.typingAnimationImageView.animationDuration = 0.6f;
-        self.typingAnimationImageView.animationRepeatCount = 0.0f;
-        [self.typingView addSubview:self.typingAnimationImageView];
-        
-        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f, 16.0f)];
-        self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
-        self.typingLabel.font = roomListMessageLabelFont;
-        self.typingLabel.textColor = roomListMessageLabelColor;
-        [self.typingLabel sizeToFit];
-        self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
-        [self.typingView addSubview:self.typingLabel];
-        
     }
     
     return self;
@@ -209,6 +87,158 @@
     if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel ||  currentRoom.type == RoomTypeTransaction) {
         //Group / Channel
         isGroup = YES;
+    }
+    
+    if (self.bgView == nil) {
+        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.tableView.frame), 74.0f)];
+        [self.contentView addSubview:self.bgView];
+    }
+    
+    CGFloat leftPadding = 16.0f;
+    CGFloat rightPadding = 16.0f;
+    
+    if (self.initialNameView == nil) {
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
+        self.initialNameView.alpha = 0.0f;
+        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.bgView addSubview:self.initialNameView];
+    }
+    
+    if (self.initialNameLabel == nil) {
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
+    }
+    
+    if (self.profileImageView == nil) {
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.profileImageView.backgroundColor = [UIColor clearColor];
+        self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
+        self.profileImageView.clipsToBounds = YES;
+        [self.bgView addSubview:self.profileImageView];
+    }
+    
+    if (self.expertIconImageView == nil) {
+        _expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 22.0f, CGRectGetMaxY(self.profileImageView.frame) - 22.0f, 22.0f, 22.0f)];
+        self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconExpert" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.expertIconImageView.alpha = 0.0f;
+        [self.bgView addSubview:self.expertIconImageView];
+    }
+    
+    if (self.timeLabel == nil) {
+        UIFont *roomListTimeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListTime];
+        UIColor *roomListTimeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListTime];
+        _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - rightPadding, CGRectGetMinY(self.profileImageView.frame) + 4.0f, 0.0f, 16.0f)];
+        self.timeLabel.textColor = roomListTimeLabelColor;
+        self.timeLabel.font = roomListTimeLabelFont;
+        [self.bgView addSubview:self.timeLabel];
+    }
+    
+    if (self.muteImageView == nil) {
+        _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
+        self.muteImageView.alpha = 0.0f;
+        self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.muteImageView.image = [self.muteImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMuted]];
+        [self.bgView addSubview:self.muteImageView];
+    }
+
+    if (self.roomNameLabel == nil) {
+        UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
+        UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
+        _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 8.0f, CGRectGetMinX(self.muteImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 20.0f)];
+        self.roomNameLabel.textColor = roomListNameLabelColor;
+        self.roomNameLabel.font = roomListNameLabelFont;
+        [self.bgView addSubview:self.roomNameLabel];
+        self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
+    }
+    
+    if (self.messageStatusImageView == nil) {
+        _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 20.0f, 20.0f, 20.0f)];
+        self.messageStatusImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.messageStatusImageView.alpha = 0.0f;
+        [self.bgView addSubview:self.messageStatusImageView];
+    }
+    
+    if (self.bubbleUnreadView == nil) {
+        _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 0.0f, 20.0f)];
+        self.bubbleUnreadView.clipsToBounds = YES;
+        self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
+        self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
+        [self.bgView addSubview:self.bubbleUnreadView];
+    }
+    
+    if (self.numberOfUnreadMessageLabel == nil) {
+        UIFont *roomListUnreadBadgeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListUnreadBadgeLabel];
+        UIColor *roomListUnreadBadgeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListUnreadBadgeLabel];
+        _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
+        self.numberOfUnreadMessageLabel.textColor = roomListUnreadBadgeLabelColor;
+        self.numberOfUnreadMessageLabel.textAlignment = NSTextAlignmentCenter;
+        self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
+        [self.bubbleUnreadView addSubview:self.numberOfUnreadMessageLabel];
+    }
+    
+    if (self.unreadMentionView == nil) {
+        _unreadMentionView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 20.0f, 20.0f)];
+        self.unreadMentionView.clipsToBounds = YES;
+        self.unreadMentionView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
+        self.unreadMentionView.layer.cornerRadius = CGRectGetHeight(self.unreadMentionView.frame) / 2.0f;
+        self.unreadMentionView.alpha = 0.0f;
+        [self.bgView addSubview:self.unreadMentionView];
+    }
+
+    if (self.unreadMentionImageView == nil) {
+        _unreadMentionImageView = [[UIImageView alloc] initWithFrame:CGRectMake(3.0f, 3.0f, 14.0f, 14.0f)];
+        self.unreadMentionImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.unreadMentionImageView.image = [self.unreadMentionImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        [self.unreadMentionView addSubview:self.unreadMentionImageView];
+    }
+    
+    UIFont *roomListMessageLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListMessage];
+    UIColor *roomListMessageLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListMessage];
+    
+    if (self.lastMessageLabel == nil) {
+        _lastMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame) - 50.0f - 4.0f, 42.0f)];
+        self.lastMessageLabel.textColor = roomListMessageLabelColor;
+        self.lastMessageLabel.font = roomListMessageLabelFont;
+        self.lastMessageLabel.numberOfLines = 2;
+        [self.bgView addSubview:self.lastMessageLabel];
+    }
+    
+    if (self.separatorView == nil) {
+        _separatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.bgView.frame) - 1.0f, CGRectGetWidth(self.bgView.frame) - CGRectGetMinX(self.roomNameLabel.frame), 1.0f)];
+        self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+        [self.bgView addSubview:self.separatorView];
+    }
+    
+    if (self.typingView == nil) {
+        _typingView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.lastMessageLabel.frame) + 2.0f, CGRectGetMinY(self.lastMessageLabel.frame), CGRectGetWidth(self.lastMessageLabel.frame), 16.0f)];
+        self.typingView.backgroundColor = [UIColor clearColor];
+        self.typingView.alpha = 0.0f;
+        [self.bgView addSubview:self.typingView];
+    }
+    
+    if (self.typingAnimationImageView == nil) {
+        _typingAnimationImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 16.0f, 16.0f)];
+        self.typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.typingAnimationImageView.animationDuration = 0.6f;
+        self.typingAnimationImageView.animationRepeatCount = 0.0f;
+        [self.typingView addSubview:self.typingAnimationImageView];
+    }
+    
+    if (self.typingLabel == nil) {
+        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.tableView.frame) - 76.0f - 45.0f, 16.0f)];
+        self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
+        self.typingLabel.font = roomListMessageLabelFont;
+        self.typingLabel.textColor = roomListMessageLabelColor;
+        [self.typingLabel sizeToFit];
+        self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
+        [self.typingView addSubview:self.typingLabel];
     }
     
     NSString *profileImageURL = @"";
@@ -591,7 +621,7 @@
             //Bubble Number
             CGSize newNumberOfUnreadMessageLabelSize = [self.numberOfUnreadMessageLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame))];
             
-            //Bubble View            
+            //Bubble View
             CGFloat bubbleUnreadViewWidth = newNumberOfUnreadMessageLabelSize.width + 7.0f + 7.0f;
             CGFloat numberOfUnreadMessageLabelXPosition = 7.0f;
             
@@ -848,8 +878,8 @@
     }
     [self.typingLabel sizeToFit];
     CGFloat typingLabelWidth = CGRectGetWidth(self.typingLabel.frame);
-    if (typingLabelWidth > CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f - 4.0f - CGRectGetWidth(self.typingAnimationImageView.frame)) {
-        typingLabelWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 76.0f - 45.0f - 4.0f - CGRectGetWidth(self.typingAnimationImageView.frame);
+    if (typingLabelWidth > CGRectGetWidth(self.tableView.frame) - 76.0f - 45.0f - 4.0f - CGRectGetWidth(self.typingAnimationImageView.frame)) {
+        typingLabelWidth = CGRectGetWidth(self.tableView.frame) - 76.0f - 45.0f - 4.0f - CGRectGetWidth(self.typingAnimationImageView.frame);
     }
     
     self.typingLabel.frame = CGRectMake(CGRectGetMaxX(self.typingAnimationImageView.frame) + 4.0f, 0.0f, typingLabelWidth, 16.0f);

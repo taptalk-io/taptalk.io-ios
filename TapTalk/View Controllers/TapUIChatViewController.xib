@@ -669,16 +669,16 @@
                     <rect key="frame" x="0.0" y="623" width="375" height="0.0"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kgs-QW-Obm">
-                            <rect key="frame" x="105" y="5" width="165" height="19"/>
+                            <rect key="frame" x="104.5" y="5" width="166.5" height="20.5"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is a chat history" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="des-jS-dAa">
-                                    <rect key="frame" x="18" y="0.0" width="147" height="19"/>
+                                    <rect key="frame" x="18" y="0.0" width="148.5" height="20.5"/>
                                     <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="16"/>
                                     <color key="textColor" red="1" green="0.49411764705882355" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconHistory" translatesAutoresizingMaskIntoConstraints="NO" id="bpC-bi-dD5">
-                                    <rect key="frame" x="0.0" y="2.5" width="14" height="14"/>
+                                    <rect key="frame" x="0.0" y="3.5" width="14" height="14"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="14" id="OXm-vh-Q17"/>
                                         <constraint firstAttribute="width" constant="14" id="cb8-OR-nQR"/>
@@ -696,13 +696,13 @@
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This user is no longer available" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DuO-ux-hS4">
-                            <rect key="frame" x="90.5" y="24" width="194" height="18"/>
+                            <rect key="frame" x="90.5" y="25.5" width="194" height="18"/>
                             <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="14"/>
                             <color key="textColor" red="1" green="0.4941176471" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tdB-BH-VFB" customClass="TAPCustomButtonView">
-                            <rect key="frame" x="0.0" y="42" width="375" height="74"/>
+                            <rect key="frame" x="0.0" y="43.5" width="375" height="74"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uGB-H3-Pan">
                                     <rect key="frame" x="16" y="15" width="343" height="44"/>
@@ -770,7 +770,7 @@
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XjO-iQ-SLk">
-                            <rect key="frame" x="0.0" y="42" width="375" height="74"/>
+                            <rect key="frame" x="0.0" y="43.5" width="375" height="74"/>
                             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <state key="normal">
                                 <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1260,14 +1260,14 @@
                             <rect key="frame" x="60" y="8" width="221" height="36"/>
                             <subviews>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconTrashChatComposer" translatesAutoresizingMaskIntoConstraints="NO" id="I8z-0p-drU">
-                                    <rect key="frame" x="3" y="2" width="32" height="32"/>
+                                    <rect key="frame" x="3" y="6" width="24" height="24"/>
                                     <constraints>
-                                        <constraint firstAttribute="width" constant="32" id="eiY-ta-N7G"/>
-                                        <constraint firstAttribute="height" constant="32" id="f5p-RL-YES"/>
+                                        <constraint firstAttribute="width" constant="24" id="eiY-ta-N7G"/>
+                                        <constraint firstAttribute="height" constant="24" id="f5p-RL-YES"/>
                                     </constraints>
                                 </imageView>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7FP-sJ-au9" userLabel="Slide To CancelView">
-                                    <rect key="frame" x="35" y="0.0" width="119" height="36"/>
+                                    <rect key="frame" x="27" y="0.0" width="127" height="36"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconChevronLeft" translatesAutoresizingMaskIntoConstraints="NO" id="SA9-JR-pNs">
                                             <rect key="frame" x="15" y="6" width="24" height="24"/>
@@ -1277,7 +1277,7 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slide left to cancel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vdD-JI-z0m">
-                                            <rect key="frame" x="39" y="11.5" width="80" height="13.5"/>
+                                            <rect key="frame" x="39" y="11.5" width="88" height="13.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -1333,10 +1333,10 @@
                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 </button>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jX0-aV-h00" userLabel="Finsih Recording">
-                                    <rect key="frame" x="35" y="0.0" width="119" height="36"/>
+                                    <rect key="frame" x="27" y="0.0" width="127" height="36"/>
                                     <subviews>
                                         <slider opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="AuN-zg-eJa">
-                                            <rect key="frame" x="18" y="0.0" width="103" height="37"/>
+                                            <rect key="frame" x="18" y="0.0" width="111" height="37"/>
                                             <connections>
                                                 <action selector="playerSliderDidChanged:" destination="-1" eventType="valueChanged" id="5Wp-o0-jIK"/>
                                             </connections>

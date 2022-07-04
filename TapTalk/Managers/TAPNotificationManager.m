@@ -179,6 +179,13 @@
 }
 
 - (void)showInAppNotificationWithMessage:(TAPMessageModel *)message {
+    if ([[TapUI sharedInstance].inAppNotificationDelegate respondsToSelector:@selector(tapTalkShouldShowInAppNotificationWithMessage:)] &&
+        ![[TapUI sharedInstance].inAppNotificationDelegate tapTalkShouldShowInAppNotificationWithMessage:message]
+    ) {
+        // Do not show if disabled by delegate
+        return;
+    }
+    
     if (message.isDeleted || message.isHidden) {
         //Do not show if message isdeleted or isHidden
         return;

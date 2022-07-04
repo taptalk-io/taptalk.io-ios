@@ -172,8 +172,8 @@
     dataImage = [self convertDictionaryToDataMediaModel:dataDictionary];
     
     //Get dummy image from cache
-    [TAPImageView imageFromCacheWithKey:currentMessage.localID message:currentMessage success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-        
+    [TAPImageView imageFromCacheWithMessage:currentMessage
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
         //Resize image
         [self resizeImage:savedImage message:resultMessage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
             
@@ -251,10 +251,10 @@
                     [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
                     
                     //Save image to cache
-                    [TAPImageView saveImageToCache:resultImage withKey:fileID];
+                    [TAPImageView saveImageToCache:resultImage withKey:resultMessage.localID];
                     
                     //Remove dummy image with localID key from cache
-                    [TAPImageView removeImageFromCacheWithKey:resultMessage.localID];
+                    //[TAPDataManager removeImageFromCacheWithMessage:resultMessage];
                     
                     //Send emit
                     [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
@@ -368,6 +368,9 @@
             [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
             
         }];
+    }
+    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+        
     }];
 }
 
@@ -715,10 +718,10 @@
                     [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
                     
                     //Save image to cache
-                    [TAPImageView saveImageToCache:resultImage withKey:fileID];
+                    [TAPImageView saveImageToCache:resultImage withKey:resultMessage.localID];
                     
                     //Remove dummy image with localID key from cache
-                    [TAPImageView removeImageFromCacheWithKey:resultMessage.localID];
+                    //[TAPDataManager removeImageFromCacheWithMessage:resultMessage];
                     
                     //Send emit
                     [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
@@ -2271,7 +2274,9 @@
         
         //Save video thumbnail image to cache
         UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:filePathString];
-        [TAPImageView saveImageToCache:thumbnailVideoImage withKey:fileID];
+        if (thumbnailVideoImage != nil) {
+            [TAPImageView saveImageToCache:thumbnailVideoImage withKey:resultMessage.localID];
+        }
         
         //Send emit
         [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];

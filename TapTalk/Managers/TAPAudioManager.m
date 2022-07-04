@@ -141,6 +141,16 @@
     return self.player.url.path;
 }
 
+- (BOOL)isRecording {
+    if (self.recorder.recording) {
+        return YES;
+    }
+    else{
+        return NO;
+    }
+    
+}
+
 - (BOOL)checkAudioPermissionAndSetup {
     switch ([[AVAudioSession sharedInstance] recordPermission]) {
         case AVAudioSessionRecordPermissionGranted:

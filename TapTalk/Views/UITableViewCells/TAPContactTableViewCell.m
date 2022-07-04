@@ -132,11 +132,21 @@
 
         NSString *imageURL = user.imageURL.fullsize;
         if (imageURL == nil || [imageURL isEqualToString:@""]) {
-            //No photo found, get the initial
-            self.initialNameView.alpha = 1.0f;
-            self.contactImageView.alpha = 0.0f;
-            self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:contactName];
-            self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:contactName isGroup:NO];
+            if(user.deleted.longValue > 0){
+                //set deleted account profil pict
+                self.initialNameView.alpha = 1.0f;
+                self.contactImageView.alpha = 1.0f;
+                self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:contactName];
+                self.initialNameLabel.text = @"";
+                self.contactImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            }
+            else{
+                //No photo found, get the initial
+                self.initialNameView.alpha = 1.0f;
+                self.contactImageView.alpha = 0.0f;
+                self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:contactName];
+                self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:contactName isGroup:NO];
+            }
         }
         else {
             self.initialNameView.alpha = 0.0f;

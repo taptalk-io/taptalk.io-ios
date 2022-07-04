@@ -882,7 +882,6 @@
         }
         case TAPComponentFontDeletedChatRoomInfoContentLabel:
         {
-            
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:TAP_DELETED_CHAT_ROOM_INFO_CONTENT_FONTSIZE_STYLE];
             return font;
@@ -1226,6 +1225,21 @@
             return font;
             break;
         }
+        case TAPComponentFontDeleteAccountTitleLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DELETE_ACCOUNT_TITLE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontDeleteAccountWarningLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DELETE_ACCOUNT_WARNING_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -1270,6 +1284,11 @@
         case TAPDefaultColorError:
         {
             return [TAPUtil getColor:TAP_COLOR_ERROR];
+            break;
+        }
+        case TAPDefaultWarningColor:
+        {
+            return [TAPUtil getColor:TAP_COLOR_WARNING];
             break;
         }
         case TAPDefaultColorTextLight:
@@ -2013,6 +2032,11 @@
             return color;
             break;
         }
+        case TAPTextColorWarningLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultWarningColor];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TAPUtil getColor:@"9B9B9B"];
@@ -2134,6 +2158,12 @@
         case TAPComponentColorButtonDestructiveBackground:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorError];
+            return color;
+            break;
+        }
+        case TAPComponentColorButtonWarningBackground:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultWarningColor];
             return color;
             break;
         }

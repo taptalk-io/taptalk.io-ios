@@ -301,45 +301,23 @@
 }
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    NSString *urlKey = [dataDictionary objectForKey:@"url"];
-    if (urlKey == nil || [urlKey isEqualToString:@""]) {
-        urlKey = [dataDictionary objectForKey:@"fileURL"];
-    }
-    urlKey = [TAPUtil nullToEmptyString:urlKey];
-    
-    if (![urlKey isEqualToString:@""]) {
-        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-    }
-    urlKey = [TAPUtil nullToEmptyString:urlKey];
-    
-    [TAPImageView imageFromCacheWithKey:urlKey message:message
-    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+    [TAPImageView imageFromCacheWithMessage:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
         if (savedImage != nil) {
             [self.imageView setImage:savedImage];
             CGFloat width = savedImage.size.width;
             CGFloat height = savedImage.size.height;
         }
-    } failure:^(TAPMessageModel *resultMessage) {
-        [TAPImageView imageFromCacheWithKey:fileID message:message
-        success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
-            if (savedImage != nil) {
-                [self.imageView setImage:savedImage];
-                CGFloat width = savedImage.size.width;
-                CGFloat height = savedImage.size.height;
-            }
-        } failure:^(TAPMessageModel *resultMessage) {
-            //Get from message.data
-            NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
-            NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
-            UIImage *image = [UIImage imageWithData:thumbnailImageData];
-            if (image != nil) {
-                self.thumbnailImageView.image = image;
-            }
-        }];
+    }
+    failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+        //Get from message.data
+        NSDictionary *dataDictionary = message.data;
+        NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
+        NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+        UIImage *image = [UIImage imageWithData:thumbnailImageData];
+        if (image != nil) {
+            self.thumbnailImageView.image = image;
+        }
     }];
 }
 

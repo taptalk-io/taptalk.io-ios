@@ -91,6 +91,11 @@
         [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     }
     
+    if ([[TapUI sharedInstance] getDeleteAccountButtonVisible]) {
+        //Handle only when delete account is visible
+        [self.myAccountView.deleteAccountButton addTarget:self action:@selector(deleteAccountButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
     [self.myAccountView setContinueButtonEnabled:YES];
     
     _currentUser = [TAPDataManager getActiveUser];
@@ -1117,6 +1122,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)logoutButtonDidTapped {
     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Logout" title:NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to log out?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"")];
+}
+
+- (void)deleteAccountButtonDidTapped {
+    id <TapUIMyAccountDelegate> myAccountDelegate = [TapUI sharedInstance].myAccountDelegate;
+    if ([myAccountDelegate respondsToSelector:@selector(tapTalkDeleteAccountButtonTapped:currentShownNavigationController:)]) {
+        [myAccountDelegate tapTalkDeleteAccountButtonTapped:self currentShownNavigationController:self.navigationController];
+    }
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {

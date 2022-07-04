@@ -3652,11 +3652,11 @@ CGPoint center;
             NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
             currentCaption = [TAPUtil nullToEmptyString:currentCaption];
         
-            [TAPImageView imageFromCacheWithKey:message.localID message:message
-            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
+            [TAPImageView imageFromCacheWithMessage:message
+            success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
+                [[TAPChatManager sharedManager] sendImageMessage:receivedMessage caption:currentCaption];
             }
-            failure:^(TAPMessageModel *resultMessage) {
+            failure:^(NSError *error, TAPMessageModel *receivedMessage) {
                 NSString *assetIdentifier = [dataDictionary objectForKey:@"assetIdentifier"];
                 assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
                 
@@ -6961,36 +6961,30 @@ CGPoint center;
     if (forwardMessageArray != nil && forwardMessageArray.count > 0) {
         [self showInputAccessoryExtensionView:YES];
         if (forwardMessageArray.count == 1) {
+            // Show forward single message layout
             _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
             TAPMessageModel *forwardMessageModel = [forwardMessageArray objectAtIndex:0];
             
-            //if reply exists check if image in quote exists
-            //if image exists change view to Quote View
-            if((forwardMessageModel.quote.fileID && ![forwardMessageModel.quote.fileID isEqualToString:@""]) || (forwardMessageModel.quote.imageURL && ![forwardMessageModel.quote.imageURL isEqualToString:@""])) {
+            if (forwardMessageModel.type == TAPChatMessageTypeImage ||
+                forwardMessageModel.type == TAPChatMessageTypeVideo
+            ) {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
-                [self setQuoteWithQuote:forwardMessageModel.quote userID:forwardMessageModel.user.userID];
+                TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:forwardMessageModel];
+                [self setQuoteWithQuote:quote userID:forwardMessageModel.user.userID];
             }
             else {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
                 [self setReplyMessageWithMessage:forwardMessageModel];
-                
-                //Set send button to active when forward model is available
-                TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
-                if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
-                    [self setSendButtonActive:YES];
-                }
             }
-        }else{
+        }
+        else {
+            // Show forward multiple message layout
             TAPMessageModel *forwardMessageModel = [forwardMessageArray objectAtIndex:0];
             [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
             [self setMultipleForwardWithMessage:forwardMessageArray forwardMessageCount:forwardMessageArray.count];
-            
-            //Set send button to active when forward model is available
-            TAPChatManagerQuoteActionType quoteActionType =  [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
-            if (quoteActionType == TAPChatManagerQuoteActionTypeForward) {
-                [self setSendButtonActive:YES];
-            }
         }
+        // Set send button to active when forward model is available
+        [self setSendButtonActive:YES];
     }
     else {
         [self showInputAccessoryExtensionView:NO];
@@ -7006,11 +7000,12 @@ CGPoint center;
             _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
             TAPMessageModel *quoteMessageModel = (TAPMessageModel *)quotedMessage;
             
-            //if reply exists check if image in quote exists
-            //if image exists change view to Quote View
-            if((quoteMessageModel.quote.fileID && ![quoteMessageModel.quote.fileID isEqualToString:@""]) || (quoteMessageModel.quote.imageURL && ![quoteMessageModel.quote.imageURL isEqualToString:@""])) {
+            if (quoteMessageModel.type == TAPChatMessageTypeImage ||
+                quoteMessageModel.type == TAPChatMessageTypeVideo
+            ) {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
-                [self setQuoteWithQuote:quoteMessageModel.quote userID:quoteMessageModel.user.userID];
+                TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quoteMessageModel];
+                [self setQuoteWithQuote:quote userID:quoteMessageModel.user.userID];
             }
             else {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -7365,6 +7360,8 @@ CGPoint center;
     if (type == TAPChatMessageTypeImage) {
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         [cell animateFinishedUploadingImage];
+//        NSArray<NSIndexPath *> *indexPaths = @[[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+//        [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
       }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
@@ -8786,7 +8783,7 @@ CGPoint center;
         [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
         [self.navigationItem setLeftBarButtonItem:barButtonItem];
-        
+        [self showInputAccessoryExtensionView:NO];
         [self.tableView reloadData];
                                      
     }];
@@ -8891,14 +8888,13 @@ CGPoint center;
         if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
             if (message.type == TAPChatMessageTypeImage) {
                 // Save image to gallery
-                [TAPImageView imageFromCacheWithKey:urlKey message:message
-                success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
-                    UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-                } failure:^(TAPMessageModel *resultMessage) {
-                    [TAPImageView imageFromCacheWithKey:fileID message:message
-                    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
-                        UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-                    }];
+                
+                [TAPImageView imageFromCacheWithMessage:message
+                success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
+                    UIImageWriteToSavedPhotosAlbum(fullImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+                }
+                failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+                    
                 }];
             }
             else if (message.type == TAPChatMessageTypeVideo) {
@@ -9011,27 +9007,15 @@ CGPoint center;
         NSString *key = [dataDictionary objectForKey:@"fileID"];
         key = [TAPUtil nullToEmptyString:key];
         
-        savedImage = [TAPImageView imageFromCacheWithKey:key];
-        
-        if (savedImage == nil) {
-            NSString *fileURL = [dataDictionary objectForKey:@"url"];
-            if (fileURL == nil || [fileURL isEqualToString:@""]) {
-                fileURL = [dataDictionary objectForKey:@"fileURL"];
+        [TAPImageView imageFromCacheWithMessage:message
+        success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
+            if (fullImage != nil) {
+                [alertController addAction:saveToGalleryAction];
             }
-            fileURL = [TAPUtil nullToEmptyString:fileURL];
-            
-            if (![fileURL isEqualToString:@""]) {
-                key = fileURL;
-                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-            }
-            
-            savedImage = [TAPImageView imageFromCacheWithKey:key];
         }
-        
-        if (savedImage != nil) {
-            //Image exist
-            [alertController addAction:saveToGalleryAction];
-        }
+        failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+            
+        }];
     }
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeVideo) {
@@ -9146,18 +9130,16 @@ CGPoint center;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
-        
 //        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
 //            [self.quoteImageView setImageWithURLString:quote.imageURL];
 //        }
-//        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+//        if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
 //            [self.quoteImageView setImageWithURLString:quote.fileID];
 //        }
-        
-        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+        if ([quote.fileType isEqualToString:@"image"] && quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.imageURL];
         }
-        if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
         
@@ -9491,6 +9473,12 @@ CGPoint center;
         self.textViewBorderView.alpha = 0.0f;
         UIColor *micPrimaryColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary];
         self.micIconImageView.image = [self.micIconImageView.image setImageTintColor:micPrimaryColor];
+
+        self.keyboardOptionButtonView.alpha = 0.0f;
+        self.keyboardOptionButton.alpha = 0.0f;
+        self.keyboardOptionButton.userInteractionEnabled = NO;
+        self.messageViewLeftConstraint.constant = -38.0f;
+        self.keyboardOptionViewRightConstraint.constant = -26.0f;
         
     }
     else{
@@ -9505,7 +9493,16 @@ CGPoint center;
         self.stopView.alpha = 0.0f;
         self.voiceNoteAudioSlider.alpha = 0.0f;
         self.isRecording = NO;
-       
+        
+        if(self.isCustomKeyboardAvailable) {
+            //There's custom keyboard for this type
+            
+            self.keyboardOptionButtonView.alpha = 1.0f;
+            self.keyboardOptionButton.alpha = 1.0f;
+            self.keyboardOptionButton.userInteractionEnabled = YES;
+            self.messageViewLeftConstraint.constant = 4.0f;
+            self.keyboardOptionViewRightConstraint.constant = 16.0f;
+        }
        
     }
 }
@@ -10011,16 +10008,21 @@ CGPoint center;
                         
                         if (isSendingAnimation) {
                             [cell receiveSentEvent];
-                            
                             [TAPUtil performBlock:^{
                                 [self fetchImageDataWithMessage:message];
                             } afterDelay:1.0f];
                         }
                         else if (setAsDelivered) {
                             [cell receiveDeliveredEvent];
+                            [TAPUtil performBlock:^{
+                                [self fetchImageDataWithMessage:message];
+                            } afterDelay:1.0f];
                         }
                         else if (setAsRead) {
                             [cell receiveReadEvent];
+                            [TAPUtil performBlock:^{
+                                [self fetchImageDataWithMessage:message];
+                            } afterDelay:1.0f];
                         }
                         else {
                             if(message.isMessageEdited){

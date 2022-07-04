@@ -1,6 +1,6 @@
 //
 //  TapUI.h
-//  
+//
 //
 //  Created by Dominic Vedericho on 24/07/19.
 //
@@ -13,6 +13,7 @@
 #import "TAPCustomNotificationAlertViewController.h"
 #import "TAPCustomKeyboardItemModel.h"
 #import "TAPProductModel.h"
+#import "TapUIChatViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -164,6 +165,24 @@ Called when user click mention in the bubble chat.
  */
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+@end
+
+//==========================================================
+//                 TapMyAccountDelegate
+//==========================================================
+
+@protocol TapUIMyAccountDelegate <NSObject>
+@optional
+
+/**
+ Called when user click the delete account button on my account view..
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkDeleteAccountButtonTapped:(UIViewController *)currentViewController
+  currentShownNavigationController:(UINavigationController *)currentNavigationController;
 @end
 
 //==========================================================
@@ -227,13 +246,31 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 @end
 
 
+//==========================================================
+//             TapUIInAppNotificationDelegate
+//==========================================================
+@protocol TapUIInAppNotificationDelegate <NSObject>
+@optional
+
+/**
+ Called when a message is received when the app is on foreground
+ 
+ @param message (TAPMessageModel *) message to be shown in the app notification
+ @return YES if TapTalk should show the in-app notification, NO if the notification should not be shown
+ */
+- (BOOL)tapTalkShouldShowInAppNotificationWithMessage:(TAPMessageModel *)message;
+
+@end
+
 @interface TapUI : NSObject
 
 @property (weak, nonatomic) UIWindow *activeWindow;
 @property (weak, nonatomic) id<TapUIChatRoomDelegate> chatRoomDelegate;
 @property (weak, nonatomic) id<TapUIRoomListDelegate> roomListDelegate;
+@property (weak, nonatomic) id<TapUIMyAccountDelegate> myAccountDelegate;
 @property (weak, nonatomic) id<TapUIChatProfileDelegate> chatProfileDelegate;
 @property (weak, nonatomic) id<TapUICustomKeyboardDelegate> customKeyboardDelegate;
+@property (weak, nonatomic) id<TapUIInAppNotificationDelegate> inAppNotificationDelegate;
 
 //Initalization
 + (TapUI *)sharedInstance;
@@ -819,6 +856,17 @@ Show or hide edit message menu from message bubble long press & chat profile
 Get current status of voice noite menu from message bubble long press & chat profile
 */
 - (BOOL)isEditMessageMenuEnabled;
+
+/**
+Show or hide delete account button in my account
+*/
+- (void)setDeleteAccountButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of  delete account button in my account
+*/
+- (BOOL)getDeleteAccountButtonVisible;
+
 
 @end
 

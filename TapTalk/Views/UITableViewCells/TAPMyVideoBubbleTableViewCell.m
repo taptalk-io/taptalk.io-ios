@@ -1782,54 +1782,16 @@
 }
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *urlKey = [dataDictionary objectForKey:@"url"];
-    if (urlKey == nil || [urlKey isEqualToString:@""]) {
-        urlKey = [dataDictionary objectForKey:@"fileURL"];
+    [TAPImageView imageFromCacheWithMessage:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        [self.bubbleImageView setImage:savedImage];
+        [self getImageSizeFromImage:savedImage];
+        [self.contentView layoutIfNeeded];
     }
-    urlKey = [TAPUtil nullToEmptyString:urlKey];
-    if (![urlKey isEqualToString:@""]) {
-        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-    }
-    
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    if (![urlKey isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:urlKey message:message
-        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self.bubbleImageView setImage:savedImage];
-            [self getImageSizeFromImage:savedImage];
-            [self.contentView layoutIfNeeded];
-        }
-        failure:^(TAPMessageModel *resultMessage) {
-            [TAPImageView imageFromCacheWithKey:fileID message:message
-            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                [self.bubbleImageView setImage:savedImage];
-                [self getImageSizeFromImage:savedImage];
-                [self.contentView layoutIfNeeded];
-            }
-            failure:^(TAPMessageModel *resultMessage) {
-                [self setSmallThumbnailFromMessageData:dataDictionary];
-            }];
-        }];
-    }
-    else if (![fileID isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:fileID message:message
-        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self.bubbleImageView setImage:savedImage];
-            [self getImageSizeFromImage:savedImage];
-            [self.contentView layoutIfNeeded];
-        }
-        failure:^(TAPMessageModel *resultMessage) {
-            [self setSmallThumbnailFromMessageData:dataDictionary];
-        }];
-    }
-    else {
+    failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+        NSDictionary *dataDictionary = message.data;
         [self setSmallThumbnailFromMessageData:dataDictionary];
-    }
+    }];
 }
 
 - (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {

@@ -320,7 +320,7 @@
         self.logoutView.layer.borderWidth = 1.0f;
         self.logoutView.layer.cornerRadius = 8.0f;
         [self.editViewContainer addSubview:self.logoutView];
-
+        
         _logoutSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f, 0.0f, 1.0f, CGRectGetHeight(self.logoutView.frame))];
         self.logoutSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         //[self.logoutView addSubview:self.logoutSeparatorView];
@@ -343,7 +343,19 @@
         _logoutButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame))];
         [self.logoutView addSubview:self.logoutButton];
         
-        self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame));
+        if ([[TapUI sharedInstance] getDeleteAccountButtonVisible]) {
+            _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 24.0f)];
+        }
+        else{
+            _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 0.0f)];
+        }
+        
+        [self.deleteAccountButton setTitle:@"Delete My Account" forState:UIControlStateNormal];
+        [self.deleteAccountButton setTitleColor:[TAPUtil getColor:@"EF5060"] forState:UIControlStateNormal];
+        self.deleteAccountButton.titleLabel.font = clickableDestructiveFont;
+        [self.editViewContainer addSubview:self.deleteAccountButton];
+        
+        self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame));
 
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
@@ -481,13 +493,20 @@
             self.logoutView.frame = CGRectMake(CGRectGetMinX(self.logoutView.frame), CGRectGetMaxY(self.emailTextField.frame), CGRectGetWidth(self.logoutView.frame), 0.0f);
         }
         
+        if ([[TapUI sharedInstance] getDeleteAccountButtonVisible]) {
+            self.deleteAccountButton.frame = CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 24.0f);
+        }
+        else{
+            self.deleteAccountButton.frame = CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 0.0f);
+        }
+        
         self.usernameLabelField.frame = CGRectMake(0.0f, CGRectGetMaxY(self.bioLabelField.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.usernameLabelField.frame));
         self.bioLabelField.frame = CGRectMake(0.0f, 24.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.bioLabelField.frame));
         self.mobileNumberLabelField.frame = CGRectMake(0.0f, CGRectGetMaxY(self.usernameLabelField.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.mobileNumberLabelField.frame));
         self.emailLabelField.frame = CGRectMake(0.0f, CGRectGetMaxY(self.mobileNumberLabelField.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.emailLabelField.frame));
         
         if(self.editViewContainer.alpha == 1.0f){
-            self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.logoutView.frame));
+            self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame));
             self.versionLabel.frame = CGRectMake(self.versionLabel.frame.origin.x, CGRectGetMaxY(self.editViewContainer.frame) + 24.0f, CGRectGetWidth(self.versionLabel.frame), 16.0f);
         }
         else{

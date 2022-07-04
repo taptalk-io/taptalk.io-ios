@@ -46,4 +46,14 @@ static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B
                       success:(void (^)(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage))success
                       failure:(void (^)(TAPMessageModel *resultMessage))failure;
 
++ (void)imageFromCacheWithMessage:(TAPMessageModel *)message
+                          success:(void (^)(UIImage *savedImage,TAPMessageModel *resultMessage))success
+                          failure:(void(^)(NSError *error, TAPMessageModel *resultMessage))failure;
+
++ (void)imageFromCacheWithMessage:(TAPMessageModel *)message
+                            start:(void(^)(TAPMessageModel *resultMessage))startProgress
+                         progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage))progressBlock
+                          success:(void (^)(UIImage *savedImage,TAPMessageModel *resultMessage))success
+                          failure:(void(^)(NSError *error, TAPMessageModel *resultMessage))failure;
+
 @end

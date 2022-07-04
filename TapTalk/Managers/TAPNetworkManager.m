@@ -116,6 +116,10 @@ static const NSInteger kAPITimeOut = 60;
         urlString = @"";
     }
     
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager GET: %@", urlString);
+#endif
+    
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
@@ -138,9 +142,15 @@ static const NSInteger kAPITimeOut = 60;
                       }
                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                            success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager GET 200: %@", urlString);
+#endif
                        }
                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                            failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager GET %ld: %@", (long)error.code, urlString);
+#endif
                        }];
 }
 
@@ -152,6 +162,10 @@ static const NSInteger kAPITimeOut = 60;
     if (urlString == nil) {
         urlString = @"";
     }
+    
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager POST: %@", urlString);
+#endif
     
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
@@ -175,9 +189,15 @@ static const NSInteger kAPITimeOut = 60;
                        }
                         success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                             success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager POST 200: %@", urlString);
+#endif
                         }
                         failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                             failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager POST %ld: %@", (long)error.code, urlString);
+#endif
                         }];
 }
 
@@ -188,6 +208,10 @@ static const NSInteger kAPITimeOut = 60;
     if (urlString == nil) {
         urlString = @"";
     }
+    
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager PUT: %@", urlString);
+#endif
     
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
@@ -203,9 +227,15 @@ static const NSInteger kAPITimeOut = 60;
                     headers:[NSDictionary dictionary]
                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                            success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager PUT 200: %@", urlString);
+#endif
                        }
                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                            failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager PUT %ld: %@", (long)error.code, urlString);
+#endif
                        }];
 }
 
@@ -216,6 +246,10 @@ static const NSInteger kAPITimeOut = 60;
     if (urlString == nil) {
         urlString = @"";
     }
+    
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager DELETE: %@", urlString);
+#endif
     
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
@@ -231,9 +265,15 @@ static const NSInteger kAPITimeOut = 60;
                           headers:[NSDictionary dictionary]
                           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                               success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager DELETE 200: %@", urlString);
+#endif
     }
                           failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                               failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager DELETE %ld: %@", (long)error.code, urlString);
+#endif
     }];
 }
 
@@ -292,6 +332,10 @@ static const NSInteger kAPITimeOut = 60;
         urlString = @"";
     }
     
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager POST: %@", urlString);
+#endif
+    
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
@@ -318,9 +362,15 @@ static const NSInteger kAPITimeOut = 60;
          }
           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
             success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager POST 200: %@", urlString);
+#endif
          }
           failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TAPNetworkManager POST %ld: %@", (long)error.code, urlString);
+#endif
     }];
 }
 

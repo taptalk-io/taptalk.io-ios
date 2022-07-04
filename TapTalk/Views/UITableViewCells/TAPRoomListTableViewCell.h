@@ -21,6 +21,8 @@ typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
 
 @interface TAPRoomListTableViewCell : TAPBaseTableViewCell
 
+@property (weak, nonatomic) UITableView *tableView;
+
 - (void)setRoomListTableViewCellWithData:(TAPRoomListModel *)roomList updateUnreadBubble:(BOOL)updateUnreadBubble;
 - (void)setAsTyping:(BOOL)typing;
 - (void)showMessageDraftWithMessage:(NSString *)draftMessage;

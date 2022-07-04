@@ -791,7 +791,15 @@
           fullNameString = [TAPUtil nullToEmptyString:fullNameString];
         }
         
-        if ([thumbnailImageString isEqualToString:@""]) {
+        if(message.user.deleted.longValue > 0){
+            //set deleted account profil pict
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 1.0f;
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderInitialLabel.text =@"";
+        }
+        else if ([thumbnailImageString isEqualToString:@""]) {
             //No photo found, get the initial
             self.senderInitialView.alpha = 1.0f;
             self.senderImageView.alpha = 0.0f;
@@ -1719,54 +1727,16 @@
 }
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *urlKey = [dataDictionary objectForKey:@"url"];
-    if (urlKey == nil || [urlKey isEqualToString:@""]) {
-        urlKey = [dataDictionary objectForKey:@"fileURL"];
+    [TAPImageView imageFromCacheWithMessage:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        [self.bubbleImageView setImage:savedImage];
+        [self getImageSizeFromImage:savedImage];
+        [self.contentView layoutIfNeeded];
     }
-    urlKey = [TAPUtil nullToEmptyString:urlKey];
-    if (![urlKey isEqualToString:@""]) {
-        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-    }
-    
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    if (![urlKey isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:urlKey message:message
-        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self.bubbleImageView setImage:savedImage];
-            [self getImageSizeFromImage:savedImage];
-            [self.contentView layoutIfNeeded];
-        }
-        failure:^(TAPMessageModel *resultMessage) {
-            [TAPImageView imageFromCacheWithKey:fileID message:message
-            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                [self.bubbleImageView setImage:savedImage];
-                [self getImageSizeFromImage:savedImage];
-                [self.contentView layoutIfNeeded];
-            }
-            failure:^(TAPMessageModel *resultMessage) {
-                [self setSmallThumbnailFromMessageData:dataDictionary];
-            }];
-        }];
-    }
-    else if (![fileID isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:fileID message:message
-        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self.bubbleImageView setImage:savedImage];
-            [self getImageSizeFromImage:savedImage];
-            [self.contentView layoutIfNeeded];
-        }
-        failure:^(TAPMessageModel *resultMessage) {
-            [self setSmallThumbnailFromMessageData:dataDictionary];
-        }];
-    }
-    else {
+    failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+        NSDictionary *dataDictionary = message.data;
         [self setSmallThumbnailFromMessageData:dataDictionary];
-    }
+    }];
 }
 
 - (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {

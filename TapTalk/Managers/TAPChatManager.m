@@ -598,6 +598,26 @@
     
     successGenerateMessage(message);
     
+    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+    requestOptions.synchronous = NO;
+    requestOptions.networkAccessAllowed = YES;
+    requestOptions.resizeMode = PHImageRequestOptionsResizeModeNone;
+    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    PHImageManager *manager = [PHImageManager defaultManager];
+    [manager requestImageForAsset:asset targetSize:CGSizeMake(imageWidthFloat, imageHeightFloat)
+                      contentMode:PHImageContentModeAspectFill
+                          options:requestOptions
+                    resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @autoreleasepool {
+                NSError *error = [info objectForKey:PHImageErrorKey];
+                if (!error && result != nil) {
+                    [TAPImageView saveImageToCache:result withKey:message.localID];
+                }
+            }
+        });
+    }];
+    
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     

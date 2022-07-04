@@ -763,67 +763,40 @@
 //    [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:room];
 }
 
-- (void)sendForwardedMessageWithMessageArray:(NSArray<TAPMessageModel*> *) messageArray
-                        room:(TAPRoomModel *)room
+- (void)sendForwardedMessageWithMessageArray:(NSArray<TAPMessageModel*> *)messageArray
+                                        room:(TAPRoomModel *)room
+                                       start:(void (^)(TAPMessageModel *message))start
+                                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                                     success:(void (^)(TAPMessageModel *message))success
+                                     failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    
+    for (TAPMessageModel *messageToForward in messageArray) {
+        [self sendForwardedMessage:messageToForward room:room start:start progress:progress success:success failure:failure];
+    }
+}
+
+- (void)sendForwardedMessage:(TAPMessageModel *)messageToForward
+             toMultipleRooms:(NSArray<TAPRoomModel*> *)rooms
                        start:(void (^)(TAPMessageModel *message))start
                     progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                      success:(void (^)(TAPMessageModel *message))success
                      failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
-    
-    for(TAPMessageModel *messageToForward in messageArray ){
-        if (messageToForward.type == TAPChatMessageTypeFile || messageToForward.type == TAPChatMessageTypeVideo || messageToForward.type == TAPChatMessageTypeVoice) {
-            NSDictionary *dataDictionary = messageToForward.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:messageToForward.room.roomID fileID:fileID];
-            filePath = [TAPUtil nullToEmptyString:filePath];
-            
-            if (![filePath isEqualToString:@""]) {
-                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:messageToForward.room.roomID fileID:fileID];
-            }
-        }
-        
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser
-                                                                     room:room
-                                                                     body:messageToForward.body
-                                                                     type:messageToForward.type
-                                                              messageData:nil];
-        
-        message.data = messageToForward.data;
-        message.quote = messageToForward.quote;
-        message.replyTo = messageToForward.replyTo;
-        
-        if (messageToForward.forwardFrom.localID != nil && ![messageToForward.forwardFrom.localID isEqualToString:@""]) {
-            //Obtain existing forward from model
-            message.forwardFrom = messageToForward.forwardFrom;
-        }
-        else {
-            //Create forward from model
-            TAPForwardFromModel *forwardFrom = [TAPForwardFromModel new];
-            forwardFrom.userID = messageToForward.user.userID;
-            forwardFrom.xcUserID = messageToForward.user.xcUserID;
-            forwardFrom.fullname = messageToForward.user.fullname;
-            forwardFrom.messageID = messageToForward.messageID;
-            forwardFrom.localID = messageToForward.localID;
-            message.forwardFrom = forwardFrom;
-        }
-        
-        [self sendCustomMessageWithMessageModel:message
-        start:^(TAPMessageModel * _Nonnull message) {
-            start(message);
-        }
-        success:^(TAPMessageModel * _Nonnull message) {
-            success(message);
-        }
-        failure:^(TAPMessageModel *message, NSError * _Nonnull error) {
-            failure(message, error);
-        }];
-        
-    //    [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:room.roomID];
-    //    [[TAPChatManager sharedManager] saveToQuotedMessage:messageToForward userInfo:[NSDictionary dictionary] roomID:room.roomID];
-    //    [[TAPChatManager sharedManager] checkAndSendForwardedMessageWithRoom:room];
+
+    for (TAPRoomModel *room in rooms) {
+        [self sendForwardedMessage:messageToForward room:room start:start progress:progress success:success failure:failure];
     }
+}
+
+- (void)sendForwardedMessageWithMessageArray:(NSArray<TAPMessageModel*> *)messageArray
+                             toMultipleRooms:(NSArray<TAPRoomModel*> *)rooms
+                                       start:(void (^)(TAPMessageModel *message))start
+                                    progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                                     success:(void (^)(TAPMessageModel *message))success
+                                     failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
-    
+    for (TAPRoomModel *room in rooms) {
+        [self sendForwardedMessageWithMessageArray:messageArray room:room start:start progress:progress success:success failure:failure];
+    }
 }
 
 - (TAPMessageModel *)constructTapTalkMessageModelWithRoom:(TAPRoomModel *)room

@@ -277,6 +277,7 @@
         
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+        cell.tableView = tableView;
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
         
         if (indexPath.row == [self.roomListArray count] - 1) {

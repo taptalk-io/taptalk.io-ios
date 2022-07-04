@@ -215,4 +215,91 @@
     }
 }
 
++ (void)imageFromCacheWithMessage:(TAPMessageModel *)message
+                          success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
+                          failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    
+    [self imageFromCacheWithMessage:message
+    start:^(TAPMessageModel *receivedMessage) {
+        
+    }
+    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage) {
+        
+    }
+    success:success
+    failure:failure];
+}
+
++ (void)imageFromCacheWithMessage:(TAPMessageModel *)message
+                            start:(void(^)(TAPMessageModel *receivedMessage))startProgress
+                         progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
+                          success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
+                          failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    
+    startProgress(message);
+    [TAPImageView imageFromCacheWithKey:message.localID message:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        success(savedImage, resultMessage);
+    }
+    failure:^(TAPMessageModel *resultMessage) {
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *urlKey = [dataDictionary objectForKey:@"url"];
+        if (urlKey == nil || [urlKey isEqualToString:@""]) {
+            urlKey = [dataDictionary objectForKey:@"fileURL"];
+        }
+        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        if (![urlKey isEqualToString:@""]) {
+            [TAPImageView imageFromCacheWithKey:urlKey message:message
+            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                //Image exist
+                success(savedImage, resultMessage);
+                // Replace key with local ID
+                [TAPImageView saveImageToCache:savedImage withKey:resultMessage.localID];
+                [TAPImageView removeImageFromCacheWithKey:urlKey];
+            }
+            failure:^(TAPMessageModel *resultMessage) {
+                if (![fileID isEqualToString:@""]) {
+                    [TAPImageView imageFromCacheWithKey:fileID message:message
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        //Image exist
+                        success(savedImage, resultMessage);
+                        // Replace key with local ID
+                        [TAPImageView saveImageToCache:savedImage withKey:resultMessage.localID];
+                        [TAPImageView removeImageFromCacheWithKey:fileID];
+                    }
+                    failure:^(TAPMessageModel *resultMessage) {
+                        failure([NSError errorWithDomain:@"Image not found in cache." code:99999 userInfo:nil], resultMessage);
+                    }];
+                }
+                else {
+                    failure([NSError errorWithDomain:@"Image not found in cache." code:99999 userInfo:nil], resultMessage);
+                }
+            }];
+        }
+        else if (![fileID isEqualToString:@""]) {
+            [TAPImageView imageFromCacheWithKey:fileID message:message
+            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                //Image exist
+                success(savedImage, resultMessage);
+                // Replace key with local ID
+                [TAPImageView saveImageToCache:savedImage withKey:resultMessage.localID];
+                [TAPImageView removeImageFromCacheWithKey:fileID];
+            }
+            failure:^(TAPMessageModel *resultMessage) {
+                failure([NSError errorWithDomain:@"Image not found in cache." code:99999 userInfo:nil], resultMessage);
+            }];
+        }
+        else {
+            failure([NSError errorWithDomain:@"Image not found in cache." code:99999 userInfo:nil], resultMessage);
+        }
+    }];
+}
+
 @end

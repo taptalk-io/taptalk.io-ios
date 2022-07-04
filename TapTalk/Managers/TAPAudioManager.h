@@ -30,6 +30,7 @@
 - (void)resumePlayer;
 - (void)stopPlayer;
 - (void)setupPlayerAudio:(NSString *)filePath;
+- (BOOL)isRecording;
 - (NSString *)getPlayerCurrentFilePath;
 - (void)setPlayerCurrentTime:(NSTimeInterval)currentTime;
 - (NSTimeInterval)getPlayerDuration;

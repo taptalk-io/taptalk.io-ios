@@ -49,6 +49,7 @@
 + (void)deleteAllMessageAndPhysicalFilesInRoomWithRoomID:(NSString *)roomID
                                                  success:(void (^)(void))success
                                                  failure:(void (^)(NSError *error))failure;
++ (void)removeImageFromCacheWithMessage:(TAPMessageModel *)message;
 
 //Convert from dictionary to model or model to dictionary
 + (TAPMessageModel *)messageModelFromDictionary:(NSDictionary *)dictionary;

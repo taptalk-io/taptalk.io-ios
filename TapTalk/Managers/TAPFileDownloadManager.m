@@ -67,85 +67,37 @@
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
                             success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage, NSString * _Nullable filePath))success
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
-    
-    NSString *roomID = message.room.roomID;
-    
-    NSDictionary *dataDictionary = message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *urlKey = [dataDictionary objectForKey:@"url"];
-    if (urlKey == nil || [urlKey isEqualToString:@""]) {
-        urlKey = [dataDictionary objectForKey:@"fileURL"];
-    }
-    urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-    urlKey = [TAPUtil nullToEmptyString:urlKey];
-    
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    if (![urlKey isEqualToString:@""]) {
-        [self receiveImageDataFromCacheWithKey:urlKey
-                                       message:message
-                                         start:startProgress
-                                      progress:progressBlock
-                                       success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) { success(fullImage, receivedMessage, @""); }
-                                       failure:^(NSError *error, TAPMessageModel *receivedMessage) {
-            
-            if (![fileID isEqualToString:@""]) {
-                [self receiveImageDataFromCacheWithKey:urlKey
-                                               message:message
-                                                 start:startProgress
-                                              progress:progressBlock
-                                               success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) { success(fullImage, receivedMessage, @""); }
-                                               failure:^(NSError *error, TAPMessageModel *receivedMessage) {
-                    [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
-                }];
-            }
-            else {
-                [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
-            }
-        }];
-    }
-    else if (![fileID isEqualToString:@""]) {
-        [self receiveImageDataFromCacheWithKey:urlKey
-                                       message:message
-                                         start:startProgress
-                                      progress:progressBlock
-                                       success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) { success(fullImage, receivedMessage, @""); }
-                                       failure:^(NSError *error, TAPMessageModel *receivedMessage) {
-            [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
-        }];
-    }
-    else {
-        failure([NSError errorWithDomain:@"Image data not found." code:99999 userInfo:nil], message);
-    }
-}
-
-- (void)receiveImageDataFromCacheWithKey:(NSString *)key
-                                 message:(TAPMessageModel *)message
-                                   start:(void(^)(TAPMessageModel *receivedMessage))startProgress
-                                progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                                 success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
-                                 failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
-    
-    [TAPImageView imageFromCacheWithKey:key message:message
-    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-        //Image exist
-        success(savedImage, resultMessage);
         
+    [TAPImageView imageFromCacheWithMessage:message
+                                      start:startProgress
+                                   progress:progressBlock
+    success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
+        success(fullImage, receivedMessage, @"");
         CGFloat progress = 1.0f;
         CGFloat total = 1.0f;
         NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-        [objectDictionary setObject:resultMessage forKey:@"message"];
-        [objectDictionary setObject:savedImage forKey:@"fullImage"];
+        [objectDictionary setObject:message forKey:@"message"];
+        [objectDictionary setObject:fullImage forKey:@"fullImage"];
         [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
         [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-        
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
-        }
-    failure:^(TAPMessageModel *resultMessage) {
-        failure([NSError errorWithDomain:@"Image not found in cache." code:99999 userInfo:nil], resultMessage);
+    }
+    failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+        [self downloadImageDataWithMessage:message start:startProgress progress:progressBlock success:success failure:failure];
     }];
+}
+
+- (void)receiveImageDataFromCacheWithMessage:(TAPMessageModel *)message
+                                       start:(void(^)(TAPMessageModel *receivedMessage))startProgress
+                                    progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
+                                     success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
+                                     failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure {
+    
+    [TAPImageView imageFromCacheWithMessage:message
+                                      start:startProgress
+                                   progress:progressBlock
+                                    success:success
+                                    failure:failure];
 }
 
 - (void)downloadImageDataWithMessage:(TAPMessageModel *)message
@@ -537,25 +489,36 @@
     [self.failedDownloadDictionary removeObjectForKey:message.localID];
     
     //Get thumbnail image for video
-    [TAPImageView imageFromCacheWithKey:key success:^(UIImage *savedImage) {
-        if (savedImage == nil) {
-            NSURL *url = [NSURL fileURLWithPath:destinationFilePath];
-            AVAsset *asset = [AVAsset assetWithURL:url];
-            UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager]  generateThumbnailImageFromFilePathString:destinationFilePath];
-            [TAPImageView saveImageToCache:thumbnailVideoImage withKey:key];
-        }
- 
+    [TAPImageView imageFromCacheWithMessage:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        // Trigger success and send notification
         success(data, message, [self getDownloadedFilePathWithRoomID:message.room.roomID fileID:key]);
-        
         [self.downloadProgressDictionary removeObjectForKey:message.localID];
-        
         CGFloat progress = 1.0f;
         CGFloat total = 1.0f;
         NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
         [objectDictionary setObject:message forKey:@"message"];
         [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
         [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
-        
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
+    }
+    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+        NSURL *url = [NSURL fileURLWithPath:destinationFilePath];
+        AVAsset *asset = [AVAsset assetWithURL:url];
+        UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager]  generateThumbnailImageFromFilePathString:destinationFilePath];
+        if (thumbnailVideoImage != nil) {
+            // Save generated thumbnail
+            [TAPImageView saveImageToCache:thumbnailVideoImage withKey:message.localID];
+        }
+        // Trigger success and send notification
+        success(data, message, [self getDownloadedFilePathWithRoomID:message.room.roomID fileID:key]);
+        [self.downloadProgressDictionary removeObjectForKey:message.localID];
+        CGFloat progress = 1.0f;
+        CGFloat total = 1.0f;
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:message forKey:@"message"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+        [objectDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:objectDictionary];
     }];
 }
@@ -605,8 +568,7 @@
                     
                     if (image != nil) {
                         //Save image to cache
-                        NSString *key = [[currentFileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-                        [TAPImageView saveImageToCache:image withKey:key];
+                        [TAPImageView saveImageToCache:image withKey:message.localID];
                         
                         // Send back success download image
                         success(image, message, filePath);
@@ -627,12 +589,12 @@
         }];
         [downloadTask resume];
     }
-    else {
+    if (currentFileID != nil && ![currentFileID isEqualToString:@""]) {
         //Call API Download Full Image
         [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:roomID isThumbnail:NO completionBlock:^(UIImage *downloadedImage) {
             
             //Save image to cache
-            [TAPImageView saveImageToCache:downloadedImage withKey:currentFileID];
+            [TAPImageView saveImageToCache:downloadedImage withKey:message.localID];
             
             //Send back success download image
             success(downloadedImage, message, @"");
@@ -642,6 +604,9 @@
         } failureBlock:^(NSError *error) {
             failure(error, message);
         }];
+    }
+    else {
+        failure([NSError errorWithDomain:@"Image data not found." code:99999 userInfo:nil], message);
     }
 }
 

@@ -284,6 +284,7 @@
     [super prepareForReuse];
 
     self.thumbnailBubbleImageView.image = nil;
+    self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
@@ -705,8 +706,9 @@
         urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
     }
     
+    [self setSmallThumbnailFromMessageData:message.data];
     if ((fileID == nil || [fileID isEqualToString:@""]) && (urlKey == nil || [urlKey isEqualToString:@""])) {
-        [TAPImageView imageFromCacheWithKey:message.localID message:message
+        [TAPImageView imageFromCacheWithMessage:message
         success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
             [self getImageSizeFromImage:savedImage];
             
@@ -715,7 +717,7 @@
             [self.contentView layoutIfNeeded];
             [self.bubbleImageView setImage:savedImage];
         }
-        failure:^(TAPMessageModel *resultMessage) {
+        failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             if (urlKey != nil && ![urlKey isEqualToString:@""]) {
                 [self.bubbleImageView setImageWithURLString:[dataDictionary objectForKey:@"url"]];
                 if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
@@ -735,8 +737,9 @@
     }
     else {
         if (self.currentFileKey == nil || ![self.currentFileKey isEqualToString:fileID] || ![self.currentFileKey isEqualToString:urlKey]) {
-            //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
-            self.bubbleImageView.image = nil;
+            // Cell is reused for different image, set image to nil first to prevent last image shown when load new image
+            //self.bubbleImageView.image = nil;
+            [self setSmallThumbnailFromMessageData:message.data];
         }
         
         //already called fetchImageDataWithMessage function in view controller for fetch image
@@ -878,8 +881,16 @@
            fullNameString = message.user.fullname;
            fullNameString = [TAPUtil nullToEmptyString:fullNameString];
         }
-
-        if ([thumbnailImageString isEqualToString:@""]) {
+        
+        if(message.user.deleted.longValue > 0){
+            //set deleted account profil pict
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 1.0f;
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderInitialLabel.text =@"";
+        }
+        else if ([thumbnailImageString isEqualToString:@""]) {
             //No photo found, get the initial
             self.senderInitialView.alpha = 1.0f;
             self.senderImageView.alpha = 0.0f;
@@ -940,6 +951,20 @@
     [self.checkMarkIconImageView.layer removeAllAnimations];
 }
 
+- (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {
+    NSString *thumbnailImageBase64String = [messageDataDictionary objectForKey:@"thumbnail"];
+    thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
+    if ([thumbnailImageBase64String isEqualToString:@""]) {
+        return;
+    }
+    NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    UIImage *image = [UIImage imageWithData:thumbnailImageData];
+    if (image != nil) {
+        self.bubbleImageView.image = image;
+        [self getImageSizeFromImage:image];
+        [self.contentView layoutIfNeeded];
+    }
+}
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
 //    self.chatBubbleButton.userInteractionEnabled = NO;

@@ -160,6 +160,7 @@
     NSString *profileImageURL = @"";
     NSString *roomName = @"";
     NSString *userID = @"";
+    NSNumber *deleted = 0;
     if (self.room.type == RoomTypePersonal) {
         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
         TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
@@ -167,6 +168,7 @@
             profileImageURL = @"";
         }
         userID = obtainedUser.userID;
+        deleted = obtainedUser.deleted;
         if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
             profileImageURL = obtainedUser.imageURL.fullsize;
             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
@@ -234,10 +236,14 @@
     }
     else {
         if(self.room.type == RoomTypePersonal){
-            if(userID != nil){
+            if(userID != nil && deleted == 0){
+                NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
                 [self.profileView.profileImageView setImageWithURLString:profileImageURL];
-                NSLog(@"===== userID: %@", userID);
-                [self getPhotoListApi:userID];
+                [self getPhotoListApi:obtainedUser];
+            }
+            else{
+                self.profileView.profileImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             }
         }
         else{
@@ -300,12 +306,14 @@
             [self.profileView setProfilePictureWithImageURL:profileImageURL userFullName:self.user.fullname];
         }
         else {
-            if(self.user.userID != nil){
+            if(self.user.userID != nil && self.user.deleted == 0){
                 [self.profileView.profileImageView setImageWithURLString:profileImageURL];
                 [self.profileView setProfilePictureWithImageURL:profileImageURL userFullName:self.user.fullname];
-                NSLog(@"===== userID: %@", self.user.userID);
-                [self getPhotoListApi:self.user.userID];
+                [self getPhotoListApi:self.user];
                 
+            }
+            else{
+                self.profileView.profileImageView = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             }
         }
         
@@ -1068,19 +1076,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         urlKey = [TAPUtil nullToEmptyString:urlKey];
         
         if (message.type == TAPChatMessageTypeImage) {
-            if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
-                [TAPImageView imageFromCacheWithKey:urlKey message:message
-                success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
-                    [self setImageCollectionViewCell:cell image:savedImage message:resultMessage];
-                } failure:^(TAPMessageModel *resultMessage) {
-                    [TAPImageView imageFromCacheWithKey:fileID message:message
-                    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
-                        [self setImageCollectionViewCell:cell image:savedImage message:resultMessage];
-                    } failure:^(TAPMessageModel *resultMessage) {
-                        [self setImageCollectionViewCell:cell image:nil message:resultMessage];
-                    }];
-                }];
+            [TAPImageView imageFromCacheWithMessage:message
+            start:^(TAPMessageModel *receivedMessage) {
+                
             }
+            progress:^(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage) {
+                
+            }
+            success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
+                [self setImageCollectionViewCell:cell image:fullImage message:receivedMessage];
+            }
+            failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+                [self setImageCollectionViewCell:cell image:nil message:receivedMessage];
+            }];
         }
         else if (message.type == TAPChatMessageTypeVideo) {
             NSNumber *duration = [message.data objectForKey:@"duration"];
@@ -2197,11 +2205,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
    
 }
 
-- (void)getPhotoListApi:(NSString *)userID {
-    [TAPDataManager callAPIGetPhotoList:userID success:^(NSMutableArray<TAPPhotoListModel *> * photoListArray) {
-        if(photoListArray.count > 0 || photoListArray != nil){
+- (void)getPhotoListApi:(TAPUserModel *)user {
+    [TAPDataManager callAPIGetPhotoList:user.userID success:^(NSMutableArray<TAPPhotoListModel *> * photoListArray) {
+        if((photoListArray.count > 0 || photoListArray != nil) && self.user.deleted == 0){
             self.photoListArray = photoListArray;
             self.profileView.profilImageCollectionView.alpha = 1.0f;
+            self.profileView.profileImageView.alpha = 0.0f;
             self.profileView.initialNameView.alpha = 0.0f;
             [self.profileView.profilImageCollectionView reloadData];
             if(self.photoListArray.count == 1){
@@ -2212,10 +2221,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             [self.profileView.pageIndicatorCollectionView reloadData];
         }
-        else{
+        else if(user.deleted == 0){
             self.profileView.profilImageCollectionView.alpha = 0.0f;
             self.profileView.initialNameView.alpha = 1.0f;
             
+        }
+        else{
+            self.profileView.profilImageCollectionView.alpha = 0.0f;
         }
         
     } failure:^(NSError *error) {
@@ -2435,7 +2447,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             self.profileView.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultGroupAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         }
     }
-    else {
+    else if(self.room.deleted.longValue == 0) {
         [self.profileView.profileImageView setImageWithURLString:roomURL];
     }
     
