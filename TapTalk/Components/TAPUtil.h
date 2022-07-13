@@ -151,5 +151,6 @@
 + (BOOL)isActiveUserMentionedWithMessage:(TAPMessageModel *)message
                               activeUser:(TAPUserModel *)activeUser;
 + (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message;
++ (void)handleReceivedSystemMessage:(TAPMessageModel *)message;
 
 @end

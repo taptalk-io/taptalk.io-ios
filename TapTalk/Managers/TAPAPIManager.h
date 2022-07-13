@@ -62,6 +62,9 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeUnStarMessage,
     TAPAPIManagerTypeGetStarredMessages,
     TAPAPIManagerTypeGetStarredMessagesIDs,
+    TAPAPIManagerTypeGetDeleteAccountState,
+    TAPAPIManagerTypeRequestDeleteAccountOTP,
+    TAPAPIManagerTypeVerifyDeleteAccountOTP,
 };
 
 @interface TAPAPIManager : NSObject

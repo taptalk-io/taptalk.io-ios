@@ -32,6 +32,8 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewTrailingConstraint;
+@property (weak, nonatomic) IBOutlet UIImageView *senderDeletedUserImageView;
+
 
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender;
@@ -76,6 +78,7 @@
     self.deletedIconImageViewWidthConstraint.constant = 0.0f;
     self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
     self.bubbleLabel.text = @"";
+    self.senderDeletedUserImageView.alpha = 0.0f;
     [self setBubbleCellStyle];
     [self showSenderInfo:NO];
     [self.contentView layoutIfNeeded];
@@ -170,9 +173,9 @@
         if(message.user.deleted.longValue > 0){
             //set deleted account profil pict
             self.senderInitialView.alpha = 1.0f;
-            self.senderImageView.alpha = 1.0f;
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderImageView.alpha = 0.0f;
+            self.senderDeletedUserImageView.alpha = 1.0f;
+            self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
             self.senderInitialLabel.text =@"";
         }
         else if ([thumbnailImageString isEqualToString:@""]) {
@@ -196,6 +199,18 @@
         self.senderImageView.image = nil;
         self.senderNameLabel.text = @"";
     }
+    
+    //remove animation
+    [self.deletedIconImageView.layer removeAllAnimations];
+    [self.senderDeletedUserImageView.layer removeAllAnimations];
+    [self.senderInitialView.layer removeAllAnimations];
+    [self.bubbleView.layer removeAllAnimations];
+    [self.bubbleLabel.layer removeAllAnimations];
+    [self.senderNameLabel.layer removeAllAnimations];
+    [self.senderImageView.layer removeAllAnimations];
+    [self.senderInitialLabel.layer removeAllAnimations];
+    [self.senderProfileImageButton.layer removeAllAnimations];
+    [self.statusLabel.layer removeAllAnimations];
     
 }
 

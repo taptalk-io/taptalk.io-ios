@@ -109,12 +109,7 @@
         return;
     }
     
-    if (message.type == TAPChatMessageTypeSystemMessage &&
-        [message.action isEqualToString:@"room/addParticipant"] &&
-        ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
-    ) {
-        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:message.room.roomID];
-    }
+    [TAPUtil handleReceivedSystemMessage:message];
     
     //Insert message to database
     [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[message] success:^{
@@ -224,10 +219,17 @@
     if (message == nil) {
         return;
     }
-
-    if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
-        [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
-    }
+    
+    //Insert message to database
+    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[message] success:^{
+        if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+            [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
+        }
+    } failure:^(NSError *error) {
+        if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+            [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
+        }
+    }];
 }
 
 

@@ -71,13 +71,14 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)showSeperatorView;
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
+- (void)setSwipeGestureEnable:(BOOL)enable;
 
 - (void)showProgressUploadView:(BOOL)show;
 - (void)animateFailedUploadingImage;
 - (void)animateProgressUploadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)setInitialAnimateUploadingImageWithType:(TAPMyImageBubbleTableViewCellStateType)type;
 - (void)animateFinishedUploadingImage;
-- (void)setFullImage:(UIImage *)image;
+- (void)setFullImage:(UIImage *_Nullable)image;
 - (void)setThumbnailImage:(UIImage *)thumbnailImage;
 - (void)setMyImageBubbleTableViewCellStateType:(TAPMyImageBubbleTableViewCellStateType)myImageBubbleTableViewCellStateType;
 

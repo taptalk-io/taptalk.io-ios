@@ -136,7 +136,7 @@
                 //set deleted account profil pict
                 self.initialNameView.alpha = 1.0f;
                 self.contactImageView.alpha = 1.0f;
-                self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:contactName];
+                self.initialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
                 self.initialNameLabel.text = @"";
                 self.contactImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             }

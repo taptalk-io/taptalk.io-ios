@@ -146,6 +146,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) UIView *rightBarInitialNameView;
 @property (strong, nonatomic) UILabel *rightBarInitialNameLabel;
 @property (strong, nonatomic) TAPImageView *rightBarImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *deletedUserImageView;
 
 @property (strong, nonatomic) TAPConnectionStatusViewController *connectionStatusViewController;
 @property (strong, nonatomic) TAPKeyboardViewController *keyboardViewController;
@@ -939,7 +940,7 @@ CGPoint center;
     }
     
     if (self.currentRoom.isDeleted) {
-        return;
+        //return;
     }
     
     _isViewWillAppeared = YES;
@@ -982,6 +983,7 @@ CGPoint center;
     [self checkAndRefreshOnlineStatus];
     [self setKeyboardStateDefault];
     
+    NSString *r = self.currentRoom.roomID;
     [TAPDataManager callAPIGetStarredMessageIDs:self.currentRoom.roomID success:^(NSMutableArray *starredMessageID) {
         self.starMessageIDArray = [starredMessageID mutableCopy];;
        // [self.tableView reloadData];
@@ -1280,6 +1282,14 @@ CGPoint center;
                         [cell showStarMessageIconView];
                     }
                     
+                    
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if(self.isSelectingForwardMessage){
                         [cell showCheckMarkIcon:YES];
                     }
@@ -1338,7 +1348,13 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
-
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if(self.isSelectingForwardMessage){
                         [cell showCheckMarkIcon:YES];
                     }
@@ -1488,6 +1504,13 @@ CGPoint center;
                     
                     [cell showStatusLabel:YES];
                     
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -1565,6 +1588,13 @@ CGPoint center;
                         if ([mentionArray count] > 0) {
                             cell.mentionIndexesArray = mentionArray;
                         }
+                    }
+                    
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
                     }
                     
                     if (!message.isHidden) {
@@ -1690,6 +1720,13 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if(self.isSelectingForwardMessage){
                         [cell showCheckMarkIcon:YES];
                     }
@@ -1801,6 +1838,13 @@ CGPoint center;
                     if([self.starMessageIDArray containsObject:message.messageID]){
                         //Show star icon on message bubble
                         [cell showStarMessageView];
+                    }
+                    
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
                     }
                     
                     if(self.isSelectingForwardMessage){
@@ -1934,6 +1978,13 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if(self.isSelectingForwardMessage){
                         [cell showCheckMarkIcon:YES];
                     }
@@ -1994,6 +2045,12 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
 
                     if(self.isSelectingForwardMessage){
                         [cell showCheckMarkIcon:YES];
@@ -2109,6 +2166,13 @@ CGPoint center;
                     
                     cell.message = message;
                     
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
                             [cell showBubbleHighlight];
@@ -2171,6 +2235,13 @@ CGPoint center;
                     }
                     
                     cell.message = message;
+                    
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
                     
                     if (!message.isHidden) {
                         if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
@@ -2272,6 +2343,13 @@ CGPoint center;
                         [cell showStarMessageView];
                     }
                     
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
+                    }
+                    
                     if(self.isSelectingForwardMessage){
                         [cell showCheckMarkIcon:YES];
                     }
@@ -2358,6 +2436,13 @@ CGPoint center;
                     if([self.starMessageIDArray containsObject:message.messageID]){
                         //Show star icon on message bubble
                         [cell showStarMessageView];
+                    }
+                    
+                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        [cell setSwipeGestureEnable:NO];
+                    }
+                    else{
+                        [cell setSwipeGestureEnable:YES];
                     }
                     
                     if(self.isSelectingForwardMessage){
@@ -3654,7 +3739,7 @@ CGPoint center;
         
             [TAPImageView imageFromCacheWithMessage:message
             success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
-                [[TAPChatManager sharedManager] sendImageMessage:receivedMessage caption:currentCaption];
+                [[TAPChatManager sharedManager] sendImageMessage:fullImage caption:currentCaption];
             }
             failure:^(NSError *error, TAPMessageModel *receivedMessage) {
                 NSString *assetIdentifier = [dataDictionary objectForKey:@"assetIdentifier"];
@@ -3687,7 +3772,6 @@ CGPoint center;
                                                                                              type:message.type
                                                                                             quote:message.quote
                                                                                       messageData:message.data];
-                        NSInteger messageIndex = [self.messageArray indexOfObject:message];
                         [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
                     }
                     else {
@@ -4655,7 +4739,6 @@ CGPoint center;
 }
 
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    NSLog(@"myVideoRetryUploadDownloadButtonDidTapped: %ld", [[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus]);
     if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         return;
     }
@@ -5715,6 +5798,10 @@ CGPoint center;
 
 - (void)yourVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
     [self messageBubbleQuoteViewDidTapped:tappedMessage];
+}
+
+- (void)yourVoiceNoteBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
+    [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
 - (void)yourVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -6889,17 +6976,32 @@ CGPoint center;
         self.rightBarImageView.contentMode = UIViewContentModeScaleAspectFill;
         [rightBarView addSubview:self.rightBarImageView];
         
+        _deletedUserImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
+        self.deletedUserImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.deletedUserImageView.alpha = 0.0f;
+        [rightBarView addSubview:self.deletedUserImageView];
+        
         NSString *profileImageURL = room.imageURL.thumbnail;
-        if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+
+        if(room.deleted.longValue > 0){
+            //set deleted account profil pict
+            self.rightBarInitialNameView.alpha = 1.0f;
+            self.rightBarImageView.alpha = 0.0f;
+            self.deletedUserImageView.alpha = 1.0f;
+            self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+            self.rightBarInitialNameLabel.text =@"";
+        }
+        else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
             BOOL isGroup = NO;
             if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
                 isGroup = YES;
             }
-            
             self.rightBarInitialNameView.alpha = 1.0f;
             self.rightBarImageView.alpha = 0.0f;
             self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:room.name];
             self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:room.name isGroup:isGroup];
+            
+            
         }
         else {
             self.rightBarInitialNameView.alpha = 0.0f;
@@ -7666,7 +7768,10 @@ CGPoint center;
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil && [fullImage class] == [UIImage class]) {
+                if ([cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]] &&
+                    fullImage != nil &&
+                    [fullImage isKindOfClass:[UIImage class]]
+                ) {
                     [cell setFullImage:fullImage];
                 }
                 if (!currentMessage.isFailedSend) {
@@ -7679,7 +7784,10 @@ CGPoint center;
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil && [fullImage class] == [UIImage class]) {
+                if ([cell isKindOfClass:[TAPYourImageBubbleTableViewCell class]] &&
+                    fullImage != nil &&
+                    [fullImage isKindOfClass:[UIImage class]]
+                ) {
                     [cell setFullImage:fullImage];
                 }
                 [cell animateFinishedDownloadingImage];
@@ -8657,6 +8765,12 @@ CGPoint center;
     NSLog(@"Message model: %@", [message toJSONString]);
 #endif
     
+    if(self.currentRoom.type == RoomTypePersonal){
+        if(self.otherUser.deleted > 0){
+            return;
+        }
+    }
+    
     if (message.isDeleted || message.isSending || message.isFailedSend || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal)) {
         return;
     }
@@ -8784,6 +8898,7 @@ CGPoint center;
         UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
         [self.navigationItem setLeftBarButtonItem:barButtonItem];
         [self showInputAccessoryExtensionView:NO];
+        self.messageTextView.text = @"";
         [self.tableView reloadData];
                                      
     }];
@@ -8999,8 +9114,6 @@ CGPoint center;
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeImage) {
         //check already downloaded or not
-        UIImage *savedImage = nil;
-        NSString *roomID = message.room.roomID;
         NSDictionary *dataDictionary = message.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
         
@@ -9020,7 +9133,6 @@ CGPoint center;
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeVideo) {
         //check already downloaded or not
-        NSString *roomID = message.room.roomID;
         NSDictionary *dataDictionary = message.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
         
@@ -9449,7 +9561,7 @@ CGPoint center;
         }
     _priorPoint = point;
     
-    NSLog(@"---y %ld", [self.voiceNoteDragView convertPoint:center toView:nil].y);
+//    NSLog(@"---y %ld", [self.voiceNoteDragView convertPoint:center toView:nil].y);
     
 }
 
@@ -9851,383 +9963,335 @@ CGPoint center;
 
 - (void)handleMessageFromSocket:(TAPMessageModel *)message isUpdatedMessage:(BOOL)isUpdated {
     dispatch_async(dispatch_get_main_queue(), ^{
-        
-        //Handle mapping mention index to array
-        NSArray *mentionIndexArray = [NSArray array];
-        if (message.type == TAPChatMessageTypeText) {
-            NSString *messageContainString = message.body;
-            messageContainString = [TAPUtil nullToEmptyString:messageContainString];
-            mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
-        }
-        else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
-            NSString *messageContainString = [message.data objectForKey:@"caption"];
-            messageContainString = [TAPUtil nullToEmptyString:messageContainString];
-            mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
-        }
-        
-        if ([mentionIndexArray count] > 0) {
-            [self.mentionIndexesDictionary removeObjectForKey:message.localID];
-            [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
-        }
-        
-        //Check if message exist in Message Pointer Dictionary
-        TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
-        if(currentMessage != nil) {
-            //Message exist in dictionary
-            
-            //Update message into array and dictionary
-            //Need to take message before data updated to get current sending state
-            
-            TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-            
-            BOOL isSendingAnimation = NO;
-            BOOL setAsDelivered = NO;
-            BOOL setAsRead = NO;
-            BOOL setAsDeleted = NO;
-            
-            
-            if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
-                //My Message
-                if (currentMessage.isSending) {
-                    //Message was sending
-                    isSendingAnimation = YES;
-                    NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
-                }
-                
-                if(!currentMessage.isDelivered && message.isDelivered && !currentMessage.isRead && !message.isRead) {
-                    setAsDelivered = YES;
-                    setAsDeleted = NO;
-                }
-                
-                if(!currentMessage.isRead && message.isRead) {
-                    setAsDelivered = NO;
-                    setAsRead = YES;
-                }
-                
-                //check if current message from socket is deleted, not from message in local array or dictionary
-                if (message.isDeleted) {
-                    setAsDeleted = YES;
-                }
-            }
-            else {
-                //Their Message
-                //check if current message from socket is deleted, not from message in local array or dictionary
-                if (message.isDeleted) {
-                    setAsDeleted = YES;
-                }
-            }
-            
-            //Update message data
-            [self updateMessageModelValueWithMessage:message];
-            
-            //Check need to update profile data or not
-            [self checkUpdatedUserProfileWithMessage:message];
-            
-            //Update view
-            NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
-            NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
-            
-            if (setAsDeleted) {
-                //Delete physical file if exist
-                if (currentMessage.type == TAPChatMessageTypeImage || currentMessage.type == TAPChatMessageTypeVideo || currentMessage.type == TAPChatMessageTypeFile || currentMessage.type == TAPChatMessageTypeVoice) {
-                    [TAPDataManager deletePhysicalFilesWithMessage:currentMessage success:^{
-                        
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                }
-                
-                //Update cell to deleted message
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            else {
-                if (currentMessage.type == TAPChatMessageTypeText) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        
-                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                        if ([mentionArray count] > 0) {
-                            cell.mentionIndexesArray = mentionArray;
-                        }
-                        
-                        if (isSendingAnimation) {
-                            [cell receiveSentEvent];
-                        }
-                        else if (setAsDelivered) {
-                            [cell receiveDeliveredEvent];
-                        }
-                        else if (setAsRead) {
-                            [cell receiveReadEvent];
-                        }
-                        else {
-                            [cell setMessage:message];
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                    else{
-                        TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        
-                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                        if ([mentionArray count] > 0) {
-                            cell.mentionIndexesArray = mentionArray;
-                        }
-                        
-                        [cell setMessage:message];
-                        
-                        if (isSendingAnimation) {
-                            //[cell receiveSentEvent];
-                        }
-                        else if (setAsDelivered) {
-                          //  [cell receiveDeliveredEvent];
-                        }
-                        else if (setAsRead) {
-                            //[cell receiveReadEvent];
-                        }
-                        else {
-                           // [cell setMessage:message];
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                }
-                else if (currentMessage.type == TAPChatMessageTypeImage) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        TAPMyImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+           
+           //Handle mapping mention index to array
+           NSArray *mentionIndexArray = [NSArray array];
+           if (message.type == TAPChatMessageTypeText) {
+               NSString *messageContainString = message.body;
+               messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+               mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+           }
+           else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+               NSString *messageContainString = [message.data objectForKey:@"caption"];
+               messageContainString = [TAPUtil nullToEmptyString:messageContainString];
+               mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
+           }
+           
+           if ([mentionIndexArray count] > 0) {
+               [self.mentionIndexesDictionary removeObjectForKey:message.localID];
+               [self.mentionIndexesDictionary setObject:mentionIndexArray forKey:message.localID];
+           }
+           
+           //Check if message exist in Message Pointer Dictionary
+           TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
+           if(currentMessage != nil) {
+               //Message exist in dictionary
+               
+               //Update message into array and dictionary
+               //Need to take message before data updated to get current sending state
+               
+               TAPUserModel *currentUser = [TAPDataManager getActiveUser];
+               
+               BOOL isSendingAnimation = NO;
+               BOOL setAsDelivered = NO;
+               BOOL setAsRead = NO;
+               BOOL setAsDeleted = NO;
+               
+               
+               if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
+                   //My Message
+                   if (currentMessage.isSending) {
+                       //Message was sending
+                       isSendingAnimation = YES;
+                       NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
+                   }
+                   
+                   if(!currentMessage.isDelivered && message.isDelivered && !currentMessage.isRead && !message.isRead) {
+                       setAsDelivered = YES;
+                       setAsDeleted = NO;
+                   }
+                   
+                   if(!currentMessage.isRead && message.isRead) {
+                       setAsDelivered = NO;
+                       setAsRead = YES;
+                   }
+                   
+                   //check if current message from socket is deleted, not from message in local array or dictionary
+                   if (message.isDeleted) {
+                       setAsDeleted = YES;
+                   }
+               }
+               else {
+                   //Their Message
+                   //check if current message from socket is deleted, not from message in local array or dictionary
+                   if (message.isDeleted) {
+                       setAsDeleted = YES;
+                   }
+               }
+               
+               //Update message data
+               [self updateMessageModelValueWithMessage:message];
+               
+               //Check need to update profile data or not
+               [self checkUpdatedUserProfileWithMessage:message];
+               
+               //Update view
+               NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
+               NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
+               
+               if (setAsDeleted) {
+                   //Delete physical file if exist
+                   if (currentMessage.type == TAPChatMessageTypeImage || currentMessage.type == TAPChatMessageTypeVideo || currentMessage.type == TAPChatMessageTypeFile || currentMessage.type == TAPChatMessageTypeVoice) {
+                       [TAPDataManager deletePhysicalFilesWithMessage:currentMessage success:^{
+                           
+                       } failure:^(NSError *error) {
+                           
+                       }];
+                   }
+                   
+                   //Update cell to deleted message
+                   [self.tableView performBatchUpdates:^{
+                       //changing beginUpdates and endUpdates with this because of deprecation
+                       [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                   } completion:^(BOOL finished) {
+                   }];
+               }
+               else {
+                   if (currentMessage.type == TAPChatMessageTypeText) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           
+                           NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                           if ([mentionArray count] > 0) {
+                               cell.mentionIndexesArray = mentionArray;
+                           }
+                           
+                           if (isSendingAnimation) {
+                               [cell receiveSentEvent];
+                           }
+                           else if (setAsDelivered) {
+                               [cell receiveDeliveredEvent];
+                           }
+                           else if (setAsRead) {
+                               [cell receiveReadEvent];
+                           }
+                           else {
+                               [cell setMessage:message];
+                               
+                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                               //        [self.tableView reloadData];
+                           }
+                       }
+                   }
+                   else if (currentMessage.type == TAPChatMessageTypeImage) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           TAPMyImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
 
-                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                        if ([mentionArray count] > 0) {
-                            cell.mentionIndexesArray = mentionArray;
-                        }
-                        
-                        if (isSendingAnimation) {
-                            [cell receiveSentEvent];
-                            [TAPUtil performBlock:^{
-                                [self fetchImageDataWithMessage:message];
-                            } afterDelay:1.0f];
-                        }
-                        else if (setAsDelivered) {
-                            [cell receiveDeliveredEvent];
-                            [TAPUtil performBlock:^{
-                                [self fetchImageDataWithMessage:message];
-                            } afterDelay:1.0f];
-                        }
-                        else if (setAsRead) {
-                            [cell receiveReadEvent];
-                            [TAPUtil performBlock:^{
-                                [self fetchImageDataWithMessage:message];
-                            } afterDelay:1.0f];
-                        }
-                        else {
-                            if(message.isMessageEdited){
-                                [cell editMessage:message];
-                            }
-                            else{
-                                [cell setMessage:message];
-                            }
-                            
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                    else{
-                        TAPYourImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                           if ([mentionArray count] > 0) {
+                               cell.mentionIndexesArray = mentionArray;
+                           }
+                           
+                           if (isSendingAnimation) {
+                               [cell receiveSentEvent];
+                               
+                               [TAPUtil performBlock:^{
+                                   [self fetchImageDataWithMessage:message];
+                               } afterDelay:1.0f];
+                           }
+                           else if (setAsDelivered) {
+                               [cell receiveDeliveredEvent];
+                           }
+                           else if (setAsRead) {
+                               [cell receiveReadEvent];
+                           }
+                           else {
+                               [cell setMessage:message];
+                               
+                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                               //        [self.tableView reloadData];
+                           }
+                       }
+                   }
+                   else if (currentMessage.type == TAPChatMessageTypeVideo) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           //My Chat
+                           TAPMyVideoBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+
+                           NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                           if ([mentionArray count] > 0) {
+                               cell.mentionIndexesArray = mentionArray;
+                           }
+
+                           cell.message = currentMessage;
+                           
+                           if (isSendingAnimation) {
+                               [cell receiveSentEvent];
+                           }
+                           else if (setAsDelivered) {
+                               [cell receiveDeliveredEvent];
+                           }
+                           else if (setAsRead) {
+                               [cell receiveReadEvent];
+                           }
+                           else {
+                               [cell setMessage:message];
+                               
+                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                               //        [self.tableView reloadData];
+                           }
+                       }
+                   }
+                   else if (currentMessage.type == TAPChatMessageTypeFile) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           TAPMyFileBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           
+                           if (isSendingAnimation) {
+                               [cell receiveSentEvent];
+                           }
+                           else if (setAsDelivered) {
+                               [cell receiveDeliveredEvent];
+                           }
+                           else if (setAsRead) {
+                               [cell receiveReadEvent];
+                           }
+                           else {
+                               [cell setMessage:message];
+                               
+                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                               //        [self.tableView reloadData];
+                           }
+                       }
+                   }
+                   else if (currentMessage.type == TAPChatMessageTypeVoice) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           TAPMyVoiceNoteBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           
+                           if (isSendingAnimation) {
+                               [cell receiveSentEvent];
+                           }
+                           else if (setAsDelivered) {
+                               [cell receiveDeliveredEvent];
+                           }
+                           else if (setAsRead) {
+                               [cell receiveReadEvent];
+                           }
+                           else {
+                               [cell setMessage:message];
+                               
+                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                               //        [self.tableView reloadData];
+                           }
+                       }
+                   }
+                   else if (currentMessage.type == TAPChatMessageTypeProduct) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           TAPProductListBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           NSArray *productListArray = [currentMessage.data objectForKey:@"items"];
+                           [cell setProductListBubbleCellWithData:productListArray];
+                           if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                               [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
+                           }
+                           else {
+                               [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
+                           }
+                       }
+                   }
+                   else if (currentMessage.type == TAPChatMessageTypeLocation) {
+                       if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                           TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           
+                           if (isSendingAnimation) {
+                               [cell receiveSentEvent];
+                           }
+                           else if (setAsDelivered) {
+                               [cell receiveDeliveredEvent];
+                           }
+                           else if (setAsRead) {
+                               [cell receiveReadEvent];
+                           }
+                           else {
+                               [cell setMessage:message];
+                               
+                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                               //        [self.tableView reloadData];
+                           }
+                       }
+                   }
+                   else {
+                       //check if custom bubble available
+                       NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
                        
-                        [cell setMessage:message];
-                        
-                    }
-                }
-                else if (currentMessage.type == TAPChatMessageTypeVideo) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        //My Chat
-                        TAPMyVideoBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-
-                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                        if ([mentionArray count] > 0) {
-                            cell.mentionIndexesArray = mentionArray;
-                        }
-
-                        cell.message = currentMessage;
-                        
-                        if (isSendingAnimation) {
-                            [cell receiveSentEvent];
-                        }
-                        else if (setAsDelivered) {
-                            [cell receiveDeliveredEvent];
-                        }
-                        else if (setAsRead) {
-                            [cell receiveReadEvent];
-                        }
-                        else {
-                            [cell setMessage:message];
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                    else{
-                        TAPYourVideoBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        [cell setMessage:message];
-                    }
-                }
-                else if (currentMessage.type == TAPChatMessageTypeFile) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        TAPMyFileBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        
-                        if (isSendingAnimation) {
-                            [cell receiveSentEvent];
-                        }
-                        else if (setAsDelivered) {
-                            [cell receiveDeliveredEvent];
-                        }
-                        else if (setAsRead) {
-                            [cell receiveReadEvent];
-                        }
-                        else {
-                            [cell setMessage:message];
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                }
-                else if (currentMessage.type == TAPChatMessageTypeVoice) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        TAPMyVoiceNoteBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        
-                        if (isSendingAnimation) {
-                            [cell receiveSentEvent];
-                        }
-                        else if (setAsDelivered) {
-                            [cell receiveDeliveredEvent];
-                        }
-                        else if (setAsRead) {
-                            [cell receiveReadEvent];
-                        }
-                        else {
-                            [cell setMessage:message];
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                }
-                else if (currentMessage.type == TAPChatMessageTypeProduct) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        TAPProductListBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        NSArray *productListArray = [currentMessage.data objectForKey:@"items"];
-                        [cell setProductListBubbleCellWithData:productListArray];
-                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                            [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
-                        }
-                        else {
-                            [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
-                        }
-                    }
-                }
-                else if (currentMessage.type == TAPChatMessageTypeLocation) {
-                    if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                        TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        
-                        if (isSendingAnimation) {
-                            [cell receiveSentEvent];
-                        }
-                        else if (setAsDelivered) {
-                            [cell receiveDeliveredEvent];
-                        }
-                        else if (setAsRead) {
-                            [cell receiveReadEvent];
-                        }
-                        else {
-                            [cell setMessage:message];
-                            
-                            //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                            //        [self.tableView reloadData];
-                        }
-                    }
-                }
-                else {
-                    //check if custom bubble available
-                    NSDictionary *cellDataDictionary = [[TAPCustomBubbleManager sharedManager] getCustomBubbleClassNameWithType:message.type];
-                    
-                    if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
-                        //if custom bubble from client available
-                        
-                        TAPBaseGeneralBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                        [cell setMessage:message];
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                }
-                
-                if(message.isMessageEdited){
-                    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    
-                    
-                    if (self.isKeyboardShowed) {
-                        _keyboardHeight = self.safeAreaBottomPadding + self.initialKeyboardHeight;
-                    }
-                    else {
-                        _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
-                    }
-                    
-                    if (self.isKeyboardShowed) {
-                        [self keyboardWillShowWithHeight:self.keyboardHeight];
-                    }
-                    else {
-                        [self keyboardWillHideWithHeight:self.keyboardHeight];
-                    }
-                    
-                }
-            }
-        }
-        else {
-            //Message not exist in dictionary
-            if (!isUpdated) {
-                //Only run when message is new message
-                if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
-                    //Bottom table view not seen, put message to holder array and insert the message when user scroll to bottom
-                    [self.scrolledPendingMessageArray insertObject:message atIndex:0];
-                    
-                    //Add message to messageDictionary first to lower load time (pending message will be inserted to messageArray at scrollViewDidScroll and chatAnchorButtonDidTapped)
-                    [self.messageDictionary setObject:message forKey:message.localID];
-                    
-                    [self addMessageToAnchorUnreadArray:message];
-                    
-                    //If new incoming message from emit and other user and also when scroll position in not in the bottom, add and show mention anchor
-                    BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
-                    if (hasMention && ![message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isRead) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self.scrolledPendingMentionArray addObject:message];
-                            [self addMessageToAnchorMentionArray:message];
-                            [self showMentionAnchorView:YES];
-                        });
-                    }
-                }
-                else {
-                    //RN Note - If crash happen on opening room see updateMessageDataAndUIWithMessages method
-                    //Bottom table view visible, insert message normally
-                    [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
-                    NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                    [self.tableView performBatchUpdates:^{
-                        //changing beginUpdates and endUpdates with this because of deprecation
-                        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                    } completion:^(BOOL finished) {
-                    }];
-                }
-            }
-        }
-        [self checkEmptyState];
-    });
+                       if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
+                           //if custom bubble from client available
+                           
+                           TAPBaseGeneralBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                           [cell setMessage:message];
+                           [self.tableView performBatchUpdates:^{
+                               //changing beginUpdates and endUpdates with this because of deprecation
+                           } completion:^(BOOL finished) {
+                           }];
+                       }
+                   }
+                   if(message.isMessageEdited){
+                       [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                       
+                       
+                       if (self.isKeyboardShowed) {
+                           _keyboardHeight = self.safeAreaBottomPadding + self.initialKeyboardHeight;
+                       }
+                       else {
+                           _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+                       }
+                       
+                       if (self.isKeyboardShowed) {
+                           [self keyboardWillShowWithHeight:self.keyboardHeight];
+                       }
+                       else {
+                           [self keyboardWillHideWithHeight:self.keyboardHeight];
+                       }
+                       
+                   }
+               }
+           }
+           else {
+               //Message not exist in dictionary
+               if (!isUpdated) {
+                   //Only run when message is new message
+                   if(self.tableView.contentOffset.y > kShowChatAnchorOffset) {
+                       //Bottom table view not seen, put message to holder array and insert the message when user scroll to bottom
+                       [self.scrolledPendingMessageArray insertObject:message atIndex:0];
+                       
+                       //Add message to messageDictionary first to lower load time (pending message will be inserted to messageArray at scrollViewDidScroll and chatAnchorButtonDidTapped)
+                       [self.messageDictionary setObject:message forKey:message.localID];
+                       
+                       [self addMessageToAnchorUnreadArray:message];
+                       
+                       //If new incoming message from emit and other user and also when scroll position in not in the bottom, add and show mention anchor
+                       BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+                       if (hasMention && ![message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isRead) {
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               [self.scrolledPendingMentionArray addObject:message];
+                               [self addMessageToAnchorMentionArray:message];
+                               [self showMentionAnchorView:YES];
+                           });
+                       }
+                   }
+                   else {
+                       //RN Note - If crash happen on opening room see updateMessageDataAndUIWithMessages method
+                       //Bottom table view visible, insert message normally
+                       [self addIncomingMessageToArrayAndDictionaryWithMessage:message atIndex:0];
+                       NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                       [self.tableView performBatchUpdates:^{
+                           //changing beginUpdates and endUpdates with this because of deprecation
+                           [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+                       } completion:^(BOOL finished) {
+                       }];
+                   }
+               }
+           }
+           [self checkEmptyState];
+       });
 }
 
 - (void)destroySequence {
@@ -11525,8 +11589,8 @@ CGPoint center;
     if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
         UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
         CGPoint velocity = [panGestureRecognizer velocityInView:self.voiceNoteContainerView];
-        NSLog(@"--> vertical : %d", velocity.y );
-        NSLog(@"--> horizontal : %d", velocity.x );
+//        NSLog(@"--> vertical : %d", velocity.y );
+//        NSLog(@"--> horizontal : %d", velocity.x );
         if (fabs(velocity.x) > fabs(velocity.y)) {
             return YES;
         }
@@ -11535,7 +11599,7 @@ CGPoint center;
     else{
         UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
         CGPoint velocity = [panGestureRecognizer velocityInView:self.voiceNoteContainerView];
-        NSLog(@"--> vertical : %d", panGestureRecognizer.view.center.y);
+//        NSLog(@"--> vertical : %d", panGestureRecognizer.view.center.y);
     }
 
     return YES;
@@ -11551,7 +11615,7 @@ CGPoint center;
     }
     else if (recognizer.state == UIGestureRecognizerStateChanged) {
         CGPoint translation = [recognizer translationInView:self.voiceNoteContainerView];
-        NSLog(@"start moving %@", translation.y);
+//        NSLog(@"start moving %@", translation.y);
     }
     else if (recognizer.state == UIGestureRecognizerStateEnded)
     {
@@ -11689,7 +11753,6 @@ CGPoint center;
         if (recipientImageURL == nil || [recipientImageURL isEqualToString:@""]) {
             self.recipientInitialNameView.alpha = 1.0f;
             self.recipientImageView.alpha = 0.0f;
-
             BOOL isGroup = NO;
             if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
                 isGroup = YES;
@@ -11981,7 +12044,7 @@ CGPoint center;
 - (void)profileImageDidTapped {
 
     //reject if deletedRoomView exist
-    if (self.deletedRoomView.alpha == 1.0f || self.kickedGroupRoomBackgroundView.alpha == 1.0f || self.isSelectingForwardMessage) {
+    if (self.kickedGroupRoomBackgroundView.alpha == 1.0f || self.isSelectingForwardMessage) {
         return;
     }
     
@@ -12030,7 +12093,7 @@ CGPoint center;
 - (void)openUserProfileFromGroupChatWithMessage:(TAPMessageModel *)tappedMessage {
 
     //reject if deletedRoomView exist
-    if (self.deletedRoomView.alpha == 1.0f || self.kickedGroupRoomBackgroundView.alpha == 1.0f) {
+    if (self.kickedGroupRoomBackgroundView.alpha == 1.0f) {
         return;
     }
     
@@ -12988,7 +13051,7 @@ CGPoint center;
 //                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
 //                    //My Chat
 //                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//                    if (fullImage != nil && [fullImage class] == [UIImage class]) {
+//                    if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
 //                        [cell setFullImage:fullImage];
 //                    }
 //                    [cell animateFinishedUploadingImage];
@@ -12996,7 +13059,7 @@ CGPoint center;
 //                else {
 //                    //Their Chat
 //                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//                    if (fullImage != nil && [fullImage class] == [UIImage class]) {
+//                    if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
 //                        [cell setFullImage:fullImage];
 //                    }
 //                    [cell animateFinishedDownloadingImage];
@@ -13080,7 +13143,14 @@ CGPoint center;
     self.nameLabel.text = room.name;
     
     NSString *profileImageURL = room.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+    if(room.deleted.longValue > 0){
+        self.rightBarInitialNameView.alpha = 1.0f;
+        self.rightBarImageView.alpha = 0.0f;
+        self.deletedUserImageView.alpha = 1.0f;
+        self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+        self.rightBarInitialNameLabel.text =@"";
+    }
+    else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
         BOOL isGroup = NO;
         if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
             isGroup = YES;
@@ -13416,7 +13486,14 @@ CGPoint center;
              NSString *updatedImageURLString = message.room.imageURL.thumbnail;
              NSString *currentImageURLString = room.imageURL.thumbnail;
              if (![updatedImageURLString isEqualToString:currentImageURLString]) {
-                 if (updatedImageURLString == nil || [updatedImageURLString isEqualToString:@""]) {
+                 if(message.room.deleted.longValue > 0){
+                     self.rightBarInitialNameView.alpha = 1.0f;
+                     self.rightBarImageView.alpha = 0.0f;
+                     self.deletedUserImageView.alpha = 1.0f;
+                     self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                     self.rightBarInitialNameLabel.text =@"";
+                 }
+                 else if (updatedImageURLString == nil || [updatedImageURLString isEqualToString:@""]) {
                      BOOL isGroup = NO;
                      if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
                          isGroup = YES;

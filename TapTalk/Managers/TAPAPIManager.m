@@ -260,6 +260,19 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/get_starred_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeGetDeleteAccountState) {
+        NSString *apiPath = @"client/user/delete_account/check_state";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRequestDeleteAccountOTP) {
+        NSString *apiPath = @"client/user/delete_account/request_otp";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeVerifyDeleteAccountOTP) {
+        NSString *apiPath = @"client/user/delete_account/verify_otp";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+
 
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }

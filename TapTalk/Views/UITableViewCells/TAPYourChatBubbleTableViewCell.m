@@ -80,6 +80,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
+@property (weak, nonatomic) IBOutlet UIImageView *deleteUserImageView;
 
 
 @property (strong, nonatomic) NSString *currentProfileImageURLString;
@@ -203,6 +204,7 @@
     self.starIconImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
+    self.deleteUserImageView.alpha = 0.0f;
     self.senderImageViewLeadingConstraint.constant = 16.0f;
     self.starIconWidthConstraint.constant = 0.0f;
     self.starIconLeadingConstraint.constant = 0.0f;
@@ -619,6 +621,7 @@
         
         NSString *thumbnailImageString = @"";
         TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:message.user.userID];
+        //NSLog(@"userID :%@, username :%@, fullname :%@, deleted :%ld",obtainedUser.userID, obtainedUser.username, obtainedUser.fullname, obtainedUser.deleted.longValue);
         if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
             thumbnailImageString = obtainedUser.imageURL.thumbnail;
             thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
@@ -637,13 +640,15 @@
             fullNameString = message.user.fullname;
             fullNameString = [TAPUtil nullToEmptyString:fullNameString];
         }
-        if(message.user.deleted.longValue > 0){
+        
+        if(message.user.deleted.longValue > 0 || obtainedUser.deleted.longValue > 0){
             //set deleted account profil pict
             self.senderInitialView.alpha = 1.0f;
-            self.senderImageView.alpha = 1.0f;
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderImageView.alpha = 0.0f;
+            self.deleteUserImageView.alpha = 1.0f;
+            self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
             self.senderInitialLabel.text =@"";
+            self.senderNameLabel.text = @"Deleted User";
         }
         else if ([thumbnailImageString isEqualToString:@""]) {
             //No photo found, get the initial
@@ -651,8 +656,6 @@
             self.senderImageView.alpha = 0.0f;
             self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
             self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
-            NSLog(@"deleted : %ld", [message.user.deleted longValue]);
-          
         }
         else {
 
@@ -681,8 +684,11 @@
     else{
         self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
     }
+    TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:message.user.userID];
     
     //remove animation
+    [self.deleteUserImageView.layer removeAllAnimations];
+    [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
@@ -1020,17 +1026,19 @@
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
         self.senderImageViewLeadingConstraint.constant = 40.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
         self.senderImageViewLeadingConstraint.constant = 16.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
+}
+
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
 }
 
 - (void)setCheckMarkState:(BOOL)isSelected {

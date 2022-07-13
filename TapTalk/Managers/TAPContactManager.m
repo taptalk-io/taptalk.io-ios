@@ -77,7 +77,7 @@
         
         [self.contactUserDictionary setObject:user forKey:user.userID];
         [self.phoneUserDictionary setObject:user forKey:user.phoneWithCode];
-        
+       // NSLog(@"userID :%@, username :%@, fullname :%@, deleted :%ld",user.userID, user.username, user.fullname, user.deleted.longValue);
         if(save) {
             //save user to database directly
             NSArray *userDataArray = @[user];

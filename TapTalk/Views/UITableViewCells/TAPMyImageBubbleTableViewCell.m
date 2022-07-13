@@ -285,8 +285,9 @@
     self.starIconBottomImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
     
-//    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
-//    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+    
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
@@ -737,11 +738,11 @@
         urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
     }
     
-    CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
-    CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
-    [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
-    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+//    CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
+//    CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
+//    [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
+//    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+//    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
     
     [self setSmallThumbnailFromMessageData:message.data];
     if ((fileID == nil || [fileID isEqualToString:@""]) && (urlKey == nil || [urlKey isEqualToString:@""])) {
@@ -1689,7 +1690,7 @@
     }
 }
 
-- (void)setFullImage:(UIImage *)image {
+- (void)setFullImage:(UIImage *_Nullable)image {
     if (image == nil) {
         return;
     }
@@ -1920,13 +1921,11 @@
 - (void)showCheckMarkIcon:(BOOL)isShow {
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
@@ -1940,6 +1939,10 @@
         self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         
     }
+}
+
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
 }
 
 - (void)showSeperatorView {

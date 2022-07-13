@@ -342,7 +342,6 @@
     groupTarget.targetName = groupTargetName;
     message.target = groupTarget;
 
-    NSLog(@"---body :%@, isEdited:%ld",message.body, [NSNumber numberWithBool:message.isMessageEdited].longValue);
     return message;
 }
 
@@ -1076,6 +1075,10 @@
     NSString *userRole = [TAPUtil jsonStringFromObject:[userDictionary objectForKey:@"userRole"]];
     userRole = [TAPUtil nullToEmptyString:userRole];
     [messageMutableDictionary setValue:userRole forKey:@"userRole"];
+    
+    NSNumber *userDeleted = [userDictionary objectForKey:@"deleted"];
+    userDeleted = [TAPUtil nullToEmptyNumber:userDeleted];
+    [messageMutableDictionary setValue:userDeleted forKey:@"userDeleted"];
     
     NSNumber *lastLogin = [userDictionary objectForKey:@"lastLogin"];
     lastLogin = [TAPUtil nullToEmptyNumber:lastLogin];
@@ -3341,12 +3344,7 @@
 
             [messageResultArray addObject:decryptedMessage];
             
-            if (decryptedMessage.type == TAPChatMessageTypeSystemMessage &&
-                [decryptedMessage.action isEqualToString:@"room/addParticipant"] &&
-                ([decryptedMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
-            ) {
-                [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:decryptedMessage.room.roomID];
-            }
+            [TAPUtil handleReceivedSystemMessage:decryptedMessage];
         }
         
         if([tempRecipientIDArray count] > 0) {
@@ -4237,7 +4235,6 @@
         
         //Add user to database with isContact = NO
         [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:YES];
-        
         success(user);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
@@ -7272,6 +7269,241 @@
         
         success(messageIDsArray);
 
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPICheckDeleteAccountState:(void (^)(NSNumber *canDelete))success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetDeleteAccountState];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPICheckDeleteAccountState:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        BOOL canDelete = [dataDictionary objectForKey:@"canDelete"];
+        NSNumber *can = [dataDictionary objectForKey:@"canDelete"];
+        
+        success(can);
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIRequestVerificationCodeDeleteAccount:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
+                                              failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestDeleteAccountOTP];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:channel forKey:@"channel"]; //channel should be `sms` or `whatsapp`
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIRequestVerificationCodeDeleteAccount:channel success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success([NSString string], [NSString string], NO, [NSString string], [NSString string], 0, [NSString string]);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        
+        NSString *OTPKey = [dataDictionary objectForKey:@"otpKey"];
+        OTPKey = [TAPUtil nullToEmptyString:OTPKey];
+        
+        NSString *OTPID = [dataDictionary objectForKey:@"otpID"];
+        OTPID = [TAPUtil nullToEmptyString:OTPID];
+        
+        NSString *isSuccessString = [dataDictionary objectForKey:@"success"];
+        isSuccessString = [TAPUtil nullToEmptyString:isSuccessString];
+        BOOL isSuccessBoolean = [isSuccessString boolValue];
+        
+        NSString *channelString = [dataDictionary objectForKey:@"channel"];
+        channelString = [TAPUtil nullToEmptyString:channelString];
+        
+        NSString *whatsAppFailureReason = [dataDictionary objectForKey:@"whatsAppFailureReason"];
+        whatsAppFailureReason = [TAPUtil nullToEmptyString:whatsAppFailureReason];
+        
+        NSString *successMessage = [dataDictionary objectForKey:@"message"];
+        successMessage = [TAPUtil nullToEmptyString:successMessage];
+        
+        
+        NSString *nextRequestSecondsRaw = [dataDictionary objectForKey:@"nextRequestSeconds"];
+        nextRequestSecondsRaw = [TAPUtil nullToEmptyString:nextRequestSecondsRaw];
+        NSInteger nextRequestSeconds = [nextRequestSecondsRaw integerValue];
+        
+        success(OTPKey, OTPID, isSuccessBoolean,channelString, whatsAppFailureReason, nextRequestSeconds, successMessage);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+        }
+    }];
+}
+
++ (void)callAPIVerifyDeleteAccoutOTP:(NSString *)OTPcode
+                               OTPID:(NSString *)OTPID
+                              OTPKey:(NSString *)OTPKey deletionReason:(NSString *)deletionReason success:(void (^)(NSNumber *isSuccess))success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeVerifyDeleteAccountOTP];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    
+    [parameterDictionary setObject:[NSNumber numberWithInteger:[OTPID integerValue]] forKey:@"otpID"];
+    [parameterDictionary setObject:OTPKey forKey:@"otpKey"];
+    [parameterDictionary setObject:OTPcode forKey:@"otpCode"];
+    [parameterDictionary setObject:deletionReason forKey:@"reason"];
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPICheckDeleteAccountState:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        NSNumber *isSuccess = [dataDictionary objectForKey:@"success"];
+        
+        success(isSuccess);
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         

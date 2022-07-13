@@ -74,7 +74,9 @@
     
     [self showLoadMoreMessageLoadingView:YES];
     
-    [TAPDataManager callAPIGetStarredMessages:self.currentRoom.roomID pageNumber:1 numberOfItems:10000 success:^(NSArray *starredMessages, BOOL hasMore) {
+    NSString *roomID = self.currentRoom.roomID;
+    
+    [TAPDataManager callAPIGetStarredMessages:roomID pageNumber:1 numberOfItems:50 success:^(NSArray *starredMessages, BOOL hasMore) {
         self.messageArray = starredMessages;
         for (TAPMessageModel *message in starredMessages){
             [self.messageDictionary setObject:message forKey:message.localID];
@@ -1032,7 +1034,7 @@
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil && [fullImage class] == [UIImage class]) {
+                if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
                     [cell setFullImage:fullImage];
                 }
                 if (!currentMessage.isFailedSend) {
@@ -1045,7 +1047,7 @@
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil && [fullImage class] == [UIImage class]) {
+                if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
                     [cell setFullImage:fullImage];
                 }
                 [cell animateFinishedDownloadingImage];

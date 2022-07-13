@@ -663,11 +663,11 @@
                          error:(&fileSizeError)];
     
     if (fileSizeValue) {
-        NSLog(@"value for %@ is %@", videoAssetURL, fileSizeValue);
+//        NSLog(@"value for %@ is %@", videoAssetURL, fileSizeValue);
         videoAssetURLFileSize = fileSizeValue;
     }
     else {
-        NSLog(@"error getting size for url %@ error was %@", videoAssetURL, fileSizeError);
+//        NSLog(@"error getting size for url %@ error was %@", videoAssetURL, fileSizeError);
         videoAssetURLFileSize = [NSNumber numberWithFloat:0.0f];
     }
     
@@ -1131,12 +1131,7 @@
         //TODO Notification Manager Handle New Message
     }
     
-    if (decryptedMessage.type == TAPChatMessageTypeSystemMessage &&
-        [decryptedMessage.action isEqualToString:@"room/addParticipant"] &&
-        ([decryptedMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
-    ) {
-        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:decryptedMessage.room.roomID];
-    }
+    [TAPUtil handleReceivedSystemMessage:decryptedMessage];
 }
 
 - (void)receiveContactUpdatedFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {

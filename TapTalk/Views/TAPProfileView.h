@@ -51,6 +51,7 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
 - (void)setAsLoadingState:(BOOL)isLoading withType:(TAPProfileLoadingType)type;
 - (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName;
 - (void)hideHeaderSeperatorView;
+- (void)setDeletedUserImage;
 
 @end
 

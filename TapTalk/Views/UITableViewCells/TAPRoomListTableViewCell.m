@@ -24,6 +24,7 @@
 @property (strong, nonatomic) UILabel *lastMessageLabel;
 @property (strong, nonatomic) UILabel *timeLabel;
 @property (strong, nonatomic) UIImageView *messageStatusImageView;
+@property (strong, nonatomic) UIImageView *deletedUserProfilImageView;
 @property (strong, nonatomic) UIView *bubbleUnreadView;
 @property (strong, nonatomic) UILabel *numberOfUnreadMessageLabel;
 @property (strong, nonatomic) UIView *unreadMentionView;
@@ -57,6 +58,7 @@
     
     _isShouldForceUpdateUnreadBubble = YES;
     [self.typingAnimationImageView stopAnimating];
+    self.deletedUserProfilImageView.alpha = 0.0f;
 //    if (self.roomType != RoomTypePersonal) {
 //        self.lastSenderLabel.alpha = 1.0f;
 //    }
@@ -122,6 +124,14 @@
         self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.frame) / 2.0f;
         self.profileImageView.clipsToBounds = YES;
         [self.bgView addSubview:self.profileImageView];
+    }
+    
+    if (self.deletedUserProfilImageView == nil) {
+        _deletedUserProfilImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.profileImageView.frame) + 11.0f, CGRectGetMinY(self.profileImageView.frame) + 11.0f, 30.0f, 30.0f)];
+        self.deletedUserProfilImageView.backgroundColor = [UIColor clearColor];
+        self.deletedUserProfilImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.deletedUserProfilImageView.alpha = 0.0f;
+        [self.bgView addSubview:self.deletedUserProfilImageView];
     }
     
     if (self.expertIconImageView == nil) {
@@ -373,13 +383,23 @@
     
     self.messageStatusType = statusType;
     
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:currentRoom.roomID];
+    TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    
+    if(message.room.deleted.longValue > 0 || obtainedUser.deleted.longValue > 0){
+        //set deleted account profil pict
+        self.initialNameView.alpha = 1.0f;
+        self.profileImageView.alpha = 0.0f;
+        self.deletedUserProfilImageView.alpha = 1.0f;
+        self.initialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+        self.initialNameLabel.text = @"";
+    }
+    else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
         //No photo found, get the initial
         self.initialNameView.alpha = 1.0f;
         self.profileImageView.alpha = 0.0f;
-        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
-        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
+            self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
+            self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
     }
     else {
         self.initialNameView.alpha = 0.0f;

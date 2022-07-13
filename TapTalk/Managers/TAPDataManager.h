@@ -402,6 +402,17 @@
 + (void)callAPIUnStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetStarredMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSArray *starredMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetStarredMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPICheckDeleteAccountState:(void (^)(NSNumber *canDelete))success
+                                failure:(void (^)(NSError *error))failure;
++ (void)callAPIRequestVerificationCodeDeleteAccount:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
+                                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIVerifyDeleteAccoutOTP:(NSString *)OTPcode
+                               OTPID:(NSString *)OTPID
+                              OTPKey:(NSString *)OTPKey deletionReason:(NSString *)deletionReason success:(void (^)(NSNumber *isSuccess))success
+                             failure:(void (^)(NSError *error))failure;
++ (NSDictionary *)dictionaryFromMessageModel:(TAPMessageModel *)message;
+
 // Used to prevent inserting message to deleted chat room
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 

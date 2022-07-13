@@ -1209,4 +1209,38 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return key;
 }
 
++ (void)handleReceivedSystemMessage:(TAPMessageModel *)message {
+    if (message.type != TAPChatMessageTypeSystemMessage) {
+        return;
+    }
+    if ([message.action isEqualToString:@"room/addParticipant"] &&
+        ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+    ) {
+        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:message.room.roomID];
+    }
+    else if ([message.action isEqualToString:@"user/delete"]) {
+        [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO saveActiveUser:YES];
+        
+        NSString *queryString = [NSString stringWithFormat:@"userID == '%@'", message.user.userID];
+        [TAPDataManager getAllMessageWithQuery:queryString
+                                     sortByKey:@"created"
+                                     ascending:NO
+        success:^(NSArray<TAPMessageModel *> *deletedUserMessageArray) {
+            NSMutableArray<TAPMessageModel *> *updatedArray = [NSMutableArray array];
+            for (TAPMessageModel *deletedUserMessage in deletedUserMessageArray) {
+                deletedUserMessage.user.deleted = message.user.deleted;
+                [updatedArray addObject:deletedUserMessage];
+            }
+            [TAPDataManager updateOrInsertDatabaseMessageWithData:updatedArray success:^{
+                
+            } failure:^(NSError *error) {
+                
+            }];
+        }
+        failure:^(NSError *error) {
+            
+        }];
+    }
+}
+
 @end

@@ -66,6 +66,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+@property (weak, nonatomic) IBOutlet UIImageView *senderDeletedUserImageView;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -113,6 +114,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -324,6 +326,7 @@
     self.starIconBottomImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
+    self.senderDeletedUserImageView.alpha = 0.0f;
     self.senderImageViewLeadingConstraint.constant = 16.0f;
     
 }
@@ -794,9 +797,9 @@
         if(message.user.deleted.longValue > 0){
             //set deleted account profil pict
             self.senderInitialView.alpha = 1.0f;
-            self.senderImageView.alpha = 1.0f;
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderImageView.alpha = 0.0f;
+            self.senderDeletedUserImageView.alpha = 1.0f;
+            self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
             self.senderInitialLabel.text =@"";
         }
         else if ([thumbnailImageString isEqualToString:@""]) {
@@ -838,6 +841,8 @@
     [self updateSpacingConstraint];
     
     //remove animation
+    [self.senderDeletedUserImageView.layer removeAllAnimations];
+    [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
@@ -1839,14 +1844,12 @@
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
         self.senderImageViewLeadingConstraint.constant = 40.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
         self.senderImageViewLeadingConstraint.constant = 16.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
@@ -1860,6 +1863,10 @@
         self.checkMarkIconImageView.image = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         
     }
+}
+
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
 }
 
 - (void)showSeperator {

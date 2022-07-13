@@ -1289,9 +1289,11 @@
 
 - (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage {
     NSString *messageRoomID = message.room.roomID;
-    
     //Check need to update user data or not
-    if (message.type == TAPChatMessageTypeSystemMessage && ([message.action isEqualToString:@"user/update"] || [message.action isEqualToString:@"room/update"])) {
+    if (message.type == TAPChatMessageTypeSystemMessage &&
+        ([message.action isEqualToString:@"user/update"] ||
+         [message.action isEqualToString:@"room/update"])
+    ) {
         [self checkUpdatedUserProfileWithMessage:message];
     }
     
@@ -1321,7 +1323,7 @@
             roomLastMessage.isDelivered = message.isDelivered;
             roomLastMessage.isHidden = message.isHidden;
             roomLastMessage.body = message.body;
-            
+            roomLastMessage.user.deleted = message.user.deleted;
             
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];

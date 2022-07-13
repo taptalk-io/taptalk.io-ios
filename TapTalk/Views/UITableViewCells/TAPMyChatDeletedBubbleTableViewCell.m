@@ -129,6 +129,11 @@
         self.deletedIconImageViewTrailingConstraint.constant = 0.0f;
         self.bubbleLabel.text = @"";
     }
+    
+    //remove animation
+    [self.bubbleView.layer removeAllAnimations];
+    [self.bubbleLabel.layer removeAllAnimations];
+    [self.statusIconImageView.layer removeAllAnimations];
 }
 
 - (void)receiveSentEvent {

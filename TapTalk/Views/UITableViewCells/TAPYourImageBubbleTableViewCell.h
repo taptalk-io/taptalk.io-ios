@@ -60,12 +60,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)animateProgressDownloadingImageWithProgress:(CGFloat)progress total:(CGFloat)total;
 - (void)animateFinishedDownloadingImage;
 - (void)setInitialAnimateDownloadingImage;
-- (void)setFullImage:(UIImage *)image;
+- (void)setFullImage:(UIImage *_Nullable)image;
 - (void)setThumbnailImage:(UIImage *)thumbnailImage;
 - (void)showStarMessageView;
 - (void)showSeperator;
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
+- (void)setSwipeGestureEnable:(BOOL)enable;
 
 @end
 

@@ -35,12 +35,21 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDeletedUser" translatesAutoresizingMaskIntoConstraints="NO" id="zwl-mx-uTV">
+                                <rect key="frame" x="7" y="7" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="NMN-au-Rd2"/>
+                                    <constraint firstAttribute="width" constant="16" id="bdT-QY-MoS"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="zwl-mx-uTV" firstAttribute="centerX" secondItem="eyz-6o-6mG" secondAttribute="centerX" id="1qb-8R-pTh"/>
                             <constraint firstAttribute="bottom" secondItem="7ek-88-Me3" secondAttribute="bottom" id="5Da-6k-tQ2"/>
                             <constraint firstItem="7ek-88-Me3" firstAttribute="top" secondItem="eyz-6o-6mG" secondAttribute="top" id="9L7-fl-lmD"/>
                             <constraint firstItem="7ek-88-Me3" firstAttribute="leading" secondItem="eyz-6o-6mG" secondAttribute="leading" id="9LT-Xw-Cek"/>
+                            <constraint firstItem="zwl-mx-uTV" firstAttribute="centerY" secondItem="eyz-6o-6mG" secondAttribute="centerY" id="9Mk-g2-hgS"/>
                             <constraint firstAttribute="trailing" secondItem="7ek-88-Me3" secondAttribute="trailing" id="q9j-CL-TiG"/>
                         </constraints>
                     </view>
@@ -51,20 +60,6 @@
                             <constraint firstAttribute="height" constant="30" id="i3i-SB-dZ2"/>
                         </constraints>
                     </imageView>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7hK-PZ-iOh">
-                        <rect key="frame" x="16" y="0.0" width="30" height="30"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="30" id="WhQ-aL-quP"/>
-                            <constraint firstAttribute="width" constant="30" id="zoN-ne-vq9"/>
-                        </constraints>
-                        <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <state key="normal">
-                            <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        </state>
-                        <connections>
-                            <action selector="senderProfileImageButtonDidTapped:" destination="PjH-D3-mkK" eventType="touchUpInside" id="Wbr-DM-CTJ"/>
-                        </connections>
-                    </button>
                     <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Y1-WU-ey7">
                         <rect key="frame" x="50" y="276" width="162" height="0.0"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -423,6 +418,20 @@
                             <constraint firstAttribute="height" constant="16" id="SbM-tF-SrH"/>
                         </constraints>
                     </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7hK-PZ-iOh">
+                        <rect key="frame" x="16" y="0.0" width="30" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="WhQ-aL-quP"/>
+                            <constraint firstAttribute="width" constant="30" id="zoN-ne-vq9"/>
+                        </constraints>
+                        <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <state key="normal">
+                            <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </state>
+                        <connections>
+                            <action selector="senderProfileImageButtonDidTapped:" destination="PjH-D3-mkK" eventType="touchUpInside" id="Wbr-DM-CTJ"/>
+                        </connections>
+                    </button>
                     <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sqh-oJ-7gl">
                         <rect key="frame" x="0.0" y="0.0" width="228" height="292"/>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -518,6 +527,7 @@
                 <outlet property="replyViewLeadingConstraint" destination="WHa-Ze-dRF" id="Zep-Wo-xAh"/>
                 <outlet property="replyViewTopConstraint" destination="bOD-pD-ihc" id="lZL-TF-e5u"/>
                 <outlet property="replyViewTrailingConstraint" destination="NU5-xN-k1b" id="iZq-Eg-VXU"/>
+                <outlet property="senderDeletedUserImageView" destination="zwl-mx-uTV" id="irw-FP-hyw"/>
                 <outlet property="senderImageView" destination="pmK-kb-fXG" id="4vE-f5-cAA"/>
                 <outlet property="senderImageViewLeadingConstraint" destination="UMm-l3-JKy" id="9T2-qv-iNm"/>
                 <outlet property="senderImageViewTrailingConstraint" destination="daK-YZ-6ID" id="aIw-Uq-h0l"/>
@@ -545,9 +555,10 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="TAPIconDeletedUser" width="16" height="16"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconLocationSelect" width="34" height="52"/>
-        <image name="TAPIconReplyChatOrange" width="32" height="32"/>
+        <image name="TAPIconReplyChatOrange" width="24" height="24"/>
         <image name="TAPIconStarGrayChatBubble" width="12" height="12"/>
         <image name="TAPIconUnselected" width="24" height="24"/>
         <systemColor name="opaqueSeparatorColor">

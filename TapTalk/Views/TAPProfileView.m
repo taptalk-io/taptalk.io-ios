@@ -29,6 +29,8 @@
 
 @property (strong, nonatomic) UILabel *initialNameLabel;
 
+@property (strong, nonatomic) UIImageView *deletedUserProfile;
+
 - (void)animateSaveLoading:(BOOL)isAnimate;
 
 @end
@@ -100,6 +102,11 @@
         [self.collectionView addSubview:self.profileImageView];
         UICollectionViewFlowLayout *collectionLayoutProfilImage = [[UICollectionViewFlowLayout alloc] init];
         collectionLayoutProfilImage.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        
+        _deletedUserProfile = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.frame) - 190.0f) / 2, 0.0f - topPadding - (self.profileImageHeight - 85.0f) - 25.0f, 190.0f, 190.0f)];
+        self.deletedUserProfile.image = [UIImage imageNamed:@"TAPIconDeletedUserProfile" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.deletedUserProfile.alpha = 0.0f;
+        [self.collectionView addSubview:self.deletedUserProfile];
         
         _profilImageCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), 360.0f) collectionViewLayout:collectionLayoutProfilImage];
         self.profilImageCollectionView.backgroundColor = [UIColor clearColor];
@@ -261,6 +268,15 @@
         self.profilImageCollectionView.alpha = 1.0f;
         self.pageIndicatorCollectionView.alpha = 1.0f;
     }
+}
+
+- (void)setDeletedUserImage {
+    self.profileImageView.alpha = 0.0f;
+    self.initialNameView.alpha = 1.0f;
+    self.deletedUserProfile.alpha = 1.0f;
+    self.initialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+    self.profileImageView.backgroundColor = [UIColor clearColor];
+    self.initialNameLabel.text = @"";
 }
 
 - (void)setAsLoadingState:(BOOL)isLoading withType:(TAPProfileLoadingType)type {

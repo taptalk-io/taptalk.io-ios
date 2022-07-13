@@ -51,7 +51,7 @@
 }
 
 - (void)xibSetup {
-    self.isTypingEnabled = NO;
+    self.isTypingEnabled = YES;
     self.backgroundColor = [UIColor clearColor];
     UIView *currentView = [[[TAPUtil currentBundle] loadNibNamed:[[self class] description] owner:self options:nil] lastObject];
     
