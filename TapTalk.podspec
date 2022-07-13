@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalk"
-    s.version      = "2.1.2"
+    s.version      = "2.2.0"
     s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. TapTalk.io provides UI-based and code-based implementation & fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.source       = { :git => 'https://github.com/taptalk-io/taptalk.io-ios.git', :tag => s.version }
+    s.source       = { :git => 'https://git.taptalk.io/ios/taptalk-ios.git', :tag => s.version }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

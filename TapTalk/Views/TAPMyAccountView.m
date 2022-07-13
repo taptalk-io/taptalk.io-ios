@@ -344,18 +344,17 @@
         [self.logoutView addSubview:self.logoutButton];
         
         if ([[TapUI sharedInstance] getDeleteAccountButtonVisible]) {
-            _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 24.0f)];
+            _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 8.0f, CGRectGetWidth(self.frame) - 32.0f, 40.0f)];
+            [self.deleteAccountButton setTitle:@"Delete My Account" forState:UIControlStateNormal];
+            [self.deleteAccountButton setTitleColor:[TAPUtil getColor:@"EF5060"] forState:UIControlStateNormal];
+            self.deleteAccountButton.titleLabel.font = clickableDestructiveFont;
         }
-        else{
-            _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 0.0f)];
+        else {
+            _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame), CGRectGetWidth(self.frame) - 32.0f, 0.0f)];
         }
-        
-        [self.deleteAccountButton setTitle:@"Delete My Account" forState:UIControlStateNormal];
-        [self.deleteAccountButton setTitleColor:[TAPUtil getColor:@"EF5060"] forState:UIControlStateNormal];
-        self.deleteAccountButton.titleLabel.font = clickableDestructiveFont;
         [self.editViewContainer addSubview:self.deleteAccountButton];
         
-        self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame));
+        self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame) + 16.0f);
 
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
@@ -494,10 +493,10 @@
         }
         
         if ([[TapUI sharedInstance] getDeleteAccountButtonVisible]) {
-            self.deleteAccountButton.frame = CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 24.0f);
+            self.deleteAccountButton.frame = CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 8.0f, CGRectGetWidth(self.frame) - 32.0f, 40.0f);
         }
-        else{
-            self.deleteAccountButton.frame = CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 0.0f);
+        else {
+            self.deleteAccountButton.frame = CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame), CGRectGetWidth(self.frame) - 32.0f, 0.0f);
         }
         
         self.usernameLabelField.frame = CGRectMake(0.0f, CGRectGetMaxY(self.bioLabelField.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.usernameLabelField.frame));
