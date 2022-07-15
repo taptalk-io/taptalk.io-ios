@@ -50,6 +50,8 @@
                       failure:(void (^)(NSError *error))failure;
 + (void)loadRoomListSuccess:(void (^)(NSArray *resultArray))success
                     failure:(void (^)(NSError *error))failure;
++ (void)loadForwardRoomListSuccess:(void (^)(NSArray *resultArray))success
+                           failure:(void (^)(NSError *error))failure;
 + (void)insertDataToDatabaseWithData:(NSArray *)dataArray
                            tableName:(NSString *)tableName
                              success:(void (^)(void))success

@@ -358,6 +358,36 @@
     });
 }
 
++ (void)loadForwardRoomListSuccess:(void (^)(NSArray *resultArray))success
+                    failure:(void (^)(NSError *error))failure {
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+        
+        RLMResults *results = [TAPMessageRealmModel allObjectsInRealm:realm];
+
+        results = [results objectsWhere:@"isHidden == 0"];
+        results = [results objectsWhere:@"roomIsDeleted == 0"];
+        results = [results sortedResultsUsingKeyPath:@"created" ascending:NO];
+        results = [results distinctResultsUsingKeyPaths:@[@"roomID"]];
+        
+        NSArray *resultArray = [NSArray array];
+        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+        
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                failure(error);
+//            });
+//        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            success(resultArray);
+        });
+    });
+}
+
 + (void)insertDataToDatabaseWithData:(NSArray *)dataArray
                            tableName:(NSString *)tableName
                              success:(void (^)(void))success

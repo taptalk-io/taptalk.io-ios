@@ -2181,6 +2181,48 @@
     }];
 }
 
++ (void)getForwardRoomListSuccess:(void (^)(NSArray *resultArray))success
+                   failure:(void (^)(NSError *error))failure {
+    [TAPDatabaseManager loadForwardRoomListSuccess:^(NSArray *resultArray) {
+        NSArray *messageArray = [TAPUtil nullToEmptyArray:resultArray];
+        NSMutableArray *modelArray = [NSMutableArray array];
+        NSMutableArray *tempRecipientIDArray = [NSMutableArray array];
+    
+        for (NSInteger count = 0; count < [messageArray count]; count++) {
+            NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[messageArray objectAtIndex:count]];
+            
+            TAPMessageModel *messageModel = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            [modelArray addObject:messageModel];
+            
+            if([messageModel.user.userID isEqualToString:[self getActiveUser].userID]) {
+                NSString *currentOtherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:messageModel.room.roomID];
+                [tempRecipientIDArray addObject:currentOtherUserID];
+            }
+
+            //Add user to Contact Manager
+            [[TAPContactManager sharedManager] addContactWithUserModel:messageModel.user saveToDatabase:NO saveActiveUser:NO];
+            
+            NSError *error;
+            
+            if (error) {
+                failure(error);
+                return;
+            }
+        }
+        
+        if([tempRecipientIDArray count] > 0) {
+            //call get multiple user API to populate contact
+            [TAPDataManager callAPIGetBulkUserByUserID:tempRecipientIDArray success:^(NSArray *userModelArray) {
+            } failure:^(NSError *error) {
+            }];
+        }
+        
+        success(modelArray);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 + (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                      failure:(void (^)(NSError *error))failure {
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableRecentSearch whereClauseQuery:@"" sortByColumnName:@"created" isAscending:NO success:^(NSArray *resultArray) {

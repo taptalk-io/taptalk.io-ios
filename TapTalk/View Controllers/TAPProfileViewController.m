@@ -2270,7 +2270,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)getPhotoListApi:(TAPUserModel *)user {
     [TAPDataManager callAPIGetPhotoList:user.userID success:^(NSMutableArray<TAPPhotoListModel *> * photoListArray) {
-        if((photoListArray.count > 0 || photoListArray != nil) && self.user.deleted.longValue == 0){
+        if((photoListArray.count > 0 || photoListArray != nil) && user.deleted.longValue == 0){
             self.photoListArray = photoListArray;
             self.profileView.profilImageCollectionView.alpha = 1.0f;
             self.profileView.profileImageView.alpha = 0.0f;
@@ -2290,6 +2290,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         else{
             self.profileView.profilImageCollectionView.alpha = 0.0f;
+            [self.profileView setDeletedUserImage];
         }
         
     } failure:^(NSError *error) {

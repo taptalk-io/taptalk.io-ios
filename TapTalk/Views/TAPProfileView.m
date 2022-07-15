@@ -256,6 +256,7 @@
     if (imageURL ==  nil || [imageURL isEqualToString:@""]) {
         self.profileImageView.alpha = 0.0f;
         self.initialNameView.alpha = 1.0f;
+        self.deletedUserProfile.alpha = 0.0f;
         self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:userFullName];
         self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:userFullName isGroup:NO];
         self.profilImageCollectionView.alpha = 0.0f;
@@ -264,6 +265,7 @@
     else {
         self.profileImageView.alpha = 1.0f;
         self.initialNameView.alpha = 0.0f;
+        self.deletedUserProfile.alpha = 0.0f;
         [self.profileImageView setImageWithURLString:imageURL];
         self.profilImageCollectionView.alpha = 1.0f;
         self.pageIndicatorCollectionView.alpha = 1.0f;

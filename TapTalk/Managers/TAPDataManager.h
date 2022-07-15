@@ -121,6 +121,8 @@
                         failure:(void (^)(NSError *error))failure;
 + (void)getRoomListSuccess:(void (^)(NSArray *resultArray))success
                    failure:(void (^)(NSError *error))failure;
++ (void)getForwardRoomListSuccess:(void (^)(NSArray *resultArray))success
+                          failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                      failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllUnreadMessagesWithSuccess:(void (^)(NSArray *unreadMessages))success

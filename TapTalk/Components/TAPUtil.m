@@ -1219,8 +1219,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:message.room.roomID];
     }
     else if ([message.action isEqualToString:@"user/delete"]) {
+        // Save user data
         [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO saveActiveUser:YES];
         
+        // Set value for message.user.deleted for existing messages from the deleted user
         NSString *queryString = [NSString stringWithFormat:@"userID == '%@'", message.user.userID];
         [TAPDataManager getAllMessageWithQuery:queryString
                                      sortByKey:@"created"
@@ -1232,8 +1234,32 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
                 [updatedArray addObject:deletedUserMessage];
             }
             [TAPDataManager updateOrInsertDatabaseMessageWithData:updatedArray success:^{
-                
-            } failure:^(NSError *error) {
+                // Set value for message.room.deleted for existing messages in deleted user's room
+                TAPRoomModel *deletedUserRoom = [TAPRoomModel createPersonalRoomIDWithOtherUser:message.user];
+                [TAPDataManager getAllMessageWithRoomID:deletedUserRoom.roomID
+                                              sortByKey:@"created"
+                                              ascending:NO
+                success:^(NSArray<TAPMessageModel *> *deletedRoomMessageArray) {
+                    NSMutableArray<TAPMessageModel *> *updatedArray = [NSMutableArray array];
+                    for (TAPMessageModel *deletedRoomMessage in deletedRoomMessageArray) {
+                        deletedRoomMessage.room.isLocked = YES;
+                        deletedRoomMessage.room.isDeleted = YES;
+                        deletedRoomMessage.room.deleted = message.user.deleted;
+                        [updatedArray addObject:deletedRoomMessage];
+                    }
+                    [TAPDataManager updateOrInsertDatabaseMessageWithData:updatedArray success:^{
+                        
+                    }
+                    failure:^(NSError *error) {
+                        
+                    }];
+                        
+                }
+                failure:^(NSError *error) {
+                    
+                }];
+            }
+            failure:^(NSError *error) {
                 
             }];
         }

@@ -1292,7 +1292,8 @@
     //Check need to update user data or not
     if (message.type == TAPChatMessageTypeSystemMessage &&
         ([message.action isEqualToString:@"user/update"] ||
-         [message.action isEqualToString:@"room/update"])
+         [message.action isEqualToString:@"room/update"] ||
+         [message.action isEqualToString:@"user/delete"])
     ) {
         [self checkUpdatedUserProfileWithMessage:message];
     }

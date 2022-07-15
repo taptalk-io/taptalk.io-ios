@@ -101,6 +101,11 @@
     
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
     
+    if (message.isRead) {
+        // Remove notification if received message is already read
+        [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:@[message.messageID]];
+    }
+    
     [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldShowNotification:NO];
 }
 

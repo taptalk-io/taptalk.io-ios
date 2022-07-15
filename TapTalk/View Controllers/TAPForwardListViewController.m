@@ -71,7 +71,7 @@
     _searchResultChatAndContactArray = [NSMutableArray array];
     _updatedString = @"";
     
-    [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {
+    [TAPDataManager getForwardRoomListSuccess:^(NSArray *resultArray) {
         _recentChatArray = resultArray;
         [self.forwardListView.recentChatTableView reloadData];
     } failure:^(NSError *error) {

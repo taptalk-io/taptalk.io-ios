@@ -398,12 +398,14 @@
         //No photo found, get the initial
         self.initialNameView.alpha = 1.0f;
         self.profileImageView.alpha = 0.0f;
+        self.deletedUserProfilImageView.alpha = 0.0f;
             self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
             self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
     }
     else {
         self.initialNameView.alpha = 0.0f;
         self.profileImageView.alpha = 1.0f;
+        self.deletedUserProfilImageView.alpha = 0.0f; 
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
     
