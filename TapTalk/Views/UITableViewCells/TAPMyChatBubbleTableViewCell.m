@@ -74,6 +74,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
@@ -207,6 +208,9 @@
     self.forwardCheckmarkButton.alpha = 0.0f;
     self.starIconLeadingConstraint.constant = 0.0f;
     self.starIconWidthConstraint.constant = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
+    self.statusLabelBottomConstraint.constant = 8.0f;
+    [self showQuoteView:NO];
     [self.contentView layoutIfNeeded];
 }
 
@@ -505,10 +509,8 @@
     if(message == nil) {
         return;
     }
-    
 //    _message = message;
     [super setMessage:message];
-    
     
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
@@ -827,8 +829,9 @@
 
 - (void)showSeperator {
     self.seperatorViewHeightConstarint.constant = 1.0f;
-    self.seperatorViewTopConstraint.constant = 16.0f;
-    self.seperatorViewBottomConstraint.constant = 6.0f;
+    //self.seperatorViewTopConstraint.constant = 16.0f;
+    //self.seperatorViewBottomConstraint.constant = 6.0f;
+    self.statusLabelBottomConstraint.constant = 30.0;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }

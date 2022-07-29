@@ -249,6 +249,8 @@
     self.checkMarkIconImageView.alpha = 0.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
     
+    self.statusLabelBottomConstraint.constant = 10.0f;
+    
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
     
@@ -259,6 +261,7 @@
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
     self.progressLayer.strokeStart = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
     [self.progressLayer removeAllAnimations];
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
@@ -1199,7 +1202,7 @@
 
 - (void)showSeperator{
     self.seperatorViewHeightConstraint.constant = 1.0f;
-    self.statusLabelBottomConstraint.constant = 33.0f;
+    self.statusLabelBottomConstraint.constant = 32.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }

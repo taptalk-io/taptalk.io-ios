@@ -27,7 +27,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFo-Q6-kr0">
-                        <rect key="frame" x="16" y="198" width="343" height="7"/>
+                        <rect key="frame" x="16" y="198" width="343" height="5"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="13" id="41f-QE-a5z"/>
@@ -572,7 +572,7 @@
                         <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UXQ-oy-Sof" userLabel="Seperator View">
-                        <rect key="frame" x="16" y="217" width="343" height="0.0"/>
+                        <rect key="frame" x="16" y="218" width="343" height="0.0"/>
                         <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                         <constraints>
                             <constraint firstAttribute="height" id="EzN-Qs-KLT"/>
@@ -615,13 +615,13 @@
                     <constraint firstItem="UXQ-oy-Sof" firstAttribute="leading" secondItem="rCz-VI-RDG" secondAttribute="leading" constant="16" id="bW2-1g-WWd"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="width" secondItem="wQr-8O-AHa" secondAttribute="width" id="cgA-R7-ntK"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="leading" secondItem="aqx-Rj-P0j" secondAttribute="leading" id="dx7-l8-9wL"/>
-                    <constraint firstItem="UXQ-oy-Sof" firstAttribute="top" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="12" id="ed0-ZX-3uV"/>
+                    <constraint firstItem="UXQ-oy-Sof" firstAttribute="top" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="15" id="ed0-ZX-3uV"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ziy-9s-GE8" secondAttribute="trailing" id="h9d-sU-tSl"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="izc-Hi-fO1"/>
                     <constraint firstItem="ziy-9s-GE8" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="topMargin" id="j5z-dX-hxH"/>
                     <constraint firstItem="ey6-uk-rbm" firstAttribute="leading" secondItem="rCz-VI-RDG" secondAttribute="leadingMargin" constant="-46" id="nSm-GE-HYi"/>
                     <constraint firstItem="WW4-aD-yJS" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="nzb-Pk-3J3"/>
-                    <constraint firstAttribute="bottom" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="8" id="o4a-wI-ijd"/>
+                    <constraint firstAttribute="bottom" secondItem="QFo-Q6-kr0" secondAttribute="bottom" constant="10" id="o4a-wI-ijd"/>
                     <constraint firstItem="ey6-uk-rbm" firstAttribute="top" secondItem="rCz-VI-RDG" secondAttribute="top" id="uOP-H3-3rB"/>
                     <constraint firstItem="EqY-PT-fA3" firstAttribute="height" secondItem="wQr-8O-AHa" secondAttribute="height" id="wvO-Kn-8s9"/>
                     <constraint firstItem="mMI-m8-7pV" firstAttribute="top" secondItem="aqx-Rj-P0j" secondAttribute="top" id="xv6-Ty-CPm"/>

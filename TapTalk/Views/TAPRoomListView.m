@@ -31,7 +31,7 @@
         self.bgView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListBackground];
         [self addSubview:self.bgView];
         
-        _roomListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
+        _roomListTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame))];
         self.roomListTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.roomListTableView.backgroundColor = [UIColor clearColor];
         [self.bgView addSubview:self.roomListTableView];

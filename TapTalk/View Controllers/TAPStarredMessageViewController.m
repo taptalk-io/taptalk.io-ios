@@ -159,7 +159,14 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
     
-    if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+    BOOL isForwardedSavedMessage = NO;
+    
+    if((![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) && isSavedMessageRoom){
+        isForwardedSavedMessage = YES;
+    }
+    
+    if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
         if (message.type == TAPChatMessageTypeText) {
             [tableView registerNib:[TAPMyChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyChatBubbleTableViewCell description]];
             TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatBubbleTableViewCell description] forIndexPath:indexPath];
@@ -1026,12 +1033,19 @@
         NSArray *messageArray = [self.messageArray copy];
         NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
         
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+        BOOL isForwardedSavedMessage = NO;
+        
+        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+            isForwardedSavedMessage = YES;
+        }
+        
         TAPChatMessageType type = currentMessage.type;
         if (type == TAPChatMessageTypeImage) {
             
             UIImage *fullImage = [notificationParameterDictionary objectForKey:@"fullImage"];
             
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
@@ -1054,7 +1068,7 @@
             }
         }
         else if (type == TAPChatMessageTypeFile) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if (!currentMessage.isFailedSend) {
@@ -1071,7 +1085,7 @@
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if (!currentMessage.isFailedSend) {

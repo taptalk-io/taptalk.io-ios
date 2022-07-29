@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM( NSInteger, TAPProfileViewControllerType) {
     TAPProfileViewControllerTypeDefault = 0,
     TAPProfileViewControllerTypeGroupMemberProfile = 1,
-    TAPProfileViewControllerTypePersonalFromClickedMention = 2
+    TAPProfileViewControllerTypePersonalFromClickedMention = 2,
+    TAPProfileViewControllerTypeSavedMessageProfile = 3
 };
 
 @protocol TAPProfileViewControllerDelegate <NSObject>

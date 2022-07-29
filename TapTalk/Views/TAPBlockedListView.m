@@ -25,7 +25,7 @@
         self.bgView.backgroundColor = [UIColor whiteColor];
         [self addSubview:self.bgView];
         
-        _tableView = [[UITableView alloc] initWithFrame:self.bgView.frame style:UITableViewStyleGrouped];
+        _tableView = [[TAPBaseTableView alloc] initWithFrame:self.bgView.frame style:UITableViewStyleGrouped];
         self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.bgView addSubview:self.tableView];

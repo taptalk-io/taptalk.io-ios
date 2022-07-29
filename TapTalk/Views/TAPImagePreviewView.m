@@ -206,7 +206,7 @@
         self.mentionTableBackgroundView.layer.masksToBounds = NO;
         [self addSubview:self.mentionTableBackgroundView];
         
-        _mentionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMinY(self.captionView.frame) - 0.0f, CGRectGetWidth(self.frame), 0.0f)];
+        _mentionTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMinY(self.captionView.frame) - 0.0f, CGRectGetWidth(self.frame), 0.0f)];
         self.mentionTableView.alpha = 0.0f;
         self.mentionTableView.clipsToBounds = YES;
         self.mentionTableView.separatorStyle = UITableViewCellSeparatorStyleNone;

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIView *alertContainerView;
 
 @property (strong, nonatomic) UIView *mentionTableBackgroundView;
-@property (strong, nonatomic) UITableView *mentionTableView;
+@property (strong, nonatomic) TAPBaseTableView *mentionTableView;
 
 @property (strong, nonatomic) UIButton *cancelButton;
 @property (strong, nonatomic) UIButton *morePictureButton;

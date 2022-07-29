@@ -42,6 +42,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+@property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -208,6 +209,11 @@
     self.senderImageViewLeadingConstraint.constant = 16.0f;
     self.starIconWidthConstraint.constant = 0.0f;
     self.starIconLeadingConstraint.constant = 0.0f;
+    self.redirectArrowButton.alpha = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
+    
+    self.statusLabelBottomConstraint.constant = 10.0f;
+    
     [self showSenderInfo:NO];
 }
 
@@ -376,6 +382,7 @@
             self.senderImageView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.senderInitialView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.senderProfileImageButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.redirectArrowButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.replyButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.statusLabel.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.swipeReplyView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
@@ -397,6 +404,7 @@
                 self.senderImageView.transform = CGAffineTransformIdentity;
                 self.senderInitialView.transform = CGAffineTransformIdentity;
                 self.senderProfileImageButton.transform = CGAffineTransformIdentity;
+                self.redirectArrowButton.transform = CGAffineTransformIdentity;
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
@@ -417,6 +425,7 @@
                 self.senderImageView.transform = CGAffineTransformIdentity;
                 self.senderInitialView.transform = CGAffineTransformIdentity;
                 self.senderProfileImageButton.transform = CGAffineTransformIdentity;
+                self.redirectArrowButton.transform = CGAffineTransformIdentity;
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
@@ -520,6 +529,9 @@
     
     _message = message;
     
+    
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:message.room.roomID];
+    
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""]  && message.replyTo != nil && message.quote != nil) {
         //reply to exists
         //if reply exists check if image in quote exists
@@ -538,7 +550,7 @@
             [self showQuoteView:NO];
         }
     }
-    else if (![message.quote.title isEqualToString:@""] && message != nil) {
+    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
         //quote exists
         [self showReplyView:NO withMessage:nil];
         [self setQuote:message.quote userID:@""];
@@ -549,7 +561,7 @@
         [self showQuoteView:NO];
     }
     
-    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil && !isSavedMessageRoom) {
         [self showForwardView:YES];
         [self setForwardData:message.forwardFrom];
     }
@@ -671,6 +683,104 @@
         
         self.senderNameLabel.text = fullNameString;
     }
+    else if(isSavedMessageRoom && (![message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom != nil)){
+        [self showSenderInfo:YES];
+        
+        if(self.seperatorViewHeightConstraint.constant == 0){
+            self.redirectArrowButton.alpha = 1.0f;
+        }
+        
+        NSString *thumbnailImageString = @"";
+        
+        NSString *fullNameString = message.forwardFrom.fullname;
+        
+        self.senderNameLabel.text = fullNameString;
+        
+        NSString *userID = message.forwardFrom.userID;
+        
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:userID];
+        
+        NSString *activeUserID = [TAPDataManager getActiveUser].userID;
+        
+        if(obtainedUser == nil && ![userID isEqualToString:activeUserID]) {
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 0.0f;
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+            [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
+                NSString *thumbnailImageString = @"";
+                thumbnailImageString = user.imageURL.thumbnail;
+                thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+                
+                if(message.user.deleted.longValue > 0 || user.deleted.longValue > 0){
+                    //set deleted account profil pict
+                    self.senderInitialView.alpha = 1.0f;
+                    self.senderImageView.alpha = 0.0f;
+                    self.deleteUserImageView.alpha = 1.0f;
+                    self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                    self.senderInitialLabel.text =@"";
+                    self.senderNameLabel.text = @"Deleted User";
+                }
+                else if ([thumbnailImageString isEqualToString:@""]) {
+                    //No photo found, get the initial
+                    self.senderInitialView.alpha = 1.0f;
+                    self.senderImageView.alpha = 0.0f;
+                    self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+                    self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+                }
+                else {
+                    if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
+                        self.senderImageView.image = nil;
+                    }
+                    
+                    self.senderInitialView.alpha = 0.0f;
+                    self.senderImageView.alpha = 1.0f;
+                    [self.senderImageView setImageWithURLString:thumbnailImageString];
+                    _currentProfileImageURLString = thumbnailImageString;
+                }
+                
+            } failure:^(NSError *error) {
+                
+            }];
+        }
+        else {
+            if([userID isEqualToString:activeUserID]){
+                thumbnailImageString = message.user.imageURL.thumbnail;
+            }
+            else{
+                thumbnailImageString = obtainedUser.imageURL.thumbnail;
+                thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+            }
+            
+            if(message.user.deleted.longValue > 0 || obtainedUser.deleted.longValue > 0){
+                //set deleted account profil pict
+                self.senderInitialView.alpha = 1.0f;
+                self.senderImageView.alpha = 0.0f;
+                self.deleteUserImageView.alpha = 1.0f;
+                self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                self.senderInitialLabel.text =@"";
+                self.senderNameLabel.text = @"Deleted User";
+            }
+            else if ([thumbnailImageString isEqualToString:@""]) {
+                //No photo found, get the initial
+                self.senderInitialView.alpha = 1.0f;
+                self.senderImageView.alpha = 0.0f;
+                self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+                self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+            }
+            else {
+                if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
+                    self.senderImageView.image = nil;
+                }
+                
+                self.senderInitialView.alpha = 0.0f;
+                self.senderImageView.alpha = 1.0f;
+                [self.senderImageView setImageWithURLString:thumbnailImageString];
+                _currentProfileImageURLString = thumbnailImageString;
+            }
+        }
+        
+    }
     else {
         [self showSenderInfo:NO];
         self.senderImageView.image = nil;
@@ -684,9 +794,9 @@
     else{
         self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
     }
-    TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:message.user.userID];
     
     //remove animation
+    [self.redirectArrowButton.layer removeAllAnimations];
     [self.deleteUserImageView.layer removeAllAnimations];
     [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
@@ -836,6 +946,13 @@
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedProfilePictureWithMessage:)]) {
         [self.delegate yourChatBubbleDidTappedProfilePictureWithMessage:self.message];
+    }
+}
+
+
+- (IBAction)redirectArrowButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedRedirectArrowWithMessage:)]) {
+        [self.delegate yourChatBubbleDidTappedRedirectArrowWithMessage:self.message];
     }
 }
 
@@ -1056,9 +1173,11 @@
 - (void)showSeperator {
     self.seperatorViewHeightConstraint.constant = 1.0f;
     self.statusLabelBottomConstraint.constant = 33.0f;
+    self.redirectArrowButton.alpha = 0.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
 }
+
 
 @end

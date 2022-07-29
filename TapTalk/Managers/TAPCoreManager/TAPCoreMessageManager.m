@@ -1060,9 +1060,8 @@
     if (message.isDelivered) {
         return;
     }
-
-    message.isDelivered = YES;
     [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
+    message.isDelivered = YES;
 }
 
 - (void)markMessagesAsDelivered:(NSArray<TAPMessageModel *> *)messageArray {
@@ -1075,8 +1074,8 @@
     if (message.isRead) {
         return;
     }
-    message.isRead = YES;
     [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
+    message.isRead = YES;
 }
 
 - (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray {

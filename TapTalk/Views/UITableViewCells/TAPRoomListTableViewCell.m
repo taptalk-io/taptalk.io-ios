@@ -25,6 +25,7 @@
 @property (strong, nonatomic) UILabel *timeLabel;
 @property (strong, nonatomic) UIImageView *messageStatusImageView;
 @property (strong, nonatomic) UIImageView *deletedUserProfilImageView;
+@property (strong, nonatomic) UIImageView *saveMessageProfilImageView;
 @property (strong, nonatomic) UIView *bubbleUnreadView;
 @property (strong, nonatomic) UILabel *numberOfUnreadMessageLabel;
 @property (strong, nonatomic) UIView *unreadMentionView;
@@ -59,6 +60,7 @@
     _isShouldForceUpdateUnreadBubble = YES;
     [self.typingAnimationImageView stopAnimating];
     self.deletedUserProfilImageView.alpha = 0.0f;
+    self.saveMessageProfilImageView.alpha = 0.0f;
 //    if (self.roomType != RoomTypePersonal) {
 //        self.lastSenderLabel.alpha = 1.0f;
 //    }
@@ -133,6 +135,15 @@
         self.deletedUserProfilImageView.alpha = 0.0f;
         [self.bgView addSubview:self.deletedUserProfilImageView];
     }
+    
+    if (self.saveMessageProfilImageView == nil) {
+        _saveMessageProfilImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.profileImageView.frame) + 11.0f, CGRectGetMinY(self.profileImageView.frame) + 11.0f, 30.0f, 30.0f)];
+        self.saveMessageProfilImageView.backgroundColor = [UIColor clearColor];
+        self.saveMessageProfilImageView.image = [UIImage imageNamed:@"TAPIconSaveMessageRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.saveMessageProfilImageView.alpha = 0.0f;
+        [self.bgView addSubview:self.saveMessageProfilImageView];
+    }
+    
     
     if (self.expertIconImageView == nil) {
         _expertIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) - 22.0f, CGRectGetMaxY(self.profileImageView.frame) - 22.0f, 22.0f, 22.0f)];
@@ -386,18 +397,30 @@
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:currentRoom.roomID];
     TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
     
+    BOOL isSaveMessageRoom = [TAPUtil isSaveMessageRoom:message.room.roomID];
+    
     if(message.room.deleted.longValue > 0 || obtainedUser.deleted.longValue > 0){
         //set deleted account profil pict
         self.initialNameView.alpha = 1.0f;
         self.profileImageView.alpha = 0.0f;
         self.deletedUserProfilImageView.alpha = 1.0f;
+        self.saveMessageProfilImageView.alpha = 0.0f;
         self.initialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+        self.initialNameLabel.text = @"";
+    }
+    else if(isSaveMessageRoom){
+        //save message room
+        self.initialNameView.alpha = 1.0f;
+        self.profileImageView.alpha = 0.0f;
+        self.saveMessageProfilImageView.alpha = 1.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
         self.initialNameLabel.text = @"";
     }
     else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
         //No photo found, get the initial
         self.initialNameView.alpha = 1.0f;
         self.profileImageView.alpha = 0.0f;
+        self.saveMessageProfilImageView.alpha = 0.0f;
         self.deletedUserProfilImageView.alpha = 0.0f;
             self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
             self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
@@ -405,7 +428,8 @@
     else {
         self.initialNameView.alpha = 0.0f;
         self.profileImageView.alpha = 1.0f;
-        self.deletedUserProfilImageView.alpha = 0.0f; 
+        self.deletedUserProfilImageView.alpha = 0.0f;
+        self.saveMessageProfilImageView.alpha = 0.0f;
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
     

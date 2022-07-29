@@ -100,6 +100,22 @@
     }
 }
 
+- (void)getSavedMessagesChatRoom:(void (^)(TAPRoomModel *room))success failure:(void (^)(NSError *error))failure {
+    TAPUserModel *activeUser = [TAPChatManager sharedManager].activeUser;
+    if (activeUser == nil || [activeUser.userID isEqualToString:@""] || activeUser.userID == nil) {
+        NSString *errorMessage =  NSLocalizedStringFromTableInBundle(@"Active user not found", nil, [TAPUtil currentBundle], @"");
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90001 errorMessage:errorMessage];
+        failure(error);
+    }
+    else {
+        NSString *userID = activeUser.userID;
+        NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+        TAPRoomModel *savedMessageRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+        success(savedMessageRoom);
+    }
+    
+}
+
 - (void)getPersonalChatRoomWithRecipientUser:(TAPUserModel *)user
                                      success:(void (^)(TAPRoomModel *room))success {
    TAPRoomModel *generatedRoom = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];

@@ -61,7 +61,7 @@
                         </constraints>
                     </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eS9-eE-7iP">
-                        <rect key="frame" x="50" y="0.0" width="254" height="429.5"/>
+                        <rect key="frame" x="50" y="0.0" width="254" height="438.5"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forwarded" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="agd-wc-1dm">
                                 <rect key="frame" x="10" y="30" width="234" height="16"/>
@@ -263,7 +263,7 @@
                                 </constraints>
                             </view>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aud-LS-c8o" customClass="TAPImageView">
-                                <rect key="frame" x="10" y="142" width="234" height="249.5"/>
+                                <rect key="frame" x="10" y="142" width="234" height="258.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" priority="999" constant="234" id="p14-rY-btA"/>
@@ -290,10 +290,10 @@
                                 </constraints>
                             </view>
                             <button opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tRn-2I-GV2">
-                                <rect key="frame" x="10" y="142" width="234" height="249.5"/>
+                                <rect key="frame" x="10" y="142" width="234" height="258.5"/>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jBF-Yk-ZbI">
-                                <rect key="frame" x="103" y="243" width="48" height="48"/>
+                                <rect key="frame" x="103" y="247.5" width="48" height="48"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="f2r-ok-xSR">
                                         <rect key="frame" x="4" y="4" width="40" height="40"/>
@@ -441,7 +441,7 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RYi-lM-6ke" customClass="ZSWTappableLabel">
-                                <rect key="frame" x="10" y="401.5" width="234" height="0.0"/>
+                                <rect key="frame" x="10" y="410.5" width="234" height="0.0"/>
                                 <constraints>
                                     <constraint firstAttribute="height" id="UkX-Gq-IhE"/>
                                 </constraints>
@@ -450,7 +450,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SZW-xo-FW3" userLabel="Timestamp Label">
-                                <rect key="frame" x="244" y="403.5" width="0.0" height="16"/>
+                                <rect key="frame" x="244" y="412.5" width="0.0" height="16"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="8BF-HK-0u7"/>
@@ -460,14 +460,14 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarGrayChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="RZ0-mV-Urb">
-                                <rect key="frame" x="226" y="405.5" width="12" height="12"/>
+                                <rect key="frame" x="226" y="414.5" width="12" height="12"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="12" id="2m4-gX-cxj"/>
                                     <constraint firstAttribute="height" constant="12" id="aV9-b0-oqe"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kPK-zB-4Y9" userLabel="Image Timestamp Container View">
-                                <rect key="frame" x="208" y="365.5" width="30" height="20"/>
+                                <rect key="frame" x="208" y="374.5" width="30" height="20"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3xm-Gy-qrd" userLabel="Image Timestamp Label">
                                         <rect key="frame" x="22" y="2" width="0.0" height="16"/>
@@ -541,14 +541,14 @@
                         </constraints>
                     </view>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ODG-45-PuS">
-                        <rect key="frame" x="306" y="399.5" width="0.0" height="28"/>
+                        <rect key="frame" x="306" y="408.5" width="0.0" height="28"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="28" id="3cs-3l-1ia"/>
                             <constraint firstAttribute="width" id="fyK-Qi-0pr"/>
                         </constraints>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HI8-sI-SJg">
-                        <rect key="frame" x="50" y="431.5" width="254" height="13"/>
+                        <rect key="frame" x="50" y="440.5" width="254" height="13"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="13" id="mj0-Di-fQ5"/>
@@ -588,11 +588,11 @@
                         </constraints>
                     </view>
                     <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rS6-Wz-vrK" userLabel="Bubble Highlight View">
-                        <rect key="frame" x="50" y="0.0" width="254" height="429.5"/>
+                        <rect key="frame" x="50" y="0.0" width="254" height="438.5"/>
                         <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jn0-Ak-emV" userLabel="SeperatorView">
-                        <rect key="frame" x="16" y="452.5" width="288" height="0.0"/>
+                        <rect key="frame" x="16" y="453.5" width="288" height="0.0"/>
                         <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                         <constraints>
                             <constraint firstAttribute="height" id="3Rl-i0-dOA"/>
@@ -626,10 +626,23 @@
                             <action selector="forwardCheckmarkButtonDidTapped:" destination="7mv-Ny-D4s" eventType="touchUpInside" id="pnU-aW-fcH"/>
                         </connections>
                     </button>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A40-6y-4iY" userLabel="Redirect Arrow Button">
+                        <rect key="frame" x="312" y="222" width="20" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="20" id="IR8-Xz-w2j"/>
+                            <constraint firstAttribute="height" constant="20" id="VoA-0J-9OF"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="TAPIconArrowSavedMessage"/>
+                        <connections>
+                            <action selector="redirectArrowButtonDidTapped:" destination="7mv-Ny-D4s" eventType="touchUpInside" id="Ut1-nZ-aS5"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" red="0.95294117649999999" green="0.95294117649999999" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
-                    <constraint firstItem="Jn0-Ak-emV" firstAttribute="top" secondItem="HI8-sI-SJg" secondAttribute="bottom" constant="8" id="2pH-Yk-0Jz"/>
+                    <constraint firstItem="A40-6y-4iY" firstAttribute="centerY" secondItem="bD3-M2-xtQ" secondAttribute="centerY" id="0KO-IF-Pgd"/>
+                    <constraint firstItem="Jn0-Ak-emV" firstAttribute="top" secondItem="HI8-sI-SJg" secondAttribute="bottom" id="2pH-Yk-0Jz"/>
                     <constraint firstAttribute="bottom" secondItem="NPC-pt-l8c" secondAttribute="bottom" id="92Y-nH-gyc"/>
                     <constraint firstItem="Jn0-Ak-emV" firstAttribute="leading" secondItem="bD3-M2-xtQ" secondAttribute="leading" constant="16" id="9PD-Ie-mxZ"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="width" secondItem="UgJ-tS-80I" secondAttribute="width" id="A7N-tC-mp1"/>
@@ -656,7 +669,8 @@
                     <constraint firstItem="NPC-pt-l8c" firstAttribute="leading" secondItem="bD3-M2-xtQ" secondAttribute="leading" id="ezg-ax-S4t"/>
                     <constraint firstItem="NPC-pt-l8c" firstAttribute="top" secondItem="bD3-M2-xtQ" secondAttribute="top" id="fuF-qY-8Xi"/>
                     <constraint firstItem="4gB-YE-GJW" firstAttribute="leading" secondItem="bD3-M2-xtQ" secondAttribute="leading" constant="16" id="gXT-x7-5yx"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="Jn0-Ak-emV" secondAttribute="bottom" id="h8v-Ed-bbS"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="Jn0-Ak-emV" secondAttribute="bottom" constant="-1" id="h8v-Ed-bbS"/>
+                    <constraint firstItem="A40-6y-4iY" firstAttribute="leading" secondItem="eS9-eE-7iP" secondAttribute="trailing" constant="8" id="iui-5X-Ahz"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="height" secondItem="UgJ-tS-80I" secondAttribute="height" id="j3B-Gn-vFt"/>
                     <constraint firstItem="UgJ-tS-80I" firstAttribute="leading" secondItem="bD3-M2-xtQ" secondAttribute="leading" constant="16" id="mIU-lr-C2e"/>
                     <constraint firstItem="dFa-gp-nAe" firstAttribute="trailing" secondItem="UgJ-tS-80I" secondAttribute="trailing" id="mdh-x4-glT"/>
@@ -711,6 +725,7 @@
                 <outlet property="quoteViewLeadingConstraint" destination="Vbs-VK-PQ4" id="aVd-3z-dBd"/>
                 <outlet property="quoteViewTopConstraint" destination="fdJ-N0-hvQ" id="LrO-cS-5HR"/>
                 <outlet property="quoteViewTrailingConstraint" destination="Wa6-cn-iiE" id="mqD-GT-Q7c"/>
+                <outlet property="redirectArrowButton" destination="A40-6y-4iY" id="U8U-KM-Lao"/>
                 <outlet property="replyButtonLeadingConstraint" destination="3VA-AJ-KbP" id="1Ad-hp-asB"/>
                 <outlet property="replyButtonTrailingConstraint" destination="bAD-tV-8ym" id="6ml-3B-VGU"/>
                 <outlet property="replyDecorationView" destination="i5t-fZ-EGg" id="RSp-pD-B1m"/>
@@ -767,6 +782,7 @@
     </objects>
     <resources>
         <image name="TAPIconAbort" width="32" height="32"/>
+        <image name="TAPIconArrowSavedMessage" width="20" height="20"/>
         <image name="TAPIconDeletedUser" width="16" height="16"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconDownload" width="24" height="24"/>

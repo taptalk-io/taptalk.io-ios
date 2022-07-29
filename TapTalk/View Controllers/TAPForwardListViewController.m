@@ -24,6 +24,8 @@
 @property (strong, nonatomic) NSMutableArray *searchResultChatAndContactArray;
 @property (strong, nonatomic) NSString *updatedString;
 
+@property (strong, nonatomic) UITapGestureRecognizer *savedMessageTapGestureRecognizer;
+
 - (void)cancelButtonDidTapped;
 
 @end
@@ -55,11 +57,6 @@
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     
     self.title = NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"");
-    
-    if (@available(iOS 15.0, *)) {
-        [self.forwardListView.recentChatTableView setSectionHeaderTopPadding:0.0f];
-        [self.forwardListView.searchResultTableView setSectionHeaderTopPadding:0.0f];
-    }
     
     self.forwardListView.searchBarView.delegate = self;
     self.forwardListView.recentChatTableView.delegate = self;
@@ -173,6 +170,14 @@
             }
         }
     }
+    else if(tableView == self.forwardListView.recentChatTableView){
+        if([[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
+            return 70.0f + 27.0f;
+        }
+        else{
+            return 23.0f;
+        }
+    }
     
     //For self.searchView.recentSearchTableView
     return CGFLOAT_MIN;
@@ -198,6 +203,67 @@
 
         
         [headerView addSubview:titleLabel];
+        
+        return headerView;
+    }
+    else if(tableView == self.forwardListView.recentChatTableView){
+        UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 97.0f)];
+        if([[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
+            UIView *savedMessageView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 70.0f)];
+            [headerView addSubview:savedMessageView];
+            
+            UIView *profileImageView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 9.0f, 52.0f, 52.0f)];
+            profileImageView.backgroundColor = [UIColor clearColor];
+            profileImageView.layer.cornerRadius = CGRectGetHeight(profileImageView.frame) / 2.0f;
+            profileImageView.clipsToBounds = YES;
+            profileImageView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            [savedMessageView addSubview:profileImageView];
+            
+            UIImageView *saveMessageProfilImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(profileImageView.frame) + 11.0f, CGRectGetMinY(profileImageView.frame) + 11.0f, 30.0f, 30.0f)];
+            saveMessageProfilImageView.backgroundColor = [UIColor clearColor];
+            saveMessageProfilImageView.image = [UIImage imageNamed:@"TAPIconSaveMessageRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            [savedMessageView addSubview:saveMessageProfilImageView];
+            
+            UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
+            UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
+            UILabel *roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(profileImageView.frame) + 8.0f, 25.0f, 150.0f, 20.0f)];
+            roomNameLabel.textColor = roomListNameLabelColor;
+            roomNameLabel.font = roomListNameLabelFont;
+            roomNameLabel.text = @"Saved Messages";
+            [savedMessageView addSubview:roomNameLabel];
+            
+            
+            UIView *seperatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(savedMessageView.frame), CGRectGetWidth([UIScreen mainScreen].bounds), 4.0f)];
+            seperatorView.backgroundColor = [UIColor whiteColor];
+            [headerView addSubview:seperatorView];
+            
+            UIFont *sectionHeaderTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+            UIColor *sectionHeaderTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
+            UILabel *recentChatLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(seperatorView.frame) + 4.0f, 150.0f, 13.0f)];
+            recentChatLabel.font = sectionHeaderTitleFont;
+            recentChatLabel.textColor = sectionHeaderTitleColor;
+            recentChatLabel.text = NSLocalizedStringFromTableInBundle(@"RECENT CHATS", nil, [TAPUtil currentBundle], @"");
+            [headerView addSubview:recentChatLabel];
+            
+            //onclick listener
+            
+            _savedMessageTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                                      action:@selector(handleSavedMessageTapGesture:)];
+            [headerView addGestureRecognizer:self.savedMessageTapGestureRecognizer];
+        }
+        else{
+            headerView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 23.0f);
+            
+            UIFont *sectionHeaderTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
+            UIColor *sectionHeaderTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
+            UILabel *recentChatLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 1.0f + 4.0f, 150.0f, 13.0f)];
+            recentChatLabel.font = sectionHeaderTitleFont;
+            recentChatLabel.textColor = sectionHeaderTitleColor;
+            recentChatLabel.text = NSLocalizedStringFromTableInBundle(@"RECENT CHATS", nil, [TAPUtil currentBundle], @"");
+            [headerView addSubview:recentChatLabel];
+        }
+        
+       
         
         return headerView;
     }
@@ -311,6 +377,27 @@
         
         [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
             self.searchResultChatAndContactArray = [roomArray mutableCopy];
+            
+            BOOL hasSavedMessage = NO;
+            if([@"Saved Messages" localizedCaseInsensitiveContainsString:newString] && [[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
+                for(TAPRoomModel *room in roomArray){
+                    if([TAPUtil isSaveMessageRoom:room.roomID]){
+                        hasSavedMessage = YES;
+                        
+                        [self.searchResultChatAndContactArray removeObject:room];
+                        [self.searchResultChatAndContactArray insertObject:room atIndex:0];
+                        
+                    }
+                }
+                if(!hasSavedMessage){
+                    NSString *userID = [TAPDataManager getActiveUser].userID;
+                    NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+                    TAPRoomModel *savedMessageRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+                    [self.searchResultChatAndContactArray insertObject:savedMessageRoom atIndex:0];
+                    
+                }
+            }
+            
 
             if (self.forwardListView.searchResultTableView.alpha == 1.0f) {
                 if ([self.searchResultChatAndContactArray count] == 0) {
@@ -357,6 +444,45 @@
 }
 
 #pragma mark - Custom Method
+
+- (void)handleSavedMessageTapGesture:(UITapGestureRecognizer *)recognizer {
+    [self.forwardListView.searchBarView.searchTextField resignFirstResponder];
+   
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+    [self.currentNavigationController popToRootViewControllerAnimated:YES];
+    
+    NSString *userID = [TAPDataManager getActiveUser].userID;
+    NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+    TAPRoomModel *savedMessageRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+    
+    NSString *currentSelectedRoomID = @"";
+    
+    currentSelectedRoomID = savedMessageRoom.roomID;
+
+    [[TapUI sharedInstance] createRoomWithRoom:savedMessageRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [self.currentNavigationController pushViewController:chatViewController animated:YES];
+    }];
+    
+    for(TAPMessageModel *forwardedMessage in self.forwardedMessages){
+        if (forwardedMessage.type == TAPChatMessageTypeFile || forwardedMessage.type == TAPChatMessageTypeVideo || forwardedMessage.type == TAPChatMessageTypeVoice) {
+            NSDictionary *dataDictionary = forwardedMessage.data;
+            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+            
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:forwardedMessage.room.roomID fileID:fileID];
+            filePath = [TAPUtil nullToEmptyString:filePath];
+            
+            if (![filePath isEqualToString:@""]) {
+                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePath roomID:currentSelectedRoomID fileID:fileID];
+            }
+        }
+        
+    }
+    
+    [[TAPChatManager sharedManager] saveToQuoteActionWithType:TAPChatManagerQuoteActionTypeForward roomID:currentSelectedRoomID];
+    [[TAPChatManager sharedManager] saveToForwardedMessages:self.forwardedMessages userInfo:[NSDictionary dictionary] roomID:currentSelectedRoomID];
+}
+
 - (void)cancelButtonDidTapped {
     [self.forwardListView.searchBarView handleCancelButtonTappedState];
     [self.forwardListView.searchBarView.searchTextField resignFirstResponder];

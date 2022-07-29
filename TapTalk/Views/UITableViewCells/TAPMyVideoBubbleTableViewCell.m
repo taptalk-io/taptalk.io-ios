@@ -111,6 +111,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -297,6 +298,8 @@
     self.starImageViewWidth.constant = 0.0f;
     self.starImageViewLeadingConstraint.constant = 4.0f;
     
+    self.statusLabelBottomConstraint.constant = 10.0f;
+    
     self.checkMarkIconImageView.alpha = 0.0f;
     
     [self.contentView layoutIfNeeded];
@@ -321,6 +324,7 @@
     self.progressLayer.strokeStart = 0.0f;
     [self.progressLayer removeAllAnimations];
     [self.syncProgressSubView removeFromSuperview];
+    self.bubbleHighlightView.alpha = 0.0f;
     _progressLayer = nil;
     _syncProgressSubView = nil;
 }
@@ -1870,9 +1874,10 @@
 }
 
 - (void)showSeperator {
-    self.seperatorViewTopConstraint.constant = 16.0f;
-    self.seperatorViewBottomConstraint.constant = 13.0f;
+    //self.seperatorViewTopConstraint.constant = 16.0f;
+    //self.seperatorViewBottomConstraint.constant = 13.0f;
     self.seperatorViewHeightConstraint.constant = 1.0f;
+    self.statusLabelBottomConstraint.constant = 32.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }

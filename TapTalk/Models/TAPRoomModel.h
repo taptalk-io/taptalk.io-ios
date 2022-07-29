@@ -35,5 +35,6 @@ typedef NS_ENUM(NSInteger, RoomType) {
 
 + (TAPRoomModel *)createPersonalRoomIDWithOtherUser:(TAPUserModel *)otherUser;
 + (TAPRoomModel *)createGroupRoomIDWithID:(NSString *)groupID name:(NSString *)name imageURL:(NSString *)imageURL;
++ (TAPRoomModel *)createPersonalRoomIDWithID:(NSString *)groupID name:(NSString *)name imageURL:(TAPImageURLModel *)imageURL;
 
 @end

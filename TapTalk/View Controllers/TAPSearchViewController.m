@@ -19,6 +19,7 @@
 @property (strong, nonatomic) TAPSearchView *searchView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 @property (strong, nonatomic) UIView *leftBarView;
+@property (strong, nonatomic) UIView *rightBarView;
 @property (strong, nonatomic) UIView *myAccountView;
 @property (strong, nonatomic) UIButton *closeButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
@@ -46,11 +47,6 @@
     _searchView = [[TAPSearchView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.searchView];
     
-    if (@available(iOS 15.0, *)) {
-        [self.searchView.recentSearchTableView setSectionHeaderTopPadding:0.0f];
-        [self.searchView.searchResultTableView setSectionHeaderTopPadding:0.0f];
-    }
-    
     self.searchView.recentSearchTableView.delegate = self;
     self.searchView.recentSearchTableView.dataSource = self;
     self.searchView.searchResultTableView.delegate = self;
@@ -63,29 +59,32 @@
     
     self.navigationController.navigationBar.alpha = 0.0f;
     
-    _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    _myAccountView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    _leftBarView = [[UIView alloc] initWithFrame:CGRectMake(
-        0.0f,
-        0.0f,
-        CGRectGetMaxX(self.myAccountView.frame),
-        40.0f
-    )];
+    _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(-10.0f, 0.0f, 0.0f, 40.0f)];
+    _myAccountView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 40.0f)];
+    _leftBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 40.0f)];
     self.leftBarView.alpha = 0.0f;
+    BOOL showCloseButton = [[TapUI sharedInstance] getCloseRoomListButtonVisibleState];
+    BOOL showMyAccountButton = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
     
+    CGFloat searchBarViewX = -54.0f;
+    if (showCloseButton || showMyAccountButton) {
+        searchBarViewX = -68.0f;
+    }
+    
+    _rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 56.0f, 40.0f)];
     UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
     UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
-    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-    [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 56.0f, 40.0f)];
+    [self.rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [self.rightBarButton setTitleColor:searchBarCancelColor forState:UIControlStateNormal];
-    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
     self.rightBarButton.titleLabel.font = searchBarCancelFont;
     [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+    [self.rightBarView addSubview:self.rightBarButton];
+    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarView];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     
     //TitleView
-    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(-55.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, 30.0f)];
+    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(searchBarViewX, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 78.0f - 16.0f, 36.0f)];
     self.searchBarView.delegate = self;
     [self.navigationItem setTitleView:self.searchBarView];
     
@@ -410,10 +409,45 @@
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [TAPDataManager searchMessageWithString:trimmedString sortBy:@"created" success:^(NSArray *resultArray) {
             [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
+                
                 self.searchResultMessageArray = [resultArray mutableCopy];
                 self.searchResultChatAndContactArray = [roomArray mutableCopy];
                 self.searchResultUnreadCountArray = [unreadCountArray mutableCopy];
                 self.searchResultUnreadMentionDictionary = [unreadMentionDictionary mutableCopy];
+                
+                BOOL hasSavedMessage = NO;
+                if([@"Saved Messages" localizedCaseInsensitiveContainsString:newString] && [[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
+                    NSInteger counter = 0;
+                    NSString *userID = [TAPDataManager getActiveUser].userID;
+                    NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+                    for(TAPRoomModel *room in roomArray){
+                        if([TAPUtil isSaveMessageRoom:room.roomID]){
+                            hasSavedMessage = YES;
+                    
+                            [self.searchResultChatAndContactArray removeObject:room];
+                            [self.searchResultChatAndContactArray insertObject:room atIndex:0];
+                            [self.searchResultUnreadMentionDictionary removeObjectForKey:savedMessageRoomID];
+                            
+                            NSString *tempUnreadCount = [self.searchResultUnreadCountArray objectAtIndex:counter];
+                            [self.searchResultUnreadCountArray removeObjectAtIndex:counter];
+                            [self.searchResultUnreadCountArray insertObject:tempUnreadCount atIndex:0];
+                            [self.searchResultUnreadMentionDictionary setObject:[NSNumber numberWithBool:NO] forKey:savedMessageRoomID];
+                            
+                        }
+                        counter += 1;
+                    }
+                    
+                    if(!hasSavedMessage){
+                        NSString *userID = [TAPDataManager getActiveUser].userID;
+                        NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+                        TAPRoomModel *savedMessageRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+                        [self.searchResultChatAndContactArray insertObject:savedMessageRoom atIndex:0];
+                        [self.searchResultUnreadCountArray insertObject:@"0" atIndex:0];
+                        [self.searchResultUnreadMentionDictionary setObject:[NSNumber numberWithBool:NO] forKey:savedMessageRoomID];
+                        
+                    }
+                }
+                
                 
                 if (self.searchView.searchResultTableView.alpha == 1.0f) {
                     if ([self.searchResultMessageArray count] == 0 && [self.searchResultChatAndContactArray count] == 0) {
@@ -477,7 +511,6 @@
     } afterDelay:0.1f];
     
     [self setUpRoomListNavigationBar];
-    
     [UIView animateWithDuration:0.2f animations:^{
         self.view.alpha = 0.0f;
     } completion:^(BOOL finished) {
@@ -494,118 +527,48 @@
     BOOL showSearchBar = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
     BOOL showNewChatButton = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
     
-    if (showCloseButton || showMyAccountButton) {
-        if (showCloseButton) {
-            UIImage *buttonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
-            
-            self.closeButton.frame = CGRectMake(-20.0f, 0.0f, 40.0f, 40.0f);
-            self.closeButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
-            [self.closeButton setImage:buttonImage forState:UIControlStateNormal];
-            
-            [self.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        }
-        
-        if (showMyAccountButton) {
-            CGFloat myAccountButtonX;
-            if (showCloseButton) {
-                myAccountButtonX = CGRectGetMaxX(self.closeButton.frame) + 8.0f;
-            }
-            else {
-                myAccountButtonX = 0.0f;
-            }
-            
-            self.myAccountView.frame = CGRectMake(myAccountButtonX, 0.0f, 40.0f, 40.0f);
-        }
-        
-        if (showCloseButton && showMyAccountButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.myAccountView.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.closeButton];
-            [self.leftBarView addSubview:self.myAccountView];
-        }
-        else if (showMyAccountButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.myAccountView.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.myAccountView];
-        }
-        else if (showCloseButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.closeButton.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.closeButton];
-        }
-        UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarView];
-        [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-        [UIView animateWithDuration:0.2f animations:^{
-            self.leftBarView.alpha = 1.0f;
-        }];
-        self.searchBarView.frame = CGRectMake(
-            CGRectGetMinX(self.searchBarView.frame),
-            CGRectGetMinY(self.searchBarView.frame),
-            CGRectGetWidth(self.searchBarView.frame) - CGRectGetWidth(self.leftBarView.frame),
-            CGRectGetHeight(self.searchBarView.frame)
-        );
-    }
-    else {
-        self.leftBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
-        [self.navigationItem setLeftBarButtonItem:nil];
-    }
-        
     if (showNewChatButton) {
         //RightBarButton
         UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
         
-        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
-        self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
-        [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-        [self.rightBarButton setTitle:nil forState:UIControlStateNormal];
-        [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
-        [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+        [UIView animateWithDuration:0.2f animations:^{
+            [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
+            [self.rightBarButton setTitle:nil forState:UIControlStateNormal];
+            self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 30.0f, 40.0f);
+            self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
+        }];
     }
     else {
-        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
-        [self.navigationItem setRightBarButtonItem:nil];
-        self.searchBarView.frame = CGRectMake(
-            CGRectGetMinX(self.searchBarView.frame),
-            CGRectGetMinY(self.searchBarView.frame),
-            CGRectGetWidth(self.searchBarView.frame) + CGRectGetWidth(self.rightBarButton.frame),
-            CGRectGetHeight(self.searchBarView.frame)
-        );
+        [UIView animateWithDuration:0.2f animations:^{
+            self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
+            [self.navigationItem setRightBarButtonItem:nil animated:YES];
+            [self.view layoutIfNeeded];
+        }];
     }
     
-    if (showSearchBar) {
-        //TitleView
-        [UIView animateWithDuration:0.2f animations:^{
-            self.searchBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarButton.frame) - 36.0f,
-                30.0f
-            );
-        }];
-        self.searchBarView.searchTextField.delegate = self;
-        
-        [self.navigationItem setTitleView:self.searchBarView];
+    // FIXME: INCORRECT VIEW POSITIONS & JUMPY SEARCH BAR POSITION ON ANIMATION START
+    CGFloat leftBarWidth = -2.0f;
+    if (showCloseButton || showMyAccountButton) {
+        leftBarWidth = 40.0f;
     }
-    else {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.searchBarView.alpha = 0.0f;
-        }];
+    CGFloat rightBarMargins = 16.0f;
+    if (showNewChatButton) {
+        rightBarMargins = -36.0f;
     }
+    
+    //TitleView
+    [UIView animateWithDuration:0.2f animations:^{
+        self.searchBarView.frame = CGRectMake(
+            CGRectGetMinX(self.searchBarView.frame) + leftBarWidth,
+            CGRectGetMinY(self.searchBarView.frame),
+            CGRectGetWidth([UIScreen mainScreen].bounds) - leftBarWidth - CGRectGetWidth(self.rightBarView.frame) + rightBarMargins,
+            CGRectGetHeight(self.searchBarView.frame)
+        );
+    }];
+    self.searchBarView.searchTextField.delegate = self;
+    
+    self.title = @"";
 }
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {

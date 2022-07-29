@@ -75,13 +75,13 @@
         [self.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
         
-        _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame)) style:UITableViewStylePlain];
+        _contactsTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame)) style:UITableViewStylePlain];
         self.contactsTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.contactsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.contactsTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];
         [self.bgView addSubview:self.contactsTableView];
         
-        _searchResultTableView = [[UITableView alloc] initWithFrame:self.contactsTableView.frame];
+        _searchResultTableView = [[TAPBaseTableView alloc] initWithFrame:self.contactsTableView.frame];
         self.searchResultTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.searchResultTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];

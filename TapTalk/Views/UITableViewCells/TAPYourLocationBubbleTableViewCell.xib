@@ -61,7 +61,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Y1-WU-ey7">
-                        <rect key="frame" x="50" y="276" width="162" height="0.0"/>
+                        <rect key="frame" x="50" y="274" width="162" height="0.0"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="13" id="zSI-Bp-3Kx"/>
@@ -405,7 +405,7 @@
                         <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R3z-hO-7At" userLabel="Seperator View">
-                        <rect key="frame" x="32" y="292" width="164" height="0.0"/>
+                        <rect key="frame" x="32" y="290" width="164" height="0.0"/>
                         <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                         <constraints>
                             <constraint firstAttribute="height" id="kSc-fN-11G"/>
@@ -433,10 +433,22 @@
                         </connections>
                     </button>
                     <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sqh-oJ-7gl">
-                        <rect key="frame" x="0.0" y="0.0" width="228" height="292"/>
+                        <rect key="frame" x="0.0" y="0.0" width="228" height="290"/>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                         <connections>
                             <action selector="forwardCheckmarkButonDidTapped:" destination="PjH-D3-mkK" eventType="touchUpInside" id="KV0-k1-iae"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ug7-wD-ASD" userLabel="Redirect Arrow Button">
+                        <rect key="frame" x="156" y="132" width="20" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="1Wm-Hg-ffA"/>
+                            <constraint firstAttribute="width" constant="20" id="toK-y5-W3D"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="TAPIconArrowSavedMessage"/>
+                        <connections>
+                            <action selector="redirectArrowButtonDidTapped:" destination="PjH-D3-mkK" eventType="touchUpInside" id="nmV-Vt-OU0"/>
                         </connections>
                     </button>
                 </subviews>
@@ -461,12 +473,14 @@
                     <constraint firstItem="MQo-pS-EVc" firstAttribute="leading" secondItem="Wtr-S7-MFN" secondAttribute="leadingMargin" constant="-46" id="UIA-4B-GK6"/>
                     <constraint firstItem="pmK-kb-fXG" firstAttribute="leading" secondItem="Wtr-S7-MFN" secondAttribute="leading" constant="16" id="UMm-l3-JKy"/>
                     <constraint firstItem="MQo-pS-EVc" firstAttribute="top" secondItem="Wtr-S7-MFN" secondAttribute="topMargin" id="UpY-Du-Qg0"/>
+                    <constraint firstItem="ug7-wD-ASD" firstAttribute="leading" secondItem="1io-G0-fB6" secondAttribute="trailing" constant="8" id="WAm-hM-L97"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1io-G0-fB6" secondAttribute="trailing" constant="80" id="aWQ-4B-08h"/>
                     <constraint firstItem="pmK-kb-fXG" firstAttribute="height" secondItem="eyz-6o-6mG" secondAttribute="height" id="cJb-e1-dnX"/>
                     <constraint firstItem="1io-G0-fB6" firstAttribute="leading" secondItem="pmK-kb-fXG" secondAttribute="trailing" constant="4" id="daK-YZ-6ID"/>
                     <constraint firstItem="7hK-PZ-iOh" firstAttribute="bottom" secondItem="pmK-kb-fXG" secondAttribute="bottom" id="dvp-nn-ktA"/>
+                    <constraint firstItem="ug7-wD-ASD" firstAttribute="centerY" secondItem="Wtr-S7-MFN" secondAttribute="centerY" id="efD-Vg-fFM"/>
                     <constraint firstItem="eyz-6o-6mG" firstAttribute="top" secondItem="pmK-kb-fXG" secondAttribute="top" id="ezZ-GY-cez"/>
-                    <constraint firstAttribute="bottom" secondItem="6Y1-WU-ey7" secondAttribute="bottom" constant="8" id="gLe-F4-2fp"/>
+                    <constraint firstAttribute="bottom" secondItem="6Y1-WU-ey7" secondAttribute="bottom" constant="10" id="gLe-F4-2fp"/>
                     <constraint firstAttribute="trailing" secondItem="Sqh-oJ-7gl" secondAttribute="trailing" id="gb9-m3-ZSJ"/>
                     <constraint firstItem="eyz-6o-6mG" firstAttribute="leading" secondItem="pmK-kb-fXG" secondAttribute="leading" id="giP-L6-x1z"/>
                     <constraint firstItem="XD8-SN-nKk" firstAttribute="bottom" secondItem="1io-G0-fB6" secondAttribute="bottom" id="icr-O7-nlJ"/>
@@ -509,6 +523,7 @@
                 <outlet property="quoteViewLeadingConstraint" destination="eMH-qJ-c7Z" id="1Wu-2Z-fov"/>
                 <outlet property="quoteViewTopConstraint" destination="ITU-ep-5iz" id="zt7-oS-aaS"/>
                 <outlet property="quoteViewTrailingConstraint" destination="6J4-d3-ySa" id="whr-eK-yVm"/>
+                <outlet property="redirectArrowButton" destination="ug7-wD-ASD" id="IEz-eL-LiD"/>
                 <outlet property="replyButtonLeadingConstraint" destination="jPT-5Z-3MX" id="kU8-8n-ExS"/>
                 <outlet property="replyButtonLeftConstraint" destination="OCV-AH-row" id="gbB-Ee-HcZ"/>
                 <outlet property="replyButtonTrailingConstraint" destination="v43-OM-1v9" id="6ox-qO-V4U"/>
@@ -555,6 +570,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="TAPIconArrowSavedMessage" width="20" height="20"/>
         <image name="TAPIconDeletedUser" width="16" height="16"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconLocationSelect" width="34" height="52"/>

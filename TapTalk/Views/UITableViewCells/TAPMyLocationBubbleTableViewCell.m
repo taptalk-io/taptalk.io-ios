@@ -211,6 +211,10 @@
     
     [self.contentView layoutIfNeeded];
 
+    self.bubbleHighlightView.alpha = 0.0f;
+    
+    self.statusLabelBottomConstraint.constant = 8.0f;
+    
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
 }
@@ -917,7 +921,7 @@
 }
 
 - (void)showSeperator {
-    self.statusLabelBottomConstraint.constant = 33.0f;
+    self.statusLabelBottomConstraint.constant = 30.0f;
     self.seperatorViewHeightConstraint.constant = 1.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];

@@ -1427,11 +1427,8 @@
 }
 
 - (void)processMessageAsDelivered:(TAPMessageModel *)message {
-    BOOL isDelivered = message.isDelivered;
-    if (!isDelivered) {
-        //Send delivered status to server
-        [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
-    }
+    //Send delivered status to server
+    [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
 }
 
 - (BOOL)checkIsTypingWithRoomID:(NSString *)roomID {
@@ -1501,6 +1498,9 @@
             if (forwardedMessage.forwardFrom.localID != nil && ![forwardedMessage.forwardFrom.localID isEqualToString:@""]) {
                 //Obtain existing forward from model
                 message.forwardFrom = forwardedMessage.forwardFrom;
+                message.forwardFrom.messageID = forwardedMessage.messageID;
+                message.forwardFrom.localID = forwardedMessage.localID;
+                message.forwardFrom.roomID = forwardedMessage.room.roomID;
             }
             else {
                 //Create forward from model
@@ -1510,6 +1510,7 @@
                 forwardFrom.fullname = forwardedMessage.user.fullname;
                 forwardFrom.messageID = forwardedMessage.messageID;
                 forwardFrom.localID = forwardedMessage.localID;
+                forwardFrom.roomID = forwardedMessage.room.roomID;
                 message.forwardFrom = forwardFrom;
             }
             

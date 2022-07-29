@@ -69,12 +69,12 @@
         self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self addSubview:self.separatorView];
         
-        _recentSearchTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight(self.frame) - CGRectGetMaxY(self.separatorView.frame))];
+        _recentSearchTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight(self.frame) - CGRectGetMaxY(self.separatorView.frame))];
         self.recentSearchTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.recentSearchTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self addSubview:self.recentSearchTableView];
         
-        _searchResultTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame)) style:UITableViewStyleGrouped];
+        _searchResultTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame)) style:UITableViewStyleGrouped];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.searchResultTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.searchResultTableView.alpha = 0.0f;

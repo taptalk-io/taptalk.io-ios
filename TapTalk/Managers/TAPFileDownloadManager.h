@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSDictionary *)getDownloadProgressWithLocalID:(NSString *)localID;
 - (void)saveDownloadedFilePathToDictionaryWithFilePath:(NSString *)filePath roomID:(NSString *)roomID fileID:(NSString *)fileID;
+- (void)removeDownloadedFilePathWithKey:(NSString *)key roomID:(NSString *)roomID;
 - (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID;
 - (void)fetchDownloadedFilePathFromPreference;
 - (void)saveDownloadedFilePathToPreference;
