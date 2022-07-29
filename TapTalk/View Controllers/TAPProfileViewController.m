@@ -320,6 +320,22 @@
         self.profileView.nameLabel.text = self.user.fullname;
         self.profileView.navigationNameLabel.text = self.user.fullname;
     }
+    else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
+        [self.profileView setSavedMessageImage];
+        
+        _mediaMessageDataArray = [[NSMutableArray alloc] init];
+        _mediaMessageDataDictionary = [[NSMutableDictionary alloc] init];
+        
+        [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:@"" numberOfItem:50 success:^(NSArray *mediaMessages) {
+            _mediaMessageDataArray = [mediaMessages mutableCopy];
+            for (TAPMessageModel *message in self.mediaMessageDataArray) {
+                [self.mediaMessageDataDictionary setObject:message forKey:message.localID];
+            }
+            [self.profileView.collectionView reloadData];
+        } failure:^(NSError *error) {
+            
+        }];
+    }
     
     self.profileView.collectionView.delegate = self;
     self.profileView.collectionView.dataSource = self;
@@ -686,6 +702,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
             return 3; //add to contact, send message, report
         }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
+            return 0;
+        }
         return 0;
     }
     else if(section == 1){
@@ -734,6 +753,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 
             }
         }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
+            return 0;
+        }
     }
     else if (section == 3) {
         if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
@@ -754,6 +776,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 return 0;
             }
             return 2;
+        }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
+            return 0;
         }
         
     }
@@ -1190,6 +1215,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
         }
+        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
+            headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+        }
+        
         
         return headerSize;
     }
@@ -1235,6 +1264,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
         }
+        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
+            headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+        }
         
         return headerSize;
     }
@@ -1256,6 +1288,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if(self.user.deleted.longValue > 0){
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
+        }
+        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
+            headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
         }
         return headerSize;
     }
@@ -1383,7 +1418,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (indexPath.row == 0) {
             TAPStarredMessageViewController *tapStarredMessageViewController = [[TAPStarredMessageViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
         
-            if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
+            if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault || self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
                 TAPRoomModel *r = self.room;
                 tapStarredMessageViewController.currentRoom = self.room;
             }

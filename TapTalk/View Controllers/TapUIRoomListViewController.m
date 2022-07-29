@@ -28,6 +28,7 @@
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 @property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIView *leftBarView;
+@property (strong, nonatomic) UIView *rightBarView;
 @property (strong, nonatomic) UIView *leftBarInitialNameView;
 @property (strong, nonatomic) UILabel *leftBarInitialNameLabel;
 @property (strong, nonatomic) UIButton *leftBarInitialNameButton;
@@ -110,30 +111,32 @@
     
     _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _myAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-    _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
+    _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, 42.0f, 42.0f)];
+    _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(
+        CGRectGetMinX(self.leftBarInitialNameView.frame),
+        CGRectGetMinY(self.leftBarInitialNameView.frame),
+        CGRectGetWidth(self.leftBarInitialNameView.frame),
+        CGRectGetHeight(self.leftBarInitialNameView.frame))
+    ];
     _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
-    _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+    _profileImageView = [[TAPImageView alloc] initWithFrame:self.leftBarInitialNameView.frame];
     _leftBarView = [[UIView alloc] initWithFrame:CGRectMake(
         0.0f,
         0.0f,
         CGRectGetMaxX(self.myAccountButton.frame),
         40.0f
     )];
+    _rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(
         0.0f,
         0.0f,
         CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarButton.frame) - 36.0f,
-        30.0f
+        36.0f
     )];
     [self setUpNavigationBar];
     
     self.roomListView.roomListTableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    
-    if (@available(iOS 15.0, *)) {
-        [self.roomListView.roomListTableView setSectionHeaderTopPadding:0.0f];
-    }
     
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
@@ -276,6 +279,7 @@
         static NSString *cellID = @"TAPRoomListTableViewCell";
         
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
+        
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
         cell.tableView = tableView;
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
@@ -514,26 +518,36 @@
         self.leftBarView.alpha = 0.0f;
     }];
     
+    BOOL showCloseButton = [[TapUI sharedInstance] getCloseRoomListButtonVisibleState];
+    BOOL showMyAccountButton = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
+    CGFloat searchBarViewX = 0.0f;
+    if (showCloseButton && showMyAccountButton) {
+        searchBarViewX = -54.0f;
+    }
+    if (showMyAccountButton) {
+        searchBarViewX = -48.0f;
+    }
+    if (showCloseButton) {
+        searchBarViewX = -32.0f;
+    }
     [UIView animateWithDuration:0.2f animations:^{
-        self.searchBarView.frame = CGRectMake(
-            -55.0f,
-            CGRectGetMinY(self.searchBarView.frame),
-            CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f,
-            CGRectGetHeight(self.searchBarView.frame)
-        );
-
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
-        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 51.0f, 40.0f);
-        [self.rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
+        self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 56.0f, 40.0f);
+        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 56.0f, 40.0f);
         [self.rightBarButton setTitleColor:searchBarCancelColor forState:UIControlStateNormal];
-        self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
         self.rightBarButton.titleLabel.font = searchBarCancelFont;
         [self.rightBarButton setImage:nil forState:UIControlStateNormal];
         [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
         
+        self.searchBarView.frame = CGRectMake(
+            searchBarViewX,
+            CGRectGetMinY(self.searchBarView.frame),
+            CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.rightBarView.frame) - 36.0f,
+            CGRectGetHeight(self.searchBarView.frame)
+        );
     } completion:^(BOOL finished) {
         TAPSearchViewController *searchViewController = [[TAPSearchViewController alloc] init];
         searchViewController.delegate = self;
@@ -617,6 +631,42 @@
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
 }
 
+- (void)chatViewControllerDidCloseWithRoomIDLastMessage:(NSString *)roomID lastMeesage:(TAPMessageModel *)lastMessage {
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+    
+    
+    if(isSavedMessageRoom){
+        if(lastMessage != nil) {
+            TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+            
+            roomList.lastMessage = lastMessage;
+            
+            NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+            NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+            [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:NO];
+        }
+        else {
+            TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+            
+            if(roomList != nil){
+                NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+                NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+                
+                [self.roomListDictionary removeObjectForKey:roomID];
+                [self.roomListArray removeObject:roomList];
+                
+                
+                [self.roomListView.roomListTableView beginUpdates];
+                
+                [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[cellIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                
+                [self.roomListView.roomListTableView endUpdates];
+            }
+            
+        }
+    }
+}
+
 - (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
     //Force mark unread bubble and unread mention to 0
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
@@ -635,6 +685,7 @@
 
 #pragma mark TAPSearchViewController
 - (void)searchViewControllerDidTappedSearchCancelButton {
+    [self checkAndUpdateActiveUserProfile];
     [UIView animateWithDuration:0.2f animations:^{
         self.leftBarView.alpha = 1.0f;
     }];
@@ -648,49 +699,12 @@
 }
 
 - (void)myAccountViewControllerDoneChangingImageProfile {
-    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        if ([TAPChatManager sharedManager].activeUser.fullname == nil || [[TAPChatManager sharedManager].activeUser.fullname isEqualToString:@""]) {
-            self.leftBarInitialNameView.alpha = 0.0f;
-            self.profileImageView.alpha = 1.0f;
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            self.leftBarInitialNameView.alpha = 1.0f;
-            self.leftBarInitialNameView.userInteractionEnabled = NO;
-            self.profileImageView.alpha = 0.0f;
-            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:[TAPChatManager sharedManager].activeUser.fullname];
-            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:[TAPChatManager sharedManager].activeUser.fullname isGroup:NO];
-        }
-    }
-    else {
-        self.leftBarInitialNameView.alpha = 0.0f;
-        self.profileImageView.alpha = 1.0f;
-        [self.profileImageView setImageWithURLString:profileImageURL];
-    }
+    [self checkAndUpdateActiveUserProfile];
 }
 
 #pragma mark UIAdaptivePresentationController
 - (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
-    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        if ([TAPChatManager sharedManager].activeUser.fullname == nil || [[TAPChatManager sharedManager].activeUser.fullname isEqualToString:@""]) {
-            self.leftBarInitialNameView.alpha = 0.0f;
-            self.profileImageView.alpha = 1.0f;
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            self.leftBarInitialNameView.alpha = 1.0f;
-            self.profileImageView.alpha = 0.0f;
-            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:[TAPChatManager sharedManager].activeUser.fullname];
-            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:[TAPChatManager sharedManager].activeUser.fullname isGroup:NO];
-        }
-    }
-    else {
-        self.leftBarInitialNameView.alpha = 0.0f;
-        self.profileImageView.alpha = 1.0f;
-        [self.profileImageView setImageWithURLString:profileImageURL];
-    }
+    [self checkAndUpdateActiveUserProfile];
 }
 
 #pragma mark - Custom Method
@@ -705,24 +719,27 @@
         if (showCloseButton) {
             UIImage *buttonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
-            self.closeButton.frame = CGRectMake(-20.0f, 0.0f, 40.0f, 40.0f);
-            self.closeButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+            self.closeButton.frame = CGRectMake(-10.0f, 0.0f, 40.0f, 40.0f);
             [self.closeButton setImage:buttonImage forState:UIControlStateNormal];
             [self.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self.leftBarView addSubview:self.closeButton];
+        }
+        else {
+            self.closeButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         }
         
         if (showMyAccountButton) {
             CGFloat myAccountButtonX;
             if (showCloseButton) {
-                myAccountButtonX = CGRectGetMaxX(self.closeButton.frame) + 8.0f;
+                myAccountButtonX = CGRectGetMaxX(self.closeButton.frame); + 4.0f;
             }
             else {
-                myAccountButtonX = 0.0f;
+                myAccountButtonX = -4.0f;
             }
             
             self.myAccountButton.frame = CGRectMake(myAccountButtonX, 0.0f, 40.0f, 40.0f);
 
-            self.leftBarInitialNameView.frame = CGRectMake(5.0f, 5.0f, 30.0f, 30.0f);
+            self.leftBarInitialNameView.frame = CGRectMake(4.0f, 4.0f, 32.0f, 32.0f);
             self.leftBarInitialNameView.alpha = 0.0f;
             self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
             self.leftBarInitialNameView.clipsToBounds = YES;
@@ -730,60 +747,60 @@
             
             UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
             UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
-            self.leftBarInitialNameLabel.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame));
+            self.leftBarInitialNameLabel.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetWidth(self.leftBarInitialNameView.frame),
+                CGRectGetHeight(self.leftBarInitialNameView.frame)
+            );
             self.leftBarInitialNameLabel.font = initialNameLabelFont;
             self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
             self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+            self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
+            self.leftBarInitialNameView.clipsToBounds = YES;
             [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
             
-            self.leftBarInitialNameButton.frame = self.leftBarInitialNameView.frame;
+            self.leftBarInitialNameButton.frame = self.leftBarInitialNameLabel.frame;
             self.leftBarInitialNameButton.alpha = 0.0f;
             self.leftBarInitialNameButton.userInteractionEnabled = NO;
             self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
             [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
             [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
             
-            self.profileImageView.frame = CGRectMake(5.0f, 5.0f, 30.0f, 30.0f);
+            self.profileImageView.frame = self.leftBarInitialNameView.frame;
             self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
             self.profileImageView.clipsToBounds = YES;
             self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
             [self.myAccountButton addSubview:self.profileImageView];
-        
             [self.myAccountButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self.leftBarView addSubview:self.myAccountButton];
+        }
+        else {
+            self.myAccountButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         }
         
-        if (showCloseButton && showMyAccountButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.myAccountButton.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.closeButton];
-            [self.leftBarView addSubview:self.myAccountButton];
-        }
-        else if (showMyAccountButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.myAccountButton.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.myAccountButton];
-        }
-        else if (showCloseButton) {
+        if (!showMyAccountButton) {
             self.leftBarView.frame = CGRectMake(
                 0.0f,
                 0.0f,
                 CGRectGetMaxX(self.closeButton.frame),
                 40.0f
             );
-            [self.leftBarView addSubview:self.closeButton];
         }
+        else {
+            self.leftBarView.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetMaxX(self.myAccountButton.frame),
+                40.0f
+            );
+        }
+        
         UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarView];
         [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     }
     else {
+        self.leftBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         [self.navigationItem setLeftBarButtonItem:nil];
     }
         
@@ -792,17 +809,18 @@
         UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
 
+        self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 30.0f, 40.0f);
         self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
-        self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
         [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
         [self.rightBarButton setTitle:nil forState:UIControlStateNormal];
         [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+        [self.rightBarView addSubview:self.rightBarButton];
+        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarView];
         
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     }
     else {
-        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
+        self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         [self.navigationItem setRightBarButtonItem:nil];
     }
     
@@ -811,14 +829,16 @@
         self.searchBarView.frame = CGRectMake(
             0.0f,
             0.0f,
-            CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarButton.frame) - 36.0f,
-            30.0f
+            CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarView.frame) - 36.0f,
+            36.0f
         );
         self.searchBarView.searchTextField.delegate = self;
         
         [self.navigationItem setTitleView:self.searchBarView];
+        self.title = @"";
     }
     else {
+        [self.navigationItem setTitleView:nil];
         self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
     }
 }
@@ -851,6 +871,19 @@
 - (void)cancelButtonDidTapped {
 //    [self.searchBarView.searchTextField resignFirstResponder];
 //    self.searchBarView.searchTextField.text = @"";
+}
+
+- (void)closeButtonDidTapped {
+    id <TapUIRoomListDelegate> roomListDelegate = [TapUI sharedInstance].roomListDelegate;
+    if ([roomListDelegate respondsToSelector:@selector(tapTalkCloseRoomListButtonTapped:currentShownNavigationController:)]) {
+        [roomListDelegate tapTalkCloseRoomListButtonTapped:self currentShownNavigationController:self.navigationController];
+    }
+    else {
+        // FIXME:
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+    }
 }
 
 - (void)mappingMessageArrayToRoomListArrayAndDictionary:(NSArray *)messageArray {
@@ -890,6 +923,20 @@
 - (void)insertRoomListToArrayAndDictionary:(TAPRoomListModel *)roomList atIndex:(NSInteger)index {
     [self.roomListArray insertObject:roomList atIndex:index];
     [self.roomListDictionary setObject:roomList forKey:roomList.lastMessage.room.roomID];
+}
+
+- (NSArray *)setSavedMessgeToTop:(NSArray *)resultArray {
+    NSMutableArray *newArray = [resultArray mutableCopy];
+    
+    for(TAPMessageModel *message in resultArray) {
+        if([TAPUtil isSaveMessageRoom:message.room.roomID]){
+            //saved room
+            [newArray removeObject:message];
+            [newArray insertObject:message atIndex:0];
+        }
+    }
+    
+    return [newArray copy];
 }
 
 - (void)viewLoadedSequence {
@@ -948,7 +995,9 @@
                     isShouldAnimate = NO;
                 }
                 
-                [self refreshViewAndQueryUnreadLogicWithMessageArray:resultArray animateReloadData:isShouldAnimate];
+                NSArray *sortedArray = [self setSavedMessgeToTop:resultArray];
+                
+                [self refreshViewAndQueryUnreadLogicWithMessageArray:sortedArray animateReloadData:isShouldAnimate];
                 
                 
                 [self fetchDataFromAPI];
@@ -1063,7 +1112,9 @@
             [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
             [[NSUserDefaults standardUserDefaults] synchronize];
             
-            [self refreshViewAndQueryUnreadLogicWithMessageArray:resultArray animateReloadData:animated];
+            NSArray *sortedArray = [self setSavedMessgeToTop:resultArray];
+            
+            [self refreshViewAndQueryUnreadLogicWithMessageArray:sortedArray animateReloadData:animated];
         });
     } failure:^(NSError *error) {
         
@@ -1300,6 +1351,18 @@
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:messageRoomID];
     
+    BOOL hasSavedMessageRoom = NO;
+    
+    for(TAPRoomListModel *roomList in self.roomListArray){
+        NSString *roomID = roomList.lastMessage.room.roomID;
+        
+        if([TAPUtil isSaveMessageRoom:roomID]){
+            hasSavedMessageRoom = YES;
+        }
+        
+    }
+    
+    
     if (roomList != nil) {
         //Room is on the list
         TAPMessageModel *roomLastMessage = roomList.lastMessage;
@@ -1313,6 +1376,8 @@
             //Don't process last message, current last message is newer that the incoming one
             return;
         }
+        
+        
         
         if ([roomLastMessage.localID isEqualToString:message.localID]) {
             //Last message is same, just updated, update the data only
@@ -1343,7 +1408,7 @@
                     roomList.numberOfUnreadMentions++;
                 }
             }
-
+            
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
             NSIndexPath *currentIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
 
@@ -1351,11 +1416,36 @@
 
             if (currentIndexPath != 0 && isNewMessage) {
                 //Move cell to top
-                [self.roomListArray removeObject:roomList];
-                [self.roomListArray insertObject:roomList atIndex:0];
+                if(hasSavedMessageRoom){
+                    if([TAPUtil isSaveMessageRoom:roomList.lastMessage.room.roomID]){
+                        [self.roomListArray removeObject:roomList];
+                        [self.roomListArray insertObject:roomList atIndex:0];
+                    }
+                    else{
+                        [self.roomListArray removeObject:roomList];
+                        [self.roomListArray insertObject:roomList atIndex:1];
+                        
+                        
+                    }
+                }
+                else{
+                    [self.roomListArray removeObject:roomList];
+                    [self.roomListArray insertObject:roomList atIndex:0];
+                }
+                
                 [self.roomListView.roomListTableView performBatchUpdates:^{
                     //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    if(hasSavedMessageRoom){
+                        if([TAPUtil isSaveMessageRoom:roomList.lastMessage.room.roomID]){
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                        }
+                        else{
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
+                        }
+                    }
+                    else{
+                        [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    }
                 } completion:^(BOOL finished) {
                 }];
             }
@@ -1389,10 +1479,32 @@
             newRoomList.numberOfUnreadMentions = 0;
         }
         
-        [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+        if(hasSavedMessageRoom){
+            if([TAPUtil isSaveMessageRoom:newRoomList.lastMessage.room.roomID]){
+                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+            }
+            else{
+                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:1];
+            }
+        }
+        else{
+            [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+        }
+        
         [self.roomListView.roomListTableView performBatchUpdates:^{
             //changing beginUpdates and endUpdates with this because of deprecation
-            [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            if(hasSavedMessageRoom){
+                if([TAPUtil isSaveMessageRoom:newRoomList.lastMessage.room.roomID]){
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+                else{
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+            }
+            else{
+                [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+            
         } completion:^(BOOL finished) {
             [self.roomListView showNoChatsView:NO];
         }];

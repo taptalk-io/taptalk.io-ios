@@ -220,7 +220,25 @@
                                                                          appropriateForURL:nil
                                                                                     create:NO
                                                                                      error:nil];
-            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+//            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+            
+            NSString *fileExtension = @"";
+            NSString *fileName = [message.data objectForKey:@"fileName"];
+            fileName = [TAPUtil nullToEmptyString:fileName];
+            
+            if ([fileName isEqualToString:@""]) {
+                fileExtension = [message.data objectForKey:@"mediaType"];
+                fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+                fileExtension = [fileExtension lastPathComponent];
+            }
+            else {
+                fileExtension = [fileName pathExtension];
+            }
+            
+            // KR Note: use temporary file name to prevent item with the same name getting overwrited
+            NSString *temporaryFileName = [NSString stringWithFormat:@"%@.%@", message.localID, fileExtension];
+            
+            return [documentsDirectoryURL URLByAppendingPathComponent:temporaryFileName];
         }
         completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
             if ([self.urlDownloadTaskDictionary objectForKey:message.localID] == nil) {
@@ -238,7 +256,8 @@
             NSData *downloadedData = [NSData dataWithContentsOfURL:filePath];
             if (downloadedData != nil) {
                 NSString *key = [[currentFileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-                [self saveDownloadedData:downloadedData andThumbnailWithKey:key message:message success:success];
+                [self saveDownloadedData:downloadedData message:message key:key success:success];
+                [[NSFileManager defaultManager] removeItemAtURL:filePath error:nil];
             }
             else {
                 [self handleFileDownloadError:error message:message];
@@ -310,7 +329,25 @@
                                                                          appropriateForURL:nil
                                                                                     create:NO
                                                                                      error:nil];
-            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+//            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+            
+            NSString *fileExtension = @"";
+            NSString *fileName = [message.data objectForKey:@"fileName"];
+            fileName = [TAPUtil nullToEmptyString:fileName];
+            
+            if ([fileName isEqualToString:@""]) {
+                fileExtension = [message.data objectForKey:@"mediaType"];
+                fileExtension = [TAPUtil nullToEmptyString:fileExtension];
+                fileExtension = [fileExtension lastPathComponent];
+            }
+            else {
+                fileExtension = [fileName pathExtension];
+            }
+            
+            // KR Note: use temporary file name to prevent item with the same name getting overwrited
+            NSString *temporaryFileName = [NSString stringWithFormat:@"%@.%@", message.localID, fileExtension];
+            
+            return [documentsDirectoryURL URLByAppendingPathComponent:temporaryFileName];
         }
         completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
             if ([self.urlDownloadTaskDictionary objectForKey:message.localID] == nil) {
@@ -329,6 +366,7 @@
             if (downloadedData != nil) {
                 NSString *key = [[currentFileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
                 [self saveDownloadedData:downloadedData andThumbnailWithKey:key message:message success:success];
+                [[NSFileManager defaultManager] removeItemAtURL:filePath error:nil];
             }
             else {
                 [self handleFileDownloadError:error message:message];
@@ -375,15 +413,17 @@
 - (void)handleFileDownloadError:(NSError *)error
                         message:(TAPMessageModel *)message {
     
-   [self.failedDownloadDictionary setObject:message forKey:message.localID];
+    [self.failedDownloadDictionary setObject:message forKey:message.localID];
    
-   [self.downloadProgressDictionary removeObjectForKey:message.localID];
+    [self.downloadProgressDictionary removeObjectForKey:message.localID];
    
-   NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
-   [objectDictionary setObject:message forKey:@"message"];
-   [objectDictionary setObject:error forKey:@"error"];
+    NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+    [objectDictionary setObject:message forKey:@"message"];
+    if (error != nil) {
+        [objectDictionary setObject:error forKey:@"error"];
+    }
    
-   [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];\
+    [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:objectDictionary];
 }
 
 - (void)saveDownloadedData:(NSData *)data
@@ -505,7 +545,7 @@
     failure:^(NSError *error, TAPMessageModel *resultMessage) {
         NSURL *url = [NSURL fileURLWithPath:destinationFilePath];
         AVAsset *asset = [AVAsset assetWithURL:url];
-        UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager]  generateThumbnailImageFromFilePathString:destinationFilePath];
+        UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:destinationFilePath];
         if (thumbnailVideoImage != nil) {
             // Save generated thumbnail
             [TAPImageView saveImageToCache:thumbnailVideoImage withKey:message.localID];
@@ -629,10 +669,24 @@
     [downloadedFilePathPerRoomDictionary setObject:filePath forKey:fileID];
     [self.downloadedFilePathDictionary setObject:downloadedFilePathPerRoomDictionary forKey:roomID];
     
-    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-        //save directly to DB when in background
-        [self saveDownloadedFilePathToPreference];
+    [self saveDownloadedFilePathToPreference];
+}
+
+- (void)removeDownloadedFilePathWithKey:(NSString *)key roomID:(NSString *)roomID {
+    if (self.downloadedFilePathDictionary == nil) {
+        return;
     }
+    
+    NSMutableDictionary *downloadedFilePathPerRoomDictionary = [[self.downloadedFilePathDictionary objectForKey:roomID] mutableCopy];
+    
+    if (downloadedFilePathPerRoomDictionary == nil || [downloadedFilePathPerRoomDictionary count] == 0) {
+        return;
+    }
+    
+    [downloadedFilePathPerRoomDictionary removeObjectForKey:key];
+    [self.downloadedFilePathDictionary setObject:downloadedFilePathPerRoomDictionary forKey:roomID];
+    
+    [self saveDownloadedFilePathToPreference];
 }
 
 - (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID {

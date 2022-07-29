@@ -166,6 +166,15 @@ Called when user click mention in the bubble chat.
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
 
+/**
+ Called when user click the close button on the top left side of room list view.
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkCloseRoomListButtonTapped:(UIViewController *)currentViewController
+  currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
 @end
 
 //==========================================================
@@ -522,6 +531,13 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
                    success:(void (^)(TapUIChatViewController *chatViewController))success;
 
 /**
+ Create saved message room
+ 
+
+ */
+- (void)createSavedMessagesChatRoom:(void (^)(TapUIChatViewController *chatViewController))success failure:(void (^)(NSError *error))failure;
+
+/**
 Show or hide profile button view in top right navigation in chat room view
  
 @param isVisible (BOOL) boolean to indicating is visible or not
@@ -866,6 +882,17 @@ Show or hide delete account button in my account
 Get current visibility state of  delete account button in my account
 */
 - (BOOL)getDeleteAccountButtonVisible;
+
+/**
+Show or hide saved messages menu
+*/
+- (void)setSavedMessagesMenuEnabled:(BOOL)isEnabled;
+
+
+/**
+Get current status of saved messages menu
+*/
+- (BOOL)isSavedMessagesMenuEnabled;
 
 
 @end

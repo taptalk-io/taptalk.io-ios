@@ -84,7 +84,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewLeftConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *keyboardOptionViewRightConstraint;
-@property (strong, nonatomic) IBOutlet UITableView *tableView;
+@property (strong, nonatomic) IBOutlet TAPBaseTableView *tableView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewTopConstraint;
 @property (strong, nonatomic) IBOutlet UIView *textViewBorderView;
 @property (strong, nonatomic) IBOutlet TAPGrowingTextView *messageTextView;
@@ -109,6 +109,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIButton *keyboardOptionButton;
 @property (strong, nonatomic) IBOutlet UIView *quoteStandingSeparatorView;
 @property (weak, nonatomic) IBOutlet UIButton *voiceNoteButton;
+@property (weak, nonatomic) IBOutlet UIView *saveMessageEmptyContainerView;
+@property (weak, nonatomic) IBOutlet UIView *saveMessageEmptyView;
+@property (weak, nonatomic) IBOutlet UILabel *saveMessageEmptyTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *saveMessageEmptyBodyLabel;
 
 
 @property (strong, nonatomic) IBOutlet UIView *dummyNavigationBarView;
@@ -128,11 +132,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIButton *mentionLoadingCancelButton;
 - (IBAction)mentionLoadingCancelButtonDidTapped:(id)sender;
 
-@property (strong, nonatomic) IBOutlet UITableView *mentionListTableView;
+@property (strong, nonatomic) IBOutlet TAPBaseTableView *mentionListTableView;
 
 @property (strong, nonatomic) IBOutlet UIButton *attachmentButton;
 
 @property (nonatomic) TopFloatingIndicatorViewType topFloatingIndicatorViewType;
+
 
 @property (strong, nonatomic) UIView *titleView;
 @property (strong, nonatomic) UILabel *nameLabel;
@@ -147,6 +152,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) UILabel *rightBarInitialNameLabel;
 @property (strong, nonatomic) TAPImageView *rightBarImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *deletedUserImageView;
+@property (strong, nonatomic) IBOutlet UIImageView *savedMessageImageView;
 
 @property (strong, nonatomic) TAPConnectionStatusViewController *connectionStatusViewController;
 @property (strong, nonatomic) TAPKeyboardViewController *keyboardViewController;
@@ -253,6 +259,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewBottomConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionListTableViewBottomConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *mentionListTableViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *savedEmptyViewBottomConstraint;
 
 //Kicked or Removed Group Room View
 @property (strong, nonatomic) IBOutlet UIView *kickedGroupRoomBackgroundView;
@@ -351,6 +358,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isEditingMessage;
 @property (strong, nonatomic) NSString *currentEditingMessageString;
 @property (strong, nonatomic) TAPMessageModel *currentEditingMessage;
+@property (strong, nonatomic) TAPMessageModel *pendingRedownloadMessage;
 
 @property (weak, nonatomic) id openedBubbleCell;
 
@@ -363,100 +371,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (strong, atomic) NSMutableArray *starMessageIDArray;
 
-
-//Custom Method
-- (void)setupNavigationViewData;
-- (void)setupInputAccessoryView;
-- (void)setupDeletedRoomView;
-- (void)showDeletedRoomView:(BOOL)show isGroup:(BOOL)isGroup;
-- (void)setDeleteRoomButtonAsLoading:(BOOL)loading animated:(BOOL)animated;
-- (void)setupKickedGroupView;
-- (void)checkAndSetupAddToContactsView;
-- (void)checkIsContainQuoteMessage;
-- (void)setSendButtonActive:(BOOL)isActive;
-- (IBAction)sendButtonDidTapped:(id)sender;
-- (IBAction)handleTapOnTableView:(UITapGestureRecognizer *)gestureRecognizer;
-- (IBAction)chatAnchorButtonDidTapped:(id)sender;
-- (IBAction)mentionAnchorButtonDidTapped:(id)sender;
-- (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender;
-- (IBAction)topFloatingIndicatorButtonDidTapped:(id)sender;
-- (IBAction)deleteGroupButtonDidTapped:(id)sender;
-- (void)backButtonDidTapped;
-- (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index;
-- (void)removeMessageFromArrayAndDictionaryWithLocalID:(NSString *)localID;
-- (void)handleMessageFromSocket:(TAPMessageModel *)message isUpdatedMessage:(BOOL)isUpdated;
-- (void)destroySequence;
-- (void)firstLoadData;
-- (void)fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:(NSString *)roomID maxCreated:(NSNumber *)maxCreated;
-- (void)retrieveExistingMessages;
-- (void)updateMessageDataAndUIWithMessages:(NSArray *)messageArray checkFirstUnreadMessage:(BOOL)checkFirstUnreadMessage toTop:(BOOL)toTop updateUserDetail:(BOOL)updateUserDetail withCompletionHandler:(void(^)())completionHandler;
-- (void)sortAndFilterMessageArray;
-- (void)updateMessageModelValueWithMessage:(TAPMessageModel *)message;
-- (void)callAPIAfterAndUpdateUIAndScrollToTop:(BOOL)scrollToTop;
-- (void)saveMessageDraft;
-- (void)applicationWillEnterForegroundNotification:(NSNotification *)notification;
-- (void)checkAnchorUnreadLabel;
-- (void)addMessageToAnchorUnreadArray:(TAPMessageModel *)message;
-- (void)removeMessageFromAnchorUnreadArray:(TAPMessageModel *)message;
-- (void)timerRefreshLastSeen;
-- (void)updateLastSeenWithTimestamp:(NSTimeInterval)timestamp;
-- (void)processMessageAsRead:(TAPMessageModel *)message forceMarkAsRead:(BOOL)force;
-- (void)processVisibleMessageAsRead;
-- (void)processAllPreviousMessageAsRead;
-- (void)setAsTyping:(BOOL)typing;
-- (void)setAsTypingNoAfterDelay;
-- (void)showInputAccessoryExtensionView:(BOOL)show;
-- (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType;
-- (void)checkAndShowInputAccessoryView;
-
-- (void)showLoadMoreMessageLoadingView:(BOOL)show
-                              withType:(LoadMoreMessageViewType)type;
-- (void)showTopFloatingIdentifierView:(BOOL)show
-                             withType:(TopFloatingIndicatorViewType)type
-               numberOfUnreadMessages:(NSInteger)numberOfUnreadMessages
-                             animated:(BOOL)animated;
-- (void)showLoadMessageCellLoading:(BOOL)show;
-- (void)setReplyMessageWithMessage:(TAPMessageModel *)message;
-- (void)setQuoteWithQuote:(TAPQuoteModel *)quote userID:(NSString *)userID;
-- (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image;
-- (void)fetchImageDataWithMessage:(TAPMessageModel *)message;
-- (void)fetchFileDataWithMessage:(TAPMessageModel *)message;
-- (void)fetchVideoDataWithMessage:(TAPMessageModel *)message;
-- (void)handleLongPressedWithURL:(NSURL *)url originalString:(NSString *)originalString;
-- (void)handleLongPressedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString;
-- (void)handleTappedWithURL:(NSURL *)url originalString:(NSString *)originalString;
-- (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString;
-- (void)handleLongPressedWithMessage:(TAPMessageModel *)message;
-- (void)openFiles;
-- (void)openCamera;
-- (void)openGallery;
-- (void)pickLocation;
-- (void)openLocationInGoogleMaps:(NSDictionary *)dataDictionary;
-- (void)openLocationInAppleMaps:(NSDictionary *)dataDictionary;
-- (void)checkAndRefreshOnlineStatus;
-- (void)scrollToFirstUnreadMessage;
-- (void)scrollToMessageAndLoadDataWithLocalID:(NSString *)localID;
-- (BOOL)checkIsRowVisibleWithRowIndex:(NSInteger)rowIndex;
-- (void)checkAndShowUnreadButton;
-- (void)showDeleteMessageActionWithMessageArray:(NSString *)deletedMessageIDArray;
-
-- (void)fileUploadManagerProgressNotification:(NSNotification *)notification;
-- (void)fileUploadManagerStartNotification:(NSNotification *)notification;
-- (void)fileUploadManagerFinishNotification:(NSNotification *)notification;
-- (void)fileUploadManagerFailureNotification:(NSNotification *)notification;
-- (void)userProfileDidChangeNotification:(NSNotification *)notification;
-
-- (void)fileDownloadManagerProgressNotification:(NSNotification *)notification;
-- (void)fileDownloadManagerStartNotification:(NSNotification *)notification;
-- (void)fileDownloadManagerFinishNotification:(NSNotification *)notification;
-- (void)fileDownloadManagerFailureNotification:(NSNotification *)notification;
-
-- (void)applicationDidBecomeActiveNotification:(NSNotification *)notification;
-
-- (void)refreshRoomStatusUIInfo;
-- (void)refreshTypingLabelState;
-
-- (void)checkAndShowRoomViewState;
+@property (nonatomic) BOOL isSavedMesasgeArrowClicked;
 
 @end
 
@@ -489,6 +404,8 @@ CGPoint center;
 
 - (void)loadView {
     [super loadView];
+    
+    TAPRoomModel *r = self.currentRoom;
     
     id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     CGFloat extensionHeight = 0.0f;
@@ -556,6 +473,7 @@ CGPoint center;
     _selectedMessage = nil;
     _mentionIndexesDictionary = [[NSMutableDictionary alloc] init];
     _starMessageIDArray = [[NSMutableArray alloc] init];
+    _isSavedMesasgeArrowClicked = NO;
     
     if (self.tappedMessageLocalID == nil) {
         _tappedMessageLocalID = @"";
@@ -617,11 +535,11 @@ CGPoint center;
     
     self.mentionListTableViewHeightConstraint.constant = 150.0f;
     self.mentionListTableView.clipsToBounds = YES;
-    self.mentionListTableView.layer.cornerRadius = 15.0f;
+    self.mentionListTableView.layer.cornerRadius = 8.0f;
     self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
 
     self.mentionTableBackgroundView.clipsToBounds = YES;
-    self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
+    self.mentionTableBackgroundView.layer.cornerRadius = 8.0f;
     self.mentionTableBackgroundView.layer.shadowRadius = 10.0f;
     self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
     self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
@@ -641,6 +559,26 @@ CGPoint center;
     
     self.inputMessageAccessoryDocumentsImageView.image = [self.inputMessageAccessoryDocumentsImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     
+    //Save message empty view
+    NSArray *stringArray = @[
+        @"Forward messages here",
+        @"Send media and files to save them",
+        @"Access this chat personally from any device"];
+    
+    self.saveMessageEmptyView.layer.cornerRadius = 8.0f;
+    self.saveMessageEmptyView.backgroundColor = [UIColor whiteColor];
+    
+    UIFont *saveMessageEmptyTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogTitle];
+    UIFont *saveMessageEmptyBodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogBody];
+    UIColor *saveMessageLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTitleLabel];
+    
+    self.saveMessageEmptyTitleLabel.font = saveMessageEmptyTitleLabelFont;
+    self.saveMessageEmptyTitleLabel.textColor = saveMessageLabelColor;
+    
+    self.saveMessageEmptyBodyLabel.font = saveMessageEmptyBodyLabelFont;
+    self.saveMessageEmptyBodyLabel.textColor = saveMessageLabelColor;
+    self.saveMessageEmptyBodyLabel.attributedText = [self attributedStringForBulletTexts:stringArray withFont:saveMessageEmptyBodyLabelFont bulletString:@"•" indentation:15 lineSpacing:2 paragraphSpacing:8 textColor:UIColor.blackColor bulletColor:UIColor.blackColor];
+    
     //Voice note button long press
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(pictureLongPressClicked)];
     [self.voiceNoteButton addGestureRecognizer:longPress];
@@ -649,9 +587,11 @@ CGPoint center;
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    BOOL isSaveMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+    
     if (self.currentRoom.type == RoomTypePersonal) {
         _otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-        if (self.otherUser == nil) {
+        if (self.otherUser == nil && !isSaveMessageRoom) {
             self.inputMessageAccessoryView.alpha = 0.0f;
         }
     }
@@ -770,6 +710,7 @@ CGPoint center;
     
     self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
     self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+    self.savedEmptyViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
     
     // Set quote layout label font and color
     UIFont *quoteTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontQuoteLayoutTitleLabel];
@@ -1031,6 +972,24 @@ CGPoint center;
         [self.delegate chatViewControllerShouldUpdateUnreadBubbleForRoomID:self.currentRoom.roomID];
     }
     
+    //check if in saved room
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+    TAPMessageModel *lastMessage = nil;
+    if(isSavedMessageRoom){
+        for(TAPMessageModel *message in self.messageArray){
+            if(!message.isHidden){
+                lastMessage = message;
+                break;
+                
+            }
+            
+        }
+    }
+    
+    if([self.delegate respondsToSelector:@selector(chatViewControllerDidCloseWithRoomIDLastMessage:lastMeesage:)]) {
+        [self.delegate chatViewControllerDidCloseWithRoomIDLastMessage:self.currentRoom.roomID lastMeesage:lastMessage];
+    }
+    
     _keyboardHeight = self.inputAccessoryExtensionHeightConstraint.constant + self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight;
     
     [[TAPChatManager sharedManager] saveAllUnsentMessageInMainThread];
@@ -1183,21 +1142,21 @@ CGPoint center;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
-        return 10.0f;
-    }
+//    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
+//        return 10.0f;
+//    }
 
     return FLT_MIN;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
-        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
-        view.layer.cornerRadius = 15.0f;
-        view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
-        view.clipsToBounds = YES;
-        return view;
-    }
+//    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
+//        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
+//        view.layer.cornerRadius = 15.0f;
+//        view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+//        view.clipsToBounds = YES;
+//        return view;
+//    }
 
     UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
     return view;
@@ -1246,8 +1205,18 @@ CGPoint center;
         
         TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
         
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+        BOOL isForwardedSavedMessage = NO;
+        
+        NSString *forwardFromLocalID = message.forwardFrom.localID;
+        forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+        
+        if(![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil && isSavedMessageRoom){
+            isForwardedSavedMessage = YES;
+        }
+        
         //Check user is equal to current user
-        if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+        if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
             //My Chat
             if (message.isDeleted) {
                 //Deleted Message (My Chat)
@@ -3700,12 +3669,7 @@ CGPoint center;
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -4042,6 +4006,7 @@ CGPoint center;
 - (void)myVoiceNoteBubblePlayerSliderDidEnd{
     self.isPlayerSliding = NO;
 }
+
 - (void)myVoiceNotePlayPauseButtonDidTapped:(TAPMessageModel *)tappedMessage{
     
     NSString *roomID = tappedMessage.room.roomID;
@@ -4068,7 +4033,8 @@ CGPoint center;
         filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
     }
     
-    if (filePath == nil || [filePath isEqualToString:@""]) {
+    if (filePath == nil || [filePath isEqualToString:@""] || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        [self showFileNotFoundPopUpWithMessage:tappedMessage];
         return;
     }
     
@@ -4110,13 +4076,7 @@ CGPoint center;
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -4298,13 +4258,7 @@ CGPoint center;
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -4441,41 +4395,7 @@ CGPoint center;
 }
 
 - (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    NSString *roomID = tappedMessage.room.roomID;
-    NSDictionary *dataDictionary = tappedMessage.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *key = [dataDictionary objectForKey:@"fileID"];
-    key = [TAPUtil nullToEmptyString:key];
-    
-    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
-    
-    if (filePath == nil || [filePath isEqualToString:@""]) {
-        NSString *fileURL = [dataDictionary objectForKey:@"url"];
-        if (fileURL == nil || [fileURL isEqualToString:@""]) {
-            fileURL = [dataDictionary objectForKey:@"fileURL"];
-        }
-        fileURL = [TAPUtil nullToEmptyString:fileURL];
-        
-        if (![fileURL isEqualToString:@""]) {
-            key = fileURL;
-            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-        }
-        
-        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
-    }
-    
-    if (filePath == nil || [filePath isEqualToString:@""]) {
-        return;
-    }
-    
-    self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
-    
-    QLPreviewController *preview = [[QLPreviewController alloc] init];
-    preview.dataSource = self;
-    preview.delegate = self;
-    
-    [self presentViewController:preview animated:YES completion:nil];
+    [self openFilePreviewViewControllerWithMessage:tappedMessage];
 }
 
 - (void)myFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
@@ -4664,13 +4584,7 @@ CGPoint center;
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:message];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -5074,8 +4988,19 @@ CGPoint center;
                 NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
                 
                 id previousCell;
+                
+                BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+                BOOL isForwardedSavedMessage = NO;
+                
+                NSString *forwardFromLocalID = self.selectedMessage.forwardFrom.localID;
+                forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                
+                if(![forwardFromLocalID isEqualToString:@""] && self.selectedMessage.forwardFrom != nil && isSavedMessageRoom){
+                    isForwardedSavedMessage = YES;
+                }
+                
                 BOOL isMyCell = NO;
-                if ([self.selectedMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                if ([self.selectedMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                     previousCell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:selectedPreviousMessageIndexPath];
                     isMyCell = YES;
                 }
@@ -5180,6 +5105,10 @@ CGPoint center;
 
 - (void)yourChatBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourChatBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage {
+    [self savedMessageRedirectArrowAction:tappedMessage];
 }
 
 - (void)yourChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
@@ -5462,13 +5391,7 @@ CGPoint center;
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:message];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -5550,6 +5473,10 @@ CGPoint center;
 
 - (void)yourImageBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourImageBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage {
+    [self savedMessageRedirectArrowAction:tappedMessage];
 }
 
 - (void)yourImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
@@ -5804,6 +5731,10 @@ CGPoint center;
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourVoiceNoteBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage {
+    [self savedMessageRedirectArrowAction:tappedMessage];
+}
+
 - (void)yourVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage {
     
     if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
@@ -5833,13 +5764,7 @@ CGPoint center;
     
     NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -5930,13 +5855,7 @@ CGPoint center;
     
     NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -5960,45 +5879,15 @@ CGPoint center;
 }
 
 - (void)yourFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    NSString *roomID = tappedMessage.room.roomID;
-    NSDictionary *dataDictionary = tappedMessage.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *key = [dataDictionary objectForKey:@"fileID"];
-    key = [TAPUtil nullToEmptyString:key];
-    
-    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
-    
-    if (filePath == nil || [filePath isEqualToString:@""]) {
-        NSString *fileURL = [dataDictionary objectForKey:@"url"];
-        if (fileURL == nil || [fileURL isEqualToString:@""]) {
-            fileURL = [dataDictionary objectForKey:@"fileURL"];
-        }
-        fileURL = [TAPUtil nullToEmptyString:fileURL];
-        
-        if (![fileURL isEqualToString:@""]) {
-            key = fileURL;
-            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-        }
-        
-        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
-    }
-    
-    if (filePath == nil || [filePath isEqualToString:@""]) {
-        return;
-    }
-    
-    self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
-    
-    QLPreviewController *preview = [[QLPreviewController alloc] init];
-    preview.dataSource = self;
-    preview.delegate = self;
-    
-    [self presentViewController:preview animated:YES completion:nil];
+    [self openFilePreviewViewControllerWithMessage:tappedMessage];
 }
 
 - (void)yourFileBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourFileBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage {
+    [self savedMessageRedirectArrowAction:tappedMessage];
 }
 
 - (void)yourFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
@@ -6121,6 +6010,10 @@ CGPoint center;
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
 }
 
+- (void)yourLocationBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage {
+    [self savedMessageRedirectArrowAction:tappedMessage];
+}
+
 - (void)yourLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
     [self processSwipeToReplyWithMessage:message];
 }
@@ -6162,13 +6055,7 @@ CGPoint center;
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-    [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-    
-    quotedMessageModel.quote = quote;
-    
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+    [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
     
     //remove selectedMessage
     self.selectedMessage = nil;
@@ -6250,6 +6137,10 @@ CGPoint center;
 
 - (void)yourVideoBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage {
     [self openUserProfileFromGroupChatWithMessage:tappedMessage];
+}
+
+- (void)yourVideoBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage {
+    [self savedMessageRedirectArrowAction:tappedMessage];
 }
 
 - (void)yourVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
@@ -6580,10 +6471,6 @@ CGPoint center;
         [self.inputMessageAccessoryView layoutIfNeeded];
         [self.view layoutIfNeeded];
     }];
-#ifdef DEBUG
-    NSLog(@">>>> growingTextViewShouldChangeHeight messageTextViewHeight: %f", height);
-    NSLog(@">>>> growingTextViewShouldChangeHeight messageViewHeightConstraint: %f", self.messageViewHeightConstraint.constant);
-#endif
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
@@ -6683,6 +6570,7 @@ CGPoint center;
     [UIView animateWithDuration:0.2f animations:^{
         if (self.emptyView.alpha != 0.0f) {
             self.emptyView.alpha = 0.0f;
+            self.saveMessageEmptyContainerView.alpha = 0.0f;
         }
     }];
     
@@ -6782,6 +6670,7 @@ CGPoint center;
     [UIView animateWithDuration:0.2f animations:^{
         if (self.emptyView.alpha != 0.0f) {
             self.emptyView.alpha = 0.0f;
+            self.saveMessageEmptyContainerView.alpha = 0.0f;
         }
     }];
     
@@ -6888,7 +6777,14 @@ CGPoint center;
     
     //Title View
     _titleView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 56.0f - 56.0f, 43.0f)];
-    _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 2.0f, CGRectGetWidth(self.titleView.frame), 22.0f)];
+    
+    if([TAPUtil isSaveMessageRoom:room.roomID]){
+        //saved room
+        _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 10.5f, CGRectGetWidth(self.titleView.frame), 22.0f)];
+    }
+    else{
+        _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 2.0f, CGRectGetWidth(self.titleView.frame), 22.0f)];
+    }
     
     UIFont *chatRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomNameLabel];
     UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
@@ -6919,7 +6815,7 @@ CGPoint center;
     [self.userDescriptionView addSubview:self.userStatusView];
     [self.userDescriptionView addSubview:self.userStatusLabel];
     
-    if (room.type != RoomTypeTransaction) {
+    if (room.type != RoomTypeTransaction && ![TAPUtil isSaveMessageRoom:room.roomID]) {
         [self.titleView addSubview:self.userDescriptionView];
     }
     
@@ -6979,9 +6875,15 @@ CGPoint center;
         _deletedUserImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
         self.deletedUserImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.deletedUserImageView.alpha = 0.0f;
-        [rightBarView addSubview:self.deletedUserImageView];
+        
+        _savedMessageImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
+        self.savedMessageImageView.image = [UIImage imageNamed:@"TAPIconSaveMessageRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.savedMessageImageView.alpha = 0.0f;
+        [rightBarView addSubview:self.savedMessageImageView];
         
         NSString *profileImageURL = room.imageURL.thumbnail;
+        
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:room.roomID];
 
         if(room.deleted.longValue > 0){
             //set deleted account profil pict
@@ -6989,6 +6891,14 @@ CGPoint center;
             self.rightBarImageView.alpha = 0.0f;
             self.deletedUserImageView.alpha = 1.0f;
             self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+            self.rightBarInitialNameLabel.text =@"";
+        }
+        else if(isSavedMessageRoom){
+            //set saved message profil pict
+            self.rightBarInitialNameView.alpha = 1.0f;
+            self.rightBarImageView.alpha = 0.0f;
+            self.savedMessageImageView.alpha = 1.0f;
+            self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             self.rightBarInitialNameLabel.text =@"";
         }
         else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
@@ -7061,7 +6971,12 @@ CGPoint center;
 - (void)checkIsContainForwardMessage {
     NSArray *forwardMessageArray = [[TAPChatManager sharedManager] getForwardedMessagestWithRoomID:self.currentRoom.roomID];
     if (forwardMessageArray != nil && forwardMessageArray.count > 0) {
+        if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+            [self sendButtonAction];
+            return;
+        }
         [self showInputAccessoryExtensionView:YES];
+    
         if (forwardMessageArray.count == 1) {
             // Show forward single message layout
             _isInputAccessoryExtensionShowedFirstTimeOpen = YES;
@@ -7071,8 +6986,7 @@ CGPoint center;
                 forwardMessageModel.type == TAPChatMessageTypeVideo
             ) {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
-                TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:forwardMessageModel];
-                [self setQuoteWithQuote:quote userID:forwardMessageModel.user.userID];
+                [self setQuoteWithMessage:forwardMessageModel saveToQuotedMessage:NO];
             }
             else {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -7106,8 +7020,7 @@ CGPoint center;
                 quoteMessageModel.type == TAPChatMessageTypeVideo
             ) {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
-                TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quoteMessageModel];
-                [self setQuoteWithQuote:quote userID:quoteMessageModel.user.userID];
+                [self setQuoteWithMessage:quoteMessageModel saveToQuotedMessage:NO];
             }
             else {
                 [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -7123,7 +7036,7 @@ CGPoint center;
         else if ([quotedMessage isKindOfClass:[TAPQuoteModel class]]) {
             TAPQuoteModel *quoteModel = (TAPQuoteModel *)quotedMessage;
             [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
-            [self setQuoteWithQuote:quoteModel userID:@""];
+            [self setQuoteWithQuote:quoteModel];
         }
     }
     else {
@@ -7235,12 +7148,14 @@ CGPoint center;
         self.deletedRoomViewHeightConstraint.constant = [TAPUtil safeAreaBottomPadding] + kInputMessageAccessoryViewHeight + 74.0f;
         self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
         self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
+        self.savedEmptyViewBottomConstraint.constant = kInputMessageAccessoryViewHeight + 74.0f;
         
         self.deletedRoomView.alpha = 1.0f;
     }
     else {
         self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
         self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+        self.savedEmptyViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
         
         self.deletedRoomView.alpha = 0.0f;
         [self showInputAccessoryView];
@@ -7586,6 +7501,13 @@ CGPoint center;
             return;
         }
         
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+        BOOL isForwardedSavedMessage = NO;
+        
+        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+            isForwardedSavedMessage = YES;
+        }
+        
         NSString *localID = obtainedMessage.localID;
         localID = [TAPUtil nullToEmptyString:localID];
         
@@ -7601,7 +7523,7 @@ CGPoint center;
         
         TAPChatMessageType type = currentMessage.type;
         if (type == TAPChatMessageTypeImage) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell animateProgressUploadingImageWithProgress:progress total:total];
@@ -7613,7 +7535,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeFile) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell animateProgressDownloadingFileWithProgress:progress total:total];
@@ -7625,7 +7547,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell animateProgressDownloadingVideoWithProgress:progress total:total];
@@ -7639,7 +7561,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell animateProgressDownloadingFileWithProgress:progress total:total];
@@ -7670,6 +7592,13 @@ CGPoint center;
             return;
         }
         
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+        BOOL isForwardedSavedMessage = NO;
+        
+        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+            isForwardedSavedMessage = YES;
+        }
+        
         NSString *localID = obtainedMessage.localID;
         localID = [TAPUtil nullToEmptyString:localID];
         
@@ -7678,8 +7607,9 @@ CGPoint center;
         NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
         
         TAPChatMessageType type = currentMessage.type;
+
         if (type == TAPChatMessageTypeImage) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 
@@ -7697,7 +7627,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeFile) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 
@@ -7710,7 +7640,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 
@@ -7723,7 +7653,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
@@ -7760,12 +7690,19 @@ CGPoint center;
         NSArray *messageArray = [self.messageArray copy];
         NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
         
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+        BOOL isForwardedSavedMessage = NO;
+        
+        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+            isForwardedSavedMessage = YES;
+        }
+        
         TAPChatMessageType type = currentMessage.type;
         if (type == TAPChatMessageTypeImage) {
             
             UIImage *fullImage = [notificationParameterDictionary objectForKey:@"fullImage"];
             
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if ([cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]] &&
@@ -7794,7 +7731,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeFile) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if (!currentMessage.isFailedSend) {
@@ -7811,7 +7748,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if (!currentMessage.isFailedSend) {
@@ -7828,7 +7765,7 @@ CGPoint center;
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
-            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+            if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 if (!currentMessage.isFailedSend) {
@@ -8771,7 +8708,9 @@ CGPoint center;
         }
     }
     
-    if (message.isDeleted || message.isSending || message.isFailedSend || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal)) {
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+    
+    if (message.isDeleted || message.isSending || message.isFailedSend || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal && !isSavedMessageRoom)) {
         return;
     }
     
@@ -8797,7 +8736,14 @@ CGPoint center;
                                           [self setReplyMessageWithMessage:message];
                                           [self showInputAccessoryExtensionView:YES];
                                           
-                                          TAPMessageModel *quotedMessageModel = [message copy];
+                                          
+                                          NSString *forwardFromLocalID = message.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+                                              message.user.fullname = message.forwardFrom.fullname;
+                                              message.user.userID = message.forwardFrom.userID;
+                                          }
+
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
                                       }
                                       else if (message.type == TAPChatMessageTypeImage) {
@@ -8807,13 +8753,17 @@ CGPoint center;
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
                                           [self showInputAccessoryExtensionView:YES];
                                           
-                                          //convert to quote model
-                                          TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-                                          [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-                                          
-                                          quotedMessageModel.quote = quote;
+                                          NSString *forwardFromLocalID = quotedMessageModel.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && quotedMessageModel.forwardFrom != nil){
+                                              quotedMessageModel.user.fullname = quotedMessageModel.forwardFrom.fullname;
+                                              quotedMessageModel.user.userID = quotedMessageModel.forwardFrom.userID;
+                                          }
                                           
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+
+                                          [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
+
                                       }
                                       else if (message.type == TAPChatMessageTypeVideo) {
                                           TAPMessageModel *quotedMessageModel = [message copy];
@@ -8822,13 +8772,17 @@ CGPoint center;
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
                                           [self showInputAccessoryExtensionView:YES];
                                           
-                                          //convert to quote model
-                                          TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-                                          [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-                                          
-                                          quotedMessageModel.quote = quote;
+                                          NSString *forwardFromLocalID = quotedMessageModel.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && quotedMessageModel.forwardFrom != nil){
+                                              quotedMessageModel.user.fullname = quotedMessageModel.forwardFrom.fullname;
+                                              quotedMessageModel.user.userID = quotedMessageModel.forwardFrom.userID;
+                                          }
                                           
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+
+                                          [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
+
                                       }
                                       else if (message.type == TAPChatMessageTypeLocation) {
                                           [self showInputAccessoryExtensionView:NO];
@@ -8836,11 +8790,25 @@ CGPoint center;
                                           [self setReplyMessageWithMessage:message];
                                           [self showInputAccessoryExtensionView:YES];
                                           
-                                          TAPMessageModel *quotedMessageModel = [message copy];
+                                          NSString *forwardFromLocalID = message.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+                                              message.user.fullname = message.forwardFrom.fullname;
+                                              message.user.userID = message.forwardFrom.userID;
+                                          }
+
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
                                       }
                                       else if (message.type == TAPChatMessageTypeFile) {
                                           TAPMessageModel *quotedMessageModel = [message copy];
+                                          
+                                          NSString *forwardFromLocalID = message.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+                                              quotedMessageModel.user.fullname = quotedMessageModel.forwardFrom.fullname;
+                                              quotedMessageModel.user.userID = quotedMessageModel.forwardFrom.userID;
+                                          }
                                           
                                           [self showInputAccessoryExtensionView:NO];
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
@@ -8862,13 +8830,7 @@ CGPoint center;
                                           
                                           NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
                                           
-                                          //convert to quote model
-                                          TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-                                          [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
-                                          
-                                          quotedMessageModel.quote = quote;
-                                          
-                                          [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+                                          [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
                                       }
                                       else if (message.type == TAPChatMessageTypeVoice) {
                                           [self showInputAccessoryExtensionView:NO];
@@ -8876,7 +8838,13 @@ CGPoint center;
                                           [self setReplyMessageWithMessage:message];
                                           [self showInputAccessoryExtensionView:YES];
                                           
-                                          TAPMessageModel *quotedMessageModel = [message copy];
+                                          NSString *forwardFromLocalID = message.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+                                              message.user.fullname = message.forwardFrom.fullname;
+                                              message.user.userID = message.forwardFrom.userID;
+                                          }
+                                          
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
                                       }
                                   }];
@@ -9289,11 +9257,30 @@ CGPoint center;
     }
     else {
         //check id message sender is equal to active user id, if yes change the title to "You"
-        if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+        NSString *userID = @"";
+        NSString *fullname = @"";
+        
+        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+        BOOL isForwardedSavedMessage = NO;
+        
+        if((![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) && isSavedMessageRoom){
+            isForwardedSavedMessage = YES;
+        }
+        
+        if(isForwardedSavedMessage){
+            userID = message.forwardFrom.userID;
+            fullname = message.forwardFrom.fullname;
+        }
+        else{
+            userID = message.user.userID;
+            fullname = message.user.fullname;
+        }
+        
+        if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
             self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
         }
         else {
-            self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:message.user.fullname];
+            self.replyMessageNameLabel.text = [TAPUtil nullToEmptyString:fullname];
         }
         
         self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
@@ -9379,9 +9366,26 @@ CGPoint center;
    
 }
 
-- (void)setQuoteWithQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
+- (void)setQuoteWithQuote:(TAPQuoteModel *)quote {
+    [self setQuoteWithMessage:nil quote:quote saveToQuotedMessage:NO];
+}
+
+- (void)setQuoteWithMessage:(TAPMessageModel *)quotedMessage saveToQuotedMessage:(BOOL)saveToQuotedMessage {
+    [self setQuoteWithMessage:quotedMessage quote:nil saveToQuotedMessage:saveToQuotedMessage];
+}
+
+- (void)setQuoteWithMessage:(TAPMessageModel *_Nullable)quotedMessage quote:(TAPQuoteModel *_Nullable)quote saveToQuotedMessage:(BOOL)saveToQuotedMessage {
+    
+    if (quote == nil && quotedMessage != nil) {
+        quote = [TAPQuoteModel constructFromMessageModel:quotedMessage];
+    }
+    
+    if (quote == nil) {
+        return;
+    }
+    
     //check id message sender is equal to active user id, if yes change the title to "You"
-    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if (quotedMessage != nil && [quotedMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         self.quoteTitleLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
     }
     else {
@@ -9398,23 +9402,42 @@ CGPoint center;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
-        
-//        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-//            [self.quoteImageView setImageWithURLString:quote.imageURL];
-//        }
-//        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
-//            [self.quoteImageView setImageWithURLString:quote.fileID];
-//        }
-        
-        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+        if (([quote.fileType isEqualToString:@"image"] || [quote.fileType isEqualToString:@"video"]) && quotedMessage != nil) {
+            [TAPImageView imageFromCacheWithMessage:quotedMessage
+            start:^(TAPMessageModel *resultMessage) {
+                
+            }
+            progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                
+            }
+            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                if (savedImage != nil) {
+                    [self.quoteImageView setImage:savedImage];
+                }
+            }
+            failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+                    [self.quoteImageView setImageWithURLString:quote.imageURL];
+                }
+                else if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+                    [self.quoteImageView setImageWithURLString:quote.fileID];
+                }
+            }];
+        }
+        else if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.imageURL];
         }
-        if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+        else if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
         
         self.quoteFileView.alpha = 0.0f;
         self.quoteImageView.alpha = 1.0f;
+    }
+    
+    if (saveToQuotedMessage) {
+        quotedMessage.quote = quote;
+        [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:self.currentRoom.roomID];
     }
 }
 
@@ -9465,7 +9488,8 @@ CGPoint center;
         filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
     }
     
-    if (filePath == nil || [filePath isEqualToString:@""]) {
+    if (filePath == nil || [filePath isEqualToString:@""] || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        [self showFileNotFoundPopUpWithMessage:message];
         return;
     }
     
@@ -9827,10 +9851,11 @@ CGPoint center;
                         [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:minCreated];
                     }
                     
+                    /**
                     if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
                         [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
                     }
-                    
+                    */
                     //Call API Get After Message
                     //Obtain Last Updated Value
                     NSNumber *lastUpdatedFromPreference = [TAPDataManager getMessageLastUpdatedWithRoomID:roomID];
@@ -9905,6 +9930,9 @@ CGPoint center;
                             [self processAllPreviousMessageAsRead];
                             //check if last message is deleted room
                             [self checkAndShowRoomViewState];
+                            if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
+                                [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
+                            }
                         }];
                     } failure:^(NSError *error) {
                         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
@@ -9932,6 +9960,10 @@ CGPoint center;
                         [self presentViewController:alertController animated:YES completion:nil];
 #endif
                         [self processAllPreviousMessageAsRead];
+                        
+                        if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
+                            [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
+                        }
                     }];
                 }];
             }
@@ -10039,7 +10071,32 @@ CGPoint center;
                NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
                NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
                
+               BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:message.room.roomID];
+               
+               BOOL isForwardedSavedMessage = NO;
+            
+               
+               if(isSavedMessageRoom && ![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil){
+                   isForwardedSavedMessage = YES;
+               }
+               
                if (setAsDeleted) {
+                   /***
+                   if(isSavedMessageRoom){
+                       BOOL emptyState = YES;
+                       for(TAPMessageModel *message in self.messageArray){
+                           if(!message.isHidden){
+                               emptyState = NO;
+                               break;
+                           }
+                           
+                       }
+                       
+                       if(emptyState){
+                           self.saveMessageEmptyContainerView.alpha = 1.0f;
+                       }
+                   }
+                   */
                    //Delete physical file if exist
                    if (currentMessage.type == TAPChatMessageTypeImage || currentMessage.type == TAPChatMessageTypeVideo || currentMessage.type == TAPChatMessageTypeFile || currentMessage.type == TAPChatMessageTypeVoice) {
                        [TAPDataManager deletePhysicalFilesWithMessage:currentMessage success:^{
@@ -10056,7 +10113,7 @@ CGPoint center;
                    } completion:^(BOOL finished) {
                    }];
                }
-               else {
+               else if(!isForwardedSavedMessage) {
                    if (currentMessage.type == TAPChatMessageTypeText) {
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
@@ -10652,6 +10709,7 @@ CGPoint center;
     }];
     
     _messageArray = [NSMutableArray arrayWithArray:sortedArray];
+    
 }
 
 - (void)callAPIAfterAndUpdateUIAndScrollToTop:(BOOL)scrollToTop {
@@ -10866,7 +10924,8 @@ CGPoint center;
         return;
     }
     
-    keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
+    // Commented to prevent incorrectly reassigned keyboardHeight value if this method is called after growing text view had changed height
+//        keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
     
     if (keyboardHeight < 0) {
         return;
@@ -10898,6 +10957,7 @@ CGPoint center;
                 mentionListTableViewBottomValue = mentionListTableViewBottomValue - safeAreaGap;
             }
             self.mentionListTableViewBottomConstraint.constant = mentionListTableViewBottomValue;
+            self.savedEmptyViewBottomConstraint.constant = mentionListTableViewBottomValue;
             
         } completion:^(BOOL finished) {
             //Do something after animation completed.
@@ -10972,6 +11032,7 @@ CGPoint center;
         mentionListTableViewBottomValue = mentionListTableViewBottomValue - safeAreaGap;
     }
     self.mentionListTableViewBottomConstraint.constant = mentionListTableViewBottomValue;
+    self.savedEmptyViewBottomConstraint.constant = mentionListTableViewBottomValue;
     
     [UIView animateWithDuration:0.2f animations:^{
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
@@ -11073,6 +11134,7 @@ CGPoint center;
         mentionListTableViewBottomValue = mentionListTableViewBottomValue - safeAreaGap;
     }
     self.mentionListTableViewBottomConstraint.constant = mentionListTableViewBottomValue;
+    self.savedEmptyViewBottomConstraint.constant = mentionListTableViewBottomValue;
     
     [UIView animateWithDuration:0.2f animations:^{
         if(self.isCustomKeyboardAvailable) {
@@ -11372,6 +11434,12 @@ CGPoint center;
         return;
     }
     if (show) {
+        CGFloat tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+        if (tableViewHeight > 150.0f) {
+            tableViewHeight = 150.0f;
+        }
+        self.mentionListTableViewHeightConstraint.constant = tableViewHeight;
+                
         if (animated) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.mentionTableBackgroundView.alpha = 1.0f;
@@ -11384,6 +11452,7 @@ CGPoint center;
             self.mentionListTableView.alpha = 1.0f;
             [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
         }
+        [self.view layoutIfNeeded];
     }
     else {
         if (animated) {
@@ -11405,7 +11474,6 @@ CGPoint center;
 - (void)checkAndSearchUserMentionList:(NSString *)text isErasing:(BOOL)isErasing {
     if (![[TapUI sharedInstance] isMentionUsernameEnabled] || [self.participantListDictionary count] == 0) {
         [self showMentionListView:NO animated:YES];
-        [self.mentionListTableView reloadData];
         return;
     }
     
@@ -11446,7 +11514,7 @@ CGPoint center;
                 self.filteredMentionListArray = [resultArray mutableCopy];
             }
             if ([self.filteredMentionListArray count] > 0) {
-            [self showMentionListView:YES animated:YES];
+                [self showMentionListView:YES animated:YES];
                 _mentionLoopIndex = loopIndex;
                 _mentionCursorIndex = cursorIndex;
             }
@@ -11701,7 +11769,9 @@ CGPoint center;
 
         NSString *emptyTitleString;
         NSString *emptyDescriptionString;
-
+        
+        
+        
         if (self.currentRoom.type == RoomTypePersonal) {
             //Personal
             NSString *emptyTitleInitialString = NSLocalizedStringFromTableInBundle(@"Start a conversation with ", nil, [TAPUtil currentBundle], @"");
@@ -11798,18 +11868,49 @@ CGPoint center;
         self.recipientInitialNameLabel.font = initialNameLabelFont;
         
         [UIView animateWithDuration:0.0f animations:^{
-            self.emptyView.alpha = 1.0f;
+            if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+                self.saveMessageEmptyContainerView.alpha = 1.0f;
+            }
+            else{
+                self.emptyView.alpha = 1.0f;
+            }
         }];
     }
     else {
-        if (self.emptyView.alpha == 0.0f) {
-            return;
+        if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+            BOOL emptyState = YES;
+            for(TAPMessageModel *message in self.messageArray){
+                if(!message.isHidden){
+                    emptyState = NO;
+                    break;
+                }
+                
+            }
+            
+            if(emptyState){
+                [UIView animateWithDuration:0.0f animations:^{
+                    self.saveMessageEmptyContainerView.alpha = 1.0f;
+                    
+                }];
+            }
+            else{
+                //hide empty chat
+                [UIView animateWithDuration:0.2f animations:^{
+                    self.saveMessageEmptyContainerView.alpha = 0.0f;
+                }];
+            }
+        }
+        else{
+            if (self.emptyView.alpha == 0.0f && self.saveMessageEmptyContainerView.alpha == 0.0f) {
+                return;
+            }
+            //hide empty chat
+            [UIView animateWithDuration:0.2f animations:^{
+                self.emptyView.alpha = 0.0f;
+                self.saveMessageEmptyContainerView.alpha = 0.0f;
+            }];
         }
         
-        //hide empty chat
-        [UIView animateWithDuration:0.2f animations:^{
-            self.emptyView.alpha = 0.0f;
-        }];
     }
 }
 
@@ -11833,9 +11934,13 @@ CGPoint center;
     else if ([popupIdentifier isEqualToString:@"User Not Found"]) {
         [self checkAndShowInputAccessoryView];
     }
+    else if ([popupIdentifier isEqualToString:@"File Not Found"] && self.pendingRedownloadMessage != nil) {
+        [self fetchFileDataWithMessage:self.pendingRedownloadMessage];
+        self.pendingRedownloadMessage = nil;
+    }
 }
 
-- (IBAction)sendButtonDidTapped:(id)sender {
+- (void)sendButtonAction{
     if ([self.messageArray count] != 0 && !self.isEditingMessage) {
         [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
     }
@@ -11998,6 +12103,10 @@ CGPoint center;
     [[TAPChatManager sharedManager] stopTyping];
 }
 
+- (IBAction)sendButtonDidTapped:(id)sender {
+    [self sendButtonAction];
+}
+
 - (IBAction)sendForwardButtonDidTapped:(id)sender {
     if(self.selectedForwardMessageArray.count > 0){
         //Forward Action Here
@@ -12072,6 +12181,9 @@ CGPoint center;
             profileViewController.room = self.currentRoom;
             profileViewController.otherUserID = otherUserID;
             profileViewController.delegate = self;
+            if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+                profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeSavedMessageProfile;
+            }
             [self.navigationController pushViewController:profileViewController animated:YES];
         }
     }
@@ -12103,31 +12215,145 @@ CGPoint center;
         [tapUIChatRoomDelegate tapTalkGroupMemberAvatarTappedWithRoom:tappedMessage.room user:tappedMessage.user currentShownNavigationController:self.navigationController];
         return;
     }
+    TAPUserModel *otherUser = nil;
+    if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+        NSString *otherRoomID = tappedMessage.forwardFrom.userID;
+        otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherRoomID];
+        
+        if(otherUser == nil){
+            [TAPDataManager callAPIGetUserByUserID:otherRoomID success:^(TAPUserModel *user) {
+                [TAPUtil performBlock:^{
+                    [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
+                } afterDelay:1.0f];
+                
+                [self setKeyboardStateDefault];
+                
+                //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+                [self.messageTextView resignFirstResponder];
+                [self.secondaryTextField resignFirstResponder];
+                [self keyboardWillHideWithHeight:0.0f];
+                
+               if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
+                   [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:user room:self.currentRoom currentShownNavigationController:self.navigationController];
+               }
+               else {
+                   TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+                   profileViewController.room = self.currentRoom;
+                   profileViewController.user = user;
+                   profileViewController.delegate = self;
+                   profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
+                   [self.navigationController pushViewController:profileViewController animated:YES];
+               }
+                
+            } failure:^(NSError *error) {
+                
+            }];
+        }
+        
+    }
+    else{
+        otherUser = tappedMessage.user;
+    }
     
-    TAPUserModel *otherUser = tappedMessage.user;
+    if(otherUser != nil){
+        [TAPUtil performBlock:^{
+            [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
+        } afterDelay:1.0f];
+        
+        [self setKeyboardStateDefault];
+        
+        //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
+        
+       if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
+           [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
+       }
+       else {
+           TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
+           profileViewController.room = self.currentRoom;
+           profileViewController.user = otherUser;
+           profileViewController.delegate = self;
+           profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
+           [self.navigationController pushViewController:profileViewController animated:YES];
+       }
+    }
     
-    [TAPUtil performBlock:^{
-        [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeUnreadMessage numberOfUnreadMessages:0 animated:YES];
-    } afterDelay:1.0f];
     
-    [self setKeyboardStateDefault];
     
-    //CS NOTE - add resign first responder before every pushVC to handle keyboard height
-    [self.messageTextView resignFirstResponder];
-    [self.secondaryTextField resignFirstResponder];
-    [self keyboardWillHideWithHeight:0.0f];
+}
+
+- (void)savedMessageRedirectArrowAction:(TAPMessageModel *)tappedMessage {
+    if(!self.isSavedMesasgeArrowClicked){
+        self.isSavedMesasgeArrowClicked = YES;
+    }
+    else{
+        return;
+    }
     
-   if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
-       [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
-   }
-   else {
-       TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
-       profileViewController.room = self.currentRoom;
-       profileViewController.user = otherUser;
-       profileViewController.delegate = self;
-       profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
-       [self.navigationController pushViewController:profileViewController animated:YES];
-   }
+    TAPRoomModel *redirectRoom = nil;
+    NSString *roomID = tappedMessage.forwardFrom.roomID;
+    
+    
+    if([roomID containsString:@"-"]){
+        //personal
+        if([TAPUtil isSaveMessageRoom:roomID]){
+            //saved room
+            NSString *userID = [TAPDataManager getActiveUser].userID;
+            NSString *savedMessageRoomID = roomID;
+            redirectRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+            
+            NSString *messageLocalID = tappedMessage.forwardFrom.localID;
+            
+            [TAPUtil performBlock:^{
+                [self scrollToMessageAndLoadDataWithLocalID:messageLocalID];
+                self.isSavedMesasgeArrowClicked = NO;
+            } afterDelay:0.5f];
+    
+            return;
+        }
+        else{
+            //normal room
+            NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:roomID];
+            TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+            redirectRoom = [TAPRoomModel createPersonalRoomIDWithOtherUser:user];
+        }
+        [self openChatroomWithRoomIDLocalID:redirectRoom localID:tappedMessage.forwardFrom.localID];
+    }
+    else{
+        //group
+        redirectRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:roomID];
+        NSString *localID = tappedMessage.forwardFrom.localID;
+        if(redirectRoom == nil){
+            [TAPDataManager callAPIGetRoomWithRoomID:roomID success:^(TAPRoomModel *room) {
+                [self openChatroomWithRoomIDLocalID:room localID:localID];
+                
+            } failure:^(NSError *error) {
+                self.isSavedMesasgeArrowClicked = NO;
+                [self displayToastWithMessage:@"Chatroom is not available."];
+            }];
+        }
+        else{
+            [self openChatroomWithRoomIDLocalID:redirectRoom localID:localID];
+        }
+        
+    }
+    
+}
+
+- (void)openChatroomWithRoomIDLocalID:(TAPRoomModel *)room localID:(NSString *)messageLocalID {
+    messageLocalID = [TAPUtil nullToEmptyString:messageLocalID];
+    if(room != nil && ![messageLocalID isEqualToString:@""]) {
+        [[TapUI sharedInstance] createRoomWithRoom:room scrollToMessageWithLocalID :messageLocalID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+        }];
+    }
+    else{
+        self.isSavedMesasgeArrowClicked = NO;
+        [self displayToastWithMessage:@"Chatroom is not available."];
+    }
 }
 
 - (IBAction)topFloatingIndicatorButtonDidTapped:(id)sender {
@@ -12541,6 +12767,12 @@ CGPoint center;
 - (void)checkAndRefreshOnlineStatus {
     if([[TAPChatManager sharedManager] checkShouldRefreshOnlineStatus]) {
         [self setAsTyping:NO];
+        
+        if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+
+            return;
+        }
+        
         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
         
         if (self.currentRoom.type == RoomTypePersonal) {
@@ -12566,6 +12798,7 @@ CGPoint center;
                 //Used to check if need to show add to contact view or not
                 _otherUser = user;
                 _isOtherUserIsContact = user.isContact;
+                
                 [self checkAndSetupAddToContactsView];
                 
             } failure:^(NSError *error) {
@@ -12636,7 +12869,14 @@ CGPoint center;
     
     NSInteger *currentRowIndex = [self.messageArray indexOfObject:message];
     
-    if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+    BOOL isForwardedSavedMessage = NO;
+    
+    if((![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) && isSavedMessageRoom){
+        isForwardedSavedMessage = YES;
+    }
+    
+    if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
         if (message.type == TAPChatMessageTypeText) {
             TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showStarMessageIconView];
@@ -13517,7 +13757,8 @@ CGPoint center;
 }
 
 - (void)processSwipeToReplyWithMessage:(TAPMessageModel *)message {
-    if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
+    BOOL isSavedRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
+    if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal && !isSavedRoom) {
            return;
     }
     
@@ -13529,6 +13770,13 @@ CGPoint center;
         [self showInputAccessoryExtensionView:YES];
            
         TAPMessageModel *quotedMessageModel = [message copy];
+        NSString *forwardFromLocalID = message.forwardFrom.localID;
+        forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+        
+        if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+            message.user.fullname = message.forwardFrom.fullname;
+            message.user.userID = message.forwardFrom.userID;
+        }
         [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
     }
     else if (message.type == TAPChatMessageTypeFile) {
@@ -13553,14 +13801,26 @@ CGPoint center;
         }
         
         NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        
+
+        NSString *forwardFromLocalID = message.forwardFrom.localID;
+        forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+        
+        if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+            quotedMessageModel.user.fullname = quotedMessageModel.forwardFrom.fullname;
+            quotedMessageModel.user.userID = quotedMessageModel.forwardFrom.userID;
+        }
            
         //convert to quote model
         TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-        [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+        
            
        quotedMessageModel.quote = quote;
        
        [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+
+        [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
+
     }
     else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
         //Type Video and Image
@@ -13570,21 +13830,162 @@ CGPoint center;
         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
         [self showInputAccessoryExtensionView:YES];
         
+
+        NSString *forwardFromLocalID = message.forwardFrom.localID;
+        forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+        
+        if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && message.forwardFrom != nil){
+            quotedMessageModel.user.fullname = quotedMessageModel.forwardFrom.fullname;
+            quotedMessageModel.user.userID = quotedMessageModel.forwardFrom.userID;
+        }
+        
         //convert to quote model
         TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
-        [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
+       
         
         quotedMessageModel.quote = quote;
         
         [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+
+        [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
+
     }
     
     //DV Note
     //Add another type here for later
 }
 
-- (void)displayToastWithMessage:(NSString *)toastMessage
-{
+- (void)openFilePreviewViewControllerWithMessage:(TAPMessageModel *)tappedMessage {
+    NSString *roomID = tappedMessage.room.roomID;
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""] || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        [self showFileNotFoundPopUpWithMessage:tappedMessage];
+        return;
+    }
+    
+    self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
+    
+    QLPreviewController *preview = [[QLPreviewController alloc] init];
+    preview.dataSource = self;
+    preview.delegate = self;
+    
+    [self presentViewController:preview animated:YES completion:nil];
+}
+
+- (void)showFileNotFoundPopUpWithMessage:(TAPMessageModel *)message {
+    NSString *roomID = message.room.roomID;
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    fileID = [TAPUtil nullToEmptyString:fileID];
+    if (![fileID isEqualToString:@""]) {
+        [[TAPFileDownloadManager sharedManager] removeDownloadedFilePathWithKey:fileID roomID:roomID];
+    }
+    
+    NSString *fileURL = [dataDictionary objectForKey:@"fileURL"];
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
+    if (![fileURL isEqualToString:@""]) {
+        [[TAPFileDownloadManager sharedManager] removeDownloadedFilePathWithKey:fileURL roomID:roomID];
+    }
+
+    NSString *url = [dataDictionary objectForKey:@"url"];
+    url = [TAPUtil nullToEmptyString:url];
+    if (![url isEqualToString:@""]) {
+        [[TAPFileDownloadManager sharedManager] removeDownloadedFilePathWithKey:url roomID:roomID];
+    }
+    
+    NSInteger indexInArray = [self.messageArray indexOfObject:message];
+    NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
+    
+    [self.tableView performBatchUpdates:^{
+       [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+    completion:^(BOOL finished) {
+        
+    }];
+        
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault
+                     popupIdentifier:@"File Not Found"
+                               title:NSLocalizedStringFromTableInBundle(@"Could not find file", nil, [TAPUtil currentBundle], @"")
+                   detailInformation:NSLocalizedStringFromTableInBundle(@"We could not find this file in your storage, would you like to download it?", nil, [TAPUtil currentBundle], @"")
+               leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+      singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
+    
+    _pendingRedownloadMessage = message;
+}
+
+- (NSAttributedString *)attributedStringForBulletTexts:(NSArray *)stringList
+                                              withFont:(UIFont *)font
+                                          bulletString:(NSString *)bullet
+                                           indentation:(CGFloat)indentation
+                                           lineSpacing:(CGFloat)lineSpacing
+                                      paragraphSpacing:(CGFloat)paragraphSpacing
+                                             textColor:(UIColor *)textColor
+                                           bulletColor:(UIColor *)bulletColor {
+
+    NSDictionary *textAttributes = @{NSFontAttributeName: font,
+                                 NSForegroundColorAttributeName: textColor};
+    NSDictionary *bulletAttributes = @{NSFontAttributeName: font, NSForegroundColorAttributeName: bulletColor};
+
+    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+    paragraphStyle.tabStops = @[[[NSTextTab alloc] initWithTextAlignment: NSTextAlignmentLeft location:indentation options:@{}]];
+    paragraphStyle.defaultTabInterval = indentation;
+    paragraphStyle.lineSpacing = lineSpacing;
+    paragraphStyle.paragraphSpacing = paragraphSpacing;
+    paragraphStyle.headIndent = indentation;
+
+    NSMutableAttributedString *bulletList = [NSMutableAttributedString new];
+
+    for (NSString *string in stringList) {
+        NSString *formattedString = [NSString stringWithFormat:@"%@\t%@\n", bullet, string];
+        
+        paragraphStyle = [paragraphStyle mutableCopy];
+        paragraphStyle.paragraphSpacing = paragraphSpacing;
+        
+        
+        
+        textAttributes = @{NSFontAttributeName: font,
+                                         NSForegroundColorAttributeName: textColor};
+        
+    
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:formattedString];
+        
+        [attributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, attributedString.length)];
+        [attributedString addAttributes:textAttributes range:NSMakeRange(0, attributedString.length)];
+
+        NSRange rangeForBullet = [formattedString rangeOfString:bullet];
+        [attributedString addAttributes:bulletAttributes range:rangeForBullet];
+        [bulletList appendAttributedString:attributedString];
+        
+    }
+
+    return bulletList;
+}
+
+- (void)displayToastWithMessage:(NSString *)toastMessage {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
         UIWindow * keyWindow = [[UIApplication sharedApplication] keyWindow];
         UILabel *toastView = [[UILabel alloc] init];

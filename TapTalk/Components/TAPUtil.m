@@ -727,6 +727,26 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return NO;
 }
 
++ (BOOL)isSaveMessageRoom:(NSString *)roomID {
+    TAPUserModel *user = [TAPDataManager getActiveUser];
+    NSString *userID = user.userID;
+    
+    NSArray *roomIDItems = [roomID componentsSeparatedByString:@"-"];
+    
+    if(roomIDItems.count < 2){
+        return NO;
+    }
+    
+    NSString *roomID1=[roomIDItems objectAtIndex:0];
+    NSString *roomID2=[roomIDItems objectAtIndex:1];
+    
+    if([roomID1 isEqualToString:userID] && [roomID2 isEqualToString:userID]){
+        return YES;
+    }
+    
+    return NO;
+}
+
 + (BOOL)validatePhoneNumber:(NSString *)candidate {
     NSString *phoneNumberRegex = @"^\\+?[0-9]*$";
     NSPredicate *phoneNumberTest = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", phoneNumberRegex];

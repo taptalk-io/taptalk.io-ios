@@ -77,6 +77,7 @@
 @property (nonatomic, strong) NSString *forwardFromFullname;
 @property (nonatomic, strong) NSString *forwardFromMessageID;
 @property (nonatomic, strong) NSString *forwardFromLocalID;
+@property (nonatomic, strong) NSString *forwardFromRoomID;
 
 //Group Target
 @property (nonatomic, strong) NSString *action; //added in schema 4 migration

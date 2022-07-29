@@ -58,6 +58,7 @@
 @property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
 @property (nonatomic) BOOL isEditMessageMenuDisabled;
 @property (nonatomic) BOOL isDeleteAccountButtonVisible;
+@property (nonatomic) BOOL isSavedMessagesMenuDisabled;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -355,6 +356,21 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
     success(chatViewController);
+}
+
+- (void)createSavedMessagesChatRoom:(void (^)(TapUIChatViewController *chatViewController))success failure:(void (^)(NSError *error))failure {
+    //Open room
+    NSString *userID = [TAPDataManager getActiveUser].userID;
+    NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+    TAPRoomModel *savedMessageRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+    
+    [[TAPCoreChatRoomManager sharedManager] getSavedMessagesChatRoom:^(TAPRoomModel *room){
+        [self createRoomWithRoom:savedMessageRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            success(chatViewController);
+        }];
+    } failure:^(NSError *error){
+        failure(error);
+    }];
 }
 
 /**
@@ -982,6 +998,21 @@ Get current visibility state of  delete account button in my account
 */
 - (BOOL)getDeleteAccountButtonVisible {
     return self.isDeleteAccountButtonVisible;
+}
+
+/**
+Show or hide saved messages menu
+*/
+- (void)setSavedMessagesMenuEnabled:(BOOL)isEnabled {
+    _isSavedMessagesMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of saved messages menu
+*/
+- (BOOL)isSavedMessagesMenuEnabled{
+    return !self.isSavedMessagesMenuDisabled;
 }
 
 

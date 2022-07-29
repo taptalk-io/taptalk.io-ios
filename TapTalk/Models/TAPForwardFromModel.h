@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *fullname;
 @property (nonatomic, strong) NSString *messageID;
 @property (nonatomic, strong) NSString *localID;
+@property (nonatomic, strong) NSString *roomID;
 
 @end
 

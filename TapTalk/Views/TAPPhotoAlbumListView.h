@@ -10,7 +10,7 @@
 
 @interface TAPPhotoAlbumListView : TAPBaseView
 
-@property (strong, nonatomic) UITableView *tableView;
-@property (strong, nonatomic) UITableView *selectedItemCollectionView;
+@property (strong, nonatomic) TAPBaseTableView *tableView;
+@property (strong, nonatomic) TAPBaseTableView *selectedItemCollectionView;
 
 @end

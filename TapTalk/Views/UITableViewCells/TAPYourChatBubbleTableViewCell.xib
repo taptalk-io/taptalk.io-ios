@@ -26,7 +26,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sLI-nG-1KB">
-                        <rect key="frame" x="50" y="130" width="254" height="0.0"/>
+                        <rect key="frame" x="50" y="128" width="254" height="0.0"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="13" id="Jwj-oD-WMp"/>
@@ -403,7 +403,7 @@
                         <color key="backgroundColor" red="0.36862745098039218" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="URi-XD-W5c" userLabel="Seperator View">
-                        <rect key="frame" x="16" y="146" width="288" height="0.0"/>
+                        <rect key="frame" x="16" y="144" width="288" height="0.0"/>
                         <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                         <constraints>
                             <constraint firstAttribute="height" id="8EB-tA-oay"/>
@@ -430,6 +430,18 @@
                             <action selector="forwardCheckmarkButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Y21-Q8-IEw"/>
                         </connections>
                     </button>
+                    <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nPq-rs-LPG" userLabel="Redirect Arrow Button">
+                        <rect key="frame" x="156" y="59" width="20" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="20" id="3kX-uG-69L"/>
+                            <constraint firstAttribute="height" constant="20" id="ydY-qn-BKa"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="TAPIconArrowSavedMessage"/>
+                        <connections>
+                            <action selector="redirectArrowButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="0f6-OT-FnV"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -442,7 +454,9 @@
                     <constraint firstItem="URi-XD-W5c" firstAttribute="top" secondItem="sLI-nG-1KB" secondAttribute="bottom" constant="16" id="Kfd-2L-Zay"/>
                     <constraint firstItem="3Nk-OP-Hbp" firstAttribute="leading" secondItem="dnm-L1-3kp" secondAttribute="trailing" constant="-28" id="LHg-Wf-xga"/>
                     <constraint firstItem="J0O-5e-F2z" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="LsH-Zo-aqt"/>
-                    <constraint firstAttribute="bottom" secondItem="sLI-nG-1KB" secondAttribute="bottom" constant="8" id="ThV-y7-ZtU"/>
+                    <constraint firstItem="nPq-rs-LPG" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="ONa-Xc-8w3"/>
+                    <constraint firstAttribute="bottom" secondItem="sLI-nG-1KB" secondAttribute="bottom" constant="10" id="ThV-y7-ZtU"/>
+                    <constraint firstItem="nPq-rs-LPG" firstAttribute="leading" secondItem="dnm-L1-3kp" secondAttribute="trailing" constant="8" id="VaT-vT-ZLu"/>
                     <constraint firstItem="dnm-L1-3kp" firstAttribute="bottom" secondItem="oYK-OX-P8O" secondAttribute="bottom" id="WMf-6e-2MC"/>
                     <constraint firstAttribute="trailing" secondItem="yGR-HN-Nbq" secondAttribute="trailing" id="X4n-kp-lgu"/>
                     <constraint firstAttribute="trailing" secondItem="sLI-nG-1KB" secondAttribute="trailing" constant="16" id="YCy-sF-t1s"/>
@@ -497,6 +511,7 @@
                 <outlet property="quoteViewLeadingConstraint" destination="kns-Hi-tE9" id="xCt-4Y-y3N"/>
                 <outlet property="quoteViewTopConstraint" destination="4Wp-QX-0kb" id="lFJ-lH-8GK"/>
                 <outlet property="quoteViewTrailingConstraint" destination="xad-qP-sQT" id="kgD-MX-kuy"/>
+                <outlet property="redirectArrowButton" destination="nPq-rs-LPG" id="ahb-Wv-fcI"/>
                 <outlet property="replyButtonLeadingConstraint" destination="Ale-Z2-lQO" id="b1G-yU-FJw"/>
                 <outlet property="replyButtonLeftConstraint" destination="LHg-Wf-xga" id="kCJ-xy-nxM"/>
                 <outlet property="replyButtonTrailingConstraint" destination="eeX-66-lf0" id="DE7-cj-8UB"/>
@@ -541,6 +556,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="TAPIconArrowSavedMessage" width="20" height="20"/>
         <image name="TAPIconDeletedUser" width="16" height="16"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconStarGrayChatBubble" width="12" height="12"/>

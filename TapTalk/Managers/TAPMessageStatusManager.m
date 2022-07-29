@@ -74,6 +74,9 @@
 }
 
 - (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message {
+    if (message.isDelivered) {
+        return;
+    }
     [self.deliveryMessageQueueArray addObject:message];
 }
 

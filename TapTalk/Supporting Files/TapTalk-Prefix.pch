@@ -48,5 +48,6 @@
 #import "TAPGrowingTextView.h"
 #import "TAPImageView.h"
 #import "TAPSearchBarView.h"
+#import "TAPBaseTableView.h"
 #import "UIImage+Color.h"
 #endif /* TapTalk_Prefix_pch */

@@ -68,7 +68,7 @@
         UIColor *popupBodyLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogBody];
         _descriptionFirstLoadLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleFirstLoadLabel.frame), CGRectGetMaxY(self.titleFirstLoadLabel.frame), CGRectGetWidth(self.titleFirstLoadLabel.frame), 18.0f)];
         self.descriptionFirstLoadLabel.textAlignment = NSTextAlignmentCenter;
-        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable conection", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable connection", nil, [TAPUtil currentBundle], @"");
         self.descriptionFirstLoadLabel.textColor = popupBodyLabelColor;
         self.descriptionFirstLoadLabel.font = popupBodyLabelFont;
         NSMutableDictionary *descriptionFirstLoadAttributesDictionary = [NSMutableDictionary dictionary];
@@ -121,7 +121,7 @@
     
     if (type == TAPSetupRoomListViewTypeSettingUp) {
         self.titleFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Setting up Your Chat Room", nil, [TAPUtil currentBundle], @"");
-        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable conection", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable connection", nil, [TAPUtil currentBundle], @"");
         self.firstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconNewSettingUp" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];

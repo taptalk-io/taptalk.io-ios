@@ -265,6 +265,8 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    self.statusLabelBottomConstraint.constant = 10.0f;
+    
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
     self.progressLayer.strokeStart = 0.0f;
@@ -282,7 +284,7 @@
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     self.voiceNoteImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
-    
+    self.bubbleHighlightView.alpha = 0.0f;
 }
 
 
@@ -1286,7 +1288,7 @@
 
 - (void)showSeperator{
     self.seperatorViewHeightConstraint.constant = 1.0f;
-    self.statusLabelBottomConstraint.constant = 33.0f;
+    self.statusLabelBottomConstraint.constant = 32.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }

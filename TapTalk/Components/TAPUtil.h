@@ -122,6 +122,7 @@
 + (BOOL)validateEmail:(NSString *)candidate;
 + (BOOL)validateUsername:(NSString *)candidate;
 + (BOOL)validatePassword:(NSString *)candidate;
++ (BOOL)isSaveMessageRoom:(NSString *)roomID;
 
 #pragma mark - Taptic Feedback
 + (void)tapticImpactFeedbackGenerator;

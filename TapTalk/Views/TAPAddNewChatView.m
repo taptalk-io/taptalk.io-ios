@@ -80,7 +80,7 @@
         [self.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
         
-        _contactsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f - 62.0f - [TAPUtil safeAreaBottomPadding]) style:UITableViewStylePlain]; //62.0f - height of sync contact button view
+        _contactsTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.separatorView.frame), CGRectGetWidth(self.bgView.frame), CGRectGetHeight(self.bgView.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - 1.0f - 62.0f - [TAPUtil safeAreaBottomPadding]) style:UITableViewStylePlain]; //62.0f - height of sync contact button view
         self.contactsTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.contactsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.contactsTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];
@@ -113,7 +113,7 @@
         [self.syncButton setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         [self.syncContactButtonView addSubview:self.syncButton];
         
-        _searchResultTableView = [[UITableView alloc] initWithFrame:self.contactsTableView.frame];
+        _searchResultTableView = [[TAPBaseTableView alloc] initWithFrame:self.contactsTableView.frame];
         self.searchResultTableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.searchResultTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.searchResultTableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];

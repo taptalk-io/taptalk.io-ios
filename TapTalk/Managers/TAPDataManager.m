@@ -319,6 +319,11 @@
     forwardFrom.localID = forwardFromLocalID;
     message.forwardFrom = forwardFrom;
     
+    NSString *forwardFromRoomID = [dictionary objectForKey:@"forwardFromRoomID"];
+    forwardFromRoomID = [TAPUtil nullToEmptyString:forwardFromRoomID];
+    forwardFrom.roomID = forwardFromRoomID;
+    message.forwardFrom = forwardFrom;
+    
     //Group Target User
     NSString *targetAction = [dictionary objectForKey:@"action"];
     targetAction = [TAPUtil nullToEmptyString:targetAction];
@@ -567,6 +572,11 @@
     NSString *forwardFromLocalID = [forwardFromDictionary objectForKey:@"localID"];
     forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
     forwardFrom.localID = forwardFromLocalID;
+    message.forwardFrom = forwardFrom;
+    
+    NSString *forwardFromRoomID = [forwardFromDictionary objectForKey:@"forwardFromRoomID"];
+    forwardFromRoomID = [TAPUtil nullToEmptyString:forwardFromRoomID];
+    forwardFrom.roomID = forwardFromRoomID;
     message.forwardFrom = forwardFrom;
     
     //Group Target
@@ -1192,6 +1202,10 @@
     NSString *forwardFromLocalID = [forwardFromDictionary objectForKey:@"localID"];
     forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
     [messageMutableDictionary setValue:forwardFromLocalID forKey:@"forwardFromLocalID"];
+    
+    NSString *forwardFromRoomID = [forwardFromDictionary objectForKey:@"roomID"];
+    forwardFromRoomID = [TAPUtil nullToEmptyString:forwardFromRoomID];
+    [messageMutableDictionary setValue:forwardFromRoomID forKey:@"forwardFromRoomID"];
     
     [messageMutableDictionary removeObjectForKey:@"forwardFrom"];
     

@@ -303,8 +303,14 @@
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
     _syncProgressSubView = nil;
+    self.bubbleHighlightView.alpha = 0.0f;
     
     self.mentionIndexesArray = nil;
+    
+    self.seperatorViewBottomConstraint.constant = 0.0f;
+    
+    self.seperatorViewTopConstraint.constant = 10.0f;
+    self.seperatorViewConstraintHeight.constant = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -1947,7 +1953,7 @@
 
 - (void)showSeperatorView {
     self.seperatorViewTopConstraint.constant = 16.0f;
-    self.seperatorViewBottomConstraint.constant = 13.0f;
+    self.seperatorViewBottomConstraint.constant = 15.0f;
     self.seperatorViewConstraintHeight.constant = 1.0f;
     
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {

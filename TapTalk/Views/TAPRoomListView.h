@@ -10,7 +10,7 @@
 
 @interface TAPRoomListView : TAPBaseView
 
-@property (strong, nonatomic) UITableView *roomListTableView;
+@property (strong, nonatomic) TAPBaseTableView *roomListTableView;
 @property (strong, nonatomic) UIButton *startChatNoChatsButton;
 
 - (void)showNoChatsView:(BOOL)isVisible;

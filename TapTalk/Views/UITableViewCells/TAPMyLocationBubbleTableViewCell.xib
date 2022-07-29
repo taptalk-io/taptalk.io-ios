@@ -391,7 +391,7 @@
                         <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i08-Bg-GYY" userLabel="Seperator View">
-                        <rect key="frame" x="16" y="311" width="331" height="0.0"/>
+                        <rect key="frame" x="16" y="308" width="331" height="0.0"/>
                         <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                         <constraints>
                             <constraint firstAttribute="height" id="crQ-Fi-uV3"/>
@@ -425,7 +425,7 @@
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="R69-3q-Chx" secondAttribute="leading" constant="80" id="MRu-jd-3M7"/>
                     <constraint firstItem="w1X-VA-DO6" firstAttribute="height" secondItem="dUK-q7-mCR" secondAttribute="height" id="RAd-48-rBZ"/>
                     <constraint firstItem="dUK-q7-mCR" firstAttribute="top" secondItem="w1X-VA-DO6" secondAttribute="top" id="Szl-y5-dlM"/>
-                    <constraint firstItem="i08-Bg-GYY" firstAttribute="top" secondItem="QDJ-Gg-cCw" secondAttribute="bottom" constant="16" id="Ta3-dK-IEW"/>
+                    <constraint firstItem="i08-Bg-GYY" firstAttribute="top" secondItem="QDJ-Gg-cCw" secondAttribute="bottom" constant="13" id="Ta3-dK-IEW"/>
                     <constraint firstItem="aGl-RH-M8y" firstAttribute="leading" secondItem="s95-Gc-wdp" secondAttribute="trailing" constant="16" id="Ugk-4r-R3n"/>
                     <constraint firstItem="xSV-MI-em6" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="topMargin" id="WHD-gc-e1D"/>
                     <constraint firstItem="Wd0-cM-7U7" firstAttribute="top" secondItem="R69-3q-Chx" secondAttribute="top" id="ahh-sE-86n"/>

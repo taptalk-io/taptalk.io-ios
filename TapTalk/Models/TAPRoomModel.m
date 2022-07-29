@@ -44,6 +44,17 @@
     return newRoom;
 }
 
++ (TAPRoomModel *)createPersonalRoomIDWithID:(NSString *)groupID name:(NSString *)name imageURL:(TAPImageURLModel *)imageURL {
+    TAPRoomModel *newRoom = [TAPRoomModel new];
+    
+    newRoom.roomID = groupID;
+    newRoom.name = name;
+    newRoom.imageURL = imageURL;
+    newRoom.type = RoomTypePersonal;
+    
+    return newRoom;
+}
+
 - (instancetype)initWithDictionary:(NSDictionary *)dict error:(NSError *__autoreleasing *)err {
     TAPRoomModel *room = [super initWithDictionary:dict error:err];
     NSArray *participantsArray = [dict objectForKey:@"participants"];

@@ -33,8 +33,8 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupActionExtensionType) {
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 //@property (strong, nonatomic) UITextField *searchBarTextField;
 @property (strong, nonatomic) UIButton *searchBarCancelButton;
-@property (strong, nonatomic) UITableView *contactsTableView;
-@property (strong, nonatomic) UITableView *searchResultTableView;
+@property (strong, nonatomic) TAPBaseTableView *contactsTableView;
+@property (strong, nonatomic) TAPBaseTableView *searchResultTableView;
 
 @property (strong, nonatomic) UIView *selectedContactsView;
 @property (strong, nonatomic) UIView *selectedContactsShadowView;

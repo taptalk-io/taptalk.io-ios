@@ -94,7 +94,7 @@
         
         [self addSubview:self.pinIconImageView];
         
-        _searchTableView = [[UITableView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchBarView.frame), CGRectGetMaxY(self.searchBarView.frame) + 5.0f, CGRectGetWidth(self.searchBarView.frame), 0.0f)];
+        _searchTableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.searchBarView.frame), CGRectGetMaxY(self.searchBarView.frame) + 5.0f, CGRectGetWidth(self.searchBarView.frame), 0.0f)];
         self.searchTableView.showsVerticalScrollIndicator = NO;
         self.searchTableView.showsHorizontalScrollIndicator = NO;
         self.searchTableView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;

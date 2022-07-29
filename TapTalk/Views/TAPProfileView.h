@@ -52,6 +52,7 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
 - (void)setProfilePictureWithImageURL:(NSString *)imageURL userFullName:(NSString *)userFullName;
 - (void)hideHeaderSeperatorView;
 - (void)setDeletedUserImage;
+- (void)setSavedMessageImage;
 
 @end
 

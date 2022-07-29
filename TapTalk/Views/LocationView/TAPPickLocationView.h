@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TAPPickLocationView : TAPBaseView
 
 @property (strong, nonatomic) MKMapView *mapView;
-@property (strong, nonatomic) UITableView *searchTableView;
+@property (strong, nonatomic) TAPBaseTableView *searchTableView;
 @property (strong, nonatomic) UIView *searchTableViewShadowView;
 @property (strong, nonatomic) TAPLocationSearchBarView *searchBarView;
 @property (strong, nonatomic) UIButton *goToCurrentLocationButton;

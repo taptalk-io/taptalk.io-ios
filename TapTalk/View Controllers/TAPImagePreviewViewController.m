@@ -78,10 +78,6 @@
     self.imagePreviewView.thumbnailCollectionView.delegate = self;
     self.imagePreviewView.thumbnailCollectionView.dataSource = self;
     
-    if (@available(iOS 15.0, *)) {
-        [self.imagePreviewView.mentionTableView setSectionHeaderTopPadding:0.0f];
-    }
-    
     self.imagePreviewView.mentionTableView.delegate = self;
     self.imagePreviewView.mentionTableView.dataSource = self;
     
@@ -140,13 +136,15 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 10.0f;
+//    return 10.0f;
+    return FLT_MIN;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
-    view.layer.cornerRadius = 15.0f;
-    view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+//    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
+//    view.layer.cornerRadius = 15.0f;
+//    view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+    UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
     return view;
 }
 
@@ -799,7 +797,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - captionViewHeight, CGRectGetWidth(self.imagePreviewView.captionView.frame), captionViewHeight);
         
         self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - CGRectGetHeight(self.imagePreviewView.mentionTableView.frame), CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), CGRectGetHeight(self.imagePreviewView.mentionTableView.frame));
-        self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+        self.imagePreviewView.mentionTableView.layer.cornerRadius = 8.0f;
         self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
         
         self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
@@ -908,7 +906,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - CGRectGetHeight(self.imagePreviewView.captionView.frame), CGRectGetWidth(self.imagePreviewView.captionView.frame), CGRectGetHeight(self.imagePreviewView.captionView.frame));
     
     self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - CGRectGetHeight(self.imagePreviewView.mentionTableView.frame), CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), CGRectGetHeight(self.imagePreviewView.mentionTableView.frame));
-    self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+    self.imagePreviewView.mentionTableView.layer.cornerRadius = 8.0f;
     self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
     
     self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
@@ -927,7 +925,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.imagePreviewView.captionView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.captionView.frame), CGRectGetMinY(self.imagePreviewView.bottomMenuView.frame) - CGRectGetHeight(self.imagePreviewView.captionView.frame), CGRectGetWidth(self.imagePreviewView.captionView.frame), CGRectGetHeight(self.imagePreviewView.captionView.frame));
     
     self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - CGRectGetHeight(self.imagePreviewView.mentionTableView.frame), CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), CGRectGetHeight(self.imagePreviewView.mentionTableView.frame));
-    self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+    self.imagePreviewView.mentionTableView.layer.cornerRadius = 8.0f;
     self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
     
     self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;
@@ -1214,16 +1212,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     
     if ([self.filteredMentionListArray count] > 0) {
-        CGFloat tableViewHeight = 0.0f;
-        if ([self.filteredMentionListArray count] >= 4) {
-            tableViewHeight = 4 * 54.0f;
-        }
-        else {
-            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+        CGFloat tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+        if (tableViewHeight > 150.0f) {
+            tableViewHeight = 150.0f;
         }
         
-        self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - tableViewHeight, CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), tableViewHeight + 10.0f); //10.0f for table view header
-        self.imagePreviewView.mentionTableView.layer.cornerRadius = 15.0f;
+        self.imagePreviewView.mentionTableView.frame = CGRectMake(CGRectGetMinX(self.imagePreviewView.mentionTableView.frame), CGRectGetMinY(self.imagePreviewView.captionView.frame) - tableViewHeight, CGRectGetWidth(self.imagePreviewView.mentionTableView.frame), tableViewHeight/* + 10.0f*/); //10.0f for table view header
+        self.imagePreviewView.mentionTableView.layer.cornerRadius = 8.0f;
         self.imagePreviewView.mentionTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
         
         self.imagePreviewView.mentionTableBackgroundView.frame = self.imagePreviewView.mentionTableView.frame;

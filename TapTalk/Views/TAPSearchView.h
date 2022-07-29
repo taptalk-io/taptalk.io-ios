@@ -12,8 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPSearchView : TAPBaseView
 
-@property (strong, nonatomic) UITableView *recentSearchTableView;
-@property (strong, nonatomic) UITableView *searchResultTableView;
+@property (strong, nonatomic) TAPBaseTableView *recentSearchTableView;
+@property (strong, nonatomic) TAPBaseTableView *searchResultTableView;
 @property (strong, nonatomic) UIButton *clearHistoryButton;
 
 - (void)isShowEmptyState:(BOOL)isShow;

@@ -24,7 +24,7 @@
     
     if(self) {
         
-        _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
+        _tableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
         
         if (IS_IPHONE_X_FAMILY) {
             self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [TAPUtil safeAreaBottomPadding] + 30.0f, 0.0f);

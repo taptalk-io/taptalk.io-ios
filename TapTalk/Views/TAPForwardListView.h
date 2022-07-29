@@ -15,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) UIView *searchBarBackgroundView;
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
-@property (strong, nonatomic) UITableView *recentChatTableView;
-@property (strong, nonatomic) UITableView *searchResultTableView;
+@property (strong, nonatomic) TAPBaseTableView *recentChatTableView;
+@property (strong, nonatomic) TAPBaseTableView *searchResultTableView;
 
 - (void)isShowEmptyState:(BOOL)isShow;
 - (void)isShowRecentChatView:(BOOL)isShow animated:(BOOL)isAnimated;
