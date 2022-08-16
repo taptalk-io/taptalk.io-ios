@@ -23,7 +23,6 @@
 #import "TAPMentionListXIBTableViewCell.h"
 @interface TAPStarredMessageViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, atomic) NSMutableArray *messageArray;
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
 @property (weak, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
 @property (weak, nonatomic) IBOutlet UILabel *loadMoreMessageLoadingLabel;
@@ -32,6 +31,19 @@
 @property (weak, nonatomic) IBOutlet UIView *emptyStateView;
 @property (weak, nonatomic) IBOutlet UILabel *emptyStateTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *emptyStateDescpLabel;
+
+//pin message
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *unpinViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *unpinAllLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *unpinAllImageView;
+@property (weak, nonatomic) IBOutlet UIButton *unpinAllButton;
+
+//loading view
+@property (weak, nonatomic) IBOutlet UIView *loadingBackgroundView;
+@property (weak, nonatomic) IBOutlet UIView *loadingView;
+@property (weak, nonatomic) IBOutlet UIImageView *loadingImageView;
+@property (weak, nonatomic) IBOutlet UILabel *loadingLabel;
+
 
 
 @property (nonatomic) CGFloat loadMoreMessageViewHeight;
@@ -50,7 +62,6 @@
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     
-    //[self.tableView setTransform:CGAffineTransformMakeRotation(-M_PI)];
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 10.0f);
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
@@ -69,32 +80,58 @@
     self.emptyStateDescpLabel.font = emptyTitleLabelFont;
     self.emptyStateDescpLabel.textColor = emptyTitleLabelColor;
     
+    self.loadingView.backgroundColor = [UIColor whiteColor];
+    self.loadingView.layer.shadowRadius = 5.0f;
+    self.loadingView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+    self.loadingView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+    self.loadingView.layer.shadowOpacity = 1.0f;
+    self.loadingView.layer.masksToBounds = NO;
+    self.loadingView.layer.cornerRadius = 6.0f;
+    self.loadingView.clipsToBounds = YES;
+    
     
     [self setupNavigationView];
-    
-    [self showLoadMoreMessageLoadingView:YES];
-    
-    NSString *roomID = self.currentRoom.roomID;
-    
-    [TAPDataManager callAPIGetStarredMessages:roomID pageNumber:1 numberOfItems:50 success:^(NSArray *starredMessages, BOOL hasMore) {
-        self.messageArray = starredMessages;
-        for (TAPMessageModel *message in starredMessages){
+    if(self.messageListType == TAPUIMessageListTypeStar){
+        [self showLoadMoreMessageLoadingView:YES];
+        
+        NSString *roomID = self.currentRoom.roomID;
+        
+        [TAPDataManager callAPIGetStarredMessages:roomID pageNumber:1 numberOfItems:50 success:^(NSArray *starredMessages, BOOL hasMore) {
+            self.messageArray = starredMessages;
+            for (TAPMessageModel *message in starredMessages){
+                [self.messageDictionary setObject:message forKey:message.localID];
+            }
+            
+            if(starredMessages.count == 0){
+                self.emptyStateView.alpha = 1.0f;
+            }
+            
+            [self.tableView reloadData];
+            [self showLoadMoreMessageLoadingView:NO];
+        } failure:^(NSError *error) {
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self showLoadMoreMessageLoadingView:NO];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Bio" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    }
+    else if(self.messageListType == TAPUIMessageListTypePin){
+        for (TAPMessageModel *message in self.messageArray){
             [self.messageDictionary setObject:message forKey:message.localID];
         }
         
-        if(starredMessages.count == 0){
-            self.emptyStateView.alpha = 1.0f;
-        }
+        self.unpinAllLabel.textColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomPinTitleLabel];
+        self.unpinAllLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
         
-        [self.tableView reloadData];
-        [self showLoadMoreMessageLoadingView:NO];
-    } failure:^(NSError *error) {
-        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-        [self showLoadMoreMessageLoadingView:NO];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Bio" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-    }];
-    
+        self.unpinAllLabel.alpha = 1.0f;
+        self.unpinAllImageView.alpha = 1.0f;
+        self.unpinViewHeightConstraint.constant = 56.0f;
+        
+        [self.tableView setTransform:CGAffineTransformMakeRotation(-M_PI)];
+        
+        [self.unpinAllButton addTarget:self action:@selector(unPinAllButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFinishNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:nil];
 }
 
@@ -107,7 +144,13 @@
     
     UIFont *chatRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomNameLabel];
     UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
-    nameLabel.text = NSLocalizedStringFromTableInBundle(@"Starred Messages", nil, [TAPUtil currentBundle], @"");
+    
+    if(self.messageListType == TAPUIMessageListTypeStar){
+        nameLabel.text = NSLocalizedStringFromTableInBundle(@"Starred Messages", nil, [TAPUtil currentBundle], @"");
+    }
+    else if(self.messageListType == TAPUIMessageListTypePin){
+        nameLabel.text = NSLocalizedStringFromTableInBundle(@"Pinned Messages", nil, [TAPUtil currentBundle], @"");
+    }
    // self.nameLabel.text = [NSString stringWithFormat:@"%ld Members", [self.room.participants count]];
     nameLabel.textColor = chatRoomNameLabelColor;
     nameLabel.font = chatRoomNameLabelFont;
@@ -176,9 +219,15 @@
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            [cell setRotaionToDefault];
-            [cell showStarMessageIconView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageIconView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             cell.isSwipeGestureOff = YES;
             
             cell.message = message;
@@ -200,8 +249,15 @@
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            [cell setRotaionToDefault];
-            [cell showSeperatorView];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperatorView];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             cell.message = message;
             
@@ -209,7 +265,6 @@
             
             if (!message.isHidden) {
                 [cell setMessage:message];
-                [cell showStarMessageView];
             }
             
             if (message.isFailedSend) {
@@ -254,12 +309,18 @@
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             if (!message.isHidden) {
                 [cell setMessage:message];
-                [cell showStarMessageView];
             }
             
             if (message != nil) {
@@ -354,9 +415,15 @@
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             [cell setAudioSliderValue:0.0f];
             
             if (!message.isHidden) {
@@ -378,9 +445,15 @@
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             if (!message.isHidden) {
                 [cell setMessage:message];
@@ -471,9 +544,16 @@
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             if (!message.isHidden) {
                 [cell setMessage:message];
@@ -502,9 +582,15 @@
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             
             cell.message = message;
@@ -527,14 +613,20 @@
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            [cell setRotaionToDefault];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             cell.message = message;
             
             if (!message.isHidden) {
                 [cell setMessage:message];
-                [cell showStarMessageView];
             }
             [cell showStatusLabel:YES animated:NO];
             
@@ -562,13 +654,19 @@
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            [cell setRotaionToDefault];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             cell.message = message;
             
             if (!message.isHidden) {
                 [cell setMessage:message];
-                [cell showStarMessageView];
             }
             
             if (message != nil) {
@@ -637,9 +735,15 @@
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             [cell setAudioSliderValue:0.0f];
             
             if (!message.isHidden) {
@@ -661,9 +765,15 @@
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             if (!message.isHidden) {
                 [cell setMessage:message];
@@ -729,9 +839,15 @@
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.delegate = self;
             cell.message = message;
-            [cell setRotaionToDefault];
-            [cell showStarMessageView];
-            [cell showSeperator];
+            if(self.messageListType == TAPUIMessageListTypeStar){
+                [cell setRotaionToDefault];
+                [cell showStarMessageView];
+                [cell showSeperator];
+            }
+            else if(self.messageListType == TAPUIMessageListTypePin){
+                [cell showPinIcon:YES];
+                [cell setSwipeGestureEnable:NO];
+            }
             
             if (!message.isHidden) {
                 [cell setMessage:message];
@@ -750,188 +866,121 @@
 #pragma mark TableView Delegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     TAPMessageModel *message = [self.messageArray objectAtIndex:indexPath.row];
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
-    
+    [self goBackToMessage:message];
 }
 
 - (void)myChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:message];
 }
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:message];
 }
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :myImageBubbleCell.message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:myImageBubbleCell.message];
 }
 
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 - (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)myVoiceNotePlayPauseButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
   
 }
 
 - (void)myVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 
 - (void)myVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self.navigationController popViewControllerAnimated:YES];
+    if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
+        [self.delegate starMessageBubbleCliked:tappedMessage];
+    }
 }
 
 - (void)yourVoiceNoteOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
   
 }
 
 - (void)yourVoiceNoteQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 
 - (void)yourVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 
 - (void)yourChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :yourImageBubbleCell.message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:yourImageBubbleCell.message];
 }
 
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:message];
 }
 
 - (void)yourFileBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)yourFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)yourFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 - (void)yourLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :tappedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-    }];
+    [self goBackToMessage:tappedMessage];
 }
 
 #pragma mark Custom Method
+
+-(void)goBackToMessage:(TAPMessageModel *)message {
+    if(self.messageListType == TAPUIMessageListTypeStar){
+        [self.navigationController popToRootViewControllerAnimated:NO];
+        [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+        }];
+    }
+    else if(self.messageListType == TAPUIMessageListTypePin){
+        [self.navigationController popViewControllerAnimated:YES];
+        if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
+            [self.delegate starMessageBubbleCliked:message];
+        }
+        
+    }
+}
 
 - (void)showLoadMoreMessageLoadingView:(BOOL)show {
     self.loadMoreMessageLoadingLabel.alpha = 0.0f;
@@ -990,6 +1039,55 @@
     }];
     */
 }
+
+- (void)unPinAllButtonDidTapped {
+    [self setAsLoadingState:YES];
+    [TAPDataManager callAPIUnPinMessage:self.currentRoom.roomID messageID: self.messageIDs success:^(NSArray *unpinnedMessageIDs) {
+        [self setAsLoadingState:NO];
+        [self.navigationController popViewControllerAnimated:YES];
+        if ([self.delegate respondsToSelector:@selector(unpinAllButtonCliked)]) {
+            [self.delegate unpinAllButtonCliked];
+        }
+        
+    } failure:^(NSError *error) {
+        [self setAsLoadingState:NO];
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+}
+
+- (void)setAsLoadingState:(BOOL)isLoading{
+    if (isLoading) {
+        self.loadingBackgroundView.alpha = 1.0f;
+        [self animateSaveLoading:YES];
+        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
+        self.loadingLabel.text = @"Loading...";
+    }
+    else {
+        self.loadingBackgroundView.alpha = 0.0f;
+        [self animateSaveLoading:NO];
+        self.loadingImageView.image = [UIImage imageNamed:@"TAPIconImageSaved" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingPopupSuccess]];
+    }
+}
+
+- (void)animateSaveLoading:(BOOL)isAnimate {
+    if (isAnimate) {
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        animation.fromValue = [NSNumber numberWithFloat:0.0f];
+        animation.toValue = [NSNumber numberWithFloat: 2 * M_PI];
+        animation.duration = 1.5f;
+        animation.repeatCount = INFINITY;
+        animation.removedOnCompletion = NO;
+        [self.loadingImageView.layer addAnimation:animation forKey:@"FirstLoadSpinAnimation"];
+    }
+    else {
+        [self.loadingImageView.layer removeAnimationForKey:@"FirstLoadSpinAnimation"];
+    }
+}
+
 
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index {
     

@@ -87,6 +87,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorSelectedMediaPreviewThumbnailBorder,
     TAPComponentColorMediaPreviewWarningBackgroundColor,
     TAPComponentColorSearchConnectionLostBackgroundColor,
+    TAPComponentColorChatBubbleHighlightBackgroundColor,
     TAPComponentColorButtonIcon,
     TAPComponentColorButtonIconPrimary,
     TAPComponentColorButtonIconDestructive,
@@ -219,6 +220,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconCheckmarkSendToContactProfile, //Share Extension Profile Image with checkMark
     TAPComponentColorBackgroundCheckmarkSendToContact, //Share Extension backgroundColor checkmark on Profile Image with checkMark
     TAPComponentColorDefaultBackgroundTableView,
+    TAPComponentColorPinBackground,
 };
 
 typedef NS_ENUM(NSInteger, TAPTextColor) {
@@ -358,6 +360,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorTableViewProfileNameSendToContactLabel,
     TAPTextColorRecordingTimeLabel,
     TAPTextColorWarningLabel,
+    TAPTextColorChatRoomPinTitleLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {

@@ -68,6 +68,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIImageView *senderDeletedUserImageView;
 @property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconBottomImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -116,6 +118,9 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomWidthConstraint;
 
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -196,6 +201,8 @@
     _minWidth = (self.maxWidth / 3.0f); //one third of max Width
     _minHeight = self.minWidth / 78.0f * 100.0f; //78.0f and 100.0f are width and height constraint on design
     
+    self.pinIconBottomImageView.image = [self.pinIconBottomImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    
     self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
     self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
     
@@ -203,9 +210,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMinXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
     
@@ -333,6 +338,10 @@
     self.redirectArrowButton.alpha = 0.0f;
     self.bubbleHighlightView.alpha = 0.0f;
     
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconBottomImageView.alpha = 0.0f;
+    self.pinIconWidthConstraint.constant = 0.0f;
+    self.pinIconBottomWidthConstraint.constant = 0.0f;
     
 }
 
@@ -942,6 +951,8 @@
     [self.senderDeletedUserImageView.layer removeAllAnimations];
     [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
+    [self.pinIconBottomImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1931,7 +1942,7 @@
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
         self.starImageViewLeadingConstraint.constant = 8.0f;
-        self.starImageViewWidthConstraint.constant = 12.0f;
+        self.starImageViewWidthConstraint.constant = 10.0f;
         if(self.imageTimestampContainerView.alpha == 0){
             self.starIconBottomImageView.alpha = 1.0f;
         }
@@ -1972,6 +1983,24 @@
 
 - (void)setSwipeGestureEnable:(BOOL)enable {
     self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        if(self.imageTimestampContainerView.alpha == 0){
+            self.pinIconBottomImageView.alpha = 1.0f;
+            self.pinIconBottomWidthConstraint.constant = 10.0f;
+        }
+        
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+        self.pinIconBottomImageView.alpha = 0.0f;
+        self.pinIconBottomWidthConstraint.constant = 0.0f;
+    }
 }
 
 - (void)showSeperator {

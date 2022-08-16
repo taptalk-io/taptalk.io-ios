@@ -272,8 +272,23 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/user/delete_account/verify_otp";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-
-
+    else if (type == TAPAPIManagerTypePinMessage) {
+        NSString *apiPath = @"chat/message/pin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnPinMessage) {
+        NSString *apiPath = @"chat/message/unpin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPinnedMessages) {
+        NSString *apiPath = @"chat/message/get_pinned_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPinnedMessagesIDs) {
+        NSString *apiPath = @"chat/message/get_pinned_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }
 

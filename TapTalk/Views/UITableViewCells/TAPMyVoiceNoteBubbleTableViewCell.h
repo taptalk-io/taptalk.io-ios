@@ -63,6 +63,7 @@ typedef NS_ENUM(NSInteger, TAPMyVoiceNoteBubbleTableViewCellStateType) {
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
 
 @end
 

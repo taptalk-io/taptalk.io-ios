@@ -129,7 +129,6 @@
         }
         else {
             [self.profileView.profileImageView setImageWithURLString:profileImageURL];
-            
         }
     }
     
@@ -1417,7 +1416,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else if (indexPath.section == 1) {
         if (indexPath.row == 0) {
             TAPStarredMessageViewController *tapStarredMessageViewController = [[TAPStarredMessageViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
-        
+            tapStarredMessageViewController.messageListType = TAPUIMessageListTypeStar;
             if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault || self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
                 TAPRoomModel *r = self.room;
                 tapStarredMessageViewController.currentRoom = self.room;

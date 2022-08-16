@@ -41,6 +41,8 @@
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -78,6 +80,9 @@
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingConstraint;
+
 
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
@@ -124,9 +129,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
@@ -204,6 +207,7 @@
     self.retryButton.alpha = 0.0f;
     self.starIconImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
+    self.pinIconImageView.alpha = 0.0f;
     
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
@@ -214,6 +218,9 @@
     self.bubbleHighlightView.alpha = 0.0f;
     
     self.statusLabelBottomConstraint.constant = 8.0f;
+    
+    self.starIconWidthConstraint.constant = 0.0f;
+    self.pinIconTrailingConstraint.constant = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -521,6 +528,7 @@
     
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -888,9 +896,15 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
+        self.starIconWidthConstraint.constant = 10.0f;
+        if(self.pinIconImageView.alpha > 0){
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+        self.starIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
     }
 }
 
@@ -918,6 +932,18 @@
 
 - (void)setSwipeGestureEnable:(BOOL)enable {
     self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        if(self.starIconImageView.alpha > 0){
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+    }
 }
 
 - (void)showSeperator {

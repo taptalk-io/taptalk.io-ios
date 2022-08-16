@@ -772,7 +772,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             else {
                 TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
-                NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+                NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue]; // -1 for admin that created the group
                 if ([self.selectedUserModelArray count] == maxGroupMember - [self.room.participants count]) {
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add More Member In Group" title:NSLocalizedStringFromTableInBundle(@"Cannot add more people", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"The max limit number of people in one group chat has been reached", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }

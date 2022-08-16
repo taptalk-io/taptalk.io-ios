@@ -1548,6 +1548,11 @@
             return color;
             break;
         }
+        case TAPTextColorChatRoomPinTitleLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         case TAPTextColorRoomListMessage: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextMedium];
             return color;
@@ -2293,6 +2298,12 @@
             return color;
             break;
         }
+        case TAPComponentColorPinBackground:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         case TAPComponentColorRightVoiceNoteButtonBackground:
         {
             UIColor *color = [TAPUtil getColor:TAP_RIGHT_BUBBLE_VOICE_NOTE_BUTTON_COLOR];
@@ -2356,6 +2367,12 @@
         case TAPComponentColorSearchConnectionLostBackgroundColor:
         {
             UIColor *color = [TAPUtil getColor:TAP_SEARCH_CONNECTION_LOST_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TAPComponentColorChatBubbleHighlightBackgroundColor:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_CHAT_BUBBLE_HIGHLIGHT_BACKGROUND_COLOR];
             return color;
             break;
         }

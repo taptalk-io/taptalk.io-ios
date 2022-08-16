@@ -63,6 +63,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -104,6 +105,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 
 
 @property (weak, nonatomic) IBOutlet UISlider *audioSlider;
@@ -178,6 +180,8 @@
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
     
+    self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    
     self.progressContainerView.layer.cornerRadius = CGRectGetHeight(self.innerBackgroundView.frame) / 2.0f;
     self.progressBarView.layer.cornerRadius = CGRectGetHeight(self.progressBarView.frame) / 2.0f;
     
@@ -187,9 +191,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.replyView.layer.cornerRadius = 4.0f;
     self.replyView.clipsToBounds = YES;
@@ -271,6 +273,9 @@
     self.redirectArrowButton.alpha = 0.0f;
     self.bubbleHighlightView.alpha = 0.0f;
     self.statusLabelBottomConstraint.constant = 10.0f;
+    
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconWidthConstraint.constant = 0.0f;
     
     [self showSenderInfo:NO];
     
@@ -855,6 +860,7 @@
     [self.senderDeletedUserImageView.layer removeAllAnimations];
     [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1434,6 +1440,17 @@
 
 - (void)setSwipeGestureEnable:(BOOL)enable {
     self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+    }
 }
 
 - (void)showSeperator {

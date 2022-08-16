@@ -93,6 +93,17 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconBottomWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomTrailingConstraint;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconBottomImageView;
+
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingContsraint;
+
+
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewConstraintHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
@@ -174,9 +185,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
 
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
 
     self.imageTimestampStatusContainerView.layer.cornerRadius = 10.0f;
     self.imageTimestampStatusContainerView.clipsToBounds = YES;
@@ -296,6 +305,16 @@
     self.starImageViewWidthConstarint.constant = 0.0f;
     self.starImageViewLeadingConstarint.constant = 4.0f;
     
+    self.starIconBottomWidthConstraint.constant = 0.0f;
+    self.pinIconBottomWidthConstraint.constant = 0.0f;
+    self.pinIconBottomTrailingConstraint.constant = 0.0f;
+    
+    self.pinIconWidthConstraint.constant = 0.0f;
+    self.pinIconTrailingContsraint.constant = 0.0f;
+    
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconBottomImageView.alpha = 0.0f;
+    
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
     self.progressLayer.strokeStart = 0.0f;
@@ -311,6 +330,8 @@
     
     self.seperatorViewTopConstraint.constant = 10.0f;
     self.seperatorViewConstraintHeight.constant = 0.0f;
+    
+    self.imageTimestampStatusContainerView.alpha = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -446,6 +467,8 @@
     if (![[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
         return;
     }
+    
+    NSLog(@"isEnable%ld", self.bubbleViewLongPressGestureRecognizer.isEnabled);
     
      if (recognizer.state == UIGestureRecognizerStateBegan) {
             _disableTriggerHapticFeedbackOnDrag = NO;
@@ -876,6 +899,8 @@
     
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
+    [self.pinIconBottomImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1907,20 +1932,32 @@
     if(self.starIconImageView.alpha == 0){
         
         self.starIconImageView.alpha = 1.0f;
-        self.starImageViewWidthConstarint.constant = 12.0f;
-        self.starImageViewLeadingConstarint.constant = 8.0f;
+        self.starImageViewWidthConstarint.constant = 10.0f;
+        //self.starImageViewLeadingConstarint.constant = 8.0f;
+        
+        if(self.pinIconImageView.alpha > 0){
+            self.pinIconTrailingContsraint.constant = 4.0f;
+        }
         
         if(self.imageTimestampStatusContainerView.alpha == 0){
             self.starIconBottomImageView.alpha = 1.0f;
+            self.starIconBottomWidthConstraint.constant = 10.0f;
+            if(self.pinIconBottomImageView.alpha > 0){
+                self.pinIconBottomTrailingConstraint.constant = 4.0f;
+            }
         }
-        
-        
+        else{
+            self.starIconBottomImageView.alpha = 0.0f;
+        }
     }
     else{
         self.starIconImageView.alpha = 0.0f;
         self.starIconBottomImageView.alpha = 0.0f;
         self.starImageViewWidthConstarint.constant = 0.0f;
-        self.starImageViewLeadingConstarint.constant = 4.0f;
+       // self.starImageViewLeadingConstarint.constant = 4.0f;
+        self.pinIconTrailingContsraint.constant = 0.0f;
+        self.starIconBottomWidthConstraint.constant = 0.0f;
+        self.pinIconBottomTrailingConstraint.constant = 4.0f;
     }
 }
 
@@ -1958,6 +1995,37 @@
     
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
+    }
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        
+        if(self.starIconImageView.alpha > 0){
+            self.pinIconTrailingContsraint.constant = 4.0f;
+        }
+        
+        if(self.imageTimestampStatusContainerView.alpha < 1){
+            self.pinIconBottomImageView.alpha = 1.0f;
+            self.pinIconBottomWidthConstraint.constant = 10.0f;
+            if(self.starIconBottomImageView.alpha > 0){
+                self.pinIconBottomTrailingConstraint.constant = 7.0f;
+            }
+        }
+        else{
+            self.pinIconBottomImageView.alpha = 0.0f;
+        }
+        
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingContsraint.constant = 0.0f;
+        self.pinIconBottomTrailingConstraint.constant = 0.0f;
+        self.pinIconBottomImageView.alpha = 0.0f;
+        self.pinIconBottomWidthConstraint.constant = 0.0f;
     }
 }
 

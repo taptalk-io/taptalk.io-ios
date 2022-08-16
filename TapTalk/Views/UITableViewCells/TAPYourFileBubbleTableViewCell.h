@@ -55,6 +55,7 @@ typedef NS_ENUM(NSInteger, TAPYourFileBubbleTableViewCellStateType) {
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
 
 @end
 

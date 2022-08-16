@@ -161,7 +161,6 @@
             return NO;
             break;
         case AVAudioSessionRecordPermissionUndetermined:
-            return NO;
             [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
                     if (granted) {
                         NSLog(@"Permission granted");
@@ -170,6 +169,7 @@
                         NSLog(@"Permission denied");
                     }
                 }];
+            return NO;
             break;
         default:
             return NO;

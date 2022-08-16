@@ -43,6 +43,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -81,6 +82,9 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+
+
 @property (weak, nonatomic) IBOutlet UIImageView *deleteUserImageView;
 
 
@@ -115,14 +119,14 @@
     [self.contentView layoutIfNeeded];
     self.statusLabel.alpha = 0.0f;
     
+    self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    
     
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.replyView.layer.cornerRadius = 4.0f;
     self.replyView.clipsToBounds = YES;
@@ -211,6 +215,8 @@
     self.starIconLeadingConstraint.constant = 0.0f;
     self.redirectArrowButton.alpha = 0.0f;
     self.bubbleHighlightView.alpha = 0.0f;
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconWidthConstraint.constant = 0.0f;
     
     self.statusLabelBottomConstraint.constant = 10.0f;
     
@@ -800,6 +806,7 @@
     [self.deleteUserImageView.layer removeAllAnimations];
     [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1129,7 +1136,7 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
-        self.starIconWidthConstraint.constant = 12.0f;
+        self.starIconWidthConstraint.constant = 10.0f;
         self.starIconLeadingConstraint.constant = 6.0f;
     }
     else{
@@ -1168,7 +1175,16 @@
     }
 }
 
- 
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+    }
+}
 
 - (void)showSeperator {
     self.seperatorViewHeightConstraint.constant = 1.0f;

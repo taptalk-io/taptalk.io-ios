@@ -54,6 +54,8 @@
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconBottomImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 
 
 
@@ -103,6 +105,10 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewWidthConstaint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starImageViewLeadingConstant;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+
+
 @property (weak, nonatomic) IBOutlet UIImageView *senderDeletedUserImageView;
 
 
@@ -193,6 +199,8 @@
     self.thumbnailBubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
     
+    self.pinIconBottomImageView.image = [self.pinIconBottomImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    
     self.progressBackgroundView.layer.cornerRadius = CGRectGetHeight(self.progressBackgroundView.bounds) / 2.0f;
     self.progressBarView.layer.cornerRadius = CGRectGetHeight(self.progressBarView.bounds) / 2.0f;
     
@@ -200,9 +208,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.imageTimestampContainerView.layer.cornerRadius = 10.0f;
     self.imageTimestampContainerView.clipsToBounds = YES;
@@ -230,6 +236,11 @@
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
+    
+    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                                          action:@selector(handleBubbleViewLongPress:)];
+    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
+    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
     
     self.starIconImageView.alpha = 0.0f;
     self.starIconBottomImageView.alpha = 0.0f;
@@ -320,17 +331,19 @@
     self.senderImageViewLeadingConstraint.constant = 16.0;
     self.starImageViewWidthConstaint.constant = 0.0f;
     self.starImageViewLeadingConstant.constant = 4.0f;
-    _bubbleViewLongPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
-                                                                                          action:@selector(handleBubbleViewLongPress:)];
-    self.bubbleViewLongPressGestureRecognizer.minimumPressDuration = 0.2f;
-    [self.bubbleView addGestureRecognizer:self.bubbleViewLongPressGestureRecognizer];
     
     self.bubbleHighlightView.alpha = 0.0f;
     
     self.seperatorTopConstraint.constant = 0.0f;
     self.seperatorBottomConstraint.constant = 0.0f;
     
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconBottomImageView.alpha = 0.0f;
     
+    self.pinIconWidthConstraint.constant = 0.0f;
+    self.pinIconBottomWidthConstraint.constant = 0.0f;
+    
+    self.bubbleViewLongPressGestureRecognizer.enabled = YES;
     
     self.mentionIndexesArray = nil;
 }
@@ -359,6 +372,8 @@
     if (![[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
         return;
     }
+    
+    NSLog(@"isEnable%ld", self.bubbleViewLongPressGestureRecognizer.isEnabled);
     
      if (recognizer.state == UIGestureRecognizerStateBegan) {
             _disableTriggerHapticFeedbackOnDrag = NO;
@@ -1045,6 +1060,8 @@
     [self.senderDeletedUserImageView.layer removeAllAnimations];
     [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
+    [self.pinIconBottomImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1858,11 +1875,14 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
-        self.starImageViewWidthConstaint.constant = 12.0f;
+        self.starImageViewWidthConstaint.constant = 10.0f;
         self.starImageViewLeadingConstant.constant = 8.0f;
         
         if(self.imageTimestampContainerView.alpha == 0){
             self.starIconBottomImageView.alpha = 1.0f;
+        }
+        else{
+            self.starIconBottomImageView.alpha = 0.0f;
         }
         
     }
@@ -1901,6 +1921,27 @@
 
 - (void)setSwipeGestureEnable:(BOOL)enable {
     self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        if(self.imageTimestampContainerView.alpha == 0){
+            self.pinIconBottomImageView.alpha = 1.0f;
+            self.pinIconBottomWidthConstraint.constant = 10.0f;
+        }
+        else{
+            self.pinIconBottomImageView.alpha = 0.0f;
+        }
+        
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+        self.pinIconBottomImageView.alpha = 0.0f;
+        self.pinIconBottomWidthConstraint.constant = 0.0f;
+    }
 }
 
 - (void)showSeperator {

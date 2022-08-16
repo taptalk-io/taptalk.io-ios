@@ -356,6 +356,43 @@ NS_ASSUME_NONNULL_BEGIN
             start:(void (^)(TAPMessageModel *message))start
             success:(void (^)(TAPMessageModel *message))success
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)pinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID;
+
+- (void)pinMessageWithMessageID:(NSString *)messageID
+                          roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                        failure:(void (^)(NSError *error))failure;
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID;
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                          failure:(void (^)(NSError *error))failure;
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID;
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                          failure:(void (^)(NSError *error))failure;
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID;
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                            failure:(void (^)(NSError *error))failure;
+- (void)getPinnedMessagesWithRoomID:(NSString *)roomID
+                          pageNumber:(NSInteger)pageNumber
+                       numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSArray<TAPMessageModel *> *pinnedMessagesArray,BOOL hasMoreData))success
+                            failure:(void (^)(NSError *error))failure;
+- (void)getPinnedMessageIDsWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                              failure:(void (^)(NSError *error))failure;
+
 @end
 
 NS_ASSUME_NONNULL_END

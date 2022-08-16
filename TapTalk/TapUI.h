@@ -894,6 +894,15 @@ Get current status of saved messages menu
 */
 - (BOOL)isSavedMessagesMenuEnabled;
 
+/**
+Show or hide pin messages menu
+*/
+- (void)setPinMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of pin messages menu
+*/
+- (BOOL)isPinMessageMenuEnabled;
 
 @end
 

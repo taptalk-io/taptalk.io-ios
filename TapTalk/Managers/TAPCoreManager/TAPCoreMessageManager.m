@@ -1772,4 +1772,114 @@
     [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
 }
 
+- (void)pinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{
+    [self pinMessagesWithMessageIDs:@[messageID] roomID:roomID
+    success:^(NSArray<NSString *> *pinnedMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)pinMessageWithMessageID:(NSString *)messageID
+                          roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    NSArray<NSString *> *messageIDs = @[messageID];
+    [self pinMessagesWithMessageIDs:messageIDs roomID:roomID success:success failure:failure];
+}
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID {
+    [self pinMessagesWithMessageIDs:messageIDs roomID:roomID
+    success:^(NSArray<NSString *> *pinnedMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIPinMessage:roomID messageID:messageIDs
+    success:^(NSArray *pinnedMessageIDs) {
+        success(pinnedMessageIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{
+    [self unpinMessageWithMessageID:messageID roomID:roomID
+    success:^(NSArray<NSString *> *unpinnedMessageIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    NSArray<NSString *> *messageIDs = @[messageID];
+    [self unpinMessagesWithMessageIDs:messageIDs roomID:roomID success:success failure:failure];
+}
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID {
+    [self unpinMessagesWithMessageIDs:messageIDs roomID:roomID
+    success:^(NSArray<NSString *> *unpinnedMessageIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                             failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIUnPinMessage:roomID messageID:messageIDs
+    success:^(NSArray *unpinnedMessageIDs) {
+        success(unpinnedMessageIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getPinnedMessagesWithRoomID:(NSString *)roomID
+                          pageNumber:(NSInteger)pageNumber
+                       numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSArray<TAPMessageModel *> *pinnedMessagesArray,BOOL hasMoreData))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetPinnedMessages:roomID pageNumber:pageNumber numberOfItems:numberOfItems
+    success:^(NSArray *pinnedMessagesArray,BOOL hasMore) {
+        success(pinnedMessagesArray,hasMore);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getPinnedMessageIDsWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetPinnedMessageIDs:roomID
+    success:^(NSArray *pinnedMessagesIDs) {
+        success(pinnedMessagesIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 @end
