@@ -208,7 +208,7 @@
     }
     else if(tableView == self.forwardListView.recentChatTableView){
         UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 97.0f)];
-        if([[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
+        if([[TapUI sharedInstance] isSavedMessagesMenuEnabled]) {
             UIView *savedMessageView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 70.0f)];
             [headerView addSubview:savedMessageView];
             

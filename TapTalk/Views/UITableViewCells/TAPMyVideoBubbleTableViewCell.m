@@ -113,6 +113,18 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconBottomWidtConstraint;
+
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconBottomImageView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomTrailingConstraint;
+
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingConstraint;
+
+
+
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
@@ -189,9 +201,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.imageTimestampStatusContainerView.layer.cornerRadius = 10.0f;
     self.imageTimestampStatusContainerView.clipsToBounds = YES;
@@ -757,6 +767,8 @@
     
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
+    [self.pinIconBottomImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1831,18 +1843,30 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
-        self.starImageViewWidth.constant = 12.0f;
-        self.starImageViewLeadingConstraint.constant = 8.0f;
+        self.starImageViewWidth.constant = 10.0f;
+        //self.starImageViewLeadingConstraint.constant = 8.0f;
+        
+        if(self.pinIconImageView.alpha > 0){
+            self.pinIconTrailingConstraint.constant = 4.0f;
+        }
+        
         if(self.imageTimestampStatusContainerView.alpha == 0){
             self.starIconBottomImageView.alpha = 1.0f;
+            self.starIconBottomWidtConstraint.constant = 10.0f;
+            if(self.pinIconBottomImageView.alpha > 0){
+                self.pinIconBottomTrailingConstraint.constant = 4.0f;
+            }
         }
         
     }
     else{
         self.starImageViewWidth.constant = 0.0f;
-        self.starImageViewLeadingConstraint.constant = 4.0f;
+        //self.starImageViewLeadingConstraint.constant = 4.0f;
         self.starIconImageView.alpha = 0.0f;
         self.starIconBottomImageView.alpha = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+        self.starIconBottomWidtConstraint.constant = 0.0f;
+        self.pinIconBottomTrailingConstraint.constant = 4.0f;
     }
 }
 
@@ -1871,6 +1895,34 @@
 
 - (void)setSwipeGestureEnable:(BOOL)enable {
     self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        
+        if(self.starIconImageView.alpha > 0){
+            self.pinIconTrailingConstraint.constant = 4.0f;
+        }
+        
+        if(self.imageTimestampStatusContainerView.alpha == 0){
+            self.pinIconBottomImageView.alpha = 1.0f;
+            self.pinIconBottomWidthConstraint.constant = 10.0f;
+            if(self.starIconBottomImageView.alpha > 0){
+                self.pinIconBottomTrailingConstraint.constant = 7.0f;
+            }
+        }
+        
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+        self.pinIconBottomTrailingConstraint.constant = 0.0f;
+        self.pinIconBottomImageView.alpha = 0.0f;
+        self.pinIconBottomWidthConstraint.constant = 0.0f;
+    }
 }
 
 - (void)showSeperator {

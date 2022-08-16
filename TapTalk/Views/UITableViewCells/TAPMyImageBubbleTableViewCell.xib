@@ -36,6 +36,10 @@
                             <constraint firstAttribute="width" id="uUf-iE-VGU"/>
                         </constraints>
                     </button>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lDI-oh-BtR" userLabel="Bubble Highlight View">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="416.5"/>
+                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ekn-LS-eHd">
                         <rect key="frame" x="50" y="0.0" width="254" height="416.5"/>
                         <subviews>
@@ -330,7 +334,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ngx-BR-Wg7" userLabel="Timestamp Label">
-                                <rect key="frame" x="224" y="390.5" width="0.0" height="16"/>
+                                <rect key="frame" x="226" y="390.5" width="0.0" height="16"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="qVn-h6-aQ7"/>
@@ -340,31 +344,38 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="e5G-qP-vVQ">
-                                <rect key="frame" x="228" y="390.5" width="16" height="16"/>
+                                <rect key="frame" x="230" y="392.5" width="14" height="14"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="16" id="1di-Ed-x6P"/>
-                                    <constraint firstAttribute="height" constant="16" id="3uD-Ih-uX8"/>
+                                    <constraint firstAttribute="width" constant="14" id="1di-Ed-x6P"/>
+                                    <constraint firstAttribute="height" constant="14" id="3uD-Ih-uX8"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jLm-jf-65H">
-                                <rect key="frame" x="10" y="393.5" width="196" height="10"/>
+                                <rect key="frame" x="10" y="393.5" width="210" height="10"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="eH1-UD-Mc1"/>
                                 </constraints>
                             </view>
                             <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="jkH-xn-SOs">
-                                <rect key="frame" x="206" y="392.5" width="12" height="12"/>
+                                <rect key="frame" x="220" y="393.5" width="0.0" height="10"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="12" id="fMI-yz-YvL"/>
-                                    <constraint firstAttribute="width" constant="12" id="h6B-RV-AVB"/>
+                                    <constraint firstAttribute="height" constant="10" id="fMI-yz-YvL"/>
+                                    <constraint firstAttribute="width" id="h6B-RV-AVB"/>
                                 </constraints>
                             </imageView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdu-OZ-86d" userLabel="Image Timestamp Status Container View">
-                                <rect key="frame" x="202" y="358.5" width="36" height="20"/>
+                            <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconPinRightBubble" translatesAutoresizingMaskIntoConstraints="NO" id="NOH-IT-mtd">
+                                <rect key="frame" x="220" y="394.5" width="0.0" height="10"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="10" id="GuB-fj-SDE"/>
+                                    <constraint firstAttribute="width" id="Qq0-w7-cdd"/>
+                                </constraints>
+                            </imageView>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdu-OZ-86d" userLabel="Image Timestamp Status Container View">
+                                <rect key="frame" x="198" y="358.5" width="40" height="20"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SyL-fJ-cTB" userLabel="Image Timestamp Label">
-                                        <rect key="frame" x="8" y="2" width="0.0" height="16"/>
+                                        <rect key="frame" x="12" y="2" width="0.0" height="16"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="16" id="yvw-CG-tkG"/>
@@ -373,32 +384,41 @@
                                         <color key="textColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="ylL-ae-F1l">
-                                        <rect key="frame" x="4" y="4" width="0.0" height="12"/>
+                                    <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="ylL-ae-F1l">
+                                        <rect key="frame" x="8" y="5" width="0.0" height="10"/>
                                         <constraints>
                                             <constraint firstAttribute="width" id="ghl-rH-mCO"/>
-                                            <constraint firstAttribute="height" constant="12" id="oIA-nz-nUa"/>
+                                            <constraint firstAttribute="height" constant="10" id="oIA-nz-nUa"/>
+                                        </constraints>
+                                    </imageView>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconPinRightBubble" translatesAutoresizingMaskIntoConstraints="NO" id="Bhc-8J-Oiy">
+                                        <rect key="frame" x="4" y="5" width="0.0" height="10"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" id="Ase-xz-JzU"/>
+                                            <constraint firstAttribute="height" constant="10" id="yDs-Ya-x4W"/>
                                         </constraints>
                                     </imageView>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="m7x-WO-ppc" userLabel="Image Status Icon Image View">
-                                        <rect key="frame" x="12" y="2" width="16" height="16"/>
+                                        <rect key="frame" x="16" y="3" width="16" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="16" id="7z7-8P-9Yd"/>
-                                            <constraint firstAttribute="height" constant="16" id="s6w-cn-MQJ"/>
+                                            <constraint firstAttribute="height" constant="14" id="s6w-cn-MQJ"/>
                                         </constraints>
                                     </imageView>
                                 </subviews>
                                 <color key="backgroundColor" red="0.098039215686274508" green="0.098039215686274508" blue="0.098039215686274508" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <constraints>
+                                    <constraint firstItem="ylL-ae-F1l" firstAttribute="leading" secondItem="Bhc-8J-Oiy" secondAttribute="trailing" constant="4" id="44h-m9-llT"/>
                                     <constraint firstAttribute="bottom" secondItem="SyL-fJ-cTB" secondAttribute="bottom" constant="2" id="7nK-Z1-h0m"/>
-                                    <constraint firstAttribute="bottom" secondItem="m7x-WO-ppc" secondAttribute="bottom" constant="2" id="Dca-j0-auc"/>
+                                    <constraint firstItem="Bhc-8J-Oiy" firstAttribute="leading" secondItem="gdu-OZ-86d" secondAttribute="leading" constant="4" id="BaR-Ud-VZ6"/>
+                                    <constraint firstAttribute="bottom" secondItem="m7x-WO-ppc" secondAttribute="bottom" constant="3" id="Dca-j0-auc"/>
                                     <constraint firstItem="ylL-ae-F1l" firstAttribute="centerY" secondItem="SyL-fJ-cTB" secondAttribute="centerY" id="KhV-JQ-8Qm"/>
+                                    <constraint firstItem="Bhc-8J-Oiy" firstAttribute="centerY" secondItem="m7x-WO-ppc" secondAttribute="centerY" id="OOf-08-Ss4"/>
                                     <constraint firstItem="m7x-WO-ppc" firstAttribute="leading" secondItem="SyL-fJ-cTB" secondAttribute="trailing" constant="4" id="OVX-fr-I6c"/>
                                     <constraint firstAttribute="trailing" secondItem="m7x-WO-ppc" secondAttribute="trailing" constant="8" id="PiZ-lK-sCX"/>
                                     <constraint firstItem="SyL-fJ-cTB" firstAttribute="leading" secondItem="ylL-ae-F1l" secondAttribute="trailing" constant="4" id="UcX-s5-LQn"/>
                                     <constraint firstItem="SyL-fJ-cTB" firstAttribute="top" secondItem="gdu-OZ-86d" secondAttribute="top" constant="2" id="bkY-g4-ETY"/>
-                                    <constraint firstItem="ylL-ae-F1l" firstAttribute="leading" secondItem="gdu-OZ-86d" secondAttribute="leading" constant="4" id="pMA-BH-Z2E"/>
-                                    <constraint firstItem="m7x-WO-ppc" firstAttribute="top" secondItem="gdu-OZ-86d" secondAttribute="top" constant="2" id="rew-6H-haP"/>
+                                    <constraint firstItem="m7x-WO-ppc" firstAttribute="top" secondItem="gdu-OZ-86d" secondAttribute="top" constant="3" id="rew-6H-haP"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -427,6 +447,7 @@
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="bottom" secondItem="IUO-Bd-7lc" secondAttribute="bottom" id="cMb-YC-29K"/>
                             <constraint firstItem="jkH-xn-SOs" firstAttribute="leading" secondItem="jLm-jf-65H" secondAttribute="trailing" id="esx-Km-NCq"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="leading" secondItem="IUO-Bd-7lc" secondAttribute="leading" id="fxY-KS-h7z"/>
+                            <constraint firstItem="jkH-xn-SOs" firstAttribute="leading" secondItem="NOH-IT-mtd" secondAttribute="trailing" id="gWH-TS-Jr3"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="top" secondItem="IUO-Bd-7lc" secondAttribute="top" id="gsR-sD-P9E"/>
                             <constraint firstAttribute="bottom" secondItem="Ngx-BR-Wg7" secondAttribute="bottom" constant="10" id="inu-wE-2VG"/>
                             <constraint firstItem="jkH-xn-SOs" firstAttribute="centerY" secondItem="Ngx-BR-Wg7" secondAttribute="centerY" id="jMs-eL-2xF"/>
@@ -438,6 +459,7 @@
                             <constraint firstItem="jLm-jf-65H" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="q35-4I-tno"/>
                             <constraint firstItem="JhP-ae-g3f" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="s8X-Ff-JfS"/>
                             <constraint firstItem="IUO-Bd-7lc" firstAttribute="top" secondItem="AXj-gR-pkg" secondAttribute="bottom" constant="4" id="sBR-fs-wmZ"/>
+                            <constraint firstItem="NOH-IT-mtd" firstAttribute="centerY" secondItem="e5G-qP-vVQ" secondAttribute="centerY" id="sFf-MC-tb5"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="trailing" secondItem="gdu-OZ-86d" secondAttribute="trailing" constant="6" id="sGo-Sy-BCj"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="bottom" secondItem="gdu-OZ-86d" secondAttribute="bottom" constant="6" id="tQx-hN-pdb"/>
                             <constraint firstItem="e5G-qP-vVQ" firstAttribute="leading" secondItem="Ngx-BR-Wg7" secondAttribute="trailing" constant="4" id="vBn-8g-77J"/>
@@ -495,10 +517,6 @@
                             <constraint firstItem="l3W-RB-3us" firstAttribute="centerY" secondItem="Wdu-3n-1bT" secondAttribute="centerY" id="yAN-6q-0C3"/>
                         </constraints>
                     </view>
-                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lDI-oh-BtR" userLabel="Bubble Highlight View">
-                        <rect key="frame" x="50" y="0.0" width="254" height="416.5"/>
-                        <color key="backgroundColor" red="0.36862745099999999" green="0.80000000000000004" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                    </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bH9-Jf-He2" userLabel="Seperator View">
                         <rect key="frame" x="16" y="441.5" width="288" height="0.0"/>
                         <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
@@ -526,22 +544,22 @@
                     <constraint firstAttribute="bottomMargin" secondItem="qkV-wM-iT4" secondAttribute="bottom" id="0aa-pQ-G1j"/>
                     <constraint firstItem="vpz-Pu-2L3" firstAttribute="bottom" secondItem="Ekn-LS-eHd" secondAttribute="bottom" constant="-5" id="1Jo-CR-KeW"/>
                     <constraint firstItem="vpz-Pu-2L3" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="trailing" constant="4" id="2yM-iX-kfC"/>
+                    <constraint firstItem="lDI-oh-BtR" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="9rV-GY-zBC"/>
                     <constraint firstItem="qkV-wM-iT4" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="C2j-gb-1eT"/>
                     <constraint firstItem="Ekn-LS-eHd" firstAttribute="leading" secondItem="mOj-ZL-6Kr" secondAttribute="trailing" constant="2" id="Clz-FG-6Ce"/>
                     <constraint firstItem="LZV-LL-Mcl" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="Cz9-sv-Pve"/>
                     <constraint firstAttribute="trailing" secondItem="cYf-Yd-bYy" secondAttribute="trailing" constant="16" id="DVI-2b-mbe"/>
-                    <constraint firstItem="lDI-oh-BtR" firstAttribute="top" secondItem="Ekn-LS-eHd" secondAttribute="top" id="Kqe-fa-6e8"/>
                     <constraint firstAttribute="bottom" secondItem="bH9-Jf-He2" secondAttribute="bottom" id="M15-sv-g0A"/>
-                    <constraint firstItem="lDI-oh-BtR" firstAttribute="trailing" secondItem="Ekn-LS-eHd" secondAttribute="trailing" id="NCC-G2-ynN"/>
                     <constraint firstItem="bH9-Jf-He2" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="NVn-eo-sLt"/>
                     <constraint firstItem="Wdu-3n-1bT" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="Qbd-AO-hr0"/>
                     <constraint firstItem="LZV-LL-Mcl" firstAttribute="leading" secondItem="Wdu-3n-1bT" secondAttribute="trailing" constant="16" id="QdF-Fo-QSI"/>
                     <constraint firstAttribute="trailing" secondItem="Ekn-LS-eHd" secondAttribute="trailing" constant="16" id="Sfa-UL-VDP"/>
                     <constraint firstItem="bH9-Jf-He2" firstAttribute="top" secondItem="cYf-Yd-bYy" secondAttribute="bottom" constant="10" id="T8g-zq-W70"/>
+                    <constraint firstItem="lDI-oh-BtR" firstAttribute="leading" secondItem="Wdu-3n-1bT" secondAttribute="trailing" id="ZFu-y8-KQZ"/>
                     <constraint firstItem="cYf-Yd-bYy" firstAttribute="top" secondItem="Ekn-LS-eHd" secondAttribute="bottom" priority="999" constant="2" id="Zsq-z4-4fl"/>
                     <constraint firstAttribute="trailing" secondItem="bH9-Jf-He2" secondAttribute="trailing" constant="16" id="Zzo-6C-sfy"/>
                     <constraint firstItem="lDI-oh-BtR" firstAttribute="bottom" secondItem="Ekn-LS-eHd" secondAttribute="bottom" id="aEL-Lt-oDp"/>
-                    <constraint firstItem="lDI-oh-BtR" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" id="nvD-Ng-6ct"/>
+                    <constraint firstAttribute="trailing" secondItem="lDI-oh-BtR" secondAttribute="trailing" id="gVT-kc-tpH"/>
                     <constraint firstAttribute="trailingMargin" secondItem="qkV-wM-iT4" secondAttribute="trailing" id="qyj-yF-qhN"/>
                     <constraint firstItem="qkV-wM-iT4" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="raF-yl-QFK"/>
                     <constraint firstItem="Wdu-3n-1bT" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="-46" id="uNa-Ty-TOD"/>
@@ -580,6 +598,12 @@
                 <outlet property="imageTimestampLabel" destination="SyL-fJ-cTB" id="PEs-rF-XfA"/>
                 <outlet property="imageTimestampStatusContainerView" destination="gdu-OZ-86d" id="rW0-OC-nqS"/>
                 <outlet property="openImageButton" destination="eKC-XJ-Soe" id="B57-ts-xrp"/>
+                <outlet property="pinIconBottomImageView" destination="NOH-IT-mtd" id="ocj-xb-Now"/>
+                <outlet property="pinIconBottomTrailingConstraint" destination="gWH-TS-Jr3" id="E1t-FH-9zH"/>
+                <outlet property="pinIconBottomWidthConstraint" destination="Qq0-w7-cdd" id="2fO-Oq-xuz"/>
+                <outlet property="pinIconImageView" destination="Bhc-8J-Oiy" id="cmN-Mq-wc8"/>
+                <outlet property="pinIconTrailingContsraint" destination="44h-m9-llT" id="lMh-T7-k55"/>
+                <outlet property="pinIconWidthConstraint" destination="Ase-xz-JzU" id="ESF-s0-2qN"/>
                 <outlet property="progressBackgroundView" destination="ZeB-2B-m5c" id="xqO-IT-RS7"/>
                 <outlet property="progressBarView" destination="tfO-kO-gDQ" id="Y8v-U5-6J5"/>
                 <outlet property="quoteDecorationView" destination="QZl-pb-DPP" id="emq-vl-PuY"/>
@@ -618,9 +642,9 @@
                 <outlet property="seperatorViewConstraintHeight" destination="6cv-yf-flh" id="nca-d2-c9c"/>
                 <outlet property="seperatorViewTopConstraint" destination="T8g-zq-W70" id="Tmf-03-9rc"/>
                 <outlet property="starIconBottomImageView" destination="jkH-xn-SOs" id="eyj-GR-ZwO"/>
+                <outlet property="starIconBottomWidthConstraint" destination="h6B-RV-AVB" id="p8b-gw-Qfq"/>
                 <outlet property="starIconImageView" destination="ylL-ae-F1l" id="9h5-pH-co6"/>
-                <outlet property="starImageViewLeadingConstarint" destination="pMA-BH-Z2E" id="mYq-C8-L1s"/>
-                <outlet property="starImageViewWidthConstarint" destination="ghl-rH-mCO" id="UvJ-iW-Csg"/>
+                <outlet property="starImageViewWidthConstarint" destination="ghl-rH-mCO" id="qQK-mB-1be"/>
                 <outlet property="statusIconImageView" destination="e5G-qP-vVQ" id="3mx-EB-Zm8"/>
                 <outlet property="statusIconImageViewHeightConstraint" destination="3uD-Ih-uX8" id="kvV-ZE-teS"/>
                 <outlet property="statusLabel" destination="cYf-Yd-bYy" id="ocE-QJ-zml"/>
@@ -641,6 +665,7 @@
         <image name="TAPIconAbort" width="32" height="32"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconDownload" width="24" height="24"/>
+        <image name="TAPIconPinRightBubble" width="9" height="9"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconSending" width="20" height="20"/>
         <image name="TAPIconStarChatBubble" width="12" height="12"/>

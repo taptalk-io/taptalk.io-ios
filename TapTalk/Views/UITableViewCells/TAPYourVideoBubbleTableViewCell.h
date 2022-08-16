@@ -79,6 +79,7 @@ typedef NS_ENUM(NSInteger, TAPYourVideoBubbleTableViewCellStateType) {
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
 
 @end
 

@@ -31,7 +31,8 @@
 + (TAPCoreConfigsModel *)getCoreConfigs;
 + (void)setUnreadRoomIDs:(NSArray *)roomIDs;
 + (NSArray *)getUnreadRoomIDs;
-
++ (void)setLatestPinnedWithMessageRoomID:(TAPMessageModel *)message roomID:(NSInteger)roomID;
++ (NSMutableDictionary *)getLatestPinnedMessage;
 
 + (void)updateMessageToFailedWhenClosedInDatabase;
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
@@ -404,6 +405,10 @@
 + (void)callAPIUnStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetStarredMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSArray *starredMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetStarredMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIPinMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageIDs success:(void (^)(NSArray *messageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIUnPinMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageIDs success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetPinnedMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSMutableArray *pinnedMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetPinnedMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *pinnedMessageIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPICheckDeleteAccountState:(void (^)(NSNumber *canDelete))success
                                 failure:(void (^)(NSError *error))failure;
 + (void)callAPIRequestVerificationCodeDeleteAccount:(NSString *)channel

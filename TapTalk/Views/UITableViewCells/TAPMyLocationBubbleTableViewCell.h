@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
 
 @end
 

@@ -59,6 +59,7 @@
 @property (nonatomic) BOOL isEditMessageMenuDisabled;
 @property (nonatomic) BOOL isDeleteAccountButtonVisible;
 @property (nonatomic) BOOL isSavedMessagesMenuDisabled;
+@property (nonatomic) BOOL isPinMessageMenuDisabled;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -1013,6 +1014,21 @@ Get current status of saved messages menu
 */
 - (BOOL)isSavedMessagesMenuEnabled{
     return !self.isSavedMessagesMenuDisabled;
+}
+
+/**
+Show or hide pin messages menu
+*/
+- (void)setPinMessageMenuEnabled:(BOOL)isEnabled {
+    _isPinMessageMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of pin messages menu
+*/
+- (BOOL)isPinMessageMenuEnabled{
+    return !self.isPinMessageMenuDisabled;
 }
 
 
