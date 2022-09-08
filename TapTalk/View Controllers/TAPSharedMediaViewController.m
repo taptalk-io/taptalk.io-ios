@@ -1449,12 +1449,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"View in Chat", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleDefault
                                    handler:^(UIAlertAction * action) {
-        [self.navigationController popToRootViewControllerAnimated:NO];
-        [[TapUI sharedInstance] createRoomWithRoom:self.room scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-            chatViewController.hidesBottomBarWhenPushed = YES;
-            [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-        }];
-                                   }];
+        [self.navigationController popViewControllerAnimated:NO];
+        if ([self.delegate respondsToSelector:@selector(scrollToMessageShareMediaWithLocalID:)]) {
+            [self.delegate scrollToMessageShareMediaWithLocalID:message.localID];
+        }
+        
+    }];
     
     UIAlertAction *cancelAction = [UIAlertAction
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")

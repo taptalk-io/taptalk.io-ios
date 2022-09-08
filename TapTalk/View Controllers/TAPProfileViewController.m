@@ -19,7 +19,7 @@
 #import "TAPStarredMessageViewController.h"
 #import "TAPSharedMediaViewController.h"
 
-@interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate, TAPCreateGroupSubjectViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, TAPStarredMessageViewControllerDelegate>
+@interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate, TAPCreateGroupSubjectViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, TAPStarredMessageViewControllerDelegate, TAPSharedMediaViewControllerDelegate>
 
 @property (strong, nonatomic) TAPProfileView *profileView;
 @property (strong, nonatomic) TAPUserModel *updatedUser;
@@ -1444,6 +1444,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (indexPath.row == 1) {
             TAPSharedMediaViewController *shareMediaVC = [[TAPSharedMediaViewController alloc] initWithNibName:@"TAPSharedMediaViewController" bundle:[TAPUtil currentBundle]];
             shareMediaVC.room = self.room;
+            shareMediaVC.delegate = self;
             [self.navigationController pushViewController:shareMediaVC animated:YES];
         }
     }
@@ -1864,10 +1865,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 #pragma mark - TAPStarredMessageViewControllerDelegate
 - (void)starMessageBubbleCliked:(TAPMessageModel *)message{
-    if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
-        [self.delegate starMessageBubbleCliked:message];
-    }
     [self.navigationController popViewControllerAnimated:NO];
+    if ([self.delegate respondsToSelector:@selector(scrollToMessageProfileWithLocalID:)]) {
+        [self.delegate scrollToMessageProfileWithLocalID:message.localID];
+    }
 }
 
 
@@ -1889,6 +1890,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.profileView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:4]];
     [cell animateFailedDownloadingMedia];
+}
+
+#pragma mark - TAPSharedMediaViewControllerDelegate
+
+- (void)scrollToMessageShareMediaWithLocalID:(NSString *)localID {
+    [self.navigationController popViewControllerAnimated:NO];
+    if ([self.delegate respondsToSelector:@selector(scrollToMessageProfileWithLocalID:)]) {
+        [self.delegate scrollToMessageProfileWithLocalID:localID];
+    }
+   
 }
 
 #pragma mark TAPMediaDetailViewController
