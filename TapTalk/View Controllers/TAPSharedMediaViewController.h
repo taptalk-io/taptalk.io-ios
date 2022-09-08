@@ -15,9 +15,19 @@ typedef NS_ENUM(NSInteger, TAPShareMediaTabType) {
     TAPShareMediaTabTypeDocument = 2,
 };
 
+@protocol TAPSharedMediaViewControllerDelegate <NSObject>
+
+@optional
+
+- (void)scrollToMessageShareMediaWithLocalID:(NSString *)localID;
+
+
+@end
+
 @interface TAPSharedMediaViewController : TAPBaseViewController
 
 @property (strong, nonatomic) TAPRoomModel *room;
+@property (weak, nonatomic) id<TAPSharedMediaViewControllerDelegate> delegate;
 
 @end
 

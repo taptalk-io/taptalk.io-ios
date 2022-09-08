@@ -967,11 +967,10 @@
 
 -(void)goBackToMessage:(TAPMessageModel *)message {
     if(self.messageListType == TAPUIMessageListTypeStar){
-        [self.navigationController popToRootViewControllerAnimated:NO];
-        [[TapUI sharedInstance] createRoomWithRoom:self.currentRoom scrollToMessageWithLocalID :message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
-            chatViewController.hidesBottomBarWhenPushed = YES;
-            [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
-        }];
+        [self.navigationController popViewControllerAnimated:NO];
+        if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
+            [self.delegate starMessageBubbleCliked:message];
+        }
     }
     else if(self.messageListType == TAPUIMessageListTypePin){
         [self.navigationController popViewControllerAnimated:YES];

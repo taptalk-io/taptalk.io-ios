@@ -27,6 +27,15 @@
 		0A9D8018282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A9D8015282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.m */; };
 		0A9D801B282EA27000597B7E /* TAPAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9D8019282EA27000597B7E /* TAPAudioManager.h */; };
 		0A9D801C282EA27000597B7E /* TAPAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A9D801A282EA27000597B7E /* TAPAudioManager.m */; };
+		0AB2B0CA28C9E15A00407B17 /* TAPSharedMediaViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB2B0C728C9E15A00407B17 /* TAPSharedMediaViewController.h */; };
+		0AB2B0CB28C9E15A00407B17 /* TAPSharedMediaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB2B0C828C9E15A00407B17 /* TAPSharedMediaViewController.m */; };
+		0AB2B0CC28C9E15A00407B17 /* TAPSharedMediaViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AB2B0C928C9E15A00407B17 /* TAPSharedMediaViewController.xib */; };
+		0AB2B0D328C9E23500407B17 /* TAPLinksShareMediaTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB2B0CD28C9E23400407B17 /* TAPLinksShareMediaTableViewCell.h */; };
+		0AB2B0D428C9E23500407B17 /* TAPLinksShareMediaTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB2B0CE28C9E23400407B17 /* TAPLinksShareMediaTableViewCell.m */; };
+		0AB2B0D528C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AB2B0CF28C9E23400407B17 /* TAPDocumentShareMediaTableViewCell.xib */; };
+		0AB2B0D628C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB2B0D028C9E23400407B17 /* TAPDocumentShareMediaTableViewCell.h */; };
+		0AB2B0D728C9E23500407B17 /* TAPLinksShareMediaTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AB2B0D128C9E23500407B17 /* TAPLinksShareMediaTableViewCell.xib */; };
+		0AB2B0D828C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB2B0D228C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.m */; };
 		0AC3937127F7360400A612AA /* TAPStarredMessageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC3936E27F7360300A612AA /* TAPStarredMessageViewController.h */; };
 		0AC3937227F7360400A612AA /* TAPStarredMessageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC3936F27F7360300A612AA /* TAPStarredMessageViewController.xib */; };
 		0AC3937327F7360400A612AA /* TAPStarredMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AC3937027F7360300A612AA /* TAPStarredMessageViewController.m */; };
@@ -452,6 +461,15 @@
 		0A9D8015282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPYourVoiceNoteBubbleTableViewCell.m; sourceTree = "<group>"; };
 		0A9D8019282EA27000597B7E /* TAPAudioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPAudioManager.h; sourceTree = "<group>"; };
 		0A9D801A282EA27000597B7E /* TAPAudioManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPAudioManager.m; sourceTree = "<group>"; };
+		0AB2B0C728C9E15A00407B17 /* TAPSharedMediaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPSharedMediaViewController.h; sourceTree = "<group>"; };
+		0AB2B0C828C9E15A00407B17 /* TAPSharedMediaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPSharedMediaViewController.m; sourceTree = "<group>"; };
+		0AB2B0C928C9E15A00407B17 /* TAPSharedMediaViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPSharedMediaViewController.xib; sourceTree = "<group>"; };
+		0AB2B0CD28C9E23400407B17 /* TAPLinksShareMediaTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPLinksShareMediaTableViewCell.h; sourceTree = "<group>"; };
+		0AB2B0CE28C9E23400407B17 /* TAPLinksShareMediaTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPLinksShareMediaTableViewCell.m; sourceTree = "<group>"; };
+		0AB2B0CF28C9E23400407B17 /* TAPDocumentShareMediaTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPDocumentShareMediaTableViewCell.xib; sourceTree = "<group>"; };
+		0AB2B0D028C9E23400407B17 /* TAPDocumentShareMediaTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPDocumentShareMediaTableViewCell.h; sourceTree = "<group>"; };
+		0AB2B0D128C9E23500407B17 /* TAPLinksShareMediaTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPLinksShareMediaTableViewCell.xib; sourceTree = "<group>"; };
+		0AB2B0D228C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPDocumentShareMediaTableViewCell.m; sourceTree = "<group>"; };
 		0AC3936E27F7360300A612AA /* TAPStarredMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPStarredMessageViewController.h; sourceTree = "<group>"; };
 		0AC3936F27F7360300A612AA /* TAPStarredMessageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPStarredMessageViewController.xib; sourceTree = "<group>"; };
 		0AC3937027F7360300A612AA /* TAPStarredMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPStarredMessageViewController.m; sourceTree = "<group>"; };
@@ -1278,6 +1296,9 @@
 				0AC3936E27F7360300A612AA /* TAPStarredMessageViewController.h */,
 				0AC3937027F7360300A612AA /* TAPStarredMessageViewController.m */,
 				0AC3936F27F7360300A612AA /* TAPStarredMessageViewController.xib */,
+				0AB2B0C728C9E15A00407B17 /* TAPSharedMediaViewController.h */,
+				0AB2B0C828C9E15A00407B17 /* TAPSharedMediaViewController.m */,
+				0AB2B0C928C9E15A00407B17 /* TAPSharedMediaViewController.xib */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -1358,6 +1379,12 @@
 				0A9D8014282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.h */,
 				0A9D8015282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.m */,
 				0A9D8013282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.xib */,
+				0AB2B0D028C9E23400407B17 /* TAPDocumentShareMediaTableViewCell.h */,
+				0AB2B0D228C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.m */,
+				0AB2B0CF28C9E23400407B17 /* TAPDocumentShareMediaTableViewCell.xib */,
+				0AB2B0CD28C9E23400407B17 /* TAPLinksShareMediaTableViewCell.h */,
+				0AB2B0CE28C9E23400407B17 /* TAPLinksShareMediaTableViewCell.m */,
+				0AB2B0D128C9E23500407B17 /* TAPLinksShareMediaTableViewCell.xib */,
 			);
 			path = UITableViewCells;
 			sourceTree = "<group>";
@@ -1567,6 +1594,7 @@
 				D79A3E6D216C72C4004525CE /* TAPConnectionStatusViewController.h in Headers */,
 				D77B5F542158BBEA00253BDC /* TAPAddNewChatViewController.h in Headers */,
 				F56AAE5F2186F4E000E0ECC3 /* TAPYourImageBubbleTableViewCell.h in Headers */,
+				0AB2B0CA28C9E15A00407B17 /* TAPSharedMediaViewController.h in Headers */,
 				D77B5EE22158BB7E00253BDC /* TAPBaseCollectionViewCell.h in Headers */,
 				A97EC5C925BEF17B0068E2D4 /* TapUI.h in Headers */,
 				DFA6365222D42B4900B9CB99 /* TAPGroupManager.h in Headers */,
@@ -1652,6 +1680,7 @@
 				0A1640BF27D9E94B007FACEE /* TAPCustomTextView.h in Headers */,
 				D7244BC821D883A1000BEEEE /* TAPPhotoAlbumListView.h in Headers */,
 				F55913DF2175EF9D004A81EC /* TAPSearchResultMessageTableViewCell.h in Headers */,
+				0AB2B0D628C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.h in Headers */,
 				DF2513CF21E61BE3000D165A /* TAPForwardFromModel.h in Headers */,
 				D779658D215B3D4400756A38 /* TAPCustomTextView.h in Headers */,
 				D77B5EA52158BB4000253BDC /* TAPAPIManager.h in Headers */,
@@ -1678,6 +1707,7 @@
 				D798D3A7229D4D6D00F73CA9 /* TAPMyChatDeletedBubbleTableViewCell.h in Headers */,
 				D77B5ED12158BB6E00253BDC /* TAPBaseModel.h in Headers */,
 				D77B5EFC2158BB8700253BDC /* TAPBaseXIBTableViewCell.h in Headers */,
+				0AB2B0D328C9E23500407B17 /* TAPLinksShareMediaTableViewCell.h in Headers */,
 				DF94DD7922B0BD5B00E7E629 /* TAPSystemMessageTableViewCell.h in Headers */,
 				D77B5ED22158BB6E00253BDC /* TAPRoomModel.h in Headers */,
 				D776CB8422CCA760003B0D4F /* UIImage+Color.h in Headers */,
@@ -1794,15 +1824,18 @@
 				D7D081202190459D0037FA57 /* TAPProductListBubbleTableViewCell.xib in Resources */,
 				D780A08521AE656E001D673D /* TAPBaseMyBubbleTableViewCell.xib in Resources */,
 				D7FF4CEB2176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.xib in Resources */,
+				0AB2B0D728C9E23500407B17 /* TAPLinksShareMediaTableViewCell.xib in Resources */,
 				D7A98E3F221EFFFE0007BF81 /* TAPMyLocationBubbleTableViewCell.xib in Resources */,
 				F56AAE612186F4E000E0ECC3 /* TAPYourImageBubbleTableViewCell.xib in Resources */,
 				D795E12F222CF1BD008E7B99 /* TAPMyFileBubbleTableViewCell.xib in Resources */,
+				0AB2B0CC28C9E15A00407B17 /* TAPSharedMediaViewController.xib in Resources */,
 				F51B8E9221621AB300C03479 /* TAPYourChatBubbleTableViewCell.xib in Resources */,
 				D7F986F92251C1C40087B652 /* PTRootUI-Medium.ttf in Resources */,
 				DF936AA522968F7F00F17B4C /* TAPLoadingTableViewCell.xib in Resources */,
 				D7A98E34221EFF1B0007BF81 /* Assets.xcassets in Resources */,
 				D795E135222CF1D7008E7B99 /* TAPYourFileBubbleTableViewCell.xib in Resources */,
 				0A9D8016282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.xib in Resources */,
+				0AB2B0D528C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.xib in Resources */,
 				F5E0B26F215B7BBB0040163B /* TAPMyChatBubbleTableViewCell.xib in Resources */,
 				D7A98E44221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.xib in Resources */,
 				D73D85AA246BC605008ABEB9 /* TAPMentionListXIBTableViewCell.xib in Resources */,
@@ -1895,6 +1928,7 @@
 				D77B5F362158BB9500253BDC /* TAPSearchView.m in Sources */,
 				F53288112174A911004E7A25 /* TAPRecentSearchTableViewCell.m in Sources */,
 				D73E2E8E220088550083E997 /* TAPProductModel.m in Sources */,
+				0AB2B0D828C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.m in Sources */,
 				D71582F3217EE99700649C70 /* TAPNotificationManager.m in Sources */,
 				D774A95322E9742A005CAD5D /* TAPCoreRoomListManager.m in Sources */,
 				D77B5F5A2158BBEA00253BDC /* TAPCreateGroupSubjectViewController.m in Sources */,
@@ -1908,6 +1942,7 @@
 				D7D3B44822FD7D8D00D1DFF7 /* TAPProjectConfigsModel.m in Sources */,
 				D77B5E882158BB2900253BDC /* NSData+Base64.m in Sources */,
 				F56AAE5A2186EEFD00E0ECC3 /* TAPMyImageBubbleTableViewCell.m in Sources */,
+				0AB2B0CB28C9E15A00407B17 /* TAPSharedMediaViewController.m in Sources */,
 				0A9D801C282EA27000597B7E /* TAPAudioManager.m in Sources */,
 				D7D3B43C22F0374400D1DFF7 /* TAPCoreChatRoomManager.m in Sources */,
 				D77B5F2B2158BB9500253BDC /* TAPCreateGroupView.m in Sources */,
@@ -1963,6 +1998,7 @@
 				D77B5ED52158BB6E00253BDC /* TAPImageURLModel.m in Sources */,
 				DF94DD7A22B0BD5B00E7E629 /* TAPSystemMessageTableViewCell.m in Sources */,
 				D77B5F322158BB9500253BDC /* TAPScanQRCodeView.m in Sources */,
+				0AB2B0D428C9E23500407B17 /* TAPLinksShareMediaTableViewCell.m in Sources */,
 				D7A98E45221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.m in Sources */,
 				D77B5F582158BBEA00253BDC /* TAPScanQRCodeViewController.m in Sources */,
 				D79A3E69216C72B3004525CE /* TAPSearchBarView.m in Sources */,
@@ -2245,7 +2281,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -2282,7 +2318,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

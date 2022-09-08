@@ -7107,6 +7107,10 @@ CGPoint center;
     }
 }
 
+- (void)scrollToMessageProfileWithLocalID:(NSString *)localID {
+    [self scrollToMessageAndLoadDataWithLocalID:localID];
+}
+
 #pragma mark - Custom Method
 #pragma mark ViewDidLoad Method
 - (void)setupNavigationViewData {
