@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="56" id="KGk-i7-Jjw" customClass="TAPDocumentShareMediaTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="56"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="56"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LYU-Ly-jRM" userLabel="Status Container">
+                        <rect key="frame" x="16" y="8" width="40" height="40"/>
+                        <subviews>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Pj-5G-Yfy" userLabel="Download View">
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDownload" translatesAutoresizingMaskIntoConstraints="NO" id="6uT-eo-l6t">
+                                        <rect key="frame" x="8" y="8" width="24" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="24" id="5bn-a5-K06"/>
+                                            <constraint firstAttribute="width" constant="24" id="MGF-5m-hPf"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8FJ-cT-GP4">
+                                        <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <connections>
+                                            <action selector="downloadButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="uHR-Nx-wLd"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="6uT-eo-l6t" firstAttribute="centerY" secondItem="7Pj-5G-Yfy" secondAttribute="centerY" id="0Ce-QK-HWI"/>
+                                    <constraint firstItem="8FJ-cT-GP4" firstAttribute="leading" secondItem="7Pj-5G-Yfy" secondAttribute="leading" id="Sxe-qh-3sO"/>
+                                    <constraint firstItem="8FJ-cT-GP4" firstAttribute="top" secondItem="7Pj-5G-Yfy" secondAttribute="top" id="Wxe-wG-aN0"/>
+                                    <constraint firstItem="6uT-eo-l6t" firstAttribute="centerX" secondItem="7Pj-5G-Yfy" secondAttribute="centerX" id="iUp-ar-l4F"/>
+                                    <constraint firstAttribute="bottom" secondItem="8FJ-cT-GP4" secondAttribute="bottom" id="n5H-Gp-ODN"/>
+                                    <constraint firstAttribute="trailing" secondItem="8FJ-cT-GP4" secondAttribute="trailing" id="w6S-4c-8Dz"/>
+                                </constraints>
+                            </view>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Asy-Lt-iDo" userLabel="Cancel View">
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconAbort" translatesAutoresizingMaskIntoConstraints="NO" id="fKl-Uz-uMF">
+                                        <rect key="frame" x="8" y="8" width="24" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="24" id="4hY-Kf-YSu"/>
+                                            <constraint firstAttribute="height" constant="24" id="Mcr-1E-n8h"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6k8-Ej-JQ5">
+                                        <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <connections>
+                                            <action selector="cancelButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="4AL-Ks-EU8"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="fKl-Uz-uMF" firstAttribute="centerY" secondItem="Asy-Lt-iDo" secondAttribute="centerY" id="4nh-Ua-8EZ"/>
+                                    <constraint firstItem="fKl-Uz-uMF" firstAttribute="centerX" secondItem="Asy-Lt-iDo" secondAttribute="centerX" id="A3n-Xc-S3G"/>
+                                    <constraint firstAttribute="bottom" secondItem="6k8-Ej-JQ5" secondAttribute="bottom" id="Aru-lK-1d7"/>
+                                    <constraint firstItem="6k8-Ej-JQ5" firstAttribute="leading" secondItem="Asy-Lt-iDo" secondAttribute="leading" id="lFl-N3-hAN"/>
+                                    <constraint firstAttribute="trailing" secondItem="6k8-Ej-JQ5" secondAttribute="trailing" id="nfp-LJ-c7b"/>
+                                    <constraint firstItem="6k8-Ej-JQ5" firstAttribute="top" secondItem="Asy-Lt-iDo" secondAttribute="top" id="s7i-Gj-51i"/>
+                                </constraints>
+                            </view>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KVt-wj-2SS" userLabel="Retry View">
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconRetry" translatesAutoresizingMaskIntoConstraints="NO" id="QGb-Nl-Mux">
+                                        <rect key="frame" x="8" y="8" width="24" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="24" id="Qbs-od-nzK"/>
+                                            <constraint firstAttribute="width" constant="24" id="ilN-XQ-37M"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FsP-6q-Vyn">
+                                        <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <connections>
+                                            <action selector="retryButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="CF5-ry-lVt"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="QGb-Nl-Mux" firstAttribute="centerY" secondItem="KVt-wj-2SS" secondAttribute="centerY" id="6bO-QV-59A"/>
+                                    <constraint firstAttribute="trailing" secondItem="FsP-6q-Vyn" secondAttribute="trailing" id="GXo-Zu-wxm"/>
+                                    <constraint firstItem="FsP-6q-Vyn" firstAttribute="top" secondItem="KVt-wj-2SS" secondAttribute="top" id="Y6s-pN-pHH"/>
+                                    <constraint firstItem="QGb-Nl-Mux" firstAttribute="centerX" secondItem="KVt-wj-2SS" secondAttribute="centerX" id="dl3-It-yLP"/>
+                                    <constraint firstItem="FsP-6q-Vyn" firstAttribute="leading" secondItem="KVt-wj-2SS" secondAttribute="leading" id="gbL-94-7hN"/>
+                                    <constraint firstAttribute="bottom" secondItem="FsP-6q-Vyn" secondAttribute="bottom" id="tI3-xN-ceE"/>
+                                </constraints>
+                            </view>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wpf-t4-Ion" userLabel="Done Download View">
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconDocumentShared" translatesAutoresizingMaskIntoConstraints="NO" id="HVl-8s-VQq">
+                                        <rect key="frame" x="8" y="8" width="24" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="24" id="7Ud-I4-jQq"/>
+                                            <constraint firstAttribute="height" constant="24" id="NZT-km-IJO"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OND-nk-wXw">
+                                        <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <connections>
+                                            <action selector="doneDownloadButtonDidTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="KiV-oq-XV1"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="OND-nk-wXw" secondAttribute="bottom" id="2Kr-LQ-UG8"/>
+                                    <constraint firstItem="OND-nk-wXw" firstAttribute="top" secondItem="wpf-t4-Ion" secondAttribute="top" id="BO3-4E-h41"/>
+                                    <constraint firstItem="OND-nk-wXw" firstAttribute="leading" secondItem="wpf-t4-Ion" secondAttribute="leading" id="Cfl-4w-UV9"/>
+                                    <constraint firstAttribute="trailing" secondItem="OND-nk-wXw" secondAttribute="trailing" id="KbY-ak-aQp"/>
+                                    <constraint firstItem="HVl-8s-VQq" firstAttribute="centerX" secondItem="wpf-t4-Ion" secondAttribute="centerX" id="ibN-1T-xYi"/>
+                                    <constraint firstItem="HVl-8s-VQq" firstAttribute="centerY" secondItem="wpf-t4-Ion" secondAttribute="centerY" id="n5G-jG-zMY"/>
+                                </constraints>
+                            </view>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dzz-b2-c8F" userLabel="Progress View">
+                                <rect key="frame" x="8" y="8" width="24" height="24"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="KVt-wj-2SS" secondAttribute="bottom" id="0GR-vo-x1a"/>
+                            <constraint firstAttribute="trailing" secondItem="7Pj-5G-Yfy" secondAttribute="trailing" id="1DG-V7-u3k"/>
+                            <constraint firstItem="7Pj-5G-Yfy" firstAttribute="top" secondItem="LYU-Ly-jRM" secondAttribute="top" id="4oG-NV-FiF"/>
+                            <constraint firstAttribute="width" constant="40" id="AUX-6s-Etm"/>
+                            <constraint firstAttribute="trailing" secondItem="KVt-wj-2SS" secondAttribute="trailing" id="C7F-U1-a3x"/>
+                            <constraint firstAttribute="bottom" secondItem="Asy-Lt-iDo" secondAttribute="bottom" id="MqG-27-WbC"/>
+                            <constraint firstItem="KVt-wj-2SS" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="leading" id="Qa5-R8-1WA"/>
+                            <constraint firstAttribute="trailing" secondItem="Asy-Lt-iDo" secondAttribute="trailing" id="Qq6-j7-5ht"/>
+                            <constraint firstItem="dzz-b2-c8F" firstAttribute="top" secondItem="LYU-Ly-jRM" secondAttribute="top" constant="8" id="SD3-y7-e23"/>
+                            <constraint firstAttribute="height" constant="40" id="SZ4-di-W15"/>
+                            <constraint firstItem="7Pj-5G-Yfy" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="leading" id="UB2-vP-GZs"/>
+                            <constraint firstItem="wpf-t4-Ion" firstAttribute="top" secondItem="LYU-Ly-jRM" secondAttribute="top" id="VCt-op-Ct0"/>
+                            <constraint firstAttribute="bottom" secondItem="7Pj-5G-Yfy" secondAttribute="bottom" id="XbZ-4L-y6g"/>
+                            <constraint firstItem="Asy-Lt-iDo" firstAttribute="top" secondItem="LYU-Ly-jRM" secondAttribute="top" id="YIS-Vi-mlC"/>
+                            <constraint firstItem="Asy-Lt-iDo" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="leading" id="Yc1-Cg-0fD"/>
+                            <constraint firstAttribute="bottom" secondItem="dzz-b2-c8F" secondAttribute="bottom" constant="8" id="Yuw-gp-PvA"/>
+                            <constraint firstItem="dzz-b2-c8F" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="leading" constant="8" id="aWB-ly-AHK"/>
+                            <constraint firstAttribute="trailing" secondItem="wpf-t4-Ion" secondAttribute="trailing" id="dzY-c5-98q"/>
+                            <constraint firstItem="wpf-t4-Ion" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="leading" id="mCP-g7-zNT"/>
+                            <constraint firstAttribute="trailing" secondItem="dzz-b2-c8F" secondAttribute="trailing" constant="8" id="vsS-4p-dcM"/>
+                            <constraint firstAttribute="bottom" secondItem="wpf-t4-Ion" secondAttribute="bottom" id="xbS-2f-sYE"/>
+                            <constraint firstItem="KVt-wj-2SS" firstAttribute="top" secondItem="LYU-Ly-jRM" secondAttribute="top" id="zRg-tw-75R"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFl-Me-IBl">
+                        <rect key="frame" x="64" y="12" width="242" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="7y1-fj-b9b"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xdS-8F-lbQ">
+                        <rect key="frame" x="64" y="34" width="242" height="14"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="14" id="78G-I6-nfw"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="LYU-Ly-jRM" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="8mW-px-dox"/>
+                    <constraint firstAttribute="trailing" secondItem="aFl-Me-IBl" secondAttribute="trailing" constant="14" id="Fcw-op-1bc"/>
+                    <constraint firstItem="aFl-Me-IBl" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="trailing" constant="8" id="HEq-cq-oOU"/>
+                    <constraint firstAttribute="bottom" secondItem="xdS-8F-lbQ" secondAttribute="bottom" constant="8" id="QKv-RA-2D3"/>
+                    <constraint firstItem="LYU-Ly-jRM" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="YlF-DC-CC3"/>
+                    <constraint firstItem="aFl-Me-IBl" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="12" id="ZL9-Yn-fkR"/>
+                    <constraint firstItem="xdS-8F-lbQ" firstAttribute="leading" secondItem="LYU-Ly-jRM" secondAttribute="trailing" constant="8" id="bYY-i9-VkJ"/>
+                    <constraint firstAttribute="trailing" secondItem="xdS-8F-lbQ" secondAttribute="trailing" constant="14" id="pTS-yW-2oT"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <connections>
+                <outlet property="cancelView" destination="Asy-Lt-iDo" id="cg8-7m-xPK"/>
+                <outlet property="documentInfoLabel" destination="xdS-8F-lbQ" id="jAF-xH-Lcs"/>
+                <outlet property="documentStatusIconView" destination="LYU-Ly-jRM" id="O3K-hg-gfw"/>
+                <outlet property="documentTitleLabel" destination="aFl-Me-IBl" id="pAd-BJ-n2R"/>
+                <outlet property="doneDownloadView" destination="wpf-t4-Ion" id="Sfa-yy-Pc5"/>
+                <outlet property="downloadView" destination="7Pj-5G-Yfy" id="dWo-SO-UpF"/>
+                <outlet property="progressBarView" destination="dzz-b2-c8F" id="8w4-dv-3IQ"/>
+                <outlet property="retryDownloadView" destination="KVt-wj-2SS" id="Xsc-GW-Tt6"/>
+            </connections>
+            <point key="canvasLocation" x="132" y="70"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="TAPIconAbort" width="32" height="32"/>
+        <image name="TAPIconDocumentShared" width="24" height="24"/>
+        <image name="TAPIconDownload" width="24" height="24"/>
+        <image name="TAPIconRetry" width="32" height="32"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

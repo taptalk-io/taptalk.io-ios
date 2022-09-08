@@ -69,6 +69,7 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeUnPinMessage,
     TAPAPIManagerTypeGetPinnedMessages,
     TAPAPIManagerTypeGetPinnedMessagesIDs,
+    TAPAPIManagerTypeGetSharedContent,
 };
 
 @interface TAPAPIManager : NSObject

@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)imageCollectionViewCellDidTappedDownloadWithMessage:(TAPMessageModel *)message;
 - (void)imageCollectionViewCellDidTappedCancelWithMessage:(TAPMessageModel *)message;
+- (void)imageCollectionViewCellLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 
 @end
 

@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, TAPChatMessageType) {
     TAPChatMessageTypeContact = 1006,
     TAPChatMessageTypeSticker = 1007,
     TAPChatMessageTypeVoice = 1008,
+    TAPChatMessageTypeLink = 1010,
     
     TAPChatMessageTypeProduct = 2001,
     TAPChatMessageTypeCategory = 2002,

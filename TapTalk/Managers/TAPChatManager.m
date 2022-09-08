@@ -388,6 +388,27 @@
     //Divide message if length more than character limit
     NSInteger characterLimit = kCharacterLimit;
     
+    //check is text message containing url
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    
+    NSArray *urlMatches = [linkDetector matchesInString:textMessage options:0 range:NSMakeRange(0, textMessage.length)];
+    
+    NSMutableArray *urlMatchesString = [[NSMutableArray alloc] init];
+    
+    for(NSTextCheckingResult *urlMatch in urlMatches){
+        NSURL *url = [urlMatch URL];
+        [urlMatchesString addObject:[url absoluteString]];
+    }
+    
+    TAPChatMessageType messagetype = TAPChatMessageTypeText;
+    NSDictionary *messageData = nil;
+    
+    if(urlMatches.count > 0){
+        messagetype = TAPChatMessageTypeLink;
+        NSString *firstUrl = [urlMatchesString objectAtIndex:0];
+        messageData = @{@"url":firstUrl, @"urls":urlMatchesString};
+    }
+    
     if ([textMessage length] > characterLimit) {
         NSInteger messageLength = [textMessage length];
         
@@ -402,8 +423,8 @@
             
             TAPMessageModel *message = [self createMessageModelWithRoom:room
                                                                    body:substringMessage
-                                                                   type:TAPChatMessageTypeText
-                                                            messageData:nil];
+                                                                   type:messagetype
+                                                            messageData:messageData];
             
             //Call block in TAPCoreMessageManager to handle things in TAPCore
             successGenerateMessage(message);
@@ -414,8 +435,8 @@
     else {
         TAPMessageModel *message = [self createMessageModelWithRoom:room
                                                                body:textMessage
-                                                               type:TAPChatMessageTypeText
-                                                        messageData:nil];
+                                                               type:messagetype
+                                                        messageData:messageData];
         
         //Call block in TAPCoreMessageManager to handle things in TAPCore
         successGenerateMessage(message);

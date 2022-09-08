@@ -1148,7 +1148,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         return NO;
     }
     
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
                 
         NSString *firstPredicateString = [NSString stringWithFormat:@" @%@ ", activeUserUsername];
         NSString *secondPredicateString = [NSString stringWithFormat:@" @%@\n", activeUserUsername];

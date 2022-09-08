@@ -288,6 +288,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/get_pinned_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeGetSharedContent) {
+        NSString *apiPath = @"chat/room/get_shared_content";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }

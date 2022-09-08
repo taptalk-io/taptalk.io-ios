@@ -1714,13 +1714,39 @@
             success:(void (^)(TAPMessageModel *message))success
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
-    if (message.type == TAPChatMessageTypeText) {
+    
+    
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
         if (updatedText.length > kCharacterLimit) {
             NSString *errorMessage = [NSString stringWithFormat:@"Message exceeds the %ld character limit", (long)kCharacterLimit];
             NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
             failure(message, error);
             return;
         }
+        
+        //check is text message containing url
+        NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+        
+        NSArray *urlMatches = [linkDetector matchesInString:updatedText options:0 range:NSMakeRange(0, updatedText.length)];
+        
+        NSMutableArray *urlMatchesString = [[NSMutableArray alloc] init];
+        
+        for(NSTextCheckingResult *urlMatch in urlMatches){
+            NSURL *url = [urlMatch URL];
+            [urlMatchesString addObject:[url absoluteString]];
+        }
+        
+        TAPChatMessageType messagetype = TAPChatMessageTypeText;
+        NSDictionary *messageData = nil;
+        
+        if(urlMatches.count > 0){
+            messagetype = TAPChatMessageTypeLink;
+            NSString *firstUrl = [urlMatchesString objectAtIndex:0];
+            messageData = @{@"url":firstUrl, @"urls":urlMatchesString};
+        }
+        
+        message.type = messagetype;
+        message.data = messageData;
         message.body = updatedText;
     }
     else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
@@ -1881,5 +1907,18 @@
         failure(error);
     }];
 }
+
+- (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated
+                           success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetSharedContent:roomID maxCreated:maxCreated  minCreated:minCreated success:^(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray) {
+        success(mediaMessagesArray, fileMessagesArray, linkMessagesArray);
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+    
+}
+
 
 @end

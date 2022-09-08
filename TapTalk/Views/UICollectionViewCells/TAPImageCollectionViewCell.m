@@ -21,6 +21,8 @@
 @property (strong, nonatomic) UIButton *downloadButton;
 @property (strong, nonatomic) UIButton *cancelButton;
 
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressGestureRecognizer;
+
 @property (strong, nonatomic) CAShapeLayer *progressLayer;
 @property (nonatomic) CGFloat lastProgress;
 @property (nonatomic) CGFloat startAngle;
@@ -47,6 +49,7 @@
         
         _thumbnailImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame))];
         self.thumbnailImageView.clipsToBounds = YES;
+        self.thumbnailImageView.layer.cornerRadius = 4.0f;
         self.thumbnailImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.contentView addSubview:self.thumbnailImageView];
         
@@ -54,10 +57,13 @@
         self.imageView.clipsToBounds = YES;
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;
         self.imageView.backgroundColor = [UIColor clearColor];
+        self.imageView.layer.cornerRadius = 4.0f;
         [self.contentView addSubview:self.imageView];
         
         _bottomGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(frame)/2, CGRectGetWidth(frame), CGRectGetHeight(frame)/2)];
         self.bottomGradientView.backgroundColor = [UIColor clearColor];
+        self.bottomGradientView.layer.cornerRadius = 4.0f;
+        self.bottomGradientView.clipsToBounds = YES;
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.bottomGradientView.bounds;
         gradient.colors = [NSArray arrayWithObjects:(id)[TAPUtil getColor:@"04040F"].CGColor, (id)[UIColor clearColor].CGColor, nil];
@@ -112,6 +118,11 @@
         
         [self.downloadButton addTarget:self action:@selector(downloadButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        
+        _longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                                  action:@selector(handleLongPress:)];
+        self.longPressGestureRecognizer.minimumPressDuration = 0.2f;
+        [self.contentView addGestureRecognizer:self.longPressGestureRecognizer];
 
         _startAngle = M_PI * 1.5;
         _endAngle = self.startAngle + (M_PI * 2);
@@ -158,6 +169,15 @@
         self.videoIndicatorImageView.alpha = 1.0f;
         self.bottomGradientView.alpha = 1.0f;
     }
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)recognizer {
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(imageCollectionViewCellLongPressedWithMessage:)]) {
+            [self.delegate imageCollectionViewCellLongPressedWithMessage:self.currentMessage];
+        }
+    }
+    
 }
 
 - (void)animateFinishedDownloadingMedia {
@@ -248,7 +268,7 @@
     [self showProgressView:NO];
     if (self.currentMessage.type == TAPChatMessageTypeImage) {
         self.bottomGradientView.alpha = 0.0f;
-        self.infoLabel.alpha = 0.0f;
+       // self.infoLabel.alpha = 0.0f;
     }
 }
 

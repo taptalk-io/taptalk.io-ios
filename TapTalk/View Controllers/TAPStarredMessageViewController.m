@@ -210,7 +210,7 @@
     }
     
     if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
-        if (message.type == TAPChatMessageTypeText) {
+        if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
             [tableView registerNib:[TAPMyChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyChatBubbleTableViewCell description]];
             TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatBubbleTableViewCell description] forIndexPath:indexPath];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -571,7 +571,7 @@
         
     }
     else{
-        if (message.type == TAPChatMessageTypeText) {
+        if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
             
             //Their Chat Message
             [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];

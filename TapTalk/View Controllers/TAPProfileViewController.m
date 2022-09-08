@@ -17,6 +17,7 @@
 #import "TAPCreateGroupViewController.h"
 #import "TAPImagePreviewCollectionViewCell.h"
 #import "TAPStarredMessageViewController.h"
+#import "TAPSharedMediaViewController.h"
 
 @interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate, TAPCreateGroupSubjectViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, TAPStarredMessageViewControllerDelegate>
 
@@ -635,7 +636,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return 4; //Not showing 2 section because shared media is empty
     }
     
-    return 5; //with media
+    //hide media
+    return 4;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
@@ -707,7 +709,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return 0;
     }
     else if(section == 1){
-        return 1;
+        return 2;
     }
     else if(section == 2){
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
@@ -974,8 +976,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
         TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
         
-        [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeStarMessage];
-        [cell showSeparatorView:YES];
+        if (indexPath.item == 0) {
+            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeStarMessage];
+            [cell showSeparatorView:YES];
+        }
+        else if (indexPath.item == 1) {
+            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeShareMedia];
+            [cell showSeparatorView:YES];
+        }
         
         return cell;
     }
@@ -1432,6 +1440,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             tapStarredMessageViewController.delegate = self;
             tapStarredMessageViewController.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:tapStarredMessageViewController animated:YES];
+        }
+        if (indexPath.row == 1) {
+            TAPSharedMediaViewController *shareMediaVC = [[TAPSharedMediaViewController alloc] initWithNibName:@"TAPSharedMediaViewController" bundle:[TAPUtil currentBundle]];
+            shareMediaVC.room = self.room;
+            [self.navigationController pushViewController:shareMediaVC animated:YES];
         }
     }
     if (indexPath.section == 2) {

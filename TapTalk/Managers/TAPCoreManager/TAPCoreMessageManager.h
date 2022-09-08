@@ -392,6 +392,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getPinnedMessageIDsWithRoomID:(NSString *)roomID
                          success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
                               failure:(void (^)(NSError *error))failure;
+- (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated
+                           success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                                   failure:(void (^)(NSError *error))failure;
 
 @end
 

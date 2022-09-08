@@ -416,6 +416,14 @@
             return font;
             break;
         }
+        case TAPComponentFontChatProfileSharedMediaTabActiveLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_TABLEVIEW_SECTION_HEADER_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         case TAPComponentFontContactListName:
         {
             
@@ -540,6 +548,30 @@
             
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_DESTRUCTIVE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontChatProfileSharedMediaSectionLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_SHARED_MEDIA_SECTION_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontChatProfileSharedMediaEmptyTitleLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_SHARED_MEDIA_EMPTY_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontChatProfileSharedMediaEmptyBodyLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_SHARED_MEDIA_EMPTY_LABEL_FONTSIZE_STYLE];
             return font;
             break;
         }
@@ -1515,6 +1547,11 @@
         }
         case TAPTextColorTableViewSectionHeaderLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            return color;
+            break;
+        }
+        case TAPTextColorSharedMediaSectionHeaderLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
             return color;
             break;
         }
