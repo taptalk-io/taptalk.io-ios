@@ -2390,7 +2390,7 @@
     
     NSString *subQueryMentionValidationString = [NSString stringWithFormat:@"(body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@' || body LIKE '%@')", firstPredicateString, secondPredicateString, thirdPredicateString, fourthPredicateString, fifthPredicateString, sixthPredicateString, seventhPredicateString, eighthPredicateString, ninthPredicateString];
     
-    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && roomID LIKE '%@' && !(userID LIKE '%@') && (type == %ld || type == %ld || type == %ld) && %@", roomID, activeUserID, TAPChatMessageTypeText, TAPChatMessageTypeImage, TAPChatMessageTypeVideo, subQueryMentionValidationString];
+    NSString *queryString = [NSString stringWithFormat:@"isRead == 0 && roomID LIKE '%@' && !(userID LIKE '%@') && (type == %ld || type == %ld || type == %ld || type == %ld) && %@", roomID, activeUserID, TAPChatMessageTypeText, TAPChatMessageTypeLink, TAPChatMessageTypeImage, TAPChatMessageTypeVideo, subQueryMentionValidationString];
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:YES success:^(NSArray *resultArray) {
         
         resultArray = [TAPUtil nullToEmptyArray:resultArray];
@@ -2418,6 +2418,70 @@
     
     if ([lastTimestamp isEqualToString:@""]) {
         queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && (type == %ld || type == %ld)", roomID, TAPChatMessageTypeImage, TAPChatMessageTypeVideo];
+    }
+    
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:NO success:^(NSArray *resultArray) {
+        
+        resultArray = [TAPUtil nullToEmptyArray:resultArray];
+        
+        NSMutableArray *obtainedArray = [NSMutableArray array];
+        for (NSDictionary *databaseDictionary in resultArray) {
+            TAPMessageModel *message = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            [obtainedArray addObject:message];
+            if ([obtainedArray count] == numberOfItem) {
+                break;
+            }
+        }
+        
+        success(obtainedArray);
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)getDatabaseFileMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *fileMessages))success
+                                         failure:(void (^)(NSError *error))failure {
+    
+    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && created < %lf && (type == %ld || type == %ld)", roomID, [lastTimestamp doubleValue], TAPChatMessageTypeFile];
+    
+    if ([lastTimestamp isEqualToString:@""]) {
+        queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && (type == %ld || type == %ld)", roomID, TAPChatMessageTypeFile];
+    }
+    
+    [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:NO success:^(NSArray *resultArray) {
+        
+        resultArray = [TAPUtil nullToEmptyArray:resultArray];
+        
+        NSMutableArray *obtainedArray = [NSMutableArray array];
+        for (NSDictionary *databaseDictionary in resultArray) {
+            TAPMessageModel *message = [TAPDataManager messageModelFromDictionary:databaseDictionary];
+            [obtainedArray addObject:message];
+            if ([obtainedArray count] == numberOfItem) {
+                break;
+            }
+        }
+        
+        success(obtainedArray);
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)getDatabaseLinkMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *linkMessages))success
+                                         failure:(void (^)(NSError *error))failure {
+    
+    NSString *queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && created < %lf && (type == %ld || type == %ld)", roomID, [lastTimestamp doubleValue], TAPChatMessageTypeLink];
+    
+    if ([lastTimestamp isEqualToString:@""]) {
+        queryString = [NSString stringWithFormat:@"isHidden == 0 && isDeleted == 0 && isFailedSend != 1 && isSending != 1 && roomID LIKE '%@' && (type == %ld || type == %ld)", roomID, TAPChatMessageTypeLink];
     }
     
     [TAPDatabaseManager loadDataFromTableName:kDatabaseTableMessage whereClauseQuery:queryString sortByColumnName:@"created" isAscending:NO success:^(NSArray *resultArray) {
@@ -7875,6 +7939,128 @@
         NSNumber *isSuccess = [dataDictionary objectForKey:@"success"];
         
         success(isSuccess);
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIGetSharedContent:(NSString *)roomID
+                     maxCreated:(long)maxCreated
+                     minCreated:(long)minCreated success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetSharedContent];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    
+    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:@(maxCreated) forKey:@"maxCreated"];
+    [parameterDictionary setObject:@(minCreated) forKey:@"minCreated"];
+    [parameterDictionary setObject:@"DESC" forKey:@"sortOrder"];
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIGetSharedContent:roomID maxCreated:maxCreated minCreated:minCreated success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        NSArray *mediaArray = [dataDictionary objectForKey:@"media"];
+        NSArray *documentArray = [dataDictionary objectForKey:@"files"];
+        NSArray *linkArray = [dataDictionary objectForKey:@"links"];
+        
+        NSMutableArray *mediaMessageArray = [NSMutableArray array];
+        NSMutableArray *documentMessageArray = [NSMutableArray array];
+        NSMutableArray *linkMessageArray = [NSMutableArray array];
+        
+        for(NSDictionary *messageDict in mediaArray) {
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDict];
+            
+            TAPUserModel *user = [TAPUserModel new];
+            user.userID = [messageDict objectForKey:@"userID"];
+            user.fullname = [messageDict objectForKey:@"userFullname"];
+            
+            TAPRoomModel * room = [TAPRoomModel createPersonalRoomIDWithID:roomID name:[messageDict objectForKey:@"userFullname"] imageURL:nil];
+            
+            decryptedMessage.user = user;
+            decryptedMessage.room = room;
+            decryptedMessage.type = [[messageDict objectForKey:@"messageType"] longValue];
+            
+            [mediaMessageArray addObject:decryptedMessage];
+        }
+        
+        for(NSDictionary *messageDict in documentArray) {
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDict];
+            
+            TAPUserModel *user = [TAPUserModel new];
+            user.userID = [messageDict objectForKey:@"userID"];
+            user.fullname = [messageDict objectForKey:@"userFullname"];
+            
+            TAPRoomModel * room = [TAPRoomModel createPersonalRoomIDWithID:roomID name:[messageDict objectForKey:@"userFullname"] imageURL:nil];
+            
+            decryptedMessage.user = user;
+            decryptedMessage.room = room;
+            decryptedMessage.type = [[messageDict objectForKey:@"messageType"] longValue];
+            
+            [documentMessageArray addObject:decryptedMessage];
+        }
+        
+        for(NSDictionary *messageDict in linkArray) {
+            TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:messageDict];
+            
+            TAPUserModel *user = [TAPUserModel new];
+            user.userID = [messageDict objectForKey:@"userID"];
+            user.fullname = [messageDict objectForKey:@"userFullname"];
+            
+            TAPRoomModel * room = [TAPRoomModel createPersonalRoomIDWithID:roomID name:[messageDict objectForKey:@"userFullname"] imageURL:nil];
+            
+            decryptedMessage.user = user;
+            decryptedMessage.room = room;
+            decryptedMessage.type = [[messageDict objectForKey:@"messageType"] longValue];
+            [linkMessageArray addObject:decryptedMessage];
+        }
+         
+        success(mediaMessageArray, linkMessageArray, documentMessageArray);
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         

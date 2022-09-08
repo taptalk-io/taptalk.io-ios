@@ -142,6 +142,16 @@
                                     numberOfItem:(NSInteger)numberOfItem
                                          success:(void (^)(NSArray *mediaMessages))success
                                          failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseFileMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *fileMessages))success
+                                        failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseLinkMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *linkMessages))success
+                                        failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
                                            success:(void (^)(NSArray *unreadRoomIDs))success
                                            failure:(void (^)(NSError *))failure;
@@ -418,6 +428,10 @@
                                OTPID:(NSString *)OTPID
                               OTPKey:(NSString *)OTPKey deletionReason:(NSString *)deletionReason success:(void (^)(NSNumber *isSuccess))success
                              failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetSharedContent:(NSString *)roomID
+                     maxCreated:(long)maxCreated
+                     minCreated:(long)minCreated success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                        failure:(void (^)(NSError *error))failure;
 + (NSDictionary *)dictionaryFromMessageModel:(TAPMessageModel *)message;
 
 // Used to prevent inserting message to deleted chat room

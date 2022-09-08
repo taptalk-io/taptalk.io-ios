@@ -777,29 +777,29 @@
     if ((fileID == nil || [fileID isEqualToString:@""]) && (urlKey == nil || [urlKey isEqualToString:@""])) {
         [TAPImageView imageFromCacheWithMessage:message
         success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-            ) {
+            //if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+             //   (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+           // ) {
                 [self getImageSizeFromImage:savedImage];
                 self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
                 self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-            }
+          //  }
             [self.bubbleImageView setImage:savedImage];
             [self.contentView layoutIfNeeded];
         }
         failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             if (urlKey != nil && ![urlKey isEqualToString:@""]) {
                 [self.bubbleImageView setImageWithURLString:[dataDictionary objectForKey:@"url"]];
-                if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                    (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                ) {
+               // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+               //     (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+               // ) {
                     if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
                         self.bubbleImageViewWidthConstraint.constant = 240.0f;
                     }
                     if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
                         self.bubbleImageViewHeightConstraint.constant = 240.0f;
                     }
-                }
+              //  }
                 [self.contentView layoutIfNeeded];
             }
             else {
@@ -811,14 +811,14 @@
                     PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
                     PHAsset *imageAsset = [fetchResult firstObject];
                     if (imageAsset != nil) {
-                        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                        ) {
+                       // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                      //      (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                      //  ) {
                             [self getImageSizeWithWidth:(CGFloat)imageAsset.pixelWidth
                                                  height:(CGFloat)imageAsset.pixelHeight];
                             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
                             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-                        }
+                     //   }
                         
                         PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
                         requestOptions.synchronous = NO;
@@ -841,24 +841,24 @@
                     }
                     else {
                         // Image data not found
-                        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                        ) {
+                       // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                          //  (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                        //) {
                             self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
                             self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
                             [self.contentView layoutIfNeeded];
-                        }
+                        //}
                     }
                 }
                 else {
                     // Image data not found
-                    if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                        (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                    ) {
+                   // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                       // (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                    //) {
                         self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
                         self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
                         [self.contentView layoutIfNeeded];
-                    }
+                    //}
                 }
             }
         }];
@@ -874,15 +874,15 @@
         //so no need to set the image here
         //just save the height and width constraint
         
-        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-        ) {
+       // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+           // (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+        //) {
             CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
             CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
             [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-        }
+        //}
         [self.contentView layoutIfNeeded];
 
         if (![urlKey isEqualToString:@""]) {

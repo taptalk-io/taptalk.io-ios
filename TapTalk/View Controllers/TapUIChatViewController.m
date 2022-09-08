@@ -1336,7 +1336,7 @@ CGPoint center;
                 return cell;
             }
             else {
-                if (message.type == TAPChatMessageTypeText) {
+                if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                     //My Chat Text Message
                     [tableView registerNib:[TAPMyChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPMyChatBubbleTableViewCell description]];
                     TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMyChatBubbleTableViewCell description] forIndexPath:indexPath];
@@ -2073,7 +2073,7 @@ CGPoint center;
                 return cell;
             }
             else {
-                if (message.type == TAPChatMessageTypeText) {
+                if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                     //Their Chat Message
                     [tableView registerNib:[TAPYourChatBubbleTableViewCell cellNib] forCellReuseIdentifier:[TAPYourChatBubbleTableViewCell description]];
                     TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPYourChatBubbleTableViewCell description] forIndexPath:indexPath];
@@ -2740,7 +2740,7 @@ CGPoint center;
     
     //Retreive before message
     if (indexPath.row == [self.messageArray count] - 5 && !self.isLoadingOldMessageFromAPI) {
-        [self retrieveExistingMessages];
+        [self retrieveExistingMessages:TAP_NUMBER_OF_ITEMS_CHAT];
     }
     
     //save cell height to prevent jumpy effects
@@ -3220,7 +3220,7 @@ CGPoint center;
     
     //Handle mapping mention index to array
     NSArray *mentionIndexArray = [NSArray array];
-    if (message.type == TAPChatMessageTypeText) {
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
         NSString *messageContainString = message.body;
         messageContainString = [TAPUtil nullToEmptyString:messageContainString];
         mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
@@ -6706,7 +6706,7 @@ CGPoint center;
             }
             
         }
-        else if (self.currentEditingMessage.type == TAPChatMessageTypeText) {
+        else if (self.currentEditingMessage.type == TAPChatMessageTypeText || self.currentEditingMessage.type == TAPChatMessageTypeLink) {
             captionString = self.currentEditingMessage.body;
             if (textLength >= kCharacterLimit) {
                 updatedNewText = [newText substringToIndex:kCharacterLimit];
@@ -9076,7 +9076,7 @@ CGPoint center;
                                       //Reply Action Here
                                       
                                     [self checkAndShowInputAccessoryView];
-                                      if (message.type == TAPChatMessageTypeText) {
+                                      if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                                           [self showInputAccessoryExtensionView:NO];
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
                                           [self setReplyMessageWithMessage:message];
@@ -9223,7 +9223,7 @@ CGPoint center;
                                  handler:^(UIAlertAction * action) {
                                      [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                                     if (message.type == TAPChatMessageTypeText) {
+                                     if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                                          [pasteboard setString:message.body];
                                      }
                                  }];
@@ -9271,7 +9271,7 @@ CGPoint center;
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
         [self checkAndShowInputAccessoryView];
-          if (message.type == TAPChatMessageTypeText) {
+          if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
               [self showInputAccessoryExtensionView:NO];
               [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
               [self setEditMessageWithMessage:message];
@@ -9435,7 +9435,7 @@ CGPoint center;
         [alertController addAction:replyAction];
     }
     
-    if ([[TapUI sharedInstance] isForwardMessageMenuEnabled] && ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo || message.type == TAPChatMessageTypeFile || message.type == TAPChatMessageTypeVoice) && message.room.type != RoomTypeTransaction)) {
+    if ([[TapUI sharedInstance] isForwardMessageMenuEnabled] && ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo || message.type == TAPChatMessageTypeFile || message.type == TAPChatMessageTypeVoice) && message.room.type != RoomTypeTransaction)) {
         //DV Temp
         //Show forward action for text and location only (temporary)
         [alertController addAction:forwardAction];
@@ -9498,7 +9498,7 @@ CGPoint center;
         }
     }
     
-    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && message.type == TAPChatMessageTypeText) {
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink)) {
         //Show copy action for chat type text only
         [alertController addAction:copyAction];
     }
@@ -9508,7 +9508,7 @@ CGPoint center;
         [alertController addAction:starAction];
     }
     
-    if([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && ([message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom == nil) && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) && [[TapUI sharedInstance] isEditMessageMenuEnabled]){
+    if([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && ([message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom == nil) && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) && [[TapUI sharedInstance] isEditMessageMenuEnabled]){
         //Show edit message for our bubble (my bubble) only and non forward
         
         long messageTimeStamp = message.created.longLongValue;
@@ -9555,7 +9555,7 @@ CGPoint center;
 }
 
 - (void)setEditMessageWithMessage:(TAPMessageModel *)message {
-    if(message.type == TAPChatMessageTypeText){
+    if(message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink){
         self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
         self.messageTextView.text = [TAPUtil nullToEmptyString:message.body];
         self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"Edit Message", nil, [TAPUtil currentBundle], @"");
@@ -10150,7 +10150,7 @@ CGPoint center;
             //Handle mapping mention index to array
             NSArray *mentionIndexArray = [NSArray array];
             for (TAPMessageModel *currentMessage in obtainedMessageArray) {
-                if (currentMessage.type == TAPChatMessageTypeText) {
+                if (currentMessage.type == TAPChatMessageTypeText || currentMessage.type == TAPChatMessageTypeLink) {
                     NSString *messageContainString = currentMessage.body;
                     messageContainString = [TAPUtil nullToEmptyString:messageContainString];
                     mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
@@ -10250,7 +10250,7 @@ CGPoint center;
                                 
                                 //Handle mapping mention index to array
                                 NSArray *mentionIndexArray = [NSArray array];
-                                if (message.type == TAPChatMessageTypeText) {
+                                if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                                     NSString *messageContainString = message.body;
                                     messageContainString = [TAPUtil nullToEmptyString:messageContainString];
                                     mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
@@ -10380,7 +10380,7 @@ CGPoint center;
            
            //Handle mapping mention index to array
            NSArray *mentionIndexArray = [NSArray array];
-           if (message.type == TAPChatMessageTypeText) {
+           if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                NSString *messageContainString = message.body;
                messageContainString = [TAPUtil nullToEmptyString:messageContainString];
                mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
@@ -10526,7 +10526,7 @@ CGPoint center;
                    }];
                }
                else if(!isForwardedSavedMessage) {
-                   if (currentMessage.type == TAPChatMessageTypeText) {
+                   if (currentMessage.type == TAPChatMessageTypeText || currentMessage.type == TAPChatMessageTypeLink) {
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                            
@@ -10844,7 +10844,7 @@ CGPoint center;
     [self.anchorMentionMessageArray removeAllObjects];
 }
 
-- (void)retrieveExistingMessages {
+- (void)retrieveExistingMessages:(NSInteger)numberOfItems{
     //Prevent retreive before message if already last page
     if (self.isLastPage) {
         [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
@@ -10859,7 +10859,7 @@ CGPoint center;
     
     _apiBeforeLastCreated = [lastMessage.created longLongValue];
     
-    [TAPDataManager getMessageWithRoomID:lastMessage.room.roomID lastMessageTimeStamp:lastMessage.created limitData:TAP_NUMBER_OF_ITEMS_CHAT success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
+    [TAPDataManager getMessageWithRoomID:lastMessage.room.roomID lastMessageTimeStamp:lastMessage.created limitData:numberOfItems success:^(NSArray<TAPMessageModel *> *obtainedMessageArray) {
         if ([obtainedMessageArray count] > 0) {
             [self updateMessageDataAndUIFromBeforeWithMessages:obtainedMessageArray withCompletionHandler:^{
                 //if there's tapped reply message id, check and scroll to item
@@ -10875,7 +10875,7 @@ CGPoint center;
         //Call API Before when message array less than limit (50)
         [TAPUtil performBlock:^{
             //Add 0.2s delay to wait update table view UI from previous update message
-            if ([obtainedMessageArray count] < TAP_NUMBER_OF_ITEMS_CHAT && !self.isFirstLoadData) {
+            if ([obtainedMessageArray count] < numberOfItems && !self.isFirstLoadData) {
                 [self fetchBeforeMessageFromAPIAndUpdateUIWithRoomID:lastMessage.room.roomID maxCreated:lastMessage.created];
             }
         } afterDelay:0.2f];
@@ -10896,7 +10896,7 @@ CGPoint center;
                 //Handle mapping mention index to array
                 NSArray *mentionIndexArray = [NSArray array];
                 for (TAPMessageModel *message in messageArray) {
-                    if (message.type == TAPChatMessageTypeText) {
+                    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                         NSString *messageContainString = message.body;
                         messageContainString = [TAPUtil nullToEmptyString:messageContainString];
                         mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
@@ -11166,7 +11166,7 @@ CGPoint center;
                 
                 //Handle mapping mention index to array
                 NSArray *mentionIndexArray = [NSArray array];
-                if (message.type == TAPChatMessageTypeText) {
+                if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
                     NSString *messageContainString = message.body;
                     messageContainString = [TAPUtil nullToEmptyString:messageContainString];
                     mentionIndexArray = [TAPUtil getMentionIndexes:messageContainString];
@@ -12586,7 +12586,7 @@ CGPoint center;
         
         [self checkEmptyState];
         [[TAPChatManager sharedManager] stopTyping];
-        [[TAPChatManager sharedManager] sendEmitWithEditedMessage:self.currentEditingMessage];
+       // [[TAPChatManager sharedManager] sendEmitWithEditedMessage:self.currentEditingMessage];
         self.messageTextView.text = @"";
         return;
         
@@ -13537,7 +13537,7 @@ CGPoint center;
     }
     
     if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
-        if (message.type == TAPChatMessageTypeText) {
+        if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
             TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showPinIcon:!isPinned];
         }
@@ -13565,7 +13565,7 @@ CGPoint center;
         
     }
     else{
-        if (message.type == TAPChatMessageTypeText) {
+        if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
             TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showPinIcon:!isPinned];
         }
@@ -13628,7 +13628,7 @@ CGPoint center;
     }
     
     if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
-        if (message.type == TAPChatMessageTypeText) {
+        if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
             TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showStarMessageIconView];
         }
@@ -13656,7 +13656,7 @@ CGPoint center;
         
     }
     else{
-        if (message.type == TAPChatMessageTypeText) {
+        if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
             TAPYourChatBubbleTableViewCell *cell = (TAPYourChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
             [cell showStarMessageView];
         }
@@ -13743,11 +13743,12 @@ CGPoint center;
        
     }
     else {
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
+        NSLog(@"localID : %@", self.tappedMessageLocalID);
+        if (![TAPUtil isEmptyString:self.tappedMessageLocalID]) {
             [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
         }
         
-        [self retrieveExistingMessages];
+        [self retrieveExistingMessages:TAP_NUMBER_OF_ITEMS_CHAT_SCROLL_TO];
     }
 }
 -(BOOL)checkIsRowVisibleWithRowIndex:(NSInteger)rowIndex {
@@ -14514,7 +14515,7 @@ CGPoint center;
            return;
     }
     
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeVoice) {
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeVoice) {
         //Type Text and Location
         [self showInputAccessoryExtensionView:NO];
         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];

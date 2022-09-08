@@ -324,6 +324,17 @@
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 1.0f;
     }
+    else if (type == profileCollectionViewCellTypeShareMedia) {
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAttach" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
+
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Shared Media", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 1.0f;
+    }
     else if (type == profileCollectionViewCellTypeUserDetail) {
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.frame =CGRectMake(24.0f, 9.0f, CGRectGetWidth(self.frame) - 24.0f - 24.0f, 16.0f);
