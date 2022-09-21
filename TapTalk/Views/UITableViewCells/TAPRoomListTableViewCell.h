@@ -28,5 +28,6 @@ typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
 - (void)showMessageDraftWithMessage:(NSString *)draftMessage;
 - (void)setIsLastCellSeparator:(BOOL)isLastCell;
 - (void)showUnreadMentionBadge:(BOOL)isShow;
+- (void)showPinRoomIcon:(BOOL)isShow roomList:(TAPRoomListModel *)roomList;
 
 @end

@@ -12,6 +12,7 @@
 #define TAP_DEFAULT_MAX_FILE_SIZE 5 * 1024 * 1024 //5 MB
 #define TAP_DEFAULT_IMAGE_COMPRESSION_QUALITY 0.5f
 #define TAP_DEFAULT_MAX_GROUP_PARTICIPANTS 100
+#define TAP_DEFAULT_MAX_PINNED_ROOM 10
 #define TAP_DEFAULT_MAX_CHANNEL_PARTICIPANTS 5000
 #define TAP_UPDATED_TIME_LIMIT 24 * 60 * 60 //1 day (in seconds)
 #define TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE 50
@@ -20,7 +21,9 @@
 //Prefs Key
 #define TAP_PREFS_ACTIVE_USER @"Prefs.TapTalkActiveUser"
 #define TAP_PREFS_UNREAD_ROOMIDS @"Prefs.TapTalkUnreadRoomIDs"
+#define TAP_PREFS_PINNED_ROOMIDS @"Prefs.TapTalkPinnedRoomIDs"
 #define TAP_PREFS_LAST_PINNED_MESSAGE @"Prefs.TapTalkLastPinnedMessage"
+#define TAP_PREFS_MUTED_ROOM_LIST @"Prefs.TapTalkMutedRoomList"
 #define TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING @"Prefs.TapTalkCurrentVoiceNoteMessagePlaying"
 #define TAP_PREFS_PUSH_TOKEN @"Prefs.TapTalkPushToken"
 #define TAP_PREFS_ACCESS_TOKEN @"Prefs.TapTalkAccessToken"

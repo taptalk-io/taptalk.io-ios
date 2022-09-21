@@ -13,6 +13,7 @@
 @property (strong, nonatomic) UIImageView *iconImageView;
 @property (strong, nonatomic) UIImageView *rightIconImageView;
 @property (strong, nonatomic) UILabel *titleLabel;
+@property (strong, nonatomic) UILabel *infoLabel;
 @property (strong, nonatomic) UILabel *userDetailLabel;
 @property (strong, nonatomic) UISwitch *switchButton;
 @property (strong, nonatomic) UIView *separatorView;
@@ -57,6 +58,12 @@
         self.titleLabel.textColor = titleLabelColor;
         [self.contentView addSubview:self.titleLabel];
         
+        _infoLabel = [[UILabel alloc] initWithFrame:CGRectMake(titleXPosition, 0.0f, titleWidth, CGRectGetHeight(frame))];
+        self.infoLabel.font = titleLabelFont;
+        self.infoLabel.textColor = [titleLabelColor colorWithAlphaComponent:0.6f];
+        self.infoLabel.alpha = 0.0;
+        [self.contentView addSubview:self.infoLabel];
+        
         _userDetailLabel = [[UILabel alloc] initWithFrame:CGRectMake(titleXPosition, 0.0f, titleWidth, CGRectGetHeight(frame))];
         self.userDetailLabel.font = titleLabelFont;
         self.userDetailLabel.textColor = titleLabelColor;
@@ -90,6 +97,7 @@
     self.userDetailLabel.alpha = 0.0f;
     self.iconImageView.alpha = 1.0f;
     self.separatorView.alpha = 1.0f;
+    self.infoLabel.alpha = 0.0;
     
     CGFloat titleXPosition = CGRectGetMaxX(self.iconImageView.frame) + 4.0f; //4.0f is left padding of title
     CGFloat titleWidth = CGRectGetMinX(self.switchButton.frame) - 4.0f - titleXPosition; //4.0f is right padding of title
@@ -105,6 +113,19 @@
 - (void)setUserDetail:(NSString *)userDetail{
     self.userDetailLabel.text = userDetail;
     [self.userDetailLabel sizeToFit];
+}
+
+- (void)setMuteDurationInfo:(BOOL)isMuted duration:(NSString *)duration {
+    if(isMuted) {
+        self.infoLabel.text = duration;
+        self.titleLabel.text = @"Muted";
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconMutedProfile" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    }
+    else {
+        self.infoLabel.text = @"OFF";
+        self.titleLabel.text = @"Mute";
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconMuteProfile" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    }
 }
 
 - (void)setProfileCollectionViewCellType:(TAPProfileCollectionViewCellType)type {
@@ -323,6 +344,22 @@
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 1.0f;
+    }
+    else if (type == profileCollectionViewCellTypeMute) {
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconMuteProfile" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
+
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Mute", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 1.0f;
+        
+        self.infoLabel.alpha = 1.0f;
+        self.infoLabel.frame = CGRectMake(CGRectGetMinX(self.rightIconImageView.frame) - 150.0f - 10.0f, 0.0f, 150.0f, CGRectGetHeight(self.frame));
+        self.infoLabel.text = @"dfderverv";
+        self.infoLabel.textAlignment = NSTextAlignmentRight;
     }
     else if (type == profileCollectionViewCellTypeShareMedia) {
         [self refreshPosition];

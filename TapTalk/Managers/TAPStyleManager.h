@@ -256,6 +256,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorActionSheetDefaultLabel,
     TAPTextColorActionSheetDestructiveLabel,
     TAPTextColorActionSheetCancelButtonLabel,
+    TAPTextColorActionSheetButtonLabelPrimary,
     TAPTextColorTableViewSectionHeaderLabel,
     TAPTextColorSharedMediaSectionHeaderLabel,
     TAPTextColorContactListName,

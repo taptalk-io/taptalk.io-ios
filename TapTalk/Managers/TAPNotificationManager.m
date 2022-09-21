@@ -201,6 +201,18 @@
     //        return;
     //    }
     
+    //check is in muted
+    NSDictionary *mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    long currentTime = [TAPUtil currentTimeInMillis].longValue;
+    NSNumber *mutedExpiredAt = [mutedRoomDictionary objectForKey:message.room.roomID];
+    
+    if(mutedExpiredAt != nil && mutedExpiredAt.longValue > currentTime) {
+        //muted room
+        return;
+    }
+    
+    
+    
     if (!self.isViewIsAddedToSubview) {
         [self initCustomNotificationAlertViewController];
     }

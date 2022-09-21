@@ -14297,25 +14297,32 @@ CGPoint center;
 
 - (IBAction)deleteGroupButtonDidTapped:(id)sender {
     //add sequence to delete message and physical files
-    [self setDeleteRoomButtonAsLoading:YES animated:YES];
-    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.currentRoom.roomID success:^{
-        
-        if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
-            [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:self.currentRoom];
-        }
-        
-        //Throw view to room list
-        [TAPUtil performBlock:^{
+    [[TAPCoreRoomListManager sharedManager] unpinChatRoomWithRoomID:self.currentRoom.roomID success:^(NSArray *roomIDs){
+        [self setDeleteRoomButtonAsLoading:YES animated:YES];
+        [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.currentRoom.roomID success:^{
+            
+            if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
+                [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:self.currentRoom];
+            }
+            
+            //Throw view to room list
+            [TAPUtil performBlock:^{
+                [self setDeleteRoomButtonAsLoading:NO animated:YES];
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            } afterDelay:1.2f];
+            
+        } failure:^(NSError *error) {
             [self setDeleteRoomButtonAsLoading:NO animated:YES];
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        } afterDelay:1.2f];
-        
-    } failure:^(NSError *error) {
-        [self setDeleteRoomButtonAsLoading:NO animated:YES];
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+    } failure:^(NSError *error){
         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Pin Room" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
+    
 }
 
 - (void)showTapTalkMessageComposerView {

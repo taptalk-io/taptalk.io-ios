@@ -60,6 +60,8 @@
 @property (nonatomic) BOOL isDeleteAccountButtonVisible;
 @property (nonatomic) BOOL isSavedMessagesMenuDisabled;
 @property (nonatomic) BOOL isPinMessageMenuDisabled;
+@property (nonatomic) BOOL isMuteRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isPinRoomListSwipeMenuDisabled;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -1031,5 +1033,32 @@ Get current status of pin messages menu
     return !self.isPinMessageMenuDisabled;
 }
 
+/**
+ Enable or disable mute/unmute swipe in chat room list
+*/
+- (void)setMuteRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isMuteRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of  mute/unmute swipe in chat room list
+*/
+- (BOOL)getMuteRoomListSwipeMenuEnabled {
+    return !self.isMuteRoomListSwipeMenuDisabled;
+}
+
+/**
+Enable or disable pin room swipe in chat room list
+*/
+- (void)setPinRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isPinRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getPinRoomListSwipeMenuEnabled {
+    return !self.isPinRoomListSwipeMenuDisabled;
+}
 
 @end

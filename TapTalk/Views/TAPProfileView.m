@@ -45,8 +45,10 @@
     if (self) {
         _profileImageHeight = CGRectGetWidth(self.frame) / 375.0f * 347.0f; //375.0f and 347.0f are width and height on design.
         CGFloat topPadding = 0.0f;
-        if (IS_IPHONE_X_FAMILY) {
+        CGFloat collectionViewPadding = 0.0f;
+        if (!IS_IPHONE_X_FAMILY) {
             //topPadding = [TAPUtil currentDeviceStatusBarHeight];
+            collectionViewPadding = 25.0f;
         }
         
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), self.profileImageHeight)];
@@ -77,7 +79,7 @@
         collectionLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - [TAPUtil safeAreaBottomPadding]) collectionViewLayout:collectionLayout];
         //self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight - [TAPUtil currentDeviceStatusBarHeight] + topPadding, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
-        self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight + topPadding + 25.0f, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
+        self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight + topPadding + collectionViewPadding, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
         self.collectionView.backgroundColor = [UIColor clearColor];
         self.collectionView.showsVerticalScrollIndicator = NO;
         self.collectionView.showsHorizontalScrollIndicator = NO;
@@ -114,7 +116,7 @@
         self.savedMessageProfile.alpha = 0.0f;
         [self.collectionView addSubview:self.savedMessageProfile];
         
-        _profilImageCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), 360.0f) collectionViewLayout:collectionLayoutProfilImage];
+        _profilImageCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - collectionViewPadding, CGRectGetWidth(self.frame), 360.0f) collectionViewLayout:collectionLayoutProfilImage];
         self.profilImageCollectionView.backgroundColor = [UIColor clearColor];
         self.profilImageCollectionView.pagingEnabled = YES;
         self.profilImageCollectionView.showsVerticalScrollIndicator = NO;
@@ -123,7 +125,7 @@
         
         UICollectionViewFlowLayout *collectionLayoutPageIndicator = [[UICollectionViewFlowLayout alloc] init];
         collectionLayoutPageIndicator.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        _pageIndicatorCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 1.0f - topPadding - self.profileImageHeight - 25.0f, CGRectGetWidth(self.frame), 3.0f) collectionViewLayout:collectionLayoutPageIndicator];
+        _pageIndicatorCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 1.0f - topPadding - self.profileImageHeight - collectionViewPadding, CGRectGetWidth(self.frame), 3.0f) collectionViewLayout:collectionLayoutPageIndicator];
         self.pageIndicatorCollectionView.backgroundColor = [UIColor clearColor];
         self.pageIndicatorCollectionView.pagingEnabled = YES;
         self.pageIndicatorCollectionView.showsVerticalScrollIndicator = NO;

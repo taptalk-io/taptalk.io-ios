@@ -1545,6 +1545,11 @@
             return color;
             break;
         }
+        case TAPTextColorActionSheetButtonLabelPrimary: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         case TAPTextColorTableViewSectionHeaderLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
