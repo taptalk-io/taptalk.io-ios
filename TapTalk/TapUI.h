@@ -904,6 +904,26 @@ Get current status of pin messages menu
 */
 - (BOOL)isPinMessageMenuEnabled;
 
+/**
+ Enable or disable mute/unmute swipe in chat room list
+*/
+- (void)setMuteRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of  mute/unmute swipe in chat room list
+*/
+- (BOOL)getMuteRoomListSwipeMenuEnabled;
+
+/**
+Enable or disable pin room swipe in chat room list
+*/
+- (void)setPinRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getPinRoomListSwipeMenuEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

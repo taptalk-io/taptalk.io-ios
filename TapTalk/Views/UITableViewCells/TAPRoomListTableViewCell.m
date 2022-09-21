@@ -19,6 +19,7 @@
 @property (strong, nonatomic) UIImageView *typingAnimationImageView;
 @property (strong, nonatomic) UIImageView *expertIconImageView;
 @property (strong, nonatomic) UILabel *roomNameLabel;
+@property (strong, nonatomic) UIImageView *muteGapImageView;
 @property (strong, nonatomic) UIImageView *muteImageView;
 //@property (strong, nonatomic) UILabel *lastSenderLabel;
 @property (strong, nonatomic) UILabel *lastMessageLabel;
@@ -27,6 +28,7 @@
 @property (strong, nonatomic) UIImageView *deletedUserProfilImageView;
 @property (strong, nonatomic) UIImageView *saveMessageProfilImageView;
 @property (strong, nonatomic) UIView *bubbleUnreadView;
+@property (strong, nonatomic) UIImageView *pinRoomImageView;
 @property (strong, nonatomic) UILabel *numberOfUnreadMessageLabel;
 @property (strong, nonatomic) UIView *unreadMentionView;
 @property (strong, nonatomic) UIImageView *unreadMentionImageView;
@@ -69,6 +71,8 @@
 //    }
 }
 
+
+
 #pragma mark - Custom Method
 - (void)setRoomListTableViewCellWithData:(TAPRoomListModel *)roomList updateUnreadBubble:(BOOL)updateUnreadBubble {
     TAPMessageModel *message = roomList.lastMessage;
@@ -77,8 +81,22 @@
     //DV Temp
     BOOL isExpert = NO;
     BOOL isMuted = NO;
+    BOOL isPinned = NO;
     //END DV Temp
-
+    
+    NSDictionary *mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    NSNumber *mutedExpired = [mutedRoomDictionary objectForKey:self.roomID];
+    
+    if(mutedExpired != nil) {
+        isMuted = YES;
+    }
+    
+    NSArray *pinnedRoomIDsArray = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+    
+    if([pinnedRoomIDsArray containsObject:self.roomID]){
+        isPinned = YES;
+    }
+    
     BOOL isGroup = NO;
     NSString *lastSender = @"";
     
@@ -161,33 +179,39 @@
         [self.bgView addSubview:self.timeLabel];
     }
     
-    if (self.muteImageView == nil) {
-        _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
-        self.muteImageView.alpha = 0.0f;
-        self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.muteImageView.image = [self.muteImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMuted]];
-        [self.bgView addSubview:self.muteImageView];
+    if (self.muteGapImageView == nil) {
+        _muteGapImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 8.0f, 0.0f, CGRectGetHeight(self.roomNameLabel.frame))];
+        self.muteGapImageView.alpha = 0.0f;
+        [self.bgView addSubview:self.muteGapImageView];
     }
 
     if (self.roomNameLabel == nil) {
         UIFont *roomListNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListName];
         UIColor *roomListNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListName];
-        _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 8.0f, CGRectGetMinX(self.muteImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 20.0f)];
+        
+        _roomNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.profileImageView.frame) + 8.0f, 8.0f, CGRectGetMinX(self.muteGapImageView.frame) - CGRectGetMaxX(self.profileImageView.frame) - 4.0f - 8.0f, 16.0f)];
         self.roomNameLabel.textColor = roomListNameLabelColor;
         self.roomNameLabel.font = roomListNameLabelFont;
         [self.bgView addSubview:self.roomNameLabel];
-        self.muteImageView.center = CGPointMake(self.muteImageView.center.x, self.roomNameLabel.center.y);
+        self.muteGapImageView.center = CGPointMake(self.muteGapImageView.center.x, self.roomNameLabel.center.y);
+    }
+    
+    if (self.muteImageView == nil) {
+        _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.roomNameLabel.frame), 8.0f, 0.0f, CGRectGetHeight(self.roomNameLabel.frame))];
+        self.muteImageView.alpha = 0.0f;
+        self.muteImageView.image = [UIImage imageNamed:@"TAPIconMuteRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        [self.bgView addSubview:self.muteImageView];
     }
     
     if (self.messageStatusImageView == nil) {
-        _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 20.0f, 20.0f, 20.0f)];
+        _messageStatusImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.bgView.frame) - 16.0f - 16.0f, CGRectGetMaxY(self.bgView.frame) - 16.0f - 16.0f, 16.0f, 16.0f)];
         self.messageStatusImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.messageStatusImageView.alpha = 0.0f;
         [self.bgView addSubview:self.messageStatusImageView];
     }
     
     if (self.bubbleUnreadView == nil) {
-        _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 0.0f, 20.0f)];
+        _bubbleUnreadView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 16.0f, 0.0f, 16.0f)];
         self.bubbleUnreadView.clipsToBounds = YES;
         self.bubbleUnreadView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         self.bubbleUnreadView.layer.cornerRadius = CGRectGetHeight(self.bubbleUnreadView.frame) / 2.0f;
@@ -197,7 +221,7 @@
     if (self.numberOfUnreadMessageLabel == nil) {
         UIFont *roomListUnreadBadgeLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListUnreadBadgeLabel];
         UIColor *roomListUnreadBadgeLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomListUnreadBadgeLabel];
-        _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 3.0f, 0.0f, 13.0f)];
+        _numberOfUnreadMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(7.0f, 2.0f, 0.0f, 13.0f)];
         self.numberOfUnreadMessageLabel.textColor = roomListUnreadBadgeLabelColor;
         self.numberOfUnreadMessageLabel.textAlignment = NSTextAlignmentCenter;
         self.numberOfUnreadMessageLabel.font = roomListUnreadBadgeLabelFont;
@@ -205,7 +229,7 @@
     }
     
     if (self.unreadMentionView == nil) {
-        _unreadMentionView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 20.0f, 20.0f, 20.0f)];
+        _unreadMentionView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 16.0f - 4.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 16.0f, 16.0f, 16.0f)];
         self.unreadMentionView.clipsToBounds = YES;
         self.unreadMentionView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorUnreadBadgeBackground];
         self.unreadMentionView.layer.cornerRadius = CGRectGetHeight(self.unreadMentionView.frame) / 2.0f;
@@ -218,6 +242,14 @@
         self.unreadMentionImageView.image = [UIImage imageNamed:@"TAPIconMentionAnchor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.unreadMentionImageView.image = [self.unreadMentionImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         [self.unreadMentionView addSubview:self.unreadMentionImageView];
+    }
+    
+    if (self.pinRoomImageView == nil) {
+        _pinRoomImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.bgView.frame) - 18.0f - 16.0f, 0.0f, 16.0f)];
+        self.pinRoomImageView.image = [UIImage imageNamed:@"TAPIconPinRoom" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.pinRoomImageView.alpha = 0.0f;
+        self.pinRoomImageView.image = [self.pinRoomImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageDelivered]];
+        [self.bgView addSubview:self.pinRoomImageView];
     }
     
     UIFont *roomListMessageLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListMessage];
@@ -439,15 +471,6 @@
     CGSize newTimeLabelSize = [self.timeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.timeLabel.frame))];
     self.timeLabel.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - newTimeLabelSize.width, CGRectGetMinY(self.timeLabel.frame), newTimeLabelSize.width, CGRectGetHeight(self.timeLabel.frame));
     
-    //MUTE IMAGE VIEW
-    if (isMuted) {
-        self.muteImageView.frame = CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f - 10.0f, CGRectGetMinY(self.muteImageView.frame), 10.0f, CGRectGetHeight(self.muteImageView.frame));
-        self.muteImageView.alpha = 1.0f;
-    }
-    else {
-        self.muteImageView.frame = CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, CGRectGetMinY(self.muteImageView.frame), 0.0f, CGRectGetHeight(self.muteImageView.frame));
-        self.muteImageView.alpha = 0.0f;
-    }
     
     //ROOM NAME LABEL
     self.roomNameLabel.text = roomName;
@@ -462,7 +485,9 @@
     [roomNameAttributedString addAttributes:roomNameAttributesDictionary
                                       range:NSMakeRange(0, [self.roomNameLabel.text length])];
     self.roomNameLabel.attributedText = roomNameAttributedString;
-    self.roomNameLabel.frame = CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMinY(self.roomNameLabel.frame), CGRectGetMinX(self.muteImageView.frame) - CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.roomNameLabel.frame));
+    self.roomNameLabel.frame = CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMinY(self.roomNameLabel.frame), CGRectGetMinX(self.muteGapImageView.frame) - CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.roomNameLabel.frame));
+
+  
     
     if (self.messageStatusType == TAPMessageStatusTypeNone) {
         //resize
@@ -470,7 +495,7 @@
     }
     else {
         //resize
-        self.messageStatusImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 20.0f, CGRectGetMinY(self.messageStatusImageView.frame), 20.0f, 20.0f);
+        self.messageStatusImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f, CGRectGetMinY(self.messageStatusImageView.frame), 16.0f, 16.0f);
     }
     
     switch (self.messageStatusType) {
@@ -646,8 +671,8 @@
         
         if (numberOfUnreadMessage == 0 && !isMarkedAsUnread) {
             self.bubbleUnreadView.alpha = 0.0f;
-            self.bubbleUnreadView.frame = CGRectMake(CGRectGetMinX(self.messageStatusImageView.frame), CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.messageStatusImageView.frame), CGRectGetHeight(self.bubbleUnreadView.frame));
-            self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
+            self.bubbleUnreadView.frame = CGRectMake(CGRectGetMinX(self.messageStatusImageView.frame), CGRectGetMinY(self.bubbleUnreadView.frame), CGRectGetWidth(self.messageStatusImageView.frame), CGRectGetHeight(self.bubbleUnreadView.frame));
+            self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 16.0f - 4.0f, CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
         }
         else {
             if (numberOfUnreadMessage > 99) {
@@ -668,12 +693,12 @@
             CGSize newNumberOfUnreadMessageLabelSize = [self.numberOfUnreadMessageLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame))];
             
             //Bubble View
-            CGFloat bubbleUnreadViewWidth = newNumberOfUnreadMessageLabelSize.width + 7.0f + 7.0f;
-            CGFloat numberOfUnreadMessageLabelXPosition = 7.0f;
+            CGFloat bubbleUnreadViewWidth = newNumberOfUnreadMessageLabelSize.width + 4.0f + 4.0f;
+            CGFloat numberOfUnreadMessageLabelXPosition = 4.0f;
             
             if(bubbleUnreadViewWidth < CGRectGetHeight(self.bubbleUnreadView.frame)) {
                 bubbleUnreadViewWidth = CGRectGetHeight(self.bubbleUnreadView.frame);
-                newNumberOfUnreadMessageLabelSize = CGSizeMake(bubbleUnreadViewWidth - 7.0f - 7.0f, newNumberOfUnreadMessageLabelSize.height);
+                newNumberOfUnreadMessageLabelSize = CGSizeMake(bubbleUnreadViewWidth - 4.0f - 4.0f, newNumberOfUnreadMessageLabelSize.height);
             }
             
             self.numberOfUnreadMessageLabel.frame = CGRectMake(numberOfUnreadMessageLabelXPosition, CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
@@ -681,7 +706,7 @@
             self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
             self.bubbleUnreadView.alpha = 1.0f;
             
-            self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 20.0f - 4.0f, CGRectGetMinY(self.unreadMentionView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
+            self.unreadMentionView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame) - 16.0f - 4.0f, CGRectGetMinY(self.unreadMentionView.frame), CGRectGetWidth(self.unreadMentionView.frame), CGRectGetHeight(self.unreadMentionView.frame));
         }
         
         if (numberOfUnreadMention > 0) {
@@ -778,18 +803,61 @@
     
     self.roomNameLabel.frame = CGRectMake(
         CGRectGetMinX(self.roomNameLabel.frame),
-        (CGRectGetHeight(self.bgView.frame) - roomNameLabelSize.height - newLastMessageLabelSize.height - 4.0f) / 2,
-        CGRectGetWidth(self.roomNameLabel.frame),
+        (CGRectGetHeight(self.bgView.frame) - roomNameLabelSize.height - newLastMessageLabelSize.height - 4.0f) / 2, CGRectGetWidth(self.roomNameLabel.frame),
         CGRectGetHeight(self.roomNameLabel.frame)
     );
+   
+    
+    //MUTE IMAGE VIEW
+    if (isMuted) {
+        self.muteGapImageView.frame = CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f - 30.0f, CGRectGetMinY(self.roomNameLabel.frame), 24.0f, CGRectGetHeight(self.roomNameLabel.frame));
+        self.muteGapImageView.alpha = 1.0f;
+        
+    }
+    else {
+        self.muteGapImageView.frame = CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, CGRectGetMinY(self.roomNameLabel.frame), 0.0f, CGRectGetHeight(self.roomNameLabel.frame));
+        self.muteGapImageView.alpha = 0.0f;
+    }
+    
+    UIFont *roomNameLabelFont = self.roomNameLabel.font;
+    CGSize stringSize = [self.roomNameLabel.text sizeWithFont:roomNameLabelFont];
+    CGFloat roomNameWidth = stringSize.width;
+    
+    if(roomNameWidth < CGRectGetWidth(self.roomNameLabel.frame)){
+        [self.roomNameLabel sizeToFit];
+    }
+    else{
+        self.roomNameLabel.frame = CGRectMake(CGRectGetMinX(self.roomNameLabel.frame), CGRectGetMinY(self.roomNameLabel.frame), CGRectGetMinX(self.muteGapImageView.frame) - CGRectGetMinX(self.roomNameLabel.frame), CGRectGetHeight(self.roomNameLabel.frame));
+    }
+    
+    if (isMuted) {
+        self.muteImageView.frame = CGRectMake(CGRectGetMaxX(self.roomNameLabel.frame), CGRectGetMinY(self.roomNameLabel.frame), CGRectGetHeight(self.roomNameLabel.frame), CGRectGetHeight(self.roomNameLabel.frame));
+        self.muteImageView.alpha = 1.0f;
+    }
+    else {
+        self.muteImageView.alpha = 0.0f;
+    }
+    
     
     CGFloat lastMessageLabelNewY = CGRectGetMaxY(self.roomNameLabel.frame) + 2.0f;
+    
+    
+    CGFloat pinRoomGap = 0.0f;
+    if(isPinned){
+        [self showPinRoomIcon:YES];
+        pinRoomGap = CGRectGetWidth(self.pinRoomImageView.frame);
+    }
+    else {
+        [self showPinRoomIcon:NO];
+        pinRoomGap = 0.0f;
+    }
+    
     
     if (numberOfUnreadMessage > 0 && numberOfUnreadMention > 0 && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         self.lastMessageLabel.frame = CGRectMake(
             CGRectGetMinX(self.lastMessageLabel.frame),
             lastMessageLabelNewY,
-            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f,
+            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - CGRectGetWidth(self.unreadMentionView.frame) - 4.0f - pinRoomGap,
             newLastMessageLabelSize.height
         );
         
@@ -799,7 +867,7 @@
         self.lastMessageLabel.frame = CGRectMake(
             CGRectGetMinX(self.lastMessageLabel.frame),
             lastMessageLabelNewY,
-            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f,
+            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - 8.0f - pinRoomGap,
             newLastMessageLabelSize.height
         );
         
@@ -809,7 +877,7 @@
         self.lastMessageLabel.frame = CGRectMake(
             CGRectGetMinX(self.lastMessageLabel.frame),
             lastMessageLabelNewY,
-            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f,
+            CGRectGetWidth(self.bgView.frame) - 76.0f - CGRectGetWidth(self.bubbleUnreadView.frame) - 16.0f - pinRoomGap,
             newLastMessageLabelSize.height
         );
         
@@ -817,6 +885,8 @@
     }
     
     [self setAsTyping:[[TAPChatManager sharedManager] checkIsTypingWithRoomID:roomList.lastMessage.room.roomID]];
+    
+    
 }
 
 - (void)setAsTyping:(BOOL)typing {
@@ -938,6 +1008,23 @@
     else {
         self.unreadMentionView.alpha = 0.0f;
     }
+}
+
+- (void)showPinRoomIcon:(BOOL)isShow {
+    if(isShow) {
+        self.pinRoomImageView.frame = CGRectMake(CGRectGetMinX(self.pinRoomImageView.frame), CGRectGetMinY(self.pinRoomImageView.frame), 16.0f, 16.0f);
+        self.pinRoomImageView.alpha = 1.0f;
+        self.bubbleUnreadView.frame = CGRectMake(CGRectGetMinX(self.pinRoomImageView.frame) - 5.0f - CGRectGetWidth(self.bubbleUnreadView.frame), CGRectGetMinY(self.bubbleUnreadView.frame), CGRectGetWidth(self.bubbleUnreadView.frame), CGRectGetHeight(self.bubbleUnreadView.frame));
+        
+        self.messageStatusImageView.frame = CGRectMake(CGRectGetMinX(self.pinRoomImageView.frame) - 5.0f - CGRectGetWidth(self.messageStatusImageView.frame), CGRectGetMinY(self.messageStatusImageView.frame), CGRectGetWidth(self.messageStatusImageView.frame), CGRectGetHeight(self.messageStatusImageView.frame));
+    }
+    else {
+        self.pinRoomImageView.frame = CGRectMake(CGRectGetMinX(self.pinRoomImageView.frame), CGRectGetMinY(self.pinRoomImageView.frame), 0.0f, 16.0f);
+        self.pinRoomImageView.alpha = 0.0f;
+        self.bubbleUnreadView.frame = CGRectMake(CGRectGetMinX(self.bubbleUnreadView.frame), CGRectGetMinY(self.bubbleUnreadView.frame), CGRectGetWidth(self.bubbleUnreadView.frame), CGRectGetHeight(self.bubbleUnreadView.frame));
+    }
+    
+    
 }
 
 @end

@@ -16,6 +16,7 @@
 #import "TAPConnectionStatusViewController.h"
 #import "TAPSearchViewController.h"
 #import "TAPMyAccountViewController.h"
+#import "TAPMutedRoomModel.h"
 
 #import <AFNetworking/AFNetworking.h>
 
@@ -36,11 +37,17 @@
 @property (strong, nonatomic) UIButton *myAccountButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 @property (strong, nonatomic) NSMutableArray *unreadRoomIDs;
+@property (strong, nonatomic) NSMutableArray *pinnedRoomIDs;
+@property (strong, nonatomic) NSMutableDictionary *mutedRoomDictionary;
 
 @property (strong, nonatomic) NSMutableDictionary *unreadMentionDictionary;
 
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
+@property (nonatomic) NSInteger counterOnSuccess;
+
+@property (nonatomic) BOOL isPinRoomDataChange;
+@property (nonatomic) BOOL isMuteRoomDataChange;
 @property (strong, nonatomic) NSString *readUnreadStateString;
 @property (strong, nonatomic) UIImage *readUnreadStateImage;
 
@@ -101,6 +108,16 @@
     [[TAPChatManager sharedManager] addDelegate:self];
     
     _unreadRoomIDs = [NSMutableArray array];
+    _pinnedRoomIDs = [NSMutableArray array];
+    
+    self.pinnedRoomIDs = [TAPDataManager getPinnedRoomIDs];
+    self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    
+    if(self.mutedRoomDictionary == nil){
+        _mutedRoomDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
     
     _setupRoomListView = [[TAPSetupRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.navigationController.view addSubview:self.setupRoomListView];
@@ -157,9 +174,6 @@
     }
     
     [self.setupRoomListView.retryButton addTarget:self action:@selector(viewLoadedSequence) forControlEvents:UIControlEventTouchUpInside];
-    
-    //fetch pref
-    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
     
     //View appear sequence
     [self viewLoadedSequence];
@@ -396,7 +410,17 @@
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UIContextualAction *archivedAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+    BOOL isPinnedRoom = NO;
+    
+    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+    TAPMessageModel *selectedMessage = roomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
+    
+    if([self.pinnedRoomIDs containsObject:selectedRoom.roomID]){
+        isPinnedRoom = YES;
+    }
+    
+    UIContextualAction *readUnreadAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         [self.view endEditing:YES];
         completionHandler(YES);
         
@@ -404,7 +428,7 @@
         TAPMessageModel *selectedMessage = roomList.lastMessage;
         TAPRoomModel *selectedRoom = selectedMessage.room;
         
-        if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+        if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
             roomList.numberOfUnreadMessages = 0;
             roomList.isMarkedAsUnread = NO;
             [self.unreadRoomIDs removeObject:selectedRoom.roomID];
@@ -439,40 +463,295 @@
         [self getAndUpdateNumberOfUnreadToDelegate];
     }];
     
-    if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && ![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+    UIContextualAction *pinUnpinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self.view endEditing:YES];
+        completionHandler(YES);
+        
+        if(isPinnedRoom) {
+            [TAPDataManager callAPIUnpinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs){
+                [self.pinnedRoomIDs removeObject:selectedRoom.roomID];
+                [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
+                    
+                TAPRoomModel *room = [self.roomListDictionary objectForKey:selectedRoom.roomID];
+                    
+                NSInteger index = [self.roomListArray indexOfObject:room];
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+                    
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+                completion:^(BOOL finished) {
+                        
+                }];
+                TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:selectedRoom.roomID];
+                
+                TAPMessageModel *lastMessage = roomList.lastMessage;
+                NSNumber *lastMessageCreated = lastMessage.created;
+                
+                NSInteger unpinnedIndex = 0;
+                NSInteger counter = 0;
+                for(TAPRoomListModel *roomList in self.roomListArray) {
+                    NSNumber *created = roomList.lastMessage.created;
+                    if(counter > [self.pinnedRoomIDs count] - 1 && lastMessageCreated.longValue > created.longValue){
+                        unpinnedIndex = counter;
+                        break;
+                    }
+                    
+                    counter += 1;
+                }
+                
+                
+                
+                NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+                NSIndexPath *currentIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+                
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedIndex inSection:0]];
+                }completion:^(BOOL finished) {
+                    
+                }];
+                [self.roomListArray removeObject:roomList];
+                [self.roomListArray insertObject:roomList atIndex:unpinnedIndex];
+                
+                
+            } failure:^(NSError *error){
+                    
+            }];
+            
+            
+        }
+        else {
+            NSInteger roomMaxPinned = [[TAPCoreRoomListManager sharedManager] getMaxPinnedRoom];
+            
+            if([self.pinnedRoomIDs count] < roomMaxPinned){
+                [TAPDataManager callAPIPinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs){
+                    [self.pinnedRoomIDs insertObject:selectedRoom.roomID atIndex:0];
+                    [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
+                    
+                
+                    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:selectedRoom.roomID];
+                    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+                    NSIndexPath *currentIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+                    
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                       [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                       
+                    }
+                    completion:^(BOOL finished) {
+                        [self.roomListView.roomListTableView performBatchUpdates:^{
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:indexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                        }
+                        completion:^(BOOL finished) {
+                         [self.roomListView.roomListTableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+                            
+                        }];
+                    }];
+                    
+                    /**
+                    
+                    */
+                    [self.roomListArray removeObject:roomList];
+                    [self.roomListArray insertObject:roomList atIndex:0];
+                } failure:^(NSError *error){
+                    
+                }];
+                
+            }
+            else{
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:@"You have reached the maximum of pinned chat rooms." leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            }
+        }
+        
+    }];
+    
+
+    if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+        /**
+        if(![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+            return nil;
+       
+        }
+        */
+        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Read", nil, [TAPUtil currentBundle], @"");
+        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    else{
+        /**
+        if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
+            return nil;
+            
+        }
+        */
+        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Unread", nil, [TAPUtil currentBundle], @"");
+        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkUnread" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
+    
+    UIImage *readUnreadImageRendered = [self createImageFromView:[self addedUIViewSwipeAction:self.readUnreadStateImage title:self.readUnreadStateString]];
+    readUnreadAction.image = readUnreadImageRendered;
+    readUnreadAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
+    
+    UIImage *pinUnpinImageRendered = nil;
+    
+    if(isPinnedRoom) {
+        pinUnpinImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconUnpinRoom" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Unpin"]];
+    }
+    else {
+        pinUnpinImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconPinRoom" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Pin"]];
+    }
+    
+    
+    pinUnpinAction.image = pinUnpinImageRendered;
+    pinUnpinAction.backgroundColor = [TAPUtil getColor:@"BB5C00"];
+    
+    
+    NSMutableArray *rowActionArray = [NSMutableArray array];
+    
+    
+    if([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+        [rowActionArray addObject:readUnreadAction];
+    }
+    else {
+        if((roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+            [rowActionArray addObject:readUnreadAction];
+        }
+        else if([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
+            [rowActionArray addObject:readUnreadAction];
+        }
+    }
+    
+    if([[TapUI sharedInstance] getPinRoomListSwipeMenuEnabled]){
+        [rowActionArray addObject:pinUnpinAction];
+    }
+    
+    return [UISwipeActionsConfiguration configurationWithActions:rowActionArray];
+}
+
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+    TAPMessageModel *selectedMessage = roomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
+    
+    BOOL isMutedRoom = NO;
+    NSNumber *mutedExpired = [self.mutedRoomDictionary objectForKey:selectedRoom.roomID];
+    if(mutedExpired != nil){
+        isMutedRoom = YES;
+    }
+    
+    UIContextualAction *muteUnmuteAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self.view endEditing:YES];
+        completionHandler(YES);
+        
+        if(isMutedRoom) {
+            [self callApiUnmuteRoom:selectedRoom.roomID];
+        }
+        else {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+            
+            long oneHourinSecond = 3600;
+            long oneHourInMili = oneHourinSecond * 1000;
+            long oneDayInMili = (oneHourinSecond *24) * 1000;
+            
+            UIAlertAction *oneHourAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"1 Hour", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long currentMilisecond = [TAPUtil currentTimeInMillis].longValue;
+                
+                currentMilisecond += oneHourInMili;
+                
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(currentMilisecond)];
+                                           }];
+            
+            UIAlertAction *eightHoursAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"8 Hours", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long currentMilisecond = [TAPUtil currentTimeInMillis].longValue;
+                
+                currentMilisecond += oneHourInMili * 8;
+                
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(currentMilisecond)];
+               
+                                           }];
+            
+            UIAlertAction *threeDaysAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"3 Days", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long currentMilisecond = [TAPUtil currentTimeInMillis].longValue;
+                
+                currentMilisecond += oneDayInMili * 3;
+                
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(currentMilisecond)];
+               
+                                           }];
+            
+            UIAlertAction *alwaysAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Always", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long always = 0;
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(always)];
+                                           }];
+            
+            UIAlertAction *cancelAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleCancel
+                                           handler:^(UIAlertAction * action) {
+                                               //Do some thing here
+                                           }];
+            
+            UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetButtonLabelPrimary];
+            UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+            
+            [oneHourAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [eightHoursAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [threeDaysAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [alwaysAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+            
+            [alertController addAction:oneHourAction];
+            [alertController addAction:eightHoursAction];
+            [alertController addAction:threeDaysAction];
+            [alertController addAction:alwaysAction];
+            [alertController addAction:cancelAction];
+            
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+        
+    }];
+    
+    if(![[TapUI sharedInstance] getMuteRoomListSwipeMenuEnabled]){
         
         return nil;
         
     }
     
-    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
-    if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+    if(!isMutedRoom){
         if(![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
             return nil;
             
         }
-        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Read", nil, [TAPUtil currentBundle], @"");
-        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Mute", nil, [TAPUtil currentBundle], @"");
+        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     else{
         if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
             return nil;
             
         }
-        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Unread", nil, [TAPUtil currentBundle], @"");
-        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkUnread" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Unmute", nil, [TAPUtil currentBundle], @"");
+        self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconUnmute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     
-    UIImage *imageRendered = [self createImageFromView:[self addedUIViewSwipeAction]];
-    archivedAction.image = imageRendered;
-    archivedAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
+    UIImage *imageRendered = [self createImageFromView:[self addedUIViewSwipeAction:self.readUnreadStateImage title:self.readUnreadStateString]];;
+    muteUnmuteAction.image = imageRendered;
+    muteUnmuteAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
     
-    NSArray *rowActionArray = @[archivedAction];
+    NSArray *rowActionArray = @[muteUnmuteAction];
     
     return [UISwipeActionsConfiguration configurationWithActions:rowActionArray];
 }
-
-//- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
@@ -916,6 +1195,8 @@
         [self insertRoomListToArrayAndDictionary:roomList atIndex:[self.roomListArray count]];
     }
     
+    self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
+    
     [self getAndUpdateNumberOfUnreadToDelegate];
     
 }
@@ -925,15 +1206,45 @@
     [self.roomListDictionary setObject:roomList forKey:roomList.lastMessage.room.roomID];
 }
 
-- (NSArray *)setSavedMessgeToTop:(NSArray *)resultArray {
+- (NSArray *)sortPinnedRoomToTop:(NSArray *)resultArray {
     NSMutableArray *newArray = [resultArray mutableCopy];
     
-    for(TAPMessageModel *message in resultArray) {
-        if([TAPUtil isSaveMessageRoom:message.room.roomID]){
-            //saved room
-            [newArray removeObject:message];
-            [newArray insertObject:message atIndex:0];
+    if(resultArray == nil || [resultArray count] == 0){
+        return [newArray copy];
+    }
+    
+    NSInteger pinIndexCounter = 0;
+    NSArray *pinRoomIDs = [TAPDataManager getPinnedRoomIDs];
+    
+    if(pinRoomIDs == nil || [pinRoomIDs count] == 0){
+        return resultArray;
+    }
+    
+    for(TAPRoomListModel *roomList in resultArray) {
+        TAPMessageModel *message = roomList.lastMessage;
+        BOOL isPinRoom = [pinRoomIDs containsObject:message.room.roomID];
+        if(pinIndexCounter >= [pinRoomIDs count]){
+            break;
         }
+        if(isPinRoom){
+            //saved room
+            //NSInteger pinnedIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
+            [newArray removeObject:roomList];
+            [newArray insertObject:roomList atIndex:pinIndexCounter];
+            pinIndexCounter += 1;
+        }
+    }
+    NSInteger counter = 0;
+    
+    for(NSString *roomID in pinRoomIDs) {
+        
+        TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        TAPMessageModel *message = roomList.lastMessage;
+        
+        [newArray removeObject:roomList];
+        [newArray insertObject:roomList atIndex:counter];
+        
+        counter += 1;
     }
     
     return [newArray copy];
@@ -989,16 +1300,14 @@
         
         [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                
                 BOOL isShouldAnimate = YES;
                 
                 if (self.roomListArray == nil || [self.roomListArray count] <= 0) {
                     isShouldAnimate = NO;
                 }
                 
-                NSArray *sortedArray = [self setSavedMessgeToTop:resultArray];
-                
-                [self refreshViewAndQueryUnreadLogicWithMessageArray:sortedArray animateReloadData:isShouldAnimate];
-                
+                [self refreshViewAndQueryUnreadLogicWithMessageArray:resultArray animateReloadData:isShouldAnimate];
                 
                 [self fetchDataFromAPI];
             });
@@ -1057,12 +1366,100 @@
 }
 
 - (void)handleRommlistAndUnreadSuccess:(NSArray *)messageArray{
+    //fetch pref
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+
+    self.pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+
+    self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    
+    if(self.mutedRoomDictionary == nil){
+        _mutedRoomDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    self.counterOnSuccess = 0;
+    
+    self.isMuteRoomDataChange = NO;
+    
+    [TAPDataManager callAPIGetMutedRoomList:^(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray) {
+        NSDictionary *mutedDictPref = [[TAPDataManager getMutedRoomDictionary] copy];
+        
+        [self.mutedRoomDictionary removeAllObjects];
+        for(TAPMutedRoomModel *mutedRooom in mutedRoomListArray) {
+            [self.mutedRoomDictionary setObject:mutedRooom.expired forKey:mutedRooom.roomID];
+            NSNumber *expiredPref = [mutedDictPref objectForKey:mutedRooom.roomID];
+            if(expiredPref == nil) {
+                self.isMuteRoomDataChange = YES;
+            }
+        }
+        
+        if([self.mutedRoomDictionary count] != [mutedDictPref count]) {
+            self.isMuteRoomDataChange = YES;
+        }
+        
+        [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+        
+        
+        self.counterOnSuccess += 1;
+        if(self.counterOnSuccess == 2 && (self.isMuteRoomDataChange || self.isPinRoomDataChange)) {
+            [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
+                [self.roomListView.roomListTableView reloadData];
+                [self.roomListView.roomListTableView layoutIfNeeded];
+            }];
+        }
+        
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Bio" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+    
+    self.isPinRoomDataChange = NO;
+    
+    [TAPDataManager callAPIGetPinnedRoomIDs:^(NSArray <NSString *> *pinnedRoomIDs){
+        NSArray *pinRoomPref = [TAPDataManager getPinnedRoomIDs];
+        if([pinRoomPref count] != [pinnedRoomIDs count]){
+            self.isPinRoomDataChange = YES;
+        }
+        else {
+            NSInteger counter = 0;
+            for(NSString *roomID in pinnedRoomIDs) {
+                NSString *roomIDPref = [pinRoomPref objectAtIndex:counter];
+                if(![roomID isEqualToString:roomIDPref]) {
+                    self.isPinRoomDataChange = YES;
+                    break;
+                }
+                counter += 1;
+            }
+        }
+        // Saved to preference
+        [TAPDataManager setPinnedRoomIDs:pinnedRoomIDs];
+        self.pinnedRoomIDs = [pinnedRoomIDs mutableCopy];
+        NSInteger counter = 0;
+        self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
+
+        self.counterOnSuccess += 1;
+        if(self.counterOnSuccess == 2 && (self.isMuteRoomDataChange || self.isPinRoomDataChange)) {
+            [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
+                [self.roomListView.roomListTableView reloadData];
+                [self.roomListView.roomListTableView layoutIfNeeded];
+            }];
+        }
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+    
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
         [[NSUserDefaults standardUserDefaults] synchronize];
     });
     
     [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
+    
+    
 }
 
 - (void)handleNewAndUpdatedSuccess:(NSArray *)messageArray{
@@ -1075,6 +1472,90 @@
     if ([messageArray count] != 0) {
         [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
     }
+    
+    //fetch pref
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+
+    self.pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+
+    self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    
+    if(self.mutedRoomDictionary == nil){
+        _mutedRoomDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    self.counterOnSuccess = 0;
+    self.isMuteRoomDataChange = NO;
+    [TAPDataManager callAPIGetMutedRoomList:^(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray) {
+        NSDictionary *mutedDictPref = [[TAPDataManager getMutedRoomDictionary] copy];
+        [self.mutedRoomDictionary removeAllObjects];
+        for(TAPMutedRoomModel *mutedRooom in mutedRoomListArray) {
+            [self.mutedRoomDictionary setObject:mutedRooom.expired forKey:mutedRooom.roomID];
+            
+            NSNumber *expiredPref = [mutedDictPref objectForKey:mutedRooom.roomID];
+            if(expiredPref == nil) {
+                self.isMuteRoomDataChange = YES;
+            }
+            
+        }
+        
+        if([self.mutedRoomDictionary count] != [mutedDictPref count]) {
+            self.isMuteRoomDataChange = YES;
+        }
+        
+        [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+        
+        self.counterOnSuccess += 1;
+        if(self.counterOnSuccess == 2 && (self.isMuteRoomDataChange || self.isPinRoomDataChange)) {
+            [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
+                [self.roomListView.roomListTableView reloadData];
+                [self.roomListView.roomListTableView layoutIfNeeded];
+            }];
+        }
+        
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Bio" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+    
+    self.isPinRoomDataChange = NO;
+    
+    [TAPDataManager callAPIGetPinnedRoomIDs:^(NSArray <NSString *> *pinnedRoomIDs){
+        NSArray *pinRoomPref = [TAPDataManager getPinnedRoomIDs];
+        if([pinRoomPref count] != [pinnedRoomIDs count]){
+            self.isPinRoomDataChange = YES;
+        }
+        else {
+            NSInteger counter = 0;
+            for(NSString *roomID in pinnedRoomIDs) {
+                NSString *roomIDPref = [pinRoomPref objectAtIndex:counter];
+                if(![roomID isEqualToString:roomIDPref]) {
+                    self.isPinRoomDataChange = YES;
+                    break;
+                }
+                counter += 1;
+            }
+        }
+        // Saved to preference
+        [TAPDataManager setPinnedRoomIDs:pinnedRoomIDs];
+        self.pinnedRoomIDs = [pinnedRoomIDs mutableCopy];
+        NSInteger counter = 0;
+        self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
+        
+        self.counterOnSuccess += 1;
+        if(self.counterOnSuccess == 2 && (self.isMuteRoomDataChange || self.isPinRoomDataChange)) {
+            [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
+                [self.roomListView.roomListTableView reloadData];
+                [self.roomListView.roomListTableView layoutIfNeeded];
+            }];
+        }
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+    
     
     //Delete physical files when isDeleted = 1 (message is deleted)
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -1112,9 +1593,7 @@
             [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
             [[NSUserDefaults standardUserDefaults] synchronize];
             
-            NSArray *sortedArray = [self setSavedMessgeToTop:resultArray];
-            
-            [self refreshViewAndQueryUnreadLogicWithMessageArray:sortedArray animateReloadData:animated];
+            [self refreshViewAndQueryUnreadLogicWithMessageArray:resultArray animateReloadData:animated];
         });
     } failure:^(NSError *error) {
         
@@ -1351,17 +1830,20 @@
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:messageRoomID];
     
-    BOOL hasSavedMessageRoom = NO;
+    BOOL hasPinnedRoom = NO;
+    BOOL isPinnedRoom = NO;
+    NSInteger pinnedRoomListIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
+    NSInteger unpinnedRoomListIndex = [self.pinnedRoomIDs count];
     
-    for(TAPRoomListModel *roomList in self.roomListArray){
-        NSString *roomID = roomList.lastMessage.room.roomID;
-        
-        if([TAPUtil isSaveMessageRoom:roomID]){
-            hasSavedMessageRoom = YES;
-        }
-        
+    NSInteger pinnedIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
+    
+    if([self.pinnedRoomIDs containsObject:message.room.roomID]){
+        isPinnedRoom = YES;
     }
     
+    if(self.pinnedRoomIDs.count > 0) {
+        hasPinnedRoom = YES;
+    }
     
     if (roomList != nil) {
         //Room is on the list
@@ -1416,16 +1898,14 @@
 
             if (currentIndexPath != 0 && isNewMessage) {
                 //Move cell to top
-                if(hasSavedMessageRoom){
-                    if([TAPUtil isSaveMessageRoom:roomList.lastMessage.room.roomID]){
+                if(hasPinnedRoom){
+                    if(isPinnedRoom){
                         [self.roomListArray removeObject:roomList];
-                        [self.roomListArray insertObject:roomList atIndex:0];
+                        [self.roomListArray insertObject:roomList atIndex:pinnedRoomListIndex];
                     }
                     else{
                         [self.roomListArray removeObject:roomList];
-                        [self.roomListArray insertObject:roomList atIndex:1];
-                        
-                        
+                        [self.roomListArray insertObject:roomList atIndex:unpinnedRoomListIndex];
                     }
                 }
                 else{
@@ -1435,12 +1915,12 @@
                 
                 [self.roomListView.roomListTableView performBatchUpdates:^{
                     //changing beginUpdates and endUpdates with this because of deprecation
-                    if(hasSavedMessageRoom){
-                        if([TAPUtil isSaveMessageRoom:roomList.lastMessage.room.roomID]){
-                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    if(hasPinnedRoom){
+                        if(isPinnedRoom){
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]];
                         }
                         else{
-                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]];
                         }
                     }
                     else{
@@ -1479,12 +1959,12 @@
             newRoomList.numberOfUnreadMentions = 0;
         }
         
-        if(hasSavedMessageRoom){
-            if([TAPUtil isSaveMessageRoom:newRoomList.lastMessage.room.roomID]){
-                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+        if(hasPinnedRoom){
+            if(isPinnedRoom){
+                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:pinnedRoomListIndex];
             }
             else{
-                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:1];
+                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:unpinnedRoomListIndex];
             }
         }
         else{
@@ -1493,12 +1973,12 @@
         
         [self.roomListView.roomListTableView performBatchUpdates:^{
             //changing beginUpdates and endUpdates with this because of deprecation
-            if(hasSavedMessageRoom){
-                if([TAPUtil isSaveMessageRoom:newRoomList.lastMessage.room.roomID]){
-                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            if(hasPinnedRoom){
+                if(isPinnedRoom){
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                 }
                 else{
-                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                 }
             }
             else{
@@ -1662,11 +2142,11 @@
     return image;
 }
 
-- (UIView *)addedUIViewSwipeAction {
+- (UIView *)addedUIViewSwipeAction:(UIImage *)image title:(NSString *)title {
     //Create UIVIEW as you want view for Action Button
     NSString *descriptionActionString = @"";
     
-    descriptionActionString = self.readUnreadStateString;
+    descriptionActionString = title;
     
     UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 74.0f, 86.0f)];
     containerView.backgroundColor = [UIColor clearColor];
@@ -1674,7 +2154,7 @@
     UIImageView *iconImageview = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(containerView.frame) - 32.0f) / 2.0f, (CGRectGetHeight(containerView.frame) - 32.0f - 6.0f - 16.0f) / 2.0f, 32.0f, 32.0f)];
     iconImageview.contentMode = UIViewContentModeScaleAspectFit;
     iconImageview.backgroundColor = [UIColor clearColor];
-    iconImageview.image = self.readUnreadStateImage;
+    iconImageview.image = image;
     [containerView addSubview:iconImageview];
     
     UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(iconImageview.frame) + 6.0f, CGRectGetWidth(containerView.frame), 16.0f)];
@@ -1693,6 +2173,52 @@
         // Saved to preference
     }
     failure:^(NSError *error) {
+    }];
+}
+
+- (void)callApiMuteRoom:(NSString *)roomID expiredAt:(NSNumber *)expiredAt {
+    [TAPDataManager callAPIMuteRoom:@[roomID] expiredAt:expiredAt  success:^(NSArray *roomIDs) {
+        [self.mutedRoomDictionary setObject:expiredAt forKey:roomID];
+        [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+        
+        TAPRoomModel *room = [self.roomListDictionary objectForKey:roomID];
+        
+        NSInteger index = [self.roomListArray indexOfObject:room];
+        NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        completion:^(BOOL finished) {
+            
+        }];
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+}
+
+- (void)callApiUnmuteRoom:(NSString *)roomID {
+    [TAPDataManager callAPIUnMuteRoom:@[roomID] success:^(NSArray *roomIDs) {
+        [self.mutedRoomDictionary removeObjectForKey:roomID];
+        [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+        
+        TAPRoomModel *room = [self.roomListDictionary objectForKey:roomID];
+        
+        NSInteger index = [self.roomListArray indexOfObject:room];
+        NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        completion:^(BOOL finished) {
+            
+        }];
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
 }
 

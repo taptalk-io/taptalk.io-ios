@@ -248,10 +248,6 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/unstar";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-    else if (type == TAPAPIManagerTypeUnStarMessage) {
-        NSString *apiPath = @"chat/message/unstar";
-        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
-    }
     else if (type == TAPAPIManagerTypeGetStarredMessages) {
         NSString *apiPath = @"chat/message/get_starred_list";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
@@ -292,7 +288,34 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/room/get_shared_content";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+
+    else if (type == TAPAPIManagerTypePinRoom) {
+        NSString *apiPath = @"client/room/pin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnpinRoom) {
+        NSString *apiPath = @"client/room/unpin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPinnedRoomIDs) {
+        NSString *apiPath = @"client/room/get_pinned_room_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
+
+    else if (type == TAPAPIManagerTypeMuteRoom) {
+        NSString *apiPath = @"client/room/mute";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnMuteRoom) {
+        NSString *apiPath = @"client/room/unmute";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetMutedRoom) {
+        NSString *apiPath = @"client/room/get_muted_room_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }
 

@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber *userPhotoMaxFileSize;
 @property (strong, nonatomic) NSNumber *groupMaxParticipants;
 @property (strong, nonatomic) NSNumber *channelMaxParticipants;
+@property (strong, nonatomic) NSNumber *roomMaxPinned;
 @end
 
 NS_ASSUME_NONNULL_END

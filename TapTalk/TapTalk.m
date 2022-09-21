@@ -631,6 +631,11 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_IGNORE_ADD_CONTACT_POPUP_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_GOOGLE_PLACES_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PINNED_ROOMIDS];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_LAST_PINNED_MESSAGE];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_MUTED_ROOM_LIST];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_UNREAD_ROOMIDS];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //AS NOTE - CLEAR `receiveMessageDictionary` from AppGroup Share Extension

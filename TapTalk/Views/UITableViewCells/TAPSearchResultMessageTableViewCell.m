@@ -45,7 +45,7 @@
         
         _muteImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.timeLabel.frame) - 4.0f, 0.0f, 0.0f, 13.0f)];
         self.muteImageView.alpha = 0.0f;
-        self.muteImageView.image = [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.muteImageView.image = [UIImage imageNamed:@"TAPIconMuteRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.muteImageView.image = [self.muteImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMuted]];
         [self.bgView addSubview:self.muteImageView];
         

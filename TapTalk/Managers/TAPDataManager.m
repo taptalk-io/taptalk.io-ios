@@ -968,6 +968,18 @@
         channelMaxParticipantsNumber = [NSNumber numberWithLong:[channelMaxParticipantsString longLongValue]];
     }
     
+    NSString *roomMaxPinnedString = [dictionary objectForKey:@"roomMaxPinned"];
+    roomMaxPinnedString = [TAPUtil nullToEmptyString:roomMaxPinnedString];
+    NSNumber *roomMaxPinnedNumber;
+    
+    if ([roomMaxPinnedString isEqualToString:@""]) {
+        //not obtain default data
+        roomMaxPinnedNumber = [NSNumber numberWithLong:TAP_DEFAULT_MAX_PINNED_ROOM];
+    }
+    else {
+        roomMaxPinnedNumber = [NSNumber numberWithLong:[roomMaxPinnedString longLongValue]];
+    }
+    
     
     TAPCoreConfigsModel *coreConfigs = [TAPCoreConfigsModel new];
     coreConfigs.chatMediaMaxFileSize = chatMediaMaxFileSizeNumber;
@@ -975,6 +987,7 @@
     coreConfigs.userPhotoMaxFileSize = userPhotoMaxFileSizeNumber;
     coreConfigs.groupMaxParticipants = groupMaxParticipantsNumber;
     coreConfigs.channelMaxParticipants = channelMaxParticipantsNumber;
+    coreConfigs.roomMaxPinned = roomMaxPinnedNumber;
     return coreConfigs;
 }
 
@@ -1501,6 +1514,23 @@
     return roomIDs;
 }
 
++ (void)setPinnedRoomIDs:(NSArray *)roomIDs {
+    if (roomIDs != nil) {
+        [[NSUserDefaults standardUserDefaults] setSecureObject:roomIDs forKey:TAP_PREFS_PINNED_ROOMIDS];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
++ (NSArray *)getPinnedRoomIDs {
+    NSArray *roomIDs =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_PINNED_ROOMIDS valid:nil];
+    
+    if(roomIDs == nil) {
+        roomIDs = [NSArray array];
+    }
+    
+    return roomIDs;
+}
+
 + (void)setLatestPinnedWithMessageRoomID:(TAPMessageModel *)message roomID:(NSString *)roomID {
     if (message != nil) {
         NSDictionary *messageDict = [self dictionaryFromMessageModel:message];
@@ -1533,6 +1563,27 @@
     }
     
     return lastPinnedDict;
+}
+
++ (void)setMutedRoomDictionary:(NSMutableDictionary *)mutedRoomDictionaryList {
+    if (mutedRoomDictionaryList != nil) {
+        [[NSUserDefaults standardUserDefaults] setSecureObject:mutedRoomDictionaryList forKey:TAP_PREFS_MUTED_ROOM_LIST];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    else{
+        [[NSUserDefaults standardUserDefaults] setSecureObject:nil forKey:TAP_PREFS_MUTED_ROOM_LIST];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
++ (NSMutableDictionary *)getMutedRoomDictionary {
+    NSMutableArray *mutedRoomDictionaryList =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_MUTED_ROOM_LIST valid:nil];
+    
+    if(mutedRoomDictionaryList == nil){
+        mutedRoomDictionaryList = [[NSMutableDictionary alloc] init];
+    }
+    
+    return mutedRoomDictionaryList;
 }
 
 + (void)setActiveUser:(TAPUserModel *)user {
@@ -8077,5 +8128,423 @@
 #endif
     }];
 }
+    
+
++ (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs expiredAt:(NSNumber *)expiredAt success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeMuteRoom];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    if(expiredAt != nil) {
+        [parameterDictionary setObject:expiredAt forKey:@"expiredAt"];
+    }
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIMuteRoom:roomIDs expiredAt:expiredAt success:success failure:failure];
+
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+
+                    
+        NSArray *starredMessageIDsArray = [dataDictionary objectForKey:@"mutedRoomIDs"];
+        
+        success(starredMessageIDsArray);
+
+
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnMuteRoom];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIUnMuteRoom:roomIDs success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        
+        NSArray *starredMessageIDsArray = [dataDictionary objectForKey:@"unmutedRoomIDs"];
+        
+        success(starredMessageIDsArray);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIGetMutedRoomList:(void (^)(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMutedRoom];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+
+                    [TAPDataManager callAPIGetMutedRoomList:success failure:failure];
+
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+
+             
+
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+
+
+        NSMutableArray *mutedRoomArray = [dataDictionary objectForKey:@"mutedRooms"];
+        
+        NSMutableArray<TAPMutedRoomModel *> *mutedRoomResultArray = [NSMutableArray array];
+        
+        for(NSDictionary *mutedRoomDict in mutedRoomArray){
+            TAPMutedRoomModel *mutedRoom = [TAPMutedRoomModel new];
+            
+            NSString *roomID = [mutedRoomDict objectForKey:@"roomID"];
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSNumber *expired = [mutedRoomDict objectForKey:@"expiredAt"];
+            
+            mutedRoom.roomID = roomID;
+            mutedRoom.expired = expired;
+            
+            [mutedRoomResultArray addObject:mutedRoom];
+            
+        }
+
+        success(mutedRoomResultArray);
+
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIPinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypePinRoom];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIPinRoom:roomIDs success:success failure:failure];
+
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+
+                    
+        NSArray *pinnedRoomIDsArray = [dataDictionary objectForKey:@"pinnedRoomIDs"];
+        
+        success(pinnedRoomIDsArray);
+
+
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIUnpinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnpinRoom];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIUnMuteRoom:roomIDs success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        
+        NSArray *unpinRoomIDsArray = [dataDictionary objectForKey:@"unpinnedRoomIDs"];
+        
+        success(unpinRoomIDsArray);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIGetPinnedRoomIDs:(void (^)(NSMutableArray *pinnedRoomIDs))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetPinnedRoomIDs];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+
+                    [TAPDataManager callAPIGetMutedRoomList:success failure:failure];
+
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+
+             
+
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+
+
+        NSMutableArray *pinnedRoomArray = [dataDictionary objectForKey:@"pinnedRoomIDs"];
+        
+
+        success(pinnedRoomArray);
+
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
 
 @end
