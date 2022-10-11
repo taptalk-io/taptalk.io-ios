@@ -315,7 +315,15 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/room/get_muted_room_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-
+    else if (type == TAPAPIManagerTypeDeleteChatroom) {
+        NSString *apiPath = @"client/room/clear_chat";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetRoomIDsWithState) {
+        NSString *apiPath = @"client/room/get_room_ids_with_state";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }
 

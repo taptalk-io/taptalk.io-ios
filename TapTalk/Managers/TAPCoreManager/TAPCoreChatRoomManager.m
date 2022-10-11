@@ -330,6 +330,23 @@
     }];
 }
 
+- (void)deleteAllChatRoomMessages:(NSString *)roomID
+                          success:(void (^)(NSArray *deletedRoomIDs))success
+                          failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIDeleteChatroom:@[roomID] success:^(NSArray *roomIDs) {
+        [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+            long currentTime = [TAPUtil currentTimeInMillis].longValue;
+            [TAPDataManager setLastRoomMessageDeleteTime:currentTime];
+            success(roomIDs);
+        } failure:^(NSError *error) {
+            failure(error);
+        }];
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 - (void)promoteGroupAdminsWithUserIDArray:(NSArray *)userIDArray
                                    roomID:(NSString *)roomID
                                   success:(void (^)(TAPRoomModel *room))success

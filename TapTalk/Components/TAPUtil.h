@@ -145,6 +145,8 @@
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
 + (UIViewController *_Nullable) topViewController;
++ (NSDictionary *) objectToDictionary:(id)object;
++ (NSArray *)getUrlsFromString:(NSString *)text;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;

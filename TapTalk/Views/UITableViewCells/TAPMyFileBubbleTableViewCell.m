@@ -532,7 +532,7 @@
             [self showReplyView:YES withMessage:message];
             [self showQuoteView:NO];
         }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];

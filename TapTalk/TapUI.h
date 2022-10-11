@@ -822,7 +822,6 @@ Show or hide bio in user/group profile page
 - (BOOL)getEditBioTextFieldVisible;
 
 /**
-<<<<<<< HEAD
 Enable or disable mark as read swipe in chat room list
 */
 - (void)setMarkAsReadRoomListSwipeMenuEnabled:(BOOL)isEnabled;
@@ -923,6 +922,26 @@ Enable or disable pin room swipe in chat room list
  Get current isEnabled state of pin room swipe in chat room list
 */
 - (BOOL)getPinRoomListSwipeMenuEnabled;
+
+/**
+ Enable or disable delete chatroom swipe in chat room list
+*/
+- (void)setDeleteRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of  delete chatroom swipe in chat room list
+*/
+- (BOOL)getDeleteRoomListSwipeMenuEnabled;
+
+/**
+Enable or disable link preview in chat room
+*/
+- (void)setLinkPreviewInMessageEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of message bubble link preview in chat room
+*/
+- (BOOL)getLinkPreviewInMessageEnabled;
 
 @end
 

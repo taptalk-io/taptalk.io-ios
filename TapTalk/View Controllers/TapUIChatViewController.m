@@ -16,6 +16,7 @@
 #import "TAPGradientView.h"
 #import "TAPCustomButtonView.h"
 //#import "TAPCustomTextView.h"
+#import <LinkPresentation/LPMetadataProvider.h>
 
 #import "TAPConnectionStatusViewController.h"
 #import "TAPKeyboardViewController.h"
@@ -49,6 +50,10 @@
 #import "TAPSystemMessageTableViewCell.h"
 #import "TAPAudioManager.h"
 #import "TAPStarredMessageViewController.h"
+
+#import <LinkPresentation/LPMetadataProvider.h>
+#import <LinkPresentation/LPLinkMetadata.h>
+#import <LinkPresentation/LinkPresentation.h>
 
 #import "TAPQuoteModel.h"
 
@@ -141,7 +146,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (weak, nonatomic) IBOutlet UILabel *pinBodyLabel;
 @property (weak, nonatomic) IBOutlet UIView *pinMessageView;
 
+@property (weak, nonatomic) IBOutlet UIView *linkPreviewComposerView;
+@property (weak, nonatomic) IBOutlet TAPImageView *linkPreviewComposerImageView;
+@property (weak, nonatomic) IBOutlet UILabel *linkPreviewCompserTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *linkPreviewComposerBodyLabel;
 
+@property (weak, nonatomic) IBOutlet UIView *replyQuoteExtensionView;
 
 @property (strong, nonatomic) UIView *pinPageIndicator0;
 @property (strong, nonatomic) UIView *pinPageIndicator1;
@@ -189,6 +199,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (strong, nonatomic) NSURL *currentSelectedFileURL;
 
+@property (strong, nonatomic) NSDictionary *linkMessageDataDictionary;
+
 @property (nonatomic) CGFloat messageTextViewHeight;
 @property (nonatomic) CGFloat safeAreaBottomPadding;
 @property (nonatomic) CGFloat keyboardHeight;
@@ -196,6 +208,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) CGFloat initialKeyboardHeight;
 @property (nonatomic) CGFloat hiddenKeyboardHeight; // Used to fix table view content inset when scroll view is dragged
 @property (nonatomic) CGFloat currentInputAccessoryExtensionHeight;
+
+@property (strong, nonatomic) NSString *textMessageFirstLinkURL;
 
 @property (nonatomic) long apiBeforeLastCreated;
 @property (nonatomic) BOOL isLastPage;
@@ -214,6 +228,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isSwipeGestureEnded;
 @property (nonatomic) BOOL isShowingTopFloatingIdentifier;
 @property (nonatomic) BOOL isUnpinMessageState;
+@property (nonatomic) BOOL isUrlCheckingOver;
 
 @property (nonatomic) CGFloat connectionStatusHeight;
 
@@ -326,12 +341,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isPlayerSliding;
 @property (strong, nonatomic) NSTimer *seekBarUpdateTimer;
 @property (strong, nonatomic) NSTimer *recorderCircleBlinkTimer;
+@property (strong, nonatomic) NSTimer *linkCheckerDelay;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceContraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceConstraint2;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinImageLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinImageWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinMessageHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinBottomcons;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageComposerWidthConstraint;
+
 
 
 
@@ -384,6 +402,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) NSString *currentEditingMessageString;
 @property (strong, nonatomic) TAPMessageModel *currentEditingMessage;
 @property (strong, nonatomic) TAPMessageModel *pendingRedownloadMessage;
+
+@property (strong, nonatomic) NSString *textViewNewTextString;
 
 @property (weak, nonatomic) id openedBubbleCell;
 
@@ -506,12 +526,14 @@ CGPoint center;
     _pinMessageIDArray = [[NSMutableArray alloc] init];
     _pinMessageArray = [[NSMutableArray alloc] init];
     _isSavedMesasgeArrowClicked = NO;
+    _linkMessageDataDictionary = [NSDictionary new];
     
     self.pinPagenationCounter = 1;
     
     if (self.tappedMessageLocalID == nil) {
         _tappedMessageLocalID = @"";
     }
+    
     
     _keyboardState = keyboardStateDefault;
     _keyboardHeight = 0.0f;
@@ -844,6 +866,7 @@ CGPoint center;
         //self.tableViewTopConstraint.constant = -50.0f;
     }
     
+    
     //setup voice note ui
     UIColor *recordingTimeColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRecordingTimeLabel];
     UIColor *slideLeftLabelColor = [[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField]colorWithAlphaComponent:0.6f];
@@ -910,7 +933,6 @@ CGPoint center;
         self.voiceNoteSpaceContraint.constant = 13.0f;
         self.voiceNoteSpaceConstraint2.constant = 25.0f;
     }
-    
     
 }
 
@@ -6729,6 +6751,15 @@ CGPoint center;
         [self.messageTextView setTypingEnabled:YES];
     }
     
+    self.textViewNewTextString = newText;
+    
+    //link preview checker
+    [self.linkCheckerDelay invalidate];
+    self.isUrlCheckingOver = NO;
+    if([[TapUI sharedInstance] getLinkPreviewInMessageEnabled]){
+        self.linkCheckerDelay = [NSTimer scheduledTimerWithTimeInterval:0.6f target:self selector:@selector(checkingMessageTextUrl) userInfo:nil repeats:NO];
+    }
+    
     if (self.currentRoom.type == RoomTypePersonal) {
         return;
     }
@@ -7413,6 +7444,10 @@ CGPoint center;
     self.quoteImageView.clipsToBounds = YES;
     self.quoteFileView.layer.cornerRadius = CGRectGetHeight(self.quoteImageView.frame)/2.0f;
     
+    self.linkPreviewComposerImageView.layer.cornerRadius = 4.0f;
+    self.linkPreviewComposerImageView.clipsToBounds = YES;
+    self.linkPreviewComposerImageView.backgroundColor = [UIColor clearColor];
+    
     [self checkIsContainQuoteMessage];
    // [self checkIsContainForwardMessage];
 }
@@ -7424,9 +7459,18 @@ CGPoint center;
     self.deleteRoomButtonView.layer.cornerRadius = 8.0f;
     self.deletedRoomView.clipsToBounds = YES;
     
+    NSArray *pinnedRoomIDs = [TAPDataManager getPinnedRoomIDs];
+    
     UIFont *buttonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
     UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
-    self.deleteRoomButtonLabel.text = NSLocalizedStringFromTableInBundle(@"Delete Chat", nil, [TAPUtil currentBundle], @"");
+    
+    if([pinnedRoomIDs containsObject:self.currentRoom.roomID]) {
+        self.deleteRoomButtonLabel.text = NSLocalizedStringFromTableInBundle(@"Unpin and Delete Chat", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        self.deleteRoomButtonLabel.text = NSLocalizedStringFromTableInBundle(@"Delete Chat", nil, [TAPUtil currentBundle], @"");
+    }
+
     self.deleteRoomButtonLabel.textAlignment = NSTextAlignmentCenter;
     self.deleteRoomButtonLabel.font = buttonFont;
     self.deleteRoomButtonLabel.textColor = buttonColor;
@@ -9080,7 +9124,12 @@ CGPoint center;
                                       //Reply Action Here
                                       
                                     [self checkAndShowInputAccessoryView];
-                                      if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
+        BOOL hasLinkPreviewImage = NO;
+        NSString *linkPreviewImage = [message.data objectForKey:@"image"];
+        if(linkPreviewImage != nil && ![linkPreviewImage isEqualToString:@""]) {
+            hasLinkPreviewImage = YES;
+        }
+                                      if (message.type == TAPChatMessageTypeText || (message.type == TAPChatMessageTypeLink && !hasLinkPreviewImage)) {
                                           [self showInputAccessoryExtensionView:NO];
                                           [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
                                           [self setReplyMessageWithMessage:message];
@@ -9095,6 +9144,25 @@ CGPoint center;
                                           }
 
                                           [[TAPChatManager sharedManager] saveToQuotedMessage:message userInfo:nil roomID:self.currentRoom.roomID];
+                                      }
+                                      else if (message.type == TAPChatMessageTypeLink) {
+                                          TAPMessageModel *quotedMessageModel = [message copy];
+                                          
+                                          [self showInputAccessoryExtensionView:NO];
+                                          [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
+                                          [self showInputAccessoryExtensionView:YES];
+                                          
+                                          NSString *forwardFromLocalID = quotedMessageModel.forwardFrom.localID;
+                                          forwardFromLocalID = [TAPUtil nullToEmptyString:forwardFromLocalID];
+                                          if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID] && ![forwardFromLocalID isEqualToString:@""] && quotedMessageModel.forwardFrom != nil){
+                                              quotedMessageModel.user.fullname = quotedMessageModel.forwardFrom.fullname;
+                                              quotedMessageModel.user.userID = quotedMessageModel.forwardFrom.userID;
+                                          }
+                                          
+                                          [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessageModel userInfo:nil roomID:self.currentRoom.roomID];
+
+                                          [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
+
                                       }
                                       else if (message.type == TAPChatMessageTypeImage) {
                                           TAPMessageModel *quotedMessageModel = [message copy];
@@ -9616,6 +9684,54 @@ CGPoint center;
     [self setSendButtonActive:NO];
 }
 
+- (void)checkingMessageTextUrl {
+    //Check link url
+    if(self.isUrlCheckingOver) {
+        return;
+    }
+    NSArray *urlMatches = [TAPUtil getUrlsFromString:self.textViewNewTextString];
+    if([urlMatches count] > 0) {
+        //contain link
+        self.textMessageFirstLinkURL = [urlMatches objectAtIndex:0];
+        [self showLinkPreviewChatComposer:YES linkUrl:urlMatches];
+    }
+    else {
+        self.textMessageFirstLinkURL = @"";
+        [self showLinkPreviewChatComposer:NO linkUrl:nil];
+    }
+}
+
+- (void)setLinkPreviewWitMessageData:(NSDictionary *)dictionary {
+   
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        if(dictionary == nil) {
+            self.linkPreviewCompserTitleLabel.text = @"Loading";
+            self.linkPreviewComposerBodyLabel.text = self.textMessageFirstLinkURL;
+            self.linkPreviewComposerImageView.image = nil;
+            UIImage *emptyLinkImage = [UIImage imageNamed:@"TAPIconEmptyLink" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            [self.linkPreviewComposerImageView setImage:emptyLinkImage];
+        }
+        else {
+            self.linkPreviewCompserTitleLabel.text = [dictionary objectForKey:@"title"];
+            self.linkPreviewComposerBodyLabel.text = [dictionary objectForKey:@"description"];
+            self.linkPreviewComposerImageView.image = nil;
+            NSString *image = [dictionary objectForKey:@"image"];
+            
+            self.linkPreviewComposerImageView.alpha = 1.0f;
+            if (image == nil || [image isEqualToString:@""]) {
+                UIImage *emptyLinkImage = [UIImage imageNamed:@"TAPIconEmptyLink" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+                [self.linkPreviewComposerImageView setImage:emptyLinkImage];
+            }
+            else {
+               [self.linkPreviewComposerImageView setImageWithURLString:image];
+                
+            }
+        }
+
+});
+}
+
 - (void)setReplyMessageWithMessage:(TAPMessageModel *)message {
     
     TAPChatManagerQuoteActionType type = [[TAPChatManager sharedManager] getQuoteActionTypeWithRoomID:self.currentRoom.roomID];
@@ -9781,6 +9897,8 @@ CGPoint center;
     self.quoteSubtitleLabel.text = quote.content;
     
     self.quoteImageView.image = nil;
+    
+    NSString *linkUrlImage = [quotedMessage.data objectForKey:@"image"];
     
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
@@ -10060,6 +10178,7 @@ CGPoint center;
     }
     else {
         _currentInputAccessoryExtensionHeight = 0.0f;
+        self.linkPreviewComposerView.alpha = 0.0f;
         
         if (self.isKeyboardShowed) {
             _keyboardHeight = /*kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding +*/ self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
@@ -10095,6 +10214,7 @@ CGPoint center;
 
 - (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType {
     _inputAccessoryExtensionType = inputAccessoryExtensionType;
+    self.replyQuoteExtensionView.alpha = 1.0f;
     if (inputAccessoryExtensionType == inputAccessoryExtensionTypeQuote) {
         self.quoteView.alpha = 1.0f;
         self.replyMessageView.alpha = 0.0f;
@@ -10112,8 +10232,20 @@ CGPoint center;
         self.messageTextView.text = @"";
     }
     
+    self.replyQuoteExtensionView.alpha = 0.0f;
+    
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     [[TAPChatManager sharedManager] removeForwardedMessageObjectWithRoomID:self.currentRoom.roomID];
+}
+
+
+- (IBAction)linkPreviewComposerCloseButtonDidTapped:(id)sender {
+    self.linkPreviewComposerView.alpha = 0.0f;
+    self.linkMessageDataDictionary = nil;
+    
+    if(self.replyQuoteExtensionView.alpha == 0.0f) {
+        [self showInputAccessoryExtensionView:NO];
+    }
 }
 
 - (void)checkAndShowInputAccessoryView {
@@ -12289,6 +12421,67 @@ CGPoint center;
     }
 }
 
+
+- (void)showLinkPreviewChatComposer:(BOOL)isShow linkUrl:(NSArray *)linkUrls {
+    [self setLinkPreviewWitMessageData:nil];
+    if(isShow) {
+        [self showInputAccessoryExtensionView:NO];
+        self.linkPreviewComposerView.alpha = 1.0f;
+        [self showInputAccessoryExtensionView:YES];
+        [self loadLinkPreview:linkUrls];
+    }
+    else {
+        self.linkPreviewComposerView.alpha = 0.0f;
+        if(self.replyQuoteExtensionView.alpha == 0.0f) {
+            [self showInputAccessoryExtensionView:NO];
+        }
+    }
+}
+
+- (void)loadLinkPreview:(NSArray *)linkUrls {
+    LPMetadataProvider * metaDataProvider = [[LPMetadataProvider alloc] init];
+    NSString *linkUrl = [linkUrls objectAtIndex:0];
+    linkUrl = [TAPUtil nullToEmptyString:linkUrl];
+    self.linkMessageDataDictionary = nil;
+    [metaDataProvider startFetchingMetadataForURL:[NSURL URLWithString:linkUrl] completionHandler:^(LPLinkMetadata *metaData, NSError *error){
+        
+        if(metaData != nil){
+            NSString *title = metaData.title;
+            
+            NSDictionary *LPLinkMetaDataDict = [TAPUtil objectToDictionary:metaData];
+            NSString *description = [LPLinkMetaDataDict objectForKey:@"summary"];
+            NSDictionary *LPImageMetaDataDict = [LPLinkMetaDataDict objectForKey:@"imageMetadata"];
+            NSDictionary *LPImageDict = [TAPUtil objectToDictionary:LPImageMetaDataDict];
+            
+            NSURL *imageURL = [LPImageDict objectForKey:@"URL"];
+            NSString *image = [imageURL absoluteString];
+            
+            title = [TAPUtil nullToEmptyString:title];
+            description = [TAPUtil nullToEmptyString:description];
+            image = [TAPUtil nullToEmptyString:image];
+            
+            if([title isEqualToString:@""] && [description isEqualToString:@""]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self showLinkPreviewChatComposer:NO linkUrl:nil];
+                });
+            }
+            
+            self.linkMessageDataDictionary =  @{@"url":linkUrl, @"urls":linkUrls, @"title":title, @"description":description, @"image":image};
+            
+            [self setLinkPreviewWitMessageData:self.linkMessageDataDictionary];
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if(self.replyQuoteExtensionView.alpha == 0.0f) {
+                    [self showInputAccessoryExtensionView:NO];
+                }
+            });
+        }
+    }];
+    
+}
+
+
 - (void)checkEmptyState {
     if ([self.messageArray count] == 0) {
         if (self.emptyView.alpha == 1.0f) {
@@ -12570,9 +12763,10 @@ CGPoint center;
         self.isEditingMessage = NO;
         NSString *currentMessage = [TAPUtil nullToEmptyString:self.messageTextView.text];
         currentMessage = [currentMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
         
-        [[TAPCoreMessageManager sharedManager] editMessage:self.currentEditingMessage
-                                               updatedText:currentMessage
+        [[TAPChatManager sharedManager] editMessage:self.currentEditingMessage
+                                               updatedText:currentMessage isMessageTypeChange:YES
         start:^(TAPMessageModel * _Nonnull message) {
         }
         success:^(TAPMessageModel * _Nonnull message) {
@@ -12603,7 +12797,7 @@ CGPoint center;
     currentMessage = [currentMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     if (![currentMessage isEqualToString:@""]) {
-        [[TAPChatManager sharedManager] sendTextMessage:currentMessage];
+        [self sendTextMessageWithString:currentMessage];
         self.messageTextView.text = @"";
     }
     else {
@@ -12670,6 +12864,24 @@ CGPoint center;
 
 }
 
+- (void)sendTextMessageWithString:(NSString *)text {
+    //check is text message containing url
+    
+    NSArray *urlMatches = [TAPUtil getUrlsFromString:text];
+    
+    self.isUrlCheckingOver = YES;
+    
+    if(urlMatches.count > 0) {
+        if(self.linkMessageDataDictionary == nil) {
+            NSString *firstUrl = [urlMatches objectAtIndex:0];
+            self.linkMessageDataDictionary = @{@"url":firstUrl, @"urls":urlMatches};
+        }
+        [[TAPChatManager sharedManager] sendLinkMessage:text messageData:self.linkMessageDataDictionary];
+    }
+    else {
+        [[TAPChatManager sharedManager] sendTextMessage:text];
+    }
+}
 
 - (void)backButtonDidTapped {
     if(self.isSelectingForwardMessage){
@@ -13476,7 +13688,6 @@ CGPoint center;
         } failure:^(NSError *error) {
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Bio" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
 }
@@ -13500,12 +13711,11 @@ CGPoint center;
         } failure:^(NSError *error) {
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Bio" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
 }
 
-- (void)callApiPinUnpinMessage:(BOOL)isPinned roomID:(NSString *)roomID message:(TAPMessageModel *)message{
+- (void)callApiPinUnpinMessage:(BOOL)isPinned roomID:(NSString *)roomID message:(TAPMessageModel *)message {
     
     NSArray<NSString *> *messageIDs = @[message.messageID];
     if(!isPinned){
@@ -14296,14 +14506,85 @@ CGPoint center;
 }
 
 - (IBAction)deleteGroupButtonDidTapped:(id)sender {
-    //add sequence to delete message and physical files
-    [[TAPCoreRoomListManager sharedManager] unpinChatRoomWithRoomID:self.currentRoom.roomID success:^(NSArray *roomIDs){
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    NSString *deleteDescriptionString = NSLocalizedStringFromTableInBundle(@"Are you sure you want to delete this conversation?", nil, [TAPUtil currentBundle], @"");
+    
+    BOOL isPinnedRoom = NO;
+    NSArray *pinnerRoomIDs = [TAPDataManager getPinnedRoomIDs];
+    if([pinnerRoomIDs containsObject:self.currentRoom.roomID]) {
+        deleteDescriptionString = NSLocalizedStringFromTableInBundle(@"Are you sure you want to unpin and delete this conversation?", nil, [TAPUtil currentBundle], @"");
+        isPinnedRoom = YES;
+    }
+    
+    UIAlertAction *deleteDescription = [UIAlertAction
+                                   actionWithTitle:deleteDescriptionString
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * action) {
+        
+    }];
+    
+    UIAlertAction *deleteAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Delete for me", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * action) {
+        //add sequence to delete message and physical files
         [self setDeleteRoomButtonAsLoading:YES animated:YES];
+        if(isPinnedRoom) {
+            NSMutableArray *pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+            [pinnedRoomIDs removeObject:self.currentRoom.roomID];
+            [TAPDataManager setPinnedRoomIDs:[pinnedRoomIDs copy]];
+        }
+        
+        [self callApiDeleteChatroom];
+        
+       
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       //Do some thing here
+        
+    }];
+    
+    UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTitleLabel];
+    UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+    
+    [deleteDescription setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+    [deleteAction setValue:[TAPUtil getColor:@"E02E2E"] forKey:@"titleTextColor"];
+    [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+    
+    [alertController addAction:deleteDescription];
+    [alertController addAction:deleteAction];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+    
+}
+
+- (void)showTapTalkMessageComposerView {
+    [self checkAndShowInputAccessoryView];
+}
+
+- (void)hideTapTalkMessageComposerView {
+    [self.view endEditing:YES];
+    [self hideInputAccessoryView];
+}
+
+- (void)callApiDeleteChatroom {
+    [TAPDataManager callAPIDeleteChatroom:@[self.currentRoom.roomID] success:^(NSArray *deletedRoomIDs){
         [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.currentRoom.roomID success:^{
             
             if ([self.delegate respondsToSelector:@selector(chatViewControllerDidLeaveOrDeleteGroupWithRoom:)]) {
                 [self.delegate chatViewControllerDidLeaveOrDeleteGroupWithRoom:self.currentRoom];
             }
+            
+            long currentTime = [TAPUtil currentTimeInMillis].longValue;
+            [TAPDataManager setLastRoomMessageDeleteTime:currentTime];
             
             //Throw view to room list
             [TAPUtil performBlock:^{
@@ -14315,23 +14596,14 @@ CGPoint center;
             [self setDeleteRoomButtonAsLoading:NO animated:YES];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedStringFromTableInBundle(@"Oops! Failed to delete chat room", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     } failure:^(NSError *error){
         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Pin Room" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group" title:NSLocalizedStringFromTableInBundle(@"Oops! Failed to delete chat room", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
     
-}
-
-- (void)showTapTalkMessageComposerView {
-    [self checkAndShowInputAccessoryView];
-}
-
-- (void)hideTapTalkMessageComposerView {
-    [self.view endEditing:YES];
-    [self hideInputAccessoryView];
 }
 
 - (void)checkAndShowRoomViewState {
@@ -14526,7 +14798,13 @@ CGPoint center;
            return;
     }
     
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeVoice) {
+    BOOL hasLinkPreviewImage = NO;
+    NSString *linkPreviewImage = [message.data objectForKey:@"image"];
+    if(linkPreviewImage != nil && ![linkPreviewImage isEqualToString:@""]) {
+        hasLinkPreviewImage = YES;
+    }
+    
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation || message.type == TAPChatMessageTypeVoice || (message.type == TAPChatMessageTypeLink && !hasLinkPreviewImage)) {
         //Type Text and Location
         [self showInputAccessoryExtensionView:NO];
         [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeReplyMessage];
@@ -14586,7 +14864,7 @@ CGPoint center;
         [self setQuoteWithMessage:quotedMessageModel saveToQuotedMessage:YES];
 
     }
-    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo || message.type == TAPChatMessageTypeLink) {
         //Type Video and Image
         TAPMessageModel *quotedMessageModel = [message copy];
         

@@ -19,6 +19,8 @@
 		0A1640C127D9E94B007FACEE /* TAPCustomTextFieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */; };
 		0A6956C12893F0BF0090B20A /* TAPBaseTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A6956BF2893F0BE0090B20A /* TAPBaseTableView.m */; };
 		0A6956C22893F0BF0090B20A /* TAPBaseTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6956C02893F0BF0090B20A /* TAPBaseTableView.h */; };
+		0A9997A728F5575C0063DDE0 /* TAPClearedRoomModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9997A528F5575B0063DDE0 /* TAPClearedRoomModel.h */; };
+		0A9997A828F5575C0063DDE0 /* TAPClearedRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A9997A628F5575C0063DDE0 /* TAPClearedRoomModel.m */; };
 		0A9D8010282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9D800D282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h */; };
 		0A9D8011282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A9D800E282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.m */; };
 		0A9D8012282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A9D800F282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.xib */; };
@@ -455,6 +457,8 @@
 		0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomTextFieldView.m; sourceTree = "<group>"; };
 		0A6956BF2893F0BE0090B20A /* TAPBaseTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPBaseTableView.m; sourceTree = "<group>"; };
 		0A6956C02893F0BF0090B20A /* TAPBaseTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPBaseTableView.h; sourceTree = "<group>"; };
+		0A9997A528F5575B0063DDE0 /* TAPClearedRoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPClearedRoomModel.h; sourceTree = "<group>"; };
+		0A9997A628F5575C0063DDE0 /* TAPClearedRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPClearedRoomModel.m; sourceTree = "<group>"; };
 		0A9D800D282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPMyVoiceNoteBubbleTableViewCell.h; sourceTree = "<group>"; };
 		0A9D800E282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPMyVoiceNoteBubbleTableViewCell.m; sourceTree = "<group>"; };
 		0A9D800F282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPMyVoiceNoteBubbleTableViewCell.xib; sourceTree = "<group>"; };
@@ -1162,6 +1166,8 @@
 				D7D3B44222FD7D7B00D1DFF7 /* TAPCoreConfigsModel.m */,
 				D7D3B44522FD7D8D00D1DFF7 /* TAPProjectConfigsModel.h */,
 				D7D3B44622FD7D8D00D1DFF7 /* TAPProjectConfigsModel.m */,
+				0A9997A528F5575B0063DDE0 /* TAPClearedRoomModel.h */,
+				0A9997A628F5575C0063DDE0 /* TAPClearedRoomModel.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1623,6 +1629,7 @@
 				D7D3B44322FD7D7B00D1DFF7 /* TAPCoreConfigsModel.h in Headers */,
 				D78364052158E3DD008AF7F5 /* NSUserDefaults+MPSecureUserDefaults.h in Headers */,
 				0ABD955128DB154B00BAD126 /* TAPMutedRoomModel.h in Headers */,
+				0A9997A728F5575C0063DDE0 /* TAPClearedRoomModel.h in Headers */,
 				D7115364222E54A90033C082 /* TAPDataFileModel.h in Headers */,
 				D74BA2AE2162066200DF494C /* TAPRoomListModel.h in Headers */,
 				D7F986F12251BB500087B652 /* TAPCustomPhoneNumberPickerView.h in Headers */,
@@ -1965,6 +1972,7 @@
 				D74BA2AF2162066200DF494C /* TAPRoomListModel.m in Sources */,
 				D77B5E862158BB2900253BDC /* AESCrypt.m in Sources */,
 				D7F986F22251BB500087B652 /* TAPCustomPhoneNumberPickerView.m in Sources */,
+				0A9997A828F5575C0063DDE0 /* TAPClearedRoomModel.m in Sources */,
 				D79533532450039200C4F90D /* NSBundle+Language.m in Sources */,
 				D77B5F042158BB8700253BDC /* TAPNewChatOptionTableViewCell.m in Sources */,
 				DF61EABA22D2040000A67364 /* TAPPlainInfoLabelTableViewCell.m in Sources */,
@@ -2289,7 +2297,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -2326,7 +2334,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

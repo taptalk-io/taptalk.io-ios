@@ -215,6 +215,79 @@
     [self sendTextMessage:message room:room start:start success:success failure:failure];
 }
 
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *firstUrl = [urls objectAtIndex:0];
+    NSDictionary *messageData = @{@"url":firstUrl, @"urls":urls, @"title":title, @"description":description, @"image":image};
+    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+        start(message);
+    }];
+}
+
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *firstUrl = [urls objectAtIndex:0];
+    NSDictionary *messageData = @{@"url":firstUrl, @"urls":urls, @"title":title, @"description":description, @"image":image, @"siteName":siteName, @"type":type};
+    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+        start(message);
+    }];
+}
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    [self sendLinkMessage:message room:room urls:urls title:title description:description image:image start:start success:success failure:failure];
+}
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    [self sendLinkMessage:message room:room urls:urls title:title description:description image:image siteName:siteName type:type start:start success:success failure:failure];
+}
+
+
 - (void)sendLocationMessageWithLatitude:(CGFloat)latitude
                               longitude:(CGFloat)longitude
                                 address:(nullable NSString *)address
@@ -1708,94 +1781,50 @@
     }];
 }
 
-- (void)editMessage:(TAPMessageModel *)message
-        updatedText:(NSString *)updatedText
+- (void)editMessage:(TAPMessageModel *)previousMessage
+        updatedText:(NSString *)updatedMessage
             start:(void (^)(TAPMessageModel *message))start
             success:(void (^)(TAPMessageModel *message))success
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
-    
-    
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
-        if (updatedText.length > kCharacterLimit) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Message exceeds the %ld character limit", (long)kCharacterLimit];
-            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-            failure(message, error);
-            return;
-        }
-        
-        //check is text message containing url
-        NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
-        
-        NSArray *urlMatches = [linkDetector matchesInString:updatedText options:0 range:NSMakeRange(0, updatedText.length)];
-        
-        NSMutableArray *urlMatchesString = [[NSMutableArray alloc] init];
-        
-        for(NSTextCheckingResult *urlMatch in urlMatches){
-            NSURL *url = [urlMatch URL];
-            [urlMatchesString addObject:[url absoluteString]];
-        }
-        
-        TAPChatMessageType messagetype = TAPChatMessageTypeText;
-        NSDictionary *messageData = nil;
-        
-        if(urlMatches.count > 0){
-            messagetype = TAPChatMessageTypeLink;
-            NSString *firstUrl = [urlMatchesString objectAtIndex:0];
-            messageData = @{@"url":firstUrl, @"urls":urlMatchesString};
-        }
-        
-        message.type = messagetype;
-        message.data = messageData;
-        message.body = updatedText;
+    [[TAPChatManager sharedManager] editMessage:previousMessage
+                                           updatedText:updatedMessage isMessageTypeChange:NO
+    start:^(TAPMessageModel * _Nonnull message) {
+        start(message);
     }
-    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
-        NSInteger length = updatedText.length;
-        NSInteger max = [[TapTalk sharedInstance] getMaxCaptionLength];
-        if (updatedText.length > [[TapTalk sharedInstance] getMaxCaptionLength]) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Caption exceeds the %ld character limit", (long)[[TapTalk sharedInstance] getMaxCaptionLength]];
-            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-            failure(message, error);
-            return;
-        }
-        NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
-        dataDictionary = [message.data mutableCopy];
-        dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
-        [dataDictionary setObject:updatedText forKey:@"caption"];
-        
-        message.data = dataDictionary;
-        
-        if (message.type == TAPChatMessageTypeImage) {
-            if ([updatedText isEqualToString:@""]) {
-                message.body = @"🖼 Photo";
-            }
-            else {
-                message.body = [NSString stringWithFormat:@"🖼 %@", updatedText];
-            }
-        }
-        else if (message.type == TAPChatMessageTypeVideo) {
-            if ([updatedText isEqualToString:@""]) {
-                message.body = @"🎥 Video";
-            }
-            else {
-                message.body = [NSString stringWithFormat:@"🎥 %@", updatedText];
-            }
-        }
+    success:^(TAPMessageModel * _Nonnull message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
     }
-    else {
-        NSString *errorMessage = @"Invalid message type. Allowed types are text (1001), image (1002), video (1003)";
-        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90309 errorMessage:errorMessage];
-        failure(message, error);
-        return;
+    failure:^(TAPMessageModel * _Nullable message, NSError *error) {
+        failure(message,error);
+    }];
+    
+   
+}
+
+- (void)editMessage:(TAPMessageModel *)updatedMessage
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    
+    [[TAPChatManager sharedManager] editMessage:updatedMessage
+    start:^(TAPMessageModel * _Nonnull message) {
+        start(message);
     }
+    success:^(TAPMessageModel * _Nonnull message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+    }
+    failure:^(TAPMessageModel * _Nullable message, NSError *error) {
+        failure(message,error);
+    }];
     
-    start(message);
-    
-    [[TAPChatManager sharedManager] sendEmitWithEditedMessage:message];
-    void (^handlerSuccess)(TAPMessageModel *) = [success copy];
-    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
-    [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
-    [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+   
 }
 
 - (void)pinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{

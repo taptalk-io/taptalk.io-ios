@@ -11,6 +11,10 @@
 #import <TapTalk/Base64.h>
 #import <CoreServices/UTType.h>
 
+#import <LinkPresentation/LPMetadataProvider.h>
+#import <LinkPresentation/LPLinkMetadata.h>
+#import <LinkPresentation/LinkPresentation.h>
+
 #define kMaximumRetryAttempt 10
 #define kDelayTime 60.0f
 
@@ -115,6 +119,15 @@
     }
     else if ([eventName isEqualToString:kTAPEventUserUpdated]) {
         [self receiveContactUpdatedFromSocketWithDataDictionary:dataDictionary];
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomClearChat]) {
+        [self receiveRoomUpdateFromSocketWithEvent:eventName dataDictionary:dataDictionary];
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomPin] || [eventName isEqualToString:kTAPEventRoomUnpin]) {
+        [self receiveRoomUpdateFromSocketWithEvent:eventName dataDictionary:dataDictionary];
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomMute] || [eventName isEqualToString:kTAPEventRoomUnmute]) {
+        [self receiveRoomUpdateFromSocketWithEvent:eventName dataDictionary:dataDictionary];
     }
 }
 
@@ -380,6 +393,143 @@
     }];
 }
 
+- (void)editMessage:(TAPMessageModel *)updatedMessage
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+   
+    start(updatedMessage);
+    [[TAPChatManager sharedManager] sendEmitWithEditedMessage:updatedMessage];
+    success(updatedMessage);
+    
+    
+}
+
+- (void)editMessage:(TAPMessageModel *)previousMessage
+        updatedText:(NSString *)updatedMessage isMessageTypeChange:(BOOL)isMeesageTypeChange
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    
+    if (previousMessage.type == TAPChatMessageTypeText || previousMessage.type == TAPChatMessageTypeLink) {
+        if (updatedMessage.length > kCharacterLimit) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Message exceeds the %ld character limit", (long)kCharacterLimit];
+            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+            failure(previousMessage, error);
+            return;
+        }
+        
+        if(isMeesageTypeChange) {
+            //check is text message containing url
+            NSArray *urlMatchesString = [TAPUtil getUrlsFromString:updatedMessage];
+            TAPChatMessageType messagetype = previousMessage.type;
+            NSDictionary *messageData = previousMessage.data;
+            
+            if(urlMatchesString.count > 0){
+                messagetype = TAPChatMessageTypeLink;
+                NSString *firstUrl = [urlMatchesString objectAtIndex:0];
+                
+                LPMetadataProvider * metaDataProvider = [[LPMetadataProvider alloc] init];
+                [metaDataProvider startFetchingMetadataForURL:[NSURL URLWithString:firstUrl] completionHandler:^(LPLinkMetadata *metaData, NSError *error){
+                    
+                    if(metaData != nil){
+                        NSString *title = metaData.title;
+                        
+                        NSDictionary *LPLinkMetaDataDict = [TAPUtil objectToDictionary:metaData];
+                        NSString *description = [LPLinkMetaDataDict objectForKey:@"summary"];
+                        NSDictionary *LPImageMetaDataDict = [LPLinkMetaDataDict objectForKey:@"imageMetadata"];
+                        NSDictionary *LPImageDict = [TAPUtil objectToDictionary:LPImageMetaDataDict];
+                        
+                        NSURL *imageURL = [LPImageDict objectForKey:@"URL"];
+                        NSString *image = [imageURL absoluteString];
+                        
+                        title = [TAPUtil nullToEmptyString:title];
+                        description = [TAPUtil nullToEmptyString:description];
+                        image = [TAPUtil nullToEmptyString:image];
+                        
+                        NSDictionary  *messageData =  @{@"url":firstUrl, @"urls":urlMatchesString, @"title":title, @"description":description, @"image":image};
+                        
+                        
+                    }
+                    
+                    previousMessage.type = messagetype;
+                    previousMessage.data = messageData;
+                    previousMessage.body = updatedMessage;
+                    
+                    [[TAPChatManager sharedManager] sendEmitWithEditedMessage:previousMessage];
+                    success(previousMessage);
+                }];
+                
+                
+            }
+            else {
+                messagetype = TAPChatMessageTypeText;
+                messageData = nil;
+                
+                previousMessage.type = messagetype;
+                previousMessage.data = messageData;
+                previousMessage.body = updatedMessage;
+                
+                [[TAPChatManager sharedManager] sendEmitWithEditedMessage:previousMessage];
+                success(previousMessage);
+            }
+        }
+        else {
+            previousMessage.body = updatedMessage;
+            
+            [[TAPChatManager sharedManager] sendEmitWithEditedMessage:previousMessage];
+            success(previousMessage);
+        }
+    }
+    else if (previousMessage.type == TAPChatMessageTypeImage || previousMessage.type == TAPChatMessageTypeVideo) {
+        NSInteger length = updatedMessage.length;
+        NSInteger max = [[TapTalk sharedInstance] getMaxCaptionLength];
+        if (updatedMessage.length > [[TapTalk sharedInstance] getMaxCaptionLength]) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Caption exceeds the %ld character limit", (long)[[TapTalk sharedInstance] getMaxCaptionLength]];
+            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+            failure(previousMessage, error);
+            return;
+        }
+        NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
+        dataDictionary = [previousMessage.data mutableCopy];
+        dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
+        [dataDictionary setObject:updatedMessage forKey:@"caption"];
+        
+        previousMessage.data = dataDictionary;
+        
+        if (previousMessage.type == TAPChatMessageTypeImage) {
+            if ([updatedMessage isEqualToString:@""]) {
+                previousMessage.body = @"🖼 Photo";
+            }
+            else {
+                previousMessage.body = [NSString stringWithFormat:@"🖼 %@", updatedMessage];
+            }
+        }
+        else if (previousMessage.type == TAPChatMessageTypeVideo) {
+            if ([updatedMessage isEqualToString:@""]) {
+                previousMessage.body = @"🎥 Video";
+            }
+            else {
+                previousMessage.body = [NSString stringWithFormat:@"🎥 %@", updatedMessage];
+            }
+        }
+        
+        [[TAPChatManager sharedManager] sendEmitWithEditedMessage:previousMessage];
+        success(previousMessage);
+    }
+    else {
+        NSString *errorMessage = @"Invalid message type. Allowed types are text (1001), image (1002), video (1003)";
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90309 errorMessage:errorMessage];
+        failure(previousMessage, error);
+        return;
+    }
+    
+    start(previousMessage);
+    
+    
+}
+
+
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
 
     //Check if forward message exist, send forward message
@@ -387,27 +537,6 @@
     
     //Divide message if length more than character limit
     NSInteger characterLimit = kCharacterLimit;
-    
-    //check is text message containing url
-    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
-    
-    NSArray *urlMatches = [linkDetector matchesInString:textMessage options:0 range:NSMakeRange(0, textMessage.length)];
-    
-    NSMutableArray *urlMatchesString = [[NSMutableArray alloc] init];
-    
-    for(NSTextCheckingResult *urlMatch in urlMatches){
-        NSURL *url = [urlMatch URL];
-        [urlMatchesString addObject:[url absoluteString]];
-    }
-    
-    TAPChatMessageType messagetype = TAPChatMessageTypeText;
-    NSDictionary *messageData = nil;
-    
-    if(urlMatches.count > 0){
-        messagetype = TAPChatMessageTypeLink;
-        NSString *firstUrl = [urlMatchesString objectAtIndex:0];
-        messageData = @{@"url":firstUrl, @"urls":urlMatchesString};
-    }
     
     if ([textMessage length] > characterLimit) {
         NSInteger messageLength = [textMessage length];
@@ -423,7 +552,56 @@
             
             TAPMessageModel *message = [self createMessageModelWithRoom:room
                                                                    body:substringMessage
-                                                                   type:messagetype
+                                                                   type:TAPChatMessageTypeText
+                                                            messageData:nil];
+            
+            //Call block in TAPCoreMessageManager to handle things in TAPCore
+            successGenerateMessage(message);
+            
+            [self sendMessage:message notifyDelegate:YES];
+        }
+    }
+    else {
+        TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                               body:textMessage
+                                                               type:TAPChatMessageTypeText
+                                                        messageData:nil];
+        
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        successGenerateMessage(message);
+        
+        [self sendMessage:message notifyDelegate:YES];
+    }
+}
+
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData {
+    [[TAPChatManager sharedManager] sendLinkMessage:textMessage messageData:messageData room:[TAPChatManager sharedManager].activeRoom successGenerateMessage:^(TAPMessageModel *message) {
+    }];
+}
+
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    //Divide message if length more than character limit
+    NSInteger characterLimit = kCharacterLimit;
+    
+    if ([textMessage length] > characterLimit) {
+        NSInteger messageLength = [textMessage length];
+        
+        for (NSInteger startIndex = 0; startIndex < messageLength; startIndex += characterLimit) {
+            //Copy current message model
+            NSInteger substringLength = messageLength - startIndex;
+            if (substringLength > characterLimit) {
+                substringLength = characterLimit;
+            }
+            
+            NSString *substringMessage = [textMessage substringWithRange:NSMakeRange(startIndex, substringLength)];
+            
+            TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                                   body:substringMessage
+                                                                   type:TAPChatMessageTypeLink
                                                             messageData:messageData];
             
             //Call block in TAPCoreMessageManager to handle things in TAPCore
@@ -435,7 +613,7 @@
     else {
         TAPMessageModel *message = [self createMessageModelWithRoom:room
                                                                body:textMessage
-                                                               type:messagetype
+                                                               type:TAPChatMessageTypeLink
                                                         messageData:messageData];
         
         //Call block in TAPCoreMessageManager to handle things in TAPCore
@@ -1078,6 +1256,67 @@
     _backgroundSequenceTimer = nil;
     [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTask];
     self.backgroundTask = UIBackgroundTaskInvalid;
+}
+
+- (void)receiveRoomUpdateFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {
+    for (id delegate in self.delegatesArray) {
+        if ([delegate respondsToSelector:@selector(chatManagerDidReceiveUpdateRoom:data:)]) {
+            [delegate chatManagerDidReceiveUpdateRoom:eventName data:dataDictionary];
+            
+        }
+        
+    }
+    
+    NSDictionary *room = [dataDictionary objectForKey:@"room"];
+    NSString *roomID = [room objectForKey:@"roomID"];
+    
+    if ([eventName isEqualToString:kTAPEventRoomClearChat]) {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveDeleteChatroom:)]) {
+                [delegate chatManagerDidReceiveDeleteChatroom:roomID];
+                
+            }
+            
+        }
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomPin]) {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceivePinChatroom:)]) {
+                [delegate chatManagerDidReceivePinChatroom:roomID];
+                
+            }
+            
+        }
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomUnpin]) {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveUnpinChatroom:)]) {
+                [delegate chatManagerDidReceiveUnpinChatroom:roomID];
+                
+            }
+            
+        }
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomMute]) {
+        NSNumber *expiredAt = [dataDictionary objectForKey:@"expiredAt"];
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveMuteChatroom:expiredAt:)]) {
+                [delegate chatManagerDidReceiveMuteChatroom:roomID expiredAt:expiredAt];
+                
+            }
+            
+        }
+    }
+    else if ([eventName isEqualToString:kTAPEventRoomUnmute]) {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveUnmuteChatroom:)]) {
+                [delegate chatManagerDidReceiveUnmuteChatroom:roomID];
+                
+            }
+            
+        }
+    }
+    
 }
 
 - (void)receiveMessageFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {

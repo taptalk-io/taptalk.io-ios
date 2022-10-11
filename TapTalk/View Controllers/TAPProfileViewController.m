@@ -499,7 +499,7 @@
                 else if (indexPath.row == 2) {
                     // Report user
                     if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
-                        height = 0.0f;
+                        //height = 0.0f;
                     }
                 }
             }
@@ -507,7 +507,7 @@
                 if (indexPath.row == 1) {
                     // Report user
                     if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
-                        height = 0.0f;
+                       // height = 0.0f;
                     }
                 }
                 
@@ -737,9 +737,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 return 2;
             }
             else{
-                
-                    return 3;
-                
+                return 4;
                 
             }
         }

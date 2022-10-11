@@ -123,6 +123,9 @@
     if (quote.imageURL == @"") {
         quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"imageURL"]];
     }
+    if (quotedMessage.type == TAPChatMessageTypeLink) {
+        quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"image"]];
+    }
     if (quotedMessage.type == TAPChatMessageTypeImage) {
         quote.fileType = @"image";
     }

@@ -39,6 +39,15 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message;
 - (void)chatManagerDidSendMessagePending:(TAPMessageModel *)message;
+- (void)chatManagerDidReceiveUpdateRoom:(NSString *)eventName data:(NSDictionary *)data;
+
+- (void)chatManagerDidReceiveDeleteChatroom:(NSString *)roomID;
+- (void)chatManagerDidReceivePinChatroom:(NSString *)roomID;
+- (void)chatManagerDidReceiveUnpinChatroom:(NSString *)roomID;
+- (void)chatManagerDidReceiveMuteChatroom:(NSString *)roomID expiredAt:(NSNumber *)expiredAt;
+- (void)chatManagerDidReceiveUnmuteChatroom:(NSString *)roomID;
+- (void)chatManagerDidReceiveMarkChatRoomAsUnread:(NSString *)roomID;
+- (void)chatManagerDidReceiveMarkChatRoomAsRead:(NSString *)roomID;
 
 @end
 
@@ -75,6 +84,8 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 
 - (void)sendTextMessage:(NSString *)textMessage;
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData;
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption;
@@ -89,6 +100,15 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
                                  fileURL:(NSURL *)fileURL
                                      room:(TAPRoomModel *)room
                    successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)editMessage:(TAPMessageModel *)previousMessage
+        updatedText:(NSString *)updatedMessage isMessageTypeChange:(BOOL)isMeesageTypeChange
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)editMessage:(TAPMessageModel *)updatedMessage
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
 - (void)sendEmitFileMessage:(TAPMessageModel *)message;
 - (void)sendProductMessage:(TAPMessageModel *)message;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address;

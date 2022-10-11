@@ -24,6 +24,7 @@
 #define TAP_PREFS_PINNED_ROOMIDS @"Prefs.TapTalkPinnedRoomIDs"
 #define TAP_PREFS_LAST_PINNED_MESSAGE @"Prefs.TapTalkLastPinnedMessage"
 #define TAP_PREFS_MUTED_ROOM_LIST @"Prefs.TapTalkMutedRoomList"
+#define TAP_PREFS_LAST_ROOM_DELETE_TIME @"Prefs.TapTalkLastRoomDeleteTime"
 #define TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING @"Prefs.TapTalkCurrentVoiceNoteMessagePlaying"
 #define TAP_PREFS_PUSH_TOKEN @"Prefs.TapTalkPushToken"
 #define TAP_PREFS_ACCESS_TOKEN @"Prefs.TapTalkAccessToken"
@@ -85,6 +86,11 @@
 #define kTAPEventEditMessage @"chat/editMessage"
 #define kTAPEventUserOnline @"user/status"
 #define kTAPEventUserUpdated @"user/updated"
+#define kTAPEventRoomClearChat @"room/clearChat"
+#define kTAPEventRoomPin @"room/pin"
+#define kTAPEventRoomUnpin @"room/unpin"
+#define kTAPEventRoomMute @"room/mute"
+#define kTAPEventRoomUnmute @"room/unmute"
 
 //Domain
 #define TAPErrorDomain @"user/updated"

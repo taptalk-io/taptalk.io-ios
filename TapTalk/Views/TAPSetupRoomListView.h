@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, TAPSetupRoomListViewType) {
     TAPSetupRoomListViewTypeSettingUp = 0,
     TAPSetupRoomListViewTypeSuccess = 1,
-    TAPSetupRoomListViewTypeFailed = 2
+    TAPSetupRoomListViewTypeFailed = 2,
+    TAPSetupRoomListViewTypeLoading = 3
 };
 
 @interface TAPSetupRoomListView : TAPBaseView

@@ -86,6 +86,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendStartTypingEmitWithRoomID:(NSString *)roomID;
 - (void)sendStopTypingEmitWithRoomID:(NSString *)roomID;
 
+- (void)deleteAllChatRoomMessages:(NSString *)roomID success:(void (^)(NSArray *deletedRoomIDs))success failure:(void (^)(NSError *error))error;
+
 @end
 
 NS_ASSUME_NONNULL_END

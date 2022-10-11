@@ -14,6 +14,7 @@
 #import "TAPCoreConfigsModel.h"
 #import "TAPPhotoListModel.h"
 #import "TAPMutedRoomModel.h"
+#import "TAPClearedRoomModel.h"
 
 @import AFNetworking;
 
@@ -38,6 +39,8 @@
 + (NSArray *)getPinnedRoomIDs;
 + (void)setMutedRoomDictionary:(NSMutableDictionary *)mutedRoomDictionaryList;
 + (NSMutableDictionary *)getMutedRoomDictionary;
++ (void)setLastRoomMessageDeleteTime:(long)timestamp;
++ (long)getLastRoomMessageDeleteTime;
 + (void)updateMessageToFailedWhenClosedInDatabase;
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
@@ -447,7 +450,10 @@
 + (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs expiredAt:(NSNumber *)expiredAt success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetMutedRoomList:(void (^)(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetRoomIDsWithState:(void (^)(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray))success failure:(void (^)(NSError *error))failure;
 // Used to prevent inserting message to deleted chat room
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
+
 
 @end
