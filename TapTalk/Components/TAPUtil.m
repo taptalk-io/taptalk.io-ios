@@ -8,7 +8,13 @@
 
 #import "TAPUtil.h"
 #import <CoreServices/UTType.h>
+#import <CoreServices/UTCoreTypes.h>
 #import <objc/runtime.h>
+#import <LinkPresentation/LPMetadataProvider.h>
+#import <LinkPresentation/LPLinkMetadata.h>
+#import <LinkPresentation/LPFoundation.h>
+#import <LinkPresentation/LPLinkView.h>
+#import <LinkPresentation/LinkPresentation.h>
 
 static const char kBundleKey = 0;
 
@@ -1131,6 +1137,64 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return topViewController;
 }
 
++ (void)getContentDataFromURL:(NSURL *)url success:(void (^)(NSString *title, NSString *body, NSURL*imageUrl))success failure:(void (^)(NSError *error))failure {
+    LPMetadataProvider * metaData = [[LPMetadataProvider alloc] init];
+    
+    [metaData startFetchingMetadataForURL:url completionHandler:^(LPLinkMetadata *metaData, NSError *error){
+        if(metaData != nil){
+            NSString *title = metaData.title;
+            NSString *body = metaData.description;
+            
+            NSDictionary *LPLinkMetaDataDict = [self objectToDictionary:metaData];
+            
+            NSDictionary *LPImageMetaDataDict = [LPLinkMetaDataDict objectForKey:@"imageMetadata"];
+            NSDictionary *LPImageDict = [self objectToDictionary:LPImageMetaDataDict];
+            
+            NSString *imageURL = [LPImageDict objectForKey:@"URL"];
+            
+        }
+        else {
+            failure(error);
+        }
+        
+    }];
+    
+    
+}
+
++ (NSDictionary *) objectToDictionary:(id)object {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+    unsigned count;
+    objc_property_t *properties = class_copyPropertyList([object class], &count);
+
+    for (int i = 0; i < count; i++) {
+        NSString *key = [NSString stringWithUTF8String:property_getName(properties[i])];
+        if([object valueForKey:key] != nil){
+            [dict setObject:[object valueForKey:key] forKey:key];
+        }
+    }
+
+    free(properties);
+
+    return [NSDictionary dictionaryWithDictionary:dict];
+}
+
+
++ (NSArray *)getUrlsFromString:(NSString *)text {
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    
+    NSArray *urlMatches = [linkDetector matchesInString:text options:0 range:NSMakeRange(0, text.length)];
+    
+    NSMutableArray *urlMatchesString = [[NSMutableArray alloc] init];
+    
+    for(NSTextCheckingResult *urlMatch in urlMatches){
+        NSURL *url = [urlMatch URL];
+        [urlMatchesString addObject:[url absoluteString]];
+    }
+    
+    return urlMatchesString;
+}
 
 
 #pragma mark - TapTalk

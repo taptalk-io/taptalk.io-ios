@@ -44,6 +44,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
 @property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+@property (weak, nonatomic) IBOutlet UIView *linkPreviewContainerView;
+@property (weak, nonatomic) IBOutlet UILabel *linkPreviewTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *linkPreviewBodyLabel;
+@property (weak, nonatomic) IBOutlet TAPImageView *linkPreviewImageView;
+
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -83,7 +88,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
-
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *timestampLabelTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageHeightConstraint;
 
 @property (weak, nonatomic) IBOutlet UIImageView *deleteUserImageView;
 
@@ -95,6 +101,8 @@
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
+
+@property (strong, nonatomic) NSURL *messageURL;
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message;
 - (void)showQuoteView:(BOOL)show;
@@ -185,6 +193,8 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    self.linkPreviewImageView.layer.cornerRadius = 8.0f;
+    
     self.mentionIndexesArray = [[NSArray alloc] init];
 }
 
@@ -219,7 +229,10 @@
     self.pinIconWidthConstraint.constant = 0.0f;
     
     self.statusLabelBottomConstraint.constant = 10.0f;
-    
+    self.linkPreviewContainerView.alpha = 0.0f;
+    self.timestampLabelTopConstraint.constant = -35.0f;
+    self.linkPreviewImageView.image = nil;
+    self.linkPreviewImageHeightConstraint.constant = 0.0f;
     [self showSenderInfo:NO];
 }
 
@@ -523,6 +536,12 @@
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
     
+    self.linkPreviewTitleLabel.textColor = quoteTitleColor;
+    self.linkPreviewTitleLabel.font = quoteTitleFont;
+    
+    self.linkPreviewBodyLabel.textColor = quoteContentColor;
+    self.linkPreviewBodyLabel.font = quoteContentFont;
+    
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     self.fileImageView.image = documentsImage;
@@ -546,7 +565,7 @@
             [self showReplyView:YES withMessage:message];
             [self showQuoteView:NO];
         }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];
@@ -801,6 +820,47 @@
         self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
     }
     
+    //link preview
+    NSDictionary *data = message.data;
+    NSString *url= [data objectForKey:@"url"];
+    
+    NSString *linkPreviewTitle = [data objectForKey:@"title"];
+    NSString *linkPreviewBody = [data objectForKey:@"description"];
+    NSString *linkPreviewImageUrl= [data objectForKey:@"image"];
+    
+    linkPreviewTitle = [TAPUtil nullToEmptyString:linkPreviewTitle];
+    linkPreviewBody = [TAPUtil nullToEmptyString:linkPreviewBody];
+    linkPreviewImageUrl = [TAPUtil nullToEmptyString:linkPreviewImageUrl];
+    
+    if(url != nil && [[TapUI sharedInstance] getLinkPreviewInMessageEnabled] && (![linkPreviewTitle isEqualToString:@""] || ![linkPreviewBody isEqualToString:@""] || ![linkPreviewImageUrl isEqualToString:@""])) {
+        //show link preview
+        self.linkPreviewContainerView.alpha = 1.0f;
+        self.timestampLabelTopConstraint.constant = 2.0f;
+        
+        self.linkPreviewTitleLabel.text = linkPreviewTitle;
+        self.linkPreviewBodyLabel.text = linkPreviewBody;
+        
+        self.messageURL = url;
+        
+        if(![linkPreviewImageUrl isEqualToString:@""]) {
+            self.linkPreviewImageHeightConstraint.constant = 170.0f;
+            [self.linkPreviewImageView setImageWithURLString:linkPreviewImageUrl];
+        }
+        else{
+            self.linkPreviewImageHeightConstraint.constant = 0.0f;
+            self.linkPreviewImageView.image = nil;
+        }
+    }
+    else {
+        //hide link preview
+        self.linkPreviewContainerView.alpha = 0.0f;
+        self.linkPreviewImageHeightConstraint.constant = 0.0f;
+        self.timestampLabelTopConstraint.constant = -35.0f;
+        self.linkPreviewTitleLabel.text = @"";
+        self.linkPreviewBodyLabel.text = @"";
+        self.linkPreviewImageView.image = nil;
+    }
+    
     //remove animation
     [self.redirectArrowButton.layer removeAllAnimations];
     [self.deleteUserImageView.layer removeAllAnimations];
@@ -960,6 +1020,13 @@
 - (IBAction)redirectArrowButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedRedirectArrowWithMessage:)]) {
         [self.delegate yourChatBubbleDidTappedRedirectArrowWithMessage:self.message];
+    }
+}
+
+
+- (IBAction)linkPreviewButtonDidTapped:(id)sender {
+    if([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedUrl:originalString:)]) {
+        [self.delegate yourChatBubbleDidTappedUrl:[NSURL URLWithString:self.messageURL] originalString:@""];
     }
 }
 

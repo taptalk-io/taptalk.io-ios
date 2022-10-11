@@ -76,6 +76,8 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypePinRoom,
     TAPAPIManagerTypeUnpinRoom,
     TAPAPIManagerTypeGetPinnedRoomIDs,
+    TAPAPIManagerTypeDeleteChatroom,
+    TAPAPIManagerTypeGetRoomIDsWithState,
 };
 
 @interface TAPAPIManager : NSObject

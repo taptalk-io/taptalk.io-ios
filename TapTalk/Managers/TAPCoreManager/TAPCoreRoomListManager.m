@@ -9,6 +9,10 @@
 #import "TAPCoreRoomListManager.h"
 #import "TAPRoomListModel.h"
 
+@interface TAPCoreRoomListManager () <TAPChatManagerDelegate>
+
+@end
+
 @implementation TAPCoreRoomListManager
 #pragma mark - Lifecycle
 + (TAPCoreRoomListManager *)sharedManager {
@@ -31,14 +35,60 @@
     self = [super init];
     
     if (self) {
-
+        //Add chat manager delegate
+        [[TAPChatManager sharedManager] addDelegate:self];
     }
     
     return self;
 }
 
 - (void)dealloc {
+    //Remove chat manager delegate
+    [[TAPChatManager sharedManager] removeDelegate:self];
+}
 
+#pragma mark - Delegate
+#pragma mark TAPChatManager
+
+- (void)chatManagerDidReceiveDeleteChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteChatRoom:)]) {
+        [self.delegate tapTalkDidDeleteChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceivePinChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidPinChatRoom:)]) {
+        [self.delegate tapTalkDidPinChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveUnpinChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidUnpinChatRoom:)]) {
+        [self.delegate tapTalkDidUnpinChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveMuteChatroom:(NSString *)roomID expiredAt:(NSNumber *)expiredAt {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidMuteChatRoom:expiredAt:)]) {
+        [self.delegate tapTalkDidMuteChatRoom:roomID expiredAt:expiredAt];
+    }
+}
+
+- (void)chatManagerDidReceiveUnmuteChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidUnmuteChatRoom:)]) {
+        [self.delegate tapTalkDidUnmuteChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveMarkChatRoomAsUnread:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidMarkChatRoomAsUnread:)]) {
+        [self.delegate tapTalkDidMarkChatRoomAsUnread:roomID];
+    }
+}
+- (void)chatManagerDidReceiveMarkChatRoomAsRead:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidMarkChatRoomAsRead:)]) {
+        [self.delegate tapTalkDidMarkChatRoomAsRead:roomID];
+    }
 }
 
 #pragma mark - Custom Method

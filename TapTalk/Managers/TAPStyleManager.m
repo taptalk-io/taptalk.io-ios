@@ -2228,7 +2228,7 @@
         }
         case TAPComponentColorPopupDialogPrimaryButtonSuccessBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorSuccess];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }

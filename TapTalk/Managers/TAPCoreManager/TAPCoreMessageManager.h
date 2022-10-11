@@ -40,6 +40,53 @@ NS_ASSUME_NONNULL_BEGIN
                   start:(void (^)(TAPMessageModel *message))start
                 success:(void (^)(TAPMessageModel *message))success
                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
 - (void)sendLocationMessageWithLatitude:(CGFloat)latitude
                               longitude:(CGFloat)longitude
                                 address:(nullable NSString *)address
@@ -351,8 +398,12 @@ NS_ASSUME_NONNULL_BEGIN
                              success:(void (^)(NSArray<NSString *> *unstarredMessagesIDs))success
                              failure:(void (^)(NSError *error))failure;
 
-- (void)editMessage:(TAPMessageModel *)message
-        updatedText:(NSString *)updatedText
+- (void)editMessage:(TAPMessageModel *)updatedMessage
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)editMessage:(TAPMessageModel *)previousMessage
             start:(void (^)(TAPMessageModel *message))start
             success:(void (^)(TAPMessageModel *message))success
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;

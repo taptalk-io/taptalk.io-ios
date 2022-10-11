@@ -1535,17 +1535,10 @@
     if (message != nil) {
         NSDictionary *messageDict = [self dictionaryFromMessageModel:message];
         NSMutableDictionary *lastMessageDict = [[self getLatestPinnedMessage] mutableCopy];
-       // if(lastMessageDict == nil){
-          //  lastMessageDict = [NSMutableDictionary dictionaryWithObject:messageDict forKey:roomID];
-       // }
-       // else{
         if(lastMessageDict == nil){
             lastMessageDict = [[NSMutableDictionary alloc] init];
         }
         [lastMessageDict setObject:messageDict forKey:roomID];
-       // }
-        //NSDictionary *messageDict = [self dictionaryFromMessageModel:message];
-       // NSDictionary *lastPinnedDict = [NSDictionary dictionaryWithObject:messageDict forKey:roomID];
         [[NSUserDefaults standardUserDefaults] setSecureObject:lastMessageDict forKey:TAP_PREFS_LAST_PINNED_MESSAGE];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
@@ -1585,6 +1578,20 @@
     
     return mutedRoomDictionaryList;
 }
+
++ (void)setLastRoomMessageDeleteTime:(long)timestamp {
+    NSNumber *timestampNumber = @(timestamp);
+    [[NSUserDefaults standardUserDefaults] setSecureObject:timestampNumber forKey:TAP_PREFS_LAST_ROOM_DELETE_TIME];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+}
+
++ (long)getLastRoomMessageDeleteTime{
+    NSNumber *timestamp =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_LAST_ROOM_DELETE_TIME valid:nil];
+    
+    return timestamp.longValue;
+}
+
 
 + (void)setActiveUser:(TAPUserModel *)user {
     if (user != nil) {
@@ -8528,6 +8535,180 @@
         
 
         success(pinnedRoomArray);
+
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDeleteChatroom];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+
+                    [TAPDataManager callAPIDeleteChatroom:roomIDs success:success failure:failure];
+
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+             
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+
+        NSArray *roomIDsArray = [dataDictionary objectForKey:@"clearedRoomIDs"];
+        
+        success(roomIDsArray);
+
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIGetRoomIDsWithState:(void (^)(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray))success failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetRoomIDsWithState];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    
+
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+
+                    [TAPDataManager callAPIGetRoomIDsWithState:success failure:failure];
+
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+
+             
+
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+
+        NSMutableArray *clearedRoomObjectArray = [dataDictionary objectForKey:@"clearedRooms"];
+        
+        NSMutableArray *clearedRoomModelArray = [[NSMutableArray alloc] init];
+
+        for(NSDictionary *clearedRoomDict in clearedRoomObjectArray){
+            TAPClearedRoomModel *clearedRoom = [TAPClearedRoomModel new];
+            
+            NSString *roomID = [clearedRoomDict objectForKey:@"roomID"];
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSNumber *clearTime = [clearedRoomDict objectForKey:@"clearTime"];
+            
+            clearedRoom.roomID = roomID;
+            clearedRoom.clearTime = clearTime;
+            
+            [clearedRoomModelArray addObject:clearedRoom];
+            
+        }
+        
+        NSMutableArray *pinnedRoomArray = [dataDictionary objectForKey:@"pinnedRoomIDs"];
+        
+        NSMutableArray *mutedRoomArray = [dataDictionary objectForKey:@"mutedRooms"];
+        
+        NSMutableArray<TAPMutedRoomModel *> *mutedRoomResultArray = [NSMutableArray array];
+        
+        for(NSDictionary *mutedRoomDict in mutedRoomArray){
+            TAPMutedRoomModel *mutedRoom = [TAPMutedRoomModel new];
+            
+            NSString *roomID = [mutedRoomDict objectForKey:@"roomID"];
+            roomID = [TAPUtil nullToEmptyString:roomID];
+            
+            NSNumber *expired = [mutedRoomDict objectForKey:@"expiredAt"];
+            
+            mutedRoom.roomID = roomID;
+            mutedRoom.expired = expired;
+            
+            [mutedRoomResultArray addObject:mutedRoom];
+            
+        }
+        
+        success(pinnedRoomArray, mutedRoomResultArray, clearedRoomModelArray);
+
 
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

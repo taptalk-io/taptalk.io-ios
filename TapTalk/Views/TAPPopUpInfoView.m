@@ -44,9 +44,11 @@
         
         UIFont *popupTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogTitle];
         UIColor *popupTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogTitle];
-        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 16.0f - 16.0f, 22.0f)];
+        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 16.0f - 16.0f, 0.0f)];
         self.titleLabel.font = popupTitleLabelFont;
         self.titleLabel.textColor = popupTitleLabelColor;
+        self.titleLabel.numberOfLines = 0;
+        self.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self.popupWhiteView addSubview:self.titleLabel];
         
         UIFont *popupBodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogBody];
@@ -55,13 +57,17 @@
         self.detailLabel.numberOfLines = 0;
         self.detailLabel.font = popupBodyLabelFont;
         self.detailLabel.textColor = popupBodyLabelColor;
+        self.detailLabel.textAlignment = NSTextAlignmentCenter;
         [self.popupWhiteView addSubview:self.detailLabel];
         
         UIFont *popupPrimaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextPrimary];
         UIColor *popupPrimaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
-        _rightButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.popupWhiteView.frame) - 100.0f - 16.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, 100.0f, 40.0f)];
+        
+        CGFloat buttonWidth = (CGRectGetWidth(self.popupWhiteView.frame) / 2) - 24.0f - 4.0f;
+        
+        _rightButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.popupWhiteView.frame) - buttonWidth - 24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, buttonWidth, 40.0f)];
         self.rightButton.titleLabel.font = popupPrimaryButtonFont;
-        self.rightButton.layer.cornerRadius = 4.0f;
+        self.rightButton.layer.cornerRadius = 8.0f;
         self.rightButton.titleLabel.textColor = popupPrimaryButtonColor;
         self.rightButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonSuccessBackground];
         [self.popupWhiteView addSubview:self.rightButton];
@@ -69,7 +75,9 @@
         UIFont *popupSecondaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextSecondary];
         UIColor *popupSecondaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
         _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 6.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
-        self.leftButton.layer.cornerRadius = 4.0f;
+        self.leftButton.layer.cornerRadius = 8.0f;
+        self.leftButton.layer.borderWidth = 1.0f;
+        self.leftButton.layer.borderColor = popupSecondaryButtonColor.CGColor;
         self.leftButton.titleLabel.font = popupSecondaryButtonFont;
         self.leftButton.titleLabel.textColor = popupSecondaryButtonColor;
         self.leftButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogSecondaryButtonBackground];
@@ -81,8 +89,11 @@
 
 #pragma mark - Custom Method
 - (void)resizeSubview {
-    CGSize size = [self.detailLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.detailLabel.frame), CGFLOAT_MAX)];
-    self.detailLabel.frame = CGRectMake(CGRectGetMinX(self.detailLabel.frame), CGRectGetMinY(self.detailLabel.frame), CGRectGetWidth(self.detailLabel.frame), size.height);
+    CGSize sizeDetail = [self.detailLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.detailLabel.frame), CGFLOAT_MAX)];
+    CGSize sizeTitle = [self.titleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.titleLabel.frame), CGFLOAT_MAX)];
+    
+    self.titleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMinY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), sizeTitle.height);
+    self.detailLabel.frame = CGRectMake(CGRectGetMinX(self.detailLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.detailLabel.frame), sizeDetail.height);
     
     self.rightButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame));
     
@@ -105,12 +116,16 @@
 
 - (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString *)leftOptionTitle singleOrRightOptionButtonTitle:(NSString *)singleOrRightOptionTitle {
     _popupInfoViewType = popupInfoViewType;
+    CGFloat buttonWidth = (CGRectGetWidth(self.popupWhiteView.frame) / 2) - 24.0f - 4.0f;
+    self.rightButton.frame = CGRectMake(CGRectGetWidth(self.popupWhiteView.frame) - buttonWidth - 24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, buttonWidth, 40.0f);
     
     if (self.popupInfoViewType == TAPPopupInfoViewTypeErrorMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDestructive];
+        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 24.0f - 24.0f, CGRectGetHeight(self.rightButton.frame));
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeSuccessMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
+        self.rightButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame));
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeInfoDefault) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
@@ -125,6 +140,8 @@
     [self.rightButton setTitle:singleOrRightOptionTitle forState:UIControlStateNormal];
     
     [self resizeSubview];
+    
+    
 }
 
 

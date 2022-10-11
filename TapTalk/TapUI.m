@@ -62,6 +62,9 @@
 @property (nonatomic) BOOL isPinMessageMenuDisabled;
 @property (nonatomic) BOOL isMuteRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isPinRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isDeleteRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isLinkPreviewInMessageDisabled;
+
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -1055,10 +1058,38 @@ Enable or disable pin room swipe in chat room list
 }
 
 /**
+ Get current isEnabled state of link preview in chat room
+*/
+- (BOOL)getLinkPreviewInMessageEnabled {
+    return !self.isLinkPreviewInMessageDisabled;
+}
+
+/**
+Enable or disable link preview in chat room
+*/
+- (void)setLinkPreviewInMessageEnabled:(BOOL)isEnabled {
+    _isLinkPreviewInMessageDisabled = !isEnabled;
+}
+
+/**
  Get current isEnabled state of pin room swipe in chat room list
 */
 - (BOOL)getPinRoomListSwipeMenuEnabled {
     return !self.isPinRoomListSwipeMenuDisabled;
+}
+
+/**
+ Enable or disable delete chatroom swipe in chat room list
+*/
+- (void)setDeleteRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isDeleteRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of  delete chatroom swipe in chat room list
+*/
+- (BOOL)getDeleteRoomListSwipeMenuEnabled {
+    return !self.isDeleteRoomListSwipeMenuDisabled;
 }
 
 @end
