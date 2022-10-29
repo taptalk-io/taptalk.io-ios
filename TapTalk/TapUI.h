@@ -122,6 +122,19 @@ Called when user click mention in the bubble chat.
 - (void)tapTalkMessageQuoteTappedWithUserInfo:(NSDictionary *)userInfo;
 
 /**
+ Called when multiple message selection (e.g. forward) is shown in active chat room
+ 
+ @param selectedMessages (NSArray<TAPMessageModel *> *) array of currently selected messages
+ */
+- (void)tapTalkChatRoomDidShowMessageSelection:(NSArray<TAPMessageModel *> *)selectedMessages;
+
+/**
+ Called when multiple message selection is hidden or cancelled in active chat room
+ 
+ */
+- (void)tapTalkChatRoomDidHideMessageSelection;
+
+/**
  Called when user click product bubble cell left option or single option button
  
  @param product (TAPProductModel *) selected product data
@@ -254,6 +267,58 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
                                                                recipient:(TAPUserModel * _Nullable)recipient;
 @end
 
+//==========================================================
+//         TapUIChatRoomCustomNavigationBarDelegate
+//==========================================================
+@protocol TapUIChatRoomCustomNavigationBarDelegate <NSObject>
+@optional
+
+/**
+Use to set custom title view for chat room navigation bar.
+ 
+@param currentChatViewController (TapUIChatViewController *) current shown chat view controller
+@param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+@param room (TAPRoomModel *) current room
+@param activeUser (TapUserModel *) active user data
+@param recipientUser (TapUserModel *) recipient user data
+*/
+- (UIView *)setCustomChatRoomNavigationBarTitleView:(TapUIChatViewController *)currentChatViewController
+                        currentNavigationController:(UINavigationController *)currentNavigationController
+                                               room:(TAPRoomModel * _Nonnull)room
+                                         activeUser:(TAPUserModel * _Nonnull)activeUser
+                                      recipientUser:(TAPUserModel * _Nullable)recipientUser;
+
+/**
+Use to set custom left bar button view for chat room navigation bar.
+ 
+@param currentChatViewController (TapUIChatViewController *) current shown chat view controller
+@param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+@param room (TAPRoomModel *) current room
+@param activeUser (TapUserModel *) active user data
+@param recipientUser (TapUserModel *) recipient user data
+*/
+- (NSArray<UIBarButtonItem *> *)setCustomChatRoomNavigationBarLeftBarButtonItems:(TapUIChatViewController *)currentChatViewController
+                                                     currentNavigationController:(UINavigationController *)currentNavigationController
+                                                                            room:(TAPRoomModel * _Nonnull)room
+                                                                      activeUser:(TAPUserModel * _Nonnull)activeUser
+                                                                   recipientUser:(TAPUserModel * _Nullable)recipientUser;
+
+/**
+Use to set custom right bar button view for chat room navigation bar.
+ 
+@param currentChatViewController (TapUIChatViewController *) current shown chat view controller
+@param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+@param room (TAPRoomModel *) current room
+@param activeUser (TapUserModel *) active user data
+@param recipientUser (TapUserModel *) recipient user data
+*/
+- (NSArray<UIBarButtonItem *> *)setCustomChatRoomNavigationBarRightBarButtonItems:(TapUIChatViewController *)currentChatViewController
+                                                      currentNavigationController:(UINavigationController *)currentNavigationController
+                                                                             room:(TAPRoomModel * _Nonnull)room
+                                                                       activeUser:(TAPUserModel * _Nonnull)activeUser
+                                                                    recipientUser:(TAPUserModel * _Nullable)recipientUser;
+@end
+
 
 //==========================================================
 //             TapUIInAppNotificationDelegate
@@ -279,6 +344,7 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 @property (weak, nonatomic) id<TapUIMyAccountDelegate> myAccountDelegate;
 @property (weak, nonatomic) id<TapUIChatProfileDelegate> chatProfileDelegate;
 @property (weak, nonatomic) id<TapUICustomKeyboardDelegate> customKeyboardDelegate;
+@property (weak, nonatomic) id<TapUIChatRoomCustomNavigationBarDelegate> chatRoomCustomNavigationBarDelegate;
 @property (weak, nonatomic) id<TapUIInAppNotificationDelegate> inAppNotificationDelegate;
 
 //Initalization

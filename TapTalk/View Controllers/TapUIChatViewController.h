@@ -100,4 +100,9 @@ Show left menu icon as custom keyboard option state
 */
 - (void)setKeyboardStateOption;
 
+/**
+Trigger chat view controller's back button tapped
+*/
+- (void)backButtonDidTapped;
+
 @end
