@@ -43,6 +43,10 @@
 		0AC3937127F7360400A612AA /* TAPStarredMessageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC3936E27F7360300A612AA /* TAPStarredMessageViewController.h */; };
 		0AC3937227F7360400A612AA /* TAPStarredMessageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC3936F27F7360300A612AA /* TAPStarredMessageViewController.xib */; };
 		0AC3937327F7360400A612AA /* TAPStarredMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AC3937027F7360300A612AA /* TAPStarredMessageViewController.m */; };
+		0AE921E4290BA6D100D591A0 /* TapCustomNavigationBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AE921E2290BA6D100D591A0 /* TapCustomNavigationBarButton.m */; };
+		0AE921E5290BA6D100D591A0 /* TapCustomNavigationBarButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AE921E3290BA6D100D591A0 /* TapCustomNavigationBarButton.h */; };
+		0AE921ED290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AE921EB290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h */; };
+		0AE921EE290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AE921EC290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m */; };
 		6E49DA7C511A492F4B7D60D1 /* libPods-TapTalk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E70D8AB2D3B87EBE824DA6A /* libPods-TapTalk.a */; };
 		A97EC5C925BEF17B0068E2D4 /* TapUI.h in Headers */ = {isa = PBXBuildFile; fileRef = A97EC5C725BEF17B0068E2D4 /* TapUI.h */; };
 		A97EC5CA25BEF17B0068E2D4 /* TapUI.m in Sources */ = {isa = PBXBuildFile; fileRef = A97EC5C825BEF17B0068E2D4 /* TapUI.m */; };
@@ -481,6 +485,10 @@
 		0AC3936E27F7360300A612AA /* TAPStarredMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPStarredMessageViewController.h; sourceTree = "<group>"; };
 		0AC3936F27F7360300A612AA /* TAPStarredMessageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPStarredMessageViewController.xib; sourceTree = "<group>"; };
 		0AC3937027F7360300A612AA /* TAPStarredMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPStarredMessageViewController.m; sourceTree = "<group>"; };
+		0AE921E2290BA6D100D591A0 /* TapCustomNavigationBarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapCustomNavigationBarButton.m; sourceTree = "<group>"; };
+		0AE921E3290BA6D100D591A0 /* TapCustomNavigationBarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapCustomNavigationBarButton.h; sourceTree = "<group>"; };
+		0AE921EB290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapBaseChatRoomCustomNavigationBarManager.h; sourceTree = "<group>"; };
+		0AE921EC290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapBaseChatRoomCustomNavigationBarManager.m; sourceTree = "<group>"; };
 		1F750616D290AB6FEF6E124E /* Pods-TapTalk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalk.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TapTalk/Pods-TapTalk.debug.xcconfig"; sourceTree = "<group>"; };
 		9E70D8AB2D3B87EBE824DA6A /* libPods-TapTalk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TapTalk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A97EC5C725BEF17B0068E2D4 /* TapUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapUI.h; sourceTree = "<group>"; };
@@ -996,6 +1004,8 @@
 				B357EBB82158F7E50049E288 /* TapTalk.m */,
 				A97EC5C725BEF17B0068E2D4 /* TapUI.h */,
 				A97EC5C825BEF17B0068E2D4 /* TapUI.m */,
+				0AE921EB290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h */,
+				0AE921EC290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m */,
 				D77B5E762158BAE400253BDC /* Supporting Files */,
 				D7FA52AD2410D7440049C73E /* Localizable.strings */,
 			);
@@ -1242,6 +1252,8 @@
 				D7358CAA227AD02200C65C67 /* TAPCountryPickerView.m */,
 				D7810819227DBB6500B41034 /* TAPMyAccountView.h */,
 				D781081A227DBB6500B41034 /* TAPMyAccountView.m */,
+				0AE921E3290BA6D100D591A0 /* TapCustomNavigationBarButton.h */,
+				0AE921E2290BA6D100D591A0 /* TapCustomNavigationBarButton.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1676,6 +1688,7 @@
 				D77B5F592158BBEA00253BDC /* TAPPopUpInfoViewController.h in Headers */,
 				D75EC5EE2296690C00A4F435 /* TAPDataMediaModel.h in Headers */,
 				D79533502450005400C4F90D /* TAPLanguageManager.h in Headers */,
+				0AE921E5290BA6D100D591A0 /* TapCustomNavigationBarButton.h in Headers */,
 				D7FF4CE32176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.h in Headers */,
 				D7A98E3E221EFFFE0007BF81 /* TAPMyLocationBubbleTableViewCell.h in Headers */,
 				D70DA2782225274400824E86 /* TAPForwardListView.h in Headers */,
@@ -1688,6 +1701,7 @@
 				D72F395F2240A14C00F4FC38 /* TAPMediaPreviewModel.h in Headers */,
 				D7FB9EDF21C8C7BC00E26FC7 /* TAPImagePreviewView.h in Headers */,
 				D77B5F2C2158BB9500253BDC /* TAPCreateGroupSubjectView.h in Headers */,
+				0AE921ED290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h in Headers */,
 				D77B5EBD2158BB6300253BDC /* TAPMessageRealmModel.h in Headers */,
 				D781081B227DBB6500B41034 /* TAPMyAccountView.h in Headers */,
 				D77B5F612158BBEA00253BDC /* TAPScanQRCodeViewController.h in Headers */,
@@ -2018,6 +2032,7 @@
 				D7A98E45221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.m in Sources */,
 				D77B5F582158BBEA00253BDC /* TAPScanQRCodeViewController.m in Sources */,
 				D79A3E69216C72B3004525CE /* TAPSearchBarView.m in Sources */,
+				0AE921E4290BA6D100D591A0 /* TapCustomNavigationBarButton.m in Sources */,
 				D7244BD821D889AD000BEEEE /* TAPImageSelectViewController.m in Sources */,
 				D798D3A8229D4D6D00F73CA9 /* TAPMyChatDeletedBubbleTableViewCell.m in Sources */,
 				D77B5F642158BBEA00253BDC /* TAPBlockedListViewController.m in Sources */,
@@ -2066,6 +2081,7 @@
 				D77B5EA02158BB4000253BDC /* TAPDataManager.m in Sources */,
 				D72F395E2240A14C00F4FC38 /* TAPMediaPreviewModel.m in Sources */,
 				F524EF1F217DE9970087D956 /* TAPSearchResultChatTableViewCell.m in Sources */,
+				0AE921EE290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m in Sources */,
 				D774A95722E974C8005CAD5D /* TAPCoreMessageManager.m in Sources */,
 				D778FA9D221D7E4F000E3A00 /* TAPPinLocationSearchResultTableViewCell.m in Sources */,
 				0A1640BC27D9E94B007FACEE /* TAPCustomTextView.m in Sources */,
@@ -2297,7 +2313,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7.0;
+				MARKETING_VERSION = 2.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -2334,7 +2350,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7.0;
+				MARKETING_VERSION = 2.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.TapTalk.TapTalk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

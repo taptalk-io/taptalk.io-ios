@@ -2355,6 +2355,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (![obtainedUserFullName isEqualToString:existingUserFullName]) {
             //Change when name is different
             _isFullNameChanged = YES;
+            self.room.name = obtainedUserFullName;
             self.profileView.nameLabel.text = obtainedUserFullName;
             self.profileView.navigationNameLabel.text = obtainedUserFullName;
         }
@@ -2362,12 +2363,18 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (![obtainedUserProfileURL isEqualToString:existingUserProfileURL]) {
             _isUserProfileURLChanged = YES;
             //Change when profile image is different
+            self.room.imageURL = user.imageURL;
             [self.profileView.profileImageView setImageWithURLString:obtainedUserProfileURL];
         }
         
         if (self.room.type == RoomTypePersonal && (self.isFullNameChanged || self.isUserProfileURLChanged)) {
             //Save changes to contact dictionary
             [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
+        }
+        
+        id<TAPCoreChatRoomManagerDelegate> chatRoomDelegate = [TAPCoreChatRoomManager sharedManager].delegate;
+        if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
+            [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:self.room recipientUser:user];
         }
         
     } failure:^(NSError *error) {
@@ -2462,6 +2469,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else {
         self.profileView.editButton.alpha = 0.0f;
+    }
+    
+    TAPUserModel *recipientUser = nil;
+    if (self.room.type == RoomTypePersonal) {
+        recipientUser = self.user;
+    }
+    id<TAPCoreChatRoomManagerDelegate> chatRoomDelegate = [TAPCoreChatRoomManager sharedManager].delegate;
+    if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
+        [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:self.room recipientUser:recipientUser];
     }
 }
 

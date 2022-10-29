@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPCoreChatRoomManagerDelegate <NSObject>
 
+@optional
+- (void)tapTalkDidReceiveUpdatedChatRoomData:(TAPRoomModel *)room recipientUser:(TAPUserModel *_Nullable)recipientUser;
 - (void)tapTalkDidStartTypingWithUser:(TAPUserModel *)user roomID:(NSString *)roomID;
 - (void)tapTalkDidStopTypingWithUser:(TAPUserModel *)user roomID:(NSString *)roomID;
 - (void)tapTalkDidReceiveOnlineStatusWithUser:(TAPUserModel *)user onlineStatus:(BOOL)isOnline lastActive:(NSNumber *)lastActive;

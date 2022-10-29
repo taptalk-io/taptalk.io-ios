@@ -534,15 +534,25 @@ CGPoint center;
         _tappedMessageLocalID = @"";
     }
     
-    
     _keyboardState = keyboardStateDefault;
     _keyboardHeight = 0.0f;
     _initialKeyboardHeight = 0.0f;
     _lastKeyboardHeight = 0.0f;
     
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
+    if (self.currentRoom.type == RoomTypePersonal) {
+        _otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    }
+    
     _lastNumberOfWordArrayForShowMention = 0;
     _lastTypingWordArrayStartIndex = 0;
     _lastTypingWordString = @"";
+    
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:otherUser:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
+    }
     
     self.pinPageIndicator0 = [[UIView alloc] init];
     self.pinPageIndicator1 = [[UIView alloc] init];
@@ -679,14 +689,10 @@ CGPoint center;
     //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
-    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.currentRoom.roomID];
     BOOL isSaveMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
     
-    if (self.currentRoom.type == RoomTypePersonal) {
-        _otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-        if (self.otherUser == nil && !isSaveMessageRoom) {
-            self.inputMessageAccessoryView.alpha = 0.0f;
-        }
+    if (self.otherUser == nil && !isSaveMessageRoom) {
+        self.inputMessageAccessoryView.alpha = 0.0f;
     }
     
     NSArray *keyboardArray = [NSArray array];
@@ -820,12 +826,6 @@ CGPoint center;
     [self.replyMessageNameLabel setTextColor:quoteTitleLabelColor];
     [self.replyMessageMessageLabel setFont:quoteSubtitleLabelFont];
     [self.replyMessageMessageLabel setTextColor:quoteSubtitleLabelColor];
-    
-    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:otherUser:currentViewController:currentShownNavigationController:)]) {
-        
-        [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
-    }
     //setup multiple forward ui
     UIFont *chatComposerFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextField];
     UIColor *chatComposerColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField];
@@ -7144,171 +7144,16 @@ CGPoint center;
 
 #pragma mark - Custom Method
 #pragma mark ViewDidLoad Method
+
 - (void)setupNavigationViewData {
     //This method is used to setup the title view of navigation bar, and also bar button view
     
+    // Init data for custom navbar manager
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    //Title View
-    _titleView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 56.0f - 56.0f, 43.0f)];
-    
-    if([TAPUtil isSaveMessageRoom:room.roomID]){
-        //saved room
-        _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 10.5f, CGRectGetWidth(self.titleView.frame), 22.0f)];
-    }
-    else{
-        _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 2.0f, CGRectGetWidth(self.titleView.frame), 22.0f)];
-    }
-    
-    UIFont *chatRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomNameLabel];
-    UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
-    self.nameLabel.text = room.name;
-    self.nameLabel.textColor = chatRoomNameLabelColor;
-    self.nameLabel.font = chatRoomNameLabelFont;
-    self.nameLabel.textAlignment = NSTextAlignmentCenter;
-    [self.titleView addSubview:self.nameLabel];
-    
-    _userStatusView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f)];
-    self.userStatusView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconUserStatusActive];
-    self.userStatusView.layer.cornerRadius = CGRectGetHeight(self.userStatusView.frame) / 2.0f;
-    self.userStatusView.alpha = 0.0f;
-    self.userStatusView.clipsToBounds = YES;
-    
-    UIFont *chatRoomStatusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomStatusLabel];
-    UIColor *chatRoomStatusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomStatusLabel];
-    _userStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 4.0f, 0.0f, 0.0f, 16.0f)];
-    self.userStatusLabel.textColor = chatRoomStatusLabelColor;
-    self.userStatusLabel.font = chatRoomStatusLabelFont;
-    self.userStatusLabel.textAlignment = NSTextAlignmentCenter;
-    [self.userStatusLabel sizeToFit];
-    self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
-    
-    CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;
-    _userDescriptionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), userStatusViewWidth, 16.0f)];
-    self.userDescriptionView.center = CGPointMake(self.nameLabel.center.x, self.userDescriptionView.center.y);
-    [self.userDescriptionView addSubview:self.userStatusView];
-    [self.userDescriptionView addSubview:self.userStatusLabel];
-    
-    if (room.type != RoomTypeTransaction && ![TAPUtil isSaveMessageRoom:room.roomID]) {
-        [self.titleView addSubview:self.userDescriptionView];
-    }
-    
-    [self.navigationItem setTitleView:self.titleView];
-    
-    _userTypingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), 100.0f, 16.0f)];
-    self.userTypingView.backgroundColor = [UIColor clearColor];
-    [self.titleView addSubview:self.userTypingView];
-    
-    UIImageView *typingAnimationImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 16.0f, 16.0f)];
-    typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
-    typingAnimationImageView.animationDuration = 0.6f;
-    typingAnimationImageView.animationRepeatCount = 0.0f;
-    [typingAnimationImageView startAnimating];
-    [self.userTypingView addSubview:typingAnimationImageView];
-    
-    _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
-    self.typingLabel.font = chatRoomStatusLabelFont;
-    self.typingLabel.textColor = chatRoomStatusLabelColor;
-    self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
-    [self.typingLabel sizeToFit];
-    self.typingLabel.frame = CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
-    [self.userTypingView addSubview:self.typingLabel];
-    
-    self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(self.typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
-    self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
-    
-    [self setAsTyping:NO];
-    [self isShowOnlineDotStatus:NO];
-    
-    //Right Bar Button
-    BOOL isShowProfileButtonView = [[TapUI sharedInstance] getProfileButtonInChatRoomVisibleState];
-    if (isShowProfileButtonView) {
-        //Show profile button view in right bar button
-        UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-
-        _rightBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-        self.rightBarInitialNameView.alpha = 0.0f;
-        self.rightBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.rightBarInitialNameView.frame) / 2.0f;
-        self.rightBarInitialNameView.clipsToBounds = YES;
-        [rightBarView addSubview:self.rightBarInitialNameView];
-        
-        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
-        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
-        _rightBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.rightBarInitialNameView.frame), CGRectGetHeight(self.rightBarInitialNameView.frame))];
-        self.rightBarInitialNameLabel.font = initialNameLabelFont;
-        self.rightBarInitialNameLabel.textColor = initialNameLabelColor;
-        self.rightBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
-        [self.rightBarInitialNameView addSubview:self.rightBarInitialNameLabel];
-        
-        _rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-        self.rightBarImageView.layer.cornerRadius = CGRectGetHeight(self.rightBarImageView.frame) / 2.0f;
-        self.rightBarImageView.clipsToBounds = YES;
-        self.rightBarImageView.contentMode = UIViewContentModeScaleAspectFill;
-        [rightBarView addSubview:self.rightBarImageView];
-        
-        _deletedUserImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
-        self.deletedUserImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.deletedUserImageView.alpha = 0.0f;
-        
-        _savedMessageImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
-        self.savedMessageImageView.image = [UIImage imageNamed:@"TAPIconSaveMessageRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.savedMessageImageView.alpha = 0.0f;
-        [rightBarView addSubview:self.savedMessageImageView];
-        
-        NSString *profileImageURL = room.imageURL.thumbnail;
-        
-        BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:room.roomID];
-
-        if(room.deleted.longValue > 0){
-            //set deleted account profil pict
-            self.rightBarInitialNameView.alpha = 1.0f;
-            self.rightBarImageView.alpha = 0.0f;
-            self.deletedUserImageView.alpha = 1.0f;
-            self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
-            self.rightBarInitialNameLabel.text =@"";
-        }
-        else if(isSavedMessageRoom){
-            //set saved message profil pict
-            self.rightBarInitialNameView.alpha = 1.0f;
-            self.rightBarImageView.alpha = 0.0f;
-            self.savedMessageImageView.alpha = 1.0f;
-            self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
-            self.rightBarInitialNameLabel.text =@"";
-        }
-        else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-            BOOL isGroup = NO;
-            if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
-                isGroup = YES;
-            }
-            self.rightBarInitialNameView.alpha = 1.0f;
-            self.rightBarImageView.alpha = 0.0f;
-            self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:room.name];
-            self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:room.name isGroup:isGroup];
-            
-            
-        }
-        else {
-            self.rightBarInitialNameView.alpha = 0.0f;
-            self.rightBarImageView.alpha = 1.0f;
-            [self.rightBarImageView setImageWithURLString:profileImageURL];
-        }
-        
-        UIButton *rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(rightBarView.frame), CGRectGetHeight(rightBarView.frame))];
-        [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        [rightBarView addSubview:rightBarButton];
-        
-        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarView];
-        [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
-    }
-    
-    //Left Bar Button
-    UIImage *backButtonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
-    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-    [button setImage:backButtonImage forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-    [self.navigationItem setLeftBarButtonItem:barButtonItem];
+    [self setupNavigationTitleView];
+    [self setupNavigationRightBarButtonItems];
+    [self setupNavigationLeftBarButtonItemsWithImage:@"TAPIconBackArrow"];
     
     self.quoteFileView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconQuotedFileBackground];
     
@@ -7340,6 +7185,218 @@ CGPoint center;
     
     self.attachmentButton.imageView.image = [self.attachmentButton.imageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerAttach]];
 
+}
+
+- (void)setupNavigationTitleView {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    UIView *customTitleView = nil;
+    id<TapUIChatRoomCustomNavigationBarDelegate> customNavbarDelegate = [TapUI sharedInstance].chatRoomCustomNavigationBarDelegate;
+    if ([customNavbarDelegate respondsToSelector:@selector(setCustomChatRoomNavigationBarTitleView:currentNavigationController:room:activeUser:recipientUser:)]) {
+        customTitleView = [customNavbarDelegate setCustomChatRoomNavigationBarTitleView:self
+                                                            currentNavigationController:self.navigationController
+                                                                                   room:room
+                                                                             activeUser:[[TapTalk sharedInstance] getTapTalkActiveUser]
+                                                                          recipientUser:self.otherUser];
+    }
+    if (customTitleView != nil) {
+        [self.navigationItem setTitleView:customTitleView];
+    }
+    else {
+        _titleView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 56.0f - 56.0f, 43.0f)];
+        
+        if ([TAPUtil isSaveMessageRoom:room.roomID]) {
+            //saved room
+            _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 10.5f, CGRectGetWidth(self.titleView.frame), 22.0f)];
+        }
+        else{
+            _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 2.0f, CGRectGetWidth(self.titleView.frame), 22.0f)];
+        }
+        
+        UIFont *chatRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomNameLabel];
+        UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
+        self.nameLabel.text = room.name;
+        self.nameLabel.textColor = chatRoomNameLabelColor;
+        self.nameLabel.font = chatRoomNameLabelFont;
+        self.nameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.titleView addSubview:self.nameLabel];
+        
+        _userStatusView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f)];
+        self.userStatusView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconUserStatusActive];
+        self.userStatusView.layer.cornerRadius = CGRectGetHeight(self.userStatusView.frame) / 2.0f;
+        self.userStatusView.alpha = 0.0f;
+        self.userStatusView.clipsToBounds = YES;
+        
+        UIFont *chatRoomStatusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomStatusLabel];
+        UIColor *chatRoomStatusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomStatusLabel];
+        _userStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 4.0f, 0.0f, 0.0f, 16.0f)];
+        self.userStatusLabel.textColor = chatRoomStatusLabelColor;
+        self.userStatusLabel.font = chatRoomStatusLabelFont;
+        self.userStatusLabel.textAlignment = NSTextAlignmentCenter;
+        [self.userStatusLabel sizeToFit];
+        self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
+        
+        CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;
+        _userDescriptionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), userStatusViewWidth, 16.0f)];
+        self.userDescriptionView.center = CGPointMake(self.nameLabel.center.x, self.userDescriptionView.center.y);
+        [self.userDescriptionView addSubview:self.userStatusView];
+        [self.userDescriptionView addSubview:self.userStatusLabel];
+        
+        if (room.type != RoomTypeTransaction && ![TAPUtil isSaveMessageRoom:room.roomID]) {
+            [self.titleView addSubview:self.userDescriptionView];
+        }
+        
+        [self.navigationItem setTitleView:self.titleView];
+        
+        _userTypingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), 100.0f, 16.0f)];
+        self.userTypingView.backgroundColor = [UIColor clearColor];
+        [self.titleView addSubview:self.userTypingView];
+        
+        UIImageView *typingAnimationImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 16.0f, 16.0f)];
+        typingAnimationImageView.animationImages = @[[UIImage imageNamed:@"TAPTypingSequence-1" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-2" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-3" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-4" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-5" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-6" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-7" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-8" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-9" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-10" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-11" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-12" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-13" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-14" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-15" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil], [UIImage imageNamed:@"TAPTypingSequence-16" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        typingAnimationImageView.animationDuration = 0.6f;
+        typingAnimationImageView.animationRepeatCount = 0.0f;
+        [typingAnimationImageView startAnimating];
+        [self.userTypingView addSubview:typingAnimationImageView];
+        
+        _typingLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, 100.0f, 16.0f)];
+        self.typingLabel.font = chatRoomStatusLabelFont;
+        self.typingLabel.textColor = chatRoomStatusLabelColor;
+        self.typingLabel.text = NSLocalizedStringFromTableInBundle(@"typing", nil, [TAPUtil currentBundle], @"");
+        [self.typingLabel sizeToFit];
+        self.typingLabel.frame = CGRectMake(CGRectGetMaxX(typingAnimationImageView.frame) + 4.0f, 0.0f, CGRectGetWidth(self.typingLabel.frame), 16.0f);
+        [self.userTypingView addSubview:self.typingLabel];
+        
+        self.userTypingView.frame = CGRectMake(CGRectGetMinX(self.userTypingView.frame), CGRectGetMinY(self.userTypingView.frame), CGRectGetMaxX(self.typingLabel.frame), CGRectGetHeight(self.userTypingView.frame));
+        self.userTypingView.center = CGPointMake(self.nameLabel.center.x, self.userTypingView.center.y);
+        
+        [self setAsTyping:NO];
+        [self isShowOnlineDotStatus:NO];
+    }
+}
+
+- (void)setupNavigationLeftBarButtonItemsWithImage:(NSString *)imageName {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    NSArray<UIBarButtonItem *> *customLeftBarButtonItems = nil;
+    id<TapUIChatRoomCustomNavigationBarDelegate> customNavbarDelegate = [TapUI sharedInstance].chatRoomCustomNavigationBarDelegate;
+    if ([customNavbarDelegate respondsToSelector:@selector(setCustomChatRoomNavigationBarLeftBarButtonItems:currentNavigationController:room:activeUser:recipientUser:)]) {
+        customLeftBarButtonItems = [customNavbarDelegate setCustomChatRoomNavigationBarLeftBarButtonItems:self
+                                                                              currentNavigationController:self.navigationController
+                                                                                                     room:room
+                                                                                               activeUser:[[TapTalk sharedInstance] getTapTalkActiveUser]
+                                                                                            recipientUser:self.otherUser];
+    }
+    if (customLeftBarButtonItems != nil && customLeftBarButtonItems.count > 0) {
+        [self.navigationItem setLeftBarButtonItems:customLeftBarButtonItems];
+    }
+    else {
+        UIImage *backButtonImage = [UIImage imageNamed:imageName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
+        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+        [button setImage:backButtonImage forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        [self.navigationItem setLeftBarButtonItems:@[barButtonItem]];
+    }
+}
+
+- (void)setupNavigationRightBarButtonItems {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    NSArray<UIBarButtonItem *> *customRightBarButtonItems = nil;
+    id<TapUIChatRoomCustomNavigationBarDelegate> customNavbarDelegate = [TapUI sharedInstance].chatRoomCustomNavigationBarDelegate;
+    if ([customNavbarDelegate respondsToSelector:@selector(setCustomChatRoomNavigationBarRightBarButtonItems:currentNavigationController:room:activeUser:recipientUser:)]) {
+        customRightBarButtonItems = [customNavbarDelegate setCustomChatRoomNavigationBarRightBarButtonItems:self
+                                                                                currentNavigationController:self.navigationController
+                                                                                                       room:room
+                                                                                                 activeUser:[[TapTalk sharedInstance] getTapTalkActiveUser]
+                                                                                              recipientUser:self.otherUser];
+    }
+    if (customRightBarButtonItems != nil && customRightBarButtonItems.count > 0) {
+        [self.navigationItem setRightBarButtonItems:customRightBarButtonItems];
+    }
+    else {
+        BOOL isShowProfileButtonView = [[TapUI sharedInstance] getProfileButtonInChatRoomVisibleState];
+        if (isShowProfileButtonView) {
+            //Show profile button view in right bar button
+            UIView *rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+
+            _rightBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+            self.rightBarInitialNameView.alpha = 0.0f;
+            self.rightBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.rightBarInitialNameView.frame) / 2.0f;
+            self.rightBarInitialNameView.clipsToBounds = YES;
+            [rightBarView addSubview:self.rightBarInitialNameView];
+            
+            UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+            UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+            _rightBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.rightBarInitialNameView.frame), CGRectGetHeight(self.rightBarInitialNameView.frame))];
+            self.rightBarInitialNameLabel.font = initialNameLabelFont;
+            self.rightBarInitialNameLabel.textColor = initialNameLabelColor;
+            self.rightBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+            [self.rightBarInitialNameView addSubview:self.rightBarInitialNameLabel];
+            
+            _rightBarImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
+            self.rightBarImageView.layer.cornerRadius = CGRectGetHeight(self.rightBarImageView.frame) / 2.0f;
+            self.rightBarImageView.clipsToBounds = YES;
+            self.rightBarImageView.contentMode = UIViewContentModeScaleAspectFill;
+            [rightBarView addSubview:self.rightBarImageView];
+            
+            _deletedUserImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
+            self.deletedUserImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.deletedUserImageView.alpha = 0.0f;
+            
+            _savedMessageImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightBarImageView.frame) + 7.0f, CGRectGetMinY(self.rightBarImageView.frame) + 7.0f, 16.0f, 16.0f)];
+            self.savedMessageImageView.image = [UIImage imageNamed:@"TAPIconSaveMessageRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.savedMessageImageView.alpha = 0.0f;
+            [rightBarView addSubview:self.savedMessageImageView];
+            
+            NSString *profileImageURL = room.imageURL.thumbnail;
+            
+            BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:room.roomID];
+
+            if(room.deleted.longValue > 0){
+                //set deleted account profil pict
+                self.rightBarInitialNameView.alpha = 1.0f;
+                self.rightBarImageView.alpha = 0.0f;
+                self.deletedUserImageView.alpha = 1.0f;
+                self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                self.rightBarInitialNameLabel.text =@"";
+            }
+            else if(isSavedMessageRoom){
+                //set saved message profil pict
+                self.rightBarInitialNameView.alpha = 1.0f;
+                self.rightBarImageView.alpha = 0.0f;
+                self.savedMessageImageView.alpha = 1.0f;
+                self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+                self.rightBarInitialNameLabel.text =@"";
+            }
+            else if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
+                BOOL isGroup = NO;
+                if (self.currentRoom.type == RoomTypeGroup || self.currentRoom.type == RoomTypeTransaction) {
+                    isGroup = YES;
+                }
+                self.rightBarInitialNameView.alpha = 1.0f;
+                self.rightBarImageView.alpha = 0.0f;
+                self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:room.name];
+                self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:room.name isGroup:isGroup];
+                
+                
+            }
+            else {
+                self.rightBarInitialNameView.alpha = 0.0f;
+                self.rightBarImageView.alpha = 1.0f;
+                [self.rightBarImageView setImageWithURLString:profileImageURL];
+            }
+            
+            UIButton *rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(rightBarView.frame), CGRectGetHeight(rightBarView.frame))];
+            [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
+            [rightBarView addSubview:rightBarButton];
+            
+            UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarView];
+            [self.navigationItem setRightBarButtonItems:@[rightBarButtonItem]];
+        }
+    }
 }
 
 - (void)checkIsContainForwardMessage {
@@ -9276,17 +9333,16 @@ CGPoint center;
         self.selectedMessasgeCounter = 1;
         
         //Left Bar Button
-        UIImage *backButtonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
-        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-        [button setImage:backButtonImage forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-        [self.navigationItem setLeftBarButtonItem:barButtonItem];
+        [self setupNavigationLeftBarButtonItemsWithImage:@"TAPIconClose"];
+        
         [self showInputAccessoryExtensionView:NO];
         self.messageTextView.text = @"";
         [self.tableView reloadData];
-                                     
+        
+        id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+        if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidShowMessageSelection:)]) {
+            [tapUIChatRoomDelegate tapTalkChatRoomDidShowMessageSelection:@[message]];
+        }
     }];
     
     UIAlertAction *copyAction = [UIAlertAction
@@ -12890,16 +12946,14 @@ CGPoint center;
         self.isSelectingForwardMessage = NO;
         self.selectedMessasgeCounter = 0;
         
-        //Left Bar Button
-        UIImage *backButtonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        backButtonImage = [backButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
-        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
-        [button setImage:backButtonImage forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-        [self.navigationItem setLeftBarButtonItem:barButtonItem];
+        [self setupNavigationLeftBarButtonItemsWithImage:@"TAPIconBackArrow"];
         
         [self.tableView reloadData];
+        
+        id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+        if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidHideMessageSelection)]) {
+            [tapUIChatRoomDelegate tapTalkChatRoomDidHideMessageSelection];
+        }
         return;
     }
     [self.lastSeenTimer invalidate];
@@ -13588,6 +13642,9 @@ CGPoint center;
                 //Upsert User to Contact Manager
                 [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:NO saveActiveUser:YES];
                 
+                self.currentRoom.name = user.fullname;
+                self.currentRoom.imageURL = user.imageURL;
+                
                 BOOL isTyping = [[TAPChatManager sharedManager] checkIsTypingWithRoomID:self.currentRoom.roomID];
                 [self setAsTyping:isTyping];
                 
@@ -13603,8 +13660,13 @@ CGPoint center;
                 //Used to check if need to show add to contact view or not
                 _otherUser = user;
                 _isOtherUserIsContact = user.isContact;
-                
+
                 [self checkAndSetupAddToContactsView];
+                
+                id<TAPCoreChatRoomManagerDelegate> chatRoomDelegate = [TAPCoreChatRoomManager sharedManager].delegate;
+                if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
+                    [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:self.currentRoom recipientUser:self.otherUser];
+                }
                 
             } failure:^(NSError *error) {
                 if (error.code == 40401) {
@@ -13636,6 +13698,11 @@ CGPoint center;
                     [self.participantListDictionary setObject:user forKey:user.username];
                 }
                 [self refreshRoomStatusUIInfo];
+                
+                id<TAPCoreChatRoomManagerDelegate> chatRoomDelegate = [TAPCoreChatRoomManager sharedManager].delegate;
+                if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
+                    [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:self.currentRoom recipientUser:nil];
+                }
             } failure:^(NSError *error) {
                 if (error.code == 40401) {
                     //user not found
@@ -14788,6 +14855,18 @@ CGPoint center;
                  
                  self.nameLabel.text = message.room.name;
              }
+            
+            self.currentRoom.name = message.room.name;
+            self.currentRoom.imageURL = message.room.imageURL;
+            
+            TAPUserModel *recipientUser = nil;
+            if (message.room.type == RoomTypePersonal) {
+                recipientUser = self.otherUser;
+            }
+            id<TAPCoreChatRoomManagerDelegate> chatRoomDelegate = [TAPCoreChatRoomManager sharedManager].delegate;
+            if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
+                [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:self.currentRoom recipientUser:recipientUser];
+            }
          }
     });
 }
