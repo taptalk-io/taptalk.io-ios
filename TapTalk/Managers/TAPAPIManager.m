@@ -315,6 +315,30 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/room/get_muted_room_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeCreateScheduleMessage) {
+        NSString *apiPath = @"chat/scheduled_message/create";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetScheduleMessages) {
+        NSString *apiPath = @"chat/scheduled_message/get_scheduled_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeScheduleMessageSendNow) {
+        NSString *apiPath = @"chat/scheduled_message/send_now";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeScheduleMessageEditTime) {
+        NSString *apiPath = @"chat/scheduled_message/edit_scheduled_time";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeEditScheduleMessageContent) {
+        NSString *apiPath = @"chat/scheduled_message/edit_content";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDeleteScheduleMessage) {
+        NSString *apiPath = @"chat/scheduled_message/delete";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     else if (type == TAPAPIManagerTypeDeleteChatroom) {
         NSString *apiPath = @"client/room/clear_chat";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];

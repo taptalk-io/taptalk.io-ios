@@ -76,6 +76,12 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypePinRoom,
     TAPAPIManagerTypeUnpinRoom,
     TAPAPIManagerTypeGetPinnedRoomIDs,
+    TAPAPIManagerTypeCreateScheduleMessage,
+    TAPAPIManagerTypeGetScheduleMessages,
+    TAPAPIManagerTypeScheduleMessageSendNow,
+    TAPAPIManagerTypeScheduleMessageEditTime,
+    TAPAPIManagerTypeEditScheduleMessageContent,
+    TAPAPIManagerTypeDeleteScheduleMessage,
     TAPAPIManagerTypeDeleteChatroom,
     TAPAPIManagerTypeGetRoomIDsWithState,
 };

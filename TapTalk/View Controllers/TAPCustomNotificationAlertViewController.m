@@ -22,6 +22,8 @@
 @property (nonatomic) BOOL isTappedSecondNotificationButton;
 @property (nonatomic) NSInteger messageShownCounter;
 
+@property (nonatomic) BOOL isScheduleMessage;
+
 - (void)hideAfterDelay;
 - (void)checkMessageQueue;
 - (void)fillDataWithMessage:(TAPMessageModel *)message;
@@ -77,9 +79,10 @@
     }
 }
 
-- (void)showWithMessage:(TAPMessageModel *)message {
+- (void)showWithMessage:(TAPMessageModel *)message isSchedule:(BOOL)isSchedule {
+    self.isScheduleMessage = isSchedule;
     
-    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !isSchedule) {
         return;
     }
     
@@ -204,7 +207,6 @@
     NSString *nameString;
     NSString *messageString = message.body;
     UIImage *thumbnailImage = nil;
-    
     if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
         NSString *thumbnailString = [message.data objectForKey:@"thumbnail"];
         if (![thumbnailString isEqualToString:@""] && thumbnailString != nil) {
@@ -214,12 +216,17 @@
         }
     }
     
-    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction || self.isScheduleMessage) {
         nameString = message.room.name;
+        profilePictureURL = message.room.imageURL.thumbnail;
+        if(self.isScheduleMessage) {
+            nameString = [NSString stringWithFormat:@"🗓 You@%@",nameString];
+        }
     }
     else {
         nameString = message.user.fullname;
     }
+    
     
     BOOL isShowContentImage = NO;
     if (thumbnailImage == nil) {

@@ -64,7 +64,7 @@
 @property (nonatomic) BOOL isPinRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isDeleteRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isLinkPreviewInMessageDisabled;
-
+@property (nonatomic) BOOL isScheduledMessageFeatureDisabled;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -1079,6 +1079,21 @@ Enable or disable link preview in chat room
 }
 
 /**
+<<<<<<< HEAD
+Enable or disable Scheduled Message Feature
+*/
+- (void)setScheduledMessageFeatureEnabled:(BOOL)isEnabled {
+    _isScheduledMessageFeatureDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getScheduledMessageFeatureEnabled {
+    return !self.isScheduledMessageFeatureDisabled;
+}
+
+/**
  Enable or disable delete chatroom swipe in chat room list
 */
 - (void)setDeleteRoomListSwipeMenuEnabled:(BOOL)isEnabled {
@@ -1091,5 +1106,6 @@ Enable or disable link preview in chat room
 - (BOOL)getDeleteRoomListSwipeMenuEnabled {
     return !self.isDeleteRoomListSwipeMenuDisabled;
 }
+
 
 @end

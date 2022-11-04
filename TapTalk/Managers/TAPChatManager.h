@@ -15,6 +15,7 @@
 #import "TAPTypingModel.h"
 #import "TAPQuoteModel.h"
 #import "TAPDataFileModel.h"
+#import "TAPScheduledMessageModel.h"
 
 #import <AVKit/AVKit.h>
 #import <Photos/Photos.h>
@@ -34,12 +35,15 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message;
+- (void)chatManagerDidReceiveNewScheduleMessage:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveOnlineStatus:(TAPOnlineStatusModel *)onlineStatus;
 - (void)chatManagerDidReceiveStartTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing;
 - (void)chatManagerDidFinishSendEmitMessage:(TAPMessageModel *)message;
 - (void)chatManagerDidSendMessagePending:(TAPMessageModel *)message;
 - (void)chatManagerDidReceiveUpdateRoom:(NSString *)eventName data:(NSDictionary *)data;
+- (void)chatManagerDidReceiveUpdateScheduleMessage:(NSString *)eventName data:(NSDictionary *)data;
+- (void)chatManagerDidReceiveGenerateScheduleMessage:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime;
 
 - (void)chatManagerDidReceiveDeleteChatroom:(NSString *)roomID;
 - (void)chatManagerDidReceivePinChatroom:(NSString *)roomID;
@@ -84,15 +88,22 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 
 - (void)sendTextMessage:(NSString *)textMessage;
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendTextMessage:(NSString *)textMessage scheduleTime:(NSNumber *) scheduleTime;
+- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
 - (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData;
-- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData scheduleTime:(NSNumber *)scheduleTime;
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room success:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))successGenerateMessage failure:(void (^)(NSError *error))failure;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption;
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
 - (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData;
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData scheduleTime:(NSNumber *)scheduleTime;
 - (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData;
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData scheduleTime:(NSNumber *)scheduleTime;
 - (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendVoiceMessageWithVoiceAssetURL:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath fileURL:(NSURL *)fileURL;
 - (void)sendVoiceMessageWithVoiceAssetURL:(TAPDataFileModel *)dataFile
@@ -113,10 +124,19 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sendProductMessage:(TAPMessageModel *)message;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address;
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address scheduleTime:(NSNumber *) scheduleTime;
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room scheduleTime:(NSNumber *) scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
 - (void)sendFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath;
 - (void)sendFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
+- (void)sendFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath scheduleTime:(NSNumber *) scheduleTime;
+- (void)sendFileMessage:(TAPDataFileModel *)dataFile
+               filePath:(NSString *)filePath
+                   room:(TAPRoomModel *)room scheduleTime:(NSNumber *) scheduleTime
+                success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
 - (void)sendCustomMessage:(TAPMessageModel *)customMessage;
 - (void)saveMessageToPendingMessageArray:(TAPMessageModel *)message;
+- (void)saveScheduleMessageToPendingMessageArray:(TAPScheduledMessageModel *)scheduleMessage;
+- (void)removeScheduleMessagesFromPendingMessagesArrayWithLocalID:(NSString *)localID;
 - (void)sendEmitWithMessage:(TAPMessageModel *)message;
 - (void)sendEmitWithEditedMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;
@@ -154,5 +174,6 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 - (void)clearChatManagerData;
 - (void)updateReadMessageToDatabaseQueueWithArray:(NSArray *)readMessageArray;
+- (void)checkAndSendPendingScheduleMessage;
 
 @end

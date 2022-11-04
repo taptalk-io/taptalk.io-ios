@@ -226,7 +226,7 @@
                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *firstUrl = [urls objectAtIndex:0];
     NSDictionary *messageData = @{@"url":firstUrl, @"urls":urls, @"title":title, @"description":description, @"image":image};
-    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room success:^(TAPMessageModel *message) {
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
         [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
@@ -248,7 +248,7 @@
                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     NSString *firstUrl = [urls objectAtIndex:0];
     NSDictionary *messageData = @{@"url":firstUrl, @"urls":urls, @"title":title, @"description":description, @"image":image, @"siteName":siteName, @"type":type};
-    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room success:^(TAPMessageModel *message) {
         void (^handlerSuccess)(TAPMessageModel *) = [success copy];
         NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
         [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
@@ -1935,6 +1935,96 @@
     failure:^(NSError *error) {
         failure(error);
     }];
+}
+
+- (void)createScheduleMessage:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
+    NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+    [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+        success(scheduledMessage);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+    
+}
+
+- (void)getScheduledMessagesWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetScheduleMessage:roomID
+    success:^(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray) {
+        success(scheduleMessageArray);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)sendScheduledMessagesNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIScheduleMessageSendNow:scheduleIDs roomID:roomID
+    success:^(NSArray<NSNumber *> *sentIDs) {
+        success(sentIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)sendScheduledMessageNow:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    [self sendScheduledMessagesNow:@[scheduleID] roomID:roomID success:^(NSArray<NSNumber *> *sentIDs) {
+        success(sentIDs);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)editScheduledMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime
+                         success:(void (^)(BOOL isEditTimeSuccess))success
+                         failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIEditScheduleMessageTime:scheduleID scheduledTime:scheduledTime success:^(BOOL isEditTimeSuccess) {
+        success(isEditTimeSuccess);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)editScheduledMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage
+                         success:(void (^)(BOOL isEditContentSuccess))success
+                         failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIEditScheduleMessageContent:scheduleID updatedMessage:updatedMessage success:^(BOOL isEditContentSuccess) {
+        success(isEditContentSuccess);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)deleteScheduledMessages:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIDeleteScheduleMessage:scheduleIDs roomID:roomID
+    success:^(NSArray<NSNumber *> *deletedIDs) {
+        success(deletedIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)deleteScheduledMessage:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                                    success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                                    failure:(void (^)(NSError *error))failure {
+    [self deleteScheduledMessages:@[scheduleID] roomID:roomID success:^(NSArray<NSNumber *> *deletedIDs) {
+        success(deletedIDs);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+    
 }
 
 - (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated

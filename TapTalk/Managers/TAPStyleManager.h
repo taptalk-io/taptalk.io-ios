@@ -505,6 +505,8 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontTableViewProfileNameSendToContactLabel,
     TAPComponentFontDeleteAccountTitleLabel,
     TAPComponentFontDeleteAccountWarningLabel,
+    TAPComponentFontDatePickerTitleLabel,
+    TAPComponentFontDatePickerCancelLabel,
 };
 
 @interface TAPStyleManager : NSObject

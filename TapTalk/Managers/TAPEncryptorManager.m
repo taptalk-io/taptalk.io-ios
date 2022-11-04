@@ -176,6 +176,52 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     return parametersDictionary;
 }
 
++ (NSDictionary *)encryptToDictionaryFromMessageModelForAPI:(TAPMessageModel *)message {
+    
+    if(message == nil) {
+        return nil;
+    }
+    
+    TAPMessageModel *encryptedMessage = [message copy];
+    
+    //Encrypt message
+    encryptedMessage.body = [self encryptString:encryptedMessage.body localID:encryptedMessage.localID];
+    encryptedMessage.quote.content = [self encryptString:encryptedMessage.quote.content localID:encryptedMessage.localID];
+    
+    NSMutableDictionary *parametersDictionary = [NSMutableDictionary dictionary];
+    parametersDictionary = [[encryptedMessage toDictionary] mutableCopy];
+    
+    NSDictionary *dataDictionary = [parametersDictionary objectForKey:@"data"];
+    NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
+    NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
+    encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
+    
+    [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
+    
+    NSMutableDictionary *userDictionary = [[parametersDictionary objectForKey:@"user"] mutableCopy];
+    NSMutableDictionary *trimmedUserDictionary = [NSMutableDictionary new];
+    [trimmedUserDictionary setObject:[userDictionary objectForKey:@"userID"] forKey:@"userID"];
+    [parametersDictionary setObject:trimmedUserDictionary forKey:@"user"];
+    
+    // Remove unused fields for API
+    [parametersDictionary removeObjectForKey:@"isDeleted"];
+    [parametersDictionary removeObjectForKey:@"isDelivered"];
+    [parametersDictionary removeObjectForKey:@"isFailedSend"];
+    [parametersDictionary removeObjectForKey:@"isHidden"];
+    [parametersDictionary removeObjectForKey:@"isMessageEdited"];
+    [parametersDictionary removeObjectForKey:@"isRead"];
+    [parametersDictionary removeObjectForKey:@"isSending"];
+    
+    NSMutableDictionary *roomDictionary = [[parametersDictionary objectForKey:@"room"] mutableCopy];
+    [roomDictionary removeObjectForKey:@"participants"];
+    [roomDictionary removeObjectForKey:@"unreadCount"];
+    [roomDictionary removeObjectForKey:@"isDeleted"];
+    [roomDictionary removeObjectForKey:@"isLocked"];
+    [parametersDictionary setObject:roomDictionary forKey:@"room"];
+    
+    return parametersDictionary;
+}
+
 + (TAPMessageModel *)decryptToMessageModelFromDictionary:(NSDictionary *)dictionary {
     if(dictionary == nil || [dictionary objectForKey:@"localID"] == nil) {
         return nil;

@@ -15,5 +15,6 @@
 
 + (TAPMessageModel *)decryptToMessageModelFromDictionary:(NSDictionary *)dictionary;
 + (NSDictionary *)encryptToDictionaryFromMessageModel:(TAPMessageModel *)message;
++ (NSDictionary *)encryptToDictionaryFromMessageModelForAPI:(TAPMessageModel *)message;
 
 @end

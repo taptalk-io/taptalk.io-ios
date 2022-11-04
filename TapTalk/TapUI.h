@@ -1005,9 +1005,21 @@ Enable or disable link preview in chat room
 - (void)setLinkPreviewInMessageEnabled:(BOOL)isEnabled;
 
 /**
+<<<<<<< HEAD
+Enable or disable Scheduled Message Feature
+*/
+- (void)setScheduledMessageFeatureEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getScheduledMessageFeatureEnabled;
+
+/**
  Get current isEnabled state of message bubble link preview in chat room
 */
 - (BOOL)getLinkPreviewInMessageEnabled;
+
 
 @end
 

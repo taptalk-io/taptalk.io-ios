@@ -16,10 +16,10 @@
 #import "TAPCreateGroupSubjectViewController.h"
 #import "TAPCreateGroupViewController.h"
 #import "TAPImagePreviewCollectionViewCell.h"
-#import "TAPStarredMessageViewController.h"
+#import "TAPSecondaryChatViewController.h"
 #import "TAPSharedMediaViewController.h"
 
-@interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate, TAPCreateGroupSubjectViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, TAPStarredMessageViewControllerDelegate, TAPSharedMediaViewControllerDelegate>
+@interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate, TAPCreateGroupSubjectViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, TAPSecondaryChatViewControllerDelegate, TAPSharedMediaViewControllerDelegate>
 
 @property (strong, nonatomic) TAPProfileView *profileView;
 @property (strong, nonatomic) TAPUserModel *updatedUser;
@@ -1381,8 +1381,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if (indexPath.section == 2) {
         if (indexPath.row == 0) {
-            TAPStarredMessageViewController *tapStarredMessageViewController = [[TAPStarredMessageViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
-            tapStarredMessageViewController.messageListType = TAPUIMessageListTypeStar;
+            TAPSecondaryChatViewController *tapStarredMessageViewController = [[TAPSecondaryChatViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
+            tapStarredMessageViewController.messageListType = TAPSecondaryChatTypeStarMessage;
             if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault || self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
                 TAPRoomModel *r = self.room;
                 tapStarredMessageViewController.currentRoom = self.room;
