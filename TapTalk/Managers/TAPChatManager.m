@@ -36,6 +36,7 @@
 
 @property (strong, nonatomic) NSMutableArray *delegatesArray;
 @property (strong, nonatomic) NSMutableArray *pendingMessageArray;
+@property (strong, nonatomic) NSMutableArray *pendingScheduleMessageArray;
 @property (strong, nonatomic) NSMutableArray *pendingEditedMessageArray;
 @property (strong, nonatomic) NSMutableArray *incomingMessageArray;
 @property (strong, nonatomic) NSMutableArray *toBeMarkAsReadMessageArray;
@@ -72,6 +73,7 @@
         //Add delegate to Connection Manager here
         _delegatesArray = [[NSMutableArray alloc] init];
         _pendingMessageArray = [[NSMutableArray alloc] init];
+        _pendingScheduleMessageArray = [[NSMutableArray alloc] init];
         _pendingEditedMessageArray = [[NSMutableArray alloc] init];
         _incomingMessageArray = [[NSMutableArray alloc] init];
         _toBeMarkAsReadMessageArray = [[NSMutableArray alloc] init];
@@ -101,8 +103,15 @@
 
 #pragma mark - Delegate
 #pragma mark TAPConnectionManager
-- (void)connectionManagerDidReceiveNewEmit:(NSString *)eventName parameter:(NSDictionary *)dataDictionary {
-    if ([eventName isEqualToString:kTAPEventNewMessage]) {
+- (void)connectionManagerDidReceiveNewEmit:(NSString *)eventName parameter:(NSDictionary *)messageDictionary {
+    NSDictionary *dataDictionary = [messageDictionary objectForKey:@"data"];
+    NSNumber *isScheduled = [messageDictionary objectForKey:@"isScheduled"];
+    if ([eventName isEqualToString:kTAPEventNewMessage] &&
+        isScheduled.longValue == 1) {
+        [self receiveScheduleMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
+        [self receiveMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
+    }
+    else if ([eventName isEqualToString:kTAPEventNewMessage]) {
         [self receiveMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
     }
     else if ([eventName isEqualToString:kTAPEventUpdateMessage]) {
@@ -129,12 +138,16 @@
     else if ([eventName isEqualToString:kTAPEventRoomMute] || [eventName isEqualToString:kTAPEventRoomUnmute]) {
         [self receiveRoomUpdateFromSocketWithEvent:eventName dataDictionary:dataDictionary];
     }
+    else if ([eventName isEqualToString:kTAPEventScheduleMessageUpdate]) {
+        [self receiveScheduleMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
+    }
 }
 
 - (void)connectionManagerDidConnected {
     //Send pending queue array
     [self checkAndSendPendingMessage];
     [self checkAndSendPendingEditedMessage];
+    [self checkAndSendPendingScheduleMessage];
 }
 
 - (void)connectionManagerDidReceiveError:(NSError *)error {
@@ -308,6 +321,21 @@
     }
 }
 
+- (void)saveScheduleMessageToPendingMessageArray:(TAPScheduledMessageModel *)scheduleMessage {
+    if (scheduleMessage != nil) {
+        [self.pendingScheduleMessageArray addObject:scheduleMessage];
+    }
+}
+
+- (void)removeScheduleMessagesFromPendingMessagesArrayWithLocalID:(NSString *)localID {
+    NSArray *messageArray = self.pendingScheduleMessageArray;
+    for (TAPScheduledMessageModel *scheduleMessage in messageArray) {
+        if (scheduleMessage.message.localID == localID) {
+            [self.pendingScheduleMessageArray removeObject:scheduleMessage];
+        }
+    }
+}
+
 - (void)saveMessageToPendingEditedMessageArray:(TAPMessageModel *)message {
     if (message != nil) {
         [self.pendingEditedMessageArray addObject:message];
@@ -386,11 +414,6 @@
 
 - (void)sendProductMessage:(TAPMessageModel *)message {
     [self sendMessage:message notifyDelegate:YES];
-}
-
-- (void)sendTextMessage:(NSString *)textMessage {
-    [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom successGenerateMessage:^(TAPMessageModel *message) {
-    }];
 }
 
 - (void)editMessage:(TAPMessageModel *)updatedMessage
@@ -528,9 +551,28 @@
     
     
 }
+- (void)sendTextMessage:(NSString *)textMessage scheduleTime:(NSNumber *) scheduleTime {
+    [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+    
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendTextMessage:(NSString *)textMessage {
+    [self sendTextMessage:textMessage scheduleTime:0];
+}
 
 
 - (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    [[TAPChatManager sharedManager] sendTextMessage:textMessage room:[TAPChatManager sharedManager].activeRoom scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendTextMessage:(NSString *)textMessage room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
 
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -556,9 +598,14 @@
                                                             messageData:nil];
             
             //Call block in TAPCoreMessageManager to handle things in TAPCore
-            successGenerateMessage(message);
-            
-            [self sendMessage:message notifyDelegate:YES];
+            if(scheduleTime.longValue == 0) {
+                success(message);
+                [self sendMessage:message notifyDelegate:YES];
+            }
+            else {
+                //call api send schedule
+                success(message);
+            }
         }
     }
     else {
@@ -568,18 +615,53 @@
                                                         messageData:nil];
         
         //Call block in TAPCoreMessageManager to handle things in TAPCore
-        successGenerateMessage(message);
         
-        [self sendMessage:message notifyDelegate:YES];
+        if(scheduleTime.longValue == 0) {
+            success(message);
+            [self sendMessage:message notifyDelegate:YES];
+        }
+        else {
+            for (id delegate in self.delegatesArray) {
+                if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                    [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
+                }
+            }
+            //call api send schedule
+            NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+            [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+                success(scheduledMessage);
+              //  [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:scheduledMessage.localID];
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
+        }
+        
     }
 }
 
 - (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData {
-    [[TAPChatManager sharedManager] sendLinkMessage:textMessage messageData:messageData room:[TAPChatManager sharedManager].activeRoom successGenerateMessage:^(TAPMessageModel *message) {
+    [self sendLinkMessage:textMessage messageData:messageData scheduleTime:0];
+}
+
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData scheduleTime:(NSNumber *)scheduleTime {
+    [[TAPChatManager sharedManager] sendLinkMessage:textMessage messageData:messageData room:[TAPChatManager sharedManager].activeRoom scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
     }];
 }
 
-- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room success:(void (^)(TAPMessageModel *message))success {
+    [[TAPChatManager sharedManager] sendLinkMessage:textMessage messageData:messageData room:[TAPChatManager sharedManager].activeRoom scheduleTime:0 success:^(TAPMessageModel *message) {
+        success(message);
+    } failure:^(NSError *error) {
+        
+    }];
+   
+}
+
+
+- (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
 
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -605,9 +687,15 @@
                                                             messageData:messageData];
             
             //Call block in TAPCoreMessageManager to handle things in TAPCore
-            successGenerateMessage(message);
             
-            [self sendMessage:message notifyDelegate:YES];
+            if(scheduleTime.longValue == 0) {
+                success(message);
+                [self sendMessage:message notifyDelegate:YES];
+            }
+            else {
+                //call api send schedule
+                success(message);
+            }
         }
     }
     else {
@@ -617,9 +705,20 @@
                                                         messageData:messageData];
         
         //Call block in TAPCoreMessageManager to handle things in TAPCore
-        successGenerateMessage(message);
-        
-        [self sendMessage:message notifyDelegate:YES];
+        if(scheduleTime.longValue == 0) {
+            success(message);
+            [self sendMessage:message notifyDelegate:YES];
+        }
+        else {
+            //call api send schedule
+            NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+            [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+                success(scheduledMessage);
+               // [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:scheduledMessage.localID];
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
+        }
     }
 }
 
@@ -629,10 +728,20 @@
     }];
 }
 
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption scheduleTime:(NSNumber *)scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    [self sendImageMessage:image caption:caption room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
 - (void)sendImageMessage:(UIImage *)image
                  caption:(NSString *)caption
-                    room:(TAPRoomModel *)room
-  successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+                    room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime
+  success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -662,17 +771,49 @@
                                                            type:TAPChatMessageTypeImage
                                                     messageData:dataDictionary];
     
-    //Call block in TAPCoreMessageManager to handle things in TAPCore
-    successGenerateMessage(message);
-    
-    //Save image to cache with localID key
-    [TAPImageView saveImageToCache:image withKey:message.localID];
-    
-    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
-    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
-    
-    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
-    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    if(scheduleTime.longValue == 0) {
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        success(message);
+        
+        //Save image to cache with localID key
+        [TAPImageView saveImageToCache:image withKey:message.localID];
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+        
+        [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+        [[TAPFileUploadManager sharedManager] sendFileWithData:message scheduleTime:scheduleTime];
+    }
+    else {
+        success(message);
+        
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
+            }
+        }
+        //Save image to cache with localID key
+        [TAPImageView saveImageToCache:image withKey:message.localID];
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+        
+        
+        [[TAPFileUploadManager sharedManager] sendFileWithData:message scheduleTime:scheduleTime];
+    }
+}
+
+
+- (void)sendImageMessage:(UIImage *)image
+                 caption:(NSString *)caption
+                    room:(TAPRoomModel *)room
+  successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    [self sendImageMessage:image caption:caption room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+   
 }
 
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption {
@@ -680,8 +821,200 @@
     [self sendImageMessageWithPHAsset:asset caption:caption room:room successGenerateMessage:^(TAPMessageModel *message) {
     }];
 }
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption scheduleTime:(NSNumber *)scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessageWithPHAsset:asset caption:caption room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
+    
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🖼 Photo", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
+    }
+    
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+    
+    CGFloat imageWidthFloat = (CGFloat)asset.pixelWidth;
+    CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
+    
+    NSNumber *imageHeight = [NSNumber numberWithFloat:imageHeightFloat];
+    NSNumber *imageWidth = [NSNumber numberWithFloat:imageWidthFloat];
+    
+    NSString *assetIdentifier = asset.localIdentifier;
+
+    //Save asset to dictionary
+    [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAsset:asset];
+    
+    [dataDictionary setObject:imageHeight forKey:@"height"];
+    [dataDictionary setObject:imageWidth forKey:@"width"];
+    [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeImage
+                                                    messageData:dataDictionary];
+    if(scheduleTime.longValue == 0) {
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        success(message);
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+
+        [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message scheduleTime:scheduleTime];
+        [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    }
+    else {
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        success(message);
+        
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
+            }
+        }
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        //[[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+
+        [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message scheduleTime:scheduleTime];
+    }
+}
 
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
+    [self sendImageMessageWithPHAsset:asset caption:caption room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+
+/**
+
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessage:image caption:caption scheduleTime:0];
+}
+
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption scheduleTime:(NSNumber *)scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    [self sendImageMessage:image caption:caption room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+    } failure:^(NSError *error) {
+    }];
+}
+
+- (void)sendImageMessage:(UIImage *)image
+                 caption:(NSString *)caption
+                    room:(TAPRoomModel *)room
+  successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
+    [self sendImageMessage:image caption:caption room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+    }];
+}
+
+- (void)sendImageMessage:(UIImage *)image
+                 caption:(NSString *)caption
+                    room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime
+  success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
+    
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🖼 Photo", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
+    }
+    
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+    
+    NSNumber *imageHeight = [NSNumber numberWithFloat:image.size.height];
+    NSNumber *imageWidth = [NSNumber numberWithFloat:image.size.width];
+    
+    [dataDictionary setObject:imageHeight forKey:@"height"];
+    [dataDictionary setObject:imageWidth forKey:@"width"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeImage
+                                                    messageData:dataDictionary];
+    
+    if(scheduleTime.longValue == 0) {
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        success(message);
+        
+        
+    }
+    else {
+        //call api send schedule
+        NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+        [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+            success(scheduledMessage);
+        } failure:^(NSError *error) {
+            failure(error);
+        }];
+    }
+    
+    //Save image to cache with localID key
+    [TAPImageView saveImageToCache:image withKey:message.localID];
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessageWithPHAsset:asset caption:caption scheduleTime:0];
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption scheduleTime:(NSNumber *)scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendImageMessageWithPHAsset:asset caption:caption room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    [self sendImageMessageWithPHAsset:asset caption:caption room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+    
+    
+}
+
+- (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -721,22 +1054,50 @@
                                                     messageData:dataDictionary];
     
     //Call block in TAPCoreMessageManager to handle things in TAPCore
-    successGenerateMessage(message);
+    if(scheduleTime.longValue == 0) {
+        success(message);
+        [self sendMessage:message notifyDelegate:YES];
+    }
+    else {
+        //call api send schedule
+        NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+        [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+            success(scheduledMessage);
+        } failure:^(NSError *error) {
+            failure(error);
+        }];
+    }
     
     //Add message to waiting upload file dictionary in ChatManager to prepare save to database
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
-
     [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
 }
+*/
 
 - (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData scheduleTime:0];
+}
+
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData scheduleTime:(NSNumber *)scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
     }];
 }
 
 - (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    [self sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendVideoMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
@@ -795,33 +1156,67 @@
                                                            type:TAPChatMessageTypeVideo
                                                     messageData:dataDictionary];
     
-    successGenerateMessage(message);
-    
-    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-    requestOptions.synchronous = NO;
-    requestOptions.networkAccessAllowed = YES;
-    requestOptions.resizeMode = PHImageRequestOptionsResizeModeNone;
-    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    PHImageManager *manager = [PHImageManager defaultManager];
-    [manager requestImageForAsset:asset targetSize:CGSizeMake(imageWidthFloat, imageHeightFloat)
-                      contentMode:PHImageContentModeAspectFill
-                          options:requestOptions
-                    resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            @autoreleasepool {
-                NSError *error = [info objectForKey:PHImageErrorKey];
-                if (!error && result != nil) {
-                    [TAPImageView saveImageToCache:result withKey:message.localID];
+    if(scheduleTime.longValue == 0) {
+        success(message);
+        
+        PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+        requestOptions.synchronous = NO;
+        requestOptions.networkAccessAllowed = YES;
+        requestOptions.resizeMode = PHImageRequestOptionsResizeModeNone;
+        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+        PHImageManager *manager = [PHImageManager defaultManager];
+        [manager requestImageForAsset:asset targetSize:CGSizeMake(imageWidthFloat, imageHeightFloat)
+                          contentMode:PHImageContentModeAspectFill
+                              options:requestOptions
+                        resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                @autoreleasepool {
+                    NSError *error = [info objectForKey:PHImageErrorKey];
+                    if (!error && result != nil) {
+                        [TAPImageView saveImageToCache:result withKey:message.localID];
+                    }
                 }
+            });
+        }];
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+        
+        [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message scheduleTime:scheduleTime];
+        [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    }
+    else {
+        success(message);
+        PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+        requestOptions.synchronous = NO;
+        requestOptions.networkAccessAllowed = YES;
+        requestOptions.resizeMode = PHImageRequestOptionsResizeModeNone;
+        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+        PHImageManager *manager = [PHImageManager defaultManager];
+        [manager requestImageForAsset:asset targetSize:CGSizeMake(imageWidthFloat, imageHeightFloat)
+                          contentMode:PHImageContentModeAspectFill
+                              options:requestOptions
+                        resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                @autoreleasepool {
+                    NSError *error = [info objectForKey:PHImageErrorKey];
+                    if (!error && result != nil) {
+                        [TAPImageView saveImageToCache:result withKey:message.localID];
+                    }
+                }
+            });
+        }];
+        
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
             }
-        });
-    }];
+        }
+        
+        [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message scheduleTime:scheduleTime];
+    }
     
-    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
-    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
-    
-    [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
-    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+   
 }
 
 - (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
@@ -830,11 +1225,34 @@
     }];
 }
 
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData scheduleTime:(NSNumber *)scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    [self sendVideoMessageWithVideoAssetURL:videoAssetURL caption:caption thumbnailImageData:thumbnailImageData room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
 - (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
                                   caption:(NSString *)caption
                        thumbnailImageData:(NSData *)thumbnailImageData
                                      room:(TAPRoomModel *)room
                    successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    [self sendVideoMessageWithVideoAssetURL:videoAssetURL caption:caption thumbnailImageData:thumbnailImageData room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+    
+}
+
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                                  caption:(NSString *)caption
+                       thumbnailImageData:(NSData *)thumbnailImageData
+                                     room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime
+                   success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -911,13 +1329,24 @@
                                                            type:TAPChatMessageTypeVideo
                                                     messageData:dataDictionary];
     
-    successGenerateMessage(message);
-    
-    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
-    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
-    
-    [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
-    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    if(scheduleTime.longValue == 0) {
+        success(message);
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+        
+        [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message scheduleTime:scheduleTime];
+        [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+    }
+    else {
+        success(message);
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
+            }
+        }
+        [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message scheduleTime:scheduleTime];
+    }
 }
 
 - (void)sendVoiceMessageWithVoiceAssetURL:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath fileURL:(NSURL *)fileURL {
@@ -1054,16 +1483,34 @@
     [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
     
     [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
-    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    [[TAPFileUploadManager sharedManager] sendFileWithData:message scheduleTime:0];
 }
 
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendLocationMessage:latitude longitude:longitude address:address room:room successGenerateMessage:^(TAPMessageModel *message) {
+    [self sendLocationMessage:latitude longitude:longitude address:address scheduleTime:0];
+}
+
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address scheduleTime:(NSNumber *) scheduleTime {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    
+    [self sendLocationMessage:latitude longitude:longitude address:address room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
     }];
 }
     
 - (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
+    [self sendLocationMessage:latitude longitude:longitude address:address room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendLocationMessage:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address room:(TAPRoomModel *)room scheduleTime:(NSNumber *) scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -1081,22 +1528,57 @@
                                                            type:TAPChatMessageTypeLocation
                                                     messageData:dataDictionary];
     
-    //Call block in TAPCoreMessageManager to handle things in TAPCore
-    successGenerateMessage(message);
-    
-    [self sendMessage:message notifyDelegate:YES];
+    if(scheduleTime.longValue == 0) {
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        success(message);
+        [self sendMessage:message notifyDelegate:YES];
+    }
+    else {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
+            }
+        }
+        NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+        [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+            success(scheduledMessage);
+           // [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:scheduledMessage.localID];
+        } failure:^(NSError *error) {
+            failure(error);
+        }];
+    }
 }
 
 - (void)sendFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath {
+    [self sendFileMessage:dataFile filePath:filePath scheduleTime:0];
+}
+
+- (void)sendFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath scheduleTime:(NSNumber *) scheduleTime {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sendFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
+    [self sendFileMessage:dataFile filePath:filePath room:room scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+        
+    } failure:^(NSError *error) {
+        
     }];
 }
+
 
 - (void)sendFileMessage:(TAPDataFileModel *)dataFile
                filePath:(NSString *)filePath
                    room:(TAPRoomModel *)room
  successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
+    [self sendFileMessage:dataFile filePath:filePath room:room scheduleTime:0 success:^(TAPMessageModel *message) {
+        successGenerateMessage(message);
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)sendFileMessage:(TAPDataFileModel *)dataFile
+               filePath:(NSString *)filePath
+                   room:(TAPRoomModel *)room scheduleTime:(NSNumber *) scheduleTime
+ success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
     
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
@@ -1123,14 +1605,25 @@
                                                            type:TAPChatMessageTypeFile
                                                     messageData:dataDictionary];
     
-    //Call block in TAPCoreMessageManager to handle things in TAPCore
-    successGenerateMessage(message);
-    
-    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
-    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
-    
-    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
-    [[TAPFileUploadManager sharedManager] sendFileWithData:message];
+    if(scheduleTime.longValue == 0) {
+        //Call block in TAPCoreMessageManager to handle things in TAPCore
+        success(message);
+        
+        //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+        [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+        
+        [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+        [[TAPFileUploadManager sharedManager] sendFileWithData:message scheduleTime:0];
+    }
+    else {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveGenerateScheduleMessage:scheduleTime:)]) {
+                [delegate chatManagerDidReceiveGenerateScheduleMessage:message scheduleTime:scheduleTime];
+            }
+        }
+        [[TAPFileUploadManager sharedManager] sendFileWithData:message scheduleTime:scheduleTime];
+    }
+   
 }
 
 - (void)sendCustomMessage:(TAPMessageModel *)customMessage {
@@ -1176,6 +1669,100 @@
     [self.pendingMessageArray removeObjectAtIndex:0];
     
     [self performSelector:@selector(checkAndSendPendingMessage) withObject:nil afterDelay:0.05f];
+}
+
+- (void)checkAndSendPendingScheduleMessage {
+    if(self.pendingScheduleMessageArray.count == 0) {
+        return;
+    }
+    
+    for(TAPScheduledMessageModel *scheduleMessage in self.pendingScheduleMessageArray) {
+        TAPMessageModel *message = scheduleMessage.message;
+        NSNumber *scheduleTime = scheduleMessage.scheduleTime;
+        NSDictionary *data = message.data;
+        if(message.type == TAPChatMessageTypeText) {
+            [self sendTextMessage:message.body scheduleTime:scheduleTime];
+            [self sendTextMessage:message.body room:[TAPChatManager sharedManager].activeRoom scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
+            } failure:^(NSError *error) {
+                
+            }];
+        }
+        else if(message.type == TAPChatMessageTypeImage) {
+            NSString *caption = [data objectForKey:@"caption"];
+            
+            [TAPImageView imageFromCacheWithMessage:message
+            success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
+                [[TAPChatManager sharedManager] sendImageMessage:fullImage caption:caption scheduleTime:scheduleMessage.scheduleTime];
+            }
+            failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+                NSString *assetIdentifier = [message.data objectForKey:@"assetIdentifier"];
+                assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+                
+                if (![assetIdentifier isEqualToString:@""]) {
+                    NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+                    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+                    PHAsset *imageAsset = [fetchResult firstObject];
+                    if (imageAsset != nil) {
+                        [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:imageAsset caption:caption scheduleTime:scheduleMessage.scheduleTime];
+                    }
+                }
+            }];
+          
+        }
+        else if(message.type == TAPChatMessageTypeVideo) {
+            NSString *thumbnailImageBase64String = [message.data objectForKey:@"thumbnail"];
+            NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+            
+            //            PHAsset *asset = [tappedMessage.data objectForKey:@"asset"];
+            NSString *assetIdentifier = [message.data objectForKey:@"assetIdentifier"];
+            assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+            
+            NSString *caption = [message.data objectForKey:@"caption"];
+            caption = [TAPUtil nullToEmptyString:caption];
+            
+            PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
+            
+            if (asset != nil && asset.mediaType == PHAssetMediaTypeVideo) {
+                [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData scheduleTime:scheduleMessage.scheduleTime];
+            }
+            else {
+                NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+                PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+                PHAsset *videoAsset = [fetchResult firstObject];
+                if (videoAsset != nil && videoAsset.mediaType == PHAssetMediaTypeVideo) {
+                    [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:videoAsset caption:caption thumbnailImageData:thumbnailImageData scheduleTime:scheduleMessage.scheduleTime];
+                }
+            }
+        }
+        else if(message.type == TAPChatMessageTypeFile) {
+            NSString *fileName = [message.data objectForKey:@"fileName"];
+            fileName = [TAPUtil nullToEmptyString:fileName];
+            
+            NSString *mediaType = [message.data objectForKey:@"mediaType"];
+            mediaType = [TAPUtil nullToEmptyString:mediaType];
+            
+            NSString *size = [message.data objectForKey:@"size"];
+            size = [TAPUtil nullToEmptyString:size];
+            
+            TAPDataFileModel *dataFile = [TAPDataFileModel new];
+            dataFile.fileName = fileName;
+            dataFile.mediaType = mediaType;
+            dataFile.size = size;
+            
+            NSString *filePath = [message.data objectForKey:@"filePath"];
+            filePath = [TAPUtil nullToEmptyString:filePath];
+            
+            NSURL *newURL = [NSURL URLWithString:filePath];
+            NSData *fileData = [NSData dataWithContentsOfURL:newURL];
+            dataFile.fileData = fileData;
+            
+            [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath scheduleTime:scheduleMessage.scheduleTime];
+        }
+        else if(message.type == TAPChatMessageTypeLocation) {
+            //[self sendLoca]
+        }
+    }
+    
 }
 
 - (void)checkAndSendPendingEditedMessage {
@@ -1256,6 +1843,63 @@
     _backgroundSequenceTimer = nil;
     [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTask];
     self.backgroundTask = UIBackgroundTaskInvalid;
+}
+
+- (void)receiveScheduleMessageFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {
+    
+    if([eventName isEqualToString:kTAPEventScheduleMessageUpdate]) {
+        for (id delegate in self.delegatesArray) {
+            if ([delegate respondsToSelector:@selector(chatManagerDidReceiveUpdateScheduleMessage:data:)]) {
+                [delegate chatManagerDidReceiveUpdateScheduleMessage:eventName data:dataDictionary];
+            }
+        }
+    }
+    else if([eventName isEqualToString:kTAPEventNewMessage]) {
+        //Decrypt message
+        TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:dataDictionary];
+        
+        //Add User to Contact Manager
+        [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:YES saveActiveUser:NO];
+        
+        decryptedMessage.isSending = NO;
+        
+        if ([eventName isEqualToString:kTAPEventNewMessage]) {
+            //Remove message from waiting response dictionary
+            if ([self.waitingResponseDictionary count] != 0) {
+                [self.waitingResponseDictionary removeObjectForKey:decryptedMessage.localID];
+            }
+            
+            NSString *senderUserID = decryptedMessage.user.userID;
+            senderUserID = [TAPUtil nullToEmptyString:senderUserID];
+            
+            NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+            currentUserID = [TAPUtil nullToEmptyString:currentUserID];
+            
+            //Check if message is send by other user, update delivery status
+            if (![senderUserID isEqualToString:currentUserID]) {
+                //Call API send delivery status to server (Update delivery status)
+                [self processMessageAsDelivered:decryptedMessage];
+            }
+        }
+        
+        //Add new message to incoming array
+        [self.incomingMessageArray addObject:decryptedMessage];
+        
+        //Check is in foreground or not
+        if ([TapTalk sharedInstance].instanceState == TapTalkInstanceStateActive) {
+            for (id delegate in self.delegatesArray) {
+                if ([delegate respondsToSelector:@selector(chatManagerDidReceiveNewScheduleMessage:)]) {
+                    [delegate chatManagerDidReceiveNewScheduleMessage:[decryptedMessage copyMessageModel]];
+                    
+                }
+                
+            }
+        }
+    }
+    
+   
+    
+    
 }
 
 - (void)receiveRoomUpdateFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {
@@ -1354,6 +1998,7 @@
     //Check is in foreground or not
     if ([TapTalk sharedInstance].instanceState == TapTalkInstanceStateActive) {
         //In foreground state or in background sequence mode
+        
         if ([decryptedMessage.room.roomID isEqualToString:self.activeRoom.roomID]) {
             //Message from current active room
             for (id delegate in self.delegatesArray) {

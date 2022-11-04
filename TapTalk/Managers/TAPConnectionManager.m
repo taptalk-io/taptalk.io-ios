@@ -104,7 +104,7 @@
         
         for (id delegate in self.delegatesArray) {
             if ([delegate respondsToSelector:@selector(connectionManagerDidReceiveNewEmit:parameter:)]) {
-                [delegate connectionManagerDidReceiveNewEmit:eventName parameter:dataDictionary];
+                [delegate connectionManagerDidReceiveNewEmit:eventName parameter:messageDictionary];
             }
         }
     }

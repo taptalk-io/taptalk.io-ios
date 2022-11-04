@@ -7,16 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TAPScheduledMessageModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TAPFileUploadManager : NSObject
 
 + (TAPFileUploadManager *)sharedManager;
-
 - (NSInteger)obtainUploadStatusWithMessage:(TAPMessageModel *)message;
-- (void)sendFileWithData:(TAPMessageModel *)message;
-- (void)sendFileAsAssetWithData:(TAPMessageModel *)message;
+- (void)sendFileWithData:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime;
+- (void)sendFileAsAssetWithData:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime ;
 - (NSDictionary *)getUploadProgressWithLocalID:(NSString *)localID;
 - (void)cancelUploadingOperationWithMessage:(TAPMessageModel *)message;
 - (void)resizeImage:(UIImage *)image maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage))success;

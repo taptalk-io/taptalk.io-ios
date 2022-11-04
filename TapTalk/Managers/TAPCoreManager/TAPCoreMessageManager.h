@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TAPScheduledMessageModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -443,6 +444,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getPinnedMessageIDsWithRoomID:(NSString *)roomID
                          success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
                               failure:(void (^)(NSError *error))failure;
+
+- (void)createScheduleMessage:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
+
+- (void)getScheduledMessagesWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success
+                             failure:(void (^)(NSError *error))failure;
+
+- (void)sendScheduledMessagesNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                                      failure:(void (^)(NSError *error))failure;
+
+- (void)sendScheduledMessageNow:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                                     failure:(void (^)(NSError *error))failure;
+- (void)editScheduledMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime
+                         success:(void (^)(BOOL isEditTimeSuccess))success
+                        failure:(void (^)(NSError *error))failure;
+- (void)editScheduledMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage
+                         success:(void (^)(BOOL isEditContentSuccess))success
+                           failure:(void (^)(NSError *error))failure;
+
+- (void)deleteScheduledMessages:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                                     failure:(void (^)(NSError *error))failure;
+- (void)deleteScheduledMessage:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                                    success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                                    failure:(void (^)(NSError *error))failure;
 - (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated
                            success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
                                    failure:(void (^)(NSError *error))failure;

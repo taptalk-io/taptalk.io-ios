@@ -49,7 +49,9 @@
 #import "TAPLoadingTableViewCell.h"
 #import "TAPSystemMessageTableViewCell.h"
 #import "TAPAudioManager.h"
-#import "TAPStarredMessageViewController.h"
+#import "TAPSecondaryChatViewController.h"
+#import "TAPOverlayChatRoomView.h"
+#import "TAPSetupRoomListView.h"
 
 #import <LinkPresentation/LPMetadataProvider.h>
 #import <LinkPresentation/LPLinkMetadata.h>
@@ -84,7 +86,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TopFloatingIndicatorViewTypeLoading = 1
 };
 
-@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate>
+@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPOverlayChatRoomViewDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -157,6 +159,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) UIView *pinPageIndicator1;
 @property (strong, nonatomic) UIView *pinPageIndicator2;
 @property (strong, nonatomic) UIView *pinPageIndicator3;
+
+@property (strong, nonatomic) TAPOverlayChatRoomView *overlayChatRoomView;
 
 - (IBAction)mentionLoadingCancelButtonDidTapped:(id)sender;
 
@@ -320,6 +324,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)addContactButtonDidTapped:(id)sender;
 - (IBAction)closeAddContactButtonDidTapped:(id)sender;
 
+
+//Schedule Message
+@property (weak, nonatomic) IBOutlet UIView *scheduleMessageBackgroundView;
+@property (weak, nonatomic) IBOutlet UIDatePicker *scheduleMessageDatePicker;
+@property (weak, nonatomic) IBOutlet UILabel *datePickerTitleLabel;
+@property (weak, nonatomic) IBOutlet UIButton *datePickerCancelButton;
+@property (weak, nonatomic) IBOutlet UIView *scheduleMessageDatePickerContainerView;
+@property (weak, nonatomic) IBOutlet UIView *scheduleMessageSendView;
+@property (weak, nonatomic) IBOutlet UIButton *scheduleMessageSendButton;
+@property (weak, nonatomic) IBOutlet UILabel *scheduleMessageSendLabel;
+
+
+
+
 //Voice Note
 @property (weak, nonatomic) IBOutlet UIView *recordingCircleView;
 @property (weak, nonatomic) IBOutlet UILabel *recordingTimeLabel;
@@ -348,6 +366,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinImageWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinMessageHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinBottomcons;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *scheduleMessageButtonWidthConstraint;
+
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageComposerWidthConstraint;
 
 
@@ -454,9 +474,6 @@ CGPoint center;
 
 - (void)loadView {
     [super loadView];
-    
-    TAPRoomModel *r = self.currentRoom;
-    
     id quotedMessage = [[TAPChatManager sharedManager] getQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
     CGFloat extensionHeight = 0.0f;
     if(quotedMessage != nil) {
@@ -477,7 +494,6 @@ CGPoint center;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
     //Open room and save to active room
     [[TAPChatManager sharedManager] openRoom:self.currentRoom];
     
@@ -548,6 +564,13 @@ CGPoint center;
     _lastTypingWordArrayStartIndex = 0;
     _lastTypingWordString = @"";
     
+
+    
+    self.overlayChatRoomView = [[TAPOverlayChatRoomView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
+    self.overlayChatRoomView.delegate = self;
+    [self.navigationController.view addSubview:self.overlayChatRoomView];
+    [self.navigationController.view bringSubviewToFront:self.overlayChatRoomView];
+
     id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
     if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:otherUser:currentViewController:currentShownNavigationController:)]) {
         
@@ -619,6 +642,19 @@ CGPoint center;
     self.mentionAnchorBadgeView.layer.borderWidth = 1.0f;
     self.mentionAnchorBadgeView.layer.cornerRadius = CGRectGetHeight(self.mentionAnchorBadgeView.frame) / 2.0f;
     self.mentionAnchorBackgroundView.layer.cornerRadius = CGRectGetHeight(self.mentionAnchorBackgroundView.frame) / 2.0f;
+    
+    
+    //Send button longpress
+    UILongPressGestureRecognizer *sendButtonLongPressGesture = [[UILongPressGestureRecognizer alloc] init];
+    [sendButtonLongPressGesture addTarget:self action:@selector(sendButtonLongPressAction:)];
+    //gestureRecognizer.delegate = self;
+    [self.sendButton addGestureRecognizer: sendButtonLongPressGesture];
+    
+    //Send button longpress
+    UITapGestureRecognizer *sendButtonTapGesture = [[UITapGestureRecognizer alloc] init];
+    [sendButtonTapGesture addTarget:self action:@selector(sendButtonAction)];
+    //gestureRecognizer.delegate = self;
+    [self.sendButton addGestureRecognizer: sendButtonTapGesture];
 
     
     //Rotate table view and commit animation
@@ -682,16 +718,12 @@ CGPoint center;
     self.saveMessageEmptyBodyLabel.textColor = saveMessageLabelColor;
     self.saveMessageEmptyBodyLabel.attributedText = [self attributedStringForBulletTexts:stringArray withFont:saveMessageEmptyBodyLabelFont bulletString:@"•" indentation:15 lineSpacing:2 paragraphSpacing:8 textColor:UIColor.blackColor bulletColor:UIColor.blackColor];
     
-    //Voice note button long press
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(pictureLongPressClicked)];
-    [self.voiceNoteButton addGestureRecognizer:longPress];
-    
     //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     BOOL isSaveMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
-    
-    if (self.otherUser == nil && !isSaveMessageRoom) {
+
+    if (self.currentRoom.type == RoomTypePersonal && self.otherUser == nil && !isSaveMessageRoom) {
         self.inputMessageAccessoryView.alpha = 0.0f;
     }
     
@@ -826,6 +858,34 @@ CGPoint center;
     [self.replyMessageNameLabel setTextColor:quoteTitleLabelColor];
     [self.replyMessageMessageLabel setFont:quoteSubtitleLabelFont];
     [self.replyMessageMessageLabel setTextColor:quoteSubtitleLabelColor];
+
+    
+    //Setup schedule message date picker
+    UIFont *scheduleFontLabel = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDatePickerTitleLabel];
+    
+    self.datePickerTitleLabel.font = scheduleFontLabel;
+    self.scheduleMessageSendLabel.font = scheduleFontLabel;
+    self.datePickerCancelButton.titleLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDatePickerCancelLabel];
+    
+    self.scheduleMessageSendView.layer.cornerRadius = 15.0f;
+    self.scheduleMessageSendButton.layer.masksToBounds = YES;
+    
+    NSDate *date = self.scheduleMessageDatePicker.date;
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+    dateFormatter.dateFormat = @"dd/MM/yy";
+
+    NSString *dateString = [dateFormatter stringFromDate: date];
+    
+    NSDateFormatter *timeFormatter = [[NSDateFormatter alloc]init];
+    timeFormatter.dateFormat = @"HH:mm";
+
+
+    NSString *timeString = [timeFormatter stringFromDate: date];
+    
+    NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
+    self.scheduleMessageSendLabel.text = scheduleSendAtString;
+     
     //setup multiple forward ui
     UIFont *chatComposerFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatComposerTextField];
     UIColor *chatComposerColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField];
@@ -933,6 +993,7 @@ CGPoint center;
         self.voiceNoteSpaceContraint.constant = 13.0f;
         self.voiceNoteSpaceConstraint2.constant = 25.0f;
     }
+
     
 }
 
@@ -986,7 +1047,7 @@ CGPoint center;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+  
     //Open room and save to active room
     //Check when isFirstLoadData is false because we already called open room in viewDidLoad method to prevent double called
     if (!self.isFirstLoadData) {
@@ -1044,11 +1105,21 @@ CGPoint center;
     
     [self checkAndRefreshOnlineStatus];
     [self setKeyboardStateDefault];
-    
     NSString *r = self.currentRoom.roomID;
     [TAPDataManager callAPIGetStarredMessageIDs:self.currentRoom.roomID success:^(NSMutableArray *starredMessageID) {
         self.starMessageIDArray = [starredMessageID mutableCopy];
        // [self.tableView reloadData];
+    } failure:^(NSError *error) {
+        
+    }];
+    
+    [TAPDataManager callAPIGetScheduleMessage:self.currentRoom.roomID success:^(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray) {
+        if(scheduleMessageArray.count == 0 || ![[TapUI sharedInstance] getScheduledMessageFeatureEnabled]) {
+            self.scheduleMessageButtonWidthConstraint.constant = 0.0f;
+        }
+        else {
+            self.scheduleMessageButtonWidthConstraint.constant = 32.0f;
+        }
     } failure:^(NSError *error) {
         
     }];
@@ -1080,11 +1151,12 @@ CGPoint center;
 
     //check if last message is deleted room
     [self checkAndShowRoomViewState];
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+   
     _isViewWillAppeared = NO;
     self.connectionStatusViewController.isChatViewControllerAppear = self.isViewWillAppeared;
     
@@ -1120,7 +1192,6 @@ CGPoint center;
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    
     _isViewDidAppeared = NO;
     [[TAPAudioManager sharedManager] stopPlayer];
     [[TAPAudioManager sharedManager] stopRecordAudio];
@@ -3058,6 +3129,21 @@ CGPoint center;
         _lastSeenTimer = nil;
         [self destroySequence];
     }
+}
+
+#pragma mark TAPOverlayChatRoomView
+- (void)overlayScheduleMessageButtonDidTapped {
+    //open time picker
+    [self.overlayChatRoomView showOverlay:NO];
+    long currentTime = [TAPUtil currentTimeInMillis].longValue;
+    long plusOneMinute = currentTime + 60000;
+    [self.scheduleMessageDatePicker setDate:[NSDate dateWithTimeIntervalSince1970:plusOneMinute/1000]animated:NO];
+    self.scheduleMessageDatePickerContainerView.alpha = 1.0;
+}
+
+- (void)overlayBackgroundButtonDidTapped {
+    [self showInputAccessoryView];
+    [self.overlayChatRoomView showOverlay:NO];
 }
 
 #pragma mark UISliderDelegate
@@ -7674,6 +7760,27 @@ CGPoint center;
     
 }
 
+- (void)sendButtonLongPressAction:(UILongPressGestureRecognizer *)recognizer {
+    
+    if(![[TapUI sharedInstance] getScheduledMessageFeatureEnabled]) {
+        return;
+    }
+    
+    if(self.playIconImageView.alpha == 1.0f) {
+        //voice note state
+        return;
+    }
+    
+    long currentTime = [TAPUtil currentTimeInMillis].longValue;
+    [self.scheduleMessageDatePicker setDate:[NSDate dateWithTimeIntervalSince1970:currentTime/1000]animated:NO];
+    
+    [self.messageTextView resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
+    [self hideInputAccessoryView];
+    
+    [self.overlayChatRoomView showOverlay:YES];
+}
+
 - (void)setSendButtonActive:(BOOL)isActive {
     if (isActive) {
         self.sendButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackground];
@@ -10148,6 +10255,41 @@ CGPoint center;
 //    NSLog(@"---y %ld", [self.voiceNoteDragView convertPoint:center toView:nil].y);
     
 }
+
+- (IBAction)scheduleDatePickerDataChanged:(id)sender {
+    NSDate *date = self.scheduleMessageDatePicker.date;
+    
+    long currentTime = [TAPUtil currentTimeInMillis].longValue;
+    NSNumber *scheduleTime = [NSNumber numberWithDouble:[date timeIntervalSince1970] * 1000.0f];
+    
+    long plusOneMinute = currentTime + 60000;
+    long scheduleTimeLong  = scheduleTime.longValue;
+    
+    if(plusOneMinute > scheduleTimeLong) {
+        //self.scheduleMessageSendButton.userInteractionEnabled = NO;
+        [self.scheduleMessageDatePicker setDate:[NSDate dateWithTimeIntervalSince1970:plusOneMinute/1000]animated:YES];
+        date = [NSDate dateWithTimeIntervalSince1970:plusOneMinute/1000];
+    }
+    else {
+        //self.scheduleMessageSendButton.userInteractionEnabled = YES;
+    }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+    dateFormatter.dateFormat = @"dd/MM/yy";
+
+    NSString *dateString = [dateFormatter stringFromDate: date];
+    
+    NSDateFormatter *timeFormatter = [[NSDateFormatter alloc]init];
+    timeFormatter.dateFormat = @"HH:mm";
+
+
+    NSString *timeString = [timeFormatter stringFromDate: date];
+    
+    NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
+    self.scheduleMessageSendLabel.text = scheduleSendAtString;
+    
+}
+
 
 -(void)stopButtonDidTapped{
     [[TAPAudioManager sharedManager] stopRecordAudio];
@@ -12905,7 +13047,7 @@ CGPoint center;
 }
 
 - (IBAction)sendButtonDidTapped:(id)sender {
-    [self sendButtonAction];
+   // [self sendButtonAction];
 }
 
 - (IBAction)sendForwardButtonDidTapped:(id)sender {
@@ -12918,6 +13060,56 @@ CGPoint center;
         [self presentViewController:forwardListNavigationController animated:YES completion:nil];
     }
 
+}
+
+
+- (IBAction)scheduleMessageButtonDidTapped:(id)sender {
+    self.scheduleMessageDatePickerContainerView.alpha = 0.0;
+  
+    
+    NSDate *date = self.scheduleMessageDatePicker.date;
+    NSNumber *scheduleTime = [NSNumber numberWithDouble:[date timeIntervalSince1970] * 1000.0f];
+    long currentTime = [TAPUtil currentTimeInMillis].longValue;
+    long plusOneMinute = currentTime + 60000;
+    
+    if(plusOneMinute > scheduleTime.longValue) {
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Invalid Schedule Time", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showInputAccessoryView];
+        return;
+    }
+    
+    TAPSecondaryChatViewController *tapSecondaryChatVC = [[TAPSecondaryChatViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
+    
+    tapSecondaryChatVC.currentRoom = self.currentRoom;
+    tapSecondaryChatVC.messageListType = TAPSecondaryChatTypeScheduleMessage;
+    tapSecondaryChatVC.hidesBottomBarWhenPushed = YES;
+    tapSecondaryChatVC.chatroomScheduleContentString = self.messageTextView.text;
+    tapSecondaryChatVC.chatRoomScheduleTimne = scheduleTime;
+    [self.navigationController pushViewController:tapSecondaryChatVC animated:YES];
+    
+    self.messageTextView.text = @"";
+}
+
+- (IBAction)scheduleDatePickerCancelButtonDidTapped:(id)sender {
+    self.scheduleMessageDatePickerContainerView.alpha = 0.0;
+    [self showInputAccessoryView];
+}
+
+- (IBAction)scheduleMessageComposerButtonDidTapped:(id)sender {
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
+    } completion:^(BOOL finished) {
+        TAPSecondaryChatViewController *tapSecondaryChatVC = [[TAPSecondaryChatViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
+        
+        tapSecondaryChatVC.currentRoom = self.currentRoom;
+        tapSecondaryChatVC.messageListType = TAPSecondaryChatTypeScheduleMessage;
+        tapSecondaryChatVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:tapSecondaryChatVC animated:YES];
+    }];
+    
 }
 
 - (void)sendTextMessageWithString:(NSString *)text {
@@ -12968,10 +13160,10 @@ CGPoint center;
 }
 
 - (void)pinMessagePageButtonDidTapped {
-    TAPStarredMessageViewController *tapStarredMessageViewController = [[TAPStarredMessageViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
+    TAPSecondaryChatViewController *tapStarredMessageViewController = [[TAPSecondaryChatViewController alloc] initWithNibName:@"TAPStarredMessageViewController" bundle:[TAPUtil currentBundle]];
     
     tapStarredMessageViewController.currentRoom = self.currentRoom;
-    tapStarredMessageViewController.messageListType = TAPUIMessageListTypePin;
+    tapStarredMessageViewController.messageListType = TAPSecondaryChatTypePinMessage;
     tapStarredMessageViewController.messageArray = self.pinMessageArray;
     tapStarredMessageViewController.messageIDs = self.pinMessageIDArray;
     

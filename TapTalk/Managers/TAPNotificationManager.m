@@ -13,6 +13,7 @@
 @interface TAPNotificationManager () <TAPChatManagerDelegate, TAPCustomNotificationAlertViewControllerDelegate>
 
 @property (nonatomic) BOOL isViewIsAddedToSubview;
+@property (nonatomic) BOOL isScheduleMessage;
 
 @end
 
@@ -47,10 +48,17 @@
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
+    self.isScheduleMessage = NO;
+    [self handleIncomingMessage:message shouldShowNotification:YES];
+}
+
+- (void)chatManagerDidReceiveNewScheduleMessage:(TAPMessageModel *)message {
+    self.isScheduleMessage = YES;
     [self handleIncomingMessage:message shouldShowNotification:YES];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
+    self.isScheduleMessage = NO;
     [self handleIncomingMessage:message shouldShowNotification:NO];
 }
 
@@ -217,7 +225,7 @@
         [self initCustomNotificationAlertViewController];
     }
     
-    [[TapUI sharedInstance].customNotificationAlertViewController showWithMessage:message];
+    [[TapUI sharedInstance].customNotificationAlertViewController showWithMessage:message isSchedule:self.isScheduleMessage];
 }
 
 - (void)initCustomNotificationAlertViewController {

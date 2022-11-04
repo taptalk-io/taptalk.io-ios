@@ -1272,6 +1272,20 @@
             return font;
             break;
         }
+        case TAPComponentFontDatePickerTitleLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DATE_PICKER_TITLE_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontDatePickerCancelLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_DATE_PICKER_CANCEL_LABEL];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];

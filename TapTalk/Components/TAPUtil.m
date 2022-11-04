@@ -83,7 +83,8 @@ static const char kBundleKey = 0;
 
     NSDate *messageDate = [NSDate dateWithTimeIntervalSince1970:messageTimeInterval];
     NSString *messageDateString = @"";
-    if (timeGap <= midnightTimeGap) {
+    
+    if (timeGap <= midnightTimeGap && timeGap > 0) {
         // Today
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
@@ -92,7 +93,7 @@ static const char kBundleKey = 0;
         NSString *today = NSLocalizedStringFromTableInBundle(@"Today", nil, [TAPUtil currentBundle], @"");
         messageDateString = [NSString stringWithFormat:@"%@ • %@", today, dateString];
     }
-    else if (timeGap <= 86400.0f + midnightTimeGap) {
+    else if (timeGap <= 86400.0f + midnightTimeGap && timeGap > 0) {
         // Yesterday
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";

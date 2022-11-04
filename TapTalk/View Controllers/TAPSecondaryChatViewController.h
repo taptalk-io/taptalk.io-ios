@@ -10,11 +10,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, TAPUIMessageListType) {
-    TAPUIMessageListTypeStar = 0,
-    TAPUIMessageListTypePin = 1,
+    TAPSecondaryChatTypeStarMessage = 0,
+    TAPSecondaryChatTypePinMessage = 1,
+    TAPSecondaryChatTypeScheduleMessage = 2,
 };
 
-@protocol TAPStarredMessageViewControllerDelegate <NSObject>
+@protocol TAPSecondaryChatViewControllerDelegate <NSObject>
 
 @optional
 
@@ -24,13 +25,15 @@ typedef NS_ENUM(NSInteger, TAPUIMessageListType) {
 
 @end
 
-@interface TAPStarredMessageViewController : TAPBaseViewController
+@interface TAPSecondaryChatViewController : TAPBaseViewController
 
 @property (strong, nonatomic) TAPRoomModel *currentRoom;
-@property (weak, nonatomic) id<TAPStarredMessageViewControllerDelegate> delegate;
+@property (weak, nonatomic) id<TAPSecondaryChatViewControllerDelegate> delegate;
 @property (nonatomic) TAPUIMessageListType messageListType;
 @property (strong, atomic) NSMutableArray *messageArray;
 @property (strong, atomic) NSMutableArray *messageIDs;
+@property (strong, nonatomic) NSString *chatroomScheduleContentString;
+@property (strong, nonatomic) NSString *chatRoomScheduleTimne;
 
 @end
 

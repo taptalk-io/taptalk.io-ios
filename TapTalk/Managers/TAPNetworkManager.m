@@ -162,7 +162,7 @@ static const NSInteger kAPITimeOut = 60;
     if (urlString == nil) {
         urlString = @"";
     }
-    
+    NSLog(@"TAPParam POST: %@",parameters);
 #ifdef DEBUG
     NSLog(@"TAPNetworkManager POST: %@", urlString);
 #endif

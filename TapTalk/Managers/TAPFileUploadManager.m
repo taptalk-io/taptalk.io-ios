@@ -24,6 +24,8 @@
 @property (strong, nonatomic) NSMutableDictionary *uploadProgressDictionary;
 @property (strong, nonatomic) NSMutableDictionary *pendingUploadAssetDictionary;
 
+@property (nonatomic) NSNumber *scheduleTime;
+
 - (void)runUploadImageWithRoomID:(NSString *)roomID;
 - (void)runUploadFileWithRoomID:(NSString *)roomID;
 - (void)runUploadImageAsAssetWithRoomID:(NSString *)roomID;
@@ -79,8 +81,9 @@
 }
 
 #pragma mark - Custom Method
-- (void)sendFileWithData:(TAPMessageModel *)message {
+- (void)sendFileWithData:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime {
     
+    self.scheduleTime = scheduleTime;
     NSString *roomID = message.room.roomID;
     if (roomID == nil || [roomID isEqualToString:@""]) {
         return;
@@ -115,9 +118,10 @@
     }
 }
 
-- (void)sendFileAsAssetWithData:(TAPMessageModel *)message {
+- (void)sendFileAsAssetWithData:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime {
     
     NSString *roomID = message.room.roomID;
+    self.scheduleTime = scheduleTime;
     if (roomID == nil || [roomID isEqualToString:@""]) {
         return;
     }
@@ -251,13 +255,18 @@
                     [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
                     
                     //Save image to cache
-                    [TAPImageView saveImageToCache:resultImage withKey:resultMessage.localID];
+                    [TAPImageView saveImageToCache:resultImage withKey:fileID];
                     
                     //Remove dummy image with localID key from cache
-                    //[TAPDataManager removeImageFromCacheWithMessage:resultMessage];
+                    [TAPImageView removeImageFromCacheWithKey:resultMessage.localID];
                     
-                    //Send emit
-                    [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+                    if(self.scheduleTime == 0) {
+                        //Send emit
+                        [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+                    }
+                    else {
+                        [self callAPICreateScheduleMessage:currentMessage];
+                    }
                     
                     //Remove first object
                     [uploadQueueRoomArray removeObjectAtIndex:0];
@@ -337,7 +346,7 @@
                 if (obtainedMesage != nil) {
                     
                     //Update isFailedSend to 1 and isSending to 0
-                    [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
+                    //[[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
                     
                     //Remove first object
                     if ([uploadQueueRoomArray count] > 0) {
@@ -473,8 +482,13 @@
         //Save file path to cache
         [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
         
-        //Send emit
-        [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
+        if(self.scheduleTime.longValue == 0) {
+            //Send emit
+            [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
+        }
+        else {
+            [self callAPICreateScheduleMessage:currentMessage];
+        }
 
         //Remove first object
         [uploadQueueRoomArray removeObjectAtIndex:0];
@@ -724,7 +738,12 @@
                     //[TAPDataManager removeImageFromCacheWithMessage:resultMessage];
                     
                     //Send emit
-                    [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+                    if(self.scheduleTime.longValue == 0){
+                        [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+                    }
+                    else {
+                        [self callAPICreateScheduleMessage:currentMessage];
+                    }
                     
                     //Remove first object
                     [uploadQueueRoomArray removeObjectAtIndex:0];
@@ -2195,6 +2214,22 @@
         return YES;
     }
     return NO;
+}
+
+- (void)callAPICreateScheduleMessage:(TAPMessageModel *)message {
+    NSDictionary *encryptedMessage = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+    //[[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:message.localID];
+    
+    TAPScheduledMessageModel *scheduleMessage = [TAPScheduledMessageModel new];
+    scheduleMessage.message = message;
+    scheduleMessage.scheduleTime = self.scheduleTime;
+   // [[TAPChatManager sharedManager] saveScheduleMessageToPendingMessageArray:scheduleMessage];
+    
+    [TAPDataManager callAPICreateScheduleMessage:encryptedMessage scheduledTime:self.scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+        //[[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:scheduledMessage.localID];
+    } failure:^(NSError *error) {
+        
+    }];
 }
 
 - (void)callAPIUploadFileWithUploadQueueRoomArray:(NSMutableArray *)uploadQueueRoomArray

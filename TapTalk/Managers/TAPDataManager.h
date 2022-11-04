@@ -14,6 +14,7 @@
 #import "TAPCoreConfigsModel.h"
 #import "TAPPhotoListModel.h"
 #import "TAPMutedRoomModel.h"
+#import "TAPScheduledMessageModel.h"
 #import "TAPClearedRoomModel.h"
 
 @import AFNetworking;
@@ -41,6 +42,8 @@
 + (NSMutableDictionary *)getMutedRoomDictionary;
 + (void)setLastRoomMessageDeleteTime:(long)timestamp;
 + (long)getLastRoomMessageDeleteTime;
++ (void)setPendingScheduleMessages:(NSArray *)scheduleMessages;
++ (NSArray *)getPendingScheduleMessages;
 + (void)updateMessageToFailedWhenClosedInDatabase;
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
@@ -450,8 +453,17 @@
 + (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs expiredAt:(NSNumber *)expiredAt success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetMutedRoomList:(void (^)(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray))success failure:(void (^)(NSError *error))failure;
+
++ (void)callAPICreateScheduleMessage:(NSDictionary *)message scheduledTime:(NSNumber *)scheduledTime success:(void (^)(TAPMessageModel *scheduledMessage))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetScheduleMessage:(NSString *)roomID success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIScheduleMessageSendNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *scheduleIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIEditScheduleMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime success:(void (^)(BOOL isEditTimeSuccess))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIEditScheduleMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage success:(void (^)(BOOL isEditContentSuccess))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIDeleteScheduleMessage:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *deletedIDs))success failure:(void (^)(NSError *error))failure;
+
 + (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetRoomIDsWithState:(void (^)(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray))success failure:(void (^)(NSError *error))failure;
+
 // Used to prevent inserting message to deleted chat room
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 

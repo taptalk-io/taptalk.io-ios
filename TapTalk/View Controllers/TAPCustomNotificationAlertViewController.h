@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) id<TAPCustomNotificationAlertViewControllerDelegate> delegate;
 
-- (void)showWithMessage:(TAPMessageModel *)message;
+- (void)showWithMessage:(TAPMessageModel *)message isSchedule:(BOOL)isSchedule;
 
 @end
 
