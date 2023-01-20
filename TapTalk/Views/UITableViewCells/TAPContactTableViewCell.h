@@ -28,5 +28,9 @@ typedef NS_ENUM(NSInteger, TAPContactTableViewCellType) {
 - (void)isCellSelected:(BOOL)isSelected;
 - (void)showSeparatorLine:(BOOL)isVisible separatorLineType:(TAPContactTableViewCellSeparatorType)separatorType;
 - (void)showAdminIndicator:(BOOL)show;
+- (void)setContactTableViewCellWithRoom:(TAPRoomModel *)room;
+- (void)showReadBy:(NSString *)deliveredTime readTime:(NSString *)readTime;
+- (void)showDeliveredTo:(NSString *)deliveredTime;
+- (void)showBlockedContactIcon:(BOOL)isShow;
 
 @end

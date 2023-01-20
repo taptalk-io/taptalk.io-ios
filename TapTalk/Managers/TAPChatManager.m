@@ -141,6 +141,9 @@
     else if ([eventName isEqualToString:kTAPEventScheduleMessageUpdate]) {
         [self receiveScheduleMessageFromSocketWithEvent:eventName dataDictionary:dataDictionary];
     }
+    else if ([eventName isEqualToString:kTAPEventUserBlock] || [eventName isEqualToString:kTAPEventUserUnblock]) {
+        [self receiveRoomUpdateFromSocketWithEvent:eventName dataDictionary:dataDictionary];
+    }
 }
 
 - (void)connectionManagerDidConnected {
@@ -1897,8 +1900,9 @@
         }
     }
     
-   
-    
+}
+
+- (void)receiveBlockUserFromSocketWithEvent:(NSString *)eventName dataDictionary:(NSDictionary *)dataDictionary {
     
 }
 

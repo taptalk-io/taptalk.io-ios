@@ -59,6 +59,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadcounterImageView;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -99,10 +101,12 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageCounterImageWidthConstraint;
 
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
+@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
 
@@ -223,6 +227,11 @@
     self.panGestureRecognizer.delegate = self;
     //[self.contentView addGestureRecognizer:self.panGestureRecognizer];
     
+    _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewTap:)];
+    [self.contentView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
+    
+    
     [self showQuoteView:NO];
     [self showForwardView:NO];
     
@@ -274,7 +283,7 @@
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
     self.statusLabelBottomConstraint.constant = 10.0f;
-    
+    self.messageCounterImageWidthConstraint.constant = 0.0f;
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
     self.progressLayer.strokeStart = 0.0f;
@@ -287,6 +296,7 @@
     
     self.bubbleLabel.text = @"";
     self.statusLabel.text = @"";
+    [self showMessageReadCounterWithNumber:NO readCount:0];
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconPlayMessageBubble" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
@@ -509,6 +519,9 @@
     
     self.audioDurationLabel.textColor = timestampLabelColor;
     self.audioDurationLabel.font = voiceDurationLabelFont;
+    
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
     
     UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownloadPrimary]];
@@ -816,6 +829,12 @@
 
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
     [super handleBubbleViewTap:recognizer];
+    
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(myVoiceNoteBubbleTappedWithMessage:)]) {
+            [self.delegate myVoiceNoteBubbleTappedWithMessage:self.message];
+        }
+    }
     
 }
 
@@ -1247,9 +1266,6 @@
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
         self.starIconWidthConstraint.constant = 10.0f;
-        if(self.pinIconImageView.alpha > 0){
-            self.pinIconTrailingConstraint.constant = 7.0f;
-        }
     }
     else{
         self.starIconImageView.alpha = 0.0f;
@@ -1305,14 +1321,39 @@
     if(isShow){
         self.pinIconImageView.alpha = 1.0f;
         self.pinIconWidthConstraint.constant = 10.0f;
-        if(self.starIconImageView.alpha > 0){
+        if(![self.messageReadCounterLabel.text isEqualToString:@""]) {
             self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+            self.pinIconTrailingConstraint.constant = 0.0f;
         }
     }
     else{
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageCounterImageWidthConstraint.constant = 10.0f;
+        if (self.pinIconImageView.alpha == 1.0f) {
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+            self.pinIconTrailingConstraint.constant = 0.0f;
+        }
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadcounterImageView.alpha = 1.0f;
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageCounterImageWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadcounterImageView.alpha = 0.0f;
     }
 }
 

@@ -11,5 +11,6 @@
 @interface TAPBlockedListView : TAPBaseView
 
 @property (strong, nonatomic) TAPBaseTableView *tableView;
+@property (strong, nonatomic) UIView *emptyStateView;
 
 @end

@@ -48,7 +48,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *linkPreviewTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *linkPreviewBodyLabel;
 @property (weak, nonatomic) IBOutlet TAPImageView *linkPreviewImageView;
-
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadcounterImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -90,6 +91,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timestampLabelTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageCounterImageWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageReadCounterTrailingConstraint;
 
 @property (weak, nonatomic) IBOutlet UIImageView *deleteUserImageView;
 
@@ -128,7 +131,7 @@
     self.statusLabel.alpha = 0.0f;
     
     self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
-    
+    self.messageReadcounterImageView.image = [self.messageReadcounterImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconMessageReadCountLeft]];
     
     self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
@@ -234,6 +237,7 @@
     self.linkPreviewImageView.image = nil;
     self.linkPreviewImageHeightConstraint.constant = 0.0f;
     [self showSenderInfo:NO];
+    [self showMessageReadCounterWithNumber:NO readCount:0];
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -541,6 +545,9 @@
     
     self.linkPreviewBodyLabel.textColor = quoteContentColor;
     self.linkPreviewBodyLabel.font = quoteContentFont;
+    
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
@@ -1250,6 +1257,23 @@
     else{
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageCounterImageWidthConstraint.constant = 10.0f;
+        self.messageReadCounterTrailingConstraint.constant = 3.0f;
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadcounterImageView.alpha = 1.0f;
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageCounterImageWidthConstraint.constant = 0.0f;
+        self.messageReadCounterTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadcounterImageView.alpha = 0.0f;
     }
 }
 

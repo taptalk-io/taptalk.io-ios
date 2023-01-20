@@ -400,6 +400,12 @@
     TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
     TAPRoomModel *selectedRoom = selectedMessage.room;
     
+    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:selectedMessage.room.roomID];
+    TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+    if (otherUser != nil) {
+        selectedRoom.imageURL = otherUser.imageURL;
+    }
+    
     [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
         chatViewController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:chatViewController animated:YES];
@@ -786,8 +792,10 @@
 
 - (void)chatManagerDidReceiveUpdateRoom:(NSString *)eventName data:(NSDictionary *)data {
     NSDictionary *room = [data objectForKey:@"room"];
+    NSDictionary *userDict = [data objectForKey:@"user"];
     NSString *roomID = [room objectForKey:@"roomID"];
     NSMutableArray *pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+    NSMutableArray *blockedUserIDs = [[TAPDataManager getBlockedUserIDs] mutableCopy];
     if([eventName isEqualToString:@"room/clearChat"]) {
         TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
@@ -871,6 +879,18 @@
         completion:^(BOOL finished) {
             
         }];
+    }
+    else if([eventName isEqualToString:@"user/block"]) {
+        TAPUserModel *user = [TAPDataManager userModelFromDictionary:userDict];
+        [blockedUserIDs addObject:user.userID];
+        [TAPDataManager setBlockedUserIDs:blockedUserIDs];
+    }
+    else if([eventName isEqualToString:@"user/unblock"]) {
+        TAPUserModel *user = [TAPDataManager userModelFromDictionary:userDict];
+        if([blockedUserIDs containsObject:user.userID]) {
+            [blockedUserIDs removeObject:user.userID];
+        }
+        [TAPDataManager setBlockedUserIDs:blockedUserIDs];
     }
 }
 
@@ -1493,6 +1513,13 @@
     self.isMuteRoomDataChange = NO;
     self.isPinRoomDataChange = NO;
     
+    [TAPDataManager callAPIGetBlockedUserIDs:^(NSArray<NSString *> *blockedUserIDs) {
+        [TAPDataManager setBlockedUserIDs:blockedUserIDs];
+        
+    } failure:^(NSError *error) {
+        
+    }];
+    
     [TAPDataManager callAPIGetRoomIDsWithState:^(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray) {
            //muted room
            NSDictionary *mutedDictPref = [[TAPDataManager getMutedRoomDictionary] copy];
@@ -1552,6 +1579,7 @@
            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
        }];
 
+
     
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1590,6 +1618,11 @@
     
     self.isPinRoomDataChange = NO;
     
+    [TAPDataManager callAPIGetBlockedUserIDs:^(NSArray<NSString *> *blockedUserIDs) {
+        [TAPDataManager setBlockedUserIDs:blockedUserIDs];
+    } failure:^(NSError *error) {
+        
+    }];
     
     [TAPDataManager callAPIGetRoomIDsWithState:^(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray) {
             //muted room
@@ -1653,10 +1686,8 @@
             }
             
         } failure:^(NSError *error) {
-            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
+
 
     
     

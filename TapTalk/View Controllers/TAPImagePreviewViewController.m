@@ -118,6 +118,16 @@
         TAPMediaPreviewModel *firstMediaPreview = [self.mediaDataArray firstObject];
         BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:firstMediaPreview];
         [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
+        
+        UIColor *sendButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorMediaPreviewSendButtonLabel];
+        if(isExcedeedFileSize) {
+            self.imagePreviewView.sendButton.userInteractionEnabled = NO;
+            [self.imagePreviewView.sendButton setTitleColor:[sendButtonColor colorWithAlphaComponent:0.5f] forState:UIControlStateNormal];
+        }
+        else {
+            self.imagePreviewView.sendButton.userInteractionEnabled = YES;
+            [self.imagePreviewView.sendButton setTitleColor:sendButtonColor forState:UIControlStateNormal];
+        }
     }
 }
 

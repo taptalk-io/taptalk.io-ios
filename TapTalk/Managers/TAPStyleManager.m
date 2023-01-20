@@ -919,6 +919,13 @@
             return font;
             break;
         }
+        case TAPComponentFontMessageInfoSectionLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_MESSAGE_INFO_SECTION_LAEBL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         case TAPComponentFontLocationPickerTextField:
         {
             
@@ -1170,6 +1177,13 @@
             
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
             font = [font fontWithSize:TAP_DEFAULT_ROOM_AVATAR_EXTRA_LARGE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontRoomDeliveredToLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_DEFAULT_ROOM_AVATAR_SMALL_LABEL_FONTSIZE_STYLE];
             return font;
             break;
         }
@@ -2916,6 +2930,12 @@
         case TAPComponentColorIconQuotedFileBackgroundLeft:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconMessageReadCountLeft:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
             return color;
             break;
         }

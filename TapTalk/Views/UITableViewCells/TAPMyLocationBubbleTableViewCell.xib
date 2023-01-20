@@ -284,15 +284,45 @@
                                     <constraint firstAttribute="width" id="miG-xH-s53"/>
                                 </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O7V-Up-bve" userLabel="Read Counter View">
+                                <rect key="frame" x="226" y="300" width="4" height="14"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZNV-pU-ANq">
+                                        <rect key="frame" x="4" y="0.0" width="0.0" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="3Ye-Rd-yXo"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconReadCount" translatesAutoresizingMaskIntoConstraints="NO" id="aWP-UU-1gq">
+                                        <rect key="frame" x="2" y="2" width="0.0" height="10"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="10" id="MHR-Fg-efB"/>
+                                            <constraint firstAttribute="width" id="mEM-sW-tvs"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="aWP-UU-1gq" firstAttribute="centerY" secondItem="ZNV-pU-ANq" secondAttribute="centerY" id="J9U-Ys-9Z8"/>
+                                    <constraint firstAttribute="trailing" secondItem="ZNV-pU-ANq" secondAttribute="trailing" id="Kj1-pl-r1c"/>
+                                    <constraint firstItem="aWP-UU-1gq" firstAttribute="leading" secondItem="O7V-Up-bve" secondAttribute="leading" constant="2" id="NYC-Io-q0R"/>
+                                    <constraint firstItem="ZNV-pU-ANq" firstAttribute="centerY" secondItem="O7V-Up-bve" secondAttribute="centerY" id="TEV-Oo-Hk1"/>
+                                    <constraint firstItem="ZNV-pU-ANq" firstAttribute="leading" secondItem="aWP-UU-1gq" secondAttribute="trailing" constant="2" id="ZGI-kk-v7u"/>
+                                    <constraint firstAttribute="height" constant="14" id="jag-xc-2Ed"/>
+                                </constraints>
+                            </view>
                             <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconPinRightBubble" translatesAutoresizingMaskIntoConstraints="NO" id="hMg-DT-wkJ">
-                                <rect key="frame" x="213" y="302" width="10" height="10"/>
+                                <rect key="frame" x="209" y="302" width="10" height="10"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="10" id="I2b-nt-fCR"/>
                                     <constraint firstAttribute="height" constant="10" id="pov-Zi-NlQ"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cyd-22-nPc">
-                                <rect key="frame" x="10" y="301" width="203" height="10"/>
+                                <rect key="frame" x="10" y="301" width="199" height="10"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="PmY-Dn-AnY"/>
@@ -310,14 +340,16 @@
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
                             <constraint firstItem="cyd-22-nPc" firstAttribute="centerY" secondItem="TUC-Lx-lNS" secondAttribute="centerY" id="0Do-y0-5fk"/>
+                            <constraint firstItem="TUC-Lx-lNS" firstAttribute="leading" secondItem="O7V-Up-bve" secondAttribute="trailing" id="0fa-iw-XOk"/>
                             <constraint firstItem="YxV-Bw-fl5" firstAttribute="centerX" secondItem="o4h-r7-Vhc" secondAttribute="centerX" id="2EJ-2j-qkF"/>
                             <constraint firstItem="1th-ab-Lvj" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="2O2-vv-yyp"/>
                             <constraint firstItem="1th-ab-Lvj" firstAttribute="top" secondItem="36F-Ej-VDx" secondAttribute="bottom" constant="6" id="4oF-D8-xbj"/>
                             <constraint firstItem="HLV-s5-iUh" firstAttribute="top" secondItem="Wd0-cM-7U7" secondAttribute="top" id="83a-Dm-53e"/>
                             <constraint firstAttribute="trailing" secondItem="EDs-Vh-gBM" secondAttribute="trailing" constant="10" id="8hM-an-ibi"/>
+                            <constraint firstItem="O7V-Up-bve" firstAttribute="centerY" secondItem="AjF-HY-hwC" secondAttribute="centerY" constant="1" id="9Fh-AA-4ID"/>
                             <constraint firstItem="EDs-Vh-gBM" firstAttribute="top" secondItem="36F-Ej-VDx" secondAttribute="bottom" constant="6" id="9a2-zm-lxL"/>
                             <constraint firstItem="o4h-r7-Vhc" firstAttribute="leading" secondItem="Wd0-cM-7U7" secondAttribute="leading" constant="10" id="Atr-7p-Anr"/>
-                            <constraint firstItem="TUC-Lx-lNS" firstAttribute="leading" secondItem="hMg-DT-wkJ" secondAttribute="trailing" constant="7" id="Eq8-Kx-4VT"/>
+                            <constraint firstItem="O7V-Up-bve" firstAttribute="leading" secondItem="hMg-DT-wkJ" secondAttribute="trailing" constant="7" id="Eq8-Kx-4VT"/>
                             <constraint firstItem="hMg-DT-wkJ" firstAttribute="centerY" secondItem="78u-Dl-gHW" secondAttribute="centerY" id="Fc1-En-R7p"/>
                             <constraint firstItem="hMg-DT-wkJ" firstAttribute="leading" secondItem="cyd-22-nPc" secondAttribute="trailing" id="Fgr-id-t4c"/>
                             <constraint firstAttribute="bottom" secondItem="AjF-HY-hwC" secondAttribute="bottom" constant="10" id="Frk-Ho-Ez4"/>
@@ -477,6 +509,9 @@
                 <outlet property="forwardTitleLabelLeadingConstraint" destination="kgt-97-uAn" id="VSX-ND-jPD"/>
                 <outlet property="forwardTitleLabelTopConstraint" destination="Ss9-H1-fPU" id="gNI-ZQ-uuJ"/>
                 <outlet property="mapView" destination="o4h-r7-Vhc" id="t4N-dc-zIk"/>
+                <outlet property="messageCounterImageWidthConstraint" destination="mEM-sW-tvs" id="YD1-wJ-Uvp"/>
+                <outlet property="messageReadCounterLabel" destination="ZNV-pU-ANq" id="TP4-rI-nZd"/>
+                <outlet property="messageReadcounterImageView" destination="aWP-UU-1gq" id="78e-HI-Nyy"/>
                 <outlet property="pinIconImageView" destination="hMg-DT-wkJ" id="KWu-jU-xMf"/>
                 <outlet property="pinIconTrailingConstraint" destination="Eq8-Kx-4VT" id="Jfg-wb-1AI"/>
                 <outlet property="quoteDecorationView" destination="5NA-VZ-OIL" id="p8C-yJ-GiO"/>
@@ -532,6 +567,7 @@
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconLocationSelect" width="34" height="52"/>
         <image name="TAPIconPinRightBubble" width="9" height="9"/>
+        <image name="TAPIconReadCount" width="14" height="14"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>
         <image name="TAPIconStarChatBubble" width="12" height="12"/>

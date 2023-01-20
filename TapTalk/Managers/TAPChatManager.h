@@ -52,6 +52,8 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)chatManagerDidReceiveUnmuteChatroom:(NSString *)roomID;
 - (void)chatManagerDidReceiveMarkChatRoomAsUnread:(NSString *)roomID;
 - (void)chatManagerDidReceiveMarkChatRoomAsRead:(NSString *)roomID;
+- (void)chatManagerDidReceiveBlockUser:(TAPUserModel *)user;
+- (void)chatManagerDidReceiveUnblockUser:(TAPUserModel *)user;
 
 @end
 

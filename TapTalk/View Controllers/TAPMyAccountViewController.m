@@ -9,6 +9,7 @@
 #import "TAPMyAccountViewController.h"
 #import "TAPMyAccountView.h"
 #import "TAPImagePreviewCollectionViewCell.h"
+#import "TAPBlockedListViewController.h"
 
 @interface TAPMyAccountViewController () <TAPCustomTextFieldViewDelegate, UIScrollViewDelegate, TAPCustomButtonViewDelegate, UIImagePickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate, TAPCustomGrowingTextViewDelegate>
 
@@ -80,6 +81,7 @@
     self.lastPageIndicatorIndex = 0;
     
     [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.myAccountView.blockedButton addTarget:self action:@selector(blockedButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     if ([[TapUI sharedInstance] getChangeProfilePictureButtonVisibleState]) {
         [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -954,6 +956,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)cancelButtonDidTapped {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)blockedButtonDidTapped {
+    TAPBlockedListViewController *blockedListViewController = [[TAPBlockedListViewController alloc] init];
+    [self.navigationController pushViewController:blockedListViewController animated:YES];
 }
 
 - (void)openCamera {

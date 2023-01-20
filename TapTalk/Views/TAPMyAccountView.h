@@ -47,6 +47,8 @@ typedef NS_ENUM(NSInteger, TAPMyAccountLoadingType) {
 @property (strong, nonatomic) UIButton *changeProfilePictureButton;
 @property (strong, nonatomic) TAPCustomGrowingTextView *bioTextView;
 
+@property (strong, nonatomic) UIButton *blockedButton;
+
 @property (strong, nonatomic) TAPCustomLabelView *bioLabelField;
 @property (strong, nonatomic) TAPCustomLabelView *usernameLabelField;
 @property (strong, nonatomic) TAPCustomLabelView *mobileNumberLabelField;

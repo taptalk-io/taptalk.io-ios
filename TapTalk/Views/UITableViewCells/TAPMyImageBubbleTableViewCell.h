@@ -22,6 +22,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 
 - (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)myImageBubbleDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message;
@@ -81,6 +82,7 @@ typedef NS_ENUM(NSInteger, TAPMyImageBubbleTableViewCellStateType) {
 - (void)setFullImage:(UIImage *_Nullable)image;
 - (void)setThumbnailImage:(UIImage *)thumbnailImage;
 - (void)setMyImageBubbleTableViewCellStateType:(TAPMyImageBubbleTableViewCellStateType)myImageBubbleTableViewCellStateType;
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount;
 
 @end
 

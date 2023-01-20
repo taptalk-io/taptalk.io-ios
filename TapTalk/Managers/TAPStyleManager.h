@@ -215,6 +215,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconFileRetryUploadDownloadPrimary, //Chat Room Page
     TAPComponentColorIconFileRetryUploadDownloadWhite, //Chat Room Page
     TAPComponentColorIconFilePlayMedia, //Chat Room Page
+    TAPComponentColorIconMessageReadCountLeft, //Chat Room Page
     TAPComponentColorShareExtensionIconSearch, //Share Extension
     TAPComponentColorBorderSendToContactProfileImage, //Share Extension Profile Image Border Color
     TAPComponentColorIconCheckmarkSendToContactProfile, //Share Extension Profile Image with checkMark
@@ -491,6 +492,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontRoomAvatarMediumLabel,
     TAPComponentFontRoomAvatarLargeLabel,
     TAPComponentFontRoomAvatarExtraLargeLabel,
+    TAPComponentFontRoomDeliveredToLabel,
     TAPComponentFontMentionListNameLabel,
     TAPComponentFontMentionListUsernameLabel,
     TAPComponentFontVersionCode,
@@ -505,6 +507,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontTableViewProfileNameSendToContactLabel,
     TAPComponentFontDeleteAccountTitleLabel,
     TAPComponentFontDeleteAccountWarningLabel,
+    TAPComponentFontMessageInfoSectionLabel,
     TAPComponentFontDatePickerTitleLabel,
     TAPComponentFontDatePickerCancelLabel,
 };

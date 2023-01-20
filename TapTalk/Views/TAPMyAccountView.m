@@ -40,6 +40,8 @@
 @property (strong, nonatomic) UIView *bioView;
 @property (strong, nonatomic) UIView *bioContainerView;
 
+@property (strong, nonatomic) UIView *blockedContactView;
+
 //View Container
 @property (strong, nonatomic) UIView *accountDetailViewContainer;
 
@@ -225,9 +227,30 @@
         _emailLabelField = [[TAPCustomLabelView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.mobileNumberLabelField.frame), CGRectGetWidth(self.frame), 62.0f)];
         [self.emailLabelField  setAccountDetailFieldString: NSLocalizedStringFromTableInBundle(@"EMAIL ADDRESS", nil, [TAPUtil currentBundle], @"") description: NSLocalizedStringFromTableInBundle(@"aaaa", nil, [TAPUtil currentBundle], @"")];
         [self.emailLabelField showSeparatorView:NO];
+        
         [self.accountDetailViewContainer addSubview:self.emailLabelField];
         
-        self.accountDetailViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.emailLabelField.frame));
+        //Blocked Contact Button
+        _blockedContactView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.emailLabelField.frame) + 24.0f, CGRectGetWidth(self.frame), 48.0f)];
+        self.blockedContactView.backgroundColor = [UIColor whiteColor];
+        
+        CGFloat blockedImageSize = 24.0f;
+        UIImageView *blockedContactImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, (CGRectGetHeight(self.blockedContactView.frame) - blockedImageSize) / 2, blockedImageSize, blockedImageSize)];
+        blockedContactImageView.image = [UIImage imageNamed:@"TAPIconBlockUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        [self.blockedContactView addSubview:blockedContactImageView];
+        
+        UIFont *labelButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatProfileMenuLabel];
+        UILabel *blockedContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(blockedContactImageView.frame) + 14.0f, (CGRectGetHeight(self.blockedContactView.frame) - blockedImageSize) / 2, 300.0f, blockedImageSize)];
+        blockedContactLabel.text = @"Blocked Contacts";
+        blockedContactLabel.font = labelButtonFont;
+        [self.blockedContactView addSubview:blockedContactLabel];
+        
+        _blockedButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.blockedContactView.frame), CGRectGetHeight(self.blockedContactView.frame))];
+        [self.blockedContactView addSubview:self.blockedButton];
+        
+        [self.accountDetailViewContainer addSubview:self.blockedContactView];
+        
+        self.accountDetailViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.blockedContactView.frame));
          
         //Edit View
         _editViewContainer = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), 900.0f)];
@@ -503,13 +526,15 @@
         self.bioLabelField.frame = CGRectMake(0.0f, 24.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.bioLabelField.frame));
         self.mobileNumberLabelField.frame = CGRectMake(0.0f, CGRectGetMaxY(self.usernameLabelField.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.mobileNumberLabelField.frame));
         self.emailLabelField.frame = CGRectMake(0.0f, CGRectGetMaxY(self.mobileNumberLabelField.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.emailLabelField.frame));
+        self.blockedContactView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.emailLabelField.frame) + 24.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.blockedContactView.frame));
+        
         
         if(self.editViewContainer.alpha == 1.0f){
             self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame));
             self.versionLabel.frame = CGRectMake(self.versionLabel.frame.origin.x, CGRectGetMaxY(self.editViewContainer.frame) + 24.0f, CGRectGetWidth(self.versionLabel.frame), 16.0f);
         }
         else{
-            self.accountDetailViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.emailLabelField.frame));
+            self.accountDetailViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.blockedContactView.frame));
             self.versionLabel.frame = CGRectMake(self.versionLabel.frame.origin.x, CGRectGetMaxY(self.accountDetailViewContainer.frame) + 24.0f, CGRectGetWidth(self.versionLabel.frame), 16.0f);
         }
         
@@ -546,7 +571,7 @@
     self.changeProfilePictureButton.frame = CGRectMake(CGRectGetMinX(self.changeLabel.frame), CGRectGetMinY(self.changeLabel.frame) - 8.0f, CGRectGetWidth(self.changeLabel.frame) + 4.0f + CGRectGetWidth(self.changeIconImageView.frame), 40.0f);
     [self setEditPorfilPictureButtonVisible:YES];
     
-    self.accountDetailViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.emailLabelField.frame));
+    self.accountDetailViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.blockedContactView.frame));
     
     self.versionLabel.frame = CGRectMake(self.versionLabel.frame.origin.x, CGRectGetMaxY(self.accountDetailViewContainer.frame) + 24.0f, CGRectGetWidth(self.versionLabel.frame), 16.0f);
     [self refreshViewPosition];

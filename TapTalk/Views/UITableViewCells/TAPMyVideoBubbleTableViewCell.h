@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 - (void)myVideoReplyDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myVideoCheckmarkDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myVideoBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)myVideoBubbleTappedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myVideoLongPressedUrl:(NSURL *)url
                originalString:(NSString*)originalString;
 - (void)myVideoLongPressedPhoneNumber:(NSString *)phoneNumber
@@ -88,6 +89,7 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
 - (void)showPinIcon:(BOOL)isShow;
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount;
 
 @end
 

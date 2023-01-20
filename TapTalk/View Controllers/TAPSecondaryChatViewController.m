@@ -307,6 +307,10 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         [[TAPChatManager sharedManager] addDelegate:self];
         
         [self showInputAccessoryExtensionView:NO];
+        _isShowAccessoryView = YES;
+        [self reloadInputViews];
+        [self.view becomeFirstResponder];
+        [self setupInputAccessoryView];
         //[[TAPChatManager sharedManager] checkAndSendPendingScheduleMessage];
     }
     
@@ -321,11 +325,6 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerStartNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFinishNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFailureNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
-    
-    _isShowAccessoryView = YES;
-    [self reloadInputViews];
-    [self.view becomeFirstResponder];
-    [self setupInputAccessoryView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -2388,6 +2387,11 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
 #pragma mark Custom Method
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
+    
+    if(!self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
+        return;
+    }
+    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     NSInteger rowIndex = [self.messageArray indexOfObject:message];

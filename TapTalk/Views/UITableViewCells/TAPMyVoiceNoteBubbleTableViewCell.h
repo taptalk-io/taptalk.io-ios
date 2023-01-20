@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, TAPMyVoiceNoteBubbleTableViewCellStateType) {
 - (void)myVoiceNoteReplyDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)myVoiceNoteBubbleTappedWithMessage:(TAPMessageModel *)message;
 - (void)myVoiceNoteRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
@@ -64,6 +65,7 @@ typedef NS_ENUM(NSInteger, TAPMyVoiceNoteBubbleTableViewCellStateType) {
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
 - (void)showPinIcon:(BOOL)isShow;
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount;
 
 @end
 

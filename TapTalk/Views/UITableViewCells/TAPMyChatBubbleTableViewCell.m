@@ -47,6 +47,10 @@
 @property (weak, nonatomic) IBOutlet TAPImageView *linkPreviewImageView;
 
 
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadcounterImageView;
+
+
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
@@ -91,6 +95,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusIconTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageCounterImageWidthConstraint;
 
 
 
@@ -235,7 +240,11 @@
     self.statusIconTopConstraint.constant = -35.0f;
     self.linkPreviewImageHeightConstraint.constant = 0.0f;
     self.linkPreviewViewHeightConstraint.constant = 0.0f;
+    self.messageReadCounterLabel.text = @"";
+    self.messageCounterImageWidthConstraint.constant = 0.0f;
+    self.pinIconTrailingConstraint.constant = 0.0f;
     [self showQuoteView:NO];
+    [self showMessageReadCounterWithNumber:NO readCount:0];
     [self.contentView layoutIfNeeded];
 }
 
@@ -527,6 +536,9 @@
     
     self.linkPreviewBodyLabel.textColor = quoteContentColor;
     self.linkPreviewBodyLabel.font = quoteContentFont;
+    
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
     
     UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.sendingIconImageView.image = sendingImage;
@@ -1003,12 +1015,39 @@
     if(isShow){
         self.pinIconImageView.alpha = 1.0f;
         self.pinIconWidthConstraint.constant = 10.0f;
-        self.pinIconTrailingConstraint.constant = 7.0f;
+        if(![self.messageReadCounterLabel.text isEqualToString:@""]) {
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+            self.pinIconTrailingConstraint.constant = 0.0f;
+        }
     }
     else{
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageCounterImageWidthConstraint.constant = 10.0f;
+        if (self.pinIconImageView.alpha == 1.0f) {
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+            self.pinIconTrailingConstraint.constant = 0.0f;
+        }
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadcounterImageView.alpha = 1.0f;
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageCounterImageWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadcounterImageView.alpha = 0.0f;
     }
 }
 

@@ -33,6 +33,8 @@
                 <outlet property="blockContactLabel" destination="KBh-WH-Lep" id="XQg-Xg-zNe"/>
                 <outlet property="blockContactView" destination="hSy-X2-bVr" id="O8U-Go-cGp"/>
                 <outlet property="blockUserViewWidthConstraint" destination="GdU-jP-Z7J" id="DAl-1A-psR"/>
+                <outlet property="blockedUserView" destination="NPs-ec-Wsh" id="fZk-nw-LPB"/>
+                <outlet property="blockedUserViewHeightConstraint" destination="Hgb-pr-Wf4" id="CnU-Nj-ra9"/>
                 <outlet property="cancelRecordingButton" destination="rLd-qi-OzR" id="tSS-9h-Rpa"/>
                 <outlet property="chatAnchorBackgroundView" destination="dWy-vT-5Kr" id="wli-qi-URh"/>
                 <outlet property="chatAnchorBackgroundViewBottomConstrait" destination="2eB-uX-zrW" id="IME-gP-BMt"/>
@@ -176,6 +178,7 @@
                 <outlet property="topFloatingIndicatorLabel" destination="JeV-Fg-0Sv" id="LHY-7d-JhA"/>
                 <outlet property="topFloatingIndicatorView" destination="kwo-aS-WWG" id="ESG-Bh-Rsb"/>
                 <outlet property="topFloatingIndicatorWidthConstraint" destination="TUm-dt-U3D" id="V5t-mh-2JW"/>
+                <outlet property="unblockButton" destination="2dT-0n-Nap" id="soS-YI-8Ca"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="gwd-Sd-WkE"/>
                 <outlet property="voiceNoteAudioSlider" destination="AuN-zg-eJa" id="4mL-lz-Qhi"/>
                 <outlet property="voiceNoteContainerView" destination="1kN-fs-Mb6" id="TZO-79-2sq"/>
@@ -863,6 +866,27 @@
                         <constraint firstItem="5hM-hr-HXK" firstAttribute="centerY" secondItem="uR0-le-vko" secondAttribute="centerY" id="vi6-zh-xfr"/>
                     </constraints>
                 </view>
+                <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NPs-ec-Wsh" userLabel="Blocked Contact View">
+                    <rect key="frame" x="0.0" y="623" width="375" height="0.0"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2dT-0n-Nap">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Unblock"/>
+                            <connections>
+                                <action selector="unblockButtonDidTapped:" destination="-1" eventType="touchUpInside" id="GI8-uF-BVL"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="2dT-0n-Nap" firstAttribute="leading" secondItem="NPs-ec-Wsh" secondAttribute="leading" id="8TP-Zh-bcc"/>
+                        <constraint firstAttribute="height" id="Hgb-pr-Wf4"/>
+                        <constraint firstItem="2dT-0n-Nap" firstAttribute="top" secondItem="NPs-ec-Wsh" secondAttribute="top" id="IBf-Ro-GRe"/>
+                        <constraint firstAttribute="bottom" secondItem="2dT-0n-Nap" secondAttribute="bottom" id="Qyc-hv-e1E"/>
+                        <constraint firstAttribute="trailing" secondItem="2dT-0n-Nap" secondAttribute="trailing" id="gK6-gT-JDN"/>
+                    </constraints>
+                </view>
                 <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ghh-uc-uz5" userLabel="Pin View">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
                     <subviews>
@@ -1044,6 +1068,7 @@
                 <constraint firstItem="lZ6-Ab-I3z" firstAttribute="leading" secondItem="yg3-tK-SMU" secondAttribute="leading" id="Ijl-s3-Ptd"/>
                 <constraint firstItem="wvI-SW-Dkb" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="JAT-oj-f0r"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="centerX" secondItem="2El-oL-J7D" secondAttribute="centerX" id="L8O-6z-aWM"/>
+                <constraint firstItem="NPs-ec-Wsh" firstAttribute="top" secondItem="uR0-le-vko" secondAttribute="bottom" priority="500" constant="52" id="L90-l9-oXa"/>
                 <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="5JX-bE-np9" secondAttribute="trailing" constant="11" id="M1J-Pq-NOP"/>
                 <constraint firstItem="ghh-uc-uz5" firstAttribute="top" secondItem="Dr2-Y3-9Wq" secondAttribute="top" id="MAH-Oc-GO5"/>
                 <constraint firstItem="8kF-QK-fyr" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Noj-wu-2Ar"/>
@@ -1064,6 +1089,7 @@
                 <constraint firstItem="tGk-j5-N3W" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="d9D-q1-TM4"/>
                 <constraint firstItem="ZsM-Zn-PUI" firstAttribute="top" secondItem="2El-oL-J7D" secondAttribute="bottom" constant="-10" id="dgL-2O-eka"/>
                 <constraint firstAttribute="bottom" secondItem="LC9-67-sIb" secondAttribute="bottom" id="di0-bf-WSM"/>
+                <constraint firstItem="NPs-ec-Wsh" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="dtH-FJ-WMZ"/>
                 <constraint firstItem="lZ6-Ab-I3z" firstAttribute="leading" secondItem="Dr2-Y3-9Wq" secondAttribute="leading" id="fWX-HV-nUf"/>
                 <constraint firstItem="uR0-le-vko" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="-50" id="gR9-V1-icX"/>
                 <constraint firstItem="0Aa-Ov-jPe" firstAttribute="bottom" secondItem="Dr2-Y3-9Wq" secondAttribute="bottom" id="gTD-sy-h9k"/>
@@ -1087,6 +1113,8 @@
                 <constraint firstItem="gfy-gG-oGe" firstAttribute="top" secondItem="7nB-bs-k4t" secondAttribute="top" constant="50" id="y3A-dR-Zbi"/>
                 <constraint firstItem="lZ6-Ab-I3z" firstAttribute="trailing" secondItem="Dr2-Y3-9Wq" secondAttribute="trailing" id="z2U-Gk-O6p"/>
                 <constraint firstItem="gfy-gG-oGe" firstAttribute="bottom" secondItem="7nB-bs-k4t" secondAttribute="bottom" id="zMO-hY-M3l"/>
+                <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="trailing" secondItem="NPs-ec-Wsh" secondAttribute="trailing" id="zdY-3j-inl"/>
+                <constraint firstItem="Dr2-Y3-9Wq" firstAttribute="bottom" secondItem="NPs-ec-Wsh" secondAttribute="bottom" id="zrb-kc-9xg"/>
             </constraints>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
             <point key="canvasLocation" x="8.8000000000000007" y="-105.69715142428787"/>

@@ -42,7 +42,8 @@
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
-
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadcounterImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -82,7 +83,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingConstraint;
-
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageCounterImageWidthConstraint;
 
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
@@ -212,7 +213,7 @@
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
-    
+    self.messageCounterImageWidthConstraint.constant = 0.0f;
     [self.contentView layoutIfNeeded];
 
     self.bubbleHighlightView.alpha = 0.0f;
@@ -224,6 +225,7 @@
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
+    [self showMessageReadCounterWithNumber:NO readCount:0];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -410,6 +412,9 @@
 
     self.timestampLabel.textColor = timestampLabelColor;
     self.timestampLabel.font = timestampLabelFont;
+    
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
     
     UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.sendingIconImageView.image = sendingImage;
@@ -897,9 +902,6 @@
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
         self.starIconWidthConstraint.constant = 10.0f;
-        if(self.pinIconImageView.alpha > 0){
-            self.pinIconTrailingConstraint.constant = 7.0f;
-        }
     }
     else{
         self.starIconImageView.alpha = 0.0f;
@@ -937,12 +939,38 @@
 - (void)showPinIcon:(BOOL)isShow {
     if(isShow){
         self.pinIconImageView.alpha = 1.0f;
-        if(self.starIconImageView.alpha > 0){
+        if(![self.messageReadCounterLabel.text isEqualToString:@""]) {
             self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+            self.pinIconTrailingConstraint.constant = 0.0f;
         }
     }
     else{
         self.pinIconImageView.alpha = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageCounterImageWidthConstraint.constant = 10.0f;
+        if (self.pinIconImageView.alpha == 1.0f) {
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+            self.pinIconTrailingConstraint.constant = 0.0f;
+        }
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadcounterImageView.alpha = 1.0f;
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageCounterImageWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadcounterImageView.alpha = 0.0f;
     }
 }
 

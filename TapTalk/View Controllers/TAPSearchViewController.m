@@ -415,6 +415,24 @@
                 self.searchResultUnreadCountArray = [unreadCountArray mutableCopy];
                 self.searchResultUnreadMentionDictionary = [unreadMentionDictionary mutableCopy];
                 
+                /**
+                NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+                for(TAPMessageModel *message in resultArray){
+                    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:message.room.roomID];
+                    if([blockedUserIDs containsObject:otherUserID]) {
+                        [self.searchResultMessageArray removeObject:message];
+                    }
+                    
+                }
+                
+                for(TAPRoomModel *room in roomArray){
+                    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:room.roomID];
+                    if([blockedUserIDs containsObject:otherUserID]) {
+                        [self.searchResultChatAndContactArray removeObject:room];
+                    }
+                    
+                }
+                */
                 BOOL hasSavedMessage = NO;
                 if([@"Saved Messages" localizedCaseInsensitiveContainsString:newString] && [[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
                     NSInteger counter = 0;

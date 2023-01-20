@@ -67,9 +67,15 @@
     _recentChatArray = [NSMutableArray array];
     _searchResultChatAndContactArray = [NSMutableArray array];
     _updatedString = @"";
-    
+    NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
     [TAPDataManager getForwardRoomListSuccess:^(NSArray *resultArray) {
-        _recentChatArray = resultArray;
+        for(TAPMessageModel *message in resultArray) {
+            if(![blockedUserIDs containsObject:message.user.userID]) {
+                [self.recentChatArray addObject:message];
+            }
+        }
+        //_recentChatArray = resultArray;
+        
         [self.forwardListView.recentChatTableView reloadData];
     } failure:^(NSError *error) {
         
@@ -377,10 +383,21 @@
         
         [TAPDataManager searchChatAndContactWithString:trimmedString SortBy:@"roomName" success:^(NSArray *roomArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary) {
             self.searchResultChatAndContactArray = [roomArray mutableCopy];
+            NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+            for(TAPRoomModel *room in roomArray){
+                NSString *userID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:room.roomID];
+                if([blockedUserIDs containsObject:userID]){
+                    [self.searchResultChatAndContactArray removeObject:room];
+                    
+                }
+            }
+            
             
             BOOL hasSavedMessage = NO;
+    
             if([@"Saved Messages" localizedCaseInsensitiveContainsString:newString] && [[TapUI sharedInstance] isSavedMessagesMenuEnabled]){
                 for(TAPRoomModel *room in roomArray){
+                    NSString *userID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:room.roomID];
                     if([TAPUtil isSaveMessageRoom:room.roomID]){
                         hasSavedMessage = YES;
                         

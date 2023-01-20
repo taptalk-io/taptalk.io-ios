@@ -125,7 +125,7 @@
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeSuccessMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
-        self.rightButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame));
+        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 24.0f - 24.0f, CGRectGetHeight(self.rightButton.frame));
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeInfoDefault) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];

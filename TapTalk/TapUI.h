@@ -154,6 +154,17 @@ Called when user click mention in the bubble chat.
  */
 - (void)tapTalkProductListBubbleRightButtonTapped:(TAPProductModel *)product room:(TAPRoomModel *)room recipient:(TAPUserModel *)recipient isSingleOption:(BOOL)isSingleOption;
 
+/**
+ Called when user click the profile button on the top right side of personal chat room page.
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param message:(TAPMessageModel *)message data that will be report
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkReportMessageButtonDidTapped:(UIViewController *)currentViewController
+                                 message:(TAPMessageModel *)message
+          currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
 @end
 
 //==========================================================
@@ -231,6 +242,15 @@ Called when user click mention in the bubble chat.
  @param room (TAPRoomModel *) chat room details of the reported group
  */
 - (void)reportGroupButtonDidTapped:(UIViewController *)currentViewController
+                              room:(TAPRoomModel *)room;
+
+/**
+ Called when user taps the Group In Common button in chat profile
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param room (TAPRoomModel *) chat room details of the reported group
+ */
+- (void)groupInCommonItemDidTapped:(UIViewController *)currentViewController
                               room:(TAPRoomModel *)room;
 
 @end
@@ -1005,7 +1025,6 @@ Enable or disable link preview in chat room
 - (void)setLinkPreviewInMessageEnabled:(BOOL)isEnabled;
 
 /**
-<<<<<<< HEAD
 Enable or disable Scheduled Message Feature
 */
 - (void)setScheduledMessageFeatureEnabled:(BOOL)isEnabled;
@@ -1020,6 +1039,63 @@ Enable or disable Scheduled Message Feature
 */
 - (BOOL)getLinkPreviewInMessageEnabled;
 
+/**
+ Enable or disable group in common menu
+*/
+- (void)setGroupInCommonMenuEnabled:(BOOL)isEnabled;
+/**
+ Get current isEnabled state of group in common menu
+*/
+- (BOOL)getGroupInCommonMenuEnabled;
+
+/**
+Show or hide message info menu
+*/
+- (void)setMessageInfoMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of message info menu
+*/
+- (BOOL)isMessageInfoMenuEnabled;
+/**
+ Enable or disable block user
+*/
+- (void)setBlockUserMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current isEnabled state of  block user
+*/
+- (BOOL)getBlockUserMenuEnabled;
+
+/**
+ Enable or disable report message menu in chat longpress
+*/
+- (void)setReportMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of   report message menu in chat longpress
+*/
+- (BOOL)getReportMessageMenuEnabled;
+
+/**
+ Enable or disable report user button in profile page
+*/
+- (void)setReportButtonInUserProfileVisible:(BOOL)isVisible;
+
+/**
+ Get current isVisible state of report user button in profile page
+*/
+- (BOOL)getReportButtonInUserProfileVisible;
+
+/**
+ Enable or disable report group button in profile page
+*/
+- (void)setReportButtonInGroupProfileVisible:(BOOL)isVisible;
+
+/**
+ Get current isVisible state of report group button in profile page
+*/
+- (BOOL)getReportButtonInGroupProfileVisible;
 
 @end
 

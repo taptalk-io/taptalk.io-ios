@@ -36,6 +36,10 @@
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIView *messageReadCounterView;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadCounterImageView;
+
 @property (strong, nonatomic) IBOutlet UIView *senderInitialView;
 @property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
 @property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
@@ -88,6 +92,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
@@ -227,14 +232,17 @@
 
     self.statusLabel.alpha = 0.0f;
     self.starIconImageView.alpha = 0.0f;
+    self.starIconWidthConstraint.constant = 0.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
     self.senderDeletedUserImageView.alpha = 0.0f;
     self.redirectArrowButton.alpha = 0.0f;
     self.bubbleHighlightView.alpha = 0.0f;
     self.statusLabelBottomConstraint.constant = 10.0f;
+    self.messageReadCounterView.alpha = 0.0f;
     
     self.pinIconImageView.alpha = 0.0f;
     self.pinIconWidthConstraint.constant = 0.0f;
+    [self showMessageReadCounterWithNumber:NO readCount:0];
 }
 
 #pragma mark - Delegate
@@ -435,9 +443,14 @@
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
     
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
+    
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     self.fileImageView.image = documentsImage;
+    
+    self.messageReadCounterImageView.image = [ self.messageReadCounterImageView.image setImageTintColor:[TAPUtil getColor:@"DADADA"]];
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -1086,9 +1099,11 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
+        self.starIconWidthConstraint.constant = 10.0f;
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+        self.starIconWidthConstraint.constant = 0.0f;
     }
 }
 
@@ -1141,5 +1156,21 @@
     }
     
 }
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadCounterView.alpha = 1.0f;
+        self.messageReadCounterImageView.alpha = 1.0f;
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadCounterView.alpha = 0.0f;
+        self.messageReadCounterImageView.alpha = 0.0f;
+    }
+}
+
 
 @end
