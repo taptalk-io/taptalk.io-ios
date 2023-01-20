@@ -16,6 +16,7 @@
 #import "TAPMutedRoomModel.h"
 #import "TAPScheduledMessageModel.h"
 #import "TAPClearedRoomModel.h"
+#import "TapMessageRecipientModel.h"
 
 @import AFNetworking;
 
@@ -40,6 +41,8 @@
 + (NSArray *)getPinnedRoomIDs;
 + (void)setMutedRoomDictionary:(NSMutableDictionary *)mutedRoomDictionaryList;
 + (NSMutableDictionary *)getMutedRoomDictionary;
++ (void)setBlockedUserIDs:(NSArray *)userIDs;
++ (NSArray *)getBlockedUserIDs;
 + (void)setLastRoomMessageDeleteTime:(long)timestamp;
 + (long)getLastRoomMessageDeleteTime;
 + (void)setPendingScheduleMessages:(NSArray *)scheduleMessages;
@@ -448,7 +451,7 @@
 + (void)callAPIUnpinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 
 + (void)callAPIGetPinnedRoomIDs:(void (^)(NSMutableArray *pinnedRoomIDs))success failure:(void (^)(NSError *error))failure;
-
++ (void)callAPIGetGroupsInCommon:(NSString *)userID success:(void (^)(NSMutableArray <TAPRoomModel *> *groupsInCommonRoom))success failure:(void (^)(NSError *error))failure;
 + (NSDictionary *)dictionaryFromMessageModel:(TAPMessageModel *)message;
 + (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs expiredAt:(NSNumber *)expiredAt success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
@@ -462,9 +465,22 @@
 + (void)callAPIDeleteScheduleMessage:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *deletedIDs))success failure:(void (^)(NSError *error))failure;
 
 + (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetMessageDetails:(NSString *)messageID
+                     success:(void (^)(TAPMessageModel *message, NSArray <TapMessageRecipientModel *> *deliveredTo, NSArray <TapMessageRecipientModel *> *readBy))success
+                         failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetMessageTotalRead:(NSString *)messageID
+                     success:(void (^)(NSInteger readCount))success
+                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetRoomIDsWithState:(void (^)(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray))success failure:(void (^)(NSError *error))failure;
 
++ (void)callAPIReportUser:(NSString *)userID category:(NSString *)category isOtherCategory:(BOOL)isOtherCategory reason:(NSString *)reason success:(void (^)(BOOL success))isSuccess failure:(void (^)(NSError *error))failure;
++ (void)callAPIReportMessage:(NSString *)messageID roomID:(NSString *)roomID category:(NSString *)category isOtherCategory:(BOOL)isOtherCategory reason:(NSString *)reason success:(void (^)(BOOL success))isSuccess failure:(void (^)(NSError *error))failure;
+
 // Used to prevent inserting message to deleted chat room
++ (void)callAPIBlockUser:(NSString *)userID success:(void (^)(TAPUserModel *blockedUser))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIUnblockUser:(NSString *)userID success:(void (^)(BOOL isSuccess))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetBlockedUserList:(void (^)(NSArray<TAPUserModel *> *blockedUserList))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetBlockedUserIDs:(void (^)(NSArray<NSString *> *blockedUserIDs))success failure:(void (^)(NSError *error))failure;
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 
 

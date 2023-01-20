@@ -461,15 +461,45 @@
                                     <constraint firstAttribute="width" id="qhr-uA-R4f"/>
                                 </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XPX-tT-m76" userLabel="Read Counter View">
+                                <rect key="frame" x="66" y="175" width="4" height="14"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dHf-5e-72u">
+                                        <rect key="frame" x="4" y="0.0" width="0.0" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="BcV-7D-UDI"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconReadCount" translatesAutoresizingMaskIntoConstraints="NO" id="1ue-4g-YMZ">
+                                        <rect key="frame" x="2" y="2" width="0.0" height="10"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" id="EEC-t0-MeX"/>
+                                            <constraint firstAttribute="height" constant="10" id="y09-8b-FKe"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="1ue-4g-YMZ" firstAttribute="centerY" secondItem="dHf-5e-72u" secondAttribute="centerY" id="Ru0-eo-PtU"/>
+                                    <constraint firstItem="dHf-5e-72u" firstAttribute="leading" secondItem="1ue-4g-YMZ" secondAttribute="trailing" constant="2" id="Sok-xS-CBX"/>
+                                    <constraint firstItem="1ue-4g-YMZ" firstAttribute="leading" secondItem="XPX-tT-m76" secondAttribute="leading" constant="2" id="fMu-Xm-dr4"/>
+                                    <constraint firstAttribute="trailing" secondItem="dHf-5e-72u" secondAttribute="trailing" id="kc6-E3-qad"/>
+                                    <constraint firstAttribute="height" constant="14" id="rSA-Z3-piB"/>
+                                    <constraint firstItem="dHf-5e-72u" firstAttribute="centerY" secondItem="XPX-tT-m76" secondAttribute="centerY" id="xGQ-Np-Kuh"/>
+                                </constraints>
+                            </view>
                             <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconPinRightBubble" translatesAutoresizingMaskIntoConstraints="NO" id="wSs-yc-JZa">
-                                <rect key="frame" x="70" y="176" width="0.0" height="10"/>
+                                <rect key="frame" x="59" y="176" width="0.0" height="10"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="Axz-zw-MTJ"/>
                                     <constraint firstAttribute="width" id="YB0-lb-loc"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s6J-ha-p5U">
-                                <rect key="frame" x="10" y="177" width="60" height="10"/>
+                                <rect key="frame" x="10" y="177" width="49" height="10"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="nff-fI-Lgg"/>
@@ -486,6 +516,7 @@
                         <accessibility key="accessibilityConfiguration" identifier="BubbleView"/>
                         <constraints>
                             <constraint firstItem="vEX-Dr-1w5" firstAttribute="trailing" secondItem="E2X-dW-cLO" secondAttribute="trailing" id="1mK-Ab-ICh"/>
+                            <constraint firstItem="U3L-6i-L1k" firstAttribute="leading" secondItem="XPX-tT-m76" secondAttribute="trailing" id="4HI-Uj-wBs"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="63v-7G-nQv"/>
                             <constraint firstItem="jYS-q2-Z1T" firstAttribute="top" secondItem="mMI-m8-7pV" secondAttribute="top" constant="10" id="8Dg-iV-c88"/>
                             <constraint firstItem="U3L-6i-L1k" firstAttribute="centerY" secondItem="tmH-Fj-gvR" secondAttribute="centerY" id="8kR-ju-Y4d"/>
@@ -520,12 +551,13 @@
                             <constraint firstItem="vEX-Dr-1w5" firstAttribute="leading" secondItem="Kq0-KU-pfc" secondAttribute="trailing" constant="8" id="oB8-vM-oj7"/>
                             <constraint firstAttribute="trailing" secondItem="RFn-yn-K8a" secondAttribute="trailing" constant="10" id="p8n-np-f56"/>
                             <constraint firstItem="njX-Xn-ryd" firstAttribute="top" secondItem="FlI-Gs-6fs" secondAttribute="top" id="q7e-4B-HJB"/>
+                            <constraint firstItem="tmH-Fj-gvR" firstAttribute="centerY" secondItem="XPX-tT-m76" secondAttribute="centerY" id="tKi-Qh-oeh"/>
                             <constraint firstItem="wSs-yc-JZa" firstAttribute="leading" secondItem="s6J-ha-p5U" secondAttribute="trailing" id="u5J-DZ-RWr"/>
                             <constraint firstAttribute="bottom" secondItem="RFn-yn-K8a" secondAttribute="bottom" constant="10" id="uZ7-xh-blo"/>
                             <constraint firstItem="E2X-dW-cLO" firstAttribute="bottom" secondItem="FlI-Gs-6fs" secondAttribute="bottom" id="w1c-vy-KWP"/>
                             <constraint firstAttribute="trailing" secondItem="tmH-Fj-gvR" secondAttribute="trailing" constant="30" id="xVR-cy-95z"/>
                             <constraint firstItem="njX-Xn-ryd" firstAttribute="leading" secondItem="Kq0-KU-pfc" secondAttribute="trailing" constant="8" id="xe4-Nd-kn1"/>
-                            <constraint firstItem="U3L-6i-L1k" firstAttribute="leading" secondItem="wSs-yc-JZa" secondAttribute="trailing" id="yjB-EB-YPy"/>
+                            <constraint firstItem="XPX-tT-m76" firstAttribute="leading" secondItem="wSs-yc-JZa" secondAttribute="trailing" constant="7" id="yjB-EB-YPy"/>
                             <constraint firstItem="wSs-yc-JZa" firstAttribute="centerY" secondItem="RFn-yn-K8a" secondAttribute="centerY" id="z6W-6d-RlD"/>
                             <constraint firstItem="Kq0-KU-pfc" firstAttribute="top" secondItem="lEj-bl-Ggt" secondAttribute="bottom" constant="8" id="zP5-Qd-Ueb"/>
                         </constraints>
@@ -668,6 +700,9 @@
                 <outlet property="forwardTitleLabelLeadingConstraint" destination="KbS-Xg-hoC" id="2py-sW-7KP"/>
                 <outlet property="forwardTitleLabelTopConstraint" destination="8Dg-iV-c88" id="cuH-V2-JTL"/>
                 <outlet property="innerBackgroundView" destination="dSd-lP-mNr" id="l6E-6A-tyy"/>
+                <outlet property="messageCounterImageWidthConstraint" destination="EEC-t0-MeX" id="sgD-ge-lFq"/>
+                <outlet property="messageReadCounterLabel" destination="dHf-5e-72u" id="hR8-gS-Ioi"/>
+                <outlet property="messageReadcounterImageView" destination="1ue-4g-YMZ" id="gqK-Jw-kAH"/>
                 <outlet property="pinIconImageView" destination="wSs-yc-JZa" id="p1S-pz-DtA"/>
                 <outlet property="pinIconTrailingConstraint" destination="yjB-EB-YPy" id="XaL-M8-LaZ"/>
                 <outlet property="pinIconWidthConstraint" destination="YB0-lb-loc" id="8q4-be-XyI"/>
@@ -730,6 +765,7 @@
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconDownload" width="24" height="24"/>
         <image name="TAPIconPinRightBubble" width="9" height="9"/>
+        <image name="TAPIconReadCount" width="14" height="14"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconRetryChat" width="22" height="22"/>
         <image name="TAPIconSending" width="20" height="20"/>

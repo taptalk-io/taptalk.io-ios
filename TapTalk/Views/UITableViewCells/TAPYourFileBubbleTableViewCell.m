@@ -64,7 +64,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
 @property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
 @property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
-
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIView *messageReadCounterView;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadCounterImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -107,10 +109,12 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
-
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageCounterImageWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
+@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
 
@@ -227,6 +231,10 @@
     self.panGestureRecognizer.delegate = self;
     [self.contentView addGestureRecognizer:self.panGestureRecognizer];
     
+    _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewTap:)];
+    [self.contentView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
+    
     [self showQuoteView:NO];
     [self showForwardView:NO];
     
@@ -259,6 +267,7 @@
     _syncProgressSubView = nil;
     
     self.starIconImageView.alpha = 0.0f;
+    self.starIconWidthConstraint.constant = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
     self.senderImageViewLeadingConstraint.constant = 16.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
@@ -267,11 +276,12 @@
     self.bubbleHighlightView.alpha = 0.0f;
     
     self.statusLabelBottomConstraint.constant = 10.0f;
-    
+    self.messageReadCounterView.alpha = 0.0f;
     self.pinIconImageView.alpha = 0.0f;
     self.pinIconWidthConstraint.constant = 0.0f;
     
     [self showSenderInfo:NO];
+    [self showMessageReadCounterWithNumber:NO readCount:0];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -489,6 +499,9 @@
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
     
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
+    
     UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownloadWhite]];
     self.cancelImageView.image = abortImage;
@@ -505,6 +518,8 @@
     UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownloadWhite]];
     self.downloadImageView.image = downloadImage;
+    
+    self.messageReadCounterImageView.image = [ self.messageReadCounterImageView.image setImageTintColor:[TAPUtil getColor:@"DADADA"]];
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -1324,9 +1339,11 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
+        self.starIconWidthConstraint.constant = 10.0f;
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+        self.starIconWidthConstraint.constant = 0.0f;
     }
 }
 
@@ -1376,6 +1393,23 @@
     self.redirectArrowButton.alpha = 0.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageCounterImageWidthConstraint.constant = 10.0f;
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadCounterView.alpha = 1.0f;
+        self.messageReadCounterImageView.alpha = 1.0f;
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageCounterImageWidthConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadCounterView.alpha = 0.0f;
+        self.messageReadCounterImageView.alpha = 0.0f;
     }
 }
 

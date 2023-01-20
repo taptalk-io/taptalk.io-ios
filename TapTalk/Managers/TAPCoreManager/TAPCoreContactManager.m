@@ -8,7 +8,7 @@
 
 #import "TAPCoreContactManager.h"
 
-@interface TAPCoreContactManager ()
+@interface TAPCoreContactManager () <TAPChatManagerDelegate>
 
 @end
 
@@ -44,12 +44,54 @@
     
 }
 
+#pragma mark - TAPChatManagerDelegate
+- (void)chatManagerDidReceiveBlockUser:(TAPUserModel *)user {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidBlockContact:)]) {
+        [self.delegate tapTalkDidBlockContact:user];
+    }
+}
+
+- (void)chatManagerDidReceiveUnblockUser:(TAPUserModel *)user {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidUnblockContact:)]) {
+        [self.delegate tapTalkDidUnblockContact:user];
+    }
+}
+
 #pragma mark - Custom Method
 - (void)getAllUserContactsWithSuccess:(void (^)(NSArray <TAPUserModel *>*userArray))success
                               failure:(void (^)(NSError *error))failure {
     [TAPDataManager getDatabaseAllContactSortBy:@"fullname" success:^(NSArray *resultArray) {
         success(resultArray);
     } failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
+    }];
+}
+
+- (void)fetchAllUserContactsFromServerWithSuccess:(void (^)(NSArray <TAPUserModel *>*userArray))success
+                                          failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetContactList:^(NSArray *responseContacts) {
+        NSMutableArray<NSString *> *contactIDs = [NSMutableArray array];
+        for (TAPUserModel *user in responseContacts) {
+            [contactIDs addObject:user.userID];
+        }
+        [self getAllUserContactsWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull localContacts) {
+            NSMutableArray<TAPUserModel *> *updatedContacts = [responseContacts mutableCopy];
+            for (TAPUserModel *user in localContacts) {
+                if (![contactIDs containsObject:user.userID]) {
+                    user.isContact = NO;
+                    [updatedContacts addObject:user];
+                }
+            }
+            [[TAPContactManager sharedManager] addContactWithUserArray:updatedContacts saveToDatabase:YES];
+            success(responseContacts);
+        }
+        failure:^(NSError * _Nonnull error) {
+            success(responseContacts);
+        }];
+    }
+    failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
     }];
@@ -164,4 +206,100 @@
     }];
 }
 
+- (void)getGroupsInCommon:(NSString *)userID
+                    success:(void (^)(NSArray<TAPRoomModel *> *groupRooms))success
+                    failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetGroupsInCommon:userID success:^(NSMutableArray<TAPRoomModel *> *groupsInCommonRoom) {
+        success(groupsInCommonRoom);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)blockUserWithUserID:(NSString *)userID
+                    success:(void (^)(TAPUserModel *blockedUser))success
+                    failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIBlockUser:userID success:^(TAPUserModel *blockedUser) {
+        [[TAPContactManager sharedManager] removeFromContactsWithUserID:userID];
+        if ([self.delegate respondsToSelector:@selector(tapTalkDidBlockContact:)]) {
+            [self.delegate tapTalkDidBlockContact:blockedUser];
+        }
+        success(blockedUser);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)unblockUserWithUserID:(NSString *)userID
+                      success:(void (^)(TAPUserModel *unblockedUser))success
+                      failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIUnblockUser:userID success:^(BOOL isSuccess) {
+        [self fetchAllUserContactsFromServerWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull userArray) {
+            [self finishUnblockUser:userID success:success];
+        }
+        failure:^(NSError * _Nonnull error) {
+            [self finishUnblockUser:userID success:success];
+        }];
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)finishUnblockUser:(NSString *)userID
+                  success:(void (^)(TAPUserModel *unblockedUser))success {
+    
+    TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:userID];
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidUnblockContact:)]) {
+        [self.delegate tapTalkDidUnblockContact:user];
+    }
+    success(user);
+}
+
+- (void)getBlockedUserList:(void (^)(NSArray<TAPUserModel *> *blockedUserList))success
+                    failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetBlockedUserList:^(NSArray<TAPUserModel *> *blockedUserList) {
+        success(blockedUserList);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getBlockedUserIDs:(void (^)(NSArray<NSString *> *blockedUserIDs))success
+                    failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetBlockedUserIDs:^(NSArray<NSString *> *blockedUserIDs) {
+        success(blockedUserIDs);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)reportUser:(NSString *)userID
+          category:(NSString *)category
+   isOtherCategory:(BOOL)isOtherCategory
+            reason:(NSString *)reason
+           success:(void (^)(BOOL isSuccess))success
+           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIReportUser:userID category:category isOtherCategory:isOtherCategory reason:reason success:^(BOOL isSuccess) {
+        success(isSuccess);
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)reportMessage:(NSString *)messageID
+               roomID:(NSString *)roomID
+          category:(NSString *)category
+   isOtherCategory:(BOOL)isOtherCategory
+            reason:(NSString *)reason
+           success:(void (^)(BOOL isSuccess))success
+           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIReportMessage:messageID roomID:roomID category:category isOtherCategory:isOtherCategory reason:reason success:^(BOOL isSuccess) {
+        success(isSuccess);
+    } failure:^(NSError *error) {
+        
+    }];
+}
 @end

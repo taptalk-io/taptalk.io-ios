@@ -103,9 +103,12 @@
         [self showCustomCancelButton];
         [self.createGroupView setTapCreateGroupViewType:TAPCreateGroupViewTypeAddMember];
         _roomParticipantsDictionary = [[NSMutableDictionary alloc] init];
-        for (TAPUserModel *user in self.room.participants) {
-            [self.roomParticipantsDictionary setObject:user forKey:user.userID];
-        }
+       // NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+        //for (TAPUserModel *user in self.room.participants) {
+          //  if(![blockedUserIDs containsObject:user.userID]) {
+          //      [self.roomParticipantsDictionary setObject:user forKey:user.userID];
+          //  }
+       // }
         [self loadContactListFromDatabase];
         self.createGroupView.searchBarView.customPlaceHolderString = NSLocalizedStringFromTableInBundle(@"Search for users", nil, [TAPUtil currentBundle], @"");
       
@@ -1349,8 +1352,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             //filter added user in group
             NSMutableArray *filteredArray = [NSMutableArray array];
+            NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
             for (TAPUserModel *user in resultArray) {
-                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil) {
+                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil && ![blockedUserIDs containsObject:user.userID]) {
                     [filteredArray addObject:user];
                 }
             }
@@ -1559,7 +1563,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //filter added user in group
             NSMutableArray *filteredArray = [NSMutableArray array];
             for (TAPUserModel *user in resultArray) {
-                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil) {
+                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil && ![[TAPDataManager getBlockedUserIDs] containsObject:user.userID]) {
                     [filteredArray addObject:user];
                 }
             }
@@ -1676,13 +1680,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         
         isDoneSearchNonContactUserFromDatabase = YES;
-        self.searchResultNonContactUserMutableArray = resultArray;
+       // self.searchResultNonContactUserMutableArray = resultArray;
         
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             //filter added user in group
             NSMutableArray *filteredArray = [NSMutableArray array];
             for (TAPUserModel *user in resultArray) {
-                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil) {
+                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil && ![[TAPDataManager getBlockedUserIDs] containsObject:user.userID]) {
+                    [filteredArray addObject:user];
+                }
+            }
+            self.searchResultNonContactUserMutableArray = filteredArray;
+        }
+        else {
+            NSMutableArray *filteredArray = [NSMutableArray array];
+            for (TAPUserModel *user in resultArray) {
+                if (![[TAPDataManager getBlockedUserIDs] containsObject:user.userID]) {
                     [filteredArray addObject:user];
                 }
             }
@@ -1740,7 +1753,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                             return;
                         }
                         
-                        [self.searchResultNonContactUserMutableArray addObject:user];
+                        if(![[TAPDataManager getBlockedUserIDs] containsObject:user.userID]) {
+                            [self.searchResultNonContactUserMutableArray addObject:user];
+                        }
+                        
                         [self.createGroupView.searchResultTableView reloadData];
                         [self.createGroupView showOverlayView:NO];
                         [UIView animateWithDuration:0.2f animations:^{

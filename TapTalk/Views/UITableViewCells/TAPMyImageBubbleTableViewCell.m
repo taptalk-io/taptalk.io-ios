@@ -52,6 +52,11 @@
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconBottomImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadCounterImageView;
+
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadCounterBoxImageView;
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterBoxLabel;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconBottomConstraint;
@@ -102,6 +107,8 @@
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingContsraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageReadCounterImageViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageReadCounterBoxImageViewWidthConstraint;
 
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewConstraintHeight;
@@ -335,6 +342,7 @@
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
+    [self showMessageReadCounterWithNumber:NO readCount:0];
 }
 
 #pragma mark - ZSWTappedLabelDelegate
@@ -458,6 +466,9 @@
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
     [super handleBubbleViewTap:recognizer];
     NSLog(@"tapped");
+    if ([self.delegate respondsToSelector:@selector(myImageBubbleDidTappedWithMessage:)]) {
+        [self.delegate myImageBubbleDidTappedWithMessage:self.message];
+    }
  //   if ([self.delegate respondsToSelector:@selector(myChatBubbleViewDidTapped:)]) {
   //      [self.delegate myChatBubbleViewDidTapped:self.message];
    // }
@@ -651,6 +662,12 @@
     UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownloadWhite]];
     self.downloadImageView.image = downloadImage;
+    
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
+
+    self.messageReadCounterBoxLabel.textColor = imageTimestampLabelColor;
+    self.messageReadCounterBoxLabel.font = imageTimestampLabelFont;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -2026,6 +2043,52 @@
         self.pinIconBottomTrailingConstraint.constant = 0.0f;
         self.pinIconBottomImageView.alpha = 0.0f;
         self.pinIconBottomWidthConstraint.constant = 0.0f;
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageReadCounterImageViewWidthConstraint.constant = 10.0f;
+        if (self.pinIconImageView.alpha == 1.0f) {
+          //  self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+           // self.pinIconTrailingConstraint.constant = 0.0f;
+        }
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadCounterImageView.alpha = 1.0f;
+        
+        self.messageReadCounterBoxLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageReadCounterBoxImageViewWidthConstraint.constant = 10.0f;
+        self.messageReadCounterBoxLabel.alpha = 1.0f;
+        self.messageReadCounterBoxImageView.alpha = 1.0f;
+        
+        
+        
+        if(self.imageTimestampStatusContainerView.alpha < 1){
+            
+        }
+        else{
+            self.messageReadCounterLabel.text = @"";
+            self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
+           // self.pinIconTrailingConstraint.constant = 0.0f;
+            self.messageReadCounterLabel.alpha = 0.0f;
+            self.messageReadCounterImageView.alpha = 0.0f;
+        }
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
+       // self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadCounterImageView.alpha = 0.0f;
+        
+        self.messageReadCounterBoxLabel.text = @"";
+        self.messageReadCounterBoxImageViewWidthConstraint.constant = 0.0f;
+       // self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterBoxLabel.alpha = 0.0f;
+        self.messageReadCounterBoxImageView.alpha = 0.0f;
     }
 }
 

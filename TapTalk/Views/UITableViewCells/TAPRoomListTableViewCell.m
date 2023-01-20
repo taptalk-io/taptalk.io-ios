@@ -304,9 +304,10 @@
          if([message.room.deleted longValue] != 0) {
              profileImageURL = @"";
          }
-         else if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+         else if (obtainedUser != nil) {
              profileImageURL = obtainedUser.imageURL.thumbnail;
              profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+             
          }
          else {
              profileImageURL = message.room.imageURL.thumbnail;

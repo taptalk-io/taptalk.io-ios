@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yourImageLongPressedPhoneNumber:(NSString *)phoneNumber
                          originalString:(NSString*)originalString;
 - (void)yourImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)yourImageBubbleTappedWithMessage:(TAPMessageModel *)message;
 - (void)yourImageBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
 - (void)yourImageBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage;
 - (void)yourImageBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
@@ -69,6 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
 - (void)showPinIcon:(BOOL)isShow;
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount;
 
 @end
 

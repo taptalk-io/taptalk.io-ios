@@ -30,7 +30,7 @@
 @property (strong, nonatomic) TAPAddNewChatView *addNewChatView;
 
 @property (strong, nonatomic) NSArray *alphabetSectionTitles;
-@property (strong, nonatomic) NSArray *contactListArray;
+@property (strong, nonatomic) NSMutableArray *contactListArray;
 @property (strong, nonatomic) NSMutableArray *searchResultUserMutableArray;
 @property (strong, nonatomic) NSMutableArray *filledMenuOptionArray;
 
@@ -80,9 +80,9 @@
     _alphabetSectionTitles = [NSArray arrayWithObjects:@"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N", @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z", nil];
     
     //Refresh Contact List From API
-    [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
+    [[TAPCoreContactManager sharedManager] fetchAllUserContactsFromServerWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull userArray) {
         [self loadContactListFromDatabase];
-    } failure:^(NSError *error) {
+    } failure:^(NSError * _Nonnull error) {
     }];
     
     _searchResultUserMutableArray = [NSMutableArray array];
@@ -662,35 +662,42 @@
         _indexSectionDictionary = [NSMutableDictionary dictionary];
         _contactListDictionary = [NSMutableDictionary dictionary];
         self.contactListArray = resultArray;
+        NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
         for (TAPUserModel *user in self.contactListArray) {
-            NSString *username = user.username;
-            [self.contactListDictionary setValue:user forKey:username];
-            
-            NSString *nameString = user.fullname;
-            if (![TAPUtil isEmptyString:nameString]) {
-                NSString *firstAlphabet = [[nameString substringWithRange:NSMakeRange(0, 1)] uppercaseString];
-                if ([self.alphabetSectionTitles containsObject:firstAlphabet]) {
-                    if ([self.indexSectionDictionary objectForKey:firstAlphabet] == nil) {
-                        //No alphabet found
-                        [self.indexSectionDictionary setObject:[NSArray arrayWithObjects:user, nil] forKey:firstAlphabet];
+            if([blockedUserIDs containsObject:user.userID]) {
+              //  [self.contactListArray removeObject:user];
+                //return;
+            }
+            else {
+                NSString *username = user.username;
+                [self.contactListDictionary setValue:user forKey:username];
+                
+                NSString *nameString = user.fullname;
+                if (![TAPUtil isEmptyString:nameString]) {
+                    NSString *firstAlphabet = [[nameString substringWithRange:NSMakeRange(0, 1)] uppercaseString];
+                    if ([self.alphabetSectionTitles containsObject:firstAlphabet]) {
+                        if ([self.indexSectionDictionary objectForKey:firstAlphabet] == nil) {
+                            //No alphabet found
+                            [self.indexSectionDictionary setObject:[NSArray arrayWithObjects:user, nil] forKey:firstAlphabet];
+                        }
+                        else {
+                            //Alphabet found
+                            NSMutableArray *contactArray = [[self.indexSectionDictionary objectForKey:firstAlphabet] mutableCopy];
+                            [contactArray addObject:user];
+                            [self.indexSectionDictionary setObject:contactArray forKey:firstAlphabet];
+                        }
                     }
                     else {
-                        //Alphabet found
-                        NSMutableArray *contactArray = [[self.indexSectionDictionary objectForKey:firstAlphabet] mutableCopy];
-                        [contactArray addObject:user];
-                        [self.indexSectionDictionary setObject:contactArray forKey:firstAlphabet];
-                    }
-                }
-                else {
-                    if ([self.indexSectionDictionary objectForKey:@"#"] == nil) {
-                        //No alphabet found
-                        [self.indexSectionDictionary setObject:[NSArray arrayWithObjects:user, nil] forKey:firstAlphabet];
-                    }
-                    else {
-                        //Alphabet found
-                        NSMutableArray *contactArray = [[self.indexSectionDictionary objectForKey:@"#"] mutableCopy];
-                        [contactArray addObject:user];
-                        [self.indexSectionDictionary setObject:contactArray forKey:firstAlphabet];
+                        if ([self.indexSectionDictionary objectForKey:@"#"] == nil) {
+                            //No alphabet found
+                            [self.indexSectionDictionary setObject:[NSArray arrayWithObjects:user, nil] forKey:firstAlphabet];
+                        }
+                        else {
+                            //Alphabet found
+                            NSMutableArray *contactArray = [[self.indexSectionDictionary objectForKey:@"#"] mutableCopy];
+                            [contactArray addObject:user];
+                            [self.indexSectionDictionary setObject:contactArray forKey:firstAlphabet];
+                        }
                     }
                 }
             }

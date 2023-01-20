@@ -55,8 +55,8 @@
     
     [TAPDataManager callAPIAddContactWithUserID:self.searchedUser.userID success:^(NSString *message, TAPUserModel *user) {        
         //Refresh Contact List From API
-        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-        } failure:^(NSError *error) {
+        [[TAPCoreContactManager sharedManager] fetchAllUserContactsFromServerWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull userArray) {
+        } failure:^(NSError * _Nonnull error) {
         }];
         
     } failure:^(NSError *error) {

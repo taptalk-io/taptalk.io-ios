@@ -22,6 +22,9 @@
 @property (strong, nonatomic) UILabel *adminIndicatorLabel;
 @property (strong, nonatomic) UIView *separatorView;
 
+@property (strong, nonatomic) UILabel *deliveredToLabel;
+@property (strong, nonatomic) UILabel *readByLabel;
+
 @property (strong, nonatomic) UIView *nonSelectedView;
 @property (strong, nonatomic) UIImageView *selectedImageView;
 
@@ -105,6 +108,21 @@
         self.selectedImageView.alpha = 0.0f;
         self.selectedImageView.center = self.nonSelectedView.center;
         [self.bgView addSubview:self.selectedImageView];
+        
+        CGFloat deliveredToWidth = 80.0f;
+        CGFloat deliveredToHeight = 16.0f;
+        UIFont *deliveredToFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomDeliveredToLabel];
+        _deliveredToLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - deliveredToWidth - 12.0f, (CGRectGetHeight(self.bgView.frame) - deliveredToHeight) /2, deliveredToWidth, 16.0f)];
+        self.deliveredToLabel.text = @"dwedw";
+        self.deliveredToLabel.font = deliveredToFont;
+        self.deliveredToLabel.alpha = 0.0f;
+        [self.bgView addSubview:self.deliveredToLabel];
+        
+        _readByLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.bgView.frame) - deliveredToWidth - 12.0f, (CGRectGetHeight(self.bgView.frame) - deliveredToHeight) /2, deliveredToWidth, 16.0f)];
+        self.readByLabel.text = @"dwedw";
+        self.readByLabel.font = deliveredToFont;
+        self.readByLabel.alpha = 0.0f;
+        [self.bgView addSubview:self.readByLabel];
         
         [self showAdminIndicator:NO];
     }
@@ -190,6 +208,81 @@
     }
 }
 
+- (void)setContactTableViewCellWithRoom:(TAPRoomModel *)room {
+    if (room.roomID != nil) {
+        NSString *contactName = room.name;
+        contactName = [TAPUtil nullToEmptyString:contactName];
+        
+        NSString *usernameString = room.name;
+        usernameString = [TAPUtil nullToEmptyString:usernameString];
+        NSString *contactUsername = [NSString stringWithFormat:@"@%@", usernameString];
+
+        NSString *imageURL = room.imageURL.fullsize;
+        if (imageURL == nil || [imageURL isEqualToString:@""]) {
+            if(room.deleted.longValue > 0){
+                //set deleted account profil pict
+                self.initialNameView.alpha = 1.0f;
+                self.contactImageView.alpha = 1.0f;
+                self.initialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                self.initialNameLabel.text = @"";
+                self.contactImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            }
+            else{
+                //No photo found, get the initial
+                self.initialNameView.alpha = 1.0f;
+                self.contactImageView.alpha = 0.0f;
+                self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:contactName];
+                self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:contactName isGroup:NO];
+            }
+        }
+        else {
+            self.initialNameView.alpha = 0.0f;
+            self.contactImageView.alpha = 1.0f;
+            [self.contactImageView setImageWithURLString:imageURL];
+        }
+        
+        if (room.type == RoomTypeGroup || room.type == RoomTypeChannel ||  room.type == RoomTypeTransaction) {
+            //Group / Channel
+            self.expertLogoImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.expertLogoImageView.alpha = 1.0f;
+        }
+        
+        NSMutableDictionary *contactNameAttributesDictionary = [NSMutableDictionary dictionary];
+        CGFloat contactNameLetterSpacing = -0.2f;
+        [contactNameAttributesDictionary setObject:@(contactNameLetterSpacing) forKey:NSKernAttributeName];
+        NSMutableAttributedString *contactNameAttributedString = [[NSMutableAttributedString alloc] initWithString:contactName];
+        [contactNameAttributedString addAttributes:contactNameAttributesDictionary
+                                             range:NSMakeRange(0, [contactName length])];
+        self.contactNameLabel.attributedText = contactNameAttributedString;
+        
+        NSMutableDictionary *contactUsernameAttributesDictionary = [NSMutableDictionary dictionary];
+        CGFloat contactUsernameLetterSpacing = -0.2f;
+        [contactUsernameAttributesDictionary setObject:@(contactUsernameLetterSpacing) forKey:NSKernAttributeName];
+        NSMutableAttributedString *contactUsernameAttributedString = [[NSMutableAttributedString alloc] initWithString:contactUsername];
+        [contactUsernameAttributedString addAttributes:contactUsernameAttributesDictionary
+                                                 range:NSMakeRange(0, [contactUsername length])];
+        self.usernameLabel.attributedText = contactUsernameAttributedString;
+    }
+    
+    if (self.contactTableViewCellType == TAPContactTableViewCellTypeWithUsername) {
+        if (room.name == nil || [room.name isEqualToString:@""]) {
+            //Set UI to cell without username because username is empty even the type is with username
+            self.usernameLabel.alpha = 0.0f;
+            self.bgView.frame = CGRectMake(CGRectGetMinX(self.bgView.frame), CGRectGetMinY(self.bgView.frame), CGRectGetWidth(self.bgView.frame), 64.0f);
+            self.contactImageView.frame = CGRectMake(CGRectGetMinX(self.contactImageView.frame), CGRectGetMinY(self.contactImageView.frame), CGRectGetWidth(self.contactImageView.frame), CGRectGetHeight(self.contactImageView.frame));
+            self.expertLogoImageView.frame = CGRectMake(CGRectGetMinX(self.expertLogoImageView.frame), CGRectGetMaxY(self.contactImageView.frame) - 22.0f, 22.0f, 22.0f);
+            self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), 15.0f, CGRectGetWidth(self.contactNameLabel.frame), 34.0f);
+            self.usernameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.usernameLabel.frame), 0.0f);
+        }
+        else {
+            self.usernameLabel.alpha = 1.0f;
+        }
+    }
+    else {
+        self.usernameLabel.alpha = 0.0f;
+    }
+}
+
 - (void)isRequireSelection:(BOOL)isRequired {
     if (isRequired) {
         //resize
@@ -211,6 +304,19 @@
     else {
         self.nonSelectedView.alpha = 1.0f;
         self.selectedImageView.alpha = 0.0f;
+    }
+}
+
+- (void)showBlockedContactIcon:(BOOL)isShow {
+    self.selectedImageView.image = [UIImage imageNamed:@"TAPIconMinusCircle" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.selectedImageView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 24.0f - 16.0f, 20.0f, 24.0f, 24.0f);
+    if(isShow) {
+        self.selectedImageView.alpha = 1.0f;
+        [self isRequireSelection:YES];
+    }
+    else {
+        self.selectedImageView.alpha = 0.0f;
+        [self isRequireSelection:NO];
     }
 }
 
@@ -241,6 +347,63 @@
         self.contactNameLabel.frame = CGRectMake(CGRectGetMaxX(self.contactImageView.frame) + 8.0f, 0.0f, CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetMaxX(self.contactImageView.frame) + 8.0f), CGRectGetHeight(self.bgView.frame));
         self.adminIndicatorLabel.frame = CGRectMake(CGRectGetMaxX(self.contactImageView.frame) + 8.0f, CGRectGetMaxY(self.contactNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 16.0f - (CGRectGetMaxX(self.contactImageView.frame) + 8.0f), 20.0f);
     }
+}
+
+- (void)showDeliveredTo:(NSString *)deliveredTime {
+    self.deliveredToLabel.text = [NSString stringWithFormat:@"delivered %@", deliveredTime];
+    [self.deliveredToLabel sizeToFit];
+    CGFloat deliveredToWidth = CGRectGetWidth(self.deliveredToLabel.frame);
+    CGFloat deliveredToHeight = CGRectGetHeight(self.deliveredToLabel.frame);
+    self.deliveredToLabel.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - deliveredToWidth - 12.0f, (CGRectGetHeight(self.bgView.frame) - deliveredToHeight) /2, deliveredToWidth, 16.0f);
+    self.deliveredToLabel.alpha = 1.0f;
+    self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMinY(self.contactNameLabel.frame), CGRectGetWidth(self.contactNameLabel.frame) - deliveredToWidth, CGRectGetHeight(self.contactNameLabel.frame));
+    
+    NSArray *deliveredTimerray = [deliveredTime componentsSeparatedByString:@"•"];
+    NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithString:self.deliveredToLabel.text];
+    NSString *deliveredTimeString = [deliveredTimerray objectAtIndex:1];
+    NSRange opsionalStringRange = [self.deliveredToLabel.text rangeOfString:deliveredTimeString];
+    UIFont *timeFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaListInfoLabel];
+    [mutableAttributedString addAttribute:NSFontAttributeName
+                                    value:timeFont
+                                    range:opsionalStringRange];
+    self.deliveredToLabel.attributedText = mutableAttributedString;
+}
+
+- (void)showReadBy:(NSString *)deliveredTime readTime:(NSString *)readTime {
+    self.deliveredToLabel.text = [NSString stringWithFormat:@"delivered %@", deliveredTime];
+    [self.deliveredToLabel sizeToFit];
+    CGFloat deliveredToWidth = CGRectGetWidth(self.deliveredToLabel.frame);
+    CGFloat deliveredToHeight = CGRectGetHeight(self.deliveredToLabel.frame);
+    self.deliveredToLabel.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - deliveredToWidth - 12.0f, CGRectGetHeight(self.bgView.frame) - deliveredToHeight - 12.0f, deliveredToWidth, 16.0f);
+    self.deliveredToLabel.alpha = 1.0f;
+    
+    self.readByLabel.text = [NSString stringWithFormat:@"read %@", readTime];
+    [self.readByLabel sizeToFit];
+    CGFloat readToWidth = CGRectGetWidth(self.readByLabel.frame);
+    self.readByLabel.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - readToWidth - 12.0f, 12.0f, readToWidth, 16.0f);
+    self.readByLabel.alpha = 1.0f;
+    
+    self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMinY(self.contactNameLabel.frame), CGRectGetWidth(self.contactNameLabel.frame) - deliveredToWidth, CGRectGetHeight(self.contactNameLabel.frame));
+    
+    
+    NSArray *deliveredTimerray = [deliveredTime componentsSeparatedByString:@"•"];
+    NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithString:self.deliveredToLabel.text];
+    NSString *deliveredTimeString = [deliveredTimerray objectAtIndex:1];
+    NSRange opsionalStringRange = [self.deliveredToLabel.text rangeOfString:deliveredTimeString];
+    UIFont *timeFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontMediaListInfoLabel];
+    [mutableAttributedString addAttribute:NSFontAttributeName
+                                    value:timeFont
+                                    range:opsionalStringRange];
+    self.deliveredToLabel.attributedText = mutableAttributedString;
+    
+    NSArray *readbyTimerray = [readTime componentsSeparatedByString:@"•"];
+    NSMutableAttributedString *mutableAttributedStringReadby = [[NSMutableAttributedString alloc] initWithString:self.readByLabel.text];
+    NSString *readbyTimeString = [readbyTimerray objectAtIndex:1];
+    NSRange readbyStringRange = [self.readByLabel.text rangeOfString:readbyTimeString];
+    [mutableAttributedStringReadby addAttribute:NSFontAttributeName
+                                    value:timeFont
+                                    range:readbyStringRange];
+    self.readByLabel.attributedText = mutableAttributedStringReadby;
 }
 
 - (void)resizeCell {

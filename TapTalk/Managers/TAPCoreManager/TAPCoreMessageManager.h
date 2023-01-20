@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "TAPScheduledMessageModel.h"
+#import "TapMessageRecipientModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -474,6 +475,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated
                            success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
                                    failure:(void (^)(NSError *error))failure;
+
+- (void)getMessageDetails:(NSString *)messageID
+                  success:(void (^)(TAPMessageModel *message, NSArray <TapMessageRecipientModel *> *deliveredTo, NSArray <TapMessageRecipientModel *> *readBy))success
+                  failure:(void (^)(NSError *error))failure;
+
+- (void)getMessageTotalRead:(NSString *)messageID
+                  success:(void (^)(NSInteger readCount))success
+                    failure:(void (^)(NSError *error))failure;
 
 @end
 

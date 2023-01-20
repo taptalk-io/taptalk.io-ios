@@ -301,8 +301,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/room/get_pinned_room_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-    
-
+    else if (type == TAPAPIManagerTypeGetGroupsInCommon) {
+        NSString *apiPath = @"client/room/groups_in_common";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     else if (type == TAPAPIManagerTypeMuteRoom) {
         NSString *apiPath = @"client/room/mute";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
@@ -347,7 +349,38 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/room/get_room_ids_with_state";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-    
+    else if (type == TAPAPIManagerTypeGetMessageDetails) {
+        NSString *apiPath = @"chat/message/get_details";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetMessageTotalRead) {
+        NSString *apiPath = @"chat/message/get_total_read";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeBlockUser) {
+        NSString *apiPath = @"client/contact/block";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnblockUser) {
+        NSString *apiPath = @"client/contact/unblock";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetBlockedUserList) {
+        NSString *apiPath = @"client/contact/get_blocked_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetBlockedUserIDs) {
+        NSString *apiPath = @"client/contact/get_blocked_user_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeReportUser) {
+        NSString *apiPath = @"client/chat_report/submit_user";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeReportMessage) {
+        NSString *apiPath = @"client/chat_report/submit_message";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }
 

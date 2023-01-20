@@ -31,6 +31,8 @@ typedef NS_ENUM(NSInteger, TAPProfileCollectionViewCellType) {
     profileCollectionViewCellTypeStarMessage = 18,
     profileCollectionViewCellTypeShareMedia = 19,
     profileCollectionViewCellTypeMute = 20,
+    profileCollectionViewCellTypeGroupInCommon = 22,
+    profileCollectionViewCellTypeUnblock = 21,
 };
 
 @interface TAPProfileCollectionViewCell : TAPBaseCollectionViewCell

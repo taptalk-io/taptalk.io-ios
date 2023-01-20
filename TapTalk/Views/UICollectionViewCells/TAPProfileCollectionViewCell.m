@@ -162,16 +162,16 @@
         
         self.rightIconImageView.alpha = 0.0f;
     }
-    else if (type == profileCollectionViewCellTypeBlock) {
+    else if (type == profileCollectionViewCellTypeBlock || type == profileCollectionViewCellTypeUnblock) {
         [self refreshPosition];
-        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconBlockUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuBlockUser]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
         
         self.switchButton.alpha = 0.0f;
         
-        if (isBlocked) {
+        if (type == profileCollectionViewCellTypeUnblock) {
             self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Unblock User", nil, [TAPUtil currentBundle], @"");
         }
         else {
@@ -292,7 +292,7 @@
     }
     else if (type == profileCollectionViewCellTypeReportUser) {
         [self refreshPosition];
-        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconReportUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
@@ -303,7 +303,7 @@
     }
     else if (type == profileCollectionViewCellTypeReportGroup) {
         [self refreshPosition];
-        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconReportUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
@@ -361,9 +361,20 @@
         self.infoLabel.text = @"dfderverv";
         self.infoLabel.textAlignment = NSTextAlignmentRight;
     }
+    else if (type == profileCollectionViewCellTypeGroupInCommon) {
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconGroupInCommon" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
+
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Groups in Common", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 1.0f;
+    }
     else if (type == profileCollectionViewCellTypeShareMedia) {
         [self refreshPosition];
-        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAttach" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAttachProfile" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
 
         self.titleLabel.textColor = titleLabelColor;

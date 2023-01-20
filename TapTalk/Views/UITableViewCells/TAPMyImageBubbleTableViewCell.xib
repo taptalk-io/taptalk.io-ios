@@ -351,7 +351,7 @@
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jLm-jf-65H">
-                                <rect key="frame" x="10" y="393.5" width="210" height="10"/>
+                                <rect key="frame" x="10" y="393.5" width="206" height="10"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="eH1-UD-Mc1"/>
@@ -371,11 +371,41 @@
                                     <constraint firstAttribute="width" id="Qq0-w7-cdd"/>
                                 </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uRf-aP-sab" userLabel="Read Counter View">
+                                <rect key="frame" x="216" y="392.5" width="4" height="14"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xwB-cW-WoY">
+                                        <rect key="frame" x="4" y="0.0" width="0.0" height="14"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="Uoh-UU-gkF"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconReadCount" translatesAutoresizingMaskIntoConstraints="NO" id="cfq-GO-4p1">
+                                        <rect key="frame" x="2" y="2" width="0.0" height="10"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="10" id="Zlc-1i-oiB"/>
+                                            <constraint firstAttribute="width" id="dbT-Vq-jB4"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="14" id="7Ly-8q-4rN"/>
+                                    <constraint firstItem="xwB-cW-WoY" firstAttribute="leading" secondItem="cfq-GO-4p1" secondAttribute="trailing" constant="2" id="TyC-B7-W7L"/>
+                                    <constraint firstItem="cfq-GO-4p1" firstAttribute="leading" secondItem="uRf-aP-sab" secondAttribute="leading" constant="2" id="eoT-zP-dbN"/>
+                                    <constraint firstAttribute="trailing" secondItem="xwB-cW-WoY" secondAttribute="trailing" id="klH-ld-Hqr"/>
+                                    <constraint firstItem="xwB-cW-WoY" firstAttribute="centerY" secondItem="uRf-aP-sab" secondAttribute="centerY" id="urz-fd-uzi"/>
+                                    <constraint firstItem="cfq-GO-4p1" firstAttribute="centerY" secondItem="xwB-cW-WoY" secondAttribute="centerY" id="vKk-rl-Rlp"/>
+                                </constraints>
+                            </view>
                             <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdu-OZ-86d" userLabel="Image Timestamp Status Container View">
-                                <rect key="frame" x="198" y="358.5" width="40" height="20"/>
+                                <rect key="frame" x="194" y="358.5" width="44" height="20"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SyL-fJ-cTB" userLabel="Image Timestamp Label">
-                                        <rect key="frame" x="12" y="2" width="0.0" height="16"/>
+                                        <rect key="frame" x="16" y="2" width="0.0" height="16"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="16" id="yvw-CG-tkG"/>
@@ -385,21 +415,51 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconStarChatBubble" translatesAutoresizingMaskIntoConstraints="NO" id="ylL-ae-F1l">
-                                        <rect key="frame" x="8" y="5" width="0.0" height="10"/>
+                                        <rect key="frame" x="12" y="5" width="0.0" height="10"/>
                                         <constraints>
                                             <constraint firstAttribute="width" id="ghl-rH-mCO"/>
                                             <constraint firstAttribute="height" constant="10" id="oIA-nz-nUa"/>
                                         </constraints>
                                     </imageView>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconPinRightBubble" translatesAutoresizingMaskIntoConstraints="NO" id="Bhc-8J-Oiy">
-                                        <rect key="frame" x="4" y="5" width="0.0" height="10"/>
+                                        <rect key="frame" x="8" y="5" width="0.0" height="10"/>
                                         <constraints>
                                             <constraint firstAttribute="width" id="Ase-xz-JzU"/>
                                             <constraint firstAttribute="height" constant="10" id="yDs-Ya-x4W"/>
                                         </constraints>
                                     </imageView>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nmu-5E-zMk" userLabel="Read Counter View">
+                                        <rect key="frame" x="4" y="3" width="4" height="14"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WNr-Sa-MKW">
+                                                <rect key="frame" x="4" y="0.0" width="0.0" height="14"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="14" id="zsz-GT-dVq"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconReadCount" translatesAutoresizingMaskIntoConstraints="NO" id="zna-aQ-mCr">
+                                                <rect key="frame" x="2" y="2" width="0.0" height="10"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" id="Mgq-dT-8Zq"/>
+                                                    <constraint firstAttribute="height" constant="10" id="yAx-AO-TnH"/>
+                                                </constraints>
+                                            </imageView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="WNr-Sa-MKW" firstAttribute="leading" secondItem="zna-aQ-mCr" secondAttribute="trailing" constant="2" id="2yS-fh-QFj"/>
+                                            <constraint firstItem="zna-aQ-mCr" firstAttribute="centerY" secondItem="WNr-Sa-MKW" secondAttribute="centerY" id="4Qt-bv-oV6"/>
+                                            <constraint firstAttribute="trailing" secondItem="WNr-Sa-MKW" secondAttribute="trailing" id="PA8-Eu-hkJ"/>
+                                            <constraint firstItem="zna-aQ-mCr" firstAttribute="leading" secondItem="nmu-5E-zMk" secondAttribute="leading" constant="2" id="ejv-Ka-yT4"/>
+                                            <constraint firstAttribute="height" constant="14" id="oOe-GO-iGl"/>
+                                            <constraint firstItem="WNr-Sa-MKW" firstAttribute="centerY" secondItem="nmu-5E-zMk" secondAttribute="centerY" id="peT-cV-pE1"/>
+                                        </constraints>
+                                    </view>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="m7x-WO-ppc" userLabel="Image Status Icon Image View">
-                                        <rect key="frame" x="16" y="3" width="16" height="14"/>
+                                        <rect key="frame" x="20" y="3" width="16" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="16" id="7z7-8P-9Yd"/>
                                             <constraint firstAttribute="height" constant="14" id="s6w-cn-MQJ"/>
@@ -410,14 +470,16 @@
                                 <constraints>
                                     <constraint firstItem="ylL-ae-F1l" firstAttribute="leading" secondItem="Bhc-8J-Oiy" secondAttribute="trailing" constant="4" id="44h-m9-llT"/>
                                     <constraint firstAttribute="bottom" secondItem="SyL-fJ-cTB" secondAttribute="bottom" constant="2" id="7nK-Z1-h0m"/>
-                                    <constraint firstItem="Bhc-8J-Oiy" firstAttribute="leading" secondItem="gdu-OZ-86d" secondAttribute="leading" constant="4" id="BaR-Ud-VZ6"/>
                                     <constraint firstAttribute="bottom" secondItem="m7x-WO-ppc" secondAttribute="bottom" constant="3" id="Dca-j0-auc"/>
                                     <constraint firstItem="ylL-ae-F1l" firstAttribute="centerY" secondItem="SyL-fJ-cTB" secondAttribute="centerY" id="KhV-JQ-8Qm"/>
                                     <constraint firstItem="Bhc-8J-Oiy" firstAttribute="centerY" secondItem="m7x-WO-ppc" secondAttribute="centerY" id="OOf-08-Ss4"/>
                                     <constraint firstItem="m7x-WO-ppc" firstAttribute="leading" secondItem="SyL-fJ-cTB" secondAttribute="trailing" constant="4" id="OVX-fr-I6c"/>
                                     <constraint firstAttribute="trailing" secondItem="m7x-WO-ppc" secondAttribute="trailing" constant="8" id="PiZ-lK-sCX"/>
+                                    <constraint firstItem="Bhc-8J-Oiy" firstAttribute="leading" secondItem="nmu-5E-zMk" secondAttribute="trailing" id="Rdg-KE-Otj"/>
                                     <constraint firstItem="SyL-fJ-cTB" firstAttribute="leading" secondItem="ylL-ae-F1l" secondAttribute="trailing" constant="4" id="UcX-s5-LQn"/>
+                                    <constraint firstItem="nmu-5E-zMk" firstAttribute="centerY" secondItem="Bhc-8J-Oiy" secondAttribute="centerY" id="XLr-mW-hB7"/>
                                     <constraint firstItem="SyL-fJ-cTB" firstAttribute="top" secondItem="gdu-OZ-86d" secondAttribute="top" constant="2" id="bkY-g4-ETY"/>
+                                    <constraint firstItem="nmu-5E-zMk" firstAttribute="leading" secondItem="gdu-OZ-86d" secondAttribute="leading" constant="4" id="ekO-2x-Uad"/>
                                     <constraint firstItem="m7x-WO-ppc" firstAttribute="top" secondItem="gdu-OZ-86d" secondAttribute="top" constant="3" id="rew-6H-haP"/>
                                 </constraints>
                             </view>
@@ -436,6 +498,7 @@
                             <constraint firstItem="eKC-XJ-Soe" firstAttribute="top" secondItem="f4S-1d-CLr" secondAttribute="top" id="G9O-2d-ReH"/>
                             <constraint firstItem="QyT-DU-suG" firstAttribute="leading" secondItem="Ekn-LS-eHd" secondAttribute="leading" constant="10" id="HAS-wo-E40"/>
                             <constraint firstItem="eKC-XJ-Soe" firstAttribute="leading" secondItem="f4S-1d-CLr" secondAttribute="leading" id="I1P-EX-2Jm"/>
+                            <constraint firstItem="NOH-IT-mtd" firstAttribute="leading" secondItem="uRf-aP-sab" secondAttribute="trailing" id="Lju-jU-52k"/>
                             <constraint firstItem="Ngx-BR-Wg7" firstAttribute="leading" secondItem="jkH-xn-SOs" secondAttribute="trailing" constant="6" id="LnE-Po-Y2g"/>
                             <constraint firstAttribute="trailing" secondItem="JhP-ae-g3f" secondAttribute="trailing" constant="10" id="Nfi-Tv-8Zo"/>
                             <constraint firstItem="ZeB-2B-m5c" firstAttribute="centerY" secondItem="f4S-1d-CLr" secondAttribute="centerY" id="PcG-cF-Vrf"/>
@@ -445,10 +508,11 @@
                             <constraint firstItem="eKC-XJ-Soe" firstAttribute="trailing" secondItem="f4S-1d-CLr" secondAttribute="trailing" id="aBu-oE-Kwn"/>
                             <constraint firstItem="aBL-bd-0Oe" firstAttribute="top" secondItem="f4S-1d-CLr" secondAttribute="bottom" constant="4" id="bst-x2-Nvl"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="bottom" secondItem="IUO-Bd-7lc" secondAttribute="bottom" id="cMb-YC-29K"/>
-                            <constraint firstItem="jkH-xn-SOs" firstAttribute="leading" secondItem="jLm-jf-65H" secondAttribute="trailing" id="esx-Km-NCq"/>
+                            <constraint firstItem="uRf-aP-sab" firstAttribute="centerY" secondItem="NOH-IT-mtd" secondAttribute="centerY" id="dDH-XC-VB6"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="leading" secondItem="IUO-Bd-7lc" secondAttribute="leading" id="fxY-KS-h7z"/>
                             <constraint firstItem="jkH-xn-SOs" firstAttribute="leading" secondItem="NOH-IT-mtd" secondAttribute="trailing" id="gWH-TS-Jr3"/>
                             <constraint firstItem="f4S-1d-CLr" firstAttribute="top" secondItem="IUO-Bd-7lc" secondAttribute="top" id="gsR-sD-P9E"/>
+                            <constraint firstItem="uRf-aP-sab" firstAttribute="leading" secondItem="jLm-jf-65H" secondAttribute="trailing" id="hz0-iJ-Teu"/>
                             <constraint firstAttribute="bottom" secondItem="Ngx-BR-Wg7" secondAttribute="bottom" constant="10" id="inu-wE-2VG"/>
                             <constraint firstItem="jkH-xn-SOs" firstAttribute="centerY" secondItem="Ngx-BR-Wg7" secondAttribute="centerY" id="jMs-eL-2xF"/>
                             <constraint firstAttribute="trailing" secondItem="e5G-qP-vVQ" secondAttribute="trailing" constant="10" id="ktF-jS-abC"/>
@@ -597,6 +661,11 @@
                 <outlet property="imageStatusIconImageView" destination="m7x-WO-ppc" id="0cn-w9-OeZ"/>
                 <outlet property="imageTimestampLabel" destination="SyL-fJ-cTB" id="PEs-rF-XfA"/>
                 <outlet property="imageTimestampStatusContainerView" destination="gdu-OZ-86d" id="rW0-OC-nqS"/>
+                <outlet property="messageReadCounterBoxImageView" destination="zna-aQ-mCr" id="Qpc-t1-fnn"/>
+                <outlet property="messageReadCounterBoxImageViewWidthConstraint" destination="Mgq-dT-8Zq" id="Luc-jR-b7C"/>
+                <outlet property="messageReadCounterBoxLabel" destination="WNr-Sa-MKW" id="sPB-zd-RhQ"/>
+                <outlet property="messageReadCounterImageViewWidthConstraint" destination="dbT-Vq-jB4" id="yhm-bG-qjT"/>
+                <outlet property="messageReadCounterLabel" destination="xwB-cW-WoY" id="hNq-Zw-RjW"/>
                 <outlet property="openImageButton" destination="eKC-XJ-Soe" id="B57-ts-xrp"/>
                 <outlet property="pinIconBottomImageView" destination="NOH-IT-mtd" id="ocj-xb-Now"/>
                 <outlet property="pinIconBottomTrailingConstraint" destination="gWH-TS-Jr3" id="E1t-FH-9zH"/>
@@ -666,6 +735,7 @@
         <image name="TAPIconDocuments" width="24" height="24"/>
         <image name="TAPIconDownload" width="24" height="24"/>
         <image name="TAPIconPinRightBubble" width="9" height="9"/>
+        <image name="TAPIconReadCount" width="14" height="14"/>
         <image name="TAPIconRetry" width="32" height="32"/>
         <image name="TAPIconSending" width="20" height="20"/>
         <image name="TAPIconStarChatBubble" width="12" height="12"/>

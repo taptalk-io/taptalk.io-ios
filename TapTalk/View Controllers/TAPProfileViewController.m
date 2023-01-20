@@ -18,6 +18,8 @@
 #import "TAPImagePreviewCollectionViewCell.h"
 #import "TAPSecondaryChatViewController.h"
 #import "TAPSharedMediaViewController.h"
+#import "TAPGroupInCommonViewController.h"
+#import "TAPReportUserViewController.h"
 
 @interface TAPProfileViewController () <UICollectionViewDataSource, UICollectionViewDelegate, TAPImageCollectionViewCellDelegate, TAPMediaDetailViewControllerDelegate, TAPCreateGroupSubjectViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, TAPSecondaryChatViewControllerDelegate, TAPSharedMediaViewControllerDelegate>
 
@@ -30,6 +32,7 @@
 @property (nonatomic) BOOL isMediaLastPage;
 @property (nonatomic) BOOL isCurrentActiveUserIsAdmin;
 @property (nonatomic) BOOL isLeaveFromGroupProfilePage;
+@property (nonatomic) BOOL isBlockedUser;
 
 //NAVIGATION BAR
 @property (strong, nonatomic) UIView *titleView;
@@ -164,7 +167,7 @@
             profileImageURL = @"";
         }
         userID = obtainedUser.userID;
-        if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+        if (obtainedUser != nil) {
             profileImageURL = obtainedUser.imageURL.fullsize;
             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
         }
@@ -378,7 +381,7 @@
         }
         else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault  && self.room.type == RoomTypeGroup){
             height = 56.0f;
-            TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+            TAPRoomModel *room = self.room;
             NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
             
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
@@ -490,7 +493,7 @@
                     if (![[TapUI sharedInstance] isAddContactEnabled] ||
                         ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState] ||
                         user != nil && user.isContact ||
-                        [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
+                        [user.userID isEqualToString:[TAPDataManager getActiveUser].userID] || [[TAPDataManager getBlockedUserIDs] containsObject:otherUserID]
                     ) {
                         // Hide if add to contacts menu is disabled in TapUI or user is already a contact
                         height = 0.0f;
@@ -520,7 +523,7 @@
                 //add to contacts
                 if (![[TapUI sharedInstance] isAddContactEnabled] ||
                     ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState] ||
-                    user != nil && user.isContact || [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+                    user != nil && user.isContact || [user.userID isEqualToString:[TAPDataManager getActiveUser].userID] || [[TAPDataManager getBlockedUserIDs] containsObject:user.userID]) {
                     // Hide if add to contacts menu is disabled in TapUI or user is already a contact
                     height = 0.0f;
                     
@@ -536,7 +539,30 @@
 
     else if (indexPath.section == 4) {
         CGFloat height = 56.0f;
+        
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+            if(self.room.type == RoomTypePersonal){
+                if (indexPath.item == 0) {
+
+                    //Report User
+                    if(![[TapUI sharedInstance] getReportButtonInUserProfileVisible] && ![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
+                        height = 0.0f;
+                    }
+                }
+            }
+            else if(self.room.type == RoomTypeGroup) {
+                if (indexPath.item == 0) {
+                    //Report User
+                    if(![[TapUI sharedInstance] getReportButtonInGroupProfileVisible] && ![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
+                        height = 0.0f;
+                    }
+                }
+            }
+        }
+        
+        
         CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), height);
+        
         return cellSize;
     }
     
@@ -698,7 +724,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return 0;
     }
     else if(section == 2){
-        return 2;
+        if((self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault && self.room.type == RoomTypeGroup) || ![[TapUI sharedInstance] getGroupInCommonMenuEnabled]) {
+            return 2;
+        }
+        return 3;
     }
     else if(section == 3){
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
@@ -712,7 +741,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 if(user.deleted.longValue > 0){
                     return 0;
                 }
-                if(user.isContact){
+                if(user.isContact || [[TAPDataManager getBlockedUserIDs] containsObject:otherUserID]){
                     return 0;
                 }
                 return 2;
@@ -747,17 +776,18 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if (section == 4) {
         if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
-            if(self.room.type == RoomTypePersonal){
+            
                 NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
                 TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
                 if(user.deleted.longValue > 0){
                     return 0;
                 }
-                return 2;
-            }
-            else{
+            
+            if(self.room.type == RoomTypeGroup) {
                 return 0;
             }
+                return 2;
+            
         }
         else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile){
             if(self.user.deleted.longValue > 0){
@@ -1023,7 +1053,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeShareMedia];
             [cell showSeparatorView:YES];
         }
-        
+        else if (indexPath.item == 2) {
+            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeGroupInCommon];
+            [cell showSeparatorView:YES];
+        }
         return cell;
     }
     else if(indexPath.section == 3){
@@ -1042,8 +1075,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [cell showSeparatorView:YES];
                 }
                 else if (indexPath.item == 2) {
-                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
-                    [cell showSeparatorView:YES];
+                   // [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+                    //[cell showSeparatorView:YES];
                 }
                 return cell;
             }
@@ -1117,8 +1150,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [cell showSeparatorView:YES];
             }
             else if (indexPath.item == 4) {
-                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
-                [cell showSeparatorView:YES];
+               // [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+               // [cell showSeparatorView:YES];
             }
             
             return cell;
@@ -1132,11 +1165,31 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             //Report User
             [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
             [cell showSeparatorView:YES];
+            
         }
         else if(indexPath.item == 1){
             //Block User
-            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeBlock];
-            [cell showSeparatorView:YES];
+            NSString *otherUserID;
+            
+            if (self.room.type == RoomTypePersonal) {
+                otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                
+            }
+            else {
+                otherUserID = self.user.userID;
+            }
+            NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+            
+            if([blockedUserIDs containsObject:otherUserID]) {
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeUnblock];
+                [cell showSeparatorView:YES];
+                self.isBlockedUser = YES;
+            }
+            else {
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeBlock];
+                [cell showSeparatorView:YES];
+                self.isBlockedUser = NO;
+            }
         }
         
         return cell;
@@ -1258,7 +1311,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         CGSize headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
         if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
             if(self.room.type == RoomTypeGroup){
-                headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+              //  headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
             else{
                 NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
@@ -1399,11 +1452,41 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             tapStarredMessageViewController.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:tapStarredMessageViewController animated:YES];
         }
-        if (indexPath.row == 1) {
+        else if (indexPath.row == 1) {
             TAPSharedMediaViewController *shareMediaVC = [[TAPSharedMediaViewController alloc] initWithNibName:@"TAPSharedMediaViewController" bundle:[TAPUtil currentBundle]];
             shareMediaVC.room = self.room;
             shareMediaVC.delegate = self;
             [self.navigationController pushViewController:shareMediaVC animated:YES];
+        }
+        else if (indexPath.row == 2) {
+            // Group in common
+            TAPUserModel *user;
+            if (self.room.type == RoomTypePersonal) {
+                user = [[TAPContactManager sharedManager] getUserWithUserID:self.otherUserID];
+                
+            }
+            else {
+                user = self.user;
+            }
+            
+            TAPGroupInCommonViewController *groupInCommonVC = [[TAPGroupInCommonViewController alloc] initWithNibName:@"TAPGroupInCommonViewController" bundle:[TAPUtil currentBundle]];
+            groupInCommonVC.otherUser = user;
+            [self.navigationController pushViewController:groupInCommonVC animated:YES];
+            
+            /**
+            id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+            if ([chatProfileDelegate respondsToSelector:@selector(groupInCommonItemDidTapped:room:)]) {
+                [chatProfileDelegate groupInCommonItemDidTapped:self room:self.room];
+            }
+            else {
+                
+                TAPSharedMediaViewController *shareMediaVC = [[TAPSharedMediaViewController alloc] initWithNibName:@"TAPSharedMediaViewController" bundle:[TAPUtil currentBundle]];
+                shareMediaVC.room = self.room;
+                shareMediaVC.delegate = self;
+                [self.navigationController pushViewController:shareMediaVC animated:YES];
+                
+            }
+            */
         }
     }
     if (indexPath.section == 3) {
@@ -1637,10 +1720,34 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
     else if (indexPath.section == 4) {
         if (indexPath.row == 0) {
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"report user"  title:NSLocalizedStringFromTableInBundle(@"You have submitted a report.", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Your report is anonymous, and this user will not be notified. The process will take up to 24 hours.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:@"OK"];
+            
+            NSString *otherUserID;
+            
+            if (self.room.type == RoomTypePersonal) {
+                otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                
+            }
+            else {
+                otherUserID = self.user.userID;
+            }
+            
+            if(otherUserID == nil) {
+                return;
+            }
+            
+            TAPReportUserViewController *reportUserVC = [[TAPReportUserViewController alloc] initWithNibName:@"TAPReportUserViewController" bundle:[TAPUtil currentBundle]];
+            reportUserVC.hidesBottomBarWhenPushed = YES;
+            reportUserVC.reportType = TAPReportTypeUser;
+            reportUserVC.userID = otherUserID;
+            [self.navigationController pushViewController:reportUserVC animated:YES];
         }
         else if (indexPath.row == 1) {
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"block user"  title:NSLocalizedStringFromTableInBundle(@"You’ve blocked this user.", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"The process will take up to 48 hours. They won’t be notified that you blocked them.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:@"OK"];
+            if(self.isBlockedUser) {
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"unblock user"  title:[NSString stringWithFormat:@"Unblock %@", self.nameLabel.text] detailInformation:NSLocalizedStringFromTableInBundle(@"Unblocking lets user send messages and calls from this contact . Are you sure you want to continue?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Yes"];
+            }
+            else {
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"block user" title:[NSString stringWithFormat:@"Block %@", self.nameLabel.text] detailInformation:NSLocalizedStringFromTableInBundle(@"Blocking someone will not allow them to see your updates, and you will not receive any messages or calls from this contact. Are you sure you want to continue?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Block"];
+            }
         }
     }
     else if (indexPath.section == 5) {
@@ -1889,6 +1996,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
     [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
+    NSMutableArray *blockedUserIDs = [[TAPDataManager getBlockedUserIDs] mutableCopy];
     
     if ([popupIdentifier isEqualToString:@"Error Promote Admin"]) {
         
@@ -2010,6 +2118,63 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }];
     }
+    else if ([popupIdentifier isEqualToString:@"block user"]) {
+        [self.profileView showLoadingView:YES];
+        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDoneLoading];
+        
+        NSString *otherUserID;
+        
+        if (self.room.type == RoomTypePersonal) {
+            otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+            
+        }
+        else {
+            otherUserID = self.user.userID;
+        }
+        
+        if(otherUserID == nil) {
+            return;
+        }
+        
+        [[TAPCoreContactManager sharedManager] blockUserWithUserID:otherUserID success:^(TAPUserModel * _Nonnull blockedUser) {
+            [self.profileView showLoadingView:NO];
+            [blockedUserIDs addObject:otherUserID];
+            [TAPDataManager setBlockedUserIDs:[blockedUserIDs copy]];
+            [self.profileView.collectionView reloadData];
+        }
+        failure:^(NSError * _Nonnull error) {
+            [self.profileView showLoadingView:NO];
+        }];
+    }
+    else if ([popupIdentifier isEqualToString:@"unblock user"]) {
+        [self.profileView showLoadingView:YES];
+        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDoneLoading];
+        
+        NSString *otherUserID;
+        
+        if (self.room.type == RoomTypePersonal) {
+            otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+            
+        }
+        else {
+            otherUserID = self.user.userID;
+        }
+        
+        if(otherUserID == nil) {
+            return;
+        }
+        
+        [[TAPCoreContactManager sharedManager] unblockUserWithUserID:otherUserID success:^(TAPUserModel * _Nonnull unblockedUser) {
+            [self.profileView showLoadingView:NO];
+            if([blockedUserIDs containsObject:otherUserID]) {
+                [blockedUserIDs removeObject:otherUserID];
+            }
+            [TAPDataManager setBlockedUserIDs:[blockedUserIDs copy]];
+            [self.profileView.collectionView reloadData];
+        } failure:^(NSError *error) {
+            [self.profileView showLoadingView:NO];
+        }];
+    }
 }
 
 #pragma mark - Custom Method
@@ -2017,7 +2182,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)setupNavigationViewData {
     //This method is used to setup the title view of navigation bar, and also bar button view
     
-    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    TAPRoomModel *room = self.room;
     //Title View
     _titleView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 56.0f - 56.0f, 43.0f)];
     _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 2.0f, CGRectGetWidth(self.titleView.frame), 22.0f)];
@@ -2054,9 +2219,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     self.userStatusView.layer.cornerRadius = CGRectGetHeight(self.userStatusView.frame) / 2.0f;
     self.userStatusView.alpha = 0.0f;
     self.userStatusView.clipsToBounds = YES;
-    
-    
-    
     
     CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;
     _userDescriptionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.nameLabel.frame), userStatusViewWidth, 16.0f)];

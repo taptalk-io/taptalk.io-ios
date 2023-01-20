@@ -71,6 +71,10 @@
 @property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *pinIconBottomImageView;
 
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadCounterImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *messageReadCounterBoxImageView;
+@property (weak, nonatomic) IBOutlet UILabel *messageReadCounterBoxLabel;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelHeightConstraint;
@@ -121,10 +125,13 @@
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomWidthConstraint;
-
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageReadCounterImageViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageReadCounterBoxImageViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
+@property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
 @property (nonatomic) BOOL isShowForwardView;
@@ -276,6 +283,10 @@
     self.panGestureRecognizer.delegate = self;
     [self.contentView addGestureRecognizer:self.panGestureRecognizer];
     
+    _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleBubbleViewTap:)];
+    [self.contentView addGestureRecognizer:self.bubbleViewTapGestureRecognizer];
+    
     self.captionLabel.tapDelegate = self;
     self.captionLabel.longPressDelegate = self;
     self.captionLabel.longPressDuration = 0.05f;
@@ -342,6 +353,7 @@
     self.pinIconBottomImageView.alpha = 0.0f;
     self.pinIconWidthConstraint.constant = 0.0f;
     self.pinIconBottomWidthConstraint.constant = 0.0f;
+    [self showMessageReadCounterWithNumber:NO readCount:0];
     
 }
 
@@ -670,6 +682,15 @@
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     self.fileImageView.image = documentsImage;
+    
+    self.messageReadCounterLabel.textColor = timestampLabelColor;
+    self.messageReadCounterLabel.font = timestampLabelFont;
+
+    self.messageReadCounterBoxLabel.textColor = imageTimestampLabelColor;
+    self.messageReadCounterBoxLabel.font = imageTimestampLabelFont;
+    
+    self.messageReadCounterImageView.image = [ self.messageReadCounterImageView.image setImageTintColor:[TAPUtil getColor:@"DADADA"]];
+    
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -1639,6 +1660,13 @@
     }
 }
 
+- (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
+    if(recognizer.state = UIGestureRecognizerStateEnded) {
+        if ([self.delegate respondsToSelector:@selector(yourVideoBubbleTappedWithMessage:)]) {
+            [self.delegate yourVideoBubbleTappedWithMessage:self.message];
+        }
+    }
+}
 
 - (void)showProgressDownloadView:(BOOL)show {
     if (show) {
@@ -2010,6 +2038,52 @@
     self.redirectArrowButton.alpha = 0.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
+    }
+}
+
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
+    if (isShow) {
+        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageReadCounterImageViewWidthConstraint.constant = 10.0f;
+        if (self.pinIconImageView.alpha == 1.0f) {
+          //  self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+        else {
+           // self.pinIconTrailingConstraint.constant = 0.0f;
+        }
+        self.messageReadCounterLabel.alpha = 1.0f;
+        self.messageReadCounterImageView.alpha = 1.0f;
+        
+        self.messageReadCounterBoxLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+        self.messageReadCounterBoxImageViewWidthConstraint.constant = 10.0f;
+        self.messageReadCounterBoxLabel.alpha = 1.0f;
+        self.messageReadCounterBoxImageView.alpha = 1.0f;
+        
+        
+        
+        if(self.imageTimestampContainerView.alpha < 1){
+            
+        }
+        else{
+            self.messageReadCounterLabel.text = @"";
+            self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
+           // self.pinIconTrailingConstraint.constant = 0.0f;
+            self.messageReadCounterLabel.alpha = 0.0f;
+            self.messageReadCounterImageView.alpha = 0.0f;
+        }
+    }
+    else {
+        self.messageReadCounterLabel.text = @"";
+        self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
+       // self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterLabel.alpha = 0.0f;
+        self.messageReadCounterImageView.alpha = 0.0f;
+        
+        self.messageReadCounterBoxLabel.text = @"";
+        self.messageReadCounterBoxImageViewWidthConstraint.constant = 0.0f;
+       // self.pinIconTrailingConstraint.constant = 0.0f;
+        self.messageReadCounterBoxLabel.alpha = 0.0f;
+        self.messageReadCounterBoxImageView.alpha = 0.0f;
     }
 }
 

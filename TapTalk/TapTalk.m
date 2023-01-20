@@ -108,8 +108,8 @@
         }
         
         //Refresh Contact List
-        [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-        } failure:^(NSError *error) {
+        [[TAPCoreContactManager sharedManager] fetchAllUserContactsFromServerWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull userArray) {
+        } failure:^(NSError * _Nonnull error) {
         }];
         
         if (self.implementationType != TapTalkImplentationTypeCore) {

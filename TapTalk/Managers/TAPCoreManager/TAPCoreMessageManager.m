@@ -2039,5 +2039,25 @@
     
 }
 
+- (void)getMessageDetails:(NSString *)messageID
+                  success:(void (^)(TAPMessageModel *message, NSArray <TapMessageRecipientModel *> *deliveredTo, NSArray <TapMessageRecipientModel *> *readBy))success
+                  failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetMessageDetails:messageID success:^(TAPMessageModel *message, NSArray<TapMessageRecipientModel *> *deliveredTo, NSArray<TapMessageRecipientModel *> *readBy) {
+        success(message, deliveredTo, readBy);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getMessageTotalRead:(NSString *)messageID
+                  success:(void (^)(NSInteger readCount))success
+                  failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetMessageTotalRead:messageID success:^(NSInteger readCount) {
+        success(readCount);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 
 @end

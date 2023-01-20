@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, TAPMyFileBubbleTableViewCellStateType) {
 - (void)myFileReplyDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)myFileBubbleTappedWithMessage:(TAPMessageModel *)message;
 - (void)myFileRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
@@ -59,6 +60,7 @@ typedef NS_ENUM(NSInteger, TAPMyFileBubbleTableViewCellStateType) {
 - (void)setCheckMarkState:(BOOL)isSelected;
 - (void)setSwipeGestureEnable:(BOOL)enable;
 - (void)showPinIcon:(BOOL)isShow;
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount;
 @end
 
 NS_ASSUME_NONNULL_END

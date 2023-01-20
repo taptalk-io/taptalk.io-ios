@@ -214,8 +214,8 @@
             [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
             
             //Refresh Contact List From API
-            [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-            } failure:^(NSError *error) {
+            [[TAPCoreContactManager sharedManager] fetchAllUserContactsFromServerWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull userArray) {
+            } failure:^(NSError * _Nonnull error) {
             }];
             
         } failure:^(NSError *error) {
@@ -261,8 +261,8 @@
             [self.addNewContactView setSearchUserButtonWithType:ButtonTypeChat];
         
             //Refresh Contact List From API
-            [TAPDataManager callAPIGetContactList:^(NSArray *userArray) {
-            } failure:^(NSError *error) {
+            [[TAPCoreContactManager sharedManager] fetchAllUserContactsFromServerWithSuccess:^(NSArray<TAPUserModel *> * _Nonnull userArray) {
+            } failure:^(NSError * _Nonnull error) {
             }];
             
         } failure:^(NSError *error) {
@@ -288,8 +288,11 @@
         _wasFailedGetData = NO;
         
         [self.addNewContactView showLoading:YES];
+        NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
         [TAPDataManager callAPIGetUserByUsername:self.updatedString success:^(TAPUserModel *user) {
-            
+            if ([blockedUserIDs containsObject:user.userID]){
+                return;
+            }
             _searchedUser = user;
             
             [self.addNewContactView showNoInternetView:NO];
