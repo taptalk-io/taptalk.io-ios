@@ -271,6 +271,15 @@ NS_ASSUME_NONNULL_BEGIN
               success:(void (^)(void))success
               failure:(void (^)(NSString *localID, NSError *error))failure;
 - (void)uploadImage:(UIImage *)image
+           progress:(void (^)(CGFloat progress, CGFloat total))progress
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure;
+- (void)uploadFile:(NSURL *)url
+          progress:(void (^)(CGFloat progress, CGFloat total))progress
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+           failure:(void (^)(NSError *error))failure;
+- (void)uploadVideo:(NSURL *)url
+           progress:(void (^)(CGFloat progress, CGFloat total))progress
             success:(void (^)(NSString *fileID, NSString *fileURL))success
             failure:(void (^)(NSError *error))failure;
 - (void)cancelMessageFileUpload:(TAPMessageModel *)message

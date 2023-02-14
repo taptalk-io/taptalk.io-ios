@@ -10,6 +10,8 @@
 
 @interface TapBaseChatRoomCustomNavigationBarManager () <TapUIChatRoomCustomNavigationBarDelegate, TapUIChatRoomDelegate, TAPCoreChatRoomManagerDelegate>
 
+@property (nonatomic) BOOL isOpeningChatRoom;
+
 @end
 
 @implementation TapBaseChatRoomCustomNavigationBarManager
@@ -40,6 +42,7 @@
          currentViewController:(UIViewController *)currentViewController
 currentShownNavigationController:(UINavigationController *)currentNavigationController {
     
+    _isOpeningChatRoom = YES;
     TAPUserModel *activeUser = [[TapTalk sharedInstance] getTapTalkActiveUser];
     if ([currentViewController isKindOfClass:[TapUIChatViewController class]]) {
         _chatViewController = (TapUIChatViewController *)currentViewController;
@@ -55,6 +58,7 @@ currentShownNavigationController:(UINavigationController *)currentNavigationCont
         self.onlineStatus.lastActive = otherUser.lastActivity;
     }
     _typingUsers = [[TAPChatManager sharedManager] getTypingUsersWithRoomID:room.roomID];
+    _isOpeningChatRoom = NO;
 }
 
 - (void)tapTalkChatRoomDidClose:(TAPRoomModel *)room
@@ -62,6 +66,9 @@ currentShownNavigationController:(UINavigationController *)currentNavigationCont
           currentViewController:(UIViewController *)currentViewController
 currentShownNavigationController:(UINavigationController *)currentNavigationController {
     
+    if (self.room != nil && ![self.room.roomID isEqualToString:room.roomID] || self.isOpeningChatRoom) {
+        return;
+    }
     _chatViewController = nil;
     _navigationController = nil;
     _room = nil;

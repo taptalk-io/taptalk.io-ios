@@ -1015,10 +1015,47 @@
 }
 
 - (void)uploadImage:(UIImage *)image
+           progress:(void (^)(CGFloat progress, CGFloat total))progress
             success:(void (^)(NSString *fileID, NSString *fileURL))success
             failure:(void (^)(NSError *error))failure {
+    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+    void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+    [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
+    [self.blockDictionary setObject:blockTypeDictionary forKey:@"uploadImage"];
     
     [[TAPFileUploadManager sharedManager]uploadImage:image success:^(NSString * _Nonnull fileID, NSString * _Nonnull fileURL) {
+        success(fileID, fileURL);
+    } failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+}
+
+- (void)uploadFile:(NSURL *)url
+            progress:(void (^)(CGFloat progress, CGFloat total))progress
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure {
+    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+    void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+    [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
+    [self.blockDictionary setObject:blockTypeDictionary forKey:@"uploadFie"];
+    
+    [[TAPFileUploadManager sharedManager]uploadFile:url success:^(NSString * _Nonnull fileID, NSString * _Nonnull fileURL) {
+        success(fileID, fileURL);
+    } failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+}
+
+- (void)uploadVideo:(NSURL *)url
+           progress:(void (^)(CGFloat progress, CGFloat total))progress
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure {
+    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+    void (^handlerProgress)(CGFloat, CGFloat) = [progress copy];
+    [blockTypeDictionary setObject:handlerProgress forKey:@"progressBlock"];
+    [self.blockDictionary setObject:blockTypeDictionary forKey:@"uploadVideo"];
+    
+    [[TAPFileUploadManager sharedManager]uploadVideo:url success:^(NSString * _Nonnull fileID, NSString * _Nonnull fileURL) {
         success(fileID, fileURL);
     } failure:^(NSError * _Nonnull error) {
         failure(error);

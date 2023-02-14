@@ -412,11 +412,135 @@
             
             success(fileID, fileURL);
         } progressBlock:^(CGFloat progress, CGFloat total) {
+            TAPMessageModel *currentMessage = [TAPMessageModel new];
+            currentMessage.localID = @"uploadImage";
+            NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+            obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+            if (obtainedDictionary == nil) {
+                obtainedDictionary = [NSMutableDictionary dictionary];
+            }
             
+            [obtainedDictionary setObject:currentMessage forKey:@"message"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            
+            [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
         } failureBlock:^(NSError *error) {
             failure(error);
         }];
     }];
+}
+
+- (void)uploadFile:(NSURL *)url
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure {
+    
+    
+    NSString *filePath = [url absoluteString];
+    NSString *encodedFileName = [filePath lastPathComponent];
+    NSString *decodedFileName = [encodedFileName stringByRemovingPercentEncoding];
+    
+    //Get Mimetype
+    NSString *fileExtension = [url pathExtension];
+    NSString *mimeType = [TAPUtil mimeTypeForFileWithExtension:fileExtension];
+    NSData *fileData = [NSData dataWithContentsOfURL:url];
+    
+
+        [TAPDataManager callAPIUploadFileWithFileData:fileData
+                                               roomID:@""
+                                             fileName:decodedFileName
+                                             fileType:@"file"
+                                             mimeType:mimeType
+                                              caption:@""
+        completionBlock:^(NSDictionary *responseObject) {
+            NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
+            
+            NSString *fileID = [responseDataDictionary objectForKey:@"id"];
+            fileID = [TAPUtil nullToEmptyString:fileID];
+            
+            NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+            }
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            success(fileID, fileURL);
+        } progressBlock:^(CGFloat progress, CGFloat total) {
+            TAPMessageModel *currentMessage = [TAPMessageModel new];
+            currentMessage.localID = @"uploadFile";
+            NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+            obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+            if (obtainedDictionary == nil) {
+                obtainedDictionary = [NSMutableDictionary dictionary];
+            }
+            
+            [obtainedDictionary setObject:currentMessage forKey:@"message"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            
+            [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
+        } failureBlock:^(NSError *error) {
+            failure(error);
+        }];
+}
+
+- (void)uploadVideo:(NSURL *)url
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure {
+    
+    
+    NSString *filePath = [url absoluteString];
+    NSString *encodedFileName = [filePath lastPathComponent];
+    NSString *decodedFileName = [encodedFileName stringByRemovingPercentEncoding];
+    
+    //Get Mimetype
+    NSString *fileExtension = [url pathExtension];
+    NSString *mimeType = [TAPUtil mimeTypeForFileWithExtension:fileExtension];
+    NSData *fileData = [NSData dataWithContentsOfURL:url];
+    
+
+        [TAPDataManager callAPIUploadFileWithFileData:fileData
+                                               roomID:@""
+                                             fileName:decodedFileName
+                                             fileType:@"video"
+                                             mimeType:mimeType
+                                              caption:@""
+        completionBlock:^(NSDictionary *responseObject) {
+            NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
+            
+            NSString *fileID = [responseDataDictionary objectForKey:@"id"];
+            fileID = [TAPUtil nullToEmptyString:fileID];
+            
+            NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [responseDataDictionary objectForKey:@"fileURL"];
+            }
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            success(fileID, fileURL);
+        } progressBlock:^(CGFloat progress, CGFloat total) {
+            TAPMessageModel *currentMessage = [TAPMessageModel new];
+            currentMessage.localID = @"uploadVideo";
+            NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
+            obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
+            if (obtainedDictionary == nil) {
+                obtainedDictionary = [NSMutableDictionary dictionary];
+            }
+            
+            [obtainedDictionary setObject:currentMessage forKey:@"message"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", progress] forKey:@"progress"];
+            [obtainedDictionary setObject:[NSString stringWithFormat:@"%f", total] forKey:@"total"];
+            
+            [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
+        } failureBlock:^(NSError *error) {
+            failure(error);
+        }];
 }
 
 - (void)runUploadFileWithRoomID:(NSString *)roomID {
