@@ -30,6 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)uploadImage:(UIImage *)image
             success:(void (^)(NSString *fileID, NSString *fileURL))success
             failure:(void (^)(NSError *error))failure;
+- (void)uploadFile:(NSURL *)url
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+           failure:(void (^)(NSError *error))failure;
+- (void)uploadVideo:(NSURL *)url
+            success:(void (^)(NSString *fileID, NSString *fileURL))success
+            failure:(void (^)(NSError *error))failure;
 
 @end
 
