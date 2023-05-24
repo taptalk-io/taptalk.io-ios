@@ -1097,6 +1097,15 @@ Get current isEnabled state of  block user
 */
 - (BOOL)getReportButtonInGroupProfileVisible;
 
+/**
+ Enable or disable Delete Others Message For Admin
+*/
+- (void)setAllowDeleteOthersMessageForAdminEnabled:(BOOL)isEnabled;
+/**
+ Get current isEnabled state of Delete Others Message For Admin
+*/
+- (BOOL)getAllowDeleteOthersMessageForAdminEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

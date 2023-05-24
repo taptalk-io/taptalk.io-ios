@@ -416,8 +416,13 @@
     
     if ([self.delegate respondsToSelector:@selector(tapTalkDidTappedNotificationWithMessage:fromActiveController:)]) {
         [self.delegate tapTalkDidTappedNotificationWithMessage:message fromActiveController:currentActiveController];
+        [self handleUpdatedChatRoomDataFromNotification:message];
     }
     else {
+        NSString *activeRoomID = [TAPChatManager sharedManager].activeRoom.roomID;
+        if ([message.room.roomID isEqualToString:[TAPChatManager sharedManager].activeRoom.roomID]) {
+            return;
+        }
         //Handle tapped notification message
         if ([currentActiveController isKindOfClass:[TapUIChatViewController class]]) {
             [currentActiveController.navigationController popViewControllerAnimated:NO];
@@ -427,6 +432,8 @@
         [[TapUI sharedInstance] createRoomWithRoom:message.room customQuoteTitle:nil customQuoteContent:nil customQuoteImageURLString:nil userInfo:nil success:^(TapUIChatViewController * _Nonnull chatViewController) {
             chatViewController.hidesBottomBarWhenPushed = YES;
             [latestActiveController pushViewController:chatViewController animated:YES];
+            
+            [self handleUpdatedChatRoomDataFromNotification:message];
         }];
     }
 }
@@ -682,6 +689,27 @@
 
 - (TAPUserModel *_Nonnull)getTapTalkActiveUser {
     return [TAPDataManager getActiveUser];
+}
+
+- (void)handleUpdatedChatRoomDataFromNotification:(TAPMessageModel *)message {
+    TAPUserModel *otherUser = nil;
+    if (message.room.type == RoomTypePersonal) {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:message.room.roomID];
+        if ([otherUserID isEqualToString:[self getTapTalkActiveUser].userID] ||
+            message.user == nil ||
+            message.user.userID == nil ||
+            [message.user.userID isEqualToString:@""]
+        ) {
+            otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+        }
+        else {
+            otherUser = message.user;
+        }
+    }
+    id<TAPCoreChatRoomManagerDelegate> chatRoomDelegate = [TAPCoreChatRoomManager sharedManager].delegate;
+    if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
+        [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:message.room recipientUser:otherUser];
+    }
 }
 
 - (void)loadCustomFontData {

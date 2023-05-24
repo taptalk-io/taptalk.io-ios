@@ -602,7 +602,7 @@
         NSString *lastMessageUserID = message.user.userID;
         if ([lastMessageUserID isEqualToString:currentUserID]) {
             //last message is from ourselves
-            lastMessage = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
+            lastMessage = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
         }
         else {
             lastMessage = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
