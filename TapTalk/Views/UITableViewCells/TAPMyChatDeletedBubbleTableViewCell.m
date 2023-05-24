@@ -115,7 +115,7 @@
         self.deletedIconImageView.image = deletedImage;
         self.deletedIconImageViewWidthConstraint.constant = 16.0f;
         self.deletedIconImageViewTrailingConstraint.constant = 4.0f;
-        self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
+        self.bubbleLabel.text = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
     }
     else if (self.type == TAPMyChatDeletedBubbleTableViewCellTypeUnsupported) {
         self.deletedIconImageView.image = nil;

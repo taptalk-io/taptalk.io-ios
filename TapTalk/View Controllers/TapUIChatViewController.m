@@ -10101,7 +10101,7 @@ CGPoint center;
         [alertController addAction:pinAction];
     }
     
-    if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && [message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending && self.isShowAccessoryView) {
+    if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] || ([self.currentRoom.admins containsObject:[TAPDataManager getActiveUser].userID] && [[TapUI sharedInstance] getAllowDeleteOthersMessageForAdminEnabled])) && !message.isSending && self.isShowAccessoryView) {
         //Show delete message for our bubble (my bubble) only
         [alertController addAction:deleteMessageAction];
     }
@@ -11378,12 +11378,19 @@ CGPoint center;
                        if([cellDataDictionary count] > 0 && cellDataDictionary != nil) {
                            //if custom bubble from client available
                            
-                           TAPBaseGeneralBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                           [cell setMessage:message];
-//                           [self.tableView performBatchUpdates:^{
-//                               //changing beginUpdates and endUpdates with this because of deprecation
-//                           } completion:^(BOOL finished) {
-//                           }];
+                           @try {
+                               id cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
+                               if ([cell isKindOfClass:[TAPBaseGeneralBubbleTableViewCell class]]) {
+                                   TAPBaseGeneralBubbleTableViewCell *bubbleCell = cell;
+                                   [bubbleCell setMessage:message];
+                               }
+                            }
+                            @catch (NSException *exception) {
+                               NSLog(@"%@", exception.reason);
+                            }
+                            @finally {
+                               NSLog(@"Finally condition");
+                            }
                        }
                    }
                    if(message.isMessageEdited){

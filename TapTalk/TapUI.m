@@ -72,8 +72,7 @@
 @property (nonatomic) BOOL isReportButtonInGroupProfileVisible;
 @property (nonatomic) BOOL isScheduledMessageFeatureDisabled;
 @property (nonatomic) BOOL isGroupInCommonMenuDisabled;
-
-
+@property (nonatomic) BOOL isAllowDeleteOthersMessageForAdminDisabled;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -1196,6 +1195,20 @@ Get current isEnabled state of  block user
 */
 - (BOOL)getReportButtonInGroupProfileVisible {
     return !self.isReportButtonInGroupProfileVisible;
+}
+
+/**
+ Enable or disable Delete Others Message For Admin
+*/
+- (void)setAllowDeleteOthersMessageForAdminEnabled:(BOOL)isEnabled {
+    _isAllowDeleteOthersMessageForAdminDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of Delete Others Message For Admin
+*/
+- (BOOL)getAllowDeleteOthersMessageForAdminEnabled {
+    return !self.isAllowDeleteOthersMessageForAdminDisabled;
 }
 
 @end
