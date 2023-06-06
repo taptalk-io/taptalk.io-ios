@@ -3264,8 +3264,17 @@ CGPoint center;
     NSLog(@"url file test:%@",[urls firstObject]);
     [coordinator coordinateReadingItemAtURL:[urls firstObject] options:NSFileCoordinatorReadingImmediatelyAvailableMetadataOnly error:&error byAccessor:^(NSURL *newURL) {
         NSError *err = nil;
+        NSURL *firstUrl = [urls firstObject];
         NSNumber *fileSize;
-        if(![[urls firstObject] getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
+        BOOL isAcccessing = [firstUrl startAccessingSecurityScopedResource];
+        NSError* error = nil;
+        NSString *path = [firstUrl path];
+        NSData *data = [NSData dataWithContentsOfFile:path options: 0 error: &error];
+        if(data == nil) {
+            NSLog(@"Failed to read file, error %@", error);
+        }
+       
+        if(![firstUrl getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
             NSLog(@"Failed error: %@", error);
             return;
         } else {
@@ -3306,6 +3315,9 @@ CGPoint center;
                     [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
                 }
             } afterDelay:0.2f];
+        }
+        if (isAcccessing) {
+            [firstUrl stopAccessingSecurityScopedResource];
         }
     }];
 }
