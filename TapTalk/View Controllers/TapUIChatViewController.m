@@ -3412,6 +3412,7 @@ CGPoint center;
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
         [self.messageTextView setText:@""];
         [self hideInputAccessoryView];
+        self.tableViewBottomConstraint.constant = 0.0f;
     }
     else {
         //Check if user remove us from the group while we are inside the chat room, handle the case
@@ -10816,6 +10817,8 @@ CGPoint center;
 }
 
 - (void)hideInputAccessoryView {
+    [self.view endEditing:YES];
+    [self.messageTextView resignFirstResponder];
     _isShowAccessoryView = NO;
     [self reloadInputViews];
 }
@@ -10869,6 +10872,7 @@ CGPoint center;
                 [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
                 [self.messageTextView setText:@""];
                 [self hideInputAccessoryView];
+                self.tableViewBottomConstraint.constant = 0.0f;
             }
             else {
                 if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
@@ -15382,6 +15386,7 @@ CGPoint center;
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
         [self.messageTextView setText:@""];
         [self hideInputAccessoryView];
+        self.tableViewBottomConstraint.constant = 0.0f;
     }
     else {
         if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
