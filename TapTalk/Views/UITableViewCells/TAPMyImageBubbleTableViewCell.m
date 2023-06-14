@@ -627,7 +627,7 @@
     self.quoteSubtitleLabel.font = quoteContentFont;
     
     self.forwardTitleLabel.textColor = quoteContentColor;
-    self.forwardTitleLabel.font = quoteContentFont;
+    self.forwardTitleLabel.font = quoteTitleFont;
     
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;
@@ -2024,7 +2024,7 @@
             self.pinIconTrailingContsraint.constant = 4.0f;
         }
         
-        if(self.imageTimestampStatusContainerView.alpha < 1){
+        if(self.imageTimestampStatusContainerView.alpha == 0.0f){
             self.pinIconBottomImageView.alpha = 1.0f;
             self.pinIconBottomWidthConstraint.constant = 10.0f;
             if(self.starIconBottomImageView.alpha > 0){

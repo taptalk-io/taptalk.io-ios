@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -45,7 +45,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="W0B-tv-mZK">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <rect key="frame" x="0.0" y="48" width="414" height="814"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LXR-kl-65E">
                             <rect key="frame" x="0.0" y="0.0" width="414" height="620.5"/>
@@ -67,13 +67,13 @@
                                                 <constraint firstAttribute="width" constant="16" id="r2K-wv-suF"/>
                                             </constraints>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" image="TAPIconUnselected"/>
+                                            <state key="normal" image="TAPIconUnselectedGray"/>
                                             <connections>
                                                 <action selector="reportReasonButtonDidTapped:" destination="-1" eventType="touchUpInside" id="bM3-Hv-Tas"/>
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sending false information" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n06-bw-yV9">
-                                            <rect key="frame" x="24" y="2.5" width="342" height="19.5"/>
+                                            <rect key="frame" x="24" y="2.5" width="342" height="19"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -85,13 +85,13 @@
                                                 <constraint firstAttribute="height" constant="16" id="aG0-9V-ty4"/>
                                             </constraints>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" image="TAPIconUnselected"/>
+                                            <state key="normal" image="TAPIconUnselectedGray"/>
                                             <connections>
                                                 <action selector="reportReasonButtonDidTapped:" destination="-1" eventType="touchUpInside" id="Xdb-hh-eVV"/>
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pretending to be someone else " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1QA-4E-4ud">
-                                            <rect key="frame" x="24" y="30.5" width="229" height="19.5"/>
+                                            <rect key="frame" x="24" y="30.5" width="229" height="19"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -103,13 +103,13 @@
                                                 <constraint firstAttribute="height" constant="16" id="Y7d-qz-gIV"/>
                                             </constraints>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" image="TAPIconUnselected"/>
+                                            <state key="normal" image="TAPIconUnselectedGray"/>
                                             <connections>
                                                 <action selector="reportReasonButtonDidTapped:" destination="-1" eventType="touchUpInside" id="YQ9-9O-Z3d"/>
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scam or fraud" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GEh-Rr-BGx">
-                                            <rect key="frame" x="24" y="58.5" width="102.5" height="19.5"/>
+                                            <rect key="frame" x="24" y="58.5" width="102.5" height="19"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -121,13 +121,13 @@
                                                 <constraint firstAttribute="height" constant="16" id="VBH-vQ-5KM"/>
                                             </constraints>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" image="TAPIconUnselected"/>
+                                            <state key="normal" image="TAPIconUnselectedGray"/>
                                             <connections>
                                                 <action selector="reportReasonButtonDidTapped:" destination="-1" eventType="touchUpInside" id="ZWb-9X-jLq"/>
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dangerous Organization" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gIg-FN-xQf">
-                                            <rect key="frame" x="24" y="86.5" width="175.5" height="19.5"/>
+                                            <rect key="frame" x="24" y="86.5" width="175.5" height="19"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -139,13 +139,13 @@
                                                 <constraint firstAttribute="width" constant="16" id="MX1-K9-1hw"/>
                                             </constraints>
                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                            <state key="normal" image="TAPIconUnselected"/>
+                                            <state key="normal" image="TAPIconUnselectedGray"/>
                                             <connections>
                                                 <action selector="reportReasonButtonDidTapped:" destination="-1" eventType="touchUpInside" id="Ogg-9L-nnl"/>
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Others" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nyc-6e-0tk">
-                                            <rect key="frame" x="24" y="114.5" width="49.5" height="19.5"/>
+                                            <rect key="frame" x="24" y="114.5" width="49.5" height="19"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -324,9 +324,9 @@
     </objects>
     <resources>
         <image name="TAPIconLoadingSmall" width="14" height="14"/>
-        <image name="TAPIconUnselected" width="24" height="24"/>
+        <image name="TAPIconUnselectedGray" width="16" height="16"/>
         <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

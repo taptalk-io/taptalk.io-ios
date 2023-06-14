@@ -152,6 +152,8 @@
     
     self.starIconImageView.alpha = 0.0f;
     
+    self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary]];
+    
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
     
@@ -523,7 +525,7 @@
     self.quoteSubtitleLabel.font = quoteContentFont;
     
     self.forwardTitleLabel.textColor = quoteContentColor;
-    self.forwardTitleLabel.font = quoteContentFont;
+    self.forwardTitleLabel.font = quoteTitleFont;
     
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;

@@ -44,7 +44,7 @@
     
     self.title = NSLocalizedStringFromTableInBundle(@"Group Subject", nil, [TAPUtil currentBundle], @"");
     TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
-    NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
+    NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue]; // -1 for admin that created the group
     self.createGroupSubjectView.selectedContactsTitleLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"GROUP MEMBERS (%ld/%ld)", nil, [TAPUtil currentBundle], @""), [self.selectedContactArray count], (long)maxGroupMember];
     NSMutableDictionary *selectedContactsTitleAttributesDictionary = [NSMutableDictionary dictionary];
     CGFloat selectedContactsTitleLetterSpacing = 1.5f;

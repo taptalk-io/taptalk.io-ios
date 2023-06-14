@@ -207,6 +207,7 @@
     self.bubbleImageView.contentMode = UIViewContentModeScaleAspectFill;
     
     self.pinIconBottomImageView.image = [self.pinIconBottomImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
     
     self.progressBackgroundView.layer.cornerRadius = CGRectGetHeight(self.progressBackgroundView.bounds) / 2.0f;
     self.progressBarView.layer.cornerRadius = CGRectGetHeight(self.progressBarView.bounds) / 2.0f;
@@ -656,7 +657,7 @@
     self.quoteSubtitleLabel.font = quoteContentFont;
     
     self.forwardTitleLabel.textColor = quoteContentColor;
-    self.forwardTitleLabel.font = quoteContentFont;
+    self.forwardTitleLabel.font = quoteTitleFont;
     
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;

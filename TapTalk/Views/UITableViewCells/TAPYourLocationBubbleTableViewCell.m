@@ -426,7 +426,7 @@
     self.quoteSubtitleLabel.font = quoteContentFont;
     
     self.forwardTitleLabel.textColor = quoteContentColor;
-    self.forwardTitleLabel.font = quoteContentFont;
+    self.forwardTitleLabel.font = quoteTitleFont;
     
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;

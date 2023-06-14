@@ -1644,12 +1644,14 @@ CGPoint center;
                             [cell showBubbleHighlight];
                             _tappedMessageLocalID = @"";
                         }
+                        [cell setMessage:message];
                         
                         
                         if([self.starMessageIDArray containsObject:message.messageID]){
                             //Show star icon on message bubble
                             [cell showStarMessageView];
                         }
+                        
                         
                         if([self.pinMessageIDArray containsObject:message.messageID]){
                             [cell showPinIcon:YES];
@@ -1658,7 +1660,6 @@ CGPoint center;
                             [cell showPinIcon:NO];
                         }
                         
-                        [cell setMessage:message];
                         
                         if(self.isSelectingForwardMessage){
                             [cell showCheckMarkIcon:YES];
@@ -13036,15 +13037,16 @@ CGPoint center;
     
     NSNumber *totalRead = [self.messageTotalReadDictionary objectForKey:localMessage.localID];
     
-    if(totalRead != nil) {
+    if(totalRead != nil && totalRead.integerValue > 0) {
         [self showTotalReadWithMessage:[totalRead integerValue] message:localMessage];
     }
     
     [TAPDataManager callAPIGetMessageTotalRead:selectedMessage.messageID success:^(NSInteger readCount) {
         NSInteger totalReadCount = readCount;
         [self.messageTotalReadDictionary setObject:@(totalReadCount) forKey:localMessage.localID];
-        
-        [self showTotalReadWithMessage:totalReadCount message:localMessage];
+        if(totalReadCount > 0) {
+            [self showTotalReadWithMessage:totalReadCount message:localMessage];
+        }
         
     } failure:^(NSError *error) {
         

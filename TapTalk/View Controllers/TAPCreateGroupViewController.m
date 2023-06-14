@@ -775,7 +775,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             else {
                 TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
-                NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue]; // -1 for admin that created the group
+                NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue];
+                if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault) {
+                    maxGroupMember -= 1;// -1 for admin that created the group
+                }
+                
                 if ([self.selectedUserModelArray count] == maxGroupMember - [self.room.participants count]) {
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add More Member In Group" title:NSLocalizedStringFromTableInBundle(@"Cannot add more people", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"The max limit number of people in one group chat has been reached", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
                 }
@@ -1220,7 +1224,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.createGroupView setAsLoadingState:YES withType:TAPCreateGroupLoadingTypeRemoveMember];
         [TAPDataManager callAPIRemoveRoomParticipantsWithRoomID:self.room.roomID userIDArray:[self.selectedIndexDictionary allKeys] success:^(TAPRoomModel *room) {
             _room = room;
-            [self showCustomEditButton];
+            //[self showCustomEditButton];
             _isEditMode = NO;
             [self.createGroupView.contactsTableView reloadData];
             [self.createGroupView showAddMembersButton];
@@ -1412,7 +1416,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
     
     if ([self.room.admins containsObject:[TAPDataManager getActiveUser].userID]) {
-        [self showCustomEditButton];
+        //[self showCustomEditButton];
         if ([self.room.participants count] >= maxGroupMember + 1) {
             [self.createGroupView showBottomActionButtonView:NO];
         }
@@ -1499,7 +1503,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     NSInteger maxGroupMember = [coreConfigs.groupMaxParticipants integerValue] - 1; // -1 for admin that created the group
     
     if ([self.room.admins containsObject:[TAPDataManager getActiveUser].userID]) {
-        [self showCustomEditButton];
+        //[self showCustomEditButton];
         if ([self.room.participants count] >= maxGroupMember + 1) {
             [self.createGroupView showBottomActionButtonView:NO];
         }
@@ -1507,7 +1511,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.createGroupView showBottomActionButtonView:YES];
         }
     }
-    [self showCustomEditButton];
+    //[self showCustomEditButton];
     _isEditMode = NO;
     [self.createGroupView showBottomActionButtonViewExtension:NO withActiveButton:0];
     [self.createGroupView.contactsTableView reloadData];
