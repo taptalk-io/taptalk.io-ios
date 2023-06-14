@@ -86,10 +86,10 @@
     self.textViewCounterLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontAlbumCountLabel];
     self.textViewCounterLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.6f];
     
-    self.errorTextFieldLabel.font = labelFont;
+    self.errorTextFieldLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontAlbumCountLabel];
     self.errorTextFieldLabel.textColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPTextColorWarningLabel];
     
-    self.selectCategoryErrorLabel.font = labelFont;
+    self.selectCategoryErrorLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontAlbumCountLabel];
     self.selectCategoryErrorLabel.textColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPTextColorWarningLabel];
     self.selectCategoryErrorLabel.text = @"";
     [self.selectCategoryErrorLabel sizeToFit];
@@ -460,7 +460,47 @@
     }
 }
 
+- (void)radioButtonLoadingState:(BOOL)isLoading {
+    UIImage *selectedIconImageGray = [UIImage imageNamed:@"TAPIconSelectedGray" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *selectedIconImage = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    if(isLoading) {
+        if(self.selectedReasonIndex == 0) {
+            [self.reportReasonSendingFalseButton setImage:selectedIconImageGray forState:UIControlStateNormal];
+        }
+        else if(self.selectedReasonIndex == 1) {
+            [self.reportReasonPretendingButton setImage:selectedIconImageGray forState:UIControlStateNormal];
+        }
+        else if(self.selectedReasonIndex == 2) {
+            [self.reportReasonScamButton setImage:selectedIconImageGray forState:UIControlStateNormal];
+        }
+        else if(self.selectedReasonIndex == 3) {
+            [self.reportReasonDangerousButton setImage:selectedIconImageGray forState:UIControlStateNormal];
+        }
+        else if(self.reportReasonOtherButton.imageView.image == selectedIconImage){
+            [self.reportReasonOtherButton setImage:selectedIconImageGray forState:UIControlStateNormal];
+        }
+    }
+    else {
+        if(self.selectedReasonIndex == 0) {
+            [self.reportReasonSendingFalseButton setImage:selectedIconImage forState:UIControlStateNormal];
+        }
+        else if(self.selectedReasonIndex == 1) {
+            [self.reportReasonPretendingButton setImage:selectedIconImage forState:UIControlStateNormal];
+        }
+        else if(self.selectedReasonIndex == 2) {
+            [self.reportReasonScamButton setImage:selectedIconImage forState:UIControlStateNormal];
+        }
+        else if(self.selectedReasonIndex == 3) {
+            [self.reportReasonDangerousButton setImage:selectedIconImage forState:UIControlStateNormal];
+        }
+        else if(self.reportReasonOtherButton.imageView.image == selectedIconImageGray){
+            [self.reportReasonOtherButton setImage:selectedIconImage forState:UIControlStateNormal];
+        }
+    }
+}
+
 - (void)showLoadingState:(BOOL)isLoading {
+    [self radioButtonLoadingState:isLoading];
     if(isLoading) {
         //ADD ANIMATION
         self.loadingIconImageView.alpha = 1.0f;
@@ -508,16 +548,16 @@
 }
 
 - (void)resetReasonButtons {
-    UIImage *unselectedIconImage = [UIImage imageNamed:@"TAPIconUnselected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *unselectedIconImage = [UIImage imageNamed:@"TAPIconUnselectedGray" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     
     self.reportReasonOtherFieldHeightConstraint.constant = 0;
     self.reportReasonOtherTextField.alpha = 0.0f;
     
-    self.reportReasonSendingFalseButton.imageView.image = unselectedIconImage;
-    self.reportReasonPretendingButton.imageView.image = unselectedIconImage;
-    self.reportReasonScamButton.imageView.image = unselectedIconImage;
-    self.reportReasonDangerousButton.imageView.image = unselectedIconImage;
-    self.reportReasonOtherButton.imageView.image = unselectedIconImage;
+    [self.reportReasonSendingFalseButton setImage:unselectedIconImage forState:UIControlStateNormal];
+    [self.reportReasonPretendingButton setImage:unselectedIconImage forState:UIControlStateNormal];
+    [self.reportReasonScamButton setImage:unselectedIconImage forState:UIControlStateNormal];
+    [self.reportReasonDangerousButton setImage:unselectedIconImage forState:UIControlStateNormal];
+    [self.reportReasonOtherButton setImage:unselectedIconImage forState:UIControlStateNormal];
     
     [self setTextFieldToError:NO];
 }

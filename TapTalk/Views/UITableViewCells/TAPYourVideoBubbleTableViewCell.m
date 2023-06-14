@@ -209,6 +209,7 @@
     _minHeight = self.minWidth / 78.0f * 100.0f; //78.0f and 100.0f are width and height constraint on design
     
     self.pinIconBottomImageView.image = [self.pinIconBottomImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
     
     self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
     self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
@@ -643,7 +644,7 @@
     self.quoteSubtitleLabel.font = quoteContentFont;
     
     self.forwardTitleLabel.textColor = quoteContentColor;
-    self.forwardTitleLabel.font = quoteContentFont;
+    self.forwardTitleLabel.font = quoteTitleFont;
     
     self.forwardFromLabel.textColor = quoteContentColor;
     self.forwardFromLabel.font = quoteContentFont;
