@@ -5667,6 +5667,185 @@
     }];
 }
 
++ (void)callAPIRequestVerificationWithPhoneNumber:(NSString *)phoneNumber
+                                            countryID:(NSString *)countryID
+                                              languageCode:(NSString *)languageCode
+                                              success:(void (^)(BOOL isSuccess,NSString *verifID, NSString *waLink, NSString *waMessage, NSString *qrCode, NSString *message, NSInteger nextRequestSeconds))success
+                                              failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestVerification];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:phoneNumber forKey:@"phone"];
+    [parameterDictionary setObject:[NSNumber numberWithInteger:[countryID integerValue]] forKey:@"countryID"];
+    [parameterDictionary setObject:languageCode forKey:@"languageCode"]; //channel should be `sms` or `whatsapp`
+    [parameterDictionary setObject:@"https://web.taptalk.io/" forKey:@"appLink"];
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPIRequestVerificationWithPhoneNumber:phoneNumber countryID:countryID languageCode:languageCode   success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success(NO,[NSString string], [NSString string], [NSString string], [NSString string], [NSString string], 0);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        NSDictionary *verifDict = [dataDictionary objectForKey:@"verification"];
+        
+        NSString *verifID = [verifDict objectForKey:@"id"];
+        NSString *waLink = [verifDict objectForKey:@"waLink"];
+        NSString *waMessage = [verifDict objectForKey:@"waMessage"];
+        NSString *qrCode = [verifDict objectForKey:@"qrCode"];
+        NSString *message = [dataDictionary objectForKey:@"message"];
+        NSNumber *isSuccess = [dataDictionary objectForKey:@"success"];
+        NSNumber *nextRequestSeconds = [dataDictionary objectForKey:@"nextRequestSeconds"];
+        nextRequestSeconds = [TAPUtil nullToEmptyNumber:nextRequestSeconds];
+        
+        
+        success([isSuccess integerValue],verifID, waLink, waMessage, qrCode, message,[nextRequestSeconds integerValue]);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+        }
+    }];
+}
+
++ (void)callAPICheckVerificationWithPhoneNumber:(NSString *)phoneWithCode
+                                 verificationID:(NSString *)verificationID
+                                              success:(void (^)(BOOL isRegistered, NSString *ticket))success
+                                              failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeCheckVerification];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [parameterDictionary setObject:phoneWithCode forKey:@"phoneWithCode"];
+    [parameterDictionary setObject:verificationID forKey:@"verificationID"]; //channel should be `sms` or `whatsapp`
+    
+    [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TAPUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TAPDataManager callAPICheckVerificationWithPhoneNumber:phoneWithCode verificationID:verificationID   success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success(NO,@"");
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        NSNumber *isRegistered = [dataDictionary objectForKey:@"isRegistered"];
+        NSString *ticket = [dataDictionary objectForKey:@"ticket"];
+        
+        
+        success([isRegistered integerValue], ticket);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TAPDataManager logErrorStringFromError:error];
+        
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
+        failure(localizedError);
+#endif
+        }
+    }];
+}
+
 + (void)callAPIAddContactWithPhones:(NSArray *)phoneNumbers
                             success:(void (^)(NSArray *users))success
                             failure:(void (^)(NSError *error))failure {

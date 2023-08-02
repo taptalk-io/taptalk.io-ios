@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIButton *searchBarCancelButton;
 @property (strong, nonatomic) TAPBaseTableView *tableView;
 @property (strong, nonatomic) TAPBaseTableView *searchResultTableView;
+@property (strong, nonatomic) UIButton *closeButton;
 
 - (void)isShowEmptyState:(BOOL)isShow;
 

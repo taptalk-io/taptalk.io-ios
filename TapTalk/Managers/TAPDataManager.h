@@ -17,6 +17,7 @@
 #import "TAPScheduledMessageModel.h"
 #import "TAPClearedRoomModel.h"
 #import "TapMessageRecipientModel.h"
+#import "TapMessageRecipientModel.h"
 
 @import AFNetworking;
 
@@ -344,6 +345,15 @@
                                               channel:(NSString *)channel
                                               success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
                                               failure:(void (^)(NSError *error))failure;
++ (void)callAPIRequestVerificationWithPhoneNumber:(NSString *)phoneNumber
+                                            countryID:(NSString *)countryID
+                                              languageCode:(NSString *)languageCode
+                                              success:(void (^)(BOOL isSuccess,NSString *verifID, NSString *waLink, NSString *waMessage, NSString *qrCode, NSString *message, NSInteger nextRequestSeconds))success
+                                          failure:(void (^)(NSError *error))failure;
++ (void)callAPICheckVerificationWithPhoneNumber:(NSString *)phoneWithCode
+                                 verificationID:(NSString *)verificationID
+                                              success:(void (^)(BOOL isRegistered, NSString *ticket))success
+                                        failure:(void (^)(NSError *error))failure;
 + (void)callAPIVerifyOTPWithCode:(NSString *)OTPcode
                            OTPID:(NSString *)OTPID
                           OTPKey:(NSString *)OTPKey

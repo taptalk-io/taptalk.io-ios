@@ -28,9 +28,11 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _countryCodeContainerView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 0.0f, 106.0f, 50.0f)];
+       _countryCodeContainerView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 0.0f, 106.0f, 50.0f)];
+            self.countryCodeContainerView.layer.borderWidth = 1.0f;
+        
         self.countryCodeContainerView.layer.cornerRadius = 8.0f;
-        self.countryCodeContainerView.layer.borderWidth = 1.0f;
+        //        self.countryCodeContainerView.layer.borderWidth = 0.0f;
         self.countryCodeContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.countryCodeContainerView.clipsToBounds = YES;
         self.countryCodeContainerView.backgroundColor = [UIColor whiteColor];
@@ -64,11 +66,16 @@
         self.shadowView.layer.shadowOpacity = 1.0f;
         self.shadowView.layer.masksToBounds = NO;
         self.shadowView.alpha = 0.0f;
-//        [self addSubview:self.shadowView];
-        
+        //        [self addSubview:self.shadowView];
+       
+       
         _phoneNumberContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame) + 10.0f, CGRectGetMinY(self.countryCodeContainerView.frame), phoneNumberContainerViewWidth, 50.0f)];
+            self.phoneNumberContainerView.layer.borderWidth = 1.0f;
+        
+        
+        // _phoneNumberContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame), CGRectGetMinY(self.countryCodeContainerView.frame), phoneNumberContainerViewWidth, 50.0f)];
         self.phoneNumberContainerView.layer.cornerRadius = 8.0f;
-        self.phoneNumberContainerView.layer.borderWidth = 1.0f;
+        //     self.phoneNumberContainerView.layer.borderWidth = 0.0f;
         self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
         self.phoneNumberContainerView.clipsToBounds = YES;
@@ -76,10 +83,13 @@
         
         UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
         UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
-        _phoneNumberTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame))];
+    
+        
+        _phoneNumberTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame))];
+        
         self.phoneNumberTextField.delegate = self;
         self.phoneNumberTextField.keyboardType = UIKeyboardTypePhonePad;
-        self.phoneNumberTextField.placeholder = @"12345678910";
+        self.phoneNumberTextField.placeholder = @"8XXX XXX XXX";
         [self.phoneNumberTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         self.phoneNumberTextField.textColor = textFieldColor;
         self.phoneNumberTextField.font = textFieldFont;
@@ -97,6 +107,18 @@
     }
 
     return self;
+}
+
+- (void)setVerifState {
+    self.layer.cornerRadius = 8.0f;
+    self.layer.borderWidth = 1.0f;
+    self.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+    self.countryCodeContainerView.frame = CGRectMake(0.0f, 0.0f, 106.0f, 50.0f);
+    self.countryCodeContainerView.layer.borderWidth = 0.0f;
+    
+    self.phoneNumberContainerView.frame = CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame), CGRectGetMinY(self.countryCodeContainerView.frame), CGRectGetWidth( self.phoneNumberContainerView.frame), 50.0f);
+    self.phoneNumberContainerView.layer.borderWidth = 0.0f;
+    self.phoneNumberTextField.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame));
 }
 
 #pragma mark - Delegate

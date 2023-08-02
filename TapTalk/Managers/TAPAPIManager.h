@@ -33,6 +33,8 @@ typedef NS_ENUM(NSInteger, TAPAPIManagerType) {
     TAPAPIManagerTypeGetBulkUserByID,
     TAPAPIManagerTypeGetCountry,
     TAPAPIManagerTypeRequestOTP,
+    TAPAPIManagerTypeRequestVerification,
+    TAPAPIManagerTypeCheckVerification,
     TAPAPIManagerTypeVerifyOTP,
     TAPAPIManagerTypeCheckUsername,
     TAPAPIManagerTypeRegister,
