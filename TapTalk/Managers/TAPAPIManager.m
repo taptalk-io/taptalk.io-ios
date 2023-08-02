@@ -142,6 +142,14 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/login/request_otp/v1_6";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeRequestVerification) {
+        NSString *apiPath = @"client/login/request_whatsapp_verification";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeCheckVerification) {
+        NSString *apiPath = @"client/login/check_whatsapp_verification";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     else if (type == TAPAPIManagerTypeVerifyOTP) {
         NSString *apiPath = @"client/login/verify_otp";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];

@@ -12,6 +12,8 @@
 
 @property (strong, nonatomic) UILabel *titleEmptyStateLabel;
 @property (strong, nonatomic) UILabel *descriptionEmptyStateLabel;
+@property (strong, nonatomic) UIView *headerView;
+@property (strong, nonatomic) UILabel *selectCountryLabel;
 
 @end
 
@@ -21,7 +23,33 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _searchBarBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 52.0f)];
+        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 56.0f)];
+        self.headerView.backgroundColor = [UIColor whiteColor];
+        UIBezierPath *maskPath = [UIBezierPath
+                                  bezierPathWithRoundedRect:self.headerView.bounds
+                                  byRoundingCorners:(UIRectCornerTopRight | UIRectCornerTopLeft)
+                                  cornerRadii:CGSizeMake(8.0f, 8.0f)
+        ];
+        
+        CAShapeLayer *maskLayer = [CAShapeLayer layer];
+        
+        maskLayer.path = maskPath.CGPath;
+        
+        self.headerView.layer.mask = maskLayer;
+        [self addSubview:self.headerView];
+        
+        _selectCountryLabel = [[UILabel alloc]initWithFrame:CGRectMake((CGRectGetWidth(self.headerView.frame) / 2) - 75, 24.0f, 150.0f, 30.0f)];
+        self.selectCountryLabel.text = @"Select Country";
+        self.selectCountryLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchNewContactResultName];
+        
+        [self.headerView addSubview:self.selectCountryLabel];
+        
+        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 30 - 16, CGRectGetMinY(self.selectCountryLabel.frame), 30.0f, 30.0f)];
+        [self.closeButton setImage:[UIImage imageNamed:@"IconClose"] forState:UIControlStateNormal];
+
+        [self.headerView addSubview:self.closeButton];
+        
+        _searchBarBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.headerView.frame), CGRectGetWidth(self.frame), 52.0f)];
         self.searchBarBackgroundView.backgroundColor = [UIColor whiteColor];
         [self addSubview:self.searchBarBackgroundView];
         
@@ -45,7 +73,7 @@
         self.searchBarCancelButton.clipsToBounds = YES;
         [self.searchBarBackgroundView addSubview:self.searchBarCancelButton];
         
-        _tableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame)) style:UITableViewStylePlain];
+        _tableView = [[TAPBaseTableView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.searchBarBackgroundView.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - CGRectGetHeight(self.searchBarBackgroundView.frame) - CGRectGetHeight(self.headerView.frame)) style:UITableViewStylePlain];
         self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.tableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];

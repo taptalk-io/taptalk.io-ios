@@ -169,6 +169,25 @@
     }
 }
 
+- (TAPRoomModel *)getLocalChatRoomData:(NSString *)roomID {
+    TAPRoomModel *room = [[TAPGroupManager sharedManager] getRoomWithRoomID:roomID];
+    if(room != nil) {
+        return room;
+    }
+    
+    if([roomID containsString:@"-"]) {
+        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:roomID];
+        TAPUserModel *otherUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+        
+        if(otherUser != nil) {
+            return [TAPRoomModel createPersonalRoomIDWithID:roomID name:otherUser.fullname imageURL:otherUser.imageURL];
+        }
+        
+    }
+    
+    return nil;
+}
+
 - (void)createGroupChatRoomWithGroupName:(NSString *)groupName
                 listOfParticipantUserIDs:(NSArray *)participantUserIDArray
                                  success:(void (^)(TAPRoomModel *room))success

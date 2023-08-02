@@ -37,14 +37,14 @@
 
 - (void)loadView {
     [super loadView];
-    _countryPickerView = [[TAPCountryPickerView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
+    _countryPickerView = [[TAPCountryPickerView alloc] initWithFrame:CGRectMake([TAPBaseView frameWithNavigationBar].origin.x , [TAPBaseView frameWithNavigationBar].origin.y + 150.0f, [TAPBaseView frameWithNavigationBar].size.width, [TAPBaseView frameWithNavigationBar].size.height - 100.0f)];
     [self.view addSubview:self.countryPickerView];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
+    self.view.backgroundColor = [UIColor clearColor];
     UIFont *navigationBarButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontNavigationBarButtonLabel];
     UIColor *navigationBarButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorNavigationBarButtonLabel];
     
@@ -57,6 +57,8 @@
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     
     [self.countryPickerView.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.countryPickerView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     _indexSectionDictionary = [[NSMutableDictionary alloc] init];
     _searchResultCountryMutableArray = [[NSMutableArray alloc] init];
@@ -84,7 +86,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
     [self showNavigationSeparator:NO];
 }
 
