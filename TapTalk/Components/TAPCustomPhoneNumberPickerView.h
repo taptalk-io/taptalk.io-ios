@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setCountryCodePhoneNumberWithData:(TAPCountryModel *)countryData;
 - (void)setAsDisabled:(BOOL)disabled;
 - (void)setVerifState;
+- (void)setAsErrorState:(BOOL)isError;
+- (void)setAsLoadiState:(BOOL)isLoading;
 
 @end
 
