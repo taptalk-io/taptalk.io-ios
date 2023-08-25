@@ -23,6 +23,19 @@
     self = [super initWithFrame:frame];
     
     if (self) {
+        self.backgroundColor = [UIColor whiteColor];
+        UIBezierPath *maskPath2 = [UIBezierPath
+                                  bezierPathWithRoundedRect:self.self.bounds
+                                  byRoundingCorners:(UIRectCornerTopRight | UIRectCornerTopLeft)
+                                  cornerRadii:CGSizeMake(8.0f, 8.0f)
+        ];
+        
+        CAShapeLayer *maskLayer2 = [CAShapeLayer layer];
+        
+        maskLayer2.path = maskPath2.CGPath;
+        
+        self.layer.mask = maskLayer2;
+        
         _headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 56.0f)];
         self.headerView.backgroundColor = [UIColor whiteColor];
         UIBezierPath *maskPath = [UIBezierPath
