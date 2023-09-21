@@ -149,6 +149,28 @@ NS_ASSUME_NONNULL_BEGIN
                        progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                         success:(void (^)(TAPMessageModel *message))success
                         failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendImageMessageWithRemoteUrl:(NSString *)imageUrl
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                              failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendImageMessageWithRemoteUrl:(NSString *)imageUrl
+                        quotedMessage:(TAPMessageModel *)quotedMessage
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                              failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
 - (void)sendVideoMessageWithAsset:(PHAsset *)asset
                           caption:(nullable NSString *)caption
                              room:(TAPRoomModel *)room
@@ -164,6 +186,10 @@ NS_ASSUME_NONNULL_BEGIN
                          progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                           success:(void (^)(TAPMessageModel *message))success
                           failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendVideoMessageWithRemoteUrl:(NSString *)videoURL
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                        fetchMetaData:(BOOL)fetchMetaData;
 /**
  * @param videoAssetURL this should be a file's path from local only (e.g: abcd/efgh/media/video.mov)
  *
@@ -184,6 +210,10 @@ NS_ASSUME_NONNULL_BEGIN
                                  progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                                   success:(void (^)(TAPMessageModel *message))success
                                   failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendVideoMessageWithRemoteUrl:(NSString *)videoURL
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                        fetchMetaData:(BOOL)fetchMetaData temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated start:(void (^)(TAPMessageModel *message))start success:(void (^)(TAPMessageModel *message))success failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
 - (void)sendFileMessageWithFileURI:(NSURL *)fileURI
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start
@@ -197,6 +227,48 @@ NS_ASSUME_NONNULL_BEGIN
                           progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                            success:(void (^)(TAPMessageModel *message))success
                            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                       quotedMessage:(TAPMessageModel *)quotedMessage
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                            fileName:(NSString *)fileName
+                            mimeType:(NSString *)mimeType
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                 caption:(nullable NSString *)caption
+                       quotedMessage:(TAPMessageModel *)quotedMessage
+                    room:(TAPRoomModel *)room
+                            fileName:(NSString *)fileName
+                            mimeType:(NSString *)mimeType
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
 - (void)sendVoiceMessageWithFileURI:(NSURL *)fileURI
                               room:(TAPRoomModel *)room
                              start:(void (^)(TAPMessageModel *message))start

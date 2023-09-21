@@ -660,14 +660,14 @@
         self.downloadedFilePathDictionary = [[NSMutableDictionary alloc] init];
     }
         
-    NSMutableDictionary *downloadedFilePathPerRoomDictionary = [[self.downloadedFilePathDictionary objectForKey:roomID] mutableCopy];
+    NSMutableDictionary *downloadedFilePathPerRoomDictionary = [[self.downloadedFilePathDictionary objectForKey:@""] mutableCopy];
     
     if (downloadedFilePathPerRoomDictionary == nil || [downloadedFilePathPerRoomDictionary count] == 0) {
         downloadedFilePathPerRoomDictionary = [[NSMutableDictionary alloc] init];
     }
     
     [downloadedFilePathPerRoomDictionary setObject:filePath forKey:fileID];
-    [self.downloadedFilePathDictionary setObject:downloadedFilePathPerRoomDictionary forKey:roomID];
+    [self.downloadedFilePathDictionary setObject:downloadedFilePathPerRoomDictionary forKey:@""];
     
     [self saveDownloadedFilePathToPreference];
 }
@@ -689,8 +689,7 @@
     [self saveDownloadedFilePathToPreference];
 }
 
-- (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID {
-    NSDictionary *downloadedFilePathPerRoomDictionary = [self.downloadedFilePathDictionary objectForKey:roomID];
+- (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID {    NSDictionary *downloadedFilePathPerRoomDictionary = [self.downloadedFilePathDictionary objectForKey:@""];
     downloadedFilePathPerRoomDictionary = [TAPUtil nullToEmptyDictionary:downloadedFilePathPerRoomDictionary];
     
     NSString *filePath = @"";
@@ -699,6 +698,16 @@
     }
     
     if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSDictionary *downloadedFilePathPerRoomDictionary = [self.downloadedFilePathDictionary objectForKey:roomID];
+            downloadedFilePathPerRoomDictionary = [TAPUtil nullToEmptyDictionary:downloadedFilePathPerRoomDictionary];
+            
+            NSString *filePath = @"";
+            if ([downloadedFilePathPerRoomDictionary count] != 0) {
+                filePath = [downloadedFilePathPerRoomDictionary objectForKey:fileID];
+            }
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]){
         return @"";
     }
     
