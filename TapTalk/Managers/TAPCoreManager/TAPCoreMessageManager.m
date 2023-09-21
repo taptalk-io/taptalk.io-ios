@@ -7,6 +7,7 @@
 //
 
 #import "TAPCoreMessageManager.h"
+#import <TapTalk/Base64.h>
 
 @interface TAPCoreMessageManager () <TAPChatManagerDelegate>
 
@@ -19,6 +20,10 @@
 @property (strong, nonatomic) NSTimer *messageListenerBulkCallbackTimer;
 @property (strong, nonatomic) NSTimer *updatedMessageListenerBulkCallbackTimer;
 @property (strong, nonatomic) NSTimer *deletedMessageListenerBulkCallbackTimer;
+@property (strong, nonatomic) NSNumber *imageHeight;
+@property (strong, nonatomic) NSNumber *imageWidth;
+@property (strong, nonatomic) NSNumber *fileSize;
+
 
 - (void)fileUploadManagerProgressNotification:(NSNotification *)notification;
 - (void)fileUploadManagerStartNotification:(NSNotification *)notification;
@@ -360,18 +365,179 @@
         
         start(message);
     }];
+    
+   // [self sendCustomMessageWithMessageModel:message start:start success:success failure:failure];
 }
 
-- (void)sendImageMessage:(UIImage *)image
-           quotedMessage:(TAPMessageModel *)quotedMessage
+- (void)sendImageMessageWithRemoteUrl:(NSString *)imageUrl
                  caption:(nullable NSString *)caption
                     room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
                    start:(void (^)(TAPMessageModel *message))start
                 progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
                  success:(void (^)(TAPMessageModel *message))success
                  failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
-    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
-    [self sendImageMessage:image caption:caption room:room start:start progress:progress success:success failure:failure];
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(nil, error);
+        return;
+    }
+    
+    NSArray *componentsArray = [imageUrl componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:imageUrl caption:caption fileName:@"" mimetype:[NSString stringWithFormat:@"image/%@",fileExtension] room:room quotedMessage:nil];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetadata) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        NSMutableString *imageURL = [NSMutableString stringWithFormat:imageUrl];
+
+        NSNumber *height;
+        NSNumber *width;
+        NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:imageUrl] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (data) {
+                    CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)[NSURL URLWithString:imageUrl], NULL);
+                    NSDictionary* imageHeader = (__bridge NSDictionary*) CGImageSourceCopyPropertiesAtIndex(source, 0, NULL);
+                    NSLog(@"Image header %@",imageHeader);
+                    NSLog(@"PixelHeight %@",[imageHeader objectForKey:@"PixelHeight"]);
+                    
+                    NSNumber *height = [imageHeader objectForKey:@"PixelHeight"];
+                    NSNumber *width = [imageHeader objectForKey:@"PixelWidth"];
+                    NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                    self.imageWidth = width;
+                    self.imageHeight = height;
+                    
+                    NSURL *URL = [NSURL URLWithString:imageUrl];
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+                    [request setHTTPMethod:@"HEAD"];
+                    NSHTTPURLResponse *response;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+                    long long size = [response expectedContentLength];
+                    self.fileSize = @(size);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                    });
+                }
+            }];
+
+        [task resume];
+        NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+        [TAPUtil getImageFromRemoteUrl:imageUrl success:^(UIImage *image) {
+            [self resizeImage:image message:nil maxImageSize:TAP_MAX_THUMBNAIL_IMAGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
+                NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+                NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+                [data setValue:thumbnailImageBase64String forKey:@"thumbnail"];
+                [data setValue:self.fileSize forKey:@"size"];
+                [data setValue:self.imageWidth forKey:@"width"];
+                [data setValue:@"" forKey:@"fileID"];
+                [data setValue:self.imageHeight forKey:@"height"];
+                temporaryMessage.data = [data copy];
+                [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+    
+            }];
+        } failure:^(NSError *error) {
+            [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        }];
+    }
+}
+
+- (void)sendImageMessageWithRemoteUrl:(NSString *)imageUrl
+                        quotedMessage:(TAPMessageModel *)quotedMessage
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(nil, error);
+        return;
+    }
+    
+    NSArray *componentsArray = [imageUrl componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:imageUrl caption:caption fileName:@"" mimetype:[NSString stringWithFormat:@"image/%@",fileExtension] room:room quotedMessage:quotedMessage];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetadata) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        NSMutableString *imageURL = [NSMutableString stringWithFormat:imageUrl];
+
+        NSNumber *height;
+        NSNumber *width;
+        NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:imageUrl] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (data) {
+                    CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)[NSURL URLWithString:imageUrl], NULL);
+                    NSDictionary* imageHeader = (__bridge NSDictionary*) CGImageSourceCopyPropertiesAtIndex(source, 0, NULL);
+                    NSLog(@"Image header %@",imageHeader);
+                    NSLog(@"PixelHeight %@",[imageHeader objectForKey:@"PixelHeight"]);
+                    
+                    NSNumber *height = [imageHeader objectForKey:@"PixelHeight"];
+                    NSNumber *width = [imageHeader objectForKey:@"PixelWidth"];
+                    NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                    self.imageWidth = width;
+                    self.imageHeight = height;
+                    
+                    NSURL *URL = [NSURL URLWithString:imageUrl];
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+                    [request setHTTPMethod:@"HEAD"];
+                    NSHTTPURLResponse *response;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+                    long long size = [response expectedContentLength];
+                    self.fileSize = @(size);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                    });
+                }
+            }];
+
+        [task resume];
+        NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+        [TAPUtil getImageFromRemoteUrl:imageUrl success:^(UIImage *image) {
+            [self resizeImage:image message:nil maxImageSize:TAP_MAX_THUMBNAIL_IMAGE_SIZE success:^(UIImage *resizedImage, TAPMessageModel *resultMessage) {
+                NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+                NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+                [data setValue:thumbnailImageBase64String forKey:@"thumbnail"];
+                [data setValue:self.fileSize forKey:@"size"];
+                [data setValue:self.imageWidth forKey:@"width"];
+                [data setValue:@"" forKey:@"fileID"];
+                [data setValue:self.imageHeight forKey:@"height"];
+                temporaryMessage.data = [data copy];
+                [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+    
+            }];
+        } failure:^(NSError *error) {
+            [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        }];
+    }
 }
 
 - (void)sendImageMessageWithAsset:(PHAsset *)asset
@@ -618,6 +784,209 @@
     });
 }
 
+- (void)sendVideoMessageWithRemoteUrl:(NSString *)videoURL
+                                  caption:(nullable NSString *)caption
+                                     room:(TAPRoomModel *)room
+                        fetchMetaData:(BOOL)fetchMetaData temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated start:(void (^)(TAPMessageModel *message))start success:(void (^)(TAPMessageModel *message))success failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    NSURL *videoAssetURL = [NSURL URLWithString:videoURL];
+    
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        return;
+    }
+    
+    NSArray *componentsArray = [videoURL componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:videoURL caption:caption fileName:@"" mimetype:[NSString stringWithFormat:@"vide0/%@",fileExtension] room:room quotedMessage:nil];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetaData) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        temporaryMessageCreated(temporaryMessage);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //Retrieve the video frame at 1 sec to define the video thumbnail
+    //        AVURLAsset *urlVideoAsset = [[AVURLAsset alloc] initWithURL:videoAssetURL options:nil];
+    //        AVAssetImageGenerator *assetImageVideoGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlVideoAsset];
+    //        assetImageVideoGenerator.appliesPreferredTrackTransform = YES;
+    //        CMTime time = CMTimeMake(1, 1);
+    //        CGImageRef imageRef = [assetImageVideoGenerator copyCGImageAtTime:time actualTime:NULL error:nil];
+            
+            //Finalize video attachment
+    //        UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+    //        CGImageRelease(imageRef); //AS NOTE - ADDED FOR RELEASE UNUSED MEMORY
+            
+    //        NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+            
+            //END - Retrieve the video frame at 1 sec to define the video thumbnail
+            
+            AVAsset *videoAsset = [AVAsset assetWithURL:videoAssetURL];
+            
+            AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+            generator.appliesPreferredTrackTransform = YES;
+            CMTime thumbTime = CMTimeMake(1, 1);
+            CGFloat videoLength = ((float) videoAsset.duration.value) / ((float) videoAsset.duration.timescale);
+            CGSize sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+            
+    //        CMTime thumbTime = CMTimeMakeWithSeconds(videoLength, 2.0);
+            
+            //Handle block to dictionary
+            NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+            
+            AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
+                if (result != AVAssetImageGeneratorSucceeded) {
+                    // Error when generating thumbnail
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                    });
+                }
+                else {
+                    // Thumbnail generated
+                    UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+                    NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                       
+                    });
+                    
+                }
+            };
+            
+            NSURL *URL = [NSURL URLWithString:videoURL];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+            [request setHTTPMethod:@"HEAD"];
+            NSHTTPURLResponse *response;
+            [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+            long long size = [response expectedContentLength];
+
+            [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
+            
+            NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+            
+           // [data setValue:thumbnailImageBase64String forKey:@"thumbnail"];
+            [data setValue:@(size) forKey:@"size"];
+            [data setValue:@(sizeDimension.width) forKey:@"width"];
+            [data setValue:@"" forKey:@"fileID"];
+            [data setValue:@(sizeDimension.height) forKey:@"height"];
+            temporaryMessage.data = [data copy];
+            [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        });
+    }
+}
+
+- (void)sendVideoMessageWithRemoteUrl:(NSString *)videoURL
+                                  caption:(nullable NSString *)caption
+                        quotedMessage:(TAPMessageModel *)quotedMessage
+                                     room:(TAPRoomModel *)room
+                        fetchMetaData:(BOOL)fetchMetaData temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated start:(void (^)(TAPMessageModel *message))start success:(void (^)(TAPMessageModel *message))success failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    NSURL *videoAssetURL = [NSURL URLWithString:videoURL];
+    
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        return;
+    }
+    
+    NSArray *componentsArray = [videoURL componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:videoURL caption:caption fileName:@"" mimetype:[NSString stringWithFormat:@"vide0/%@",fileExtension] room:room quotedMessage:quotedMessage];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetaData) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        temporaryMessageCreated(temporaryMessage);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //Retrieve the video frame at 1 sec to define the video thumbnail
+    //        AVURLAsset *urlVideoAsset = [[AVURLAsset alloc] initWithURL:videoAssetURL options:nil];
+    //        AVAssetImageGenerator *assetImageVideoGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlVideoAsset];
+    //        assetImageVideoGenerator.appliesPreferredTrackTransform = YES;
+    //        CMTime time = CMTimeMake(1, 1);
+    //        CGImageRef imageRef = [assetImageVideoGenerator copyCGImageAtTime:time actualTime:NULL error:nil];
+            
+            //Finalize video attachment
+    //        UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+    //        CGImageRelease(imageRef); //AS NOTE - ADDED FOR RELEASE UNUSED MEMORY
+            
+    //        NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+            
+            //END - Retrieve the video frame at 1 sec to define the video thumbnail
+            
+            AVAsset *videoAsset = [AVAsset assetWithURL:videoAssetURL];
+            
+            AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+            generator.appliesPreferredTrackTransform = YES;
+            CMTime thumbTime = CMTimeMake(1, 1);
+            CGFloat videoLength = ((float) videoAsset.duration.value) / ((float) videoAsset.duration.timescale);
+            CGSize sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+            
+    //        CMTime thumbTime = CMTimeMakeWithSeconds(videoLength, 2.0);
+            
+            //Handle block to dictionary
+            NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+            
+            AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
+                if (result != AVAssetImageGeneratorSucceeded) {
+                    // Error when generating thumbnail
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        
+                    });
+                }
+                else {
+                    // Thumbnail generated
+                    UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+                    NSData *videoThumbnailImageData = UIImageJPEGRepresentation(videoThumbnailImage, 1.0f);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                       
+                    });
+                    
+                }
+            };
+            
+            NSURL *URL = [NSURL URLWithString:videoURL];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+            [request setHTTPMethod:@"HEAD"];
+            NSHTTPURLResponse *response;
+            [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+            long long size = [response expectedContentLength];
+
+            [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
+            
+            NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+            
+           // [data setValue:thumbnailImageBase64String forKey:@"thumbnail"];
+            [data setValue:@(size) forKey:@"size"];
+            [data setValue:@(sizeDimension.width) forKey:@"width"];
+            [data setValue:@"" forKey:@"fileID"];
+            [data setValue:@(sizeDimension.height) forKey:@"height"];
+            temporaryMessage.data = [data copy];
+            [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        });
+    }
+}
+
 - (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
                             quotedMessage:(TAPMessageModel *)quotedMessage
                                   caption:(nullable NSString *)caption
@@ -703,6 +1072,272 @@
                            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
     [self sendFileMessageWithFileURI:fileURI room:room start:start progress:progress success:success failure:failure];
+}
+
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(nil, error);
+        return;
+    }
+    
+    NSArray *componentsArray = [fileUrl componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:fileUrl caption:caption fileName:@"" mimetype:[NSString stringWithFormat:@"file/%@",fileExtension] room:room quotedMessage:nil];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetadata) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        NSMutableString *imageURL = [NSMutableString stringWithFormat:fileUrl];
+        
+        NSURL *url = [NSURL URLWithString:fileUrl];
+        NSString *filenameWithExtension = [url lastPathComponent];
+        //NSRange range = [filenameWithExtension rangeOfString:@"."];
+       // NSString *fileName = [fileUrl substringWithRange:NSMakeRange(0, range.location)];
+
+        NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+        NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:fileUrl] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (data) {
+                    NSURL *URL = [NSURL URLWithString:fileUrl];
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+                    [request setHTTPMethod:@"HEAD"];
+                    NSHTTPURLResponse *response;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+                    long long size = [response expectedContentLength];
+                    self.fileSize = @(size);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [data setValue:self.fileSize forKey:@"size"];
+                        [data setValue:@"" forKey:@"fileID"];
+                        [data setValue:filenameWithExtension forKey:@"fileName"];
+                        temporaryMessage.data = [data copy];
+                        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+                    });
+                }
+            }];
+
+        [task resume];
+    }
+}
+
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                       quotedMessage:(TAPMessageModel *)quotedMessage
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(nil, error);
+        return;
+    }
+    
+    NSArray *componentsArray = [fileUrl componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:fileUrl caption:caption fileName:@"" mimetype:[NSString stringWithFormat:@"file/%@",fileExtension] room:room quotedMessage:quotedMessage];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetadata) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        NSMutableString *imageURL = [NSMutableString stringWithFormat:fileUrl];
+        
+        NSURL *url = [NSURL URLWithString:fileUrl];
+        NSString *filenameWithExtension = [url lastPathComponent];
+        //NSRange range = [filenameWithExtension rangeOfString:@"."];
+       // NSString *fileName = [fileUrl substringWithRange:NSMakeRange(0, range.location)];
+
+        NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+        NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:fileUrl] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (data) {
+                    NSURL *URL = [NSURL URLWithString:fileUrl];
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+                    [request setHTTPMethod:@"HEAD"];
+                    NSHTTPURLResponse *response;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+                    long long size = [response expectedContentLength];
+                    self.fileSize = @(size);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [data setValue:self.fileSize forKey:@"size"];
+                        [data setValue:@"" forKey:@"fileID"];
+                        [data setValue:filenameWithExtension forKey:@"fileName"];
+                        temporaryMessage.data = [data copy];
+                        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+                    });
+                }
+            }];
+
+        [task resume];
+    }
+}
+
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                 caption:(nullable NSString *)caption
+                    room:(TAPRoomModel *)room
+                            fileName:(NSString *)fileName
+                            mimeType:(NSString *)mimeType
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(nil, error);
+        return;
+    }
+    
+    NSArray *componentsArray = [fileUrl componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:fileUrl caption:caption fileName:@"" mimetype:mimeType room:room quotedMessage:nil];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetadata) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        NSMutableString *imageURL = [NSMutableString stringWithFormat:fileUrl];
+        
+        NSURL *url = [NSURL URLWithString:fileUrl];
+        NSString *filenameWithExtension = [url lastPathComponent];
+        //NSRange range = [filenameWithExtension rangeOfString:@"."];
+       // NSString *fileName = [fileUrl substringWithRange:NSMakeRange(0, range.location)];
+
+        NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+        NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:fileUrl] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (data) {
+                    NSURL *URL = [NSURL URLWithString:fileUrl];
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+                    [request setHTTPMethod:@"HEAD"];
+                    NSHTTPURLResponse *response;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+                    long long size = [response expectedContentLength];
+                    self.fileSize = @(size);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [data setValue:self.fileSize forKey:@"size"];
+                        [data setValue:@"" forKey:@"fileID"];
+                        [data setValue:fileName forKey:@"fileName"];
+                        temporaryMessage.data = [data copy];
+                        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+                    });
+                }
+            }];
+
+        [task resume];
+    }
+}
+
+- (void)sendFileMessageWithRemoteUrl:(NSString *)fileUrl
+                 caption:(nullable NSString *)caption
+                       quotedMessage:(TAPMessageModel *)quotedMessage
+                    room:(TAPRoomModel *)room
+                            fileName:(NSString *)fileName
+                            mimeType:(NSString *)mimeType
+                        fetchMetadata:(BOOL)fetchMetadata
+              temporaryMessageCreated:(void (^)(TAPMessageModel *message))temporaryMessageCreated
+                   start:(void (^)(TAPMessageModel *message))start
+                progress:(void (^)(TAPMessageModel *message, CGFloat progress, CGFloat total))progress
+                 success:(void (^)(TAPMessageModel *message))success
+                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *captionString = @"";
+    if (caption != nil) {
+        captionString = caption;
+    }
+    
+    // Check if caption is longer than allowed max length
+    NSInteger maxCaptionCharacterLength = [[TapTalk sharedInstance] getMaxCaptionLength];
+    if ([captionString length] > maxCaptionCharacterLength) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Media caption exceeds the %ld character limit", (long)maxCaptionCharacterLength];
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
+        failure(nil, error);
+        return;
+    }
+    
+    NSArray *componentsArray = [fileUrl componentsSeparatedByString:@"."];
+    NSString *fileExtension = [componentsArray lastObject];
+    
+    TAPMessageModel *temporaryMessage = [self createTemporaryMediaMessageWithUrl:TAPChatMessageTypeImage url:fileUrl caption:caption fileName:@"" mimetype:mimeType room:room quotedMessage:quotedMessage];
+    temporaryMessageCreated(temporaryMessage);
+    
+    if(!fetchMetadata) {
+        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+        
+    }
+    else {
+        NSMutableString *imageURL = [NSMutableString stringWithFormat:fileUrl];
+        
+        NSURL *url = [NSURL URLWithString:fileUrl];
+        NSString *filenameWithExtension = [url lastPathComponent];
+        //NSRange range = [filenameWithExtension rangeOfString:@"."];
+       // NSString *fileName = [fileUrl substringWithRange:NSMakeRange(0, range.location)];
+
+        NSMutableDictionary *data = [temporaryMessage.data mutableCopy];
+        NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:fileUrl] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (data) {
+                    NSURL *URL = [NSURL URLWithString:fileUrl];
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+                    [request setHTTPMethod:@"HEAD"];
+                    NSHTTPURLResponse *response;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+                    long long size = [response expectedContentLength];
+                    self.fileSize = @(size);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [data setValue:self.fileSize forKey:@"size"];
+                        [data setValue:@"" forKey:@"fileID"];
+                        [data setValue:fileName forKey:@"fileName"];
+                        temporaryMessage.data = [data copy];
+                        [self sendCustomMessageWithMessageModel:temporaryMessage start:start success:success failure:failure];
+                    });
+                }
+            }];
+
+        [task resume];
+    }
 }
 
 - (void)sendVoiceMessageWithFileURI:(NSURL *)fileURI
@@ -2096,5 +2731,101 @@
     }];
 }
 
+- (void)resizeImage:(UIImage *)image message:(TAPMessageModel *)message maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage, TAPMessageModel *resultMessage))success {
+    __block UIImage *resizedImage;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        CGFloat imageWidth = image.size.width;
+        CGFloat imageHeight = image.size.height;
+        
+        if (imageWidth > imageHeight) {
+            if (imageWidth > maxImageSize) {
+                imageWidth = maxImageSize;
+                
+                imageHeight = (imageWidth / image.size.width) * image.size.height;
+                if (imageHeight > maxImageSize) {
+                    imageHeight = maxImageSize;
+                }
+            }
+        }
+        else {
+            if (imageHeight > maxImageSize) {
+                imageHeight = maxImageSize;
+
+                imageWidth = (imageHeight / image.size.height) * image.size.width;
+                if (imageWidth > maxImageSize) {
+                    imageWidth = maxImageSize;
+                }
+            }
+        }
+        
+        resizedImage = [TAPUtil resizedImage:image frame:CGRectMake(0.0f, 0.0f, roundf(imageWidth), roundf(imageHeight))];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            success(resizedImage, message);
+        });
+        
+    });
+}
+
+- (TAPMessageModel *)createTemporaryMediaMessageWithUrl:(NSInteger)type url:(NSString *)url caption:(NSString *)caption fileName:(NSString *)fileName mimetype:(NSString *)mimetype room:(TAPRoomModel *)room quotedMessage:(TAPRoomModel *)quotedMessage  {
+    NSString *body;
+    
+    if(type == TAPChatMessageTypeImage) {
+        body = [NSString stringWithFormat:@"🖼 %@", caption];
+    }
+    else if(type == TAPChatMessageTypeVideo) {
+        body = [NSString stringWithFormat:@"🎥 %@", caption];
+    }
+    else if(type == TAPChatMessageTypeFile) {
+        body = [NSString stringWithFormat:@"📎  %@", caption];
+    }
+    else if(type == TAPChatMessageTypeVoice) {
+        body = [NSString stringWithFormat:@"🎤 %@", caption];
+    }
+    else {
+        body = @"";
+    }
+    
+    NSMutableDictionary *data = [NSMutableDictionary dictionary];
+    [data setValue:url forKey:@"url"];
+    
+    if(![TAPUtil isEmptyString:caption]) {
+        [data setValue:caption forKey:@"caption"];
+    }
+    
+    if(![TAPUtil isEmptyString:fileName]) {
+        [data setValue:fileName forKey:@"fileName"];
+    }
+    
+    if(![TAPUtil isEmptyString:mimetype]) {
+        [data setValue:mimetype forKey:@"mediaType"];
+    }
+    else {
+        NSString *mediaType;
+        if(type == TAPChatMessageTypeImage) {
+            mediaType = @"image/jpg";
+        }
+        else if(type == TAPChatMessageTypeVideo) {
+            mediaType = @"video/mp4";
+        }
+        else if(type == TAPChatMessageTypeVoice) {
+            mediaType = @"audio/mp3";
+        }
+        else {
+            mediaType = @"application/octet-stream";
+        }
+        [data setValue:mediaType forKey:@"mediaType"];
+    }
+    
+    if(quotedMessage != nil) {
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPDataManager getActiveUser] room:room body:body type:type quote:quotedMessage messageData:data];
+        return message;
+    }
+    else {
+        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPDataManager getActiveUser] created:[TAPUtil currentTimeInMillis] room:room body:body type:type messageData:data];
+        return message;
+    }
+    
+}
 
 @end

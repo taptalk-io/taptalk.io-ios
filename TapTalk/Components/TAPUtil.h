@@ -147,7 +147,7 @@
 + (UIViewController *_Nullable) topViewController;
 + (NSDictionary *) objectToDictionary:(id)object;
 + (NSArray *)getUrlsFromString:(NSString *)text;
-
++ (void)getImageFromRemoteUrl:(NSString *)urlString  success:(void (^)(UIImage *image))success failure:(void (^)(NSError *error))failure;
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;
 + (void)setLanguage:(NSString *)language;

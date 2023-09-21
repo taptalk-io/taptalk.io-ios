@@ -580,6 +580,9 @@
         NSString *fileID = [responseDataDictionary objectForKey:@"id"];
         fileID = [TAPUtil nullToEmptyString:fileID];
 
+        NSString *caption = dataFile.caption;
+        caption = [TAPUtil nullToEmptyString:caption];
+        
         NSString *fileURL = [responseDataDictionary objectForKey:@"url"];
         if (fileURL == nil || [fileURL isEqualToString:@""]) {
             fileURL = [responseDataDictionary objectForKey:@"fileURL"];
@@ -598,6 +601,7 @@
         [resultDataDictionary setObject:fileURL forKey:@"url"];
         [resultDataDictionary setObject:fileName forKey:@"fileName"];
         [resultDataDictionary setObject:sizeNum forKey:@"size"];
+        [resultDataDictionary setObject:caption forKey:@"caption"];
         currentMessage.data = resultDataDictionary;
 
         //Remove from waiting upload dictionary in ChatManager
@@ -2101,6 +2105,9 @@
     NSString *mediaType = [dictionary objectForKey:@"mediaType"];
     mediaType = [TAPUtil nullToEmptyString:mediaType];
     
+    NSString *caption = [dictionary objectForKey:@"caption"];
+       caption = [TAPUtil nullToEmptyString:caption];
+    
     NSNumber *size = [dictionary objectForKey:@"size"];
     
     dataFile.fileID = fileID;
@@ -2108,6 +2115,7 @@
     dataFile.fileName = fileName;
     dataFile.mediaType = mediaType;
     dataFile.size = size;
+    dataFile.caption = caption;
     
     return dataFile;
 }

@@ -116,6 +116,10 @@
     if ([self.mediaDataArray count] != 0) {
         //Show excedeed bottom view if needed
         TAPMediaPreviewModel *firstMediaPreview = [self.mediaDataArray firstObject];
+        if(![TAPUtil isEmptyString:firstMediaPreview.caption]) {
+            [self.imagePreviewView.captionTextView setInitialText:firstMediaPreview.caption];
+        }
+        
         BOOL isExcedeedFileSize = [self isAssetSizeExcedeedLimitWithData:firstMediaPreview];
         [self.imagePreviewView showExcedeedFileSizeAlertView:isExcedeedFileSize animated:YES];
         
@@ -866,43 +870,55 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [cell showProgressView:YES animated:YES];
     
     _showVideoPlayer = YES;
-    [[TAPFetchMediaManager sharedManager] fetchVideoDataForAsset:mediaPreview.asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
-        
-        [cell animateProgressMediaWithProgress:progress total:1.0f];
-        if (progress == 1.0f) {
+    if(mediaPreview.asset != nil) {
+        [[TAPFetchMediaManager sharedManager] fetchVideoDataForAsset:mediaPreview.asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
+            
+            [cell animateProgressMediaWithProgress:progress total:1.0f];
+            if (progress == 1.0f) {
+                [TAPUtil performBlock:^{
+                    [cell animateFinishedDownload];
+                } afterDelay:0.3f];
+            }
+            
+        } resultHandler:^(AVAsset * _Nonnull resultVideoAsset) {
+            mediaPreview.videoAsset = resultVideoAsset;
+            cell.mediaPreviewData = mediaPreview;
+            
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+            
+            AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:resultVideoAsset];
+            AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+            
+            if (self.showVideoPlayer) {
+                AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+                controller.delegate = self;
+                controller.showsPlaybackControls = YES;
+                [self presentViewController:controller animated:YES completion:nil];
+                controller.player = player;
+                [player play];
+            }
+            
             [TAPUtil performBlock:^{
-                [cell animateFinishedDownload];
-            } afterDelay:0.3f];
-        }
-        
-    } resultHandler:^(AVAsset * _Nonnull resultVideoAsset) {
-        mediaPreview.videoAsset = resultVideoAsset;
-        cell.mediaPreviewData = mediaPreview;
-        
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        
-        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:resultVideoAsset];
-        AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-        
-        if (self.showVideoPlayer) {
-            AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-            controller.delegate = self;
-            controller.showsPlaybackControls = YES;
-            [self presentViewController:controller animated:YES completion:nil];
-            controller.player = player;
-            [player play];
-        }
-        
-        [TAPUtil performBlock:^{
-            [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
-            [cell showProgressView:NO animated:NO];
-            [cell showPlayButton:YES animated:NO];
-            _showVideoPlayer = NO;
-        } afterDelay:0.5f];
-    } failureHandler:^{
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Cannot play video at the moment, please check your connection and try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+                [cell showProgressView:NO animated:NO];
+                [cell showPlayButton:YES animated:NO];
+                _showVideoPlayer = NO;
+            } afterDelay:0.5f];
+        } failureHandler:^{
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Cannot play video at the moment, please check your connection and try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
-    }];
+        }];
+    }
+    else {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+            NSURL *videoURL = [NSURL URLWithString:mediaPreview.url];
+            AVPlayer *player = [AVPlayer playerWithURL:videoURL];
+            AVPlayerViewController *playerViewController = [AVPlayerViewController new];
+            playerViewController.player = player;
+            [self presentViewController:playerViewController animated:YES completion:^{
+                [player play];
+            }];
+    }
 }
 
 #pragma mark - Custom Method

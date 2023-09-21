@@ -1589,6 +1589,9 @@
     NSString *fileName = dataFile.fileName;
     fileName = [TAPUtil nullToEmptyString:fileName];
     
+    NSString *caption = dataFile.caption;
+        caption = [TAPUtil nullToEmptyString:caption];
+    
     NSString *mediaType = dataFile.mediaType;
     mediaType = [TAPUtil nullToEmptyString:mediaType];
     
@@ -1602,6 +1605,7 @@
     [dataDictionary setObject:fileName forKey:@"fileName"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:size forKey:@"size"];
+    [dataDictionary setObject:caption forKey:@"caption"];
     
     TAPMessageModel *message = [self createMessageModelWithRoom:room
                                                            body:messageBodyString
