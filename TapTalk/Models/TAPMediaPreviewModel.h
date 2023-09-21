@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) NSString *caption;
 @property (nonatomic, strong) NSString *mediaType;
+@property (nonatomic, strong) NSString *url;
 
 //0 for not define, 1 for is exceeded, 2 for not exceeded
 @property (nonatomic) NSInteger fileSizeLimitStatus;

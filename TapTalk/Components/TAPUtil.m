@@ -7,6 +7,8 @@
 //
 
 #import "TAPUtil.h"
+#import "SDWebImageDownloader.h"
+#import "SDImageCache.h"
 #import <CoreServices/UTType.h>
 #import <CoreServices/UTCoreTypes.h>
 #import <objc/runtime.h>
@@ -431,6 +433,80 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
     
     return newImage;
+}
+
++ (void)getImageFromRemoteUrl:(NSString *)urlString  success:(void (^)(UIImage *image))success failure:(void (^)(NSError *error))failure {
+    if (urlString == nil) {
+        urlString = @"";
+    }
+    
+    //_imageURLString = urlString;
+    NSString *key = urlString;
+    if ([urlString hasPrefix:@"http"]) {
+        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
+    SDImageCache *imageCache = [SDImageCache sharedImageCache];
+    [imageCache diskImageExistsWithKey:key completion:^(BOOL isInCache) {
+        if (isInCache) {
+            //Image exist in disk, load from disk
+            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:key];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                success(savedImage);
+               // self.image = savedImage;
+                
+//                if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+//                    [self.delegate imageViewDidFinishLoadImage:self];
+//                }
+            });
+        }
+        else {
+            if (![urlString hasPrefix:@"http"]) {
+                //Do not load url when url is fileID type
+//                if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+//                    [self.delegate imageViewDidFinishLoadImage:self];
+//                }
+                return;
+            }
+            NSURL *imageURL = [NSURL URLWithString:urlString];
+            
+            SDWebImageDownloader *imageDownloader = [SDWebImageDownloader sharedDownloader];
+            [imageDownloader downloadImageWithURL:imageURL options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+//#ifdef DEBUG
+//                NSLog(@"Image Download: %ld of %ld", (long)receivedSize, (long)expectedSize);
+//#endif
+            } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                if (finished && image != nil) {
+                    success(image);
+//#ifdef DEBUG
+//                    NSLog(@"Image Download Completed");
+//#endif
+                    //            [imageCache storeImage:image forKey:urlString];
+                    [imageCache storeImage:image forKey:urlString completion:^{
+                    }];
+//                    if ([self.imageURLString isEqualToString:[imageURL absoluteString]]) {
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            self.image = image;
+//
+//                            if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+//                                [self.delegate imageViewDidFinishLoadImage:self];
+//                            }
+//                        });
+//                    }
+                }
+                else {
+//#ifdef DEBUG
+//                    NSLog(@"Image Download Failed: %@", [error description]);
+//#endif
+                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        self.image = nil;
+//                        if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+//                            [self.delegate imageViewDidFinishLoadImage:self];
+//                        }
+                    });
+                }
+            }];
+        }
+    }];
 }
 
 #pragma mark - Encoding
