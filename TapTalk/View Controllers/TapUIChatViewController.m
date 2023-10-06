@@ -506,26 +506,6 @@ CGPoint center;
     // Do any additional setup after loading the view from its nib.
     //Open room and save to active room
     [[TAPChatManager sharedManager] openRoom:self.currentRoom];
-    [[TAPCoreMessageManager sharedManager] sendImageMessageWithRemoteUrl:@"https://taptalk.io/assets/image/new-home-2/section-1/webp/section-1-slider-4-min.webp" caption:@"assxax" room:nil fetchMetadata:YES temporaryMessageCreated:^(TAPMessageModel * _Nonnull message) {
-        
-    } start:^(TAPMessageModel * _Nonnull message) {
-        
-    } progress:^(TAPMessageModel * _Nonnull message, CGFloat progress, CGFloat total) {
-        
-    } success:^(TAPMessageModel * _Nonnull message) {
-        
-    } failure:^(TAPMessageModel * _Nullable message, NSError * _Nonnull error) {
-        
-    }];
-//    [[TAPCoreMessageManager sharedManager] sendImageMessageWithRemoteUrl:@"https://taptalk.io/assets/image/new-home-2/section-1/webp/section-1-slider-4-min.webp" caption:@"scscscsdcdscdscdscsdc" room:nil start:^(TAPMessageModel * _Nonnull message) {
-//
-//    } progress:^(TAPMessageModel * _Nonnull message, CGFloat progress, CGFloat total) {
-//
-//    } success:^(TAPMessageModel * _Nonnull message) {
-//
-//    } failure:^(TAPMessageModel * _Nullable message, NSError * _Nonnull error) {
-//
-//    }];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityStatusChange:) name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
     
@@ -10536,7 +10516,9 @@ CGPoint center;
         filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
     }
     
-    if (filePath == nil || [filePath isEqualToString:@""] || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+    if (filePath == nil || [filePath isEqualToString:@""]
+        //|| ![[NSFileManager defaultManager] fileExistsAtPath:filePath]
+        ) {
         [self showFileNotFoundPopUpWithMessage:message];
         return;
     }

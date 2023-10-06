@@ -1086,8 +1086,14 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (NSString *)mimeTypeForFileWithExtension:(NSString *)fileExtension {
+    if ([TAPUtil isEmptyString:fileExtension]) {
+        return @"";
+    }
     NSString *UTI = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)fileExtension, NULL);
     NSString *mimeType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)UTI, kUTTagClassMIMEType);
+    if ([TAPUtil isEmptyString:mimeType]) {
+        return @"";
+    }
     return mimeType;
 }
 
@@ -1273,6 +1279,212 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return urlMatchesString;
 }
 
++ (void)fetchVideoThumbnailWithRemoteURL:(NSString *)url
+                                 success:(void (^)(UIImage *thumbnail))success
+                                 failure:(void (^)(NSError *error))failure {
+    
+    NSString *key = [[url componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    SDImageCache *imageCache = [SDImageCache sharedImageCache];
+    
+    CMTime thumbTime = CMTimeMake(1, 1);
+    AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
+        if (result != AVAssetImageGeneratorSucceeded) {
+            // Error when generating thumbnail
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSError *error = [NSError errorWithDomain:@"" code:99999 userInfo:nil];
+                failure(error);
+            });
+        }
+        else {
+            // Thumbnail generated
+            UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (videoThumbnailImage != nil) {
+                    [imageCache storeImage:videoThumbnailImage forKey:key completion:^{
+                        success(videoThumbnailImage);
+                    }];
+                }
+                else {
+                    NSError *error = [NSError errorWithDomain:@"" code:99999 userInfo:nil];
+                    failure(error);
+                }
+            });
+        }
+    };
+    
+    [imageCache diskImageExistsWithKey:key completion:^(BOOL isInCache) {
+        if (isInCache) {
+            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:key];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (savedImage != nil) {
+                    // Thumbnail exists in cache
+                    success(savedImage);
+                }
+                else {
+                    // Fetch thumbnail
+                    AVAsset *videoAsset = [AVAsset assetWithURL:[NSURL URLWithString:url]];
+                    AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+                    generator.appliesPreferredTrackTransform = YES;
+                    [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
+                }
+            });
+        }
+        else {
+            // Fetch thumbnail
+            AVAsset *videoAsset = [AVAsset assetWithURL:[NSURL URLWithString:url]];
+            AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+            generator.appliesPreferredTrackTransform = YES;
+            [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
+        }
+    }];
+}
+
++ (void)fetchVideoMetadataWithRemoteURL:(NSString *)url
+                                success:(void (^)(UIImage *_Nullable thumbnail,
+                                                  NSNumber *size,
+                                                  NSNumber *width,
+                                                  NSNumber *height,
+                                                  NSNumber *duration))success {
+    
+    NSString *key = [[url componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    SDImageCache *imageCache = [SDImageCache sharedImageCache];
+    
+    AVAsset *videoAsset = [AVAsset assetWithURL:[NSURL URLWithString:url]];
+    CGSize sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+    
+    NSURL *URL = [NSURL URLWithString:url];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    [request setHTTPMethod:@"HEAD"];
+    NSHTTPURLResponse *response;
+    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error: nil];
+    long long videoSize = [response expectedContentLength];
+    
+    CGFloat durationMilliseconds = CMTimeGetSeconds(videoAsset.duration) * 1000.0f;
+    
+    NSNumber *size = [NSNumber numberWithLongLong:videoSize];
+    NSNumber *width = [NSNumber numberWithLong:[NSNumber numberWithFloat:sizeDimension.width].longValue];
+    NSNumber *height = [NSNumber numberWithLong:[NSNumber numberWithFloat:sizeDimension.height].longValue];
+    NSNumber *duration = [NSNumber numberWithLong:[NSNumber numberWithFloat:durationMilliseconds].longValue];
+    
+    CMTime thumbTime = CMTimeMake(1, 1);
+    AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
+        if (result != AVAssetImageGeneratorSucceeded) {
+            // Error when generating thumbnail
+            dispatch_async(dispatch_get_main_queue(), ^{
+                success(nil, size, width, height, duration);
+            });
+        }
+        else {
+            // Thumbnail generated
+            UIImage *videoThumbnailImage = [[UIImage alloc] initWithCGImage:imageRef];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (videoThumbnailImage != nil) {
+                    [imageCache storeImage:videoThumbnailImage forKey:key completion:^{
+                        success(videoThumbnailImage, size, width, height, duration);
+                    }];
+                }
+                else {
+                    success(nil, size, width, height, duration);
+                }
+            });
+        }
+    };
+    
+    [imageCache diskImageExistsWithKey:key completion:^(BOOL isInCache) {
+        if (isInCache) {
+            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:key];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (savedImage != nil) {
+                    // Thumbnail exists in cache
+                    success(savedImage, size, width, height, duration);
+                }
+                else {
+                    // Fetch thumbnail
+                    AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+                    generator.appliesPreferredTrackTransform = YES;
+                    [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
+                }
+            });
+        }
+        else {
+            // Fetch thumbnail
+            AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:videoAsset];
+            generator.appliesPreferredTrackTransform = YES;
+            [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
+        }
+    }];
+}
+
++ (void)fetchVideoAssetWithRemoteURL:(NSString *)url
+                             success:(void (^)(AVAsset *videoAsset))success
+                             failure:(void (^)(NSError *error))failure {
+    
+    NSString *key = [[url componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:@"" fileID:key];
+    
+    if (filePath != nil && ![filePath isEqualToString:@""]) {
+        AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:filePath]];
+        if (asset != nil) {
+            // Asset saved in storage
+            dispatch_async(dispatch_get_main_queue(), ^{
+                success(asset);
+            });
+            return;
+        }
+    }
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Fetch asset from URL
+        AVAsset *videoAsset = [AVAsset assetWithURL:[NSURL URLWithString:url]];
+        NSURL *fileURL = [(AVURLAsset *)videoAsset URL];
+        __block NSData *assetData = nil;
+
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:videoAsset presetName:AVAssetExportPresetHighestQuality];
+        exportSession.outputURL = fileURL;
+        exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            assetData = [NSData dataWithContentsOfURL:fileURL];
+            
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+            
+            NSString *destinationFilePath =  [documentsDirectory stringByAppendingPathComponent:@"/Videos"];
+            
+            if (![[NSFileManager defaultManager] fileExistsAtPath:destinationFilePath]) {
+                [[NSFileManager defaultManager] createDirectoryAtPath:destinationFilePath withIntermediateDirectories:NO attributes:nil error:nil]; // Create folder
+            }
+            
+            NSString *fileName = [url lastPathComponent];
+            
+            destinationFilePath = [destinationFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@", fileName]];
+            
+            NSString *destinationFileString = [TAPUtil getNewFileAndCheckExistingFilePath:destinationFilePath
+                                                                     fileNameCounterStart:0];
+            
+            [assetData writeToFile:destinationFileString atomically:YES];
+            
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationFileString roomID:@"" fileID:key];
+
+            // Fetch thumbnail and save to cache
+            [self fetchVideoThumbnailWithRemoteURL:url success:^(UIImage *thumbnail) {
+                
+            } failure:^(NSError *error) {
+                
+            }];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (videoAsset != nil) {
+                    success(videoAsset);
+                }
+                else {
+                    NSError *error = [NSError errorWithDomain:@"Unable to fetch video data." code:99999 userInfo:nil];
+                    failure(error);
+                }
+            });
+        }];
+    });
+}
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle {
