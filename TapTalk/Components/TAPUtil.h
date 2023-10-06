@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <CoreLocation/CoreLocation.h>
+#import <AVFoundation/AVAsset.h>
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #import "TAPMessageModel.h"
@@ -148,6 +149,18 @@
 + (NSDictionary *) objectToDictionary:(id)object;
 + (NSArray *)getUrlsFromString:(NSString *)text;
 + (void)getImageFromRemoteUrl:(NSString *)urlString  success:(void (^)(UIImage *image))success failure:(void (^)(NSError *error))failure;
++ (void)fetchVideoThumbnailWithRemoteURL:(NSString *_Nonnull)url
+                                 success:(void (^_Nullable)(UIImage *_Nonnull thumbnail))success
+                                 failure:(void (^_Nullable)(NSError *_Nullable error))failure;
++ (void)fetchVideoMetadataWithRemoteURL:(NSString *_Nonnull)url
+                                success:(void (^_Nullable)(UIImage *_Nullable thumbnail,
+                                                           NSNumber *_Nonnull size,
+                                                           NSNumber *_Nonnull width,
+                                                           NSNumber *_Nonnull height,
+                                                           NSNumber *_Nonnull duration))success;
++ (void)fetchVideoAssetWithRemoteURL:(NSString *_Nonnull)url
+                             success:(void (^_Nullable)(AVAsset *_Nonnull videoAsset))success
+                             failure:(void (^_Nullable)(NSError *_Nullable error))failure;
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;
 + (void)setLanguage:(NSString *)language;

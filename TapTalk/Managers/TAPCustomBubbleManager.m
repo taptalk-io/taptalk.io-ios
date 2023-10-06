@@ -46,7 +46,9 @@
     NSMutableDictionary *cellDictionary = [[NSMutableDictionary alloc] init];
     [cellDictionary setObject:cellName forKey:@"name"];
     [cellDictionary setObject:[NSNumber numberWithInteger:type] forKey:@"type"];
-    [cellDictionary setObject:delegate forKey:@"delegate"];
+    if (delegate != nil) {
+        [cellDictionary setObject:delegate forKey:@"delegate"];
+    }
     [cellDictionary setObject:bundle forKey:@"bundle"];
     [self.customBubbleDataDictionary setObject:cellDictionary forKey:[NSNumber numberWithInteger:type]];
 }

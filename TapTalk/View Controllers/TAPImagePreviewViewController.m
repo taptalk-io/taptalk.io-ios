@@ -132,6 +132,13 @@
             self.imagePreviewView.sendButton.userInteractionEnabled = YES;
             [self.imagePreviewView.sendButton setTitleColor:sendButtonColor forState:UIControlStateNormal];
         }
+        
+        // Show caption on first item
+        TAPMediaPreviewModel *mediaPreview = [self.mediaDataArray objectAtIndex:0];
+        if (mediaPreview.caption != nil && ![mediaPreview.caption isEqualToString:@""]) {
+            [self.imagePreviewView.captionTextView setText:mediaPreview.caption];
+        }
+
     }
 }
 
@@ -285,7 +292,32 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 cell.isExceededMaxFileSize = NO;
             }
             
-            if (mediaPreview.asset == nil) {
+            
+            if (mediaPreview.url != nil && ![mediaPreview.url isEqualToString:@""]) {
+                if ([mediaPreview.mediaType isEqualToString:@"video"]) {
+                    // Fetch video data
+                    [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeVideo];
+                    [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDownloading];
+                    [cell showProgressView:YES animated:NO];
+                    [cell animateProgressMediaWithProgress:1.0f total:1.0f];
+                    [TAPUtil fetchVideoThumbnailWithRemoteURL:mediaPreview.url
+                    success:^(UIImage *thumbnail) {
+                        [cell showProgressView:NO animated:NO];
+                        [cell showPlayButton:YES animated:NO];
+                        [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+                        [cell setImagePreviewImage:thumbnail];
+                    }
+                    failure:^(NSError *error) {
+                        [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+                        [cell showProgressView:NO animated:NO];
+                    }];
+                }
+                else {
+                    [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeImage];
+                    [cell setImagePreviewImageWithUrl:mediaPreview.url];
+                }
+            }
+            else if (mediaPreview.asset == nil) {
                 //Data is UIImage from camera
                 UIImage *image = mediaPreview.image;
                 [cell setImagePreviewImage:image];
@@ -863,6 +895,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark TAPImagePreviewCollectionViewCell
+
 - (void)imagePreviewCollectionViewCellDidPlayVideoButtonDidTappedWithMediaPreview:(TAPMediaPreviewModel *)mediaPreview indexPath:(NSIndexPath *)indexPath {
     
     TAPImagePreviewCollectionViewCell *cell = (TAPImagePreviewCollectionViewCell *)[self.imagePreviewView.imagePreviewCollectionView cellForItemAtIndexPath:indexPath];
@@ -870,7 +903,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [cell showProgressView:YES animated:YES];
     
     _showVideoPlayer = YES;
-    if(mediaPreview.asset != nil) {
+    
+    if (mediaPreview.asset != nil) {
         [[TAPFetchMediaManager sharedManager] fetchVideoDataForAsset:mediaPreview.asset progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
             
             [cell animateProgressMediaWithProgress:progress total:1.0f];
@@ -881,44 +915,65 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             
         } resultHandler:^(AVAsset * _Nonnull resultVideoAsset) {
-            mediaPreview.videoAsset = resultVideoAsset;
-            cell.mediaPreviewData = mediaPreview;
-            
-            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-            
-            AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:resultVideoAsset];
-            AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-            
-            if (self.showVideoPlayer) {
-                AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-                controller.delegate = self;
-                controller.showsPlaybackControls = YES;
-                [self presentViewController:controller animated:YES completion:nil];
-                controller.player = player;
-                [player play];
-            }
-            
-            [TAPUtil performBlock:^{
-                [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
-                [cell showProgressView:NO animated:NO];
-                [cell showPlayButton:YES animated:NO];
-                _showVideoPlayer = NO;
-            } afterDelay:0.5f];
+            [self playVideoWithAVAsset:resultVideoAsset cell:cell mediaPreview:mediaPreview];
         } failureHandler:^{
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Cannot Fetch Video"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Cannot play video at the moment, please check your connection and try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-
+            [self showPlayVideoErrorPopUp];
+        }];
+    }
+    else if (mediaPreview.url != nil) {
+        [TAPUtil fetchVideoAssetWithRemoteURL:mediaPreview.url success:^(AVAsset *videoAsset) {
+            [self playVideoWithAVAsset:videoAsset cell:cell mediaPreview:mediaPreview];
+        }
+        failure:^(NSError *error) {
+            [self showPlayVideoErrorPopUp];
         }];
     }
     else {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-            NSURL *videoURL = [NSURL URLWithString:mediaPreview.url];
-            AVPlayer *player = [AVPlayer playerWithURL:videoURL];
-            AVPlayerViewController *playerViewController = [AVPlayerViewController new];
-            playerViewController.player = player;
-            [self presentViewController:playerViewController animated:YES completion:^{
-                [player play];
-            }];
+        [self showPlayVideoErrorPopUp];
     }
+}
+
+- (void)playVideoWithAVAsset:(AVAsset *)videoAsset
+                        cell:(TAPImagePreviewCollectionViewCell *)cell
+                mediaPreview:(TAPMediaPreviewModel *)mediaPreview {
+    
+    if (videoAsset == nil) {
+        [self showPlayVideoErrorPopUp];
+        return;
+    }
+    
+    mediaPreview.videoAsset = videoAsset;
+    cell.mediaPreviewData = mediaPreview;
+    
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    
+    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:videoAsset];
+    AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+    
+    if (self.showVideoPlayer) {
+        AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+        controller.delegate = self;
+        controller.showsPlaybackControls = YES;
+        [self presentViewController:controller animated:YES completion:nil];
+        controller.player = player;
+        [player play];
+    }
+    
+    [TAPUtil performBlock:^{
+        [cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
+        [cell showProgressView:NO animated:NO];
+        [cell showPlayButton:YES animated:NO];
+        self->_showVideoPlayer = NO;
+    } afterDelay:0.5f];
+}
+
+- (void)showPlayVideoErrorPopUp {
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                     popupIdentifier:@"Error Cannot Fetch Video"
+                               title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"")
+                   detailInformation:NSLocalizedStringFromTableInBundle(@"Cannot play video at the moment, please check your connection and try again.", nil, [TAPUtil currentBundle], @"")
+               leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+      singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
 }
 
 #pragma mark - Custom Method
