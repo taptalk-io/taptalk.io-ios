@@ -82,6 +82,7 @@
     
     [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.myAccountView.blockedButton addTarget:self action:@selector(blockedButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.myAccountView.dismissKeyboardButton addTarget:self action:@selector(dismissKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     if ([[TapUI sharedInstance] getChangeProfilePictureButtonVisibleState]) {
         [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -102,6 +103,13 @@
     
     _currentUser = [TAPDataManager getActiveUser];
     [self fetchUserDataWithUser:self.currentUser];
+    
+    _photoListArray = [TAPDataManager geActiveUserPhotos];
+    if ([self.photoListArray count] > 0) {
+        [self.myAccountView showMultipleProfilePicture];
+        [self.myAccountView.profilImageCollectionView reloadData];
+        [self.myAccountView.pageIndicatorCollectionView reloadData];
+    }
     
     self.automaticallyAdjustsScrollViewInsets = NO;
     
@@ -173,6 +181,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     NSString *cellID = @"TAPImagePreviewCollectionViewCell";
     [collectionView registerClass:[TAPImagePreviewCollectionViewCell class] forCellWithReuseIdentifier:cellID];
     TAPImagePreviewCollectionViewCell *cell = (TAPImagePreviewCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+    [cell setImageBackgroundColor:[TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR]];
     
     [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeProfileImage];
     //[cell setImagePreviewCollectionViewCellStateType:TAPImagePreviewCollectionViewCellStateTypeDefault];
@@ -203,7 +212,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)customGrowingTextViewDidBeginEditing:(UITextView *)textView {
     [TAPUtil performBlock:^{
         CGFloat additionalHeight = 0.0f;
-        additionalHeight = self.myAccountView.bioTextView.frame.origin.y + (self.keyboardHeight + 28.0f);
+        NSInteger cursorIndex = self.myAccountView.bioTextView.textView.selectedRange.location;
+        NSInteger textLength = self.myAccountView.bioTextView.textView.text.length;
+        CGFloat ratio = 1.0f;
+        if (cursorIndex >= 0 && textLength > 0 && cursorIndex < textLength) {
+            ratio = [NSNumber numberWithInt:cursorIndex].floatValue / [NSNumber numberWithInt:textLength].floatValue;
+        }
+        additionalHeight = self.myAccountView.bioTextView.frame.origin.y + (self.keyboardHeight + (CGRectGetHeight(textView.frame) * ratio));
         [self.myAccountView.scrollView setContentOffset:CGPointMake(0, additionalHeight) animated:YES];
     } afterDelay:0.1f];
   
@@ -507,8 +522,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.myAccountView.profilImageCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
             [self.myAccountView.pageIndicatorCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
             
-            self.currentUser.imageURL.thumbnail = self.photoListArray[0].fullsizeImageURL;
+            self.currentUser.imageURL.thumbnail = self.photoListArray[0].thumbnailImageURL;
+            self.currentUser.imageURL.fullsize = self.photoListArray[0].fullsizeImageURL;
             [TAPDataManager setActiveUser:self.currentUser];
+            [TAPDataManager seActiveUserPhotos:photoListArray];
             [self.myAccountView setEditPorfilPictureButtonVisible:YES];
             //[TAPChatManager sharedManager].activeUser.imageURL.thumbnail = self.photoListArray[0].fullsizeImageURL;
         }
@@ -961,6 +978,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)blockedButtonDidTapped {
     TAPBlockedListViewController *blockedListViewController = [[TAPBlockedListViewController alloc] init];
     [self.navigationController pushViewController:blockedListViewController animated:YES];
+}
+
+- (void)dismissKeyboardButtonDidTapped {
+    [self.view endEditing:YES];
+    [self.myAccountView.bioTextView.textView resignFirstResponder];
+    [self.myAccountView.fullNameTextField.textField resignFirstResponder];
+    [self.myAccountView.emailTextField.textField resignFirstResponder];
+    [self.myAccountView.usernameTextField.textField resignFirstResponder];
+    [self.myAccountView.mobileNumberTextField.textField resignFirstResponder];
 }
 
 - (void)openCamera {

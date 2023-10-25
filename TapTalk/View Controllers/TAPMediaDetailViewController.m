@@ -414,7 +414,7 @@
                                       delay:0.0f
                      usingSpringWithDamping:0.8f
                       initialSpringVelocity:0.8f
-                                    options:UIViewAnimationOptionCurveEaseOut
+                                    options:UIViewAnimationOptionCurveEaseInOut
                                  animations:^{
                                      self.mediaDetailView.movementView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.mediaDetailView.movementView.frame), CGRectGetHeight(self.mediaDetailView.movementView.frame));
                                      self.mediaDetailView.backgroundView.alpha = 1.0f;
@@ -438,7 +438,7 @@
                                       delay:0.0f
                      usingSpringWithDamping:0.8f
                       initialSpringVelocity:0.8f
-                                    options:UIViewAnimationOptionCurveEaseOut
+                                    options:UIViewAnimationOptionCurveEaseInOut
                                  animations:^{
                                      self.mediaDetailView.movementView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.mediaDetailView.movementView.frame), CGRectGetHeight(self.mediaDetailView.movementView.frame));
                                      self.mediaDetailView.backgroundView.alpha = 1.0f;

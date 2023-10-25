@@ -848,12 +848,18 @@
         NSInteger index = [self.roomListArray indexOfObject:roomList];
         NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
         
-        [self.roomListView.roomListTableView performBatchUpdates:^{
-           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        @try {
+            [self.roomListView.roomListTableView performBatchUpdates:^{
+                [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+                                                          completion:^(BOOL finished) {
+                
+            }];
         }
-        completion:^(BOOL finished) {
-            
-        }];
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            [self.roomListView.roomListTableView reloadData];
+        }
     }
     else if([eventName isEqualToString:@"room/unmute"]) {
         NSNumber *expired = [self.mutedRoomDictionary objectForKey:roomID];
@@ -873,12 +879,18 @@
         NSInteger index = [self.roomListArray indexOfObject:roomList];
         NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
         
-        [self.roomListView.roomListTableView performBatchUpdates:^{
-           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        @try {
+            [self.roomListView.roomListTableView performBatchUpdates:^{
+                [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+                                                          completion:^(BOOL finished) {
+                
+            }];
         }
-        completion:^(BOOL finished) {
-            
-        }];
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            [self.roomListView.roomListTableView reloadData];
+        }
     }
     else if([eventName isEqualToString:@"user/block"]) {
         TAPUserModel *user = [TAPDataManager userModelFromDictionary:userDict];
@@ -1063,11 +1075,17 @@
                 [self.roomListArray removeObject:roomList];
                 
                 
-                [self.roomListView.roomListTableView beginUpdates];
-                
-                [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[cellIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                
-                [self.roomListView.roomListTableView endUpdates];
+                @try {
+                    [self.roomListView.roomListTableView beginUpdates];
+                    
+                    [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[cellIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    
+                    [self.roomListView.roomListTableView endUpdates];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.roomListView.roomListTableView reloadData];
+                }
             }
             
         }
@@ -1817,12 +1835,18 @@
             
             //Handle room insert
             if([insertIndexArray count] > 0) {
-                [self.roomListView.roomListTableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
-                } completion:^(BOOL finished) {
-                    [self.roomListView.roomListTableView scrollsToTop];
-                }];
+                @try {
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                    } completion:^(BOOL finished) {
+                        [self.roomListView.roomListTableView scrollsToTop];
+                    }];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.roomListView.roomListTableView reloadData];
+                }
             }
             
             //Handle room move
@@ -1832,11 +1856,17 @@
                     NSInteger newIndex = [[moveToIndexArray objectAtIndex:count] intValue];
                     
                     [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
-                    [self.roomListView.roomListTableView performBatchUpdates:^{
-                        //changing beginUpdates and endUpdates with this because of deprecation
-                        [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
-                    } completion:^(BOOL finished) {
-                    }];
+                    @try {
+                        [self.roomListView.roomListTableView performBatchUpdates:^{
+                            //changing beginUpdates and endUpdates with this because of deprecation
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
+                        } completion:^(BOOL finished) {
+                        }];
+                    }
+                    @catch (NSException *exception) {
+                        NSLog(@"%@", exception.reason);
+                        [self.roomListView.roomListTableView reloadData];
+                    }
                 }
             }
             
@@ -1856,11 +1886,17 @@
                     //Data not exist, delete cell
                     NSInteger oldIndex = [oldRoomListArray indexOfObject:oldRoomList];
                     [oldRoomListArray removeObjectAtIndex:oldIndex];
-                    [self.roomListView.roomListTableView performBatchUpdates:^{
-                        //changing beginUpdates and endUpdates with this because of deprecation
-                        [self.roomListView.roomListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    } completion:^(BOOL finished) {
-                    }];
+                    @try {
+                        [self.roomListView.roomListTableView performBatchUpdates:^{
+                            //changing beginUpdates and endUpdates with this because of deprecation
+                            [self.roomListView.roomListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+                        } completion:^(BOOL finished) {
+                        }];
+                    }
+                    @catch (NSException *exception) {
+                        NSLog(@"%@", exception.reason);
+                        [self.roomListView.roomListTableView reloadData];
+                    }
                 }
             }
         }
@@ -2047,21 +2083,27 @@
                     [self.roomListArray insertObject:roomList atIndex:0];
                 }
                 
-                [self.roomListView.roomListTableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    if(hasPinnedRoom){
-                        if(isPinnedRoom){
-                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]];
+                @try {
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        if(hasPinnedRoom){
+                            if(isPinnedRoom){
+                                [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]];
+                            }
+                            else{
+                                [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]];
+                            }
                         }
                         else{
-                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]];
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
                         }
-                    }
-                    else{
-                        [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-                    }
-                } completion:^(BOOL finished) {
-                }];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.roomListView.roomListTableView reloadData];
+                }
             }
         }
     }
@@ -2105,23 +2147,29 @@
             [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
         }
         
-        [self.roomListView.roomListTableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            if(hasPinnedRoom){
-                if(isPinnedRoom){
-                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        @try {
+            [self.roomListView.roomListTableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                if(hasPinnedRoom){
+                    if(isPinnedRoom){
+                        [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    }
+                    else{
+                        [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    }
                 }
                 else{
-                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                 }
-            }
-            else{
-                [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
-            
-        } completion:^(BOOL finished) {
-            [self.roomListView showNoChatsView:NO];
-        }];
+                
+            } completion:^(BOOL finished) {
+                [self.roomListView showNoChatsView:NO];
+            }];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            [self.roomListView.roomListTableView reloadData];
+        }
     }
     
     [self getAndUpdateNumberOfUnreadToDelegate];
@@ -2328,19 +2376,25 @@
         NSInteger index = [self.roomListArray indexOfObject:roomList];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
         
-        [self.roomListView.roomListTableView performBatchUpdates:^{
-           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
-           
-        }
-        completion:^(BOOL finished) {
+        @try {
             [self.roomListView.roomListTableView performBatchUpdates:^{
-                [self.roomListView.roomListTableView moveRowAtIndexPath:indexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-            }
-            completion:^(BOOL finished) {
-             [self.roomListView.roomListTableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+                [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
                 
+            }
+                                                          completion:^(BOOL finished) {
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    [self.roomListView.roomListTableView moveRowAtIndexPath:indexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                }
+                                                              completion:^(BOOL finished) {
+                    [self.roomListView.roomListTableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+                    
+                }];
             }];
-        }];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            [self.roomListView.roomListTableView reloadData];
+        }
         
         [self.roomListArray removeObject:roomList];
         [self.roomListArray insertObject:roomList atIndex:0];
@@ -2355,12 +2409,18 @@
         NSInteger index = [self.roomListArray indexOfObject:roomList];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
             
-        [self.roomListView.roomListTableView performBatchUpdates:^{
-            [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
-        completion:^(BOOL finished) {
+        @try {
+            [self.roomListView.roomListTableView performBatchUpdates:^{
+                [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+                                                          completion:^(BOOL finished) {
                 
-        }];
+            }];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            [self.roomListView.roomListTableView reloadData];
+        }
         
         TAPMessageModel *lastMessage = roomList.lastMessage;
         long lastMessageCreated = lastMessage.created.longValue;
@@ -2383,11 +2443,17 @@
         NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
         NSIndexPath *currentIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
         
-        [self.roomListView.roomListTableView performBatchUpdates:^{
-            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedIndex inSection:0]];
-        }completion:^(BOOL finished) {
-            
-        }];
+        @try {
+            [self.roomListView.roomListTableView performBatchUpdates:^{
+                [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedIndex inSection:0]];
+            }completion:^(BOOL finished) {
+                
+            }];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            [self.roomListView.roomListTableView reloadData];
+        }
         [self.roomListArray removeObject:roomList];
         [self.roomListArray insertObject:roomList atIndex:unpinnedIndex];
     }
@@ -2442,12 +2508,18 @@
     NSInteger index = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
     
-    [self.roomListView.roomListTableView performBatchUpdates:^{
-       [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+    @try {
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+            [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+                                                      completion:^(BOOL finished) {
+            
+        }];
     }
-    completion:^(BOOL finished) {
-        
-    }];
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception.reason);
+        [self.roomListView.roomListTableView reloadData];
+    }
     
     [TAPDataManager callAPIMuteRoom:@[roomID] expiredAt:expiredAt  success:^(NSArray *roomIDs) {
         
@@ -2471,12 +2543,18 @@
     NSInteger index = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
     
-    [self.roomListView.roomListTableView performBatchUpdates:^{
-       [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+    @try {
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+            [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+                                                      completion:^(BOOL finished) {
+            
+        }];
     }
-    completion:^(BOOL finished) {
-        
-    }];
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception.reason);
+        [self.roomListView.roomListTableView reloadData];
+    }
     [TAPDataManager callAPIUnMuteRoom:@[roomID] success:^(NSArray *roomIDs) {
         
     } failure:^(NSError *error) {

@@ -1486,7 +1486,24 @@
                    success:(void (^)(NSArray <NSString *> *updatedMessageIDs))success
                    failure:(void (^)(NSError *error))failure {
     
-    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:messageArray
+    NSMutableArray *filteredMessageArray = [NSMutableArray array];
+    TAPUserModel *activeUser = [[TAPChatManager sharedManager] activeUser];
+    for (TAPMessageModel *message in messageArray) {
+        if (activeUser != nil &&
+            message.user != nil &&
+            ![TAPUtil isEmptyString:activeUser.userID] &&
+            ![TAPUtil isEmptyString:message.user.userID] &&
+            ![message.user.userID isEqualToString:activeUser.userID]
+        ) {
+            [filteredMessageArray addObject:message];
+        }
+    }
+    
+    if ([filteredMessageArray count] == 0) {
+        return;
+    }
+    
+    [TAPDataManager callAPIUpdateMessageReadStatusWithArray:filteredMessageArray
     success:^(NSArray *updatedMessageIDsArray, NSArray *originMessageArray) {
         [[TAPChatManager sharedManager] updateReadMessageToDatabaseQueueWithArray:originMessageArray];
         success(updatedMessageIDsArray);
@@ -2473,9 +2490,9 @@
     
     NSMutableDictionary *data = [NSMutableDictionary dictionary];
     [data setObject:url forKey:@"url"];
-    if (![TAPUtil isEmptyString:caption]) {
-        [data setObject:caption forKey:@"caption"];
-    }
+    [data setObject:@"" forKey:@"fileID"];
+    caption = [TAPUtil nullToEmptyString:caption];
+    [data setObject:caption forKey:@"caption"];
     if (![TAPUtil isEmptyString:fileName]) {
         [data setObject:fileName forKey:@"fileName"];
     }

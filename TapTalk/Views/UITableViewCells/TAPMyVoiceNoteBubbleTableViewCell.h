@@ -30,6 +30,7 @@ typedef NS_ENUM(NSInteger, TAPMyVoiceNoteBubbleTableViewCellStateType) {
 - (void)myVoiceNoteCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNotePlayPauseButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myVoiceNoteBubbleDidTriggerSwipeInfoWithMessage:(TAPMessageModel *)message;
 - (void)myVoiceNoteBubblePlayerSliderDidChange:(NSTimeInterval)currentTime message:(TAPMessageModel *)message;
 - (void)myVoiceNoteBubblePlayerSliderDidEnd;
 

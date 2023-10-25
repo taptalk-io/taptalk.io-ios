@@ -22,6 +22,7 @@ typedef NS_ENUM(NSInteger, TAPThumbnailImagePreviewCollectionViewCellType) {
 @property (nonatomic) BOOL isExceededMaxFileSize;
 
 - (void)setThumbnailImageView:(UIImage *)image;
+- (void)setImageUrl:(NSString *)url;
 - (void)setAsSelected:(BOOL)isSelected;
 - (void)setAsExceededFileSize:(BOOL)isExceeded animated:(BOOL)animated;
 - (void)setThumbnailImagePreviewCollectionViewCellType:(TAPThumbnailImagePreviewCollectionViewCellType)thumbnailImagePreviewCollectionViewCellType;

@@ -16,6 +16,7 @@
 #define TAP_DEFAULT_MAX_CHANNEL_PARTICIPANTS 5000
 #define TAP_UPDATED_TIME_LIMIT 24 * 60 * 60 //1 day (in seconds)
 #define TAP_NUMBER_OF_ITEMS_API_MESSAGE_BEFORE 50
+#define TAP_REPORT_REASON_CHARACTER_LIMIT 2000
 #define kCharacterLimit 4000
 
 //Prefs Key
@@ -50,6 +51,7 @@
 #define TAP_PREFS_PENDING_UPDATE_READ_MESSAGE @"Prefs.TapTalkPendingUpdateReadMessage"
 #define TAP_PREFS_USER_IGNORE_ADD_CONTACT_POPUP_DICTIONARY @"Prefs.TapTalkUserIgnoreAddContactPopupDictionary"
 #define TAP_PREFS_GOOGLE_PLACES_TOKEN @"Prefs.TapTalkGooglePlacesToken"
+#define TAP_PREFS_ACTIVE_USER_PHOTOS @"Prefs.TapTalkActiveUserPhotos"
 
 //Color
 #define TAP_COLOR_WHITE @"FFFFFF"

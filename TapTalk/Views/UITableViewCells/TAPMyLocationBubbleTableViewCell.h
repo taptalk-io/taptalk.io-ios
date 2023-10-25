@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)myLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myLocationBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myLocationBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myLocationBubbleDidTriggerSwipeInfoWithMessage:(TAPMessageModel *)message;
 
 @end
 

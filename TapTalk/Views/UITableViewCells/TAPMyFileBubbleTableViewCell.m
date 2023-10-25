@@ -325,10 +325,10 @@
         if (recognizer.state == UIGestureRecognizerStateChanged) {
             CGPoint translation = [recognizer translationInView:self];
             
-            if (translation.x < 0) {
-                //Cannot swipe left
-                return;
-            }
+//            if (translation.x < 0) {
+//                //Cannot swipe left
+//                return;
+//            }
             
             if (translation.x > 50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
                 [TAPUtil tapticImpactFeedbackGenerator];
@@ -352,9 +352,16 @@
                 
                 _disableTriggerHapticFeedbackOnDrag = YES;
             }
+            else if (translation.x < -50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
+                [TAPUtil tapticImpactFeedbackGenerator];
+                _disableTriggerHapticFeedbackOnDrag = YES;
+            }
             
             if (translation.x > 70.0f) {
                 translation.x = 70.0f;
+            }
+            else if (translation.x < -70.0f) {
+                translation.x = -70.0f;
             }
             
             self.bubbleView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
@@ -372,6 +379,11 @@
             if (translation.x > 50.0f) {
                 if ([self.delegate respondsToSelector:@selector(myFileBubbleDidTriggerSwipeToReplyWithMessage:)]) {
                     [self.delegate myFileBubbleDidTriggerSwipeToReplyWithMessage:self.message];
+                }
+            }
+            else if (translation.x < -50.0f) {
+                if ([self.delegate respondsToSelector:@selector(myFileBubbleDidTriggerSwipeInfoWithMessage:)]) {
+                    [self.delegate myFileBubbleDidTriggerSwipeInfoWithMessage:self.message];
                 }
             }
             
@@ -676,6 +688,7 @@
     [self.forwardTitleLabel.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
     
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)receiveSentEvent {
@@ -692,23 +705,22 @@
 
 - (void)showStatusLabel:(BOOL)show {
     if (show) {
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButton.alpha = 1.0f;
-            self.replyButtonRightConstraint.constant = 2.0f;
-            self.statusIconImageView.alpha = 1.0f;
-            [self.contentView layoutIfNeeded];
+        self.statusLabel.alpha = 1.0f;
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        self.replyButton.alpha = 1.0f;
+        self.replyButtonRightConstraint.constant = 2.0f;
+        self.statusIconImageView.alpha = 1.0f;
     }
     else {
-            self.statusLabel.alpha = 0.0f;
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            self.replyButton.alpha = 0.0f;
-            self.replyButtonRightConstraint.constant = -28.0f;
-            self.statusIconImageView.alpha = 1.0f;
-            [self.contentView layoutIfNeeded];
+        self.statusLabel.alpha = 0.0f;
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
+        self.replyButton.alpha = 0.0f;
+        self.replyButtonRightConstraint.constant = -28.0f;
+        self.statusIconImageView.alpha = 1.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 - (IBAction)forwardCheckmarkButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myFileCheckmarkDidTapped:)]) {
@@ -1195,15 +1207,16 @@
 }
 
 - (void)showStarMessageView {
-    if(self.starIconImageView.alpha == 0){
+    if (self.starIconImageView.alpha == 0) {
         self.starIconImageView.alpha = 1.0f;
         self.starIconWidthConstraint.constant = 10.0f;
     }
-    else{
+    else {
         self.starIconImageView.alpha = 0.0f;
         self.starIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
@@ -1234,21 +1247,22 @@
 }
 
 - (void)showPinIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.pinIconImageView.alpha = 1.0f;
         self.pinIconWidthConstraint.constant = 10.0f;
-        if(![self.messageReadCounterLabel.text isEqualToString:@""]) {
+        if (![self.messageReadCounterLabel.text isEqualToString:@""]) {
             self.pinIconTrailingConstraint.constant = 7.0f;
         }
         else {
             self.pinIconTrailingConstraint.constant = 0.0f;
         }
     }
-    else{
+    else {
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 
@@ -1272,6 +1286,7 @@
         self.messageReadCounterLabel.alpha = 0.0f;
         self.messageReadcounterImageView.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showSeperator{
@@ -1280,6 +1295,7 @@
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
+    [self.contentView layoutIfNeeded];
 }
 
 @end

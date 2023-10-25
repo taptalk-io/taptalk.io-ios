@@ -891,6 +891,8 @@
     [self.senderNameLabel.layer removeAllAnimations];
     [self.senderImageView.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setAudioSliderValue:(NSTimeInterval)currentTime{
@@ -1404,29 +1406,31 @@
 }
 
 - (void)showStarMessageView {
-    if(self.starIconImageView.alpha == 0){
+    if (self.starIconImageView.alpha == 0) {
         self.starIconImageView.alpha = 1.0f;
         self.starIconWidthConstraint.constant = 10.0f;
     }
-    else{
+    else {
         self.starIconImageView.alpha = 0.0f;
         self.starIconWidthConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.checkMarkIconImageView.alpha = 1.0f;
         self.senderImageViewLeadingConstraint.constant = 40.0f;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
-    else{
+    else {
         self.checkMarkIconImageView.alpha = 0.0f;
         self.senderImageViewLeadingConstraint.constant = 16.0f;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setCheckMarkState:(BOOL)isSelected {
@@ -1461,14 +1465,15 @@
 }
 
 - (void)showPinIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.pinIconImageView.alpha = 1.0f;
         self.pinIconWidthConstraint.constant = 10.0f;
     }
-    else{
+    else {
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showSeperator {
@@ -1478,6 +1483,7 @@
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
@@ -1493,6 +1499,7 @@
         self.messageReadCounterView.alpha = 0.0f;
         self.messageReadCounterImageView.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 @end

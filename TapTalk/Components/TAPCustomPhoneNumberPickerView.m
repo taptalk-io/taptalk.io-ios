@@ -91,7 +91,7 @@
         
         self.phoneNumberTextField.delegate = self;
         self.phoneNumberTextField.keyboardType = UIKeyboardTypePhonePad;
-        self.phoneNumberTextField.placeholder = @"8XXX XXX XXX";
+        self.phoneNumberTextField.placeholder = @"8XXX XXXX XXXX";
         [self.phoneNumberTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         self.phoneNumberTextField.textColor = textFieldColor;
         self.phoneNumberTextField.font = textFieldFont;

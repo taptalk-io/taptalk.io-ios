@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, TAPImagePreviewCollectionViewCellStateType) {
 - (void)animateFinishedDownload;
 - (void)showPlayButton:(BOOL)show animated:(BOOL)isAnimated;
 - (void)setPageIndicatorActive:(BOOL)isActive;
+- (void)setImageBackgroundColor:(UIColor *)color;
 
 @end
 

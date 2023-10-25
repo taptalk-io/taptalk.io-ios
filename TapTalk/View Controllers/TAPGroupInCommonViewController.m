@@ -19,6 +19,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if (self.otherUser == nil || self.otherUser.userID == nil) {
+        [self.navigationController popViewControllerAnimated:NO];
+        return;
+    }
+    
     self.title = NSLocalizedStringFromTableInBundle(self.otherUser.fullname, nil, [TAPUtil currentBundle], @"");
     [self showCustomBackButton];
     

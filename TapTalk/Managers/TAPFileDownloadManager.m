@@ -572,6 +572,8 @@
     NSDictionary *currentDataDictionary = message.data;
     NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
     NSString *currentFileURL = [currentDataDictionary objectForKey:@"url"];
+    currentFileID = [TAPUtil nullToEmptyString:currentFileID];
+    currentFileURL = [TAPUtil nullToEmptyString:currentFileURL];
     if (currentFileURL == nil || [currentFileURL isEqualToString:@""]) {
         currentFileURL = [currentDataDictionary objectForKey:@"fileURL"];
     }

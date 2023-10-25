@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVideoDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)myVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myVideoBubbleDidTriggerSwipeInfoWithMessage:(TAPMessageModel *)message;
 - (void)myVideoBubblePressedMentionWithWord:(NSString*)word
                               tappedAtIndex:(NSInteger)index
                                     message:(TAPMessageModel *)message

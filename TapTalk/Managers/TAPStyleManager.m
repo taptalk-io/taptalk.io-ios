@@ -3333,6 +3333,9 @@
 }
 
 - (NSString *)getInitialsWithName:(NSString *)name isGroup:(BOOL)isGroup {
+    if ([TAPUtil isEmptyString:name]) {
+        return @"";
+    }
     NSMutableString *displayString = [NSMutableString stringWithString:@""];
     NSMutableArray *words = [[name componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] mutableCopy];
     if ([words count]) {
@@ -3344,7 +3347,7 @@
         }
         
         if (isGroup) {
-            return displayString;
+            return [displayString uppercaseString];
         }
         
         if ([words count] >= 2) {
@@ -3362,10 +3365,10 @@
             }
         }
         
-        return displayString;
+        return [displayString uppercaseString];
     }
     
-    return displayString;
+    return [displayString uppercaseString];
 }
 
 @end

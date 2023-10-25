@@ -59,7 +59,12 @@
 
 - (void)setInfoDesciption:(NSString *)descp{
     self.infoDescriptionLabel.text = descp;
-    [self.infoDescriptionLabel sizeToFit];
+    
+    CGSize size = [self.infoDescriptionLabel sizeThatFits:CGSizeMake(self.infoDescriptionLabel.frame.size.width, CGFLOAT_MAX)];
+    CGRect frame = self.infoDescriptionLabel.frame;
+    frame.size.height = size.height;
+    self.infoDescriptionLabel.frame = frame;
+    
     self.frame = CGRectMake(0.0f, 24.0f, CGRectGetWidth(self.frame), 62.0f - 24.0f + CGRectGetHeight(self.infoDescriptionLabel.frame) + 6.0f);
 }
 

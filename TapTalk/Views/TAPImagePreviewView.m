@@ -232,12 +232,12 @@
 }
 
 - (void)isShowCounterCharCount:(BOOL)isShow {
-    if (isShow) {
+//    if (isShow) {
         self.wordCountLabel.alpha = 1.0f;
-    }
-    else {
-        self.wordCountLabel.alpha = 0.0f;
-    }
+//    }
+//    else {
+//        self.wordCountLabel.alpha = 0.0f;
+//    }
 }
 
 - (void)isShowAsSingleImagePreview:(BOOL)isShow animated:(BOOL)animated {

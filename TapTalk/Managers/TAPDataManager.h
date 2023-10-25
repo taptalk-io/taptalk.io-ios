@@ -44,6 +44,8 @@
 + (NSMutableDictionary *)getMutedRoomDictionary;
 + (void)setBlockedUserIDs:(NSArray *)userIDs;
 + (NSArray *)getBlockedUserIDs;
++ (void)seActiveUserPhotos:(NSArray<TAPPhotoListModel *> *)photos;
++ (NSArray<TAPPhotoListModel *> *)geActiveUserPhotos;
 + (void)setLastRoomMessageDeleteTime:(long)timestamp;
 + (long)getLastRoomMessageDeleteTime;
 + (void)setPendingScheduleMessages:(NSArray *)scheduleMessages;

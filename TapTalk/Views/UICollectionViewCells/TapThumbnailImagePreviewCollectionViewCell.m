@@ -10,7 +10,7 @@
 
 @interface TAPThumbnailImagePreviewCollectionViewCell ()
 
-@property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) TAPImageView *imageView;
 @property (strong, nonatomic) UIView *removeView;
 
 @property (strong, nonatomic) UIView *removeGrayImageContainerView;
@@ -32,7 +32,7 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 56.0f, 56.0f)];
+        _imageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 56.0f, 56.0f)];
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;
         self.imageView.clipsToBounds = YES;
         [self.contentView addSubview:self.imageView];
@@ -89,8 +89,13 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)setThumbnailImageView:(UIImage *)image {
     self.imageView.image = image;
+}
+
+- (void)setImageUrl:(NSString *)url {
+    [self.imageView setImageWithURLString:url];
 }
 
 - (void)setAsSelected:(BOOL)isSelected {
