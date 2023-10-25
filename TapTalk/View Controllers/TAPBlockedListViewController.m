@@ -14,6 +14,8 @@
 @property (strong, nonatomic) TAPBlockedListView *blockedListView;
 @property (strong, nonatomic) UIButton *rightNavigationButton;
 @property (strong, nonatomic) UIBarButtonItem *barButtonRightItem;
+@property (strong, nonatomic) UIView *loadingView;
+@property (strong, nonatomic) UIImageView *loadingImageView;
 @property (strong, nonatomic) NSMutableArray* blockedUserList;
 
 @property (nonatomic) BOOL isEditState;
@@ -28,6 +30,19 @@
     [super loadView];
     _blockedListView = [[TAPBlockedListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.blockedListView];
+    
+    // Loading view
+    _loadingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
+    self.loadingView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+    self.loadingView.alpha = 0.0f;
+    UIWindow *currentWindow = [UIApplication sharedApplication].keyWindow;
+    [currentWindow addSubview:self.loadingView];
+    
+    CGFloat loadingImageSize = 56.0f;
+    _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.loadingView.frame) - loadingImageSize) / 2, (CGRectGetHeight(self.loadingView.frame) - loadingImageSize) / 2, loadingImageSize, loadingImageSize)];
+    [self.loadingImageView setImage:[UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    self.loadingImageView.image = [self.loadingImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
+    [self.loadingView addSubview:self.loadingImageView];
 }
 
 - (void)viewDidLoad {
@@ -101,6 +116,11 @@
         
     }];
 }
+
+- (void)viewDidUnload {
+    [self.loadingView removeFromSuperview];
+}
+
 #pragma mark - Data Source
 #pragma mark TableView
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -194,8 +214,7 @@
 }
 
 - (void)updateRightNavigation {
-    
-    if(self.blockedUserList.count == 0) {
+    if (self.blockedUserList.count == 0) {
         [self.rightNavigationButton setTitle:@"" forState:UIControlStateNormal];
         self.rightNavigationButton.userInteractionEnabled = NO;
         self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
@@ -205,7 +224,7 @@
     }
     
     self.rightNavigationButton.userInteractionEnabled = YES;
-    if(self.isEditState) {
+    if (self.isEditState) {
         self.isEditState = NO;
         [self.rightNavigationButton setTitle:@"Edit" forState:UIControlStateNormal];
     }
@@ -219,34 +238,35 @@
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
-    if ([popupIdentifier isEqualToString:@"unblock confirmation"]){
-        NSMutableArray *blockedUserIDs = [[TAPDataManager getBlockedUserIDs] mutableCopy];
-        
-        if([blockedUserIDs containsObject:self.selectedContact.userID]) {
-            [blockedUserIDs removeObject:self.selectedContact.userID];
-        }
-        //[TAPDataManager setBlockedUserIDs:[blockedUserIDs copy]];
-        
-        [self.blockedUserList removeObject:self.selectedContact];
-        
-        [self.blockedListView.tableView  reloadData];
-        
-        if(self.blockedUserList.count == 0) {
-            self.blockedListView.emptyStateView.alpha = 1.0f;
-        }
-        else {
-            self.blockedListView.emptyStateView.alpha = 0.0f;
-        }
-        
-        if(blockedUserIDs.count == 0) {
-            [self updateRightNavigation];
-        }
-        
-        
+    if ([popupIdentifier isEqualToString:@"unblock confirmation"]) {
+        [self showLoading:YES];
         [[TAPCoreContactManager sharedManager] unblockUserWithUserID:self.selectedContact.userID success:^(TAPUserModel * _Nonnull unblockedUser) {
             
+            NSMutableArray *blockedUserIDs = [[TAPDataManager getBlockedUserIDs] mutableCopy];
+            
+            if ([blockedUserIDs containsObject:self.selectedContact.userID]) {
+                [blockedUserIDs removeObject:self.selectedContact.userID];
+            }
+            //[TAPDataManager setBlockedUserIDs:[blockedUserIDs copy]];
+            
+            [self.blockedUserList removeObject:self.selectedContact];
+            
+            [self.blockedListView.tableView  reloadData];
+            
+            if (self.blockedUserList.count == 0) {
+                self.blockedListView.emptyStateView.alpha = 1.0f;
+            }
+            else {
+                self.blockedListView.emptyStateView.alpha = 0.0f;
+            }
+            
+            if (blockedUserIDs.count == 0) {
+                [self updateRightNavigation];
+            }
+            
+            [self showLoading:NO];
         } failure:^(NSError *error) {
-           
+            [self showLoading:NO];
         }];
     }
 }
@@ -277,4 +297,34 @@
     UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
+
+- (void)showLoading:(BOOL)show {
+    if (show) {
+        if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            animation.fromValue = [NSNumber numberWithFloat:0.0f];
+            animation.toValue = [NSNumber numberWithFloat:(2 * M_PI)];
+            animation.duration = 1.5f;
+            animation.repeatCount = INFINITY;
+            animation.cumulative = YES;
+            animation.removedOnCompletion = NO;
+            [self.loadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+        }
+        [UIView animateWithDuration:0.1f animations:^{
+            self.loadingView.alpha = 1.0f;
+            [self.view layoutIfNeeded];
+        }];
+    }
+    else {
+        [UIView animateWithDuration:0.1f animations:^{
+            self.loadingView.alpha = 0.0f;
+            [self.view layoutIfNeeded];
+        } completion:^(BOOL finished) {
+            if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+                [self.loadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
+            }
+        }];
+    }
+}
+
 @end

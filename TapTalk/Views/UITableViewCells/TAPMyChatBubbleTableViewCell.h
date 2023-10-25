@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
                             originalString:(NSString*)originalString;
 - (void)myChatBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myChatBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myChatBubbleDidTriggerSwipeInfoWithMessage:(TAPMessageModel *)message;
 - (void)myChatBubblePressedMentionWithWord:(NSString*)word
                              tappedAtIndex:(NSInteger)index
                                    message:(TAPMessageModel *)message

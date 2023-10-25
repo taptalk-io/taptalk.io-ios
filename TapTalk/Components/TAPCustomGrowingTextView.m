@@ -97,7 +97,7 @@
     
     self.textView.textContainerInset = UIEdgeInsetsZero;
     
-    _placeholderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.textView.frame), CGRectGetMinY(self.textView.frame), CGRectGetWidth(self.textView.frame), CGRectGetHeight(self.textView.frame))];
+    _placeholderLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.textView.frame) + self.textView.textContainerInset.left, CGRectGetMinY(self.textView.frame), CGRectGetWidth(self.textView.frame), CGRectGetHeight(self.textView.frame))];
     self.placeholderLabel.backgroundColor = [UIColor clearColor];
     [self addSubview:self.placeholderLabel];
     
@@ -220,7 +220,7 @@
 }
 
 - (void)checkHeight {
-    CGSize contentSize = [self.textView sizeThatFits:CGSizeMake(CGRectGetWidth(self.frame), MAXFLOAT)];
+    CGSize contentSize = [self.textView sizeThatFits:CGSizeMake(CGRectGetWidth(self.frame), MAXFLOAT + self.textView.textContainerInset.top + self.textView.textContainerInset.bottom)];
     
     self.textView.textContainer.size = CGSizeMake(self.textView.textContainer.size.width, contentSize.height);
     
@@ -233,6 +233,8 @@
     }
     
     self.textView.frame = CGRectMake(CGRectGetMinX(self.textView.frame), CGRectGetMinY(self.textView.frame), CGRectGetWidth(self.textView.frame), contentSize.height);
+    
+    self.placeholderLabel.frame = CGRectMake(CGRectGetMinX(self.textView.frame) + self.textView.textContainerInset.left, CGRectGetMinY(self.textView.frame), CGRectGetWidth(self.textView.frame), CGRectGetHeight(self.textView.frame));
     
     if (contentSize.height != CGRectGetHeight(self.frame)) {
         if ([self.delegate respondsToSelector:@selector(customGrowingTextView:shouldChangeHeight:)]) {

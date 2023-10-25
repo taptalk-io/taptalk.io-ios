@@ -723,9 +723,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         return 0;
     }
-    else if(section == 2){
-        if((self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault && self.room.type == RoomTypeGroup) || ![[TapUI sharedInstance] getGroupInCommonMenuEnabled]) {
+    else if (section == 2) {
+        if ((self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault && self.room.type == RoomTypeGroup) || ![[TapUI sharedInstance] getGroupInCommonMenuEnabled]) {
             return 2;
+        }
+        else if (self.otherUserID == nil ||
+                 [self.otherUserID isEqualToString:@""] ||
+                 [self.otherUserID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]
+        ) {
+            return 1;
         }
         return 3;
     }
@@ -861,59 +867,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return cell;
     }
     if (indexPath.section == 1) {
-        //DV Note
-        //Temporary Hidden For V1 because features is not complete (25 Mar 2019)
-//        NSString *cellID = @"TAPProfileCollectionViewCell";
-//        [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
-//        TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
-//
-//        if (indexPath.item == 0) {
-//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeNotification];
-//            [cell showSeparatorView:YES];
-//        }
-//        else if (indexPath.item == 1) {
-//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeConversationColor];
-//            [cell showSeparatorView:YES];
-//        }
-//        else if (indexPath.item == 2) {
-//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeBlock];
-//            [cell showSeparatorView:YES];
-//        }
-//        else if (indexPath.item == 3) {
-//            [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeClearChat];
-//            [cell showSeparatorView:NO];
-//        }
-//
-//        return cell;
-        //END DV Note
-        /**
-        //profil picture collection view
-        if(collectionView == self.profileView.pageIndicatorCollectionView || collectionView == self.profileView.profilImageCollectionView){
-            NSString *cellID = @"TAPImagePreviewCollectionViewCell";
-            [collectionView registerClass:[TAPImagePreviewCollectionViewCell class] forCellWithReuseIdentifier:cellID];
-            TAPImagePreviewCollectionViewCell *cell = (TAPImagePreviewCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
-            
-            [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeProfileImage];
-            cell.delegate = self;
-            
-            if(collectionView == self.profileView.pageIndicatorCollectionView){
-                if(indexPath.row == 0){
-                    [cell setPageIndicatorActive:YES];
-                }
-                else{
-                    [cell setPageIndicatorActive:NO];
-                }
-            }
-            else{
-                //UIImage *image = [UIImage imageNamed:@"TAPIconDefaultGroupAvatar"];
-                NSString *imageUrl = self.photoListArray[indexPath.row].fullsizeImageURL;
-                [cell setImagePreviewImageWithUrl:imageUrl];
-                //cell.backgroundColor = [TAPUtil randomPastelColor];
-            }
-            
-            return cell;
-        }
-        */
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
             if (self.room.type == RoomTypePersonal) {
                 NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
@@ -2120,7 +2073,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if ([popupIdentifier isEqualToString:@"block user"]) {
         [self.profileView showLoadingView:YES];
-        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDoneLoading];
+        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDefault];
         
         NSString *otherUserID;
         
@@ -2148,7 +2101,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if ([popupIdentifier isEqualToString:@"unblock user"]) {
         [self.profileView showLoadingView:YES];
-        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDoneLoading];
+        [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDefault];
         
         NSString *otherUserID;
         

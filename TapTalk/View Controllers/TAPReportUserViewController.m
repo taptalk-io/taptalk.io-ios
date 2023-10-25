@@ -167,8 +167,12 @@
     
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     
-    if(newString.length > 100) {
+    if (newString.length > 100) {
         return NO;
+    }
+    
+    if (newString.length > 0) {
+        [self setTextFieldToError:NO];
     }
     
     return YES;
@@ -196,10 +200,11 @@
     
     NSInteger stringCount = newString.length;
     
-    NSString *counterTextView = [NSString stringWithFormat:@"%ld/2000", stringCount];
+    NSString *counterTextView = [NSString stringWithFormat:@"%ld/%ld", MIN(stringCount, TAP_REPORT_REASON_CHARACTER_LIMIT), TAP_REPORT_REASON_CHARACTER_LIMIT];
     self.textViewCounterLabel.text = counterTextView;
     
-    if(stringCount > 2000) {
+    if (stringCount > TAP_REPORT_REASON_CHARACTER_LIMIT) {
+        self.reportReasonTextView.text = [newString substringToIndex:TAP_REPORT_REASON_CHARACTER_LIMIT];
         return NO;
     }
     
@@ -319,6 +324,9 @@
     } completion:^(BOOL finished) {
         //completion
     }];
+
+    CGPoint bottomOffset = CGPointMake(0, self.scrollView.contentSize.height - self.scrollView.bounds.size.height + self.scrollView.contentInset.bottom);
+    [self.scrollView setContentOffset:bottomOffset animated:YES];
 }
 
 - (void)backButtonDidTapped {
@@ -350,8 +358,8 @@
 }
 
 - (IBAction)submitReportButtonDidTapped:(id)sender {
-    if(self.reportReasonOtherTextField.alpha == 1) {
-        if(self.reportReasonOtherTextField.text.length == 0) {
+    if (self.reportReasonOtherTextField.alpha == 1) {
+        if (self.reportReasonOtherTextField.text.length == 0) {
             [self setTextFieldToError:YES];
             self.selectCategoryErrorLabel.text = @"";
             [self.selectCategoryErrorLabel sizeToFit];
@@ -364,18 +372,16 @@
         }
     }
     else {
-        if(self.selectedReasonIndex >= 0) {
+        if (self.selectedReasonIndex >= 0) {
             [self showConfirmationPopup];
             self.selectCategoryErrorLabel.text = @"";
             [self.selectCategoryErrorLabel sizeToFit];
         }
         else {
-            self.selectCategoryErrorLabel.text = @"This field is required.";
+            self.selectCategoryErrorLabel.text = @"Please select a category.";
             [self.selectCategoryErrorLabel sizeToFit];
         }
     }
-    
-    
 }
 
 - (void)showConfirmationPopup {

@@ -643,6 +643,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_MUTED_ROOM_LIST];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_UNREAD_ROOMIDS];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CURRENT_VOICE_MESSAGE_PLAYING];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACTIVE_USER_PHOTOS];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //AS NOTE - CLEAR `receiveMessageDictionary` from AppGroup Share Extension

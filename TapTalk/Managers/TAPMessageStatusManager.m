@@ -60,13 +60,22 @@
 
 #pragma mark - Custom Method
 - (void)markMessageAsReadWithMessage:(TAPMessageModel *)message {
+    TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+    if (activeUser != nil &&
+        message.user != nil &&
+        ![TAPUtil isEmptyString:activeUser.userID] &&
+        ![TAPUtil isEmptyString:message.user.userID] &&
+        [message.user.userID isEqualToString:activeUser.userID]
+    ) {
+        return;
+    }
     [self.readMessageQueueArray addObject:message];
     
     //Add to read count dictionary
     [self increaseReadCountDictionaryWithRoomID:message.room.roomID];
     
     //Check if has mention
-    BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+    BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:activeUser];
     if (hasMention) {
         //Add to read mention count dictionary
         [self increaseReadCountMentionDictionaryWithRoomID:message.room.roomID];
@@ -74,7 +83,14 @@
 }
 
 - (void)markMessageAsDeliveredWithMessage:(TAPMessageModel *)message {
-    if (message.isDelivered) {
+    TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+    if (message.isDelivered ||
+        (activeUser != nil &&
+        message.user != nil &&
+        ![TAPUtil isEmptyString:activeUser.userID] &&
+        ![TAPUtil isEmptyString:message.user.userID] &&
+        [message.user.userID isEqualToString:activeUser.userID])
+    ) {
         return;
     }
     [self.deliveryMessageQueueArray addObject:message];
@@ -238,6 +254,17 @@
 - (void)markMessageAsDeliveredFromPushNotificationWithMessage:(TAPMessageModel *)message {
 //    NSString *messageIDString = message.messageID;
 //    NSArray *parameterMessageIDsArray = @[messageIDString];
+    
+    TAPUserModel *activeUser = [TAPDataManager getActiveUser];
+    if (message.isDelivered ||
+        (activeUser != nil &&
+        message.user != nil &&
+        ![TAPUtil isEmptyString:activeUser.userID] &&
+        ![TAPUtil isEmptyString:message.user.userID] &&
+        [message.user.userID isEqualToString:activeUser.userID])
+    ) {
+        return;
+    }
     
     //Update to database
     [TAPDataManager updateMessageDeliveryStatusToDatabaseWithData:@[message] success:^{

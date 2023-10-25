@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -151,6 +151,7 @@
                 <outlet property="saveMessageEmptyView" destination="5hM-hr-HXK" id="sN9-bH-CZp"/>
                 <outlet property="savedEmptyViewBottomConstraint" destination="00X-0j-9ID" id="Vym-z7-akb"/>
                 <outlet property="scheduleMessageBackgroundView" destination="0Aa-Ov-jPe" id="3th-QE-lIu"/>
+                <outlet property="scheduleMessageButton" destination="wTO-Uv-4bD" id="XPk-KC-rDM"/>
                 <outlet property="scheduleMessageButtonWidthConstraint" destination="iqo-lh-7gc" id="nXG-HA-rnd"/>
                 <outlet property="scheduleMessageDatePicker" destination="MtU-il-mcP" id="n7J-fk-z7c"/>
                 <outlet property="scheduleMessageDatePickerContainerView" destination="0Aa-Ov-jPe" id="f9b-W0-omy"/>
@@ -979,7 +980,7 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iyY-7J-ccc">
-                            <rect key="frame" x="16" y="12" width="68.5" height="21"/>
+                            <rect key="frame" x="16" y="12" width="76.5" height="21"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="21" id="R0M-0G-tDa"/>
                             </constraints>

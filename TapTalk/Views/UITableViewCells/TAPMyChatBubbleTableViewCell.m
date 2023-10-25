@@ -378,10 +378,10 @@
         if (recognizer.state == UIGestureRecognizerStateChanged) {
             CGPoint translation = [recognizer translationInView:self];
             
-            if (translation.x < 0) {
-                //Cannot swipe left
-                return;
-            }
+//            if (translation.x < 0) {
+//                //Cannot swipe left
+//                return;
+//            }
             
             if (translation.x > 50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
                 [TAPUtil tapticImpactFeedbackGenerator];
@@ -405,9 +405,16 @@
                 
                 _disableTriggerHapticFeedbackOnDrag = YES;
             }
+            else if (translation.x < -50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
+                [TAPUtil tapticImpactFeedbackGenerator];
+                _disableTriggerHapticFeedbackOnDrag = YES;
+            }
             
             if (translation.x > 70.0f) {
                 translation.x = 70.0f;
+            }
+            else if (translation.x < -70.0f) {
+                translation.x = -70.0f;
             }
             
             self.bubbleView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
@@ -425,6 +432,11 @@
             if (translation.x > 50.0f) {
                 if ([self.delegate respondsToSelector:@selector(myChatBubbleDidTriggerSwipeToReplyWithMessage:)]) {
                     [self.delegate myChatBubbleDidTriggerSwipeToReplyWithMessage:self.message];
+                }
+            }
+            else if (translation.x < -50.0f) {
+                if ([self.delegate respondsToSelector:@selector(myChatBubbleDidTriggerSwipeInfoWithMessage:)]) {
+                    [self.delegate myChatBubbleDidTriggerSwipeInfoWithMessage:self.message];
                 }
             }
             
@@ -674,16 +686,16 @@
         self.linkPreviewBodyLabel.text = linkPreviewBody;
         
         if(![linkPreviewImageUrl isEqualToString:@""]) {
-            self.linkPreviewImageHeightConstraint.constant = 170.0f;
            // [self.linkPreviewImageView setImageWithURLString:linkPreviewImageUrl];
             NSURL *urlImage = [NSURL URLWithString:linkPreviewImageUrl];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:urlImage];
             [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
             [self.linkPreviewImageView setImageWithURLRequest:request placeholderImage:nil success:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, UIImage *image){
-                if(image != nil){
+                if (image != nil) {
                     [self.linkPreviewImageView setImage:image];
+                    self.linkPreviewImageHeightConstraint.constant = 170.0f;
                 }
-                else{
+                else {
                     self.linkPreviewImageHeightConstraint.constant = 0.0f;
                     self.linkPreviewImageView.image = nil;
                 }
@@ -725,6 +737,8 @@
     [self.forwardFromLabel.layer removeAllAnimations];
     [self.forwardTitleLabel.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)receiveSentEvent {
@@ -910,6 +924,7 @@
         self.starIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
@@ -943,6 +958,7 @@
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
@@ -1027,6 +1043,7 @@
         self.pinIconTrailingConstraint.constant = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
@@ -1049,6 +1066,7 @@
         self.messageReadCounterLabel.alpha = 0.0f;
         self.messageReadcounterImageView.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showBubbleHighlight {

@@ -354,7 +354,7 @@
         }
         default:
         {
-            loadingString = NSLocalizedStringFromTableInBundle(@"Updating...", nil, [TAPUtil currentBundle], @"");
+            loadingString = NSLocalizedStringFromTableInBundle(@"Loading...", nil, [TAPUtil currentBundle], @"");
             doneLoadingString = NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"");
             break;
         }

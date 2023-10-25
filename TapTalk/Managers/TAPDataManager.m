@@ -1681,6 +1681,17 @@
     return coreConfigs;
 }
 
++ (void)seActiveUserPhotos:(NSArray<TAPPhotoListModel *> *)photos {
+    [[NSUserDefaults standardUserDefaults] setSecureObject:photos forKey:TAP_PREFS_ACTIVE_USER_PHOTOS];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (NSArray<TAPPhotoListModel *> *)geActiveUserPhotos {
+    NSArray *photos =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_ACTIVE_USER_PHOTOS valid:nil];
+    [TAPUtil nullToEmptyArray:photos];
+    return photos;
+}
+
 + (void)updateMessageToFailedWhenClosedInDatabase {
     [[TAPDatabaseManager sharedManager] updateMessageToFailedWhenClosed];
 }

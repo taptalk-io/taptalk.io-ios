@@ -38,7 +38,8 @@ static const NSInteger kInputMessageAccessoryViewHeight = 52.0f;
 static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
 @interface TAPSecondaryChatViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, UINavigationControllerDelegate, TAPGrowingTextViewDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate,TAPPickLocationViewControllerDelegate, TAPChatManagerDelegate>
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (weak, nonatomic) IBOutlet TAPBaseTableView *tableView;
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
 @property (weak, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
 @property (weak, nonatomic) IBOutlet UILabel *loadMoreMessageLoadingLabel;
@@ -556,7 +557,35 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
+        return 10.0f;
+    }
+    return CGFLOAT_MIN;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(tableView.frame), CGRectGetMinY(tableView.frame), CGRectGetWidth(tableView.frame), 10.0f)];
+        return view;
+    }
+    UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
+    return view;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if (self.messageListType == TAPSecondaryChatTypePinMessage || self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
+        return 10.0f;
+    }
     return FLT_MIN;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    if (self.messageListType == TAPSecondaryChatTypePinMessage || self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(tableView.frame), CGRectGetMinY(tableView.frame), CGRectGetWidth(tableView.frame), 10.0f)];
+        return view;
+    }
+    UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
+    return view;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1448,13 +1477,13 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
+    CGFloat previousHeight = self.messageTextViewHeight;
     [UIView animateWithDuration:0.2f animations:^{
         self.messageTextViewHeight = height;
         self.messageTextViewHeightConstraint.constant = height;
         self.messageViewHeightConstraint.constant = self.messageTextViewHeight + 16.0f + 4.0f;
-        [self.messageTextView layoutIfNeeded];
+        self.inputMessageAccessoryView.frame = CGRectMake(CGRectGetMinX(self.inputMessageAccessoryView.frame), CGRectGetMinY(self.inputMessageAccessoryView.frame) - height + previousHeight, CGRectGetWidth(self.inputMessageAccessoryView.frame), CGRectGetHeight(self.inputMessageAccessoryView.frame) + height - previousHeight);
         [self.inputMessageAccessoryView layoutIfNeeded];
-        [self.view layoutIfNeeded];
     }];
 }
 

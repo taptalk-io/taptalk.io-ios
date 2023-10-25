@@ -259,10 +259,10 @@
         if (recognizer.state == UIGestureRecognizerStateChanged) {
             CGPoint translation = [recognizer translationInView:self];
             
-            if (translation.x < 0) {
-                //Cannot swipe left
-                return;
-            }
+//            if (translation.x < 0) {
+//                //Cannot swipe left
+//                return;
+//            }
             
             if (translation.x > 50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
                 [TAPUtil tapticImpactFeedbackGenerator];
@@ -286,9 +286,16 @@
                 
                 _disableTriggerHapticFeedbackOnDrag = YES;
             }
+            else if (translation.x < -50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
+                [TAPUtil tapticImpactFeedbackGenerator];
+                _disableTriggerHapticFeedbackOnDrag = YES;
+            }
             
             if (translation.x > 70.0f) {
                 translation.x = 70.0f;
+            }
+            else if (translation.x < -70.0f) {
+                translation.x = -70.0f;
             }
             
             self.bubbleView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
@@ -307,6 +314,11 @@
             if (translation.x > 50.0f) {
                 if ([self.delegate respondsToSelector:@selector(myLocationBubbleDidTriggerSwipeToReplyWithMessage:)]) {
                     [self.delegate myLocationBubbleDidTriggerSwipeToReplyWithMessage:self.message];
+                }
+            }
+            else if (translation.x < -50.0f) {
+                if ([self.delegate respondsToSelector:@selector(myLocationBubbleDidTriggerSwipeInfoWithMessage:)]) {
+                    [self.delegate myLocationBubbleDidTriggerSwipeInfoWithMessage:self.message];
                 }
             }
             
@@ -547,6 +559,8 @@
     [self.forwardFromLabel.layer removeAllAnimations];
     [self.forwardTitleLabel.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)receiveSentEvent {
@@ -899,15 +913,16 @@
 }
 
 - (void)showStarMessageView {
-    if(self.starIconImageView.alpha == 0){
+    if (self.starIconImageView.alpha == 0) {
         self.starIconImageView.alpha = 1.0f;
         self.starIconWidthConstraint.constant = 10.0f;
     }
-    else{
+    else {
         self.starIconImageView.alpha = 0.0f;
         self.starIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
@@ -937,7 +952,7 @@
 }
 
 - (void)showPinIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.pinIconImageView.alpha = 1.0f;
         if(![self.messageReadCounterLabel.text isEqualToString:@""]) {
             self.pinIconTrailingConstraint.constant = 7.0f;
@@ -946,10 +961,11 @@
             self.pinIconTrailingConstraint.constant = 0.0f;
         }
     }
-    else{
+    else {
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
@@ -972,6 +988,7 @@
         self.messageReadCounterLabel.alpha = 0.0f;
         self.messageReadcounterImageView.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showSeperator {
@@ -980,6 +997,7 @@
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
+    [self.contentView layoutIfNeeded];
 }
 
 @end

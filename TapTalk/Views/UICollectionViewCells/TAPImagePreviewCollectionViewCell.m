@@ -42,6 +42,7 @@
         _selectedPictureImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
         self.selectedPictureImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.selectedPictureImageView.clipsToBounds = YES;
+        self.selectedPictureImageView.backgroundColor = [UIColor blackColor];
         [self.contentView addSubview:self.selectedPictureImageView];
         
         _saveImageButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.contentView.frame), CGRectGetHeight(self.contentView.frame))];
@@ -194,7 +195,7 @@
     CGFloat lastProgress = self.lastProgress;
     _newProgress = progress/total;
     
-    NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));    
+    NSInteger lastPercentage = (NSInteger)floorf((100.0f * lastProgress));
     //Circular Progress Bar using CAShapeLayer and UIBezierPath
     _progressLayer = [CAShapeLayer layer];
     [self.progressLayer setFrame:self.progressBarView.bounds];
@@ -304,6 +305,10 @@
     if ([self.delegate respondsToSelector:@selector(saveImageButtonDidLongpressWithIndex:)]) {
         [self.delegate saveImageButtonDidLongpressWithIndex:self.selectedPictureImageView];
     }
+}
+
+- (void)setImageBackgroundColor:(UIColor *)color {
+    self.selectedPictureImageView.backgroundColor = color;
 }
 
 @end

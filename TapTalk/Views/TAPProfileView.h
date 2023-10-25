@@ -19,6 +19,7 @@ typedef NS_ENUM(NSInteger, TAPProfileLoadingType) {
     TAPProfileLoadingTypeDeleteGroup,
     TAPProfileLoadingTypeDoneLoading,
     TAPProfileLoadingTypeImageSaveLoading,
+    TAPProfileLoadingTypeDefault,
 };
 
 @interface TAPProfileView : TAPBaseView

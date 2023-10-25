@@ -61,6 +61,8 @@ typedef NS_ENUM(NSInteger, TAPMyAccountLoadingType) {
 
 @property (strong, nonatomic) UIView *editViewContainer;
 
+@property (strong, nonatomic) UIButton *dismissKeyboardButton;
+
 - (void)refreshViewPosition;
 - (void)setContinueButtonEnabled:(BOOL)enable;
 - (void)setContentEditable:(BOOL)editable;

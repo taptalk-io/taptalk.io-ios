@@ -114,7 +114,6 @@
         self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
         [self addSubview:self.errorInfoLabel];
-                
     }
     
     return self;

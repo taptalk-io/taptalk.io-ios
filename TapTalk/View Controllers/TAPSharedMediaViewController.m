@@ -1507,7 +1507,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
     }
     
-    if (filePath == nil || [filePath isEqualToString:@""] || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+    if (filePath == nil || [filePath isEqualToString:@""]/* || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]*/) {
        // [self showFileNotFoundPopUpWithMessage:tappedMessage];
         return;
     }

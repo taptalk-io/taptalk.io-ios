@@ -142,13 +142,6 @@
         self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
         [self.initialNameView addSubview:self.initialNameLabel];
         
-        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f,  CGRectGetWidth(self.frame), 360.0f)];
-        //self.profileImageView.layer.cornerRadius = CGRectGetWidth(self.profileImageView.frame) / 2.0f;
-        self.profileImageView.alpha = 0.0f;
-        self.profileImageView.layer.masksToBounds = YES;
-        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
-        [self.scrollView addSubview:self.profileImageView];
-
         //profile image collectionview
         UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
         collectionLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
@@ -159,6 +152,14 @@
         self.profilImageCollectionView.showsHorizontalScrollIndicator = NO;
         self.profilImageCollectionView.alpha = 0.0f;
         [self.scrollView addSubview:self.profilImageCollectionView];
+        
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f,  CGRectGetWidth(self.frame), 360.0f)];
+        //self.profileImageView.layer.cornerRadius = CGRectGetWidth(self.profileImageView.frame) / 2.0f;
+        self.profileImageView.alpha = 0.0f;
+        self.profileImageView.backgroundColor = [TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR];
+        self.profileImageView.layer.masksToBounds = YES;
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFit;
+        [self.scrollView addSubview:self.profileImageView];
         
         UICollectionViewFlowLayout *collectionLayout2 = [[UICollectionViewFlowLayout alloc] init];
         collectionLayout2.scrollDirection = UICollectionViewScrollDirectionHorizontal;
@@ -193,9 +194,8 @@
         self.changeLabel.text = NSLocalizedStringFromTableInBundle(@"Set New Profile Picture", nil, [TAPUtil currentBundle], @"");
         self.changeLabel.textColor = clickableLabelColor;
         CGSize changeLabelSize = [self.changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
-        self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
+        self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width/* - 4.0f - 14.0f*/) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
         [self.scrollView addSubview:self.changeLabel];
-
 
         _changeIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.changeLabel.frame) + 4.0f, CGRectGetMinY(self.changeLabel.frame), 20.0f, 20.0f)];
         self.changeIconImageView.image = [UIImage imageNamed:@"TAPIconEditPicture" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -258,10 +258,14 @@
         
         self.editViewContainer.alpha = 0.0f;
         
+        _dismissKeyboardButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.editViewContainer.frame), CGRectGetHeight(self.editViewContainer.frame))];
+        [self.editViewContainer addSubview:self.dismissKeyboardButton];
+        
         _fullNameTextField = [[TAPCustomTextFieldView alloc] initWithFrame:CGRectMake(0.0f, 24.0f, CGRectGetWidth(self.frame), 0.0f)];
         [self.fullNameTextField setTapCustomTextFieldViewType:TAPCustomTextFieldViewTypeFullName];
         self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
         [self.editViewContainer addSubview:self.fullNameTextField];
+        self.fullNameTextField.textField.alpha = 0.4f;
         
         _bioView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.fullNameTextField.frame) + 24.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 0.0f)];
         [self.editViewContainer addSubview:self.bioView];
@@ -289,16 +293,19 @@
         UIColor *bioTextViewColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
         UIColor *bioPlaceholderTextViewColor = [[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder] colorWithAlphaComponent:0.4f];
         
-        self.bioContainerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(bioTitleLabel.frame) + 8.0f, CGRectGetWidth(self.bioView.frame), 50.0f)];
+        self.bioContainerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(bioTitleLabel.frame) + 8.0f, CGRectGetWidth(self.bioView.frame), 48.0f)];
         self.bioContainerView.backgroundColor = [UIColor whiteColor];
         self.bioContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.bioContainerView.layer.cornerRadius = 8.0f;
         self.bioContainerView.layer.borderWidth = 1.0f;
         [self.bioView addSubview:self.bioContainerView];
         
-        _bioTextView = [[TAPCustomGrowingTextView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bioContainerView.frame) + 16.0f, CGRectGetMinY(self.bioContainerView.frame) + 12.0f, CGRectGetWidth(self.bioContainerView.frame) - 16.0f - 16.0f, 24.0f)];
+        _bioTextView = [[TAPCustomGrowingTextView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.bioContainerView.frame), CGRectGetMinY(self.bioContainerView.frame), CGRectGetWidth(self.bioContainerView.frame), CGRectGetHeight(self.bioContainerView.frame))];
         [self.bioTextView setCharacterCountLimit:[[TapTalk sharedInstance] getMaxCaptionLength]];
         self.bioTextView.minimumHeight = 24.0f;
+        self.bioTextView.maximumHeight = 10000.0f;
+        self.bioTextView.textView.textContainerInset = UIEdgeInsetsMake(16.0f, 12.0f, 16.0f, 12.0f);
+        self.bioTextView.textView.scrollEnabled = NO;
         [self.bioTextView setFont:bioTextViewFont];
         [self.bioTextView setTextColor:[UIColor blackColor]];
         [self.bioTextView setPlaceholderColor:bioPlaceholderTextViewColor];
@@ -321,6 +328,7 @@
         [self.emailTextField setTapCustomTextFieldViewType:TAPCustomTextFieldViewTypeEmailOptional];
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMinY(self.emailTextField.frame), CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         [self.editViewContainer addSubview:self.emailTextField];
+        self.emailTextField.textField.alpha = 0.4f;
 
         if (![[TapUI sharedInstance] getChangeProfilePictureButtonVisibleState]) {
             self.changeIconImageView.alpha = 0.0f;
@@ -378,6 +386,7 @@
         [self.editViewContainer addSubview:self.deleteAccountButton];
         
         self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame) + 16.0f);
+        self.dismissKeyboardButton.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.editViewContainer.frame), CGRectGetHeight(self.editViewContainer.frame));
 
         _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.logoutView.frame) + 24.0f, CGRectGetWidth(self.frame), 50.0f)];
         [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
@@ -491,8 +500,9 @@
 #pragma mark - Custom Method
 - (void)updateGrowingTextViewPosition:(CGFloat)textViewHeight {
     CGFloat updatedTextViewGap = textViewHeight - self.bioTextView.minimumHeight;
-    self.bioContainerView.frame = CGRectMake(0.0f, CGRectGetMinY(self.bioContainerView.frame), CGRectGetWidth(self.bioView.frame), 25.0+textViewHeight);
-    self.bioView.frame = CGRectMake(16.0f, CGRectGetMaxY(self.fullNameTextField.frame) + 24.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, CGRectGetMaxY(self.bioContainerView.frame));
+    self.bioContainerView.frame = CGRectMake(0.0f, CGRectGetMinY(self.bioContainerView.frame), CGRectGetWidth(self.bioView.frame), textViewHeight);
+    self.bioTextView.frame = self.bioContainerView.frame;
+    self.bioView.frame = CGRectMake(16.0f, CGRectGetMaxY(self.fullNameTextField.frame) + 24.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, /*CGRectGetMaxY(self.bioContainerView.frame)*/29.0f + textViewHeight);
     [self refreshViewPosition];
 }
 
@@ -531,6 +541,7 @@
         
         if(self.editViewContainer.alpha == 1.0f){
             self.editViewContainer.frame = CGRectMake(0.0f, CGRectGetMaxY(self.changeLabel.frame), CGRectGetWidth(self.frame), CGRectGetMaxY(self.deleteAccountButton.frame));
+            self.dismissKeyboardButton.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.editViewContainer.frame), CGRectGetHeight(self.editViewContainer.frame));
             self.versionLabel.frame = CGRectMake(self.versionLabel.frame.origin.x, CGRectGetMaxY(self.editViewContainer.frame) + 24.0f, CGRectGetWidth(self.versionLabel.frame), 16.0f);
         }
         else{
@@ -567,7 +578,7 @@
     self.changeLabel.text = NSLocalizedStringFromTableInBundle(@"Set New Profile Picture", nil, [TAPUtil currentBundle], @"");
     
     CGSize changeLabelSize = [self.changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
-    self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
+    self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width/* - 4.0f - 14.0f*/) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
     self.changeProfilePictureButton.frame = CGRectMake(CGRectGetMinX(self.changeLabel.frame), CGRectGetMinY(self.changeLabel.frame) - 8.0f, CGRectGetWidth(self.changeLabel.frame) + 4.0f + CGRectGetWidth(self.changeIconImageView.frame), 40.0f);
     [self setEditPorfilPictureButtonVisible:YES];
     
@@ -583,7 +594,7 @@
     self.changeLabel.text = NSLocalizedStringFromTableInBundle(@"Edit Profile Picture", nil, [TAPUtil currentBundle], @"");
     
     CGSize changeLabelSize = [self.changeLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 22.0f)];
-    self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width - 4.0f - 14.0f) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
+    self.changeLabel.frame = CGRectMake((CGRectGetWidth(self.frame) - changeLabelSize.width/* - 4.0f - 14.0f*/) / 2, CGRectGetMinY(self.changeLabel.frame), changeLabelSize.width, 22.0f);
     self.changeProfilePictureButton.frame = CGRectMake(CGRectGetMinX(self.changeLabel.frame), CGRectGetMinY(self.changeLabel.frame) - 8.0f, CGRectGetWidth(self.changeLabel.frame) + 4.0f + CGRectGetWidth(self.changeIconImageView.frame), 40.0f);
     
     self.versionLabel.frame = CGRectMake(self.versionLabel.frame.origin.x, CGRectGetMaxY(self.editViewContainer.frame) + 24.0f, CGRectGetWidth(self.versionLabel.frame), 16.0f);
@@ -608,9 +619,11 @@
 }
 
 - (void)showMultipleProfilePicture{
-    self.profilImageCollectionView.alpha = 1.0f;
-    self.pageIndicatorCollectionView.alpha = 1.0f;
-    self.profileImageView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        self.profilImageCollectionView.alpha = 1.0f;
+        self.pageIndicatorCollectionView.alpha = 1.0f;
+        self.profileImageView.alpha = 0.0f;
+    } afterDelay:0.3f];
 }
 
 - (void)setContinueButtonEnabled:(BOOL)enable {
