@@ -34,6 +34,8 @@
 #define TAP_COLOR_ICON_SUCCESS @"7EC82A"
 #define TAP_COLOR_ICON_ERROR @"FF3F57"
 
+#define TAP_COLOR_BLACK_19 @"191919"
+
 #pragma mark - Default Avatar Background Color
 //Default Color
 #define TAP_AVATAR_BACKGROUND_COLOR_1 @"F99181"

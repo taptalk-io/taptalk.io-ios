@@ -214,6 +214,12 @@ shouldChangeTextInRange:(NSRange)range
     }
 }
 
+- (void)textViewDidEndEditing:(UITextView *)textView {
+    if ([self.delegate respondsToSelector:@selector(growingTextViewDidEndEditing:)]) {
+        [self.delegate growingTextViewDidEndEditing:self];
+    }
+}
+
 #pragma mark - Custom Method
 - (void)setFont:(UIFont *)font {
     _font = font;

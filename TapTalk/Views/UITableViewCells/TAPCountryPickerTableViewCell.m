@@ -62,10 +62,9 @@
 #pragma mark - Custom Method
 - (void)setCountryData:(TAPCountryModel *)country {
     
-    NSString *countryName = country.countryCommonName;
     NSString *flagIconURL = country.flagIconURL;
     
-    self.countryNameLabel.text = countryName;
+    self.countryNameLabel.text = [NSString stringWithFormat:@"%@ (+%@)", country.countryCommonName, country.countryCallingCode];
     
     if (flagIconURL == nil || [flagIconURL isEqualToString:@""]) {
         self.countryFlagImageView.image = [UIImage imageNamed:@"TAPDefaultCountryFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];

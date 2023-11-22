@@ -631,7 +631,7 @@
         }];
         [downloadTask resume];
     }
-    if (currentFileID != nil && ![currentFileID isEqualToString:@""]) {
+    else if (currentFileID != nil && ![currentFileID isEqualToString:@""]) {
         //Call API Download Full Image
         [TAPDataManager callAPIDownloadFileWithFileID:currentFileID roomID:roomID isThumbnail:NO completionBlock:^(UIImage *downloadedImage) {
             

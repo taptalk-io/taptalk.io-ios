@@ -90,7 +90,13 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timestampLabelTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewBodyTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageRightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewViewZeroHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageCounterImageWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageReadCounterTrailingConstraint;
 
@@ -198,6 +204,10 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    self.linkPreviewImageView.backgroundColor = [UIColor clearColor];
+    self.linkPreviewImageView.opaque = NO;
+    self.linkPreviewImageView.clipsToBounds = YES;
+    self.linkPreviewImageView.layer.masksToBounds = YES;
     self.linkPreviewImageView.layer.cornerRadius = 8.0f;
     
     self.mentionIndexesArray = [[NSArray alloc] init];
@@ -238,6 +248,9 @@
     self.timestampLabelTopConstraint.constant = -35.0f;
     self.linkPreviewImageView.image = nil;
     self.linkPreviewImageHeightConstraint.constant = 0.0f;
+    self.linkPreviewViewHeightConstraint.active = NO;
+    self.linkPreviewViewZeroHeightConstraint.active = YES;
+    
     [self showSenderInfo:NO];
     [self showMessageReadCounterWithNumber:NO readCount:0];
 }
@@ -470,8 +483,30 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            [self showQuoteView:NO];
-            [self showReplyView:YES withMessage:self.message];
+            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
+                    [TAPImageView imageFromCacheWithMessage:self.message
+                    start:^(TAPMessageModel *resultMessage) {
+                        
+                    }
+                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                        
+                    }
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        if (savedImage != nil) {
+                            [self.quoteImageView setImage:savedImage];
+                            [self showReplyView:NO withMessage:nil];
+                            [self showQuoteView:YES];
+                        }
+                    }
+                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+            }
+            else {
+                [self showQuoteView:NO];
+                [self showReplyView:YES withMessage:self.message];
+            }
         }
     }
 }
@@ -570,13 +605,20 @@
         //reply to exists
         //if reply exists check if image in quote exists
         //if image exists  change view to Quote View
-        if([message.quote.content isEqualToString:@"🎤 Voice"]){
-            [self showReplyView:YES withMessage:message];
-            [self showQuoteView:NO];
-        }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
-            [self showReplyView:NO withMessage:nil];
-            [self showQuoteView:YES];
+        if ((![TAPUtil isEmptyString:message.quote.fileType] &&
+             ([message.quote.fileType isEqualToString:@"image"] ||
+             [message.quote.fileType isEqualToString:@"video"] ||
+             [message.quote.fileType isEqualToString:@"file"])) ||
+            ![TAPUtil isEmptyString:message.quote.imageURL]
+        ) {
+            if ([message.quote.fileType isEqualToString:@"video"]) {
+                [self showReplyView:YES withMessage:message];
+                [self showQuoteView:NO];
+            }
+            else {
+                [self showReplyView:NO withMessage:nil];
+                [self showQuoteView:YES];
+            }
             [self setQuote:message.quote userID:message.replyTo.userID];
         }
         else {
@@ -829,7 +871,7 @@
         self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
     }
     
-    //link preview
+    // Link preview
     NSDictionary *data = message.data;
     NSString *url= [data objectForKey:@"url"];
     
@@ -840,34 +882,87 @@
     linkPreviewTitle = [TAPUtil nullToEmptyString:linkPreviewTitle];
     linkPreviewBody = [TAPUtil nullToEmptyString:linkPreviewBody];
     linkPreviewImageUrl = [TAPUtil nullToEmptyString:linkPreviewImageUrl];
+    BOOL linkpreviewUI = [[TapUI sharedInstance] getLinkPreviewInMessageEnabled];
     
-    if(url != nil && [[TapUI sharedInstance] getLinkPreviewInMessageEnabled] && (![linkPreviewTitle isEqualToString:@""] || ![linkPreviewBody isEqualToString:@""] || ![linkPreviewImageUrl isEqualToString:@""])) {
-        //show link preview
+    if (url != nil && linkpreviewUI && (![linkPreviewTitle isEqualToString:@""] || ![linkPreviewBody isEqualToString:@""] || ![linkPreviewImageUrl isEqualToString:@""])) {
+        // Show link preview
         self.linkPreviewContainerView.alpha = 1.0f;
-        self.timestampLabelTopConstraint.constant = 2.0f;
+        self.timestampLabelTopConstraint.constant = 4.0f;
+        self.linkPreviewViewHeightConstraint.active = YES;
+        self.linkPreviewViewZeroHeightConstraint.active = NO;
+        self.linkPreviewImageWidthConstraint.active = YES;
+        self.linkPreviewImageRightConstraint.priority = UILayoutPriorityDefaultHigh;
+        
+        self.messageURL = [NSURL URLWithString:url];
         
         self.linkPreviewTitleLabel.text = linkPreviewTitle;
         self.linkPreviewBodyLabel.text = linkPreviewBody;
         
-        self.messageURL = url;
-        
-        if(![linkPreviewImageUrl isEqualToString:@""]) {
-            self.linkPreviewImageHeightConstraint.constant = 170.0f;
-            [self.linkPreviewImageView setImageWithURLString:linkPreviewImageUrl];
+        if ([linkPreviewBody isEqualToString:@""]) {
+            self.linkPreviewBodyLabel.alpha = 0.0f;
+            self.linkPreviewBodyTopConstraint.constant = 4.0f;
         }
-        else{
-            self.linkPreviewImageHeightConstraint.constant = 0.0f;
-            self.linkPreviewImageView.image = nil;
+        else {
+            self.linkPreviewBodyLabel.alpha = 1.0f;
+            self.linkPreviewBodyTopConstraint.constant = 9.0f;
+        }
+        
+        if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidRequestLinkPreviewImageWithUrl:message:)] &&
+            [self.delegate yourChatBubbleDidRequestLinkPreviewImageWithUrl:linkPreviewImageUrl message:message] != nil
+        ) {
+            UIImage *image = [self.delegate yourChatBubbleDidRequestLinkPreviewImageWithUrl:linkPreviewImageUrl message:message];
+            if (image.size.height > 1.0f) {
+                [self setLinkPreviewImage:image];
+            }
+            else {
+                [self hideLinkPreviewImage];
+            }
+        }
+        else if (![linkPreviewImageUrl isEqualToString:@""]) {
+//            [self.linkPreviewImageView setImageWithURLString:linkPreviewImageUrl];
+            NSURL *urlImage = [NSURL URLWithString:linkPreviewImageUrl];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:urlImage];
+            [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
+            [self.linkPreviewImageView setImageWithURLRequest:request
+                                             placeholderImage:nil
+                                                      success:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, UIImage *image) {
+                if (image != nil) {
+                    [self setLinkPreviewImage:image];
+                }
+                else {
+                    [self hideLinkPreviewImage];
+                }
+                
+                if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
+                    [self.delegate yourChatBubbleDidFinishLoadingLinkPreviewImage:image url:linkPreviewImageUrl message:message];
+                }
+            } failure:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, NSError *error) {
+                [self hideLinkPreviewImage];
+                
+                if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
+                    [self.delegate yourChatBubbleDidFinishLoadingLinkPreviewImage:nil url:linkPreviewImageUrl message:message];
+                }
+            }];
+        }
+        else {
+            [self hideLinkPreviewImage];
         }
     }
     else {
-        //hide link preview
+        // Hide link preview
         self.linkPreviewContainerView.alpha = 0.0f;
+        self.linkPreviewImageWidthConstraint.constant = 0.0f;
         self.linkPreviewImageHeightConstraint.constant = 0.0f;
-        self.timestampLabelTopConstraint.constant = -35.0f;
+        self.linkPreviewBodyTopConstraint.constant = 0.0f;
+        self.linkPreviewImageTopConstraint.constant = 0.0f;
+        self.timestampLabelTopConstraint.constant = 0.0f;
         self.linkPreviewTitleLabel.text = @"";
         self.linkPreviewBodyLabel.text = @"";
         self.linkPreviewImageView.image = nil;
+        self.linkPreviewViewHeightConstraint.active = NO;
+        self.linkPreviewViewZeroHeightConstraint.active = YES;
+        self.linkPreviewImageWidthConstraint.active = NO;
+        self.linkPreviewImageRightConstraint.priority = UILayoutPriorityRequired;
     }
     
     //remove animation
@@ -892,6 +987,46 @@
     [self.quoteImageView.layer removeAllAnimations];
     
     [self.contentView layoutIfNeeded];
+}
+
+- (void)setLinkPreviewImage:(UIImage *)image {
+    CGFloat width = image.size.width;
+    CGFloat height = image.size.height;
+    CGFloat maxWidth = CGRectGetWidth(self.frame) - 160.0f;
+    CGFloat maxHeight = 195.0f;
+    if (width > maxWidth || height > maxHeight) {
+        if (width / height > maxWidth / maxHeight) {
+            // Set to max width
+            width = maxWidth;
+            height = (image.size.height / image.size.width) * maxWidth;
+        }
+        else {
+            // Set to max height
+            width = (image.size.width / image.size.height) * maxHeight;
+            height = maxHeight;
+        }
+    }
+    self.linkPreviewImageWidthConstraint.constant = width;
+    self.linkPreviewImageHeightConstraint.constant = height;
+    if (self.linkPreviewBodyLabel.alpha != 1.0f) {
+        self.linkPreviewImageTopConstraint.constant = 12.0f;
+    }
+    else {
+        self.linkPreviewImageTopConstraint.constant = 8.0f;
+    }
+    [self.linkPreviewImageView setImage:image];
+}
+
+- (void)hideLinkPreviewImage {
+    self.linkPreviewImageWidthConstraint.constant = 0.0f;
+    self.linkPreviewImageHeightConstraint.constant = 0.0f;
+    if (self.linkPreviewBodyLabel.alpha != 1.0f) {
+        self.linkPreviewImageTopConstraint.constant = 4.0f;
+    }
+    else {
+        self.linkPreviewImageTopConstraint.constant = 0.0f;
+    }
+    self.linkPreviewImageView.image = nil;
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {

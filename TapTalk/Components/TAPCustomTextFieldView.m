@@ -596,6 +596,7 @@
     
     [self.phoneNumberPickerView setCountryCodePhoneNumberWithData:country];
     self.phoneNumberPickerView.phoneNumberTextField.text = phoneNumber;
+    [self.phoneNumberPickerView textFieldTextDidChange];
     self.textField.text = phoneNumber;
 }
 

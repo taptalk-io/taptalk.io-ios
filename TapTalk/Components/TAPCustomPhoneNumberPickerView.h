@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setVerifState;
 - (void)setAsErrorState:(BOOL)isError;
 - (void)setAsLoadiState:(BOOL)isLoading;
+- (void)textFieldTextDidChange;
 
 @end
 

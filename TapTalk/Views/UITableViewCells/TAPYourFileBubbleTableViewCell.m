@@ -416,8 +416,30 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            [self showQuoteView:NO];
-            [self showReplyView:YES withMessage:self.message];
+            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
+                    [TAPImageView imageFromCacheWithMessage:self.message
+                    start:^(TAPMessageModel *resultMessage) {
+                        
+                    }
+                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                        
+                    }
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        if (savedImage != nil) {
+                            [self.quoteImageView setImage:savedImage];
+                            [self showReplyView:NO withMessage:nil];
+                            [self showQuoteView:YES];
+                        }
+                    }
+                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+            }
+            else {
+                [self showQuoteView:NO];
+                [self showReplyView:YES withMessage:self.message];
+            }
         }
     }
 }
@@ -557,13 +579,20 @@
         }
         [self.contentView layoutIfNeeded];
         
-        if([message.quote.content isEqualToString:@"🎤 Voice"]){
-            [self showReplyView:YES withMessage:message];
-            [self showQuoteView:NO];
-        }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
-            [self showReplyView:NO withMessage:nil];
-            [self showQuoteView:YES];
+        if ((![TAPUtil isEmptyString:message.quote.fileType] &&
+             ([message.quote.fileType isEqualToString:@"image"] ||
+             [message.quote.fileType isEqualToString:@"video"] ||
+             [message.quote.fileType isEqualToString:@"file"])) ||
+            ![TAPUtil isEmptyString:message.quote.imageURL]
+        ) {
+            if ([message.quote.fileType isEqualToString:@"video"]) {
+                [self showReplyView:YES withMessage:message];
+                [self showQuoteView:NO];
+            }
+            else {
+                [self showReplyView:NO withMessage:nil];
+                [self showQuoteView:YES];
+            }
             [self setQuote:message.quote userID:message.replyTo.userID];
         }
         else {

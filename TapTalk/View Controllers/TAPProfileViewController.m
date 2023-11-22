@@ -890,7 +890,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 else if (indexPath.item == 2) {
                     //MOBILE NUMBER
                     [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeUserDetail];
-                    [cell setUserDetailString: NSLocalizedStringFromTableInBundle(@"MOBILE NUMBER", nil, [TAPUtil currentBundle], @"") detail:user.phone];
+                    [cell setUserDetailString: NSLocalizedStringFromTableInBundle(@"MOBILE NUMBER", nil, [TAPUtil currentBundle], @"") detail:[TAPUtil beautifyPhoneNumber:user.phone insertPlus:YES]];
                     
                     if([[TapUI sharedInstance] getEmailAddressInChatProfileVisible]){
                         [cell showSeparatorView:YES];
@@ -953,7 +953,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else if (indexPath.item == 2) {
                 //MOBILE NUMBER
                 [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeUserDetail];
-                [cell setUserDetailString: NSLocalizedStringFromTableInBundle(@"MOBILE NUMBER", nil, [TAPUtil currentBundle], @"") detail:self.user.phone];
+                [cell setUserDetailString: NSLocalizedStringFromTableInBundle(@"MOBILE NUMBER", nil, [TAPUtil currentBundle], @"") detail:[TAPUtil beautifyPhoneNumber:self.user.phone insertPlus:YES]];
                 
                 if([[TapUI sharedInstance] getEmailAddressInChatProfileVisible]){
                     [cell showSeparatorView:YES];

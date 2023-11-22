@@ -17,6 +17,7 @@
 
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height;
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView;
+- (void)growingTextViewDidEndEditing:(TAPGrowingTextView *)textView;
 - (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView;
 - (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView;
 - (void)growingTextViewShouldChangeTextInRange:(NSRange)range
