@@ -953,7 +953,7 @@
 }
 - (IBAction)linkPreviewButtonDidTapped:(id)sender {
     if([self.delegate respondsToSelector:@selector(myChatBubbleDidTappedUrl:originalString:)]) {
-        [self.delegate myChatBubbleDidTappedUrl:[NSURL URLWithString:self.messageURL] originalString:@""];
+        [self.delegate myChatBubbleDidTappedUrl:self.messageURL originalString:@""];
     }
 }
 
