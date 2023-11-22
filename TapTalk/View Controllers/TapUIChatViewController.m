@@ -438,6 +438,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (nonatomic) NSInteger currentIndexPinned;
 
+@property (strong, nonatomic) NSMutableDictionary<NSString *, UIImage *> *linkPreviewImageDictionary;
+
 // Textview mention loop index
 @property (nonatomic) NSInteger mentionLoopIndex;
 @property (nonatomic) NSInteger mentionCursorIndex;
@@ -1481,7 +1483,13 @@ CGPoint center;
                         [cell showPinIcon:NO];
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -1646,7 +1654,13 @@ CGPoint center;
                     
                     [cell showStatusLabel:YES];
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -1747,7 +1761,13 @@ CGPoint center;
                         }
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -1899,7 +1919,13 @@ CGPoint center;
                         [cell showPinIcon:NO];
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2034,7 +2060,13 @@ CGPoint center;
                         [cell showPinIcon:NO];
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2149,7 +2181,13 @@ CGPoint center;
                             [cell showPinIcon:NO];
                         }
                         
-                        if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        if (message.isHidden ||
+                            message.isSending ||
+                            message.isFailedSend ||
+                            message.isDeleted ||
+                            self.otherUser.deleted.longValue > 0 ||
+                            self.isSelectingForwardMessage
+                        ) {
                             [cell setSwipeGestureEnable:NO];
                         }
                         else{
@@ -2264,7 +2302,13 @@ CGPoint center;
                         [cell showPinIcon:NO];
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2389,7 +2433,13 @@ CGPoint center;
                     
 //                    cell.message = message;
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2466,7 +2516,13 @@ CGPoint center;
                     
 //                    cell.message = message;
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2594,7 +2650,13 @@ CGPoint center;
                         [cell showPinIcon:NO];
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2696,7 +2758,13 @@ CGPoint center;
                         [cell showPinIcon:NO];
                     }
                     
-                    if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                    if (message.isHidden ||
+                        message.isSending ||
+                        message.isFailedSend ||
+                        message.isDeleted ||
+                        self.otherUser.deleted.longValue > 0 ||
+                        self.isSelectingForwardMessage
+                    ) {
                         [cell setSwipeGestureEnable:NO];
                     }
                     else{
@@ -2797,7 +2865,13 @@ CGPoint center;
                             [cell showPinIcon:NO];
                         }
                         
-                        if(self.otherUser.deleted.longValue > 0 || self.isSelectingForwardMessage){
+                        if (message.isHidden ||
+                            message.isSending ||
+                            message.isFailedSend ||
+                            message.isDeleted ||
+                            self.otherUser.deleted.longValue > 0 ||
+                            self.isSelectingForwardMessage
+                        ) {
                             [cell setSwipeGestureEnable:NO];
                         }
                         else{
@@ -3981,6 +4055,38 @@ CGPoint center;
                            mentionIndexesArray:(NSArray *)mentionIndexesArray {
     
     [self taptTalkUserMentionLongPressedWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
+}
+
+- (UIImage *_Nullable)myChatBubbleDidRequestLinkPreviewImageWithUrl:(NSString *)url message:(TAPMessageModel *)message {
+    if ([TAPUtil isEmptyString:url] || self.linkPreviewImageDictionary == nil) {
+        return nil;
+    }
+    NSString *key = [[url componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    UIImage *image = [self.linkPreviewImageDictionary objectForKey:key];
+    return image;
+}
+
+- (void)myChatBubbleDidFinishLoadingLinkPreviewImage:(UIImage *_Nullable)image url:(NSString *)url message:(TAPMessageModel *)message {
+    if (![TAPUtil isEmptyString:url]) {
+        NSString *key = [[url componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        if (self.linkPreviewImageDictionary == nil) {
+            _linkPreviewImageDictionary = [NSMutableDictionary dictionary];
+        }
+        if (image != nil) {
+            [self.linkPreviewImageDictionary setObject:image forKey:key];
+        }
+        else {
+            // Set empty image to prevent reloading
+            CGSize size = CGSizeMake(1.0f, 1.0f);
+            UIGraphicsBeginImageContextWithOptions(size, YES, 0);
+            [[UIColor whiteColor] setFill];
+            UIRectFill(CGRectMake(0, 0, size.width, size.height));
+            UIImage *emptyImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            [self.linkPreviewImageDictionary setObject:emptyImage forKey:key];
+        }
+    }
+    [self reloadTableViewCellWithMessage:message];
 }
 
 #pragma mark TAPMyChatDeletedBubbleTableViewCell
@@ -5503,6 +5609,14 @@ CGPoint center;
     [self taptTalkUserMentionLongPressedWithWord:word tappedAtIndex:index message:message mentionIndexesArray:mentionIndexesArray];
 }
 
+- (UIImage *_Nullable)yourChatBubbleDidRequestLinkPreviewImageWithUrl:(NSString *)url message:(TAPMessageModel *)message {
+    return [self myChatBubbleDidRequestLinkPreviewImageWithUrl:url message:message];
+}
+
+- (void)yourChatBubbleDidFinishLoadingLinkPreviewImage:(UIImage *_Nullable)image url:(NSString *)url message:(TAPMessageModel *)message {
+    [self myChatBubbleDidFinishLoadingLinkPreviewImage:image url:url message:message];
+}
+
 #pragma mark TAPYourChatDeletedBubbleTableViewCell
 - (void)yourChatDeletedBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (!tappedMessage.isSending) {
@@ -6528,8 +6642,8 @@ CGPoint center;
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
-    
     [self setKeyboardStateDefault];
+    self.textViewBorderView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
     
     if (textView.text != nil) {
         if (![textView.text isEqualToString:@""]) {
@@ -6547,6 +6661,10 @@ CGPoint center;
             }
         }
     }
+}
+
+- (void)growingTextViewDidEndEditing:(TAPGrowingTextView *)textView {
+    self.textViewBorderView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
 }
 
 - (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView {
@@ -8550,7 +8668,7 @@ CGPoint center;
 }
 
 - (void)openFiles {
-    UIDocumentPickerViewController *documentPickerViewController = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.data"] inMode:UIDocumentPickerModeOpen];
+    UIDocumentPickerViewController *documentPickerViewController = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.data"] inMode:UIDocumentPickerModeImport];
     documentPickerViewController.delegate = self;
     documentPickerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:documentPickerViewController animated:YES completion:^{
@@ -10064,6 +10182,23 @@ CGPoint center;
     [self presentViewController:controller animated:YES completion:nil];
     controller.player = player;
     [player play];
+}
+
+- (void)reloadTableViewCellWithMessage:(TAPMessageModel *)message {
+    NSInteger indexInArray = [self.messageArray indexOfObject:message];
+    if (indexInArray < 0 || indexInArray >= [self.messageArray count]) {
+        return;
+    }
+    NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
+    @try {
+        [self.tableView beginUpdates];
+        [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception.reason);
+        [self.tableView reloadData];
+    }
 }
 
 #pragma mark Input Accessory View

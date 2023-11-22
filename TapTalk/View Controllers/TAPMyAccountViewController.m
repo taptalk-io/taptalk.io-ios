@@ -1124,7 +1124,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     //Set Phone
     [self.myAccountView.mobileNumberTextField setPhoneNumber:phoneNumber country:country];
-    [self.myAccountView.mobileNumberLabelField setAccountDetailFieldString: NSLocalizedStringFromTableInBundle(@"MOBILE NUMBER", nil, [TAPUtil currentBundle], @"") description:[NSString stringWithFormat:@"+%@ %@", country.countryCallingCode, phoneNumber]];
+    [self.myAccountView.mobileNumberLabelField setAccountDetailFieldString: NSLocalizedStringFromTableInBundle(@"MOBILE NUMBER", nil, [TAPUtil currentBundle], @"")
+                                                               description:[TAPUtil beautifyPhoneNumber:[NSString stringWithFormat:@"%@%@", country.countryCallingCode, phoneNumber] insertPlus:YES]];
     
     //Set Email
     email = [TAPUtil nullToEmptyString:email];

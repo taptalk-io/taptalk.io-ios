@@ -15,6 +15,7 @@
 
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 @property (nonatomic) CGFloat navigationBarShadowOpacity;
+@property (nonatomic) CGFloat currentKeyboardHeight;
 
 - (void)backButtonDidTapped;
 - (void)closeButtonDidTapped;
@@ -119,13 +120,13 @@
 #pragma mark - Custom Method
 - (void)keyboardWillShow:(NSNotification *)notification {
     CGFloat keyboardHeight = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
-    
+    self->_currentKeyboardHeight = keyboardHeight;
     [self keyboardWillShowWithHeight:keyboardHeight];
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
     CGFloat keyboardHeight = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
-    
+    self->_currentKeyboardHeight = 0.0f;
     [self keyboardWillHideWithHeight:keyboardHeight];
 }
 
@@ -268,6 +269,120 @@
 
 - (void)cancelButtonDidTapped {
     
+}
+
+- (void)showSnackBar:(SnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName {
+    [self showSnackBar:type message:message iconName:iconName showDuration:3.0f animationDuration:0.3f];
+}
+
+- (void)showSnackBar:(SnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName showDuration:(CGFloat)showDuration animationDuration:(CGFloat)animationDuration {
+    UIView *snackBarView = [[UIView alloc] initWithFrame:CGRectMake(
+        16.0f,
+        CGRectGetHeight(self.view.frame) - 80.0f - [TAPUtil safeAreaBottomPadding] - self.currentKeyboardHeight,
+        CGRectGetWidth(self.view.frame) - 32.0f,
+        48.0f
+    )];
+    snackBarView.clipsToBounds = YES;
+    snackBarView.alpha = 0.0f;
+    
+    UIImage *iconImage = nil;
+    UIImageView *iconImageView = nil;
+    if (![TAPUtil isEmptyString:iconName]) {
+        iconImage = [UIImage imageNamed:iconName];
+    }
+    if (iconImage != nil) {
+        iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, 24.0f, 24.0f)];
+        iconImageView.image = iconImage;
+        [snackBarView addSubview:iconImageView];
+    }
+    
+    CGFloat labelX = 0.0f;
+    if (iconImageView != nil && iconImageView.image != nil) {
+        labelX = 32.0f;
+    }
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(
+        16.0f + labelX,
+        12.0f,
+        CGRectGetWidth(snackBarView.frame) - 32.0f - labelX,
+        24.0f
+    )];
+    label.font = [UIFont fontWithName:TAP_FONT_FAMILY_BOLD size:16.0f];
+    label.text = message;
+    label.numberOfLines = 0;
+    [snackBarView addSubview:label];
+    
+    if (type == SnackBarTypeError) {
+        snackBarView.backgroundColor = [TAPUtil getColor:@"FFECEE"];
+        snackBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ERROR].CGColor;
+        snackBarView.layer.borderWidth = 1.0f;
+        label.textColor = [TAPUtil getColor:TAP_COLOR_ERROR];
+        if (iconImageView != nil && iconImageView.image != nil) {
+            iconImageView.image = [iconImageView.image setImageTintColor:[TAPUtil getColor:TAP_COLOR_ERROR]];
+        }
+    }
+    else {
+        snackBarView.backgroundColor = [TAPUtil getColor:TAP_COLOR_TEXT_DARK];
+        snackBarView.layer.borderWidth = 0.0f;
+        label.textColor = [UIColor whiteColor];
+        if (iconImageView != nil && iconImageView.image != nil) {
+            iconImageView.image = [iconImageView.image setImageTintColor:[UIColor whiteColor]];
+        }
+    }
+    
+    if (type == SnackBarTypeToast) {
+        [label sizeToFit];
+        CGFloat iconWidth = 0.0f;
+        if (iconImageView != nil && iconImageView.image != nil) {
+            iconWidth = 32.0f;
+        }
+        snackBarView.frame = CGRectMake(
+            MAX(CGRectGetMinX(snackBarView.frame), (CGRectGetWidth(self.view.frame) - CGRectGetWidth(label.frame) - iconWidth - 32.0f) / 2),
+            MIN(CGRectGetMinY(snackBarView.frame), CGRectGetHeight(self.view.frame) - CGRectGetHeight(label.frame) - 24.0f - [TAPUtil safeAreaBottomPadding] - self.currentKeyboardHeight),
+            MIN(CGRectGetWidth(snackBarView.frame), CGRectGetWidth(label.frame) + iconWidth + 32.0f),
+            MAX(CGRectGetHeight(snackBarView.frame), CGRectGetHeight(label.frame) + 24.0f)
+        );
+        snackBarView.backgroundColor = [TAPUtil getColor:TAP_COLOR_TEXT_DARK withAlpha:0.8f];
+        snackBarView.layer.cornerRadius = 24.0f;
+    }
+    else {
+        CGSize labelSize = [label sizeThatFits:CGSizeMake(CGRectGetWidth(label.frame), CGFLOAT_MAX)];
+        label.frame = CGRectMake(
+            CGRectGetMinX(label.frame),
+            CGRectGetMinY(label.frame),
+            CGRectGetWidth(label.frame),
+            MAX(CGRectGetHeight(label.frame), labelSize.height)
+        );
+        snackBarView.frame = CGRectMake(
+            CGRectGetMinX(snackBarView.frame),
+            MIN(CGRectGetMinY(snackBarView.frame), CGRectGetHeight(self.view.frame) - CGRectGetHeight(label.frame) - 24.0f - [TAPUtil safeAreaBottomPadding] - self.currentKeyboardHeight),
+            CGRectGetWidth(snackBarView.frame),
+            MAX(CGRectGetHeight(snackBarView.frame), CGRectGetHeight(label.frame) + 24.0f)
+        );
+        snackBarView.layer.cornerRadius = 8.0f;
+    }
+    
+    if (iconImageView != nil && iconImageView.image != nil) {
+        iconImageView.frame = CGRectMake(
+            CGRectGetMinX(iconImageView.frame),
+            (CGRectGetHeight(snackBarView.frame) - CGRectGetHeight(iconImageView.frame)) / 2,
+            CGRectGetWidth(iconImageView.frame),
+            CGRectGetHeight(iconImageView.frame)
+        );
+    }
+    
+    [self.view addSubview:snackBarView];
+    
+    [UIView animateWithDuration:animationDuration animations:^{
+        snackBarView.alpha = 1.0f;
+    } completion:^(BOOL finished) {
+        [TAPUtil performBlock:^{
+            [UIView animateWithDuration:animationDuration * 3.0f animations:^{
+                snackBarView.alpha = 0.0f;
+            } completion:^(BOOL finished) {
+                [snackBarView removeFromSuperview];
+            }];
+        } afterDelay:showDuration];
+    }];
 }
 
 //Note

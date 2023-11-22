@@ -312,6 +312,7 @@
 
     self.thumbnailBubbleImageView.image = nil;
     self.bubbleImageView.image = nil;
+    self.thumbnailBubbleImageView.alpha = 0.0f;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
@@ -599,8 +600,30 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            [self showQuoteView:NO];
-            [self showReplyView:YES withMessage:self.message];
+            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
+                    [TAPImageView imageFromCacheWithMessage:self.message
+                    start:^(TAPMessageModel *resultMessage) {
+                        
+                    }
+                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                        
+                    }
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        if (savedImage != nil) {
+                            [self.quoteImageView setImage:savedImage];
+                            [self showReplyView:NO withMessage:nil];
+                            [self showQuoteView:YES];
+                        }
+                    }
+                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+            }
+            else {
+                [self showQuoteView:NO];
+                [self showReplyView:YES withMessage:self.message];
+            }
         }
     }
 }
@@ -1119,9 +1142,16 @@
     NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
     UIImage *image = [UIImage imageWithData:thumbnailImageData];
     if (image != nil) {
-        self.bubbleImageView.image = image;
+        self.thumbnailBubbleImageView.image = image;
+//        self.bubbleImageView.image = image;
 //        [self getImageSizeFromImage:image];
 //        [self.contentView layoutIfNeeded];
+        if (self.bubbleImageView.image == nil) {
+            self.thumbnailBubbleImageView.alpha = 1.0f;
+        }
+        else {
+            self.thumbnailBubbleImageView.alpha = 0.0f;
+        }
     }
     [self refreshImageSize];
 }
@@ -1666,6 +1696,8 @@
 
     self.bubbleImageView.image = image;
     [self getImageSizeFromImage:image];
+    self.bubbleImageView.alpha = 1.0f;
+    self.thumbnailBubbleImageView.alpha = 0.0f;
     [self.contentView layoutIfNeeded];
 }
 
@@ -1676,6 +1708,13 @@
 
     self.thumbnailBubbleImageView.image = thumbnailImage;
     [self refreshImageSize];
+    
+    if (self.bubbleImageView.image == nil) {
+        self.thumbnailBubbleImageView.alpha = 1.0f;
+    }
+    else {
+        self.thumbnailBubbleImageView.alpha = 0.0f;
+    }
 }
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {

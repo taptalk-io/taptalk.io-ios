@@ -36,6 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
                                    tappedAtIndex:(NSInteger)index
                                          message:(TAPMessageModel *)message
                              mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (UIImage *_Nullable)yourChatBubbleDidRequestLinkPreviewImageWithUrl:(NSString *)url
+                                                              message:(TAPMessageModel *)message;
+- (void)yourChatBubbleDidFinishLoadingLinkPreviewImage:(UIImage *_Nullable)image
+                                                   url:(NSString *)url
+                                               message:(TAPMessageModel *)message;
 
 @end
 

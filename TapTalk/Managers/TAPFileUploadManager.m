@@ -607,12 +607,29 @@
         //Remove from waiting upload dictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
 
-        //Save file path to cache
         NSString *key = fileID;
-        if (![TAPUtil isEmptyString:key]) {
+        if ([TAPUtil isEmptyString:key]) {
             key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
         }
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
+
+        // Copy temp file to app's documents directory and save the path
+        NSURL *documentDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
+                                                                           inDomains:NSUserDomainMask] lastObject];
+        NSString *destinationPath = [documentDirectory.path stringByAppendingPathComponent:[fileUrl lastPathComponent]];
+        destinationPath = [TAPUtil getNewFileAndCheckExistingFilePath:destinationPath
+                                                 fileNameCounterStart:0];
+        NSError *error = nil;
+        [[NSFileManager defaultManager] copyItemAtPath:fileUrl.path
+                                                toPath:destinationPath
+                                                 error:&error];
+        if (!error) {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:key];
+        }
+        else {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
+        }
+        //Save file path to cache
+//        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
         
         if(self.scheduleTime.longValue == 0) {
             //Send emit
@@ -1663,7 +1680,7 @@
 
         //Save file path to cache
         NSString *key = fileID;
-        if (![TAPUtil isEmptyString:key]) {
+        if ([TAPUtil isEmptyString:key]) {
             key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
         }
         [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
@@ -2446,7 +2463,7 @@
 
         //Save video file path to cache
         NSString *key = fileID;
-        if (![TAPUtil isEmptyString:key]) {
+        if ([TAPUtil isEmptyString:key]) {
             key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
         }
         [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:key];

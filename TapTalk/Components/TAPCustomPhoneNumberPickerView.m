@@ -13,6 +13,7 @@
 @property (strong, nonatomic) UIView *countryCodeContainerView;
 @property (strong, nonatomic) TAPImageView *countryFlagImageView;
 @property (strong, nonatomic) UILabel *countryCodeLabel;
+@property (strong, nonatomic) UILabel *beautifiedPhoneLabel;
 @property (strong, nonatomic) UIImageView *loadingImageView;
 
 @property (strong, nonatomic) UIView *phoneNumberContainerView;
@@ -91,16 +92,30 @@
         
         self.phoneNumberTextField.delegate = self;
         self.phoneNumberTextField.keyboardType = UIKeyboardTypePhonePad;
-        self.phoneNumberTextField.placeholder = @"8XXX XXXX XXXX";
+        self.phoneNumberTextField.placeholder = @"8XXX XXXX XXX";
         [self.phoneNumberTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
-        self.phoneNumberTextField.textColor = textFieldColor;
+//        self.phoneNumberTextField.textColor = textFieldColor;
+        self.phoneNumberTextField.textColor = [UIColor clearColor];
         self.phoneNumberTextField.font = textFieldFont;
+        NSMutableDictionary *attrs = [self.phoneNumberTextField.defaultTextAttributes mutableCopy];
+        [attrs addEntriesFromDictionary:@{
+            NSKernAttributeName: @1,
+        }];
+        self.phoneNumberTextField.defaultTextAttributes = attrs;
+        [self.phoneNumberTextField addTarget:self
+                      action:@selector(textFieldTextDidChange)
+            forControlEvents:UIControlEventEditingChanged];
         [self.phoneNumberContainerView addSubview:self.phoneNumberTextField];
         
         _keyboardAccessoryView = [[TAPNumericKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 44.0f)];
         NSString *keyboardString = NSLocalizedStringFromTableInBundle(@"DONE", nil, [TAPUtil currentBundle], @"");
         [self.keyboardAccessoryView setHeaderNumericKeyboardButtonTitleWithText:keyboardString];
         self.phoneNumberTextField.inputAccessoryView = self.keyboardAccessoryView;
+        
+        _beautifiedPhoneLabel = [[UILabel alloc] initWithFrame:self.phoneNumberTextField.frame];
+        self.beautifiedPhoneLabel.textColor = textFieldColor;
+        self.beautifiedPhoneLabel.font = textFieldFont;
+        [self.phoneNumberContainerView addSubview:self.beautifiedPhoneLabel];
         
         _pickerButton = [[UIButton alloc] initWithFrame:self.countryCodeContainerView.frame];
         [self addSubview:self.pickerButton];
@@ -109,6 +124,10 @@
     }
 
     return self;
+}
+
+- (void)textFieldTextDidChange {
+    self.beautifiedPhoneLabel.text = [TAPUtil beautifyPhoneNumber:self.phoneNumberTextField.text insertPlus:NO];
 }
 
 - (void)setVerifState {
@@ -133,6 +152,7 @@
     self.phoneNumberContainerView.layer.cornerRadius = 0.0f;
     
     self.phoneNumberTextField.frame = CGRectMake(0.0f, -1.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame));
+    self.beautifiedPhoneLabel.frame = self.phoneNumberTextField.frame;
     self.pickerButton.frame = self.countryCodeContainerView.frame;
     
     self.isVerif = YES;
@@ -141,7 +161,6 @@
 #pragma mark - Delegate
 #pragma mark UITextField
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-
     if ([self.delegate respondsToSelector:@selector(customPhoneNumberPickerViewTextField:shouldChangeCharactersInRange:replacementString:)]) {
         return [self.delegate customPhoneNumberPickerViewTextField:textField shouldChangeCharactersInRange:range replacementString:string];
     }
@@ -349,7 +368,7 @@
     [self.countryCodeLabel sizeToFit];
     CGFloat widthLabel = CGRectGetWidth(self.countryCodeLabel.frame);
     
-    if(self.isVerif) {
+    if (self.isVerif) {
         self.countryCodeContainerView.frame = CGRectMake(0.0f, 0.0f, 80.0f + widthLabel, 50.0f);
         self.phoneNumberContainerView.frame = CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame), CGRectGetMinY(self.countryCodeContainerView.frame), CGRectGetWidth( self.phoneNumberContainerView.frame), 50.0f);
     }
@@ -376,6 +395,7 @@
     //AS NOTE - ADDED FOR DEFAULT COLOR `phoneNumberContainerView`
     self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
     self.phoneNumberTextField.alpha = 1.0f;
+    self.beautifiedPhoneLabel.alpha = 1.0f;
     
     if (disabled) {
         self.pickerButton.userInteractionEnabled = NO;
@@ -390,14 +410,14 @@
         //AS NOTE - CHANGE FOR DISABLED COLOR `phoneNumberContainerView`
         UIColor *phoneNumberContainerViewBackgroundColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.1f]; //AS TEMP
         self.phoneNumberContainerView.backgroundColor = phoneNumberContainerViewBackgroundColor; //AS TEMP
-        self.phoneNumberTextField.alpha = 0.4f; //AS TEMP
-        self.phoneNumberTextField.textColor = textFieldColor; //AS TEMP - CHANGE DISABLED COLOR OF TEXTFIELD
+        self.beautifiedPhoneLabel.alpha = 0.4f; //AS TEMP
+        self.beautifiedPhoneLabel.textColor = textFieldColor; //AS TEMP - CHANGE DISABLED COLOR OF TEXTFIELD
     }
     else {
         self.pickerButton.userInteractionEnabled = YES;
         self.phoneNumberTextField.userInteractionEnabled = YES;
         self.countryCodeLabel.textColor = textFieldColor;
-        self.phoneNumberTextField.textColor = textFieldColor;
+        self.beautifiedPhoneLabel.textColor = textFieldColor;
     }
 }
 
@@ -416,6 +436,7 @@
     //AS NOTE - ADDED FOR DEFAULT COLOR `phoneNumberContainerView`
     self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
     self.phoneNumberTextField.alpha = 1.0f;
+    self.beautifiedPhoneLabel.alpha = 1.0f;
     
     self.backgroundColor = [UIColor whiteColor];
     self.alpha = 1.0f;
@@ -431,14 +452,14 @@
         self.alpha = 0.8f;
         self.phoneNumberContainerView.backgroundColor = [UIColor clearColor];
         self.countryCodeContainerView.backgroundColor = [UIColor clearColor];; //AS TEMP
-        self.phoneNumberTextField.alpha = 0.4f;
+        self.beautifiedPhoneLabel.alpha = 0.4f;
         self.countryCodeContainerView.alpha = 0.4f;
     }
     else {
         self.pickerButton.userInteractionEnabled = YES;
         self.phoneNumberTextField.userInteractionEnabled = YES;
         self.countryCodeLabel.textColor = textFieldColor;
-        self.phoneNumberTextField.textColor = textFieldColor;
+        self.beautifiedPhoneLabel.textColor = textFieldColor;
     }
 }
 

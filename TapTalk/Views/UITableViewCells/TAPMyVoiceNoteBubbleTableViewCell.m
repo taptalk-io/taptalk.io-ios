@@ -225,7 +225,7 @@
     
     _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureAction:)];
     self.panGestureRecognizer.delegate = self;
-    //[self.contentView addGestureRecognizer:self.panGestureRecognizer];
+    [self.contentView addGestureRecognizer:self.panGestureRecognizer];
     
     _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                               action:@selector(handleBubbleViewTap:)];
@@ -351,10 +351,10 @@
         if (recognizer.state == UIGestureRecognizerStateChanged) {
             CGPoint translation = [recognizer translationInView:self];
             
-//            if (translation.x < 0) {
-//                //Cannot swipe left
-//                return;
-//            }
+            if (translation.x < 0 && (self.message == nil || self.message.room.type == RoomTypePersonal)) {
+                // Cannot swipe left on personal room (message info)
+                return;
+            }
             
             if (translation.x > 50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
                 [TAPUtil tapticImpactFeedbackGenerator];
@@ -407,7 +407,7 @@
                     [self.delegate myVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:self.message];
                 }
             }
-            else if (translation.x < -50.0f) {
+            else if (translation.x < -50.0f && (self.message != nil && self.message.room.type != RoomTypePersonal)) {
                 if ([self.delegate respondsToSelector:@selector(myVoiceNoteBubbleDidTriggerSwipeInfoWithMessage:)]) {
                     [self.delegate myVoiceNoteBubbleDidTriggerSwipeInfoWithMessage:self.message];
                 }
@@ -456,8 +456,30 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            [self showQuoteView:NO];
-            [self showReplyView:YES withMessage:self.message];
+            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
+                    [TAPImageView imageFromCacheWithMessage:self.message
+                    start:^(TAPMessageModel *resultMessage) {
+                        
+                    }
+                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                        
+                    }
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        if (savedImage != nil) {
+                            [self.quoteImageView setImage:savedImage];
+                            [self showReplyView:NO withMessage:nil];
+                            [self showQuoteView:YES];
+                        }
+                    }
+                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+            }
+            else {
+                [self showQuoteView:NO];
+                [self showReplyView:YES withMessage:self.message];
+            }
         }
     }
 }
@@ -584,14 +606,20 @@
         }
         [self.contentView layoutIfNeeded];
         
-        
-        if([message.quote.content isEqualToString:@"🎤 Voice"]){
-            [self showReplyView:YES withMessage:message];
-            [self showQuoteView:NO];
-        }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
-            [self showReplyView:NO withMessage:nil];
-            [self showQuoteView:YES];
+        if ((![TAPUtil isEmptyString:message.quote.fileType] &&
+             ([message.quote.fileType isEqualToString:@"image"] ||
+             [message.quote.fileType isEqualToString:@"video"] ||
+             [message.quote.fileType isEqualToString:@"file"])) ||
+            ![TAPUtil isEmptyString:message.quote.imageURL]
+        ) {
+            if ([message.quote.fileType isEqualToString:@"video"]) {
+                [self showReplyView:YES withMessage:message];
+                [self showQuoteView:NO];
+            }
+            else {
+                [self showReplyView:NO withMessage:nil];
+                [self showQuoteView:YES];
+            }
             [self setQuote:message.quote userID:message.replyTo.userID];
         }
         else {

@@ -35,6 +35,11 @@ NS_ASSUME_NONNULL_BEGIN
                                  tappedAtIndex:(NSInteger)index
                                        message:(TAPMessageModel *)message
                            mentionIndexesArray:(NSArray *)mentionIndexesArray;
+- (UIImage *_Nullable)myChatBubbleDidRequestLinkPreviewImageWithUrl:(NSString *)url
+                                                            message:(TAPMessageModel *)message;
+- (void)myChatBubbleDidFinishLoadingLinkPreviewImage:(UIImage *_Nullable)image
+                                                 url:(NSString *)url
+                                             message:(TAPMessageModel *)message;
 @end
 
 @interface TAPMyChatBubbleTableViewCell : TAPBaseMyBubbleTableViewCell

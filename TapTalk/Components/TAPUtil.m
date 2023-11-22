@@ -221,8 +221,18 @@ static const char kBundleKey = 0;
 }
 
 #pragma mark - Color
+
 + (UIColor *)getColor:(NSString *)hexColor {
-    if ([hexColor length] == 6) {
+    return [TAPUtil getColor:hexColor withAlpha:1.0f];
+}
+
++ (UIColor *)getColor:(NSString *)hexColor withAlpha:(CGFloat)alpha {
+    
+    if ([hexColor isEqualToString:@""]){
+        return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        
+    }
+    else {
         unsigned int red, green, blue;
         
         NSRange range;
@@ -238,31 +248,7 @@ static const char kBundleKey = 0;
         range.location = 4;
         [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&blue];
         
-        return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:1.0f];
-    }
-    else if ([hexColor length] == 8) {
-        unsigned int alpha, red, green, blue;
-        
-        NSRange range;
-        
-        range.length = 2;
-        
-        range.location = 0;
-        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&alpha];
-        
-        range.location = 2;
-        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&red];
-        
-        range.location = 4;
-        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&green];
-        
-        range.location = 6;
-        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&blue];
-        
-        return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:(float)(alpha/255.0f)];
-    }
-    else {
-        return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
+        return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:alpha];
     }
 }
 
@@ -664,6 +650,80 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return [self stringByTrimmingTrailingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] withString:string];
 }
 
++ (NSString *)beautifyPhoneNumber:(NSString *)phoneNumber insertPlus:(BOOL)insertPlus {
+    if ([TAPUtil isEmptyString:phoneNumber]) {
+        return @"";
+    }
+    
+    NSString *plus = @"";
+    if (insertPlus) {
+        plus = @"+";
+    }
+    BOOL hasIDCountryCodePrefix;
+    NSString *phoneWithoutCode;
+    
+    // Obtain trimmed phone without code
+    if ([phoneNumber hasPrefix:@"+62"]) {
+        phoneWithoutCode = [phoneNumber substringFromIndex:3];
+        hasIDCountryCodePrefix = YES;
+    }
+    else if ([phoneNumber hasPrefix:@"62"]) {
+        phoneWithoutCode = [phoneNumber substringFromIndex:2];
+        hasIDCountryCodePrefix = YES;
+    }
+    else {
+        phoneWithoutCode = phoneNumber;
+        hasIDCountryCodePrefix = NO;
+    }
+    phoneWithoutCode = [phoneWithoutCode stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    NSString *phoneRegex = @"^[0-9]*$";
+    NSPredicate *phonePredicate = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", phoneRegex];
+    if (![phonePredicate evaluateWithObject:phoneWithoutCode]) {
+        // Return original string if not number
+        return phoneNumber;
+    }
+    
+    if (phoneWithoutCode.length < 6) {
+        // Skip beautification if length < 6
+        if (hasIDCountryCodePrefix) {
+            return [NSString stringWithFormat:@"%@62 %@", plus, phoneWithoutCode];
+        }
+        return [NSString stringWithFormat:@"%@%@", plus, phoneNumber];
+    }
+
+    // Calculate three digit segment amount (0 to 3)
+    int threeDigitSegments = phoneWithoutCode.length % 4;
+    if (threeDigitSegments <= 0) {
+        threeDigitSegments = 0;
+    }
+    else {
+        threeDigitSegments = 4 - threeDigitSegments;
+    }
+
+    // Insert spaces
+    NSMutableString *beautifiedPhoneNumber = [phoneWithoutCode mutableCopy];
+    NSInteger insertIndex = phoneWithoutCode.length;
+    while (insertIndex > 0) {
+        if (threeDigitSegments > 0) {
+            insertIndex -= 3;
+        }
+        else {
+            insertIndex -= 4;
+        }
+        if (insertIndex > 0) {
+            [beautifiedPhoneNumber insertString:@" " atIndex:insertIndex];
+        }
+        threeDigitSegments--;
+    }
+
+    // Return beautified number
+    if (hasIDCountryCodePrefix) {
+        return [NSString stringWithFormat:@"%@62 %@", plus, beautifiedPhoneNumber];
+    }
+    return [NSString stringWithFormat:@"%@%@", plus, beautifiedPhoneNumber];
+}
+
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2 {
     CLLocation *locationA = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
@@ -741,6 +801,25 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
     
     return countedRect;
+}
+
+#pragma mark - View
+
+- (void)addSpinAnimation:(UIView *)view {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    animation.fromValue = [NSNumber numberWithFloat:0.0f];
+    animation.toValue = [NSNumber numberWithFloat:(2 * M_PI)];
+    animation.duration = 1.5f;
+    animation.repeatCount = INFINITY;
+    animation.cumulative = YES;
+    animation.removedOnCompletion = NO;
+    [view.layer addAnimation:animation forKey:@"SpinAnimation"];
+}
+
+- (void)removeSpinAnimation:(UIView *)view {
+    if ([view.layer animationForKey:@"SpinAnimation"] != nil) {
+        [view.layer removeAnimationForKey:@"SpinAnimation"];
+    }
 }
 
 #pragma mark - Device

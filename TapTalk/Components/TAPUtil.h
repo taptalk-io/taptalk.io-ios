@@ -77,6 +77,7 @@
 
 #pragma mark - Color
 + (UIColor *)getColor:(NSString *)hexColor;
++ (UIColor *)getColor:(NSString *)hexColor withAlpha:(CGFloat)alpha;
 + (UIColor *)randomPastelColor;
 
 #pragma mark - Image Processing
@@ -98,6 +99,7 @@
 + (NSString *)stringByTrimmingLeadingWhitespaceAndNewlineCharactersWithString:(NSString *)string;
 + (NSString *)stringByTrimmingTrailingCharactersInSet:(NSCharacterSet *)characterSet withString:(NSString *)string;
 + (NSString *)stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:(NSString *)string;
++ (NSString *)beautifyPhoneNumber:(NSString *)phoneNumber insertPlus:(BOOL)insertPlus;
 
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2;
@@ -111,6 +113,10 @@
 + (CGFloat)screenAdjustedHeight:(CGFloat)currentHeight;
 + (CGFloat)screenAdjustedWidth:(CGFloat)currentWidth;
 + (CGRect)getStringConstrainedSizeWithString:(NSString *)string withFont:(UIFont *)font withConstrainedSize:(CGSize)size;
+
+#pragma mark - View
+- (void)addSpinAnimation:(UIView *)view;
+- (void)removeSpinAnimation:(UIView *)view;
 
 #pragma mark - Device
 + (NSString *)hardwareModel;

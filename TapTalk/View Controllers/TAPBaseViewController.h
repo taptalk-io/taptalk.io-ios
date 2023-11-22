@@ -9,6 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "TAPPopUpInfoViewController.h"
 
+typedef NS_ENUM(NSInteger, SnackBarType) {
+    SnackBarTypeDefault,
+    SnackBarTypeError,
+    SnackBarTypeToast,
+};
+
 @interface TAPBaseViewController : UIViewController
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight;
@@ -20,6 +26,8 @@
 - (void)showCustomEditButton;
 - (void)showCustomCancelButtonRight;
 - (void)reachabilityChangeIsReachable:(BOOL)reachable;
+- (void)showSnackBar:(SnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName;
+- (void)showSnackBar:(SnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName showDuration:(CGFloat)showDuration animationDuration:(CGFloat)animationDuration;
 - (void)showPopupViewWithPopupType:(TAPPopUpInfoViewControllerType)type popupIdentifier:(NSString * _Nonnull)popupIdentifier title:(NSString * _Nonnull)title detailInformation:(NSString * _Nonnull)detailInfo leftOptionButtonTitle:(NSString * __nullable)leftOptionString singleOrRightOptionButtonTitle:(NSString * __nullable)singleOrRightOptionString;
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
