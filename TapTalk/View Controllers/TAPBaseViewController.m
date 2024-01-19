@@ -271,11 +271,11 @@
     
 }
 
-- (void)showSnackBar:(SnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName {
+- (void)showSnackBar:(TapTalkSnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName {
     [self showSnackBar:type message:message iconName:iconName showDuration:3.0f animationDuration:0.3f];
 }
 
-- (void)showSnackBar:(SnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName showDuration:(CGFloat)showDuration animationDuration:(CGFloat)animationDuration {
+- (void)showSnackBar:(TapTalkSnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName showDuration:(CGFloat)showDuration animationDuration:(CGFloat)animationDuration {
     UIView *snackBarView = [[UIView alloc] initWithFrame:CGRectMake(
         16.0f,
         CGRectGetHeight(self.view.frame) - 80.0f - [TAPUtil safeAreaBottomPadding] - self.currentKeyboardHeight,
@@ -311,7 +311,7 @@
     label.numberOfLines = 0;
     [snackBarView addSubview:label];
     
-    if (type == SnackBarTypeError) {
+    if (type == TapTalkSnackBarTypeError) {
         snackBarView.backgroundColor = [TAPUtil getColor:@"FFECEE"];
         snackBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_ERROR].CGColor;
         snackBarView.layer.borderWidth = 1.0f;
@@ -329,7 +329,7 @@
         }
     }
     
-    if (type == SnackBarTypeToast) {
+    if (type == TapTalkSnackBarTypeToast) {
         [label sizeToFit];
         CGFloat iconWidth = 0.0f;
         if (iconImageView != nil && iconImageView.image != nil) {

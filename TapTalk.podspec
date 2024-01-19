@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalk"
-    s.version      = "2.15.1"
+    s.version      = "2.15.2"
     s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. TapTalk.io provides UI-based and code-based implementation & fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -66,8 +66,7 @@ Pod::Spec.new do |s|
     }
 
     # ――― XCConfig ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-    #uncomment to disable bitcode
-#    s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
+    s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
     s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
     s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 

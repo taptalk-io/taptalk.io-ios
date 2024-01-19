@@ -607,11 +607,6 @@
         //Remove from waiting upload dictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
 
-        NSString *key = fileID;
-        if ([TAPUtil isEmptyString:key]) {
-            key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-        }
-
         // Copy temp file to app's documents directory and save the path
         NSURL *documentDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                                            inDomains:NSUserDomainMask] lastObject];
@@ -623,10 +618,12 @@
                                                 toPath:destinationPath
                                                  error:&error];
         if (!error) {
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:key];
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:fileID];
         }
         else {
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
         }
         //Save file path to cache
 //        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
@@ -1679,11 +1676,8 @@
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
 
         //Save file path to cache
-        NSString *key = fileID;
-        if ([TAPUtil isEmptyString:key]) {
-            key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-        }
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
         
         //Send emit
         [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
@@ -2462,11 +2456,8 @@
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
 
         //Save video file path to cache
-        NSString *key = fileID;
-        if ([TAPUtil isEmptyString:key]) {
-            key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-        }
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:key];
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:fileID];
         
         //Save video thumbnail image to cache
         UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:filePathString];
