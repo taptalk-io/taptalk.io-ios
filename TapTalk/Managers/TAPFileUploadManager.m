@@ -254,11 +254,13 @@
                     //Remove from waiting upload dictionary in ChatManager
                     [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
                     
-                    //Save image to cache
-                    [TAPImageView saveImageToCache:resultImage withKey:fileID];
-                    
                     //Remove dummy image with localID key from cache
                     [TAPImageView removeImageFromCacheWithKey:resultMessage.localID];
+                    
+                    //Save image to cache
+                    [TAPImageView saveImageToCache:resultImage withKey:fileID];
+                    [TAPImageView saveImageToCache:resultImage withKey:fileURL];
+                    [TAPImageView saveImageToCache:resultImage withKey:resultMessage.localID];
                     
                     if(self.scheduleTime == 0) {
                         //Send emit
@@ -618,12 +620,20 @@
                                                 toPath:destinationPath
                                                  error:&error];
         if (!error) {
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:fileID];
+            if (![TAPUtil isEmptyString:fileID]) {
+                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:fileID];
+            }
+            if (![TAPUtil isEmptyString:fileURL]) {
+                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:destinationPath roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+            }
         }
         else {
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
+            if (![TAPUtil isEmptyString:fileID]) {
+                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
+            }
+            if (![TAPUtil isEmptyString:fileURL]) {
+                [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+            }
         }
         //Save file path to cache
 //        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
@@ -1676,8 +1686,12 @@
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:currentMessage];
 
         //Save file path to cache
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
+        if (![TAPUtil isEmptyString:fileID]) {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:fileID];
+        }
+        if (![TAPUtil isEmptyString:fileURL]) {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+        }
         
         //Send emit
         [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
@@ -2456,8 +2470,12 @@
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:resultMessage];
 
         //Save video file path to cache
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
-        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:resultMessage.room.roomID fileID:fileID];
+        if (![TAPUtil isEmptyString:fileID]) {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:currentMessage.room.roomID fileID:fileID];
+        }
+        if (![TAPUtil isEmptyString:fileURL]) {
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+        }
         
         //Save video thumbnail image to cache
         UIImage *thumbnailVideoImage = [[TAPFetchMediaManager sharedManager] generateThumbnailImageFromFilePathString:filePathString];

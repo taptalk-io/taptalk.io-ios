@@ -146,6 +146,7 @@
 + (NSString *)mimeTypeForFileAtPath:(NSString *)path;
 + (NSString *)mimeTypeForFileWithExtension:(NSString *)fileExtension;
 + (NSString *)mimeTypeForData:(NSData *)data;
++ (NSString *)getFileExtensionFromPath:(NSString *)filePath;
 + (NSString *)getNewFileAndCheckExistingFilePath:(NSString *)path fileNameCounterStart:(NSInteger)counter;
 + (CGFloat)safeAreaBottomPadding;
 + (CGFloat)safeAreaTopPadding;

@@ -457,6 +457,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (nonatomic) BOOL isBlockedUser;
 
+@property (strong, nonatomic) UIViewController *currentPresentedViewController;
+
 @end
 
 @implementation TapUIChatViewController
@@ -1142,9 +1144,9 @@ CGPoint center;
                                                                   action:@selector(handleNavigationPopGesture:)];
     
     if (self.initialKeyboardHeight == 0.0f) {
-        [UIView performWithoutAnimation:^{
-            [self.messageTextView becameFirstResponder];
-        }];
+//        [UIView performWithoutAnimation:^{
+//            [self.messageTextView becameFirstResponder];
+//        }];
         
         [UIView performWithoutAnimation:^{
             [self.messageTextView resignFirstResponder];
@@ -1235,7 +1237,18 @@ CGPoint center;
     [self.secondaryTextField resignFirstResponder];
     [self.messageTextView resignFirstResponder];
     [self keyboardWillHideWithHeight:0.0f];
+    [self hideInputAccessoryView];
+    _currentPresentedViewController = viewControllerToPresent;
     [super presentViewController:viewControllerToPresent animated:flag completion:completion];
+}
+
+- (void)pushViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag {
+    [self.secondaryTextField resignFirstResponder];
+    [self.messageTextView resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
+    [self hideInputAccessoryView];
+    _currentPresentedViewController = viewControllerToPresent;
+    [self.navigationController pushViewController:viewControllerToPresent animated:YES];
 }
 
 - (void)viewDidUnload {
@@ -3451,6 +3464,8 @@ CGPoint center;
 #endif
             [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
             
+            [self showInputAccessoryExtensionView:NO];
+            
             [TAPUtil performBlock:^{
                 if ([self.messageArray count] != 0) {
                     [self chatAnchorButtonDidTapped:[[UIButton alloc] init]]; //Scroll table view to top with pending message logic
@@ -3461,10 +3476,12 @@ CGPoint center;
             [firstUrl stopAccessingSecurityScopedResource];
         }
     }];
+    
+    [self checkAndShowRoomViewState];
 }
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
-    
+    [self checkAndShowRoomViewState];
 }
 
 - (void)starMessageBubbleCliked:(TAPMessageModel *)message{
@@ -3520,12 +3537,14 @@ CGPoint center;
     NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 
     @try {
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-        } completion:^(BOOL finished) {
-            [self.tableView scrollsToTop];
-        }];
+//        [self.tableView performBatchUpdates:^{
+        // Changed to begin/end updates to prevent duplicate media / invalid recycle index
+        [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+//        } completion:^(BOOL finished) {
+        [self.tableView scrollsToTop];
+//        }];
     }
     @catch (NSException *exception) {
         NSLog(@"%@", exception.reason);
@@ -4398,6 +4417,7 @@ CGPoint center;
         CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+        _currentPresentedViewController = mediaDetailViewController;
         myImageBubbleCell.bubbleImageView.alpha = 0.0f;
         _openedBubbleCell = myImageBubbleCell;
     }
@@ -5809,6 +5829,7 @@ CGPoint center;
         CGRect imageRectInView = CGRectMake(xPosition, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], yourImageBubbleCell.bubbleImageViewWidthConstraint.constant, yourImageBubbleCell.bubbleImageViewHeightConstraint.constant);
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+        _currentPresentedViewController = mediaDetailViewController;
         yourImageBubbleCell.bubbleImageView.alpha = 0.0f;
         _openedBubbleCell = yourImageBubbleCell;
     }
@@ -6889,6 +6910,7 @@ CGPoint center;
         TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)self.openedBubbleCell;
         cell.bubbleImageView.alpha = 1.0f;
     }
+    [self checkAndShowRoomViewState];
 }
 
 #pragma mark TAPPickLocationViewController
@@ -7595,20 +7617,28 @@ CGPoint center;
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell animateProgressUploadingImageWithProgress:progress total:total];
+        if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+            [cell animateProgressUploadingImageWithProgress:progress total:total];
+        }
     }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell animateProgressUploadingFileWithProgress:progress total:total];
+        if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+            [cell animateProgressUploadingFileWithProgress:progress total:total];
+        }
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        cell.message = obtainedMessage;
-        [cell animateProgressUploadingVideoWithProgress:progress total:total];
+        if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+            cell.message = obtainedMessage;
+            [cell animateProgressUploadingVideoWithProgress:progress total:total];
+        }
     }
     else if (type == TAPChatMessageTypeVoice) {
         TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell animateProgressUploadingFileWithProgress:progress total:total];
+        if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+            [cell animateProgressUploadingFileWithProgress:progress total:total];
+        }
     }
 }
 
@@ -7688,52 +7718,60 @@ CGPoint center;
     if (type == TAPChatMessageTypeImage) {
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         
-        [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
+        if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+            [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
+        }
     }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
+        if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
+                } completion:^(BOOL finished) {
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+            }
         }
     }
     else if (type == TAPChatMessageTypeVoice) {
         TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [cell showFileBubbleStatusWithType:TAPMyVoiceNoteBubbleTableViewCellStateTypeUploading];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
+        if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell showFileBubbleStatusWithType:TAPMyVoiceNoteBubbleTableViewCellStateTypeUploading];
+                } completion:^(BOOL finished) {
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+            }
         }
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        cell.message = obtainedMessage;
-        
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeUploading];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
+        if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+            cell.message = obtainedMessage;
+            
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeUploading];
+                } completion:^(BOOL finished) {
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+            }
         }
     }
 }
@@ -7766,54 +7804,62 @@ CGPoint center;
     TAPChatMessageType type = currentMessage.type;
     if (type == TAPChatMessageTypeImage) {
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell animateFinishedUploadingImage];
+        if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+            [cell animateFinishedUploadingImage];
+        }
 //        NSArray<NSIndexPath *> *indexPaths = @[[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
 //        [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
       }
     else if (type == TAPChatMessageTypeFile) {
         TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [cell animateFinishedUploadFile];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
+        
+        if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell animateFinishedUploadFile];
+                } completion:^(BOOL finished) {
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+            }
         }
     }
     else if (type == TAPChatMessageTypeVoice) {
         TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [cell animateFinishedUploadFile];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
+        
+        if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell animateFinishedUploadFile];
+                } completion:^(BOOL finished) {
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+            }
         }
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         cell.message = obtainedMessage;
         
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [cell animateFinishedUploadVideo];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
+        if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [cell animateFinishedUploadVideo];
+                } completion:^(BOOL finished) {
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+            }
         }
     }
 }
@@ -7853,67 +7899,74 @@ CGPoint center;
         TAPChatMessageType type = currentMessage.type;
         if (type == TAPChatMessageTypeImage) {
             TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-            [cell setMessage:currentMessage];
-            
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [cell animateFailedUploadingImage];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
+            if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+                [cell setMessage:currentMessage];
+                
+                @try {
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateFailedUploadingImage];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.tableView reloadData];
+                }
             }
         }
         else if (type == TAPChatMessageTypeFile) {
             TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-            [cell setMessage:currentMessage];
-            
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [cell animateFailedUploadFile];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
+            if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                [cell setMessage:currentMessage];
+                
+                @try {
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateFailedUploadFile];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.tableView reloadData];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
             TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-            [cell setMessage:currentMessage];
-            
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [cell animateFailedUploadFile];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
+            if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                [cell setMessage:currentMessage];
+                
+                @try {
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateFailedUploadFile];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.tableView reloadData];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
             TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-            cell.message = obtainedMessage;
-            [cell setMessage:currentMessage];
-            
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [cell animateFailedUploadVideo];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
+            if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                [cell setMessage:currentMessage];
+                
+                @try {
+                    [self.tableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [cell animateFailedUploadVideo];
+                    } completion:^(BOOL finished) {
+                    }];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@", exception.reason);
+                    [self.tableView reloadData];
+                }
             }
         }
     });
@@ -7966,50 +8019,66 @@ CGPoint center;
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressUploadingImageWithProgress:progress total:total];
+                if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+                    [cell animateProgressUploadingImageWithProgress:progress total:total];
+                }
             }
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingImageWithProgress:progress total:total];
+                if (cell != nil && [cell isKindOfClass:[TAPYourImageBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingImageWithProgress:progress total:total];
+                }
             }
         }
         else if (type == TAPChatMessageTypeFile) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                }
             }
             else {
                 //Their Chat
                 TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                if (cell != nil && [cell isKindOfClass:[TAPYourFileBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingVideoWithProgress:progress total:total];
-                [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:[NSNumber numberWithFloat:progress/total] stateType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingVideoWithProgress:progress total:total];
+                    [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:[NSNumber numberWithFloat:progress/total] stateType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
+                }
             }
             else {
                 //Their Chat
                 TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingVideoWithProgress:progress total:total];
-                [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:[NSNumber numberWithFloat:progress/total] stateType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPYourVideoBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingVideoWithProgress:progress total:total];
+                    [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:[NSNumber numberWithFloat:progress/total] stateType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                }
             }
             else {
                 //Their Chat
                 TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                if (cell != nil && [cell isKindOfClass:[TAPYourVoiceNoteBubbleTableViewCell class]]) {
+                    [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                }
             }
         }
     });
@@ -8057,55 +8126,69 @@ CGPoint center;
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
                 
-                if (currentMessage.isFailedSend) {
-                    [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeFailed];
-                }
-                else {
-                    [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+                    if (currentMessage.isFailedSend) {
+                        [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeFailed];
+                    }
+                    else {
+                        [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeDownloading];
+                    }
                 }
             }
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell setInitialAnimateDownloadingImage];
+                if (cell != nil && [cell isKindOfClass:[TAPYourImageBubbleTableViewCell class]]) {
+                    [cell setInitialAnimateDownloadingImage];
+                }
             }
         }
         else if (type == TAPChatMessageTypeFile) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                
-                [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                    [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeDownloading];
+                }
             }
             else {
                 //Their Chat
                 TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPYourFileBubbleTableViewCell class]]) {
+                    [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDownloading];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                
-                [cell showFileBubbleStatusWithType:TAPMyVoiceNoteBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                    [cell showFileBubbleStatusWithType:TAPMyVoiceNoteBubbleTableViewCellStateTypeDownloading];
+                }
             }
             else {
                 //Their Chat
                 TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell showFileBubbleStatusWithType:TAPYourVoiceNoteBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPYourVoiceNoteBubbleTableViewCell class]]) {
+                    [cell showFileBubbleStatusWithType:TAPYourVoiceNoteBubbleTableViewCellStateTypeDownloading];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                    [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
+                }
             }
             else {
                 //Their Chat
                 TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell showVideoBubbleStatusWithType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
+                if (cell != nil && [cell isKindOfClass:[TAPYourVideoBubbleTableViewCell class]]) {
+                    [cell showVideoBubbleStatusWithType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
+                }
             }
         }
     });
@@ -8153,84 +8236,94 @@ CGPoint center;
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if ([cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]] &&
-                    fullImage != nil &&
-                    [fullImage isKindOfClass:[UIImage class]]
-                ) {
-                    [cell setFullImage:fullImage];
-                }
-                if (!currentMessage.isFailedSend) {
-                    [cell animateFinishedUploadingImage];
-                }
-                else {
-                    [cell animateFailedUploadingImage];
+                if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+                    if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
+                        [cell setFullImage:fullImage];
+                    }
+                    if (!currentMessage.isFailedSend) {
+                        [cell animateFinishedUploadingImage];
+                    }
+                    else {
+                        [cell animateFailedUploadingImage];
+                    }
                 }
             }
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if ([cell isKindOfClass:[TAPYourImageBubbleTableViewCell class]] &&
-                    fullImage != nil &&
-                    [fullImage isKindOfClass:[UIImage class]]
-                ) {
-                    [cell setFullImage:fullImage];
+                if (cell != nil && [cell isKindOfClass:[TAPYourImageBubbleTableViewCell class]]) {
+                    if (fullImage != nil && [fullImage isKindOfClass:[UIImage class]]) {
+                        [cell setFullImage:fullImage];
+                    }
+                    [cell animateFinishedDownloadingImage];
                 }
-                [cell animateFinishedDownloadingImage];
             }
         }
         else if (type == TAPChatMessageTypeFile) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (!currentMessage.isFailedSend) {
-                    [cell animateFinishedDownloadFile];
-                }
-                else {
-                    [cell animateFailedUploadFile];
+                if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                    if (!currentMessage.isFailedSend) {
+                        [cell animateFinishedDownloadFile];
+                    }
+                    else {
+                        [cell animateFailedUploadFile];
+                    }
                 }
             }
             else {
                 //Their Chat
                 TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadFile];
+                if (cell != nil && [cell isKindOfClass:[TAPYourFileBubbleTableViewCell class]]) {
+                    [cell animateFinishedDownloadFile];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVoice) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (!currentMessage.isFailedSend) {
-                    [cell animateFinishedDownloadFile];
-                }
-                else {
-                    [cell animateFailedUploadFile];
+                if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                    if (!currentMessage.isFailedSend) {
+                        [cell animateFinishedDownloadFile];
+                    }
+                    else {
+                        [cell animateFailedUploadFile];
+                    }
                 }
             }
             else {
                 //Their Chat
                 TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadFile];
+                if (cell != nil && [cell isKindOfClass:[TAPYourVoiceNoteBubbleTableViewCell class]]) {
+                    [cell animateFinishedDownloadFile];
+                }
             }
         }
         else if (type == TAPChatMessageTypeVideo) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (!currentMessage.isFailedSend) {
-                    [cell animateFinishedDownloadVideo];
+                if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                    if (!currentMessage.isFailedSend) {
+                        [cell animateFinishedDownloadVideo];
+                    }
+                    else {
+                        [cell animateFailedUploadVideo];
+                    }
+                    [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:nil stateType:TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded];
+                    [cell setThumbnailImageForVideoWithMessage:currentMessage];
                 }
-                else {
-                    [cell animateFailedUploadVideo];
-                }
-                [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:nil stateType:TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded];
-                [cell setThumbnailImageForVideoWithMessage:currentMessage];
             }
             else {
                 //Their Chat
                 TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadVideo];
-                [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:nil stateType:TAPYourVideoBubbleTableViewCellStateTypeDoneDownloaded];
-                [cell setThumbnailImageForVideoWithMessage:currentMessage];
+                if (cell != nil && [cell isKindOfClass:[TAPYourVideoBubbleTableViewCell class]]) {
+                    [cell animateFinishedDownloadVideo];
+                    [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:nil stateType:TAPYourVideoBubbleTableViewCellStateTypeDoneDownloaded];
+                    [cell setThumbnailImageForVideoWithMessage:currentMessage];
+                }
             }
         }
     });
@@ -8270,12 +8363,16 @@ CGPoint center;
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFailedUploadingImage];
+                if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+                    [cell animateFailedUploadingImage];
+                }
             }
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFailedDownloadingImage];
+                if (cell != nil && [cell isKindOfClass:[TAPYourImageBubbleTableViewCell class]]) {
+                    [cell animateFailedDownloadingImage];
+                }
             }
         }
         else if (type == TAPChatMessageTypeFile) {
@@ -8284,44 +8381,53 @@ CGPoint center;
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    @try {
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                            [cell animateCancelDownloadFile];
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception.reason);
-                        [self.tableView reloadData];
+                    if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                        @try {
+                            [self.tableView performBatchUpdates:^{
+                                //changing beginUpdates and endUpdates with this because of deprecation
+                                [cell animateCancelDownloadFile];
+                            } completion:^(BOOL finished) {
+                            }];
+                        }
+                        @catch (NSException *exception) {
+                            NSLog(@"%@", exception.reason);
+                            [self.tableView reloadData];
+                        }
                     }
                 }
                 else {
                     //Their Chat
                     TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    @try {
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                            [cell animateCancelDownloadFile];
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception.reason);
-                        [self.tableView reloadData];
+                    if (cell != nil && [cell isKindOfClass:[TAPYourFileBubbleTableViewCell class]]) {
+                        @try {
+                            [self.tableView performBatchUpdates:^{
+                                //changing beginUpdates and endUpdates with this because of deprecation
+                                [cell animateCancelDownloadFile];
+                            } completion:^(BOOL finished) {
+                            }];
+                        }
+                        @catch (NSException *exception) {
+                            NSLog(@"%@", exception.reason);
+                            [self.tableView reloadData];
+                        }
                     }
                 }
-            } else {
+            }
+            else {
                 // failed
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell animateFailedDownloadFile];
+                    if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                        [cell animateFailedDownloadFile];
+                    }
                 }
                 else {
                     //Their Chat
                     TAPYourFileBubbleTableViewCell *cell = (TAPYourFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell animateFailedDownloadFile];
+                    if (cell != nil && [cell isKindOfClass:[TAPYourFileBubbleTableViewCell class]]) {
+                        [cell animateFailedDownloadFile];
+                    }
                 }
             }
             
@@ -8332,44 +8438,53 @@ CGPoint center;
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    @try {
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                            [cell animateCancelDownloadFile];
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception.reason);
-                        [self.tableView reloadData];
+                    if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                        @try {
+                            [self.tableView performBatchUpdates:^{
+                                //changing beginUpdates and endUpdates with this because of deprecation
+                                [cell animateCancelDownloadFile];
+                            } completion:^(BOOL finished) {
+                            }];
+                        }
+                        @catch (NSException *exception) {
+                            NSLog(@"%@", exception.reason);
+                            [self.tableView reloadData];
+                        }
                     }
                 }
                 else {
                     //Their Chat
                     TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    @try {
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                            [cell animateCancelDownloadFile];
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception.reason);
-                        [self.tableView reloadData];
+                    if (cell != nil && [cell isKindOfClass:[TAPYourVoiceNoteBubbleTableViewCell class]]) {
+                        @try {
+                            [self.tableView performBatchUpdates:^{
+                                //changing beginUpdates and endUpdates with this because of deprecation
+                                [cell animateCancelDownloadFile];
+                            } completion:^(BOOL finished) {
+                            }];
+                        }
+                        @catch (NSException *exception) {
+                            NSLog(@"%@", exception.reason);
+                            [self.tableView reloadData];
+                        }
                     }
                 }
-            } else {
+            }
+            else {
                 // failed
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell animateFailedDownloadFile];
+                    if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                        [cell animateFailedDownloadFile];
+                    }
                 }
                 else {
                     //Their Chat
                     TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell animateFailedDownloadFile];
+                    if (cell != nil && [cell isKindOfClass:[TAPYourVoiceNoteBubbleTableViewCell class]]) {
+                        [cell animateFailedDownloadFile];
+                    }
                 }
             }
             
@@ -8380,44 +8495,53 @@ CGPoint center;
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    @try {
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                            [cell animateCancelDownloadVideo];
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception.reason);
-                        [self.tableView reloadData];
+                    if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                        @try {
+                            [self.tableView performBatchUpdates:^{
+                                //changing beginUpdates and endUpdates with this because of deprecation
+                                [cell animateCancelDownloadVideo];
+                            } completion:^(BOOL finished) {
+                            }];
+                        }
+                        @catch (NSException *exception) {
+                            NSLog(@"%@", exception.reason);
+                            [self.tableView reloadData];
+                        }
                     }
                 }
                 else {
                     //Their Chat
                     TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    @try {
-                        [self.tableView performBatchUpdates:^{
-                            //changing beginUpdates and endUpdates with this because of deprecation
-                            [cell animateCancelDownloadVideo];
-                        } completion:^(BOOL finished) {
-                        }];
-                    }
-                    @catch (NSException *exception) {
-                        NSLog(@"%@", exception.reason);
-                        [self.tableView reloadData];
+                    if (cell != nil && [cell isKindOfClass:[TAPYourVideoBubbleTableViewCell class]]) {
+                        @try {
+                            [self.tableView performBatchUpdates:^{
+                                //changing beginUpdates and endUpdates with this because of deprecation
+                                [cell animateCancelDownloadVideo];
+                            } completion:^(BOOL finished) {
+                            }];
+                        }
+                        @catch (NSException *exception) {
+                            NSLog(@"%@", exception.reason);
+                            [self.tableView reloadData];
+                        }
                     }
                 }
-            } else {
+            }
+            else {
                 // failed
                 if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                     //My Chat
                     TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell animateFailedDownloadVideo];
+                    if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                        [cell animateFailedDownloadVideo];
+                    }
                 }
                 else {
                     //Their Chat
                     TAPYourVideoBubbleTableViewCell *cell = (TAPYourVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                    [cell animateFailedDownloadVideo];
+                    if (cell != nil && [cell isKindOfClass:[TAPYourVideoBubbleTableViewCell class]]) {
+                        [cell animateFailedDownloadVideo];
+                    }
                 }
             }
         }
@@ -8744,10 +8868,13 @@ CGPoint center;
     
     UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
     imagePreviewNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:^{
-        [self.messageTextView resignFirstResponder];
-        [self hideInputAccessoryView];
+    [self presentViewController:imagePreviewNavigationController animated:YES completion:^{
+        
     }];
+//    [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:^{
+//        [self.messageTextView resignFirstResponder];
+//        [self hideInputAccessoryView];
+//    }];
 }
 
 - (void)openLocationInGoogleMaps:(NSDictionary *)dataDictionary {
@@ -9166,7 +9293,7 @@ CGPoint center;
                                                  [self.messageTextView resignFirstResponder];
                                                  [self.secondaryTextField resignFirstResponder];
                                                  [self keyboardWillHideWithHeight:0.0f];
-                                                 [self.navigationController pushViewController:webViewController animated:YES];
+                                                 [self pushViewController:webViewController animated:YES];
                                              }
                                          }];
             }
@@ -9565,7 +9692,7 @@ CGPoint center;
             reportUserVC.reportType = TAPReportTypeMessage;
             reportUserVC.messageID = message.messageID;
             reportUserVC.roomID = message.room.roomID;
-            [self.navigationController pushViewController:reportUserVC animated:YES];
+            [self pushViewController:reportUserVC animated:YES];
         }
         
     }];
@@ -9787,7 +9914,7 @@ CGPoint center;
     messageInfoVC.showStar = [self.starMessageIDArray containsObject:message.messageID];
     messageInfoVC.showPin = [self.pinMessageIDArray containsObject:message.messageID];
 
-    [self.navigationController pushViewController:messageInfoVC animated:YES];
+    [self pushViewController:messageInfoVC animated:YES];
 }
 
 - (void)setEditMessageWithMessage:(TAPMessageModel *)message {
@@ -10480,9 +10607,16 @@ CGPoint center;
 }
 
 - (void)showInputAccessoryView {
-    _isShowAccessoryView = YES;
-    [self reloadInputViews];
-    [self becomeFirstResponder];
+    if (self.currentPresentedViewController == nil ||
+        self.currentPresentedViewController.viewIfLoaded == nil ||
+        self.currentPresentedViewController.viewIfLoaded.window == nil
+    ) {
+        self->_isShowAccessoryView = YES;
+        if (!self.messageTextView.isFirstResponder && self.keyboardState != keyboardStateOptions) {
+            [self becomeFirstResponder];
+        }
+        [self reloadInputViews];
+    }
 }
 
 - (void)hideInputAccessoryView {
@@ -10905,55 +11039,59 @@ CGPoint center;
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                            
-                           NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                           if ([mentionArray count] > 0) {
-                               cell.mentionIndexesArray = mentionArray;
-                           }
-                           
-                           if (isSendingAnimation) {
-                               [cell receiveSentEvent];
-                           }
-                           else if (setAsDelivered) {
-                               [cell receiveDeliveredEvent];
-                           }
-                           else if (setAsRead) {
-                               [cell receiveReadEvent];
-                           }
-                           else {
-                               [cell setMessage:message];
+                           if (cell != nil && [cell isKindOfClass:[TAPMyChatBubbleTableViewCell class]]) {
+                               NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                               if ([mentionArray count] > 0) {
+                                   cell.mentionIndexesArray = mentionArray;
+                               }
                                
-                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                               //        [self.tableView reloadData];
+                               if (isSendingAnimation) {
+                                   [cell receiveSentEvent];
+                               }
+                               else if (setAsDelivered) {
+                                   [cell receiveDeliveredEvent];
+                               }
+                               else if (setAsRead) {
+                                   [cell receiveReadEvent];
+                               }
+                               else {
+                                   [cell setMessage:message];
+                                   
+                                   //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                                   //        [self.tableView reloadData];
+                               }
                            }
                        }
                    }
                    else if (currentMessage.type == TAPChatMessageTypeImage) {
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyImageBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-
-                           NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                           if ([mentionArray count] > 0) {
-                               cell.mentionIndexesArray = mentionArray;
-                           }
                            
-                           if (isSendingAnimation) {
-                               [cell receiveSentEvent];
+                           if (cell != nil && [cell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+                               NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                               if ([mentionArray count] > 0) {
+                                   cell.mentionIndexesArray = mentionArray;
+                               }
                                
-                               [TAPUtil performBlock:^{
-                                   [self fetchImageDataWithMessage:message];
-                               } afterDelay:1.0f];
-                           }
-                           else if (setAsDelivered) {
-                               [cell receiveDeliveredEvent];
-                           }
-                           else if (setAsRead) {
-                               [cell receiveReadEvent];
-                           }
-                           else {
-                               [cell setMessage:message];
-                               
-                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                               //        [self.tableView reloadData];
+                               if (isSendingAnimation) {
+                                   [cell receiveSentEvent];
+                                   
+                                   [TAPUtil performBlock:^{
+                                       [self fetchImageDataWithMessage:message];
+                                   } afterDelay:1.0f];
+                               }
+                               else if (setAsDelivered) {
+                                   [cell receiveDeliveredEvent];
+                               }
+                               else if (setAsRead) {
+                                   [cell receiveReadEvent];
+                               }
+                               else {
+                                   [cell setMessage:message];
+                                   
+                                   //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                                   //        [self.tableView reloadData];
+                               }
                            }
                        }
                    }
@@ -10961,28 +11099,30 @@ CGPoint center;
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            //My Chat
                            TAPMyVideoBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-
-                           NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                           if ([mentionArray count] > 0) {
-                               cell.mentionIndexesArray = mentionArray;
-                           }
-
-                           cell.message = currentMessage;
                            
-                           if (isSendingAnimation) {
-                               [cell receiveSentEvent];
-                           }
-                           else if (setAsDelivered) {
-                               [cell receiveDeliveredEvent];
-                           }
-                           else if (setAsRead) {
-                               [cell receiveReadEvent];
-                           }
-                           else {
-                               [cell setMessage:message];
+                           if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+                               NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                               if ([mentionArray count] > 0) {
+                                   cell.mentionIndexesArray = mentionArray;
+                               }
                                
-                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                               //        [self.tableView reloadData];
+                               cell.message = currentMessage;
+                               
+                               if (isSendingAnimation) {
+                                   [cell receiveSentEvent];
+                               }
+                               else if (setAsDelivered) {
+                                   [cell receiveDeliveredEvent];
+                               }
+                               else if (setAsRead) {
+                                   [cell receiveReadEvent];
+                               }
+                               else {
+                                   [cell setMessage:message];
+                                   
+                                   //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                                   //        [self.tableView reloadData];
+                               }
                            }
                        }
                    }
@@ -10990,20 +11130,22 @@ CGPoint center;
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyFileBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                            
-                           if (isSendingAnimation) {
-                               [cell receiveSentEvent];
-                           }
-                           else if (setAsDelivered) {
-                               [cell receiveDeliveredEvent];
-                           }
-                           else if (setAsRead) {
-                               [cell receiveReadEvent];
-                           }
-                           else {
-                               [cell setMessage:message];
-                               
-                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                               //        [self.tableView reloadData];
+                           if (cell != nil && [cell isKindOfClass:[TAPMyFileBubbleTableViewCell class]]) {
+                               if (isSendingAnimation) {
+                                   [cell receiveSentEvent];
+                               }
+                               else if (setAsDelivered) {
+                                   [cell receiveDeliveredEvent];
+                               }
+                               else if (setAsRead) {
+                                   [cell receiveReadEvent];
+                               }
+                               else {
+                                   [cell setMessage:message];
+                                   
+                                   //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                                   //        [self.tableView reloadData];
+                               }
                            }
                        }
                    }
@@ -11011,33 +11153,37 @@ CGPoint center;
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyVoiceNoteBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                            
-                           if (isSendingAnimation) {
-                               [cell receiveSentEvent];
-                           }
-                           else if (setAsDelivered) {
-                               [cell receiveDeliveredEvent];
-                           }
-                           else if (setAsRead) {
-                               [cell receiveReadEvent];
-                           }
-                           else {
-                               [cell setMessage:message];
-                               
-                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                               //        [self.tableView reloadData];
+                           if (cell != nil && [cell isKindOfClass:[TAPMyVoiceNoteBubbleTableViewCell class]]) {
+                               if (isSendingAnimation) {
+                                   [cell receiveSentEvent];
+                               }
+                               else if (setAsDelivered) {
+                                   [cell receiveDeliveredEvent];
+                               }
+                               else if (setAsRead) {
+                                   [cell receiveReadEvent];
+                               }
+                               else {
+                                   [cell setMessage:message];
+                                   
+                                   //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                                   //        [self.tableView reloadData];
+                               }
                            }
                        }
                    }
                    else if (currentMessage.type == TAPChatMessageTypeProduct) {
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPProductListBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                           NSArray *productListArray = [currentMessage.data objectForKey:@"items"];
-                           [cell setProductListBubbleCellWithData:productListArray];
-                           if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
-                               [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
-                           }
-                           else {
-                               [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
+                           if (cell != nil && [cell isKindOfClass:[TAPProductListBubbleTableViewCell class]]) {
+                               NSArray *productListArray = [currentMessage.data objectForKey:@"items"];
+                               [cell setProductListBubbleCellWithData:productListArray];
+                               if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+                                   [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeSingleOption];
+                               }
+                               else {
+                                   [cell setProductListBubbleTableViewCellType:TAPProductListBubbleTableViewCellTypeTwoOption];
+                               }
                            }
                        }
                    }
@@ -11045,20 +11191,22 @@ CGPoint center;
                        if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                            TAPMyLocationBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
                            
-                           if (isSendingAnimation) {
-                               [cell receiveSentEvent];
-                           }
-                           else if (setAsDelivered) {
-                               [cell receiveDeliveredEvent];
-                           }
-                           else if (setAsRead) {
-                               [cell receiveReadEvent];
-                           }
-                           else {
-                               [cell setMessage:message];
-                               
-                               //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
-                               //        [self.tableView reloadData];
+                           if (cell != nil && [cell isKindOfClass:[TAPMyLocationBubbleTableViewCell class]]) {
+                               if (isSendingAnimation) {
+                                   [cell receiveSentEvent];
+                               }
+                               else if (setAsDelivered) {
+                                   [cell receiveDeliveredEvent];
+                               }
+                               else if (setAsRead) {
+                                   [cell receiveReadEvent];
+                               }
+                               else {
+                                   [cell setMessage:message];
+                                   
+                                   //        //RN Note - Remove reload data and change to set message locally to prevent blink on sending animation, change to reload data if find any bug related
+                                   //        [self.tableView reloadData];
+                               }
                            }
                        }
                    }
@@ -11071,7 +11219,7 @@ CGPoint center;
                            
                            @try {
                                id cell = [self.tableView cellForRowAtIndexPath:messageIndexPath];
-                               if ([cell isKindOfClass:[TAPBaseGeneralBubbleTableViewCell class]]) {
+                               if (cell != nil && [cell isKindOfClass:[TAPBaseGeneralBubbleTableViewCell class]]) {
                                    TAPBaseGeneralBubbleTableViewCell *bubbleCell = cell;
                                    [bubbleCell setMessage:message];
                                }
@@ -12146,7 +12294,7 @@ CGPoint center;
     if (user != nil) {
         [[TapUI sharedInstance] createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
             chatViewController.hidesBottomBarWhenPushed = YES;
-            [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+            [self pushViewController:chatViewController animated:YES];
         }];
     }
     else {
@@ -12157,7 +12305,7 @@ CGPoint center;
             //User found, send message
             [[TapUI sharedInstance] createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
                 chatViewController.hidesBottomBarWhenPushed = YES;
-                [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
+                [self pushViewController:chatViewController animated:YES];
             }];
             
             [self showMentionLoadingView:NO];
@@ -12426,7 +12574,7 @@ CGPoint center;
         profileViewController.user = user;
         profileViewController.delegate = self;
         profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
-        [self.navigationController pushViewController:profileViewController animated:YES];
+        [self pushViewController:profileViewController animated:YES];
     }
     else {
         //User not found in participant
@@ -12467,7 +12615,7 @@ CGPoint center;
             profileViewController.otherUserID = user.userID;
             profileViewController.delegate = self;
             profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypePersonalFromClickedMention;
-            [self.navigationController pushViewController:profileViewController animated:YES];
+            [self pushViewController:profileViewController animated:YES];
             
             [self showMentionLoadingView:NO];
         } failure:^(NSError *error) {
@@ -13416,7 +13564,7 @@ CGPoint center;
     tapSecondaryChatVC.hidesBottomBarWhenPushed = YES;
     tapSecondaryChatVC.chatroomScheduleContentString = self.messageTextView.text;
     tapSecondaryChatVC.chatRoomScheduleTimne = scheduleTime;
-    [self.navigationController pushViewController:tapSecondaryChatVC animated:YES];
+    [self pushViewController:tapSecondaryChatVC animated:YES];
     
     self.messageTextView.text = @"";
 }
@@ -13438,7 +13586,7 @@ CGPoint center;
         tapSecondaryChatVC.currentRoom = self.currentRoom;
         tapSecondaryChatVC.messageListType = TAPSecondaryChatTypeScheduleMessage;
         tapSecondaryChatVC.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:tapSecondaryChatVC animated:YES];
+        [self pushViewController:tapSecondaryChatVC animated:YES];
     }];
 
     
@@ -13501,7 +13649,7 @@ CGPoint center;
     
     tapStarredMessageViewController.delegate = self;
     tapStarredMessageViewController.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:tapStarredMessageViewController animated:YES];
+    [self pushViewController:tapStarredMessageViewController animated:YES];
 }
 
 - (void)pinnedMessageButtonDidTapped {
@@ -13567,7 +13715,7 @@ CGPoint center;
             if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
                 profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeSavedMessageProfile;
             }
-            [self.navigationController pushViewController:profileViewController animated:YES];
+            [self pushViewController:profileViewController animated:YES];
         }
     }
     else if (self.currentRoom.type == RoomTypeGroup) {
@@ -13580,7 +13728,7 @@ CGPoint center;
             profileViewController.room = self.currentRoom;
             profileViewController.otherUserID = otherUserID;
             profileViewController.delegate = self;
-            [self.navigationController pushViewController:profileViewController animated:YES];
+            [self pushViewController:profileViewController animated:YES];
         }
     }
 }
@@ -13625,7 +13773,7 @@ CGPoint center;
                    profileViewController.user = user;
                    profileViewController.delegate = self;
                    profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
-                   [self.navigationController pushViewController:profileViewController animated:YES];
+                   [self pushViewController:profileViewController animated:YES];
                }
                 
             } failure:^(NSError *error) {
@@ -13659,7 +13807,7 @@ CGPoint center;
            profileViewController.user = otherUser;
            profileViewController.delegate = self;
            profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeGroupMemberProfile;
-           [self.navigationController pushViewController:profileViewController animated:YES];
+           [self pushViewController:profileViewController animated:YES];
        }
     }
     
@@ -14545,9 +14693,11 @@ CGPoint center;
         if (!currentMessage.isDeleted && !currentMessage.isHidden) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:currentRowIndex inSection:0];
             [TAPUtil performBlock:^{
-                [self.tableView reloadData];
-                [self.tableView layoutIfNeeded];
-                [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                if ([self.tableView numberOfRowsInSection:0] > currentRowIndex) {
+                    [self.tableView reloadData];
+                    [self.tableView layoutIfNeeded];
+                    [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                }
             } afterDelay:0.2f];
         }
         else {

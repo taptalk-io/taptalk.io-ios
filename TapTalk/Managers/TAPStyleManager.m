@@ -1544,7 +1544,7 @@
             break;
         }
         case TAPTextColorPopupDialogBody: {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
+            UIColor *color = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark] colorWithAlphaComponent:0.6f];
             return color;
             break;
         }

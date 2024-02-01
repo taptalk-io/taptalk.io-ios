@@ -32,8 +32,8 @@
         self.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3f];
         [self addSubview:self.backgroundView];
         
-        _popupWhiteView = [[UIView alloc] initWithFrame:CGRectMake(32.0f, 0.0f, CGRectGetWidth(self.frame) - 32.0f - 32.0f, 0.0f)];
-        self.popupWhiteView.layer.cornerRadius = 4.0f;
+        _popupWhiteView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 32.0f, 0.0f)];
+        self.popupWhiteView.layer.cornerRadius = 8.0f;
         self.popupWhiteView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f].CGColor;
         self.popupWhiteView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
         self.popupWhiteView.layer.shadowOpacity = 0.4f;
@@ -44,7 +44,7 @@
         
         UIFont *popupTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogTitle];
         UIColor *popupTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogTitle];
-        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 16.0f - 16.0f, 0.0f)];
+        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(24.0f, 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 48.0f, 0.0f)];
         self.titleLabel.font = popupTitleLabelFont;
         self.titleLabel.textColor = popupTitleLabelColor;
         self.titleLabel.numberOfLines = 0;
@@ -53,7 +53,7 @@
         
         UIFont *popupBodyLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogBody];
         UIColor *popupBodyLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogBody];
-        _detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 0.0f)];
+        _detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.titleLabel.frame), 0.0f)];
         self.detailLabel.numberOfLines = 0;
         self.detailLabel.font = popupBodyLabelFont;
         self.detailLabel.textColor = popupBodyLabelColor;
@@ -74,7 +74,7 @@
         
         UIFont *popupSecondaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextSecondary];
         UIColor *popupSecondaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
-        _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 6.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
+        _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 8.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
         self.leftButton.layer.cornerRadius = 8.0f;
         self.leftButton.layer.borderWidth = 1.0f;
         self.leftButton.layer.borderColor = popupSecondaryButtonColor.CGColor;
@@ -93,11 +93,11 @@
     CGSize sizeTitle = [self.titleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.titleLabel.frame), CGFLOAT_MAX)];
     
     self.titleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMinY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), sizeTitle.height);
-    self.detailLabel.frame = CGRectMake(CGRectGetMinX(self.detailLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.detailLabel.frame), sizeDetail.height);
+    self.detailLabel.frame = CGRectMake(CGRectGetMinX(self.detailLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.detailLabel.frame), sizeDetail.height);
     
     self.rightButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame));
     
-    self.leftButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame) - 6.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.leftButton.frame), CGRectGetHeight(self.leftButton.frame));
+    self.leftButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame) - 8.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.leftButton.frame), CGRectGetHeight(self.leftButton.frame));
 
     CGFloat popupInfoViewHeight = CGRectGetMaxY(self.rightButton.frame) + 16.0f;
     self.popupWhiteView.frame = CGRectMake(CGRectGetMinX(self.popupWhiteView.frame), (CGRectGetHeight(self.frame) - popupInfoViewHeight) / 2.0f, CGRectGetWidth(self.popupWhiteView.frame), popupInfoViewHeight);
@@ -121,11 +121,11 @@
     
     if (self.popupInfoViewType == TAPPopupInfoViewTypeErrorMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDestructive];
-        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 24.0f - 24.0f, CGRectGetHeight(self.rightButton.frame));
+        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 48.0f, CGRectGetHeight(self.rightButton.frame));
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeSuccessMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
-        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 24.0f - 24.0f, CGRectGetHeight(self.rightButton.frame));
+        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 48.0f, CGRectGetHeight(self.rightButton.frame));
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeInfoDefault) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
@@ -135,13 +135,20 @@
     }
     
     self.titleLabel.text = title;
-    self.detailLabel.text = detailInfo;
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:detailInfo attributes:nil];
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setLineSpacing:self.detailLabel.font.pointSize * 0.25f];
+    [style setAlignment:NSTextAlignmentCenter];
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:style
+                             range:NSMakeRange(0, [attributedString length])];
+    self.detailLabel.attributedText = attributedString;
+    
     [self.leftButton setTitle:leftOptionTitle forState:UIControlStateNormal];
     [self.rightButton setTitle:singleOrRightOptionTitle forState:UIControlStateNormal];
     
     [self resizeSubview];
-    
-    
 }
 
 

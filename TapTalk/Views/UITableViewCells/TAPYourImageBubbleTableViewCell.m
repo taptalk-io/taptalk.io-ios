@@ -1141,7 +1141,7 @@
     }
     NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
     UIImage *image = [UIImage imageWithData:thumbnailImageData];
-    if (image != nil) {
+    if (image != nil && (self.bubbleImageView.image == nil || self.bubbleImageView.image.size.width < image.size.width)) {
         self.thumbnailBubbleImageView.image = image;
 //        self.bubbleImageView.image = image;
 //        [self getImageSizeFromImage:image];
@@ -1698,7 +1698,8 @@
     [self getImageSizeFromImage:image];
     self.bubbleImageView.alpha = 1.0f;
     self.thumbnailBubbleImageView.alpha = 0.0f;
-    [self.contentView layoutIfNeeded];
+    [self refreshCellHeight];
+//    [self.contentView layoutIfNeeded];
 }
 
 - (void)setThumbnailImage:(UIImage *)thumbnailImage {
@@ -2136,6 +2137,28 @@
     self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
     self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
     [self.contentView layoutIfNeeded];
+}
+
+- (UITableView * _Nullable)getTableView {
+    id view = [self superview];
+    while (view && [view isKindOfClass:[UITableView class]] == NO) {
+        view = [view superview];
+    }
+    if (view != nil && [view isKindOfClass:[UITableView class]]) {
+        UITableView *tableView = (UITableView *)view;
+        return tableView;
+    }
+    return nil;
+}
+
+- (void)refreshCellHeight {
+    [UIView performWithoutAnimation:^{
+        UITableView *tableView = [self getTableView];
+        if (tableView != nil) {
+            [tableView beginUpdates];
+            [tableView endUpdates];
+        }
+    }];
 }
 
 @end
