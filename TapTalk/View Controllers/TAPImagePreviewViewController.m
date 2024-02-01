@@ -891,8 +891,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)photoAlbumListViewControllerSelectImageWithDataArray:(NSArray *)dataArray {
     
     [self setMediaPreviewDataWithArray:dataArray];
-    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [[TapTalk sharedInstance] getMaxCaptionLength], [[TapTalk sharedInstance] getMaxCaptionLength]];
-    [self.imagePreviewView isShowCounterCharCount:NO];
     
     if ([self.mediaDataArray count] != 0 && [self.mediaDataArray count] > 1) {
         [self.imagePreviewView isShowAsSingleImagePreview:NO animated:NO];
@@ -900,11 +898,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else {
         [self.imagePreviewView isShowAsSingleImagePreview:YES animated:NO];
     }
-    
-    self.selectedIndex = 0;
-    
-    [self.imagePreviewView.thumbnailCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
-    [self.imagePreviewView.imagePreviewCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
     
     [self.imagePreviewView setItemNumberWithCurrentNumber:1 ofTotalNumber:[self.mediaDataArray count]];
     [self.imagePreviewView.imagePreviewCollectionView reloadData];

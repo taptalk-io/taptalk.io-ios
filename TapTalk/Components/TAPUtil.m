@@ -1243,6 +1243,17 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return nil;
 }
 
++ (NSString *)getFileExtensionFromPath:(NSString *)filePath {
+    if ([TAPUtil isEmptyString:filePath]) {
+        return @"";
+    }
+    NSString *lastComponent = [filePath lastPathComponent];
+    if ([TAPUtil isEmptyString:lastComponent] || ![lastComponent containsString:@"."]) {
+        return @"";
+    }
+    return [lastComponent pathExtension];
+}
+
 + (CGFloat)safeAreaBottomPadding {
     CGFloat bottomPadding = 0.0f;
     

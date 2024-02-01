@@ -199,12 +199,12 @@
 }
 
 - (void)mediaDetailViewDidFinishClosingAnimation {
-    if([self.delegate respondsToSelector:@selector(mediaDetailViewControllerDidFinishClosingAnimation)]) {
-        [self.delegate mediaDetailViewControllerDidFinishClosingAnimation];
-    }
-    
     [self.view removeFromSuperview];
     [self removeFromParentViewController];
+    
+    if ([self.delegate respondsToSelector:@selector(mediaDetailViewControllerDidFinishClosingAnimation)]) {
+        [self.delegate mediaDetailViewControllerDidFinishClosingAnimation];
+    }
 }
 
 - (void)mediaDetailViewWillStartOpeningAnimation {

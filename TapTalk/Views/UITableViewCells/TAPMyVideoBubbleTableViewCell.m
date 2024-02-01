@@ -1877,7 +1877,8 @@
     success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
         [self.bubbleImageView setImage:savedImage];
         [self getImageSizeFromImage:savedImage];
-        [self.contentView layoutIfNeeded];
+        [self refreshCellHeight];
+//        [self.contentView layoutIfNeeded];
     }
     failure:^(NSError *error, TAPMessageModel *receivedMessage) {
         NSDictionary *dataDictionary = message.data;
@@ -2106,6 +2107,28 @@
     self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
     self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
     [self.contentView layoutIfNeeded];
+}
+
+- (UITableView * _Nullable)getTableView {
+    id view = [self superview];
+    while (view && [view isKindOfClass:[UITableView class]] == NO) {
+        view = [view superview];
+    }
+    if (view != nil && [view isKindOfClass:[UITableView class]]) {
+        UITableView *tableView = (UITableView *)view;
+        return tableView;
+    }
+    return nil;
+}
+
+- (void)refreshCellHeight {
+    [UIView performWithoutAnimation:^{
+        UITableView *tableView = [self getTableView];
+        if (tableView != nil) {
+            [tableView beginUpdates];
+            [tableView endUpdates];
+        }
+    }];
 }
 
 @end

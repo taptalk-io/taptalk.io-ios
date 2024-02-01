@@ -169,6 +169,7 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     // Remove unused fields for socket emit
     [parametersDictionary removeObjectForKey:@"user"];
     NSMutableDictionary *roomDictionary = [[parametersDictionary objectForKey:@"room"] mutableCopy];
+    roomDictionary = [TAPUtil nullToEmptyDictionary:roomDictionary];
     [roomDictionary removeObjectForKey:@"participants"];
     [roomDictionary removeObjectForKey:@"unreadCount"];
     [parametersDictionary setObject:roomDictionary forKey:@"room"];
@@ -213,6 +214,7 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     [parametersDictionary removeObjectForKey:@"isSending"];
     
     NSMutableDictionary *roomDictionary = [[parametersDictionary objectForKey:@"room"] mutableCopy];
+    roomDictionary = [TAPUtil nullToEmptyDictionary:roomDictionary];
     [roomDictionary removeObjectForKey:@"participants"];
     [roomDictionary removeObjectForKey:@"unreadCount"];
     [roomDictionary removeObjectForKey:@"isDeleted"];
