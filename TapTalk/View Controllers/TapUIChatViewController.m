@@ -374,13 +374,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinMessageHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinBottomcons;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *scheduleMessageButtonWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *playIconImageViewVerticalConstraint;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageComposerWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *unblockViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *blockedUserViewHeightConstraint;
-
-
-
 
 //Multiple Forward
 @property (weak, nonatomic) IBOutlet UIButton *sendForwardButton;
@@ -1120,16 +1118,22 @@ CGPoint center;
         
     }];
     
-    [TAPDataManager callAPIGetScheduleMessage:self.currentRoom.roomID success:^(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray) {
-        if(scheduleMessageArray.count == 0 || ![[TapUI sharedInstance] getScheduledMessageFeatureEnabled]) {
-            self.scheduleMessageButtonWidthConstraint.constant = 0.0f;
-        }
-        else {
-            self.scheduleMessageButtonWidthConstraint.constant = 32.0f;
-        }
-    } failure:^(NSError *error) {
-        
-    }];
+//    [TAPDataManager callAPIGetScheduleMessage:self.currentRoom.roomID success:^(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray) {
+//        if(scheduleMessageArray.count == 0 || ![[TapUI sharedInstance] getScheduledMessageFeatureEnabled]) {
+//            self.scheduleMessageButtonWidthConstraint.constant = 0.0f;
+//        }
+//        else {
+//            self.scheduleMessageButtonWidthConstraint.constant = 32.0f;
+//        }
+//    } failure:^(NSError *error) {
+//        
+//    }];
+    if (![[TapUI sharedInstance] getScheduledMessageFeatureEnabled]) {
+        self.scheduleMessageButtonWidthConstraint.constant = 0.0f;
+    }
+    else {
+        self.scheduleMessageButtonWidthConstraint.constant = 32.0f;
+    }
     
     self.isSavedMesasgeArrowClicked = NO;
     
@@ -8912,24 +8916,24 @@ CGPoint center;
     }
 }
 
-- (void)playVoiceNoteAudio{
-    if(![self.voiceNoteUrl.path isEqualToString:[[TAPAudioManager sharedManager] getPlayerCurrentFilePath]]){
+- (void)playVoiceNoteAudio {
+    if (![self.voiceNoteUrl.path isEqualToString:[[TAPAudioManager sharedManager] getPlayerCurrentFilePath]]) {
         [[TAPAudioManager sharedManager] setupPlayerAudio:self.voiceNoteUrl.path];
         self.voiceNoteAudioSlider.value = 0.0f;
         
     }
-    if([[TAPAudioManager sharedManager] isPlaying]){
+    if ([[TAPAudioManager sharedManager] isPlaying]) {
         [[TAPAudioManager sharedManager] pausePlayer];
         self.isComposerAudioPlaying = NO;
         self.playIconImageView.image = [UIImage imageNamed:@"TAPIconPlayComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.playIconImageViewVerticalConstraint.constant = 2.0f;
     }
-    else{
+    else {
         self.isComposerAudioPlaying = YES;
         [[TAPAudioManager sharedManager] resumePlayer];
         self.playIconImageView.image = [UIImage imageNamed:@"TAPIconPauseComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.playIconImageViewVerticalConstraint.constant = 0.0f;
     }
-    
-    
 }
 
 - (void)cancelRecordingButtonDidTapped{
@@ -10352,9 +10356,8 @@ CGPoint center;
 }
 
 - (void)handleVoiceNoteViewTap:(UITapGestureRecognizer *)recognizer{
-    if (recognizer.state == UIGestureRecognizerStateEnded)
-    {
-        [self displayToastWithMessage:@"Long press mic to record."];
+    if (recognizer.state == UIGestureRecognizerStateEnded) {
+        [self showSnackBar:TapTalkSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Long press mic to record.", nil, [TAPUtil currentBundle], @"") iconName:@""];
     }
 }
 
@@ -12141,14 +12144,14 @@ CGPoint center;
 
 - (void)checkKeyboard {
     //WK Note - To check if the keyboard was showed before attachment button tapped.
-    if (self.isKeyboardWasShowed) {
-        if (self.keyboardState == keyboardStateDefault) {
-            [self.messageTextView becameFirstResponder];
-        }
-        else {
-            [self.secondaryTextField becomeFirstResponder];
-        }
-    }
+//    if (self.isKeyboardWasShowed) {
+//        if (self.keyboardState == keyboardStateDefault) {
+//            [self.messageTextView becameFirstResponder];
+//        }
+//        else {
+//            [self.secondaryTextField becomeFirstResponder];
+//        }
+//    }
 }
 
 - (void)setKeyboardStateDefault {
@@ -13862,7 +13865,7 @@ CGPoint center;
                 
             } failure:^(NSError *error) {
                 self.isSavedMesasgeArrowClicked = NO;
-                [self displayToastWithMessage:@"Chatroom is not available."];
+                [self showSnackBar:TapTalkSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Chatroom is not available.", nil, [TAPUtil currentBundle], @"") iconName:@""];
             }];
         }
         else{
@@ -13883,7 +13886,7 @@ CGPoint center;
     }
     else{
         self.isSavedMesasgeArrowClicked = NO;
-        [self displayToastWithMessage:@"Chatroom is not available."];
+        [self showSnackBar:TapTalkSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Chatroom is not available.", nil, [TAPUtil currentBundle], @"") iconName:@""];
     }
 }
 
@@ -15839,41 +15842,6 @@ CGPoint center;
     }
 
     return bulletList;
-}
-
-- (void)displayToastWithMessage:(NSString *)toastMessage {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
-        UIWindow * keyWindow = [[UIApplication sharedApplication] keyWindow];
-        UILabel *toastView = [[UILabel alloc] init];
-        toastView.text = toastMessage;
-        UIFont *toastFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
-        toastView.font = toastFont;
-        toastView.textColor = [UIColor whiteColor];
-        toastView.backgroundColor = [TAPUtil getColor:@"666666"];
-        toastView.textAlignment = NSTextAlignmentCenter;
-        if(self.isKeyboardShowed){
-            toastView.frame = CGRectMake((keyWindow.frame.size.width/2) - 100.0, keyWindow.frame.size.height - 430.0f, 200.0f, 20.0f);
-        }
-        else{
-            toastView.frame = CGRectMake((keyWindow.frame.size.width/2) - 100.0, keyWindow.frame.size.height - 120.0f, 200.0f, 20.0f);
-        }
-        
-        toastView.layer.cornerRadius = 10;
-        toastView.layer.masksToBounds = YES;
-
-        [keyWindow addSubview:toastView];
-
-        [UIView animateWithDuration: 3.0f
-                          delay: 0.0
-                        options: UIViewAnimationOptionCurveEaseOut
-                     animations: ^{
-                         toastView.alpha = 0.0;
-                     }
-                     completion: ^(BOOL finished) {
-                         [toastView removeFromSuperview];
-                     }
-         ];
-    }];
 }
 
 @end

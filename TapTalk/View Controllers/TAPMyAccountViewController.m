@@ -891,7 +891,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [saveImageAction setValue:[saveActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         
-        UIImage *removeActionImage = [UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *removeActionImage = [UIImage imageNamed:@"TAPIconTrashChatComposer" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
        // removeActionImage = [removeActionImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSelectPictureGallery]];
         
         [removeAction setValue:[removeActionImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
@@ -920,7 +920,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else{
         //set new profil picture
         if(self.photoListArray.count == 10){
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@""  title:NSLocalizedStringFromTableInBundle(@"You have reached maximum profile picture.", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"You can only have 10 profile picture at a time, remove some picture to upload new ones.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@"OK"];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@""  title:NSLocalizedStringFromTableInBundle(@"You have reached maximum profile picture.", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"You can only have 10 profile picture at a time, remove some picture to upload new ones.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@"OK"];
             return;
         }
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];

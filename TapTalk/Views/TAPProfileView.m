@@ -51,7 +51,10 @@
             collectionViewPadding = 25.0f;
         }
         
+        self.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+        
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), self.profileImageHeight)];
+        self.profileImageView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.profileImageView.clipsToBounds = YES;
         
@@ -77,7 +80,7 @@
         
         UICollectionViewFlowLayout *collectionLayout = [[UICollectionViewFlowLayout alloc] init];
         collectionLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - [TAPUtil safeAreaBottomPadding]) collectionViewLayout:collectionLayout];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, topPadding, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame)) collectionViewLayout:collectionLayout];
         //self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight - [TAPUtil currentDeviceStatusBarHeight] + topPadding, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
         self.collectionView.contentInset = UIEdgeInsetsMake(self.profileImageHeight + topPadding + collectionViewPadding, 0.0f, 8.0f, 0.0f); //-statusBarHeight because the inset start after status bar.
         self.collectionView.backgroundColor = [UIColor clearColor];
@@ -116,7 +119,7 @@
         self.savedMessageProfile.alpha = 0.0f;
         [self.collectionView addSubview:self.savedMessageProfile];
         
-        _profilImageCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - topPadding - self.profileImageHeight - collectionViewPadding, CGRectGetWidth(self.frame), 360.0f) collectionViewLayout:collectionLayoutProfilImage];
+        _profilImageCollectionView = [[UICollectionView alloc] initWithFrame:self.profileImageView.frame collectionViewLayout:collectionLayoutProfilImage];
         self.profilImageCollectionView.backgroundColor = [UIColor clearColor];
         self.profilImageCollectionView.pagingEnabled = YES;
         self.profilImageCollectionView.showsVerticalScrollIndicator = NO;

@@ -342,7 +342,7 @@
             return cellSize;
         }
         else if(collectionView == self.profileView.profilImageCollectionView){
-            CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 360.0f);
+            CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 347.0f);
             return cellSize;
         }
         CGFloat height = 56.0f;
@@ -816,6 +816,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSString *cellID = @"TAPImagePreviewCollectionViewCell";
             [collectionView registerClass:[TAPImagePreviewCollectionViewCell class] forCellWithReuseIdentifier:cellID];
             TAPImagePreviewCollectionViewCell *cell = (TAPImagePreviewCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+            [cell setImageBackgroundColor:[TAPUtil getColor:TAP_DEFAULT_BACKGROUND_COLOR]];
             
             [cell setImagePreviewCollectionViewCellType:TAPImagePreviewCollectionViewCellTypeProfileImage];
             
@@ -1162,64 +1163,62 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
-    if(section == 1){
+    if (section == 1) {
         CGSize headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
         headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
         TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
         
-        if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault && self.room.type == RoomTypeGroup){
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault && self.room.type == RoomTypeGroup) {
             return headerSize;
-            
         }
         
-        if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault ){
-            if (![[TapUI sharedInstance] getEditBioTextFieldVisible] || user.bio == nil && ![[TapUI sharedInstance] getUsernameInChatProfileVisible] || user.username == nil && ![[TapUI sharedInstance] getMobileNumberInChatProfileVisible] || user.phone == nil && ![[TapUI sharedInstance] getEmailAddressInChatProfileVisible] || user.email == nil) {
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+            if ((![[TapUI sharedInstance] getEditBioTextFieldVisible] || user.bio == nil) &&
+                (![[TapUI sharedInstance] getUsernameInChatProfileVisible] || user.username == nil) &&
+                (![[TapUI sharedInstance] getMobileNumberInChatProfileVisible] || user.phone == nil) &&
+                (![[TapUI sharedInstance] getEmailAddressInChatProfileVisible] || user.email == nil)
+            ) {
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
-            
-            
-            
-            
         }
-        
         return headerSize;
-        
     }
-    else if(section == 2){
+    else if (section == 2) {
         CGSize headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
         headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
         
-        if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
-            if(self.room.type == RoomTypePersonal){
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+            if (self.room.type == RoomTypePersonal) {
                 NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
                 TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-                if(user.deleted.longValue > 0){
+                if (user.deleted.longValue > 0) {
                     headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
                 }
             }
-            
         }
-        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile){
-            if(self.user.deleted.longValue > 0){
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile){
+            if (self.user.deleted.longValue > 0) {
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
         }
-        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
             headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
         }
-        
-        
         return headerSize;
     }
-    else if(section == 3){
+    else if (section == 3) {
         CGSize headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
-        if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
-            if(self.room.type == RoomTypePersonal){
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+            if (self.room.type == RoomTypePersonal) {
                 NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
                 TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
                 
-                if(![[TapUI sharedInstance] getEditBioTextFieldVisible] && ![[TapUI sharedInstance] getUsernameInChatProfileVisible] && ![[TapUI sharedInstance] getMobileNumberInChatProfileVisible] && ![[TapUI sharedInstance] getEmailAddressInChatProfileVisible]){
+                if (![[TapUI sharedInstance] getEditBioTextFieldVisible] &&
+                    ![[TapUI sharedInstance] getUsernameInChatProfileVisible] &&
+                    ![[TapUI sharedInstance] getMobileNumberInChatProfileVisible] &&
+                    ![[TapUI sharedInstance] getEmailAddressInChatProfileVisible]
+                ){
                     headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
                 }
                 
@@ -1231,12 +1230,18 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     // Hide if add to contacts menu is disabled in TapUI or user is already a contact
                     headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
                 }
-                else{
+                else {
                     headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
                 }
                 
-                if(user.deleted.longValue > 0){
+                if (user.deleted.longValue > 0) {
                     headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+                }
+                else {
+                    NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+                    if ([blockedUserIDs containsObject:user.userID]) {
+                        headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+                    }
                 }
 
                 /**
@@ -1249,37 +1254,42 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                  */
             }
         }
-        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile){
-            if(self.user.deleted.longValue > 0){
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
+            if (self.user.deleted.longValue > 0) {
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
-        }
-        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
-            headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
-        }
-        
-        return headerSize;
-    }
-    else if(section == 4){
-        CGSize headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
-        if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
-            if(self.room.type == RoomTypeGroup){
-              //  headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
-            }
-            else{
-                NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
-                TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
-                if(user.deleted.longValue > 0){
+            else {
+                NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+                if ([blockedUserIDs containsObject:self.user.userID]) {
                     headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
                 }
             }
         }
-        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile){
-            if(self.user.deleted.longValue > 0){
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
+            headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+        }
+        return headerSize;
+    }
+    else if (section == 4) {
+        CGSize headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 24.0f);
+        if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault){
+            if (self.room.type == RoomTypeGroup) {
+              //  headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+            }
+            else {
+                NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                if (user.deleted.longValue > 0) {
+                    headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
+                }
+            }
+        }
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
+            if (self.user.deleted.longValue > 0) {
                 headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
             }
         }
-        else if(self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile){
+        else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeSavedMessageProfile) {
             headerSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), 0.01f);
         }
         return headerSize;
@@ -1498,14 +1508,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
             }
             else if(self.room.type == RoomTypeGroup){
-                if(indexPath.row == 0){
-                    //leave group
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedStringFromTableInBundle(@"Leave Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"All messages and shared medias from this room will be inaccessible. Are you sure you want to leave?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Leave", nil, [TAPUtil currentBundle], @"")];
-                }
-                else if(indexPath.row == 1){
-                    //delete group
-                    
+                if (self.isCurrentActiveUserIsAdmin && [self.room.participants count] == 1) {
+                    // Delete group
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Delete Group" title:NSLocalizedStringFromTableInBundle(@"Delete Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"All messages and shared medias from this room will be inaccessible. Are you sure you want to delete?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Delete", nil, [TAPUtil currentBundle], @"")];
+                }
+                else {
+                    // Leave group
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedStringFromTableInBundle(@"Leave Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"All messages and shared medias from this room will be inaccessible. Are you sure you want to leave?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Leave", nil, [TAPUtil currentBundle], @"")];
                 }
             }
         }
@@ -1926,6 +1935,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     self.profileView.nameLabel.text = roomName;
     self.profileView.navigationNameLabel.text = roomName;
+    [self setupNavigationViewData];
     
     if (roomURL == nil || [roomURL isEqualToString:@""]) {
         if (self.room.type == RoomTypePersonal) {
@@ -1938,7 +1948,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
     }
     else {
-        [self.profileView.profileImageView setImageWithURLString:roomURL];
+        [self.profileView setProfilePictureWithImageURL:roomURL userFullName:roomName];
+//        [self.profileView.profileImageView setImageWithURLString:roomURL];
     }
 }
 
