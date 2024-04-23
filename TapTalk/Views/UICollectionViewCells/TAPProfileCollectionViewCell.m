@@ -318,7 +318,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileSearchChat]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Search chat", nil, [TAPUtil currentBundle], @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Search Chat", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
@@ -329,7 +329,7 @@
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileEditGroup]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Edit group", nil, [TAPUtil currentBundle], @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Edit Group", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 1.0f;
@@ -386,21 +386,20 @@
     else if (type == profileCollectionViewCellTypeUserDetail) {
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.frame =CGRectMake(24.0f, 9.0f, CGRectGetWidth(self.frame) - 24.0f - 24.0f, 16.0f);
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Edit group", nil, [TAPUtil currentBundle], @"");
+        self.titleLabel.text = @"";
         UIFont *titleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatProfileTitleLabelStyle];
         self.titleLabel.font = titleLabelFont;
         UIColor *titleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileDetailTitleLabel];
         self.titleLabel.textColor = titleLabelColor;
         
         self.userDetailLabel.frame = CGRectMake(24.0f, CGRectGetMaxY(self.titleLabel.frame) + 0.0f, CGRectGetWidth(self.frame) - 24.0f - 24.0f, 24.0f);
-        self.userDetailLabel.text = @"etst";
+        self.userDetailLabel.text = @"";
         
         self.userDetailLabel.alpha = 1.0f;
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
         self.iconImageView.alpha = 0.0;
     }
-    
 }
 
 - (void)refreshPosition{

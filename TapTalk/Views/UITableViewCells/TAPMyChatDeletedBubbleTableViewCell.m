@@ -14,7 +14,6 @@
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *sendingIconImageView;
-@property (strong, nonatomic) IBOutlet UIImageView *statusIconImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *deletedIconImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 
@@ -23,8 +22,6 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *chatBubbleRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconLeftConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendingIconBottomConstraint;
-@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconBottomConstraint;
-@property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusIconRightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *deletedIconImageViewTrailingConstraint;
 
@@ -43,7 +40,6 @@
     [self.contentView layoutIfNeeded];
 
     self.statusLabel.alpha = 0.0f;
-    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     self.bubbleView.clipsToBounds = YES;
     
@@ -63,7 +59,6 @@
     self.statusLabelTopConstraint.constant = 0.0f;
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
-    self.statusIconImageView.alpha = 0.0f;
     self.sendingIconImageView.alpha = 0.0f;
     self.sendingIconLeftConstraint.constant = 4.0f;
     self.sendingIconBottomConstraint.constant = -5.0f;
@@ -133,7 +128,6 @@
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
     [self.bubbleLabel.layer removeAllAnimations];
-    [self.statusIconImageView.layer removeAllAnimations];
 }
 
 - (void)receiveSentEvent {

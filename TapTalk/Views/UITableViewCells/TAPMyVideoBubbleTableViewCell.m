@@ -2015,47 +2015,49 @@
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
-    if (isShow) {
-        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
-        self.messageReadCounterImageViewWidthConstraint.constant = 10.0f;
-        if (self.pinIconImageView.alpha == 1.0f) {
-          //  self.pinIconTrailingConstraint.constant = 7.0f;
+    [UIView animateWithDuration:0.2f animations:^{
+        if (isShow) {
+            self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+            self.messageReadCounterImageViewWidthConstraint.constant = 10.0f;
+            if (self.pinIconImageView.alpha == 1.0f) {
+                //  self.pinIconTrailingConstraint.constant = 7.0f;
+            }
+            else {
+                // self.pinIconTrailingConstraint.constant = 0.0f;
+            }
+            self.messageReadCounterLabel.alpha = 1.0f;
+            self.messageReadCounterImageView.alpha = 1.0f;
+            
+            self.messageReadCounterBoxLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+            self.messageReadCounterBoxImageViewWidthConstraint.constant = 10.0f;
+            self.messageReadCounterBoxLabel.alpha = 1.0f;
+            self.messageReadCounterBoxImageView.alpha = 1.0f;
+            
+            if (self.imageTimestampStatusContainerView.alpha >= 1.0f) {
+                self.messageReadCounterLabel.text = @"";
+                self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
+                // self.pinIconTrailingConstraint.constant = 0.0f;
+                self.messageReadCounterLabel.alpha = 0.0f;
+                self.messageReadCounterImageView.alpha = 0.0f;
+            }
         }
         else {
-           // self.pinIconTrailingConstraint.constant = 0.0f;
-        }
-        self.messageReadCounterLabel.alpha = 1.0f;
-        self.messageReadCounterImageView.alpha = 1.0f;
-        
-        self.messageReadCounterBoxLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
-        self.messageReadCounterBoxImageViewWidthConstraint.constant = 10.0f;
-        self.messageReadCounterBoxLabel.alpha = 1.0f;
-        self.messageReadCounterBoxImageView.alpha = 1.0f;
-        
-        if (self.imageTimestampStatusContainerView.alpha >= 1.0f) {
             self.messageReadCounterLabel.text = @"";
             self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
-           // self.pinIconTrailingConstraint.constant = 0.0f;
+            // self.pinIconTrailingConstraint.constant = 0.0f;
             self.messageReadCounterLabel.alpha = 0.0f;
             self.messageReadCounterImageView.alpha = 0.0f;
+            
+            self.messageReadCounterBoxLabel.text = @"";
+            self.messageReadCounterBoxImageViewWidthConstraint.constant = 0.0f;
+            // self.pinIconTrailingConstraint.constant = 0.0f;
+            self.messageReadCounterBoxLabel.alpha = 0.0f;
+            self.messageReadCounterBoxImageView.alpha = 0.0f;
         }
-    }
-    else {
-        self.messageReadCounterLabel.text = @"";
-        self.messageReadCounterImageViewWidthConstraint.constant = 0.0f;
-       // self.pinIconTrailingConstraint.constant = 0.0f;
-        self.messageReadCounterLabel.alpha = 0.0f;
-        self.messageReadCounterImageView.alpha = 0.0f;
-        
-        self.messageReadCounterBoxLabel.text = @"";
-        self.messageReadCounterBoxImageViewWidthConstraint.constant = 0.0f;
-       // self.pinIconTrailingConstraint.constant = 0.0f;
-        self.messageReadCounterBoxLabel.alpha = 0.0f;
-        self.messageReadCounterBoxImageView.alpha = 0.0f;
-    }
-    [self.messageReadCounterLabel sizeToFit];
-    [self.messageReadCounterBoxLabel sizeToFit];
-    [self refreshImageSize];
+        [self.messageReadCounterLabel sizeToFit];
+        [self.messageReadCounterBoxLabel sizeToFit];
+        [self refreshImageSize];
+    }];
 }
 
 - (void)refreshImageSize {

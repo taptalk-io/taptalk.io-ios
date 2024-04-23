@@ -1434,21 +1434,23 @@
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
-    if (isShow) {
-        self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
-        self.messageCounterImageWidthConstraint.constant = 10.0f;
-        self.messageReadCounterLabel.alpha = 1.0f;
-        self.messageReadCounterView.alpha = 1.0f;
-        self.messageReadCounterImageView.alpha = 1.0f;
-    }
-    else {
-        self.messageReadCounterLabel.text = @"";
-        self.messageCounterImageWidthConstraint.constant = 0.0f;
-        self.messageReadCounterLabel.alpha = 0.0f;
-        self.messageReadCounterView.alpha = 0.0f;
-        self.messageReadCounterImageView.alpha = 0.0f;
-    }
-    [self.contentView layoutIfNeeded];
+    [UIView animateWithDuration:0.2f animations:^{
+        if (isShow) {
+            self.messageReadCounterLabel.text = [NSString stringWithFormat:@"%ld •", readCount];
+            self.messageCounterImageWidthConstraint.constant = 10.0f;
+            self.messageReadCounterLabel.alpha = 1.0f;
+            self.messageReadCounterView.alpha = 1.0f;
+            self.messageReadCounterImageView.alpha = 1.0f;
+        }
+        else {
+            self.messageReadCounterLabel.text = @"";
+            self.messageCounterImageWidthConstraint.constant = 0.0f;
+            self.messageReadCounterLabel.alpha = 0.0f;
+            self.messageReadCounterView.alpha = 0.0f;
+            self.messageReadCounterImageView.alpha = 0.0f;
+        }
+        [self.contentView layoutIfNeeded];
+    }];
 }
 
 @end
