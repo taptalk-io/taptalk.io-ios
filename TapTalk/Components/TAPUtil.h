@@ -125,6 +125,7 @@
 #pragma mark - Validation
 + (BOOL)isAlphabetCharactersOnlyFromText:(NSString *)text;
 + (BOOL)isEmptyString:(NSString *)string;
++ (BOOL)isEmptyArray:(NSArray *)array;
 + (BOOL)validatePhoneNumber:(NSString *)candidate;
 + (BOOL)validateAllNumber:(NSString *)candidate;
 + (BOOL)validateEmail:(NSString *)candidate;

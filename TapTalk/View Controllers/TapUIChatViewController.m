@@ -367,6 +367,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) NSTimer *seekBarUpdateTimer;
 @property (strong, nonatomic) NSTimer *recorderCircleBlinkTimer;
 @property (strong, nonatomic) NSTimer *linkCheckerDelay;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteMicButtonWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceContraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceNoteSpaceConstraint2;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinImageLeadingConstraint;
@@ -1021,7 +1022,9 @@ CGPoint center;
         self.voiceNoteDragView.alpha = 0.0f;
         self.voiceNoteContainerView.alpha = 0.0f;
         self.voiceNoteSpaceContraint.constant = 13.0f;
-        self.voiceNoteSpaceConstraint2.constant = 25.0f;
+//        self.voiceNoteSpaceConstraint2.constant = 25.0f;
+        self.voiceNoteSpaceConstraint2.constant = 6.0f;
+        self.voiceNoteMicButtonWidthConstraint.constant = 0.0f;
     }
 
     
@@ -3353,7 +3356,7 @@ CGPoint center;
         self.voiceNoteAudioSlider.maximumValue = duration;
     }
     else if (self.isMessageAudioPlaying) {
-        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.currentVoiceNoteMessage];
         if (self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice) {
             if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
@@ -3384,7 +3387,7 @@ CGPoint center;
     }
     
     if (self.currentVoiceNoteMessage != nil) {
-        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.currentVoiceNoteMessage];
         
         NSDictionary *dataDictionary = self.currentVoiceNoteMessage.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
@@ -3676,7 +3679,7 @@ CGPoint center;
                 }
                 
                 //Update cell
-                NSInteger indexInArray = [self.messageArray indexOfObject:selectedMessage];
+                NSInteger indexInArray = [[self.messageArray copy] indexOfObject:selectedMessage];
                 NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
                 
                 @try {
@@ -3741,7 +3744,7 @@ CGPoint center;
                 }
                 
                 //Update cell
-                NSInteger indexInArray = [self.messageArray indexOfObject:selectedMessage];
+                NSInteger indexInArray = [[self.messageArray copy] indexOfObject:selectedMessage];
                 NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
                 
                 @try {
@@ -3831,7 +3834,7 @@ CGPoint center;
 #pragma mark TAPMyChatBubbleTableViewCell
 - (void)myChatCheckmarkDidTapped:(TAPMessageModel *)tappedMessage {
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -3848,26 +3851,14 @@ CGPoint center;
         
     }
 }
+
 - (void)myChatBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
         NSString *currentMessageString = tappedMessage.body;
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            [self.messageArray removeObjectAtIndex:messageIndex];
-            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
-            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                } completion:^(BOOL finished) {
-                    [[TAPChatManager sharedManager] sendTextMessage:currentMessageString];
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
-            }
+            [self removeMessageFromTable:tappedMessage completion:^(BOOL isFinished) {
+                [[TAPChatManager sharedManager] sendTextMessage:currentMessageString];
+            }];
         } failure:^(NSError *error) {
             
         }];
@@ -3877,7 +3868,7 @@ CGPoint center;
     }
     else if (!tappedMessage.isSending) {
         if(self.isSelectingForwardMessage){
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             
             TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -3897,7 +3888,7 @@ CGPoint center;
             //select message that had been selected
             self.selectedMessage = nil;
             
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
             
@@ -3925,7 +3916,7 @@ CGPoint center;
             if (self.selectedMessage == nil) {
                 //no messages had been selected
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -3951,7 +3942,7 @@ CGPoint center;
             }
             else {
                 //a message had been selected
-                NSInteger previousMessageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+                NSInteger previousMessageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
                 NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
                 
                 id previousCell;
@@ -3965,7 +3956,7 @@ CGPoint center;
                 }
                 
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -4000,7 +3991,7 @@ CGPoint center;
     }
     
     //set selected message to chat field
-    NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     //WK Note : Do reply here later.
     [self showInputAccessoryExtensionView:NO];
@@ -4119,7 +4110,7 @@ CGPoint center;
             //select message that had been selected
             self.selectedMessage = nil;
             
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
             
@@ -4146,7 +4137,7 @@ CGPoint center;
             if (self.selectedMessage == nil) {
                 //no messages had been selected
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -4171,7 +4162,7 @@ CGPoint center;
             }
             else {
                 //a message had been selected
-                NSInteger previousMessageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+                NSInteger previousMessageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
                 NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
                 
                 id previousCell;
@@ -4185,7 +4176,7 @@ CGPoint center;
                 }
                 
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -4218,7 +4209,7 @@ CGPoint center;
 #pragma mark TAPMyImageBubbleTableViewCell
 - (void)myImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -4243,8 +4234,8 @@ CGPoint center;
     
     //Remove message from array and dictionary in ChatViewController
     TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
-    NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
-    [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
+    [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
+    }];
     
     //Remove from WaitingUploadDictionary in ChatManager
     [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
@@ -4255,20 +4246,6 @@ CGPoint center;
     } failure:^(NSError *error) {
         
     }];
-    
-    //Update chat room UI
-    NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-    @try {
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-        } completion:^(BOOL finished) {
-        }];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"%@", exception.reason);
-        [self.tableView reloadData];
-    }
 }
 
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
@@ -4302,24 +4279,11 @@ CGPoint center;
         return;
     }
     
-    NSInteger messageIndex = [self.messageArray indexOfObject:message];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
     
     [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
-        [self.messageArray removeObjectAtIndex:messageIndex];
-        [self.messageDictionary removeObjectForKey:message.localID];
-        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-        
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
-        }
+        [self removeMessageFromTable:message completion:^(BOOL isFinished) {
+        }];
         
         NSDictionary *dataDictionary = message.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
@@ -4414,7 +4378,7 @@ CGPoint center;
         
         [mediaDetailViewController setActiveIndex:0];
         
-        NSInteger selectedRow = [self.messageArray indexOfObject:myImageBubbleCell.message];
+        NSInteger selectedRow = [[self.messageArray copy] indexOfObject:myImageBubbleCell.message];
         NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
         CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
@@ -4478,7 +4442,7 @@ CGPoint center;
 #pragma mark TAPMyVoiceBubbleTableViewCell
 - (void)myVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -4505,7 +4469,7 @@ CGPoint center;
         self.isPlayerSliding = YES;
     }
     else{
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
        //My Chat
         TAPMyVoiceNoteBubbleTableViewCell *cell = (TAPMyVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
         [cell setAudioSliderValue:0.0f];
@@ -4635,7 +4599,7 @@ CGPoint center;
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
         
         //File exist, retry upload file
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
             
@@ -4688,7 +4652,7 @@ CGPoint center;
     else if (tappedMessage.isFailedSend) {
         // File already uploaded, resend message
         TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:tappedMessage.user room:tappedMessage.room body:tappedMessage.body type:tappedMessage.type quote:tappedMessage.quote messageData:tappedMessage.data];
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
@@ -4727,7 +4691,7 @@ CGPoint center;
         
         //Remove message from array and dictionary in ChatViewController
         TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:tappedMessage.localID];
-        NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
+        NSInteger deletedIndex = [[self.messageArray copy] indexOfObject:currentDeletedMessage];
         [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
         
         //Remove from WaitingUploadDictionary in ChatManager
@@ -4772,7 +4736,7 @@ CGPoint center;
 #pragma mark TAPMyFileBubbleTableViewCell
 - (void)myFileCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -4844,24 +4808,11 @@ CGPoint center;
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
         
         //File exist, retry upload file
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            
-            [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
-            
-            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
-            }
+            [self removeMessageFromTable:tappedMessage completion:^(BOOL isFinished) {
+            }];
             
             NSString *fileName = [tappedMessage.data objectForKey:@"fileName"];
             fileName = [TAPUtil nullToEmptyString:fileName];
@@ -4869,8 +4820,8 @@ CGPoint center;
             NSString *mediaType = [tappedMessage.data objectForKey:@"mediaType"];
             mediaType = [TAPUtil nullToEmptyString:mediaType];
             
-            NSString *size = [tappedMessage.data objectForKey:@"size"];
-            size = [TAPUtil nullToEmptyString:size];
+            NSNumber *size = [tappedMessage.data objectForKey:@"size"];
+            size = [TAPUtil nullToEmptyNumber:size];
             
             TAPDataFileModel *dataFile = [TAPDataFileModel new];
             dataFile.fileName = fileName;
@@ -4898,22 +4849,10 @@ CGPoint center;
                                                                              type:tappedMessage.type
                                                                             quote:tappedMessage.quote
                                                                       messageData:tappedMessage.data];
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            [self.messageArray removeObjectAtIndex:messageIndex];
-            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
-            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
-            }
+            [self removeMessageFromTable:tappedMessage completion:^(BOOL isFinished) {
+            }];
             
             [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
         } failure:^(NSError *error) {
@@ -4937,8 +4876,8 @@ CGPoint center;
         
         //Remove message from array and dictionary in ChatViewController
         TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:tappedMessage.localID];
-        NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
-        [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
+        [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
+        }];
         
         //Remove from WaitingUploadDictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
@@ -4949,20 +4888,6 @@ CGPoint center;
         } failure:^(NSError *error) {
             
         }];
-        
-        //Update chat room UI
-        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
-        }
     }
     else {
         //File not exist, download file
@@ -4989,7 +4914,7 @@ CGPoint center;
 #pragma mark TAPMyLocationBubbleTableViewCell
 - (void)myLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5009,7 +4934,7 @@ CGPoint center;
 
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage {
     if (tappedMessage.isFailedSend) {
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         
         NSDictionary *dataDictionary = tappedMessage.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
@@ -5020,21 +4945,8 @@ CGPoint center;
         CGFloat currentLongitude = [[dataDictionary objectForKey:@"longitude"] floatValue];
         
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            [self.messageArray removeObjectAtIndex:messageIndex];
-            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
-            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
-            @try {
-                [self.tableView performBatchUpdates:^{
-                    //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                } completion:^(BOOL finished) {
-                }];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@", exception.reason);
-                [self.tableView reloadData];
-            }
-            
+            [self removeMessageFromTable:tappedMessage completion:^(BOOL isFinished) {
+            }];
             [[TAPChatManager sharedManager] sendLocationMessage:currentLatitude longitude:currentLongitude address:currentAddress];
         } failure:^(NSError *error) {
             
@@ -5104,7 +5016,7 @@ CGPoint center;
         return;
     }
     
-    NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     
     [self showInputAccessoryExtensionView:NO];
@@ -5148,7 +5060,7 @@ CGPoint center;
 #pragma mark TAPMyVideoBubbleTableViewCell
 - (void)myVideoCheckmarkDidTappedWithMessage:(TAPMessageModel *)message{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5231,8 +5143,8 @@ CGPoint center;
         
         //Remove message from array and dictionary in ChatViewController
         TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
-        NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
-        [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
+        [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
+        }];
         
         //Remove from WaitingUploadDictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
@@ -5243,20 +5155,6 @@ CGPoint center;
         } failure:^(NSError *error) {
             
         }];
-        
-        //Update chat room UI
-        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
-        }
     }
     else {
         //Video not exist, download file
@@ -5274,7 +5172,7 @@ CGPoint center;
     
     if ([key isEqualToString:@""]) {
         //Video exist, retry upload
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         
         NSString *caption = [tappedMessage.data objectForKey:@"caption"];
         caption = [TAPUtil nullToEmptyString:caption];
@@ -5337,7 +5235,7 @@ CGPoint center;
                                                                              type:tappedMessage.type
                                                                             quote:tappedMessage.quote
                                                                       messageData:tappedMessage.data];
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
             [self.messageArray removeObjectAtIndex:messageIndex];
             [self.messageDictionary removeObjectForKey:tappedMessage.localID];
@@ -5403,7 +5301,7 @@ CGPoint center;
 #pragma mark TAPYourChatBubbleTableViewCell
 - (void)yourChatCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5426,7 +5324,7 @@ CGPoint center;
             [self loadTotalReadMessage:tappedMessage];
         }
         if(self.isSelectingForwardMessage){
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             
             TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5446,7 +5344,7 @@ CGPoint center;
             //select message that had been selected
             self.selectedMessage = nil;
             
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
             
@@ -5467,7 +5365,7 @@ CGPoint center;
             if (self.selectedMessage == nil) {
                 //no messages had been selected
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5486,7 +5384,7 @@ CGPoint center;
             }
             else {
                 //a message had been selected
-                NSInteger previousMessageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+                NSInteger previousMessageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
                 NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
                 
                 id previousCell;
@@ -5511,7 +5409,7 @@ CGPoint center;
                 }
                 
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5549,7 +5447,7 @@ CGPoint center;
     [self checkAndShowInputAccessoryView];
     
     //set selected message to chat field
-    NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     //WK Note : Do reply here later.
     [self showInputAccessoryExtensionView:NO];
@@ -5648,7 +5546,7 @@ CGPoint center;
             //select message that had been selected
             self.selectedMessage = nil;
             
-            NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+            NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
             NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
             TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
             
@@ -5669,7 +5567,7 @@ CGPoint center;
             if (self.selectedMessage == nil) {
                 //no messages had been selected
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5688,7 +5586,7 @@ CGPoint center;
             }
             else {
                 //a message had been selected
-                NSInteger previousMessageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+                NSInteger previousMessageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
                 NSIndexPath *selectedPreviousMessageIndexPath = [NSIndexPath indexPathForRow:previousMessageIndex inSection:0];
                 
                 id previousCell;
@@ -5702,7 +5600,7 @@ CGPoint center;
                 }
                 
                 self.selectedMessage = tappedMessage;
-                NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+                NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
                 NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
                 
                 TAPYourChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5738,7 +5636,7 @@ CGPoint center;
 #pragma mark TAPYourImageBubbleTableViewCell
 - (void)yourImageCheckmarkDidTappedWithMessage:(TAPMessageModel *)message{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5818,7 +5716,7 @@ CGPoint center;
         
         [mediaDetailViewController setActiveIndex:0];
         
-        NSInteger selectedRow = [self.messageArray indexOfObject:yourImageBubbleCell.message];
+        NSInteger selectedRow = [[self.messageArray copy] indexOfObject:yourImageBubbleCell.message];
         NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
         CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
@@ -5894,7 +5792,7 @@ CGPoint center;
 #pragma mark TAPYourVoiceBubbleTableViewCell
 - (void)yourVoiceNoteCheckmarkDidTapped:(TAPMessageModel *)message{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -5918,7 +5816,7 @@ CGPoint center;
         self.isPlayerSliding = YES;
     }
     else{
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
        //My Chat
         TAPYourVoiceNoteBubbleTableViewCell *cell = (TAPYourVoiceNoteBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:messageIndex inSection:0]];
         [cell setAudioSliderValue:0.0f];
@@ -6076,7 +5974,7 @@ CGPoint center;
 #pragma mark TAPYourFileBubbleTableViewCell
 - (void)yourFileCheckmarkDidTapped:(TAPMessageModel *)tappedMessage{
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -6184,7 +6082,7 @@ CGPoint center;
 #pragma mark TAPYourLocationBubbleTableViewCell
 - (void)yourLocationCheckmarkDidTapped:(TAPMessageModel *)tappedMessage {
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -6266,7 +6164,7 @@ CGPoint center;
         return;
     }
     
-    NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:tappedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     
     [self showInputAccessoryExtensionView:NO];
@@ -6314,7 +6212,7 @@ CGPoint center;
 #pragma mark TAPYourVideoBubbleTableViewCell
 - (void)yourVideoCheckmarkDidTappedWithMessage:(TAPMessageModel *)message {
     if(self.isSelectingForwardMessage){
-        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
         NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
         
         TAPMyChatBubbleTableViewCell *cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
@@ -6401,7 +6299,7 @@ CGPoint center;
         
         //Remove message from array and dictionary in ChatViewController
         TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
-        NSInteger deletedIndex = [self.messageArray indexOfObject:currentDeletedMessage];
+        NSInteger deletedIndex = [[self.messageArray copy] indexOfObject:currentDeletedMessage];
         [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
         
         //Remove from WaitingUploadDictionary in ChatManager
@@ -7044,7 +6942,7 @@ CGPoint center;
     else {
         _titleView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 56.0f - 56.0f, 43.0f)];
         
-        if ([TAPUtil isSaveMessageRoom:room.roomID]) {
+        if (room.type == RoomTypeTransaction || [TAPUtil isSaveMessageRoom:room.roomID]) {
             // saved room
             _nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 10.5f, CGRectGetWidth(self.titleView.frame), 22.0f)];
         }
@@ -7653,7 +7551,7 @@ CGPoint center;
         self.recordingTimeLabel.text = [self secondToMinuteString:currentTime];
     }
     else if (self.isMessageAudioPlaying) {
-        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.currentVoiceNoteMessage];
         if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
             NSTimeInterval currentTime = [[TAPAudioManager sharedManager] getPlayerCurrentTime];
             if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
@@ -9796,7 +9694,7 @@ CGPoint center;
         NSString *key = [dataDictionary objectForKey:@"fileID"];
         key = [TAPUtil nullToEmptyString:key];
         
-        NSInteger *currentRowIndex = [self.messageArray indexOfObject:message];
+        NSInteger *currentRowIndex = [[self.messageArray copy] indexOfObject:message];
         TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
         
         if(cell.bubbleImageView.image != nil){
@@ -10315,8 +10213,38 @@ CGPoint center;
     [player play];
 }
 
+- (void)removeMessageFromTable:(TAPMessageModel *)message completion:(void (^)(BOOL isFinished))completion {
+    if (message == nil) {
+        completion(NO);
+        return;
+    }
+    [self.messageDictionary removeObjectForKey:message.localID];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
+    if (messageIndex >= 0 && messageIndex < [self.messageArray count]) {
+        [self.messageArray removeObjectAtIndex:messageIndex];
+        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        if ([self.tableView numberOfRowsInSection:0] > messageIndex) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+                } completion:^(BOOL finished) {
+                    completion(YES);
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+                completion(YES);
+            }
+            return;
+        }
+        return;
+    }
+    completion(NO);
+}
+
 - (void)reloadTableViewCellWithMessage:(TAPMessageModel *)message {
-    NSInteger indexInArray = [self.messageArray indexOfObject:message];
+    NSInteger indexInArray = [[self.messageArray copy] indexOfObject:message];
     if (indexInArray < 0 || indexInArray >= [self.messageArray count]) {
         return;
     }
@@ -10923,7 +10851,7 @@ CGPoint center;
                    if (currentMessage.isSending) {
                        //Message was sending
                        isSendingAnimation = YES;
-                       NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
+                       NSInteger indexInArray = [[self.messageArray copy] indexOfObject:currentMessage];
                    }
                    
                    if(!currentMessage.isDelivered && message.isDelivered && !currentMessage.isRead && !message.isRead) {
@@ -10956,7 +10884,7 @@ CGPoint center;
                [self checkUpdatedUserProfileWithMessage:message];
                
                //Update view
-               NSInteger indexInArray = [self.messageArray indexOfObject:currentMessage];
+               NSInteger indexInArray = [[self.messageArray copy] indexOfObject:currentMessage];
                NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
                
                BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:message.room.roomID];
@@ -11567,7 +11495,7 @@ CGPoint center;
                         TAPMessageModel *smallestCreatedUnreadMessage = [messageArray objectAtIndex:earliestUnreadMessageIndex];
                         NSString *obtainedLocalID = smallestCreatedUnreadMessage.localID;
                         TAPMessageModel *obtainedMessage = [self.messageDictionary objectForKey:obtainedLocalID];
-                        NSInteger unreadMessageIndex = [self.messageArray indexOfObject:obtainedMessage];
+                        NSInteger unreadMessageIndex = [[self.messageArray copy] indexOfObject:obtainedMessage];
                         
                         if(NSNotFound != unreadMessageIndex) {
                             //Only run when index in found in message array
@@ -11584,7 +11512,7 @@ CGPoint center;
                     //From Database
                     NSString *unreadMessageLocalID = self.unreadLocalID;
                     TAPMessageModel *obtainedMessage = [self.messageDictionary objectForKey:unreadMessageLocalID];
-                    NSInteger messageIndex = [self.messageArray indexOfObject:obtainedMessage];
+                    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:obtainedMessage];
                     
                     if(NSNotFound != messageIndex) {
                         //Only run when index in found in message array
@@ -12187,8 +12115,11 @@ CGPoint center;
         //adding validation to check if keyHeight is minus
         //    [self.keyboardViewController setKeyboardHeight:self.initialKeyboardHeight - kInputMessageAccessoryViewHeight];
         CGFloat keyHeight = self.initialKeyboardHeight - kInputMessageAccessoryViewHeight;
-        if (keyHeight < 0.0f) {
-            keyHeight = 0.0f;
+        if (keyHeight < 216.0f) {
+            keyHeight = 216.0f;
+        }
+        else if (keyHeight > 400.0f) {
+            keyHeight = 400.0f;
         }
         [self.keyboardViewController setKeyboardHeight:keyHeight];
         //END DV Note
@@ -12753,7 +12684,7 @@ CGPoint center;
 //    }
 //
 //    TAPMessageModel *obtainedMentionMessage = [self.scrolledPendingMentionArray firstObject];
-//    NSInteger rowIndex = [self.messageArray indexOfObject:obtainedMentionMessage];
+//    NSInteger rowIndex = [[self.messageArray copy] indexOfObject:obtainedMentionMessage];
 //
 //    if (rowIndex != NSNotFound) {
 //        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowIndex inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
@@ -13020,7 +12951,7 @@ CGPoint center;
 
 // TODO: HANDLE LEFT MESSAGE BUBBLE
 - (void)showTotalReadWithMessage:(NSInteger)totalRead message:(TAPMessageModel *)message {
-    NSInteger currentRowIndex = [self.messageArray indexOfObject:message];
+    NSInteger currentRowIndex = [[self.messageArray copy] indexOfObject:message];
     if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
         if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
             TAPMyChatBubbleTableViewCell *cell = (TAPMyChatBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
@@ -13372,7 +13303,7 @@ CGPoint center;
     }
     
     //Remove highlighted message.
-    NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.selectedMessage];
     NSIndexPath *selectedMessageIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
     id cell = [self.tableView cellForRowAtIndexPath:selectedMessageIndexPath];
     
@@ -14501,7 +14432,7 @@ CGPoint center;
         }];
     }
     
-    NSInteger *currentRowIndex = [self.messageArray indexOfObject:message];
+    NSInteger *currentRowIndex = [[self.messageArray copy] indexOfObject:message];
     
     BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
     BOOL isForwardedSavedMessage = NO;
@@ -14592,7 +14523,7 @@ CGPoint center;
         }];
     }
     
-    NSInteger *currentRowIndex = [self.messageArray indexOfObject:message];
+    NSInteger *currentRowIndex = [[self.messageArray copy] indexOfObject:message];
     
     BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
     BOOL isForwardedSavedMessage = NO;
@@ -14749,7 +14680,7 @@ CGPoint center;
         //Show unread message view
         NSString *obtainedLocalID = self.unreadLocalID;
         TAPMessageModel *obtainedMessage = [self.messageDictionary objectForKey:obtainedLocalID];
-        NSInteger unreadMessageIndex = [self.messageArray indexOfObject:obtainedMessage];
+        NSInteger unreadMessageIndex = [[self.messageArray copy] indexOfObject:obtainedMessage];
         if(NSNotFound != unreadMessageIndex) {
             NSInteger rowIndex = unreadMessageIndex + 1; // +1 because unread identifier cell is above earliest unread message
             BOOL isVisible = [self checkIsRowVisibleWithRowIndex:rowIndex];
@@ -15064,7 +14995,7 @@ CGPoint center;
 //            }
 //
 //            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//            NSInteger currentRowIndex = [[self.messageArray copy] indexOfObject:currentMessage];
 //
 //            TAPChatMessageType type = currentMessage.type;
 //            if (type == TAPChatMessageTypeImage) {
@@ -15098,7 +15029,7 @@ CGPoint center;
 //            }
 //
 //            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-//            NSInteger currentRowIndex = [self.messageArray indexOfObject:currentMessage];
+//            NSInteger currentRowIndex = [[self.messageArray copy] indexOfObject:currentMessage];
 //
 //            TAPChatMessageType type = currentMessage.type;
 //            if (type == TAPChatMessageTypeImage) {
@@ -15148,7 +15079,7 @@ CGPoint center;
     }
     
     [UIView animateWithDuration:0.2f animations:^{
-        if ([self.currentRoom.participants count] == 0) {
+        if ([self.currentRoom.participants count] == 0 || self.currentRoom.type == RoomTypeTransaction) {
             self.userStatusLabel.text = @"";
             self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), 10.5f, CGRectGetWidth(self.nameLabel.frame), CGRectGetHeight(self.nameLabel.frame));
         }
@@ -15434,7 +15365,7 @@ CGPoint center;
 
 - (void)voiceMessagePlayingState:(BOOL)isPlaying{
     if(self.currentVoiceNoteMessage != nil){
-        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.currentVoiceNoteMessage];
         if(self.currentVoiceNoteMessage.type == TAPChatMessageTypeVoice){
             if ([self.currentVoiceNoteMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
@@ -15454,7 +15385,7 @@ CGPoint center;
 
 - (void)resetMessageAudioSlider{
     if(self.currentVoiceNoteMessage != nil){
-        NSInteger messageIndex = [self.messageArray indexOfObject:self.currentVoiceNoteMessage];
+        NSInteger messageIndex = [[self.messageArray copy] indexOfObject:self.currentVoiceNoteMessage];
         NSDictionary *dataDictionary = self.currentVoiceNoteMessage.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
         NSNumber *vnDuration = [dataDictionary objectForKey:@"duration"];
@@ -15770,7 +15701,7 @@ CGPoint center;
         [[TAPFileDownloadManager sharedManager] removeDownloadedFilePathWithKey:url roomID:roomID];
     }
     
-    NSInteger indexInArray = [self.messageArray indexOfObject:message];
+    NSInteger indexInArray = [[self.messageArray copy] indexOfObject:message];
     NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
     
     @try {

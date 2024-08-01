@@ -54,8 +54,8 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     //6. Add random number to the first index of the encrypted message with salt
     //END DV note
     
-    if(originalString == nil || localID == nil || [originalString isEqualToString:@""] || [localID isEqualToString:@""]) {
-        return nil;
+    if (originalString == nil || localID == nil || [originalString isEqualToString:@""] || [localID isEqualToString:@""]) {
+        return @"";
     }
     
     NSString *substringLocalID = [localID substringWithRange:NSMakeRange(8, 16)];
@@ -84,7 +84,7 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     NSInteger encryptedStringLength = [encryptedString length];
     
     if (encryptedStringLength <= 0) {
-        return nil;
+        return @"";
     }
     
     NSInteger saltCharIndexPosition = (((encryptedStringLength + randomNumber) * randomNumber) % encryptedStringLength);
@@ -98,8 +98,8 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
 
 + (NSString *)decryptString:(NSString *)encryptedString localID:(NSString *)localID {
     
-    if(encryptedString == nil || localID == nil || [encryptedString isEqualToString:@""] || [localID isEqualToString:@""]) {
-        return nil;
+    if (encryptedString == nil || localID == nil || [encryptedString isEqualToString:@""] || [localID isEqualToString:@""]) {
+        return @"";
     }
     
     @try {
@@ -120,7 +120,7 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
         NSInteger encryptedStringLength = [encryptedStringWithSalt length] - 2; //-2 for removing random number and salt character
         
         if (encryptedStringLength <= 0) {
-            return nil;
+            return @"";
         }
         
         NSString *randomNumberString = [encryptedStringWithSalt substringWithRange:NSMakeRange(0, 1)];
@@ -133,21 +133,21 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
             encryptedStringModified = [encryptedStringModified stringByReplacingCharactersInRange:NSMakeRange(saltCharIndexPosition, 1) withString:@""];
         }
         else {
-            return nil;
+            return @"";
         }
         
         NSString *decryptedString = [AESCrypt decrypt:encryptedStringModified password:password];
         
         return decryptedString;
-    } @catch (NSException *exception) {
-        return nil;
+    }
+    @catch (NSException *exception) {
+        return @"";
     }
 }
 
 + (NSDictionary *)encryptToDictionaryFromMessageModel:(TAPMessageModel *)message {
-    
-    if(message == nil) {
-        return nil;
+    if (message == nil) {
+        return [NSDictionary dictionary];
     }
     
     TAPMessageModel *encryptedMessage = [message copy];
@@ -156,10 +156,9 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     encryptedMessage.body = [self encryptString:encryptedMessage.body localID:encryptedMessage.localID];
     encryptedMessage.quote.content = [self encryptString:encryptedMessage.quote.content localID:encryptedMessage.localID];
     
-    NSMutableDictionary *parametersDictionary = [NSMutableDictionary dictionary];
-    parametersDictionary = [[encryptedMessage toDictionary] mutableCopy];
+    NSMutableDictionary *parametersDictionary = [[TAPUtil nullToEmptyDictionary:[encryptedMessage toDictionary]] mutableCopy];
     
-    NSDictionary *dataDictionary = [parametersDictionary objectForKey:@"data"];
+    NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"data"]];
     NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
     NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
     encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
@@ -178,9 +177,8 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
 }
 
 + (NSDictionary *)encryptToDictionaryFromMessageModelForAPI:(TAPMessageModel *)message {
-    
-    if(message == nil) {
-        return nil;
+    if (message == nil) {
+        return [NSDictionary dictionary];
     }
     
     TAPMessageModel *encryptedMessage = [message copy];
@@ -189,10 +187,9 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     encryptedMessage.body = [self encryptString:encryptedMessage.body localID:encryptedMessage.localID];
     encryptedMessage.quote.content = [self encryptString:encryptedMessage.quote.content localID:encryptedMessage.localID];
     
-    NSMutableDictionary *parametersDictionary = [NSMutableDictionary dictionary];
-    parametersDictionary = [[encryptedMessage toDictionary] mutableCopy];
+    NSMutableDictionary *parametersDictionary = [[TAPUtil nullToEmptyDictionary:[encryptedMessage toDictionary]] mutableCopy];
     
-    NSDictionary *dataDictionary = [parametersDictionary objectForKey:@"data"];
+    NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"data"]];
     NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
     NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
     encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
@@ -225,11 +222,11 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
 }
 
 + (TAPMessageModel *)decryptToMessageModelFromDictionary:(NSDictionary *)dictionary {
-    if(dictionary == nil || [dictionary objectForKey:@"localID"] == nil) {
-        return nil;
+    if (dictionary == nil || [dictionary objectForKey:@"localID"] == nil) {
+        return [TAPMessageModel new];
     }
     
-    NSString *encryptedString = [dictionary objectForKey:@"data"];
+    NSString *encryptedString = [TAPUtil nullToEmptyString:[dictionary objectForKey:@"data"]];
     NSString *decryptedString = [self decryptString:encryptedString localID:[dictionary objectForKey:@"localID"]];
     NSDictionary *decryptedDataDictionary = [TAPUtil jsonObjectFromString:decryptedString];
     decryptedDataDictionary = [TAPUtil nullToEmptyDictionary:decryptedDataDictionary];

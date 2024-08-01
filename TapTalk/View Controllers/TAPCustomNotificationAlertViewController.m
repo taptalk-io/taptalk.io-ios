@@ -59,6 +59,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    self.view.backgroundColor = [UIColor clearColor];
+    
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *navigationBarAppearance = [[UINavigationBarAppearance alloc] init];
+        navigationBarAppearance.backgroundColor = [UIColor clearColor];
+        [navigationBarAppearance configureWithOpaqueBackground];
+        [UINavigationBar appearance].standardAppearance = navigationBarAppearance;
+        [UINavigationBar appearance].compactAppearance = navigationBarAppearance;
+        [UINavigationBar appearance].scrollEdgeAppearance = navigationBarAppearance;
+    }
+    
     [self.customNotificationAlertView.notificationButton addTarget:self action:@selector(notificationButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.customNotificationAlertView.secondaryNotificationButton addTarget:self action:@selector(secondaryNotificationButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
 
