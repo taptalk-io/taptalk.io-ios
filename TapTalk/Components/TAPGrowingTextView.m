@@ -148,6 +148,9 @@
         [currentView addConstraint:bottom];
     }
     
+    if (@available(iOS 17, *)) {
+        self.textView.textContainer.lineFragmentPadding = 0;
+    }
     self.textView.textContainerInset = UIEdgeInsetsMake(8.0f, -5.0f, 0.0f, 0.0f);
     
     if (self.minimumHeight == 0.0f) {

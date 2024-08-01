@@ -939,6 +939,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return NO;
 }
 
++ (BOOL)isEmptyArray:(NSArray *)array {
+    return array == nil || [array count] <= 0;
+}
+
 + (BOOL)isSaveMessageRoom:(NSString *)roomID {
     TAPUserModel *user = [TAPDataManager getActiveUser];
     NSString *userID = user.userID;
@@ -1440,7 +1444,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
     
     AVAsset *videoAsset = [AVAsset assetWithURL:[NSURL URLWithString:url]];
-    CGSize sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+    CGSize sizeDimension = CGSizeZero;
+    if (![TAPUtil isEmptyArray:[videoAsset tracksWithMediaType:AVMediaTypeVideo]]) {
+        sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+    }
     
     NSURL *URL = [NSURL URLWithString:url];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];

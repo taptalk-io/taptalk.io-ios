@@ -185,6 +185,7 @@
                 <outlet property="voiceNoteAudioSlider" destination="AuN-zg-eJa" id="4mL-lz-Qhi"/>
                 <outlet property="voiceNoteContainerView" destination="1kN-fs-Mb6" id="TZO-79-2sq"/>
                 <outlet property="voiceNoteDragView" destination="TdP-7Q-3me" id="8Z0-rT-6v6"/>
+                <outlet property="voiceNoteMicButtonWidthConstraint" destination="qI6-Oq-nYB" id="S7n-tK-Uu5"/>
                 <outlet property="voiceNoteSpaceConstraint2" destination="pj5-fb-FKG" id="QKK-mO-wbW"/>
             </connections>
         </placeholder>

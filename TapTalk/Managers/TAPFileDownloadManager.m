@@ -843,6 +843,8 @@
     if (downloadTask != nil) {
         [downloadTask cancel]; // FIXME: CANCEL DOWNLOAD TASK NOT WORKING
         [self.urlDownloadTaskDictionary removeObjectForKey:message.localID];
+        NSError *error = [NSError errorWithDomain:@"Download was cancelled" code:90308 userInfo:nil];
+        [self handleFileDownloadError:error message:message];
     }
 }
 
