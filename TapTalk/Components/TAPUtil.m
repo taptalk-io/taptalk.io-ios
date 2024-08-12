@@ -1303,15 +1303,43 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     [self performSelector:@selector(performBlock:) withObject:block_ afterDelay:delay];
 }
 
-+ (UIViewController *_Nullable) topViewController {
-    UIViewController *topViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    if (topViewController == nil) {
-        return nil;
++ (UIViewController * _Nullable)topViewControllerWithRootViewController:(UIViewController *)rootViewController {
+    if (rootViewController == nil) {
+        rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+        if (rootViewController == nil) {
+            return nil;
+        }
     }
-    while (topViewController.presentedViewController) {
-        topViewController = topViewController.presentedViewController;
+    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tabBarController = (UITabBarController *) rootViewController;
+        if (tabBarController.selectedViewController != nil) {
+            return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+        }
+        else {
+            return rootViewController;
+        }
     }
-    return topViewController;
+    else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *) rootViewController;
+        if (navigationController.visibleViewController != nil) {
+            return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else if (rootViewController.presentedViewController) {
+        UIViewController *presentedViewController = rootViewController.presentedViewController;
+        if (rootViewController.presentedViewController != nil) {
+            return [self topViewControllerWithRootViewController:presentedViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else {
+        return rootViewController;
+    }
 }
 
 + (void)getContentDataFromURL:(NSURL *)url success:(void (^)(NSString *title, NSString *body, NSURL*imageUrl))success failure:(void (^)(NSError *error))failure {

@@ -8568,7 +8568,7 @@ CGPoint center;
         [alertController addAction:galleryAction];
     }
     
-    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState] &&
+    if (//[[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState] &&
         [[TapUI sharedInstance] isLocationAttachmentEnabled]
     ) {
         //Only show when Google Places API Key is insert

@@ -153,7 +153,8 @@
 + (CGFloat)safeAreaTopPadding;
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
-+ (UIViewController *_Nullable) topViewController;
++ (UIViewController * _Nullable)topViewController;
++ (UIViewController * _Nullable)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 + (NSDictionary *) objectToDictionary:(id)object;
 + (NSArray *)getUrlsFromString:(NSString *)text;
 + (void)getImageFromRemoteUrl:(NSString *)urlString  success:(void (^)(UIImage *image))success failure:(void (^)(NSError *error))failure;

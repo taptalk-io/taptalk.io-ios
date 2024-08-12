@@ -204,6 +204,8 @@
                 
                 UIColor *buttonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
                 self.buttonTitleLabel.textColor = buttonColor;
+                self.buttonIconImageView.image = [self.buttonIconImageView.image setImageTintColor:buttonColor];
+                self.buttonIconImageView.alpha = 1.0f;
             }];
         }
         else {
@@ -222,6 +224,8 @@
                 
                 UIColor *buttonInactiveLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonInactiveLabel];
                 self.buttonTitleLabel.textColor = buttonInactiveLabelColor;
+                self.buttonIconImageView.image = [self.buttonIconImageView.image setImageTintColor:[buttonInactiveLabelColor colorWithAlphaComponent:1.0f]];
+                self.buttonIconImageView.alpha = 0.4f;
             }];
         }
     }
