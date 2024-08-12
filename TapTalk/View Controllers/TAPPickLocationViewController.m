@@ -10,6 +10,7 @@
 #import "TAPPickLocationView.h"
 #import "TAPPinLocationSearchResultTableViewCell.h"
 #import <MapKit/MapKit.h>
+#import <Contacts/CNPostalAddressFormatter.h>
 
 @import GooglePlaces;
 @import GoogleMaps;
@@ -273,19 +274,27 @@
     CLLocationCoordinate2D center = [mapView centerCoordinate];
     [self.pickLocationView setAsLoading:YES];
     
-    [[GMSGeocoder geocoder] reverseGeocodeCoordinate:center completionHandler:
-     ^(GMSReverseGeocodeResponse *response, NSError *error){
-         if ([[response.firstResult valueForKey:@"lines"] objectAtIndex:0]) {
-             NSString *currentLocation = [NSString stringWithFormat:@"%@", [[response.firstResult valueForKey:@"lines"] objectAtIndex:0]];
-             NSString *currentPostalCode = [NSString stringWithFormat:@"%@", [response.firstResult valueForKey:@"postalCode"]];
-             
-             if(![currentLocation isEqualToString:@""]) {
-                 _selectedLocationCoordinate = center;
-                 _selectedLocationAddress = currentLocation;
-                 _selectedPostalCode = currentPostalCode;
-                 [self.pickLocationView setAsLoading:NO];
-                 [self.pickLocationView setAddress:currentLocation];
-                 [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
+    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState]) {
+        [[GMSGeocoder geocoder] reverseGeocodeCoordinate:center completionHandler:
+         ^(GMSReverseGeocodeResponse *response, NSError *error){
+             if ([[response.firstResult valueForKey:@"lines"] objectAtIndex:0]) {
+                 NSString *currentLocation = [NSString stringWithFormat:@"%@", [[response.firstResult valueForKey:@"lines"] objectAtIndex:0]];
+                 NSString *currentPostalCode = [NSString stringWithFormat:@"%@", [response.firstResult valueForKey:@"postalCode"]];
+                 
+                 if(![currentLocation isEqualToString:@""]) {
+                     _selectedLocationCoordinate = center;
+                     _selectedLocationAddress = currentLocation;
+                     _selectedPostalCode = currentPostalCode;
+                     [self.pickLocationView setAsLoading:NO];
+                     [self.pickLocationView setAddress:currentLocation];
+                     [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
+                 }
+                 else {
+                     //Location not found
+                     [self.pickLocationView setAsLoading:YES];
+                     [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
+                     [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+                 }
              }
              else {
                  //Location not found
@@ -293,14 +302,37 @@
                  [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
                  [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
              }
-         }
-         else {
-             //Location not found
-             [self.pickLocationView setAsLoading:YES];
-             [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
-             [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
-         }
-     }];
+         }];
+    }
+    else {
+        CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+        CLLocation *location = [[CLLocation alloc] initWithLatitude:center.latitude longitude:center.longitude];
+        [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+            if (![TAPUtil isEmptyArray:placemarks]) {
+                CNPostalAddressFormatter *formatter = [[CNPostalAddressFormatter alloc] init];
+                _selectedLocationAddress = [[formatter stringFromPostalAddress:placemarks[0].postalAddress] stringByReplacingOccurrencesOfString:@"\n" withString:@", "];
+                if (![TAPUtil isEmptyString:self.selectedLocationAddress]) {
+                    _selectedLocationCoordinate = center;
+                    _selectedPostalCode = placemarks[0].postalCode;
+                    [self.pickLocationView setAsLoading:NO];
+                    [self.pickLocationView setAddress:self.selectedLocationAddress];
+                    [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
+                }
+                else {
+                    //Location not found
+                    [self.pickLocationView setAsLoading:YES];
+                    [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
+                    [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+                }
+            }
+            else {
+                //Location not found
+                [self.pickLocationView setAsLoading:YES];
+                [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
+                [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+            }
+        }];
+    }
 }
 
 #pragma mark - TAPCustomButtonView

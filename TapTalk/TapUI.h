@@ -396,12 +396,12 @@ Use to set custom right bar button view for chat room navigation bar.
 /**
  Obtain current active navigation controller
  */
-- (UINavigationController *)getCurrentTapTalkActiveNavigationController;
+- (UINavigationController * _Nullable)getCurrentTapTalkActiveNavigationController;
 
 /**
  Obtain current active view controller
  */
-- (UIViewController *)getCurrentTapTalkActiveViewController;
+- (UIViewController * _Nullable)getCurrentTapTalkActiveViewController;
 
 //==========================================================
 //                    Custom Bubble Chat

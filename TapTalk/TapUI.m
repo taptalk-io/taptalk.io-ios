@@ -129,28 +129,42 @@
     return !self.isDisableActivateInAppNotification;
 }
 
-- (UINavigationController *)getCurrentTapTalkActiveNavigationController {
-    return [self getCurrentTapTalkActiveViewController].navigationController;
-}
-
-- (UIViewController *)getCurrentTapTalkActiveViewController {
-    return [self topViewControllerWithRootViewController:self.activeWindow.rootViewController];
-}
-
-- (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController {
-    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
-        UITabBarController* tabBarController = (UITabBarController*)rootViewController;
-        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
-    } else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
-        UINavigationController* navigationController = (UINavigationController*)rootViewController;
-        return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
-    } else if (rootViewController.presentedViewController) {
-        UIViewController* presentedViewController = rootViewController.presentedViewController;
-        return [self topViewControllerWithRootViewController:presentedViewController];
-    } else {
-        return rootViewController;
+- (UINavigationController * _Nullable)getCurrentTapTalkActiveNavigationController {
+    UIViewController *currentActiveViewController = [self getCurrentTapTalkActiveViewController];
+    if (currentActiveViewController != nil) {
+        return currentActiveViewController.navigationController;
     }
+    return nil;
 }
+
+- (UIViewController * _Nullable)getCurrentTapTalkActiveViewController {
+    UIViewController *rootViewController;
+    if (self.activeWindow != nil && self.activeWindow.rootViewController != nil) {
+        rootViewController = self.activeWindow.rootViewController;
+    }
+    else {
+        rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    }
+    if (rootViewController == nil) {
+        return nil;
+    }
+    return [TAPUtil topViewControllerWithRootViewController:rootViewController];
+}
+
+//- (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)rootViewController {
+//    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
+//        UITabBarController* tabBarController = (UITabBarController*)rootViewController;
+//        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+//    } else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+//        UINavigationController* navigationController = (UINavigationController*)rootViewController;
+//        return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
+//    } else if (rootViewController.presentedViewController) {
+//        UIViewController* presentedViewController = rootViewController.presentedViewController;
+//        return [self topViewControllerWithRootViewController:presentedViewController];
+//    } else {
+//        return rootViewController;
+//    }
+//}
 
 //Custom Bubble
 - (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate bundle:(NSBundle *)bundle {

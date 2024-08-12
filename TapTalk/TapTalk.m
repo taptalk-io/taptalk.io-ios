@@ -484,8 +484,7 @@
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
     //Google API Key
     [GMSPlacesClient provideAPIKey:apiKey];
-    [GMSServices provideAPIKey:apiKey];
-    _isGooglePlacesAPIInitialize = YES;
+    _isGooglePlacesAPIInitialize = [GMSServices provideAPIKey:apiKey];
 }
 
 - (BOOL)obtainGooglePlacesAPIInitializeState {

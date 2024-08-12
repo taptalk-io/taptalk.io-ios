@@ -36,14 +36,14 @@
         self.addressView.layer.shadowOpacity = 0.18f;
         [self addSubview:self.addressView];
         
-        _addressIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10.0f, 10.0f, 32.0f, 32.0f)];
+        _addressIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, 16.0f, 16.0f)];
         self.addressIconImageView.image = [UIImage imageNamed:@"TAPIconLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.addressIconImageView.image = [self.addressIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerAddressInactive]];
         [self.addressView addSubview:self.addressIconImageView];
         
         UIFont *placeholderLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLocationPickerAddressPlaceholder];
         UIColor *placeholderLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLocationPickerAddressPlaceholder];
-        _addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f, 20.0f, CGRectGetWidth(self.addressView.frame) - (CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f) - 16.0f, 64.0f)];
+        _addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f, 16.0f, CGRectGetWidth(self.addressView.frame) - (CGRectGetMaxX(self.addressIconImageView.frame) + 8.0f) - 16.0f, 64.0f)];
         self.addressLabel.font = placeholderLabelFont;
         self.addressLabel.textColor = placeholderLabelColor;
         self.addressLabel.numberOfLines = 0;
@@ -84,6 +84,10 @@
         self.searchBarView.placeholder = NSLocalizedStringFromTableInBundle(@"Search Address", nil, [TAPUtil currentBundle], @"");
         self.searchBarView.leftViewImage = [UIImage imageNamed:@"TAPIconSearch" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.searchBarView.leftViewImage = [self.searchBarView.leftViewImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconSearchBarMagnifier]];
+        
+        if (![[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState]) {
+            self.searchBarView.alpha = 0.0f;
+        }
 
         [self.searchBarView setReturnKeyType:UIReturnKeySearch];
         [self addSubview:self.searchBarView];
