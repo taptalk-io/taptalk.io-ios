@@ -14026,6 +14026,12 @@ CGPoint center;
     
     [UIView animateWithDuration:0.2f animations:^{
         self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), 2.0f, CGRectGetWidth(self.nameLabel.frame), CGRectGetHeight(self.nameLabel.frame));
+        self.userTypingView.frame = CGRectMake(
+            CGRectGetMinX(self.userTypingView.frame),
+            CGRectGetMaxY(self.nameLabel.frame),
+            CGRectGetWidth(self.userTypingView.frame),
+            CGRectGetHeight(self.userTypingView.frame)
+        );
         self.userStatusLabel.text = lastSeenString;
         [self.userStatusLabel sizeToFit];
         self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
@@ -14051,6 +14057,12 @@ CGPoint center;
             self.userStatusLabel.frame = CGRectMake(0.0f, 0.0f, 0.0f, 16.0f);
             self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), 10.5f, CGRectGetWidth(self.nameLabel.frame), CGRectGetHeight(self.nameLabel.frame));
         }
+        self.userTypingView.frame = CGRectMake(
+            CGRectGetMinX(self.userTypingView.frame),
+            CGRectGetMaxY(self.nameLabel.frame),
+            CGRectGetWidth(self.userTypingView.frame),
+            CGRectGetHeight(self.userTypingView.frame)
+        );
     }];
 }
 
@@ -14061,6 +14073,12 @@ CGPoint center;
             self.userTypingView.alpha = 1.0f;
             self.userDescriptionView.alpha = 0.0f;
             self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), 2.0f, CGRectGetWidth(self.nameLabel.frame), CGRectGetHeight(self.nameLabel.frame));
+            self.userTypingView.frame = CGRectMake(
+                CGRectGetMinX(self.userTypingView.frame),
+                CGRectGetMaxY(self.nameLabel.frame),
+                CGRectGetWidth(self.userTypingView.frame),
+                CGRectGetHeight(self.userTypingView.frame)
+            );
         }];
         [self performSelector:@selector(setAsTypingNoAfterDelay) withObject:nil afterDelay:15.0f];
     }
@@ -14080,6 +14098,12 @@ CGPoint center;
         else {
             self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), 2.0f, CGRectGetWidth(self.nameLabel.frame), CGRectGetHeight(self.nameLabel.frame));
         }
+        self.userTypingView.frame = CGRectMake(
+            CGRectGetMinX(self.userTypingView.frame),
+            CGRectGetMaxY(self.nameLabel.frame),
+            CGRectGetWidth(self.userTypingView.frame),
+            CGRectGetHeight(self.userTypingView.frame)
+        );
     }];
 }
 
@@ -15087,6 +15111,12 @@ CGPoint center;
             self.userStatusLabel.text = [NSString stringWithFormat:@"%ld Members", [self.currentRoom.participants count]];
             self.nameLabel.frame = CGRectMake(CGRectGetMinX(self.nameLabel.frame), 2.0f, CGRectGetWidth(self.nameLabel.frame), CGRectGetHeight(self.nameLabel.frame));
         }
+        self.userTypingView.frame = CGRectMake(
+            CGRectGetMinX(self.userTypingView.frame),
+            CGRectGetMaxY(self.nameLabel.frame),
+            CGRectGetWidth(self.userTypingView.frame),
+            CGRectGetHeight(self.userTypingView.frame)
+        );
         [self.userStatusLabel sizeToFit];
         self.userStatusLabel.frame = CGRectMake(CGRectGetMinX(self.userStatusLabel.frame), CGRectGetMinY(self.userStatusLabel.frame), CGRectGetWidth(self.userStatusLabel.frame), 16.0f);
         CGFloat userStatusViewWidth = CGRectGetWidth(self.userStatusLabel.frame) + CGRectGetWidth(self.userStatusView.frame) + 4.0f;

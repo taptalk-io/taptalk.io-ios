@@ -158,20 +158,23 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     
     NSMutableDictionary *parametersDictionary = [[TAPUtil nullToEmptyDictionary:[encryptedMessage toDictionary]] mutableCopy];
     
-    NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"data"]];
-    NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
-    NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
-    encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
-    
-    [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
+    if ([parametersDictionary objectForKey:@"data"] != nil) {
+        NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"data"]];
+        NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
+        NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
+        encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
+        [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
+    }
     
     // Remove unused fields for socket emit
     [parametersDictionary removeObjectForKey:@"user"];
-    NSMutableDictionary *roomDictionary = [[parametersDictionary objectForKey:@"room"] mutableCopy];
-    roomDictionary = [TAPUtil nullToEmptyDictionary:roomDictionary];
-    [roomDictionary removeObjectForKey:@"participants"];
-    [roomDictionary removeObjectForKey:@"unreadCount"];
-    [parametersDictionary setObject:roomDictionary forKey:@"room"];
+    if ([parametersDictionary objectForKey:@"room"] != nil) {
+        NSMutableDictionary *roomDictionary = [[TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"room"]] mutableCopy];
+        roomDictionary = [TAPUtil nullToEmptyDictionary:roomDictionary];
+        [roomDictionary removeObjectForKey:@"participants"];
+        [roomDictionary removeObjectForKey:@"unreadCount"];
+        [parametersDictionary setObject:roomDictionary forKey:@"room"];
+    }
     
     return parametersDictionary;
 }
@@ -189,17 +192,20 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     
     NSMutableDictionary *parametersDictionary = [[TAPUtil nullToEmptyDictionary:[encryptedMessage toDictionary]] mutableCopy];
     
-    NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"data"]];
-    NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
-    NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
-    encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
+    if ([parametersDictionary objectForKey:@"data"] != nil) {
+        NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"data"]];
+        NSString *dataJSONString = [TAPUtil jsonStringFromObject:dataDictionary];
+        NSString *encryptedDataJSONString = [self encryptString:dataJSONString localID:message.localID];
+        encryptedDataJSONString = [TAPUtil nullToEmptyString:encryptedDataJSONString];
+        [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
+    }
     
-    [parametersDictionary setObject:encryptedDataJSONString forKey:@"data"];
-    
-    NSMutableDictionary *userDictionary = [[parametersDictionary objectForKey:@"user"] mutableCopy];
-    NSMutableDictionary *trimmedUserDictionary = [NSMutableDictionary new];
-    [trimmedUserDictionary setObject:[userDictionary objectForKey:@"userID"] forKey:@"userID"];
-    [parametersDictionary setObject:trimmedUserDictionary forKey:@"user"];
+    if ([parametersDictionary objectForKey:@"user"] != nil) {
+        NSMutableDictionary *userDictionary = [[TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"user"]] mutableCopy];
+        NSMutableDictionary *trimmedUserDictionary = [NSMutableDictionary new];
+        [trimmedUserDictionary setObject:[TAPUtil nullToEmptyString:[userDictionary objectForKey:@"userID"]] forKey:@"userID"];
+        [parametersDictionary setObject:trimmedUserDictionary forKey:@"user"];
+    }
     
     // Remove unused fields for API
     [parametersDictionary removeObjectForKey:@"isDeleted"];
@@ -210,13 +216,15 @@ static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+
     [parametersDictionary removeObjectForKey:@"isRead"];
     [parametersDictionary removeObjectForKey:@"isSending"];
     
-    NSMutableDictionary *roomDictionary = [[parametersDictionary objectForKey:@"room"] mutableCopy];
-    roomDictionary = [TAPUtil nullToEmptyDictionary:roomDictionary];
-    [roomDictionary removeObjectForKey:@"participants"];
-    [roomDictionary removeObjectForKey:@"unreadCount"];
-    [roomDictionary removeObjectForKey:@"isDeleted"];
-    [roomDictionary removeObjectForKey:@"isLocked"];
-    [parametersDictionary setObject:roomDictionary forKey:@"room"];
+    if ([parametersDictionary objectForKey:@"room"] != nil) {
+        NSMutableDictionary *roomDictionary = [[TAPUtil nullToEmptyDictionary:[parametersDictionary objectForKey:@"room"]] mutableCopy];
+        roomDictionary = [TAPUtil nullToEmptyDictionary:roomDictionary];
+        [roomDictionary removeObjectForKey:@"participants"];
+        [roomDictionary removeObjectForKey:@"unreadCount"];
+        [roomDictionary removeObjectForKey:@"isDeleted"];
+        [roomDictionary removeObjectForKey:@"isLocked"];
+        [parametersDictionary setObject:roomDictionary forKey:@"room"];
+    }
     
     return parametersDictionary;
 }
