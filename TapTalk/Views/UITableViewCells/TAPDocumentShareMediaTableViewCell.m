@@ -72,8 +72,16 @@
 }
 
 - (void)setDocumentTitleInfoWithMessage:(TAPMessageModel *)message {
-    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+    NSString *fileSize;
+    NSNumber *size = [message.data objectForKey:@"size"];
+    if (size == nil || size.longValue <= 0) {
+        fileSize = @"";
+    }
+    else {
+        fileSize = [NSByteCountFormatter stringFromByteCount:size.longValue countStyle:NSByteCountFormatterCountStyleBinary];
+    }
     NSString *fileName = [message.data objectForKey:@"fileName"];
+    fileName = [fileName stringByDeletingPathExtension];
     
     NSTimeInterval messageTimeInterval = [message.created doubleValue] / 1000.0f;
     NSDate *messageDate = [NSDate dateWithTimeIntervalSince1970:messageTimeInterval];
@@ -85,19 +93,21 @@
     NSString *dateString = [dateFormatter stringFromDate:messageDate];
     NSString *timeString = [timeFormatter stringFromDate:messageDate];
     
-    self.documentInfoLabel.text = [NSString stringWithFormat:@"%@ • %@ • %@", fileSize, dateString, timeString];
+    if ([TAPUtil isEmptyString:fileSize]) {
+        self.documentInfoLabel.text = [NSString stringWithFormat:@"%@ • %@", dateString, timeString];
+    }
+    else {
+        self.documentInfoLabel.text = [NSString stringWithFormat:@"%@ • %@ • %@", fileSize, dateString, timeString];
+    }
     
     self.documentTitleLabel.text = fileName;
-    
 }
-
 
 - (IBAction)downloadButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(documentShareManagerDownloadButtonDidTapped:)]) {
         [self.delegate documentShareManagerDownloadButtonDidTapped:self.message];
         
     }
-    
 }
 
 - (IBAction)cancelButtonDidTapped:(id)sender {

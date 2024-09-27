@@ -933,14 +933,11 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (BOOL)isEmptyString:(NSString *)string {
-    if (string == nil || [string isEqualToString:@""]) {
-        return YES;
-    }
-    return NO;
+    return string == nil || [string isKindOfClass:[NSNull class]] || [string isEqualToString:@""];
 }
 
 + (BOOL)isEmptyArray:(NSArray *)array {
-    return array == nil || [array count] <= 0;
+    return array == nil || [array isKindOfClass:[NSNull class]] || [array count] <= 0;
 }
 
 + (BOOL)isSaveMessageRoom:(NSString *)roomID {

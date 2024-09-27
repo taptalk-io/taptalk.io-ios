@@ -476,7 +476,12 @@
     }
     else if(indexPath.section == 2){
         CGFloat height = 56.0f;
-        if (indexPath.row == 0 && ![[TapUI sharedInstance] isStarMessageMenuEnabled]){
+        if ((indexPath.row == 0 && ![[TapUI sharedInstance] isStarMessageMenuEnabled]) ||
+            (indexPath.row == 1 && (![[TapUI sharedInstance] isSharedMediaMenuEnabled] ||
+             (![[TapUI sharedInstance] isSharedMediaMediasTabVisible] &&
+              ![[TapUI sharedInstance] isSharedMediaLinksTabVisible] &&
+              ![[TapUI sharedInstance] isSharedMediaDocumentsTabVisible])))
+        ) {
             height = 0.0f;
         }
         CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), height);
