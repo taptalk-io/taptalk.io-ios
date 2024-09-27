@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol TAPLinkShareManagerCellDelegate <NSObject>
 
 - (void)linkShareManagerLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)sharedLinkUrlDidTappedWithMessage:(TAPMessageModel *)message url:(NSURL *)url;
+- (void)sharedLinkUrlDidLongPressedWithMessage:(TAPMessageModel *)message url:(NSURL *)url;
 
 @end
 

@@ -26,6 +26,20 @@
 @property (weak, nonatomic) IBOutlet UILabel *emptyStateTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *emptyStateBodyLabel;
 
+@property (weak, nonatomic) IBOutlet UIView *tabButtonsView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *tabButtonsViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet UIView *mediaTabButtonView;
+@property (weak, nonatomic) IBOutlet UIView *linksTabButtonView;
+@property (weak, nonatomic) IBOutlet UIView *documentsTabButtonView;
+@property (weak, nonatomic) IBOutlet UIButton *mediaTabButton;
+@property (weak, nonatomic) IBOutlet UIButton *linksTabButton;
+@property (weak, nonatomic) IBOutlet UIButton *documentsTabButton;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaTabButtonViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linksTabButtonViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *documentsTabButtonViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linksTabButtonViewLeftConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linksTabButtonViewRightConstraint;
 
 @property (weak, nonatomic) IBOutlet UIView *mediaTabView;
 @property (weak, nonatomic) IBOutlet UIView *linksTabView;
@@ -38,10 +52,10 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaTabWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *linksTabWidthConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *documentsTabWidthConstraint;
+
 @property (weak, nonatomic) IBOutlet UIView *emptyStateView;
 
 @property (weak, nonatomic) IBOutlet UIView *tabSeperatorView;
-
 
 @property (strong, nonatomic) NSURL *currentSelectedFileURL;
 
@@ -75,8 +89,6 @@
 @property (nonatomic) BOOL isMediaLoadMore;
 @property (nonatomic) BOOL isLinkLoadMore;
 @property (nonatomic) BOOL isDocumentLoadMore;
-
-
 
 @property (nonatomic, strong) NSString *mediaLastCreated;
 @property (nonatomic, strong) NSString *linkLastCreated;
@@ -116,7 +128,6 @@
     
     self.documentsTableView.dataSource = self;
     self.documentsTableView.delegate = self;
-    
     
     self.mediaCollectionView.dataSource = self;
     self.mediaCollectionView.delegate = self;
@@ -174,16 +185,46 @@
     self.documentsLabel.font = tabLabelFontInActive;
     self.documentsLabel.attributedText = attributedDocumentString;
     
-    TAPRoomModel *roomi = self.room;
-    NSString *roomID = self.room.roomID;
+    [self.mediaTabButton addTarget:self action:@selector(mediaTabButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.linksTabButton addTarget:self action:@selector(linksTabButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.documentsTabButton addTarget:self action:@selector(documentsTabButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
-    [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:roomID lastTimestamp:self.mediaLastCreated numberOfItem:50 success:^(NSArray *mediaMessages) {
+    NSInteger hiddenTabs = 0;
+    if (![[TapUI sharedInstance] isSharedMediaMediasTabVisible]) {
+        self.mediaTabButtonView.alpha = 0.0f;
+        self.mediaTabButtonViewWidthConstraint.constant = 0.0f;
+        self.linksTabButtonViewLeftConstraint.constant = 0.0f;
+        hiddenTabs++;
+        [self linksTabButtonDidTapped];
+    }
+    if (![[TapUI sharedInstance] isSharedMediaLinksTabVisible]) {
+        self.linksTabButtonView.alpha = 0.0f;
+        self.linksTabButtonViewWidthConstraint.constant = 0.0f;
+        self.linksTabButtonViewRightConstraint.constant = 0.0f;
+        hiddenTabs++;
+        if (![[TapUI sharedInstance] isSharedMediaMediasTabVisible]) {
+            [self documentsTabButtonDidTapped];
+        }
+    }
+    if (![[TapUI sharedInstance] isSharedMediaDocumentsTabVisible]) {
+        self.documentsTabButtonView.alpha = 0.0f;
+        self.documentsTabButtonViewWidthConstraint.constant = 0.0f;
+        self.linksTabButtonViewRightConstraint.constant = 0.0f;
+        hiddenTabs++;
+        
+    }
+    if (hiddenTabs > 1) {
+        self.tabButtonsView.alpha = 0.0f;
+        self.tabButtonsViewHeightConstraint.constant = 0.0f;
+    }
+    
+    [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:self.mediaLastCreated numberOfItem:50 success:^(NSArray *mediaMessages) {
         _mediaMessageArray = [mediaMessages mutableCopy];
         [self insertMediaSectionArray:self.mediaMessageArray];
         [self.mediaCollectionView reloadData];
         TAPMessageModel *lastLocalMediaMessage = [mediaMessages lastObject];
         self.mediaLastCreated = [lastLocalMediaMessage.created stringValue];
-        if(mediaMessages.count < 50) {
+        if (mediaMessages.count < 50) {
             self.allLocalMediasLoaded = YES;
             [self callApiLoad];
         }
@@ -191,13 +232,6 @@
     } failure:^(NSError *error) {
         
     }];
-    
-    /**
-    
-    
-    
-    */
-    
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerProgressNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerStartNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:nil];
@@ -254,7 +288,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    if(self.shareMediaTabType == TAPShareMediaTabTypeMedia && indexPath.row == [self.mediaMessageArray count] - 25 && !self.allLocalMediasLoaded){
+    if (self.shareMediaTabType == TAPShareMediaTabTypeMedia && indexPath.row == [self.mediaMessageArray count] - 25 && !self.allLocalMediasLoaded) {
         TAPMessageModel *lastMessage = (TAPMessageModel *)[self.mediaMessageArray lastObject];
         [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:self.mediaLastCreated numberOfItem:50 success:^(NSArray *mediaMessages) {
             [self.mediaMessageArray addObjectsFromArray:mediaMessages];
@@ -262,7 +296,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.mediaCollectionView reloadData];
             TAPMessageModel *lastLocalMediaMessage = [mediaMessages lastObject];
             self.mediaLastCreated = [lastLocalMediaMessage.created stringValue];
-            if(mediaMessages.count < 50) {
+            if (mediaMessages.count < 50) {
                 self.allLocalMediasLoaded = YES;
             }
             
@@ -270,7 +304,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
         }];
     }
-    else if(self.shareMediaTabType == TAPShareMediaTabTypeLink && indexPath.row == [self.linksMessageArray count] - 25 && !self.allLocalLinksLoaded){
+    else if (self.shareMediaTabType == TAPShareMediaTabTypeLink && indexPath.row == [self.linksMessageArray count] - 25 && !self.allLocalLinksLoaded) {
         TAPMessageModel *lastMessage = (TAPMessageModel *)[self.linksMessageArray lastObject];
         [TAPDataManager getDatabaseLinkMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:self.linkLastCreated numberOfItem:50 success:^(NSArray *linkMessages) {
             [self.linksMessageArray addObjectsFromArray:linkMessages];
@@ -278,7 +312,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.linksTableView reloadData];
             TAPMessageModel *lastLocalLinkMessage = [linkMessages lastObject];
             self.linkLastCreated = [lastLocalLinkMessage.created stringValue];
-            if(linkMessages.count < 50) {
+            if (linkMessages.count < 50) {
                 self.allLocalLinksLoaded = YES;
             }
             
@@ -286,7 +320,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
         }];
     }
-    else if(self.shareMediaTabType == TAPShareMediaTabTypeDocument && indexPath.row == [self.documentsMessageArray count] - 25 && !self.allLocalDocumentsLoaded) {
+    else if (self.shareMediaTabType == TAPShareMediaTabTypeDocument && indexPath.row == [self.documentsMessageArray count] - 25 && !self.allLocalDocumentsLoaded) {
         TAPMessageModel *lastMessage = (TAPMessageModel *)[self.documentsMessageArray lastObject];
         [TAPDataManager getDatabaseFileMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:self.documentLastCreated numberOfItem:50 success:^(NSArray *documentMessages) {
             [self.documentsMessageArray addObjectsFromArray:documentMessages];
@@ -294,7 +328,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.documentsTableView reloadData];
             TAPMessageModel *lastLocalDocumentMessage = [documentMessages lastObject];
             self.documentLastCreated = [lastLocalDocumentMessage.created stringValue];
-            if(documentMessages.count < 50) {
+            if (documentMessages.count < 50) {
                 self.allLocalDocumentsLoaded = YES;
             }
             
@@ -348,15 +382,28 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             [self setImageCollectionViewCell:cell image:nil message:receivedMessage];
         }];
-        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-        [cell setInfoLabelWithString:fileSize];
+        NSNumber *size = [message.data objectForKey:@"size"];
+        if (size == nil || size.longValue <= 0) {
+            [cell setInfoLabelWithString:@""];
+        }
+        else {
+            NSString *fileSize = [NSByteCountFormatter stringFromByteCount:size.longValue countStyle:NSByteCountFormatterCountStyleBinary];
+            [cell setInfoLabelWithString:fileSize];
+        }
     }
     else if (message.type == TAPChatMessageTypeVideo) {
         NSNumber *duration = [message.data objectForKey:@"duration"];
         NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
         NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
         
-        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        NSString *fileSize;
+        NSNumber *size = [message.data objectForKey:@"size"];
+        if (size == nil || size.longValue <= 0) {
+            fileSize = @"";
+        }
+        else {
+            fileSize = [NSByteCountFormatter stringFromByteCount:size.longValue countStyle:NSByteCountFormatterCountStyleBinary];
+        }
         
         //Check video exist in cache
         
@@ -429,19 +476,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     [headerView.subviews makeObjectsPerformSelector: @selector(removeFromSuperview)];
     
-    if(indexPath.row == 0){
+    if (indexPath.row == 0) {
         UICollectionViewLayoutAttributes *attributes = [collectionView layoutAttributesForItemAtIndexPath:indexPath];
         [headerView preferredLayoutAttributesFittingAttributes:attributes];
         
         headerView.backgroundColor = [UIColor whiteColor];
         
         UIView *seperatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(headerView.frame) - 8.0f, CGRectGetWidth(headerView.frame), 1.0f)];
-        seperatorView.backgroundColor = [UIColor opaqueSeparatorColor];
+        seperatorView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.1f];
         [headerView addSubview:seperatorView];
         
-        if(indexPath.section != 0){
+        if (indexPath.section != 0) {
             UIView *seperatorViewTop = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
-            seperatorViewTop.backgroundColor = [UIColor opaqueSeparatorColor];
+            seperatorViewTop.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.1f];
             [headerView addSubview:seperatorViewTop];
         }
     
@@ -453,8 +500,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         [headerView addSubview:monthLabel];
     }
-    
-    
     
     return headerView;
 }
@@ -480,7 +525,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         UIImage *cellImage = cell.imageView.image;
         NSArray *imageSliderImage = [NSArray array];
-        if(cellImage != nil) {
+        if (cellImage != nil) {
             imageSliderImage = @[cellImage];
             TAPMessageModel *currentMessage = cell.currentMessage;
             NSString *cellImageURLString = [TAPUtil nullToEmptyString:[cell.currentMessage.data objectForKey:@"fileID"]];
@@ -558,11 +603,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark TableView
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if(tableView == self.linksTableView){
+    if (tableView == self.linksTableView) {
         NSMutableArray *sectionArray = [self.linkMessageWithSectionArray objectAtIndex:section];
         return sectionArray.count;
     }
-    else if(tableView == self.documentsTableView){
+    else if (tableView == self.documentsTableView) {
         NSMutableArray *sectionArray = [self.documentMessageWithSectionArray objectAtIndex:section];
         return sectionArray.count;
     }
@@ -571,10 +616,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if(tableView == self.linksTableView){
+    if (tableView == self.linksTableView) {
         return [self.linkMessageWithSectionArray count];
     }
-    else if(tableView == self.documentsTableView){
+    else if (tableView == self.documentsTableView) {
         return [self.documentMessageWithSectionArray count];
     }
     return 0;
@@ -595,10 +640,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
     NSMutableArray *sectionArray = nil;
     
-    if(tableView == self.linksTableView){
+    if (tableView == self.linksTableView) {
         sectionArray = [self.linkMessageWithSectionArray objectAtIndex:section];
     }
-    else if(tableView == self.documentsTableView){
+    else if (tableView == self.documentsTableView) {
         sectionArray = [self.documentMessageWithSectionArray objectAtIndex:section];
     }
     else{
@@ -618,7 +663,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    if(tableView == self.linksTableView){
+    if (tableView == self.linksTableView) {
         [tableView registerNib:[TAPLinksShareMediaTableViewCell cellNib] forCellReuseIdentifier:[TAPLinksShareMediaTableViewCell description]];
         TAPLinksShareMediaTableViewCell *cell = (TAPLinksShareMediaTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPLinksShareMediaTableViewCell description] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -629,13 +674,26 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSMutableArray *sectionArray = [self.linkMessageWithSectionArray objectAtIndex:indexPath.section];
         
         TAPMessageModel *message = [sectionArray objectAtIndex:indexPath.row];
+        NSArray<NSString *> *urls = [message.data objectForKey:@"urls"];
         NSString *urlString = [message.data objectForKey:@"url"];
-        [cell setLinkLabelWithString:urlString];
+        NSString *text = @"";
+        if (![TAPUtil isEmptyArray:urls]) {
+            for (NSString * url in urls) {
+                if (![TAPUtil isEmptyString:text]) {
+                    text = [NSString stringWithFormat:@"%@\n", text];
+                }
+                text = [NSString stringWithFormat:@"%@%@", text, url];
+            }
+        }
+        else {
+            text = [TAPUtil nullToEmptyString:urlString];
+        }
+        [cell setLinkLabelWithString:text];
         cell.message = message;
         
         return cell;
     }
-    else if(tableView == self.documentsTableView){
+    else if (tableView == self.documentsTableView) {
         [tableView registerNib:[TAPDocumentShareMediaTableViewCell cellNib] forCellReuseIdentifier:[TAPDocumentShareMediaTableViewCell description]];
         TAPDocumentShareMediaTableViewCell *cell = (TAPDocumentShareMediaTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPDocumentShareMediaTableViewCell description] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -733,23 +791,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(tableView == self.documentsTableView){
+    if (tableView == self.documentsTableView) {
         return 56.0f;
     }
     return UITableViewAutomaticDimension;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if(tableView == self.documentsTableView){
-        if(section == [self.documentMessageWithSectionArray count] - 1){
+    if (tableView == self.documentsTableView) {
+        if (section == [self.documentMessageWithSectionArray count] - 1) {
             return FLT_MIN;
         }
         else{
             return 4.0f;
         }
     }
-    else if(tableView == self.linksTableView){
-        if(section == [self.linkMessageWithSectionArray count] - 1){
+    else if (tableView == self.linksTableView) {
+        if (section == [self.linkMessageWithSectionArray count] - 1) {
             return FLT_MIN;
         }
         else{
@@ -769,41 +827,29 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(tableView == self.linksTableView){
+    if (tableView == self.linksTableView) {
         // present in app web view, the app is not installed
         TAPMessageModel *message = [self.linksMessageArray objectAtIndex:indexPath.row];
         NSString *urlString = [message.data objectForKey:@"url"];
-        NSURL *url = [NSURL URLWithString:urlString];
-        
-        if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:url
-                                                   options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
-                                         completionHandler:^(BOOL success){
-                                             if(!success) {
-                                                 // present in app web view, the app is not installed
-                                                 TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
-                                                 webViewController.urlString = url.absoluteString;
-                                                 //CS NOTE - add resign first responder before every pushVC to handle keyboard height
-                                                 
-                                                 [self keyboardWillHideWithHeight:0.0f];
-                                                 [self.navigationController pushViewController:webViewController animated:YES];
-                                             }
-                                         }];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:url];
+        if ([TAPUtil isEmptyString:urlString]) {
+            NSArray<NSString *> *urls = [message.data objectForKey:@"urls"];
+            if (![TAPUtil isEmptyArray:urls]) {
+                urlString = [urls objectAtIndex:0];
             }
         }
-        
+        if ([TAPUtil isEmptyString:urlString]) {
+            return;
+        }
+        NSURL *url = [NSURL URLWithString:urlString];
+        [self openUrl:url];
     }
-    else if(tableView == self.documentsTableView){
+    else if (tableView == self.documentsTableView) {
         
     }
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.shareMediaTabType == TAPShareMediaTabTypeLink && indexPath.row == [self.linksMessageArray count] - 25 && !self.allLocalLinksLoaded){
+    if (self.shareMediaTabType == TAPShareMediaTabTypeLink && indexPath.row == [self.linksMessageArray count] - 25 && !self.allLocalLinksLoaded) {
         TAPMessageModel *lastMessage = (TAPMessageModel *)[self.linksMessageArray lastObject];
         [TAPDataManager getDatabaseLinkMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:self.linkLastCreated numberOfItem:50 success:^(NSArray *linkMessages) {
             [self.linksMessageArray addObjectsFromArray:linkMessages];
@@ -811,7 +857,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.linksTableView reloadData];
             TAPMessageModel *lastLocalLinkMessage = [linkMessages lastObject];
             self.linkLastCreated = [lastLocalLinkMessage.created stringValue];
-            if(linkMessages.count < 50) {
+            if (linkMessages.count < 50) {
                 self.allLocalLinksLoaded = YES;
             }
             
@@ -819,7 +865,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
         }];
     }
-    else if(self.shareMediaTabType == TAPShareMediaTabTypeDocument && indexPath.row == [self.documentsMessageArray count] - 25 && !self.allLocalDocumentsLoaded) {
+    else if (self.shareMediaTabType == TAPShareMediaTabTypeDocument && indexPath.row == [self.documentsMessageArray count] - 25 && !self.allLocalDocumentsLoaded) {
         TAPMessageModel *lastMessage = (TAPMessageModel *)[self.documentsMessageArray lastObject];
         [TAPDataManager getDatabaseFileMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:self.documentLastCreated numberOfItem:50 success:^(NSArray *documentMessages) {
             [self.documentsMessageArray addObjectsFromArray:documentMessages];
@@ -827,7 +873,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.documentsTableView reloadData];
             TAPMessageModel *lastLocalDocumentMessage = [documentMessages lastObject];
             self.documentLastCreated = [lastLocalDocumentMessage.created stringValue];
-            if(documentMessages.count < 50) {
+            if (documentMessages.count < 50) {
                 self.allLocalDocumentsLoaded = YES;
             }
             
@@ -837,9 +883,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
 }
 
-#pragma mark TAPDocumentShareManagerCellDelegate
+#pragma mark TAPLinkShareManagerCellDelegate
+
 - (void)linkShareManagerLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
     [self handleLongPressWithMessage:longPressedMessage];
+}
+
+- (void)sharedLinkUrlDidTappedWithMessage:(TAPMessageModel *)message url:(NSURL *)url {
+    [self openUrl:url];
+}
+
+- (void)sharedLinkUrlDidLongPressedWithMessage:(TAPMessageModel *)message url:(NSURL *)url {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    [pasteboard setString:url.absoluteString];
+    [self showSnackBar:TapTalkSnackBarTypeToast
+               message:NSLocalizedStringFromTableInBundle(@"Link copied.", nil, [TAPUtil currentBundle], @"")
+              iconName:@""];
 }
 
 #pragma mark TAPDocumentShareManagerCellDelegate
@@ -934,7 +993,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPMessageModel *currentMessage = [self.messageDataDictionary objectForKey:localID];
         TAPChatMessageType type = currentMessage.type;
         
-        if(type == TAPChatMessageTypeFile){
+        if (type == TAPChatMessageTypeFile) {
             NSInteger section = [self getSectionWithArray:self.documentMessageWithSectionArray message:currentMessage];
             
             NSMutableArray *messageArray = [self.documentMessageWithSectionArray objectAtIndex:section];
@@ -984,7 +1043,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPMessageModel *currentMessage = [self.messageDataDictionary objectForKey:localID];
         TAPChatMessageType type = currentMessage.type;
         
-        if(type == TAPChatMessageTypeFile){
+        if (type == TAPChatMessageTypeFile) {
             NSInteger section = [self getSectionWithArray:self.documentMessageWithSectionArray message:currentMessage];
             NSMutableArray *messageArray = [self.documentMessageWithSectionArray objectAtIndex:section];
             NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
@@ -1033,7 +1092,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPMessageModel *currentMessage = [self.messageDataDictionary objectForKey:localID];
         TAPChatMessageType type = currentMessage.type;
         
-        if(type == TAPChatMessageTypeFile){
+        if (type == TAPChatMessageTypeFile) {
             NSInteger section = [self getSectionWithArray:self.documentMessageWithSectionArray message:currentMessage];
             NSMutableArray *messageArray = [self.documentMessageWithSectionArray objectAtIndex:section];
             NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
@@ -1101,7 +1160,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         TAPChatMessageType type = currentMessage.type;
         
-        if(type == TAPChatMessageTypeFile) {
+        if (type == TAPChatMessageTypeFile) {
             NSInteger section = [self getSectionWithArray:self.documentMessageWithSectionArray message:currentMessage];
             NSMutableArray *messageArray = [self.documentMessageWithSectionArray objectAtIndex:section];
             NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
@@ -1127,7 +1186,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             TAPImageCollectionViewCell *cell = (TAPImageCollectionViewCell *)[self.mediaCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:currentRowIndex inSection:section]];
             
-            NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[currentMessage.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+            NSString *fileSize;
+            NSNumber *size = [currentMessage.data objectForKey:@"size"];
+            if (size == nil || size.longValue <= 0) {
+                fileSize = @"";
+            }
+            else {
+                fileSize = [NSByteCountFormatter stringFromByteCount:size.longValue countStyle:NSByteCountFormatterCountStyleBinary];
+            }
             
             if (type == TAPChatMessageTypeImage) {
                 [cell animateFailedDownloadingMedia];
@@ -1148,16 +1214,17 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 #pragma mark - Custom Method
-- (IBAction)mediaTabButtonDidTapped:(id)sender {
+
+- (void)mediaTabButtonDidTapped {
     self.shareMediaTabType = TAPShareMediaTabTypeMedia;
-    if(!self.allLocalMediasLoaded) {
+    if (!self.allLocalMediasLoaded) {
         [TAPDataManager getDatabaseMediaMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:@"" numberOfItem:50 success:^(NSArray *mediaMessages) {
             _mediaMessageArray = [mediaMessages mutableCopy];
             [self insertMediaSectionArray:mediaMessages];
             [self.mediaCollectionView reloadData];
             TAPMessageModel *lastLocalMediaMessage = [mediaMessages lastObject];
             self.mediaLastCreated = [lastLocalMediaMessage.created stringValue];
-            if(mediaMessages.count < 50) {
+            if (mediaMessages.count < 50) {
                 self.allLocalMediasLoaded = YES;
                 [self callApiLoad];
             }
@@ -1166,10 +1233,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }];
     }
     else{
-        if(self.isRemoteContentFetched){
+        if (self.isRemoteContentFetched) {
             [self insertLoadMoreData];
             
-            if(self.mediaMessageArray.count == 0) {
+            if (self.mediaMessageArray.count == 0) {
                 self.emptyStateView.alpha = 1.0f;
             }
             else{
@@ -1196,16 +1263,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
 }
 
-- (IBAction)linksTabButtonDidTapped:(id)sender {
+- (void)linksTabButtonDidTapped {
     self.shareMediaTabType = TAPShareMediaTabTypeLink;
-    if(!self.allLocalLinksLoaded){
+    if (!self.allLocalLinksLoaded) {
         [TAPDataManager getDatabaseLinkMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:@"" numberOfItem:50 success:^(NSArray *linkMessages) {
             _linksMessageArray = [linkMessages mutableCopy];
             [self insertLinkSectionArray:linkMessages];
             [self.linksTableView reloadData];
             TAPMessageModel *lastLocalLinkMessage = [linkMessages lastObject];
             self.linkLastCreated = [lastLocalLinkMessage.created stringValue];
-            if(linkMessages.count < 50){
+            if (linkMessages.count < 50) {
                 self.allLocalLinksLoaded = YES;
                 [self callApiLoad];
             }
@@ -1215,10 +1282,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }];
     }
     else{
-        if(self.isRemoteContentFetched){
+        if (self.isRemoteContentFetched) {
             [self insertLoadMoreData];
             
-            if(self.linksMessageArray.count == 0) {
+            if (self.linksMessageArray.count == 0) {
                 self.emptyStateView.alpha = 1.0f;
             }
             else{
@@ -1243,16 +1310,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     
 }
 
-- (IBAction)DocumentsTabButtonDidTapped:(id)sender {
+- (void)documentsTabButtonDidTapped {
     self.shareMediaTabType = TAPShareMediaTabTypeDocument;
-    if(!self.allLocalDocumentsLoaded) {
+    if (!self.allLocalDocumentsLoaded) {
         [TAPDataManager getDatabaseFileMessagesInRoomWithRoomID:self.room.roomID lastTimestamp:@"" numberOfItem:50 success:^(NSArray *fileMessages) {
             _documentsMessageArray = [fileMessages mutableCopy];
             [self insertDocumentSectionArray:fileMessages];
             [self.documentsTableView reloadData];
             TAPMessageModel *lastLocalFileMessage = [fileMessages lastObject];
             self.documentLastCreated = [lastLocalFileMessage.created stringValue];
-            if(fileMessages.count < 50){
+            if (fileMessages.count < 50) {
                 self.allLocalDocumentsLoaded = YES;
                 [self callApiLoad];
             }
@@ -1262,10 +1329,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }];
     }
     else {
-        if(self.isRemoteContentFetched){
+        if (self.isRemoteContentFetched) {
             [self insertLoadMoreData];
             
-            if(self.documentsMessageArray.count == 0) {
+            if (self.documentsMessageArray.count == 0) {
                 self.emptyStateView.alpha = 1.0f;
             }
             else{
@@ -1290,22 +1357,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)callApiLoad {
-    if(!self.isRemoteContentFetched){
+    if (!self.isRemoteContentFetched) {
         [TAPDataManager getDatabaseOldestCreatedTimeFromRoom:self.room.roomID success:^(NSNumber *createdTime) {
             long oldestCreatedTime = [createdTime longValue];
             [TAPDataManager callAPIGetSharedContent:self.room.roomID maxCreated:oldestCreatedTime  minCreated:0 success:^(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray) {
                 
                 self.isRemoteContentFetched = YES;
                 
-                if(mediaMessagesArray.count > 0){
+                if (mediaMessagesArray.count > 0) {
                     self.remoteMediaArray = mediaMessagesArray;
                 }
                 
-                if(fileMessagesArray.count > 0){
+                if (fileMessagesArray.count > 0) {
                     self.remoteDocumentsMessageArray = fileMessagesArray;
                 }
                 
-                if(linkMessagesArray.count > 0){
+                if (linkMessagesArray.count > 0) {
                     self.remoteLinksMessageArray = linkMessagesArray;
                 }
                 
@@ -1327,39 +1394,39 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)insertLoadMoreData {
-    if(self.shareMediaTabType == TAPShareMediaTabTypeMedia && !self.isMediaLoadMore){
+    if (self.shareMediaTabType == TAPShareMediaTabTypeMedia && !self.isMediaLoadMore) {
         self.isMediaLoadMore = YES;
         [self.mediaMessageArray addObjectsFromArray:self.remoteMediaArray];
         [self insertMediaSectionArray:self.mediaMessageArray];
         [self.mediaCollectionView reloadData];
         
-        if(self.mediaMessageArray.count == 0) {
+        if (self.mediaMessageArray.count == 0) {
             self.emptyStateView.alpha = 1.0f;
         }
         else{
             self.emptyStateView.alpha = 0.0f;
         }
     }
-    else if(self.shareMediaTabType == TAPShareMediaTabTypeLink && !self.isLinkLoadMore){
+    else if (self.shareMediaTabType == TAPShareMediaTabTypeLink && !self.isLinkLoadMore) {
         self.isLinkLoadMore = YES;
         [self.linksMessageArray addObjectsFromArray:self.remoteLinksMessageArray];
         [self insertLinkSectionArray:self.linksMessageArray];
         [self.linksTableView reloadData];
         
-        if(self.linksMessageArray.count == 0) {
+        if (self.linksMessageArray.count == 0) {
             self.emptyStateView.alpha = 1.0f;
         }
         else{
             self.emptyStateView.alpha = 0.0f;
         }
     }
-    else if(self.shareMediaTabType == TAPShareMediaTabTypeDocument && !self.isDocumentLoadMore){
+    else if (self.shareMediaTabType == TAPShareMediaTabTypeDocument && !self.isDocumentLoadMore) {
         self.isDocumentLoadMore = YES;
         [self.documentsMessageArray addObjectsFromArray:self.remoteDocumentsMessageArray];
         [self insertDocumentSectionArray:self.documentsMessageArray];
         [self.documentsTableView reloadData];
         
-        if(self.documentsMessageArray.count == 0) {
+        if (self.documentsMessageArray.count == 0) {
             self.emptyStateView.alpha = 1.0f;
         }
         else{
@@ -1377,7 +1444,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSInteger createdMonth = [self getMonthWithCreatedTime:message.created];
         [self.messageDataDictionary setObject:message forKey:message.localID];
         
-        if(createdMonth == month) {
+        if (createdMonth == month) {
             NSMutableArray *sectionArray = [self.mediaMessageWithSectionArray objectAtIndex:section];
             [sectionArray addObject:message];
         }
@@ -1401,7 +1468,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     for(TAPMessageModel *message in messageArray) {
         NSInteger createdMonth = [self getMonthWithCreatedTime:message.created];
         
-        if(createdMonth == month) {
+        if (createdMonth == month) {
             NSMutableArray *sectionArray = [self.linkMessageWithSectionArray objectAtIndex:section];
             [sectionArray addObject:message];
         }
@@ -1426,7 +1493,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         NSInteger createdMonth = [self getMonthWithCreatedTime:message.created];
         [self.messageDataDictionary setObject:message forKey:message.localID];
         
-        if(createdMonth == month) {
+        if (createdMonth == month) {
             NSMutableArray *sectionArray = [self.documentMessageWithSectionArray objectAtIndex:section];
             [sectionArray addObject:message];
         }
@@ -1581,7 +1648,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
         [cell setInitialAnimateDownloadingMedia];
         
-        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        NSString *fileSize;
+        NSNumber *size = [message.data objectForKey:@"size"];
+        if (size == nil || size.longValue <= 0) {
+            fileSize = @"";
+        }
+        else {
+            fileSize = [NSByteCountFormatter stringFromByteCount:size.longValue countStyle:NSByteCountFormatterCountStyleBinary];
+        }
         [cell setInfoLabelWithString:fileSize];
         
         [cell animateProgressDownloadingMediaWithProgress:progress total:total];
@@ -1589,7 +1663,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else {
         //Image not exist in cache
         //if not show download button
-        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        NSString *fileSize;
+        NSNumber *size = [message.data objectForKey:@"size"];
+        if (size == nil || size.longValue <= 0) {
+            fileSize = @"";
+        }
+        else {
+            fileSize = [NSByteCountFormatter stringFromByteCount:size.longValue countStyle:NSByteCountFormatterCountStyleBinary];
+        }
         [cell setInfoLabelWithString:fileSize];
         [cell setAsNotDownloaded];
     }
@@ -1625,7 +1706,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPMessageModel *message = [messageArray objectAtIndex:0];
         NSInteger month = [self getMonthWithCreatedTime:message.created];
         NSInteger year = [self getYearWithCreatedTime:message.created];
-        if(mediaMonth == month && mediaYear == year){
+        if (mediaMonth == month && mediaYear == year) {
             return counter;
         }
         counter += 1;
@@ -1662,8 +1743,30 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 
-
-
-
+- (void)openUrl:(NSURL *)url {
+    if (url == nil) {
+        return;
+    }
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        if (IS_IOS_11_OR_ABOVE) {
+            [[UIApplication sharedApplication] openURL:url
+                                               options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
+                                     completionHandler:^(BOOL success) {
+                                         if (!success) {
+                                             // present in app web view, the app is not installed
+                                             TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
+                                             webViewController.urlString = url.absoluteString;
+                                             //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+                                             
+                                             [self keyboardWillHideWithHeight:0.0f];
+                                             [self.navigationController pushViewController:webViewController animated:YES];
+                                         }
+                                     }];
+        }
+        else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }
+}
 
 @end

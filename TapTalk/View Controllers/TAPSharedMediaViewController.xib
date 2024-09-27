@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -13,22 +13,35 @@
             <connections>
                 <outlet property="documentsIndicatorView" destination="maS-vg-bn7" id="dHi-V0-BZf"/>
                 <outlet property="documentsLabel" destination="f2w-FO-05X" id="95u-gy-8uc"/>
+                <outlet property="documentsTabButton" destination="mHY-WL-D5j" id="AIv-Kv-T0o"/>
+                <outlet property="documentsTabButtonView" destination="qSj-Nq-wLJ" id="U2c-H6-xkb"/>
+                <outlet property="documentsTabButtonViewWidthConstraint" destination="fW8-6p-lNH" id="i4r-Co-gTE"/>
                 <outlet property="documentsTabView" destination="9i5-OF-i7i" id="uSk-a5-8Af"/>
-                <outlet property="documentsTabWidthConstraint" destination="cgk-gs-dvF" id="L0l-bq-UVT"/>
+                <outlet property="documentsTabWidthConstraint" destination="cgk-gs-dvF" id="joV-ef-s9K"/>
                 <outlet property="documentsTableView" destination="oAM-sI-qIQ" id="VJC-qU-gPE"/>
                 <outlet property="emptyStateBodyLabel" destination="NRK-zT-r4J" id="NlR-ws-3bB"/>
                 <outlet property="emptyStateTitleLabel" destination="zQl-zt-0ag" id="NVl-kr-bfa"/>
                 <outlet property="emptyStateView" destination="bzI-u4-UNq" id="Kv7-RL-St2"/>
                 <outlet property="linksIndicatorView" destination="Nqb-0D-4be" id="V2P-3E-chO"/>
                 <outlet property="linksLabel" destination="FC7-8e-aMQ" id="y4a-as-Zf3"/>
+                <outlet property="linksTabButton" destination="hBg-hC-gQ2" id="5OJ-xu-8vb"/>
+                <outlet property="linksTabButtonView" destination="6Y9-rF-9Jp" id="k07-SN-EKb"/>
+                <outlet property="linksTabButtonViewLeftConstraint" destination="kaY-c2-1mI" id="tHg-kv-oDm"/>
+                <outlet property="linksTabButtonViewRightConstraint" destination="EeB-kk-zmb" id="D45-9J-P87"/>
+                <outlet property="linksTabButtonViewWidthConstraint" destination="Cil-XI-3Jg" id="qnm-5c-55v"/>
                 <outlet property="linksTabView" destination="TNm-2I-MpK" id="Uoq-7F-PC3"/>
                 <outlet property="linksTabWidthConstraint" destination="Y1g-x8-sF3" id="8Og-v4-9Wj"/>
                 <outlet property="linksTableView" destination="1iA-KK-7tA" id="mlC-v5-778"/>
                 <outlet property="mediaCollectionView" destination="Png-19-KD0" id="08f-pd-4Bb"/>
                 <outlet property="mediaIndicatorView" destination="TpB-FK-r7Q" id="LXW-fW-U0A"/>
                 <outlet property="mediaLabel" destination="Vz4-WI-4r3" id="UID-3u-5FE"/>
+                <outlet property="mediaTabButton" destination="WGL-tl-xfr" id="hz5-xN-Itd"/>
+                <outlet property="mediaTabButtonView" destination="Cut-7Q-RMs" id="jWw-qb-xpV"/>
+                <outlet property="mediaTabButtonViewWidthConstraint" destination="Ztg-iC-xTr" id="A5Y-ta-9rg"/>
                 <outlet property="mediaTabView" destination="SJy-G8-hxL" id="pXf-Yg-j6T"/>
                 <outlet property="mediaTabWidthConstraint" destination="yfI-A2-KyM" id="3vU-f3-6Qa"/>
+                <outlet property="tabButtonsView" destination="clz-8m-B21" id="Gs9-Fq-p0H"/>
+                <outlet property="tabButtonsViewHeightConstraint" destination="TrE-oj-zYq" id="X2U-Fk-Lby"/>
                 <outlet property="tabSeperatorView" destination="S6K-sz-bd1" id="g9u-Wc-jix"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -38,16 +51,16 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="clz-8m-B21">
-                    <rect key="frame" x="0.0" y="44" width="414" height="39"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="clz-8m-B21" userLabel="Tab Buttons View">
+                    <rect key="frame" x="0.0" y="48" width="414" height="39"/>
                     <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bg2-uu-nvh">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bg2-uu-nvh" userLabel="Tabs Content View">
                             <rect key="frame" x="16" y="0.0" width="382" height="38"/>
                             <subviews>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Iai-Sz-SoO">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Iai-Sz-SoO" userLabel="Tabs Inner Content View">
                                     <rect key="frame" x="52" y="0.0" width="278" height="38"/>
                                     <subviews>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cut-7Q-RMs">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cut-7Q-RMs" userLabel="Media Tab Button View">
                                             <rect key="frame" x="0.0" y="0.0" width="54" height="38"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vz4-WI-4r3">
@@ -57,7 +70,7 @@
                                                             <attributes>
                                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                 <font key="NSFont" metaFont="system" size="17"/>
-                                                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineSpacing="1" tighteningFactorForTruncation="0.0"/>
+                                                                <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineSpacing="1" tighteningFactorForTruncation="0.0"/>
                                                             </attributes>
                                                         </fragment>
                                                     </attributedString>
@@ -73,9 +86,6 @@
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WGL-tl-xfr">
                                                     <rect key="frame" x="0.0" y="0.0" width="54" height="36"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                    <connections>
-                                                        <action selector="mediaTabButtonDidTapped:" destination="-1" eventType="touchUpInside" id="gWC-4m-oNs"/>
-                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -92,7 +102,7 @@
                                                 <constraint firstItem="TpB-FK-r7Q" firstAttribute="leading" secondItem="Vz4-WI-4r3" secondAttribute="leading" constant="-8" id="wzJ-g8-Sdz"/>
                                             </constraints>
                                         </view>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Y9-rF-9Jp">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Y9-rF-9Jp" userLabel="Links Tab Button View">
                                             <rect key="frame" x="86" y="0.0" width="51" height="38"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LINKS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FC7-8e-aMQ">
@@ -111,9 +121,6 @@
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hBg-hC-gQ2">
                                                     <rect key="frame" x="0.0" y="0.0" width="51" height="38"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                    <connections>
-                                                        <action selector="linksTabButtonDidTapped:" destination="-1" eventType="touchUpInside" id="ora-cG-Roe"/>
-                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -130,7 +137,7 @@
                                                 <constraint firstItem="Nqb-0D-4be" firstAttribute="trailing" secondItem="FC7-8e-aMQ" secondAttribute="trailing" constant="8" id="uMP-9P-kKR"/>
                                             </constraints>
                                         </view>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qSj-Nq-wLJ">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qSj-Nq-wLJ" userLabel="Documents Tab Button View">
                                             <rect key="frame" x="169" y="0.0" width="109" height="38"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DOCUMENTS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f2w-FO-05X">
@@ -149,9 +156,6 @@
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mHY-WL-D5j">
                                                     <rect key="frame" x="0.0" y="0.0" width="109" height="38"/>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                    <connections>
-                                                        <action selector="DocumentsTabButtonDidTapped:" destination="-1" eventType="touchUpInside" id="DD6-bh-WEk"/>
-                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -162,6 +166,7 @@
                                                 <constraint firstItem="mHY-WL-D5j" firstAttribute="top" secondItem="qSj-Nq-wLJ" secondAttribute="top" id="Kbk-Mh-mMP"/>
                                                 <constraint firstItem="maS-vg-bn7" firstAttribute="trailing" secondItem="f2w-FO-05X" secondAttribute="trailing" constant="8" id="U1v-dl-5hT"/>
                                                 <constraint firstAttribute="bottom" secondItem="mHY-WL-D5j" secondAttribute="bottom" id="df5-Pd-b7t"/>
+                                                <constraint firstAttribute="width" constant="109" id="fW8-6p-lNH"/>
                                                 <constraint firstItem="f2w-FO-05X" firstAttribute="centerY" secondItem="qSj-Nq-wLJ" secondAttribute="centerY" id="fwE-zt-U00"/>
                                                 <constraint firstItem="f2w-FO-05X" firstAttribute="leading" secondItem="qSj-Nq-wLJ" secondAttribute="leading" constant="10" id="lht-B0-SUT"/>
                                                 <constraint firstAttribute="bottom" secondItem="maS-vg-bn7" secondAttribute="bottom" id="pR0-gy-uoV"/>
@@ -186,7 +191,7 @@
                                         <constraint firstItem="aJM-sI-aQm" firstAttribute="top" secondItem="Iai-Sz-SoO" secondAttribute="top" id="foi-lW-vo3"/>
                                         <constraint firstAttribute="bottom" secondItem="aJM-sI-aQm" secondAttribute="bottom" id="gNl-58-MWv"/>
                                         <constraint firstItem="6Y9-rF-9Jp" firstAttribute="leading" secondItem="Cut-7Q-RMs" secondAttribute="trailing" constant="32" id="kaY-c2-1mI"/>
-                                        <constraint firstAttribute="width" constant="278" id="kkL-RQ-rQw"/>
+                                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="278" id="kkL-RQ-rQw"/>
                                         <constraint firstAttribute="trailing" secondItem="qSj-Nq-wLJ" secondAttribute="trailing" id="lmZ-n1-HfM"/>
                                     </constraints>
                                 </view>
@@ -198,7 +203,7 @@
                                 <constraint firstItem="Iai-Sz-SoO" firstAttribute="centerX" secondItem="bg2-uu-nvh" secondAttribute="centerX" id="zxy-FO-ZpF"/>
                             </constraints>
                         </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S6K-sz-bd1">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S6K-sz-bd1" userLabel="Tabs Separator View">
                             <rect key="frame" x="0.0" y="38" width="414" height="1"/>
                             <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                             <constraints>
@@ -219,10 +224,10 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SJy-G8-hxL" userLabel="Media View">
-                    <rect key="frame" x="0.0" y="83" width="414" height="779"/>
+                    <rect key="frame" x="0.0" y="87" width="414" height="775"/>
                     <subviews>
                         <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" bounces="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="Png-19-KD0">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="779"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="775"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="lRC-gA-PQh">
                                 <size key="itemSize" width="128" height="128"/>
@@ -242,10 +247,10 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TNm-2I-MpK" userLabel="Links View">
-                    <rect key="frame" x="414" y="83" width="414" height="779"/>
+                    <rect key="frame" x="414" y="87" width="414" height="775"/>
                     <subviews>
                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="1iA-KK-7tA">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="779"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="775"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </tableView>
@@ -260,10 +265,10 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9i5-OF-i7i" userLabel="Documents View">
-                    <rect key="frame" x="828" y="83" width="414" height="779"/>
+                    <rect key="frame" x="828" y="87" width="414" height="775"/>
                     <subviews>
                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="oAM-sI-qIQ">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="779"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="775"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </tableView>
@@ -278,23 +283,23 @@
                     </constraints>
                 </view>
                 <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bzI-u4-UNq" userLabel="Empty View">
-                    <rect key="frame" x="0.0" y="83" width="414" height="779"/>
+                    <rect key="frame" x="0.0" y="87" width="414" height="775"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPEmptySharedMedia" translatesAutoresizingMaskIntoConstraints="NO" id="k8t-BE-hYo">
-                            <rect key="frame" x="84" y="180.5" width="246" height="180"/>
+                            <rect key="frame" x="84" y="178.5" width="246" height="180"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="246" id="b4B-51-p4t"/>
                                 <constraint firstAttribute="height" constant="180" id="dz1-V1-yk8"/>
                             </constraints>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Shared Media" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zQl-zt-0ag">
-                            <rect key="frame" x="141.5" y="379.5" width="131" height="20.5"/>
+                            <rect key="frame" x="141.5" y="377.5" width="131" height="20.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You can see all your shared media from this chat here once you start sharing them." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NRK-zT-r4J">
-                            <rect key="frame" x="25" y="412" width="364" height="41"/>
+                            <rect key="frame" x="25" y="410" width="364" height="41"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
@@ -337,13 +342,13 @@
     <resources>
         <image name="TAPEmptySharedMedia" width="246" height="181"/>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

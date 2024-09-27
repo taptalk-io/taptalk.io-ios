@@ -6,10 +6,11 @@
 //
 
 #import "TAPLinksShareMediaTableViewCell.h"
+#import "ZSWTappableLabel.h"
 
-@interface TAPLinksShareMediaTableViewCell ()
+@interface TAPLinksShareMediaTableViewCell () <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
-@property (weak, nonatomic) IBOutlet UILabel *linkLabel;
+@property (weak, nonatomic) IBOutlet ZSWTappableLabel *linkLabel;
 @property (weak, nonatomic) IBOutlet UIView *linkIconView;
 @property (weak, nonatomic) IBOutlet UIImageView *linkIcomImageView;
 
@@ -36,14 +37,94 @@
     [self.contentView addGestureRecognizer:self.longPressGestureRecognizer];
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+#pragma mark - ZSWTappedLabelDelegate
 
-    // Configure the view for the selected state
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+        tappedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) { 
+            case NSTextCheckingTypeLink:
+                if ([self.delegate respondsToSelector:@selector(sharedLinkUrlDidTappedWithMessage:url:)]) {
+                    [self.delegate sharedLinkUrlDidTappedWithMessage:self.message url:result.URL];
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel 
+   longPressedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+    
+    //get selected word by tapped/selected index
+    NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
+    NSInteger currentWordLength = 0;
+    NSString *selectedWord = @"";
+    for (NSString *word in wordArray) {
+        currentWordLength = currentWordLength + [word length];
+        if(idx <= currentWordLength) {
+            selectedWord = word;
+            break;
+        }
+    }
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypeLink:
+                if ([self.delegate respondsToSelector:@selector(sharedLinkUrlDidLongPressedWithMessage:url:)]) {
+                    [self.delegate sharedLinkUrlDidLongPressedWithMessage:self.message url:result.URL];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 - (void)setLinkLabelWithString:(NSString *)linkUrlString {
-    self.linkLabel.text = linkUrlString;
+    linkUrlString = [TAPUtil nullToEmptyString:linkUrlString];
+    
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    UIColor *highlightedTextColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRightBubbleMessageBodyURLHighlighted];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:linkUrlString attributes:nil];
+    [linkDetector enumerateMatchesInString:linkUrlString options:0 range:NSMakeRange(0, linkUrlString.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedTextColor;
+        attributes[@"NSTextCheckingResult"] = result;
+
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    
+    // Add line spacing
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setLineSpacing:self.linkLabel.font.pointSize * 0.25f];
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:style
+                             range:NSMakeRange(0, [attributedString length])];
+    
+    self.linkLabel.attributedText = attributedString;
+    self.linkLabel.tapDelegate = self;
+    self.linkLabel.longPressDelegate = self;
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)recognizer {

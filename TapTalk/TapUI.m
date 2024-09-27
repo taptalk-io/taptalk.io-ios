@@ -1,6 +1,6 @@
 //
 //  TapUI.m
-//  
+//
 //
 //  Created by Dominic Vedericho on 24/07/19.
 //
@@ -55,6 +55,10 @@
 @property (nonatomic) BOOL isMarkAsReadRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isMarkAsUnreadRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isStarMessageMenuDisabled;
+@property (nonatomic) BOOL isSharedMediaMenuDisabled;
+@property (nonatomic) BOOL isSharedMediaMediasTabHidden;
+@property (nonatomic) BOOL isSharedMediaLinksTabHidden;
+@property (nonatomic) BOOL isSharedMediaDocumentsTabHidden;
 @property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
 @property (nonatomic) BOOL isEditMessageMenuDisabled;
 @property (nonatomic) BOOL isDeleteAccountButtonVisible;
@@ -983,6 +987,63 @@ Get current status of star message menu from message bubble long press & chat pr
 }
 
 /**
+Show or hide shared media menu in chat profile
+*/
+- (void)setSharedMediaMenuEnabled:(BOOL)isEnabled {
+    _isSharedMediaMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of shared media  menu in chat profile
+*/
+- (BOOL)isSharedMediaMenuEnabled {
+    return !self.isSharedMediaMenuDisabled;
+}
+
+/**
+Show or hide Medias tab in  shared media page
+*/
+- (void)setSharedMediaMediasTabVisible:(BOOL)isVisible {
+    _isSharedMediaMediasTabHidden = !isVisible;
+}
+
+/**
+Get current visibility of Medias tab in shared media page
+*/
+- (BOOL)isSharedMediaMediasTabVisible {
+    return !self.isSharedMediaMediasTabHidden;
+}
+
+/**
+Show or hide Links tab in  shared media page
+*/
+- (void)setSharedMediaLinksTabVisible:(BOOL)isVisible {
+    _isSharedMediaLinksTabHidden = !isVisible;
+}
+
+/**
+Get current visibility of Links tab in shared media page
+*/
+- (BOOL)isSharedMediaLinksTabVisible {
+    return !self.isSharedMediaLinksTabHidden;
+}
+
+/**
+Show or hide Documents tab in  shared media page
+*/
+- (void)setSharedMediaDocumentsTabVisible:(BOOL)isVisible {
+    _isSharedMediaDocumentsTabHidden = !isVisible;
+}
+
+/**
+Get current visibility of Documents tab in shared media page
+*/
+- (BOOL)isSharedMediaDocumentsTabVisible {
+    return !self.isSharedMediaDocumentsTabHidden;
+}
+
+/**
 Show or hide voice note menu from message bubble long press & chat profile
 */
 - (void)setSendVoiceNoteMenuEnabled:(BOOL)isEnabled {
@@ -1020,7 +1081,7 @@ Show or hide delete account button in my account
 }
 
 /**
-Get current visibility state of  delete account button in my account 
+Get current visibility state of  delete account button in my account
 */
 - (BOOL)getDeleteAccountButtonVisible {
     return self.isDeleteAccountButtonVisible;
