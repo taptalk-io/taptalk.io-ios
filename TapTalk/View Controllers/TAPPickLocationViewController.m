@@ -68,7 +68,7 @@
     
     self.pickLocationView.mapView.delegate = self;
     self.pickLocationView.searchTableView.delegate = self;
-    self.pickLocationView.sendLocationButton.delegate = self;
+    [self.pickLocationView.sendLocationButton setClickAction:@selector(sendLocationButtonViewDidTapped) target:self];
 
     [self.pickLocationView.goToCurrentLocationButton addTarget:self action:@selector(goToCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
     
@@ -287,20 +287,20 @@
                      _selectedPostalCode = currentPostalCode;
                      [self.pickLocationView setAsLoading:NO];
                      [self.pickLocationView setAddress:currentLocation];
-                     [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
+                     [self.pickLocationView.sendLocationButton setType:TapHighlightCustomButtonViewTypeDefaultGradient];
                  }
                  else {
                      //Location not found
                      [self.pickLocationView setAsLoading:YES];
                      [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
-                     [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+                     [self.pickLocationView.sendLocationButton setType:TapHighlightCustomButtonViewTypeDisabled];
                  }
              }
              else {
                  //Location not found
                  [self.pickLocationView setAsLoading:YES];
                  [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
-                 [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+                 [self.pickLocationView.sendLocationButton setType:TapHighlightCustomButtonViewTypeDisabled];
              }
          }];
     }
@@ -316,32 +316,23 @@
                     _selectedPostalCode = placemarks[0].postalCode;
                     [self.pickLocationView setAsLoading:NO];
                     [self.pickLocationView setAddress:self.selectedLocationAddress];
-                    [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
+                    [self.pickLocationView.sendLocationButton setType:TapHighlightCustomButtonViewTypeDefaultGradient];
                 }
                 else {
                     //Location not found
                     [self.pickLocationView setAsLoading:YES];
                     [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
-                    [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+                    [self.pickLocationView.sendLocationButton setType:TapHighlightCustomButtonViewTypeDisabled];
                 }
             }
             else {
                 //Location not found
                 [self.pickLocationView setAsLoading:YES];
                 [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
-                [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
+                [self.pickLocationView.sendLocationButton setType:TapHighlightCustomButtonViewTypeDisabled];
             }
         }];
     }
-}
-
-#pragma mark - TAPCustomButtonView
-- (void)customButtonViewDidTappedButton {
-    if ([self.delegate respondsToSelector:@selector(pickLocationViewControllerSetLocationWithLatitude:longitude:address:postalCode:)]) {
-        [self.delegate pickLocationViewControllerSetLocationWithLatitude:self.selectedLocationCoordinate.latitude longitude:self.selectedLocationCoordinate.longitude address:self.selectedLocationAddress postalCode:self.selectedPostalCode];
-    }
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - LocationManager Method
@@ -539,6 +530,14 @@
 }
 
 - (void)cancelButtonDidTapped {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)sendLocationButtonViewDidTapped {
+    if ([self.delegate respondsToSelector:@selector(pickLocationViewControllerSetLocationWithLatitude:longitude:address:postalCode:)]) {
+        [self.delegate pickLocationViewControllerSetLocationWithLatitude:self.selectedLocationCoordinate.latitude longitude:self.selectedLocationCoordinate.longitude address:self.selectedLocationAddress postalCode:self.selectedPostalCode];
+    }
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

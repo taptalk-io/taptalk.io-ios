@@ -76,12 +76,10 @@
     }
     if (![TAPUtil isEmptyString:self.roomModel.name]) {
         self.createGroupSubjectView.groupNameTextField.textField.text = self.roomModel.name;
-        //enable button create
-        [self.createGroupSubjectView.createButtonView setAsActiveState:YES animated:NO];
+//        [self.createGroupSubjectView.createButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
     }
     else {
-        //enable button create
-        [self.createGroupSubjectView.createButtonView setAsActiveState:NO animated:NO];
+//        [self.createGroupSubjectView.createButtonView setType:TapHighlightCustomButtonViewTypeDisabled];
     }
     
     _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
@@ -264,14 +262,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     newString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 //    self.roomModel.name = newString; //AS NOTE - TIDAK PERLU LANGSUNG DIUBAH
     
-    if ([newString length] <= 0) {
-        //disable button create
-        [self.createGroupSubjectView.createButtonView setAsActiveState:NO animated:NO];
-    }
-    else {
-        //enable button create
-        [self.createGroupSubjectView.createButtonView setAsActiveState:YES animated:NO];
-    }
+//    if ([newString length] <= 0) {
+//        [self.createGroupSubjectView.createButtonView setType:TapHighlightCustomButtonViewTypeDisabled];
+//    }
+//    else {
+//        [self.createGroupSubjectView.createButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+//    }
     
     if ([newString length] > GROUP_NAME_MAX_LENGTH) {
         return NO;
@@ -331,7 +327,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
     //Error pop up tapped
-    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:NO];
+    [self.createGroupSubjectView.createButtonView setIsLoading:NO];
+    self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
     if ([popupIdentifier isEqualToString:@"Error Upload Group Image"]) {
         //group created but failed to upload image, open room
     }
@@ -359,8 +356,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)createButtonDidTapped {
     _isLoading = YES;
-    [self.createGroupSubjectView.createButtonView setAsLoading:YES animated:YES];
-    self.createGroupSubjectView.createButtonView.userInteractionEnabled = NO;
+    [self.createGroupSubjectView.createButtonView setIsLoading:YES];
+    self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = NO;
     
     NSString *groupName = self.createGroupSubjectView.groupNameTextField.textField.text;
     groupName = [groupName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -385,8 +382,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
                 NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
-                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setIsLoading:NO];
 #ifdef DEBUG
                     NSLog(@"Success upload image");
 #endif
@@ -416,8 +413,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     
                 } failureBlock:^(NSError *error) {
-                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setIsLoading:NO];
                     NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                     errorMessage = [TAPUtil nullToEmptyString:errorMessage];
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
@@ -427,8 +424,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //no image, open room
                 
                 _isLoading = NO;
-                [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                [self.createGroupSubjectView.createButtonView setIsLoading:NO];
+                self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
                 
                 //Save to group preference
                 [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
@@ -441,8 +438,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
         } failure:^(NSError *error) {
             _isLoading = NO;
-            [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-            self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+            [self.createGroupSubjectView.createButtonView setIsLoading:NO];
+            self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
             errorMessage = [TAPUtil nullToEmptyString:errorMessage];
             [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
@@ -456,8 +453,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
                 NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:self.roomModel.roomID completionBlock:^(TAPRoomModel *room) {
-                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setIsLoading:NO];
 
                     //Save to group preference
                     TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -483,8 +480,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     
                 } failureBlock:^(NSError *error) {
-                    self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                    [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                    self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
+                    [self.createGroupSubjectView.createButtonView setIsLoading:NO];
                     NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                     errorMessage = [TAPUtil nullToEmptyString:errorMessage];
                     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
@@ -509,8 +506,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
                     NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
                     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
-                        self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                        [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                        self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
+                        [self.createGroupSubjectView.createButtonView setIsLoading:NO];
 
                         //Save to group preference
                         TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -537,8 +534,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         
                     } failureBlock:^(NSError *error) {
                         _isLoading = NO;
-                        self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
-                        [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
+                        self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
+                        [self.createGroupSubjectView.createButtonView setIsLoading:NO];
                         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
                         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Upload Group Image" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
@@ -568,8 +565,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
             } failure:^(NSError *error) {
                 _isLoading = NO;
-                [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
-                self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
+                [self.createGroupSubjectView.createButtonView setIsLoading:NO];
+                self.createGroupSubjectView.createButtonView.button.userInteractionEnabled = YES;
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
                 errorMessage = [TAPUtil nullToEmptyString:errorMessage];
                 [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Update Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];

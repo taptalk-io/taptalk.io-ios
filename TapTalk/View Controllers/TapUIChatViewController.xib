@@ -29,6 +29,7 @@
                 <outlet property="addToContactsViewHeightConstraint" destination="Jud-9s-FZv" id="Acl-cn-o8u"/>
                 <outlet property="addToContactsViewLeftConstraint" destination="Alf-Ki-Rcs" id="0PV-Q1-3sO"/>
                 <outlet property="addToContactsViewWidthConstraint" destination="u8t-iB-loh" id="n7Q-h9-my7"/>
+                <outlet property="attachmentButtonHighlightView" destination="BG1-4v-kcF" id="f5F-9A-viS"/>
                 <outlet property="blockContactButton" destination="7CY-3d-RO6" id="foE-H4-7Yp"/>
                 <outlet property="blockContactLabel" destination="KBh-WH-Lep" id="XQg-Xg-zNe"/>
                 <outlet property="blockContactView" destination="hSy-X2-bVr" id="O8U-Go-cGp"/>
@@ -159,6 +160,7 @@
                 <outlet property="scheduleMessageSendButton" destination="Zkk-CM-ZhJ" id="h8D-gW-hR6"/>
                 <outlet property="scheduleMessageSendLabel" destination="hI3-zv-yHd" id="SBd-QV-HKq"/>
                 <outlet property="scheduleMessageSendView" destination="Wfc-GH-ZjR" id="cw5-rf-GQ5"/>
+                <outlet property="scheduledMessageButtonHighlightView" destination="tb5-dK-rfp" id="NUu-kT-32s"/>
                 <outlet property="secondaryTextField" destination="QeJ-a5-K4g" id="Q01-ew-2fO"/>
                 <outlet property="selectedForwardTextLabel" destination="chb-NW-p75" id="RFe-rn-ZgY"/>
                 <outlet property="sendButton" destination="0IG-Fu-FyX" id="l9w-KL-Khc"/>
@@ -183,6 +185,7 @@
                 <outlet property="unblockButton" destination="2dT-0n-Nap" id="soS-YI-8Ca"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="gwd-Sd-WkE"/>
                 <outlet property="voiceNoteAudioSlider" destination="AuN-zg-eJa" id="4mL-lz-Qhi"/>
+                <outlet property="voiceNoteButtonHighlightView" destination="kCz-pQ-vpf" id="xgz-7M-PCr"/>
                 <outlet property="voiceNoteContainerView" destination="1kN-fs-Mb6" id="TZO-79-2sq"/>
                 <outlet property="voiceNoteDragView" destination="TdP-7Q-3me" id="8Z0-rT-6v6"/>
                 <outlet property="voiceNoteMicButtonWidthConstraint" destination="qI6-Oq-nYB" id="S7n-tK-Uu5"/>
@@ -1508,17 +1511,35 @@
                                         <action selector="scheduleMessageComposerButtonDidTapped:" destination="-1" eventType="touchUpInside" id="5hO-eG-Nd1"/>
                                     </connections>
                                 </button>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BG1-4v-kcF" userLabel="Attachment Button Highlight View">
+                                    <rect key="frame" x="183" y="2" width="32" height="32"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </view>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tb5-dK-rfp" userLabel="Scheduled Message Button Highlight View">
+                                    <rect key="frame" x="148" y="2" width="32" height="32"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="32" id="jgL-sw-3J1"/>
+                                        <constraint firstAttribute="height" constant="32" id="qDd-Ef-Z43"/>
+                                    </constraints>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
+                                <constraint firstItem="q9a-KQ-qbT" firstAttribute="bottom" secondItem="BG1-4v-kcF" secondAttribute="bottom" id="8bE-Kg-blr"/>
                                 <constraint firstAttribute="height" constant="36" id="KxI-oc-Qf3"/>
                                 <constraint firstItem="q9a-KQ-qbT" firstAttribute="leading" secondItem="wTO-Uv-4bD" secondAttribute="trailing" constant="3" id="Qkx-kA-RdA"/>
                                 <constraint firstItem="bob-7z-ZfQ" firstAttribute="top" secondItem="bIM-9m-lUi" secondAttribute="top" id="VjD-vv-Mct"/>
                                 <constraint firstItem="wTO-Uv-4bD" firstAttribute="leading" secondItem="bob-7z-ZfQ" secondAttribute="trailing" id="ZCK-4n-ZPQ"/>
+                                <constraint firstItem="q9a-KQ-qbT" firstAttribute="top" secondItem="BG1-4v-kcF" secondAttribute="top" id="fBj-50-6BX"/>
                                 <constraint firstAttribute="trailing" secondItem="q9a-KQ-qbT" secondAttribute="trailing" constant="8" id="g0X-Oa-AA3"/>
+                                <constraint firstItem="q9a-KQ-qbT" firstAttribute="trailing" secondItem="BG1-4v-kcF" secondAttribute="trailing" id="gXs-gf-2qc"/>
                                 <constraint firstAttribute="bottom" secondItem="bob-7z-ZfQ" secondAttribute="bottom" constant="4" id="kBt-5A-QXb"/>
                                 <constraint firstItem="wTO-Uv-4bD" firstAttribute="centerY" secondItem="q9a-KQ-qbT" secondAttribute="centerY" id="mQ6-ka-oDk"/>
+                                <constraint firstItem="wTO-Uv-4bD" firstAttribute="top" secondItem="tb5-dK-rfp" secondAttribute="top" id="oHN-hy-HDh"/>
+                                <constraint firstItem="wTO-Uv-4bD" firstAttribute="trailing" secondItem="tb5-dK-rfp" secondAttribute="trailing" id="rNa-UV-aWs"/>
                                 <constraint firstAttribute="bottom" secondItem="q9a-KQ-qbT" secondAttribute="bottom" constant="2" id="s8O-eG-lxt"/>
+                                <constraint firstItem="q9a-KQ-qbT" firstAttribute="leading" secondItem="BG1-4v-kcF" secondAttribute="leading" id="sT0-H4-TrI"/>
                                 <constraint firstItem="bob-7z-ZfQ" firstAttribute="leading" secondItem="bIM-9m-lUi" secondAttribute="leading" constant="12" id="wKb-Cc-Hlb"/>
                             </constraints>
                         </view>
@@ -1570,6 +1591,14 @@
                                     <rect key="frame" x="0.0" y="0.0" width="34" height="40"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </view>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kCz-pQ-vpf" userLabel="Voice Note Button Highlight View">
+                                    <rect key="frame" x="1" y="4" width="32" height="32"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="32" id="WKO-nN-8WI"/>
+                                        <constraint firstAttribute="width" constant="32" id="nuR-bD-LRh"/>
+                                    </constraints>
+                                </view>
                                 <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Myj-fU-jVp" userLabel="StopButton">
                                     <rect key="frame" x="0.0" y="0.0" width="34" height="40"/>
                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -1581,6 +1610,7 @@
                             </subviews>
                             <constraints>
                                 <constraint firstItem="twl-eK-1Pf" firstAttribute="centerY" secondItem="KaA-j8-cin" secondAttribute="centerY" constant="2" id="2yY-Dg-YUo"/>
+                                <constraint firstItem="KaA-j8-cin" firstAttribute="centerY" secondItem="kCz-pQ-vpf" secondAttribute="centerY" id="5Ys-zu-atz"/>
                                 <constraint firstItem="w35-D2-ugh" firstAttribute="height" secondItem="Myj-fU-jVp" secondAttribute="height" id="6Lj-Nt-jRH"/>
                                 <constraint firstItem="Myj-fU-jVp" firstAttribute="leading" secondItem="1kN-fs-Mb6" secondAttribute="leading" id="7ef-kM-73S"/>
                                 <constraint firstItem="Myj-fU-jVp" firstAttribute="top" secondItem="1kN-fs-Mb6" secondAttribute="top" id="9EP-Tb-MiA"/>
@@ -1589,6 +1619,7 @@
                                 <constraint firstAttribute="trailing" secondItem="Myj-fU-jVp" secondAttribute="trailing" id="GE1-nR-lcP"/>
                                 <constraint firstItem="TdP-7Q-3me" firstAttribute="top" secondItem="1kN-fs-Mb6" secondAttribute="top" id="IjG-VN-whC"/>
                                 <constraint firstItem="twl-eK-1Pf" firstAttribute="centerX" secondItem="KaA-j8-cin" secondAttribute="centerX" id="KDZ-FC-OvP"/>
+                                <constraint firstItem="KaA-j8-cin" firstAttribute="centerX" secondItem="kCz-pQ-vpf" secondAttribute="centerX" id="PrA-KQ-L20"/>
                                 <constraint firstItem="Uiv-dr-zPY" firstAttribute="centerX" secondItem="KaA-j8-cin" secondAttribute="centerX" id="Rhe-lu-h46"/>
                                 <constraint firstAttribute="bottom" secondItem="TdP-7Q-3me" secondAttribute="bottom" id="Skr-8n-fSi"/>
                                 <constraint firstItem="w35-D2-ugh" firstAttribute="width" secondItem="Myj-fU-jVp" secondAttribute="width" id="Wct-Kg-d1D"/>
@@ -1855,7 +1886,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

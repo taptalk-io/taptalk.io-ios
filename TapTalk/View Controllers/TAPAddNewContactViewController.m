@@ -9,7 +9,7 @@
 #import "TAPAddNewContactViewController.h"
 #import "TAPAddNewContactView.h"
 #import "TAPScanQRCodePopupView.h"
-#import <AFNetworking/AFNetworking.h>
+#import "AFNetworking.h"
 
 @interface TAPAddNewContactViewController () <TAPSearchBarViewDelegate>
 
@@ -56,7 +56,7 @@
     
     _addContactPopupView = [[TAPScanQRCodePopupView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.addContactPopupView.closePopupButton addTarget:self action:@selector(closePopupButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.addContactPopupView.chatNowButton addTarget:self action:@selector(userChatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.addContactPopupView.chatNowButton.button addTarget:self action:@selector(userChatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.addContactPopupView showPopupView:NO animated:NO];
     [self.navigationController.view addSubview:self.addContactPopupView];
     [self.navigationController.view bringSubviewToFront:self.addContactPopupView];

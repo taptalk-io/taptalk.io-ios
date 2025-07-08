@@ -19,6 +19,8 @@
 		0A1640C127D9E94B007FACEE /* TAPCustomTextFieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */; };
 		0A6956C12893F0BF0090B20A /* TAPBaseTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A6956BF2893F0BE0090B20A /* TAPBaseTableView.m */; };
 		0A6956C22893F0BF0090B20A /* TAPBaseTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6956C02893F0BF0090B20A /* TAPBaseTableView.h */; };
+		0A94F47D2CBE272400E938F7 /* TapHighlightCustomButtonView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A94F47B2CBE272300E938F7 /* TapHighlightCustomButtonView.h */; };
+		0A94F47E2CBE272400E938F7 /* TapHighlightCustomButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A94F47C2CBE272300E938F7 /* TapHighlightCustomButtonView.m */; };
 		0A9997A728F5575C0063DDE0 /* TAPClearedRoomModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9997A528F5575B0063DDE0 /* TAPClearedRoomModel.h */; };
 		0A9997A828F5575C0063DDE0 /* TAPClearedRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A9997A628F5575C0063DDE0 /* TAPClearedRoomModel.m */; };
 		0A9D8010282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9D800D282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h */; };
@@ -50,6 +52,66 @@
 		0AE921E5290BA6D100D591A0 /* TapCustomNavigationBarButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AE921E3290BA6D100D591A0 /* TapCustomNavigationBarButton.h */; };
 		0AE921ED290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AE921EB290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h */; };
 		0AE921EE290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AE921EC290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m */; };
+		0AF5DCDD2E1D00C200168BF5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCAD2E1D00C100168BF5 /* LICENSE */; };
+		0AF5DCDE2E1D00C200168BF5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCAD2E1D00C100168BF5 /* LICENSE */; };
+		0AF5DCDF2E1D00C200168BF5 /* AFSecurityPolicy.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCAF2E1D00C100168BF5 /* AFSecurityPolicy.h */; };
+		0AF5DCE02E1D00C200168BF5 /* AFSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB02E1D00C100168BF5 /* AFSecurityPolicy.m */; };
+		0AF5DCE12E1D00C200168BF5 /* AFSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB02E1D00C100168BF5 /* AFSecurityPolicy.m */; };
+		0AF5DCE22E1D00C200168BF5 /* WKWebView+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCB22E1D00C100168BF5 /* WKWebView+AFNetworking.h */; };
+		0AF5DCE32E1D00C200168BF5 /* UIProgressView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB32E1D00C100168BF5 /* UIProgressView+AFNetworking.m */; };
+		0AF5DCE42E1D00C200168BF5 /* UIProgressView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB32E1D00C100168BF5 /* UIProgressView+AFNetworking.m */; };
+		0AF5DCE52E1D00C200168BF5 /* UIButton+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCB42E1D00C100168BF5 /* UIButton+AFNetworking.h */; };
+		0AF5DCE62E1D00C200168BF5 /* UIRefreshControl+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB52E1D00C100168BF5 /* UIRefreshControl+AFNetworking.m */; };
+		0AF5DCE72E1D00C200168BF5 /* UIRefreshControl+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB52E1D00C100168BF5 /* UIRefreshControl+AFNetworking.m */; };
+		0AF5DCE82E1D00C300168BF5 /* UIImageView+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCB62E1D00C100168BF5 /* UIImageView+AFNetworking.h */; };
+		0AF5DCE92E1D00C300168BF5 /* AFImageDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCB72E1D00C100168BF5 /* AFImageDownloader.h */; };
+		0AF5DCEA2E1D00C300168BF5 /* AFNetworkActivityIndicatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB82E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.m */; };
+		0AF5DCEB2E1D00C300168BF5 /* AFNetworkActivityIndicatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCB82E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.m */; };
+		0AF5DCEC2E1D00C300168BF5 /* AFAutoPurgingImageCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCB92E1D00C100168BF5 /* AFAutoPurgingImageCache.h */; };
+		0AF5DCED2E1D00C300168BF5 /* UIActivityIndicatorView+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCBA2E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.h */; };
+		0AF5DCEE2E1D00C300168BF5 /* WKWebView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCBB2E1D00C100168BF5 /* WKWebView+AFNetworking.m */; };
+		0AF5DCEF2E1D00C300168BF5 /* WKWebView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCBB2E1D00C100168BF5 /* WKWebView+AFNetworking.m */; };
+		0AF5DCF02E1D00C300168BF5 /* UIProgressView+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCBC2E1D00C100168BF5 /* UIProgressView+AFNetworking.h */; };
+		0AF5DCF12E1D00C300168BF5 /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCBD2E1D00C100168BF5 /* UIImageView+AFNetworking.m */; };
+		0AF5DCF22E1D00C300168BF5 /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCBD2E1D00C100168BF5 /* UIImageView+AFNetworking.m */; };
+		0AF5DCF32E1D00C300168BF5 /* UIKit+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCBE2E1D00C100168BF5 /* UIKit+AFNetworking.h */; };
+		0AF5DCF42E1D00C300168BF5 /* UIRefreshControl+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCBF2E1D00C100168BF5 /* UIRefreshControl+AFNetworking.h */; };
+		0AF5DCF52E1D00C300168BF5 /* UIButton+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC02E1D00C100168BF5 /* UIButton+AFNetworking.m */; };
+		0AF5DCF62E1D00C300168BF5 /* UIButton+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC02E1D00C100168BF5 /* UIButton+AFNetworking.m */; };
+		0AF5DCF72E1D00C300168BF5 /* UIActivityIndicatorView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC12E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.m */; };
+		0AF5DCF82E1D00C300168BF5 /* UIActivityIndicatorView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC12E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.m */; };
+		0AF5DCF92E1D00C300168BF5 /* AFAutoPurgingImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC22E1D00C100168BF5 /* AFAutoPurgingImageCache.m */; };
+		0AF5DCFA2E1D00C300168BF5 /* AFAutoPurgingImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC22E1D00C100168BF5 /* AFAutoPurgingImageCache.m */; };
+		0AF5DCFB2E1D00C300168BF5 /* AFNetworkActivityIndicatorManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCC32E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.h */; };
+		0AF5DCFC2E1D00C300168BF5 /* AFImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC42E1D00C100168BF5 /* AFImageDownloader.m */; };
+		0AF5DCFD2E1D00C300168BF5 /* AFImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC42E1D00C100168BF5 /* AFImageDownloader.m */; };
+		0AF5DCFE2E1D00C300168BF5 /* AFURLRequestSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCC62E1D00C100168BF5 /* AFURLRequestSerialization.h */; };
+		0AF5DCFF2E1D00C300168BF5 /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC72E1D00C100168BF5 /* AFURLResponseSerialization.m */; };
+		0AF5DD002E1D00C300168BF5 /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC72E1D00C100168BF5 /* AFURLResponseSerialization.m */; };
+		0AF5DD012E1D00C300168BF5 /* AFURLResponseSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCC82E1D00C100168BF5 /* AFURLResponseSerialization.h */; };
+		0AF5DD022E1D00C300168BF5 /* AFURLRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC92E1D00C100168BF5 /* AFURLRequestSerialization.m */; };
+		0AF5DD032E1D00C300168BF5 /* AFURLRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCC92E1D00C100168BF5 /* AFURLRequestSerialization.m */; };
+		0AF5DD042E1D00C300168BF5 /* AFNetworking.release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCCB2E1D00C100168BF5 /* AFNetworking.release.xcconfig */; };
+		0AF5DD052E1D00C300168BF5 /* AFNetworking.release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCCB2E1D00C100168BF5 /* AFNetworking.release.xcconfig */; };
+		0AF5DD062E1D00C300168BF5 /* AFNetworking-prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCCC2E1D00C100168BF5 /* AFNetworking-prefix.pch */; };
+		0AF5DD072E1D00C300168BF5 /* AFNetworking.debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCCD2E1D00C100168BF5 /* AFNetworking.debug.xcconfig */; };
+		0AF5DD082E1D00C300168BF5 /* AFNetworking.debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCCD2E1D00C100168BF5 /* AFNetworking.debug.xcconfig */; };
+		0AF5DD092E1D00C300168BF5 /* AFNetworking-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCCE2E1D00C100168BF5 /* AFNetworking-umbrella.h */; };
+		0AF5DD0A2E1D00C300168BF5 /* AFNetworking-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD02E1D00C100168BF5 /* AFNetworking-dummy.m */; };
+		0AF5DD0B2E1D00C300168BF5 /* AFNetworking-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD02E1D00C100168BF5 /* AFNetworking-dummy.m */; };
+		0AF5DD0C2E1D00C300168BF5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD12E1D00C100168BF5 /* README.md */; };
+		0AF5DD0D2E1D00C300168BF5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD12E1D00C100168BF5 /* README.md */; };
+		0AF5DD0E2E1D00C300168BF5 /* AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCD22E1D00C100168BF5 /* AFNetworking.h */; };
+		0AF5DD0F2E1D00C300168BF5 /* AFNetworkReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCD42E1D00C100168BF5 /* AFNetworkReachabilityManager.h */; };
+		0AF5DD102E1D00C300168BF5 /* AFNetworkReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD52E1D00C200168BF5 /* AFNetworkReachabilityManager.m */; };
+		0AF5DD112E1D00C300168BF5 /* AFNetworkReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD52E1D00C200168BF5 /* AFNetworkReachabilityManager.m */; };
+		0AF5DD122E1D00C300168BF5 /* AFURLSessionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCD82E1D00C200168BF5 /* AFURLSessionManager.h */; };
+		0AF5DD132E1D00C300168BF5 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD92E1D00C200168BF5 /* AFHTTPSessionManager.m */; };
+		0AF5DD142E1D00C300168BF5 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCD92E1D00C200168BF5 /* AFHTTPSessionManager.m */; };
+		0AF5DD152E1D00C300168BF5 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCDA2E1D00C200168BF5 /* AFURLSessionManager.m */; };
+		0AF5DD162E1D00C300168BF5 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5DCDA2E1D00C200168BF5 /* AFURLSessionManager.m */; };
+		0AF5DD172E1D00C300168BF5 /* AFCompatibilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCDB2E1D00C200168BF5 /* AFCompatibilityMacros.h */; };
+		0AF5DD182E1D00C300168BF5 /* AFHTTPSessionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF5DCDC2E1D00C200168BF5 /* AFHTTPSessionManager.h */; };
 		0AF82BCB297A5F7300E0E26F /* TapMessageRecipientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF82BC9297A5F7200E0E26F /* TapMessageRecipientModel.m */; };
 		0AF82BCC297A5F7300E0E26F /* TapMessageRecipientModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF82BCA297A5F7300E0E26F /* TapMessageRecipientModel.h */; };
 		0AF82BD6297A614E00E0E26F /* TAPReportUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AF82BCD297A614E00E0E26F /* TAPReportUserViewController.xib */; };
@@ -475,6 +537,8 @@
 		0A1640B927D9E94B007FACEE /* TAPCustomTextFieldView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPCustomTextFieldView.m; sourceTree = "<group>"; };
 		0A6956BF2893F0BE0090B20A /* TAPBaseTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPBaseTableView.m; sourceTree = "<group>"; };
 		0A6956C02893F0BF0090B20A /* TAPBaseTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPBaseTableView.h; sourceTree = "<group>"; };
+		0A94F47B2CBE272300E938F7 /* TapHighlightCustomButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapHighlightCustomButtonView.h; sourceTree = "<group>"; };
+		0A94F47C2CBE272300E938F7 /* TapHighlightCustomButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapHighlightCustomButtonView.m; sourceTree = "<group>"; };
 		0A9997A528F5575B0063DDE0 /* TAPClearedRoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPClearedRoomModel.h; sourceTree = "<group>"; };
 		0A9997A628F5575C0063DDE0 /* TAPClearedRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAPClearedRoomModel.m; sourceTree = "<group>"; };
 		0A9D800D282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAPMyVoiceNoteBubbleTableViewCell.h; sourceTree = "<group>"; };
@@ -507,6 +571,47 @@
 		0AE921E3290BA6D100D591A0 /* TapCustomNavigationBarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapCustomNavigationBarButton.h; sourceTree = "<group>"; };
 		0AE921EB290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapBaseChatRoomCustomNavigationBarManager.h; sourceTree = "<group>"; };
 		0AE921EC290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapBaseChatRoomCustomNavigationBarManager.m; sourceTree = "<group>"; };
+		0AF5DCAD2E1D00C100168BF5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		0AF5DCAF2E1D00C100168BF5 /* AFSecurityPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFSecurityPolicy.h; sourceTree = "<group>"; };
+		0AF5DCB02E1D00C100168BF5 /* AFSecurityPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFSecurityPolicy.m; sourceTree = "<group>"; };
+		0AF5DCB22E1D00C100168BF5 /* WKWebView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCB32E1D00C100168BF5 /* UIProgressView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIProgressView+AFNetworking.m"; sourceTree = "<group>"; };
+		0AF5DCB42E1D00C100168BF5 /* UIButton+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCB52E1D00C100168BF5 /* UIRefreshControl+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIRefreshControl+AFNetworking.m"; sourceTree = "<group>"; };
+		0AF5DCB62E1D00C100168BF5 /* UIImageView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCB72E1D00C100168BF5 /* AFImageDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFImageDownloader.h; sourceTree = "<group>"; };
+		0AF5DCB82E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFNetworkActivityIndicatorManager.m; sourceTree = "<group>"; };
+		0AF5DCB92E1D00C100168BF5 /* AFAutoPurgingImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFAutoPurgingImageCache.h; sourceTree = "<group>"; };
+		0AF5DCBA2E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIActivityIndicatorView+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCBB2E1D00C100168BF5 /* WKWebView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WKWebView+AFNetworking.m"; sourceTree = "<group>"; };
+		0AF5DCBC2E1D00C100168BF5 /* UIProgressView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIProgressView+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCBD2E1D00C100168BF5 /* UIImageView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+AFNetworking.m"; sourceTree = "<group>"; };
+		0AF5DCBE2E1D00C100168BF5 /* UIKit+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIKit+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCBF2E1D00C100168BF5 /* UIRefreshControl+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIRefreshControl+AFNetworking.h"; sourceTree = "<group>"; };
+		0AF5DCC02E1D00C100168BF5 /* UIButton+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+AFNetworking.m"; sourceTree = "<group>"; };
+		0AF5DCC12E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIActivityIndicatorView+AFNetworking.m"; sourceTree = "<group>"; };
+		0AF5DCC22E1D00C100168BF5 /* AFAutoPurgingImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFAutoPurgingImageCache.m; sourceTree = "<group>"; };
+		0AF5DCC32E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworkActivityIndicatorManager.h; sourceTree = "<group>"; };
+		0AF5DCC42E1D00C100168BF5 /* AFImageDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFImageDownloader.m; sourceTree = "<group>"; };
+		0AF5DCC62E1D00C100168BF5 /* AFURLRequestSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLRequestSerialization.h; sourceTree = "<group>"; };
+		0AF5DCC72E1D00C100168BF5 /* AFURLResponseSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLResponseSerialization.m; sourceTree = "<group>"; };
+		0AF5DCC82E1D00C100168BF5 /* AFURLResponseSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLResponseSerialization.h; sourceTree = "<group>"; };
+		0AF5DCC92E1D00C100168BF5 /* AFURLRequestSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLRequestSerialization.m; sourceTree = "<group>"; };
+		0AF5DCCB2E1D00C100168BF5 /* AFNetworking.release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = AFNetworking.release.xcconfig; sourceTree = "<group>"; };
+		0AF5DCCC2E1D00C100168BF5 /* AFNetworking-prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AFNetworking-prefix.pch"; sourceTree = "<group>"; };
+		0AF5DCCD2E1D00C100168BF5 /* AFNetworking.debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = AFNetworking.debug.xcconfig; sourceTree = "<group>"; };
+		0AF5DCCE2E1D00C100168BF5 /* AFNetworking-umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AFNetworking-umbrella.h"; sourceTree = "<group>"; };
+		0AF5DCCF2E1D00C100168BF5 /* AFNetworking.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = AFNetworking.modulemap; sourceTree = "<group>"; };
+		0AF5DCD02E1D00C100168BF5 /* AFNetworking-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AFNetworking-dummy.m"; sourceTree = "<group>"; };
+		0AF5DCD12E1D00C100168BF5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0AF5DCD22E1D00C100168BF5 /* AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworking.h; sourceTree = "<group>"; };
+		0AF5DCD42E1D00C100168BF5 /* AFNetworkReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworkReachabilityManager.h; sourceTree = "<group>"; };
+		0AF5DCD52E1D00C200168BF5 /* AFNetworkReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFNetworkReachabilityManager.m; sourceTree = "<group>"; };
+		0AF5DCD82E1D00C200168BF5 /* AFURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLSessionManager.h; sourceTree = "<group>"; };
+		0AF5DCD92E1D00C200168BF5 /* AFHTTPSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPSessionManager.m; sourceTree = "<group>"; };
+		0AF5DCDA2E1D00C200168BF5 /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
+		0AF5DCDB2E1D00C200168BF5 /* AFCompatibilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFCompatibilityMacros.h; sourceTree = "<group>"; };
+		0AF5DCDC2E1D00C200168BF5 /* AFHTTPSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPSessionManager.h; sourceTree = "<group>"; };
 		0AF82BC9297A5F7200E0E26F /* TapMessageRecipientModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapMessageRecipientModel.m; sourceTree = "<group>"; };
 		0AF82BCA297A5F7300E0E26F /* TapMessageRecipientModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapMessageRecipientModel.h; sourceTree = "<group>"; };
 		0AF82BCD297A614E00E0E26F /* TAPReportUserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TAPReportUserViewController.xib; sourceTree = "<group>"; };
@@ -937,6 +1042,102 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0AF5DCAC2E1D00C100168BF5 /* AFNetworking */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCD22E1D00C100168BF5 /* AFNetworking.h */,
+				0AF5DCAD2E1D00C100168BF5 /* LICENSE */,
+				0AF5DCD12E1D00C100168BF5 /* README.md */,
+				0AF5DCD72E1D00C200168BF5 /* NSURLSession */,
+				0AF5DCD32E1D00C100168BF5 /* Reachability */,
+				0AF5DCAE2E1D00C100168BF5 /* Security */,
+				0AF5DCC52E1D00C100168BF5 /* Serialization */,
+				0AF5DCCA2E1D00C100168BF5 /* Support Files */,
+				0AF5DCB12E1D00C100168BF5 /* UIKit */,
+			);
+			path = AFNetworking;
+			sourceTree = "<group>";
+		};
+		0AF5DCAE2E1D00C100168BF5 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCAF2E1D00C100168BF5 /* AFSecurityPolicy.h */,
+				0AF5DCB02E1D00C100168BF5 /* AFSecurityPolicy.m */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
+		0AF5DCB12E1D00C100168BF5 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCB92E1D00C100168BF5 /* AFAutoPurgingImageCache.h */,
+				0AF5DCC22E1D00C100168BF5 /* AFAutoPurgingImageCache.m */,
+				0AF5DCB72E1D00C100168BF5 /* AFImageDownloader.h */,
+				0AF5DCC42E1D00C100168BF5 /* AFImageDownloader.m */,
+				0AF5DCC32E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.h */,
+				0AF5DCB82E1D00C100168BF5 /* AFNetworkActivityIndicatorManager.m */,
+				0AF5DCBA2E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.h */,
+				0AF5DCC12E1D00C100168BF5 /* UIActivityIndicatorView+AFNetworking.m */,
+				0AF5DCB42E1D00C100168BF5 /* UIButton+AFNetworking.h */,
+				0AF5DCC02E1D00C100168BF5 /* UIButton+AFNetworking.m */,
+				0AF5DCB62E1D00C100168BF5 /* UIImageView+AFNetworking.h */,
+				0AF5DCBD2E1D00C100168BF5 /* UIImageView+AFNetworking.m */,
+				0AF5DCBE2E1D00C100168BF5 /* UIKit+AFNetworking.h */,
+				0AF5DCBC2E1D00C100168BF5 /* UIProgressView+AFNetworking.h */,
+				0AF5DCB32E1D00C100168BF5 /* UIProgressView+AFNetworking.m */,
+				0AF5DCBF2E1D00C100168BF5 /* UIRefreshControl+AFNetworking.h */,
+				0AF5DCB52E1D00C100168BF5 /* UIRefreshControl+AFNetworking.m */,
+				0AF5DCB22E1D00C100168BF5 /* WKWebView+AFNetworking.h */,
+				0AF5DCBB2E1D00C100168BF5 /* WKWebView+AFNetworking.m */,
+			);
+			path = UIKit;
+			sourceTree = "<group>";
+		};
+		0AF5DCC52E1D00C100168BF5 /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCC62E1D00C100168BF5 /* AFURLRequestSerialization.h */,
+				0AF5DCC92E1D00C100168BF5 /* AFURLRequestSerialization.m */,
+				0AF5DCC72E1D00C100168BF5 /* AFURLResponseSerialization.m */,
+				0AF5DCC82E1D00C100168BF5 /* AFURLResponseSerialization.h */,
+			);
+			path = Serialization;
+			sourceTree = "<group>";
+		};
+		0AF5DCCA2E1D00C100168BF5 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCCF2E1D00C100168BF5 /* AFNetworking.modulemap */,
+				0AF5DCD02E1D00C100168BF5 /* AFNetworking-dummy.m */,
+				0AF5DCCE2E1D00C100168BF5 /* AFNetworking-umbrella.h */,
+				0AF5DCCC2E1D00C100168BF5 /* AFNetworking-prefix.pch */,
+				0AF5DCCB2E1D00C100168BF5 /* AFNetworking.release.xcconfig */,
+				0AF5DCCD2E1D00C100168BF5 /* AFNetworking.debug.xcconfig */,
+			);
+			path = "Support Files";
+			sourceTree = "<group>";
+		};
+		0AF5DCD32E1D00C100168BF5 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCD42E1D00C100168BF5 /* AFNetworkReachabilityManager.h */,
+				0AF5DCD52E1D00C200168BF5 /* AFNetworkReachabilityManager.m */,
+			);
+			path = Reachability;
+			sourceTree = "<group>";
+		};
+		0AF5DCD72E1D00C200168BF5 /* NSURLSession */ = {
+			isa = PBXGroup;
+			children = (
+				0AF5DCDB2E1D00C200168BF5 /* AFCompatibilityMacros.h */,
+				0AF5DCDC2E1D00C200168BF5 /* AFHTTPSessionManager.h */,
+				0AF5DCD92E1D00C200168BF5 /* AFHTTPSessionManager.m */,
+				0AF5DCD82E1D00C200168BF5 /* AFURLSessionManager.h */,
+				0AF5DCDA2E1D00C200168BF5 /* AFURLSessionManager.m */,
+			);
+			path = NSURLSession;
+			sourceTree = "<group>";
+		};
 		55834131EE3FE88D54A14E41 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1054,6 +1255,7 @@
 			isa = PBXGroup;
 			children = (
 				D77B5F8F2158C4E900253BDC /* AESCrypt */,
+				0AF5DCAC2E1D00C100168BF5 /* AFNetworking */,
 				D78364012158E3CD008AF7F5 /* Secure-NSUserDefaults */,
 				B681FA5821F707570074749B /* Base64 */,
 				D77B5E672158BABB00253BDC /* TAPImageView.h */,
@@ -1097,6 +1299,8 @@
 				D776CB8322CCA760003B0D4F /* UIImage+Color.m */,
 				D77910AA244ED123002037DF /* NSBundle+Language.h */,
 				D79533522450039200C4F90D /* NSBundle+Language.m */,
+				0A94F47B2CBE272300E938F7 /* TapHighlightCustomButtonView.h */,
+				0A94F47C2CBE272300E938F7 /* TapHighlightCustomButtonView.m */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1593,11 +1797,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF5DD122E1D00C300168BF5 /* AFURLSessionManager.h in Headers */,
 				D77B5ED32158BB6E00253BDC /* TAPGroupModel.h in Headers */,
 				D7F986E92251BB1B0087B652 /* TAPCustomTextFieldView.h in Headers */,
 				DF343D0D22F2C6A7004D54F5 /* TAPMediaDetailPreviewViewController.h in Headers */,
 				DF343D1122F2C6DB004D54F5 /* TAPCreateGroupViewController.h in Headers */,
 				0A1640BB27D9E94B007FACEE /* TAPCustomTextFieldView.h in Headers */,
+				0AF5DCE92E1D00C300168BF5 /* AFImageDownloader.h in Headers */,
 				DF343D0522F2C642004D54F5 /* TAPMediaDetailView.h in Headers */,
 				D77B5F282158BB9500253BDC /* TAPCreateGroupView.h in Headers */,
 				D77B5F562158BBEA00253BDC /* TAPBlockedListViewController.h in Headers */,
@@ -1622,6 +1828,7 @@
 				D7244BD921D889AD000BEEEE /* TAPImageSelectViewController.h in Headers */,
 				D729550421899E5100B2AC56 /* TAPContactCacheManager.h in Headers */,
 				D7358CAF227AD03200C65C67 /* TAPCountryPickerViewController.h in Headers */,
+				0AF5DD092E1D00C300168BF5 /* AFNetworking-umbrella.h in Headers */,
 				0AC06E092915038A00CB55F5 /* TAPScheduledMessageModel.h in Headers */,
 				D73F0CE6237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.h in Headers */,
 				D7F95BDA21CB885B00885FC6 /* TAPCustomGrowingTextView.h in Headers */,
@@ -1629,9 +1836,11 @@
 				D77B5F002158BB8700253BDC /* TAPBaseTableViewCell.h in Headers */,
 				D798F6A62301351D0001CC16 /* TAPCoreErrorManager.h in Headers */,
 				D77B5ED42158BB6E00253BDC /* TAPImageURLModel.h in Headers */,
+				0AF5DCE82E1D00C300168BF5 /* UIImageView+AFNetworking.h in Headers */,
 				F51B8E9021621AB300C03479 /* TAPYourChatBubbleTableViewCell.h in Headers */,
 				D7D081182190255B0037FA57 /* TAPProductListCollectionViewCell.h in Headers */,
 				D795E133222CF1D7008E7B99 /* TAPYourFileBubbleTableViewCell.h in Headers */,
+				0A94F47D2CBE272400E938F7 /* TapHighlightCustomButtonView.h in Headers */,
 				D77B5F6E2158BBEA00253BDC /* TAPCustomNavigationController.h in Headers */,
 				F5301EF6217A2209007227D2 /* TAPContactRealmModel.h in Headers */,
 				F53288102174A911004E7A25 /* TAPRecentSearchTableViewCell.h in Headers */,
@@ -1653,12 +1862,14 @@
 				0A1640BD27D9E94B007FACEE /* TAPCustomPhoneNumberPickerView.h in Headers */,
 				D77B5EA12158BB4000253BDC /* TAPDatabaseManager.h in Headers */,
 				0A9D8017282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.h in Headers */,
+				0AF5DCED2E1D00C300168BF5 /* UIActivityIndicatorView+AFNetworking.h in Headers */,
 				D77B5F6B2158BBEA00253BDC /* TAPBaseViewController.h in Headers */,
 				D7E26BE1225E042200B50506 /* TAPYourVideoBubbleTableViewCell.h in Headers */,
 				D76948BA21B10D2B00AE0BE6 /* TAPCustomBubbleManager.h in Headers */,
 				D754CFB42216ECC6008CE9F9 /* TAPPickLocationView.h in Headers */,
 				D71582F2217EE99700649C70 /* TAPNotificationManager.h in Headers */,
 				DFEFE68D21AFC79100E486F8 /* TAPCustomKeyboardItemModel.h in Headers */,
+				0AF5DCDF2E1D00C200168BF5 /* AFSecurityPolicy.h in Headers */,
 				D77B5E8C2158BB2900253BDC /* AESCrypt.h in Headers */,
 				D780A08321AE656E001D673D /* TAPBaseMyBubbleTableViewCell.h in Headers */,
 				D79A3E68216C72B3004525CE /* TAPSearchBarView.h in Headers */,
@@ -1670,12 +1881,15 @@
 				A97EC5C925BEF17B0068E2D4 /* TapUI.h in Headers */,
 				DFA6365222D42B4900B9CB99 /* TAPGroupManager.h in Headers */,
 				DFFEFEA72227E66000017739 /* TAPWebViewViewController.h in Headers */,
+				0AF5DD062E1D00C300168BF5 /* AFNetworking-prefix.pch in Headers */,
+				0AF5DD0F2E1D00C300168BF5 /* AFNetworkReachabilityManager.h in Headers */,
 				0A1640B127D9D71C007FACEE /* TAPPhotoListModel.h in Headers */,
 				D7D3B43B22F0374400D1DFF7 /* TAPCoreChatRoomManager.h in Headers */,
 				D77B5EE52158BB7E00253BDC /* TAPContactCollectionViewCell.h in Headers */,
 				D71582FB217EFAEC00649C70 /* TAPCustomNotificationAlertView.h in Headers */,
 				F58EF7E22188244E00F50B24 /* TAPProfileView.h in Headers */,
 				D778FA9C221D7E4F000E3A00 /* TAPPinLocationSearchResultTableViewCell.h in Headers */,
+				0AF5DCFE2E1D00C300168BF5 /* AFURLRequestSerialization.h in Headers */,
 				D77B5E6F2158BABB00253BDC /* TAPImageView.h in Headers */,
 				D77B5F312158BB9500253BDC /* TAPScanQRCodeView.h in Headers */,
 				D709F856229E2FDA00EB81C2 /* TAPYourChatDeletedBubbleTableViewCell.h in Headers */,
@@ -1689,9 +1903,11 @@
 				D78364052158E3DD008AF7F5 /* NSUserDefaults+MPSecureUserDefaults.h in Headers */,
 				0ABD955128DB154B00BAD126 /* TAPMutedRoomModel.h in Headers */,
 				0A9997A728F5575C0063DDE0 /* TAPClearedRoomModel.h in Headers */,
+				0AF5DCFB2E1D00C300168BF5 /* AFNetworkActivityIndicatorManager.h in Headers */,
 				D7115364222E54A90033C082 /* TAPDataFileModel.h in Headers */,
 				0AC06E112915139B00CB55F5 /* TAPSecondaryChatViewController.h in Headers */,
 				D74BA2AE2162066200DF494C /* TAPRoomListModel.h in Headers */,
+				0AF5DD182E1D00C300168BF5 /* AFHTTPSessionManager.h in Headers */,
 				D7F986F12251BB500087B652 /* TAPCustomPhoneNumberPickerView.h in Headers */,
 				0A9D8010282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.h in Headers */,
 				D77B5F0A2158BB8700253BDC /* TAPBaseXIBRotatedTableViewCell.h in Headers */,
@@ -1709,6 +1925,7 @@
 				D774A95222E9742A005CAD5D /* TAPCoreRoomListManager.h in Headers */,
 				DF936AA322968F7F00F17B4C /* TAPLoadingTableViewCell.h in Headers */,
 				D7FB9EE721C8D71900E26FC7 /* TAPThumbnailImagePreviewCollectionViewCell.h in Headers */,
+				0AF5DCF32E1D00C300168BF5 /* UIKit+AFNetworking.h in Headers */,
 				DFFEFEA32227E64400017739 /* TAPWebViewView.h in Headers */,
 				0A9D801B282EA27000597B7E /* TAPAudioManager.h in Headers */,
 				D7A98E46221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.h in Headers */,
@@ -1742,14 +1959,18 @@
 				D7A98E3E221EFFFE0007BF81 /* TAPMyLocationBubbleTableViewCell.h in Headers */,
 				D70DA2782225274400824E86 /* TAPForwardListView.h in Headers */,
 				DFA598FF21B7B17D0082C5F3 /* TAPOnlineStatusModel.h in Headers */,
+				0AF5DD0E2E1D00C300168BF5 /* AFNetworking.h in Headers */,
 				0AF82BDE297A614E00E0E26F /* TAPReportUserViewController.h in Headers */,
 				D77B5ECF2158BB6E00253BDC /* TAPMessageModel.h in Headers */,
 				D77B5F032158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.h in Headers */,
 				D77B5F752158BC7A00253BDC /* Configs.h in Headers */,
 				D780A08821AEC413001D673D /* TAPBaseGeneralBubbleTableViewCell.h in Headers */,
+				0AF5DCE52E1D00C200168BF5 /* UIButton+AFNetworking.h in Headers */,
 				DFF60D5A225B44B40038FB4D /* TAPLeftCustomNavigationButton.h in Headers */,
 				D72F395F2240A14C00F4FC38 /* TAPMediaPreviewModel.h in Headers */,
 				D7FB9EDF21C8C7BC00E26FC7 /* TAPImagePreviewView.h in Headers */,
+				0AF5DCEC2E1D00C300168BF5 /* AFAutoPurgingImageCache.h in Headers */,
+				0AF5DCF42E1D00C300168BF5 /* UIRefreshControl+AFNetworking.h in Headers */,
 				D77B5F2C2158BB9500253BDC /* TAPCreateGroupSubjectView.h in Headers */,
 				0AE921ED290BC6D100D591A0 /* TapBaseChatRoomCustomNavigationBarManager.h in Headers */,
 				D77B5EBD2158BB6300253BDC /* TAPMessageRealmModel.h in Headers */,
@@ -1782,8 +2003,10 @@
 				D77B5EA82158BB4000253BDC /* TAPEncryptorManager.h in Headers */,
 				D795E12D222CF1BD008E7B99 /* TAPMyFileBubbleTableViewCell.h in Headers */,
 				F5CC1B832189700200F39F7D /* TAPProfileCollectionViewCell.h in Headers */,
+				0AF5DCE22E1D00C200168BF5 /* WKWebView+AFNetworking.h in Headers */,
 				D798D3A7229D4D6D00F73CA9 /* TAPMyChatDeletedBubbleTableViewCell.h in Headers */,
 				D77B5ED12158BB6E00253BDC /* TAPBaseModel.h in Headers */,
+				0AF5DCF02E1D00C300168BF5 /* UIProgressView+AFNetworking.h in Headers */,
 				D77B5EFC2158BB8700253BDC /* TAPBaseXIBTableViewCell.h in Headers */,
 				0AB2B0D328C9E23500407B17 /* TAPLinksShareMediaTableViewCell.h in Headers */,
 				DF94DD7922B0BD5B00E7E629 /* TAPSystemMessageTableViewCell.h in Headers */,
@@ -1794,6 +2017,8 @@
 				D74600A72163274600CE5EEC /* TAPSetupRoomListView.h in Headers */,
 				D77B5F332158BB9500253BDC /* TAPBlockedListView.h in Headers */,
 				DF343D0122F2C592004D54F5 /* TAPMediaDetailViewController.h in Headers */,
+				0AF5DD172E1D00C300168BF5 /* AFCompatibilityMacros.h in Headers */,
+				0AF5DD012E1D00C300168BF5 /* AFURLResponseSerialization.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1881,6 +2106,7 @@
 			files = (
 				F5717643216DD31000B50F3C /* TAPKeyboardTableViewCell.xib in Resources */,
 				D7F986F72251C1C40087B652 /* PTRootUI-Bold.ttf in Resources */,
+				0AF5DD072E1D00C300168BF5 /* AFNetworking.debug.xcconfig in Resources */,
 				D709F858229E2FDA00EB81C2 /* TAPYourChatDeletedBubbleTableViewCell.xib in Resources */,
 				0A9D8012282EA1EF00597B7E /* TAPMyVoiceNoteBubbleTableViewCell.xib in Resources */,
 				D798D3A9229D4D6D00F73CA9 /* TAPMyChatDeletedBubbleTableViewCell.xib in Resources */,
@@ -1903,6 +2129,7 @@
 				D780A08521AE656E001D673D /* TAPBaseMyBubbleTableViewCell.xib in Resources */,
 				D7FF4CEB2176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.xib in Resources */,
 				0AB2B0D728C9E23500407B17 /* TAPLinksShareMediaTableViewCell.xib in Resources */,
+				0AF5DCDD2E1D00C200168BF5 /* LICENSE in Resources */,
 				D7A98E3F221EFFFE0007BF81 /* TAPMyLocationBubbleTableViewCell.xib in Resources */,
 				F56AAE612186F4E000E0ECC3 /* TAPYourImageBubbleTableViewCell.xib in Resources */,
 				D795E12F222CF1BD008E7B99 /* TAPMyFileBubbleTableViewCell.xib in Resources */,
@@ -1913,11 +2140,13 @@
 				D7F986F92251C1C40087B652 /* PTRootUI-Medium.ttf in Resources */,
 				DF936AA522968F7F00F17B4C /* TAPLoadingTableViewCell.xib in Resources */,
 				D7A98E34221EFF1B0007BF81 /* Assets.xcassets in Resources */,
+				0AF5DD042E1D00C300168BF5 /* AFNetworking.release.xcconfig in Resources */,
 				D795E135222CF1D7008E7B99 /* TAPYourFileBubbleTableViewCell.xib in Resources */,
 				0A9D8016282EA23900597B7E /* TAPYourVoiceNoteBubbleTableViewCell.xib in Resources */,
 				0AB2B0D528C9E23500407B17 /* TAPDocumentShareMediaTableViewCell.xib in Resources */,
 				F5E0B26F215B7BBB0040163B /* TAPMyChatBubbleTableViewCell.xib in Resources */,
 				D7A98E44221F001C0007BF81 /* TAPYourLocationBubbleTableViewCell.xib in Resources */,
+				0AF5DD0C2E1D00C300168BF5 /* README.md in Resources */,
 				D73D85AA246BC605008ABEB9 /* TAPMentionListXIBTableViewCell.xib in Resources */,
 				D7F986FA2251C1C40087B652 /* PTRootUI-Regular.ttf in Resources */,
 			);
@@ -1927,6 +2156,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF5DD052E1D00C300168BF5 /* AFNetworking.release.xcconfig in Resources */,
+				0AF5DCDE2E1D00C200168BF5 /* LICENSE in Resources */,
+				0AF5DD0D2E1D00C300168BF5 /* README.md in Resources */,
+				0AF5DD082E1D00C300168BF5 /* AFNetworking.debug.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1979,6 +2212,7 @@
 				D77B5EE32158BB7E00253BDC /* TAPBaseCollectionViewCell.m in Sources */,
 				DF343D0722F2C650004D54F5 /* TAPMediaDetailView.m in Sources */,
 				D7CAAE002251FE1A005493D9 /* TAPCountryModel.m in Sources */,
+				0AF5DCF52E1D00C300168BF5 /* UIButton+AFNetworking.m in Sources */,
 				DF343D0F22F2C6B1004D54F5 /* TAPMediaDetailPreviewViewController.m in Sources */,
 				D77B5E8B2158BB2900253BDC /* NSData+CommonCrypto.m in Sources */,
 				D77B5EFD2158BB8700253BDC /* TAPNewChatAddNewContactTableViewCell.m in Sources */,
@@ -1987,6 +2221,7 @@
 				D7D3B43822F0373700D1DFF7 /* TAPCoreContactManager.m in Sources */,
 				0A1640B027D9D71C007FACEE /* TAPPhotoListModel.m in Sources */,
 				F5301EF7217A2209007227D2 /* TAPContactRealmModel.m in Sources */,
+				0AF5DCEA2E1D00C300168BF5 /* AFNetworkActivityIndicatorManager.m in Sources */,
 				DF343D0B22F2C67D004D54F5 /* TAPMediaDetailPreviewView.m in Sources */,
 				D7115365222E54A90033C082 /* TAPDataFileModel.m in Sources */,
 				D77B5F5C2158BBEA00253BDC /* TAPSearchViewController.m in Sources */,
@@ -2000,6 +2235,7 @@
 				F51B8E9121621AB300C03479 /* TAPYourChatBubbleTableViewCell.m in Sources */,
 				D7796595215B3F1300756A38 /* TAPConnectionStatusView.m in Sources */,
 				D70DA2792225274400824E86 /* TAPForwardListView.m in Sources */,
+				0AF5DCF12E1D00C300168BF5 /* UIImageView+AFNetworking.m in Sources */,
 				D77B5EFB2158BB8700253BDC /* TAPBaseTableViewCell.m in Sources */,
 				D703D23122D4BAAD002822E0 /* TAPGroupTargetModel.m in Sources */,
 				D7810820227DBB7500B41034 /* TAPMyAccountViewController.m in Sources */,
@@ -2022,13 +2258,16 @@
 				D7FF4CE42176F171004F1809 /* TAPUnreadMessagesBubbleTableViewCell.m in Sources */,
 				D7D3B44822FD7D8D00D1DFF7 /* TAPProjectConfigsModel.m in Sources */,
 				D77B5E882158BB2900253BDC /* NSData+Base64.m in Sources */,
+				0AF5DCEE2E1D00C300168BF5 /* WKWebView+AFNetworking.m in Sources */,
 				F56AAE5A2186EEFD00E0ECC3 /* TAPMyImageBubbleTableViewCell.m in Sources */,
 				0AC06E122915139B00CB55F5 /* TAPSecondaryChatViewController.m in Sources */,
 				0AB2B0CB28C9E15A00407B17 /* TAPSharedMediaViewController.m in Sources */,
 				0A9D801C282EA27000597B7E /* TAPAudioManager.m in Sources */,
+				0AF5DD0A2E1D00C300168BF5 /* AFNetworking-dummy.m in Sources */,
 				D7D3B43C22F0374400D1DFF7 /* TAPCoreChatRoomManager.m in Sources */,
 				D77B5F2B2158BB9500253BDC /* TAPCreateGroupView.m in Sources */,
 				D747AB6B2357229C00E1B443 /* TapUIChatViewController.m in Sources */,
+				0AF5DCE62E1D00C200168BF5 /* UIRefreshControl+AFNetworking.m in Sources */,
 				D77B5EDB2158BB6E00253BDC /* TAPUserModel.m in Sources */,
 				D73D85A6246BB52A008ABEB9 /* TAPMentionListTableViewCell.m in Sources */,
 				D7B49550215B55B800F07BEC /* TAPUserRoleModel.m in Sources */,
@@ -2057,12 +2296,14 @@
 				D77B5E722158BABB00253BDC /* TAPImageView.m in Sources */,
 				F5E0B26E215B7BBB0040163B /* TAPMyChatBubbleTableViewCell.m in Sources */,
 				D79533512450005400C4F90D /* TAPLanguageManager.m in Sources */,
+				0AF5DCF72E1D00C300168BF5 /* UIActivityIndicatorView+AFNetworking.m in Sources */,
 				0A1640C127D9E94B007FACEE /* TAPCustomTextFieldView.m in Sources */,
 				D77B5ED62158BB6E00253BDC /* TAPGroupModel.m in Sources */,
 				0AF82BD7297A614E00E0E26F /* TAPGroupInCommonViewController.m in Sources */,
 				A97EC5CA25BEF17B0068E2D4 /* TapUI.m in Sources */,
 				D70DA27D2225275500824E86 /* TAPForwardListViewController.m in Sources */,
 				D7FF4CEA2176F3B8004F1809 /* TAPLoadMoreBubbleTableViewCell.m in Sources */,
+				0AF5DD132E1D00C300168BF5 /* AFHTTPSessionManager.m in Sources */,
 				D7358CB4227AD28400C65C67 /* TAPCountryPickerTableViewCell.m in Sources */,
 				D74600A82163274600CE5EEC /* TAPSetupRoomListView.m in Sources */,
 				DFFEFEA42227E64400017739 /* TAPWebViewView.m in Sources */,
@@ -2077,7 +2318,9 @@
 				D77B5EFF2158BB8700253BDC /* TAPNewChatBlockedContactsTableViewCell.m in Sources */,
 				D7111BA7215CC11C00D9225D /* TAPGradientView.m in Sources */,
 				DFA5990021B7B17D0082C5F3 /* TAPOnlineStatusModel.m in Sources */,
+				0AF5DD152E1D00C300168BF5 /* AFURLSessionManager.m in Sources */,
 				DF2513CC21E61BCB000D165A /* TAPReplyToModel.m in Sources */,
+				0AF5DCE32E1D00C200168BF5 /* UIProgressView+AFNetworking.m in Sources */,
 				D77B5ED52158BB6E00253BDC /* TAPImageURLModel.m in Sources */,
 				DF94DD7A22B0BD5B00E7E629 /* TAPSystemMessageTableViewCell.m in Sources */,
 				D77B5F322158BB9500253BDC /* TAPScanQRCodeView.m in Sources */,
@@ -2092,6 +2335,7 @@
 				DF2513D021E61BE3000D165A /* TAPForwardFromModel.m in Sources */,
 				D728D530217D813E00DACE7A /* TAPScanQRCodePopupView.m in Sources */,
 				D7CAADFC2251F68A005493D9 /* TAPCustomButtonView.m in Sources */,
+				0AF5DCFF2E1D00C300168BF5 /* AFURLResponseSerialization.m in Sources */,
 				D73F0CE7237A8C9C00FE7179 /* TAPContactLoadingTableViewCell.m in Sources */,
 				D77866C0224205C000A98F05 /* TAPFetchMediaManager.m in Sources */,
 				0AF82BD8297A614E00E0E26F /* TAPReportUserViewController.m in Sources */,
@@ -2119,6 +2363,8 @@
 				D729550521899E5100B2AC56 /* TAPContactCacheManager.m in Sources */,
 				D7CAADF82251EB6C005493D9 /* TAPNumericKeyboardAccessoryView.m in Sources */,
 				D754CFB52216ECC6008CE9F9 /* TAPPickLocationView.m in Sources */,
+				0AF5DCF92E1D00C300168BF5 /* AFAutoPurgingImageCache.m in Sources */,
+				0A94F47E2CBE272400E938F7 /* TapHighlightCustomButtonView.m in Sources */,
 				F58EF7DF2188243D00F50B24 /* TAPProfileViewController.m in Sources */,
 				D77B5EA72158BB4000253BDC /* TAPConnectionManager.m in Sources */,
 				D77B5F632158BBEA00253BDC /* TAPAddNewContactViewController.m in Sources */,
@@ -2130,10 +2376,13 @@
 				0AF82BCB297A5F7300E0E26F /* TapMessageRecipientModel.m in Sources */,
 				DFF60D5B225B44B40038FB4D /* TAPLeftCustomNavigationButton.m in Sources */,
 				D77B5F5E2158BBEA00253BDC /* TAPBaseViewController.m in Sources */,
+				0AF5DCFC2E1D00C300168BF5 /* AFImageDownloader.m in Sources */,
+				0AF5DCE02E1D00C200168BF5 /* AFSecurityPolicy.m in Sources */,
 				D77B5F572158BBEA00253BDC /* TAPAddNewChatViewController.m in Sources */,
 				D779658E215B3D4400756A38 /* TAPGrowingTextView.m in Sources */,
 				D7F986EA2251BB1B0087B652 /* TAPCustomTextFieldView.m in Sources */,
 				D77B5EA02158BB4000253BDC /* TAPDataManager.m in Sources */,
+				0AF5DD102E1D00C300168BF5 /* AFNetworkReachabilityManager.m in Sources */,
 				0AC06E0E2915106300CB55F5 /* TAPOverlayChatRoomView.m in Sources */,
 				D72F395E2240A14C00F4FC38 /* TAPMediaPreviewModel.m in Sources */,
 				F524EF1F217DE9970087D956 /* TAPSearchResultChatTableViewCell.m in Sources */,
@@ -2152,6 +2401,7 @@
 				D77B5ED92158BB6E00253BDC /* TAPBaseModel.m in Sources */,
 				DF133C47219C475200A0E6CC /* TAPCustomAccessoryView.m in Sources */,
 				D7D3B44422FD7D7B00D1DFF7 /* TAPCoreConfigsModel.m in Sources */,
+				0AF5DD022E1D00C300168BF5 /* AFURLRequestSerialization.m in Sources */,
 				0AC06E0A2915038A00CB55F5 /* TAPScheduledMessageModel.m in Sources */,
 				D77B5EE42158BB7E00253BDC /* TAPContactCollectionViewCell.m in Sources */,
 				D7AB09912191882B00C18BEE /* TAPOldDataManager.m in Sources */,
@@ -2180,7 +2430,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF5DD162E1D00C300168BF5 /* AFURLSessionManager.m in Sources */,
+				0AF5DCEF2E1D00C300168BF5 /* WKWebView+AFNetworking.m in Sources */,
+				0AF5DCE12E1D00C200168BF5 /* AFSecurityPolicy.m in Sources */,
+				0AF5DCE42E1D00C200168BF5 /* UIProgressView+AFNetworking.m in Sources */,
+				0AF5DCE72E1D00C200168BF5 /* UIRefreshControl+AFNetworking.m in Sources */,
 				D77B5E582158BA8C00253BDC /* TapTalkTests.m in Sources */,
+				0AF5DCFA2E1D00C300168BF5 /* AFAutoPurgingImageCache.m in Sources */,
+				0AF5DD032E1D00C300168BF5 /* AFURLRequestSerialization.m in Sources */,
+				0AF5DD142E1D00C300168BF5 /* AFHTTPSessionManager.m in Sources */,
+				0AF5DD112E1D00C300168BF5 /* AFNetworkReachabilityManager.m in Sources */,
+				0AF5DCF22E1D00C300168BF5 /* UIImageView+AFNetworking.m in Sources */,
+				0AF5DCF82E1D00C300168BF5 /* UIActivityIndicatorView+AFNetworking.m in Sources */,
+				0AF5DCF62E1D00C300168BF5 /* UIButton+AFNetworking.m in Sources */,
+				0AF5DCEB2E1D00C300168BF5 /* AFNetworkActivityIndicatorManager.m in Sources */,
+				0AF5DD002E1D00C300168BF5 /* AFURLResponseSerialization.m in Sources */,
+				0AF5DCFD2E1D00C300168BF5 /* AFImageDownloader.m in Sources */,
+				0AF5DD0B2E1D00C300168BF5 /* AFNetworking-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

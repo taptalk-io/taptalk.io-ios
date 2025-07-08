@@ -6,6 +6,7 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
+#import "AFNetworking.h"
 #import "TapUIRoomListViewController.h"
 #import "TAPRoomListView.h"
 #import "TAPAddNewChatViewController.h"
@@ -18,9 +19,6 @@
 #import "TAPMyAccountViewController.h"
 #import "TAPMutedRoomModel.h"
 #import "TAPClearedRoomModel.h"
-
-
-#import <AFNetworking/AFNetworking.h>
 
 @interface TapUIRoomListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, UITextFieldDelegate, TAPConnectionStatusViewControllerDelegate, TAPAddNewChatViewControllerDelegate, TAPChatViewControllerDelegate, UIViewControllerPreviewingDelegate, TAPSearchViewControllerDelegate, TAPMyAccountViewControllerDelegate, UIAdaptivePresentationControllerDelegate>
 @property (strong, nonatomic) UIImage *navigationShadowImage;
@@ -163,6 +161,7 @@
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
     self.roomListView.roomListTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
+    self.roomListView.roomListTableView.delaysContentTouches = NO;
     
     _roomListArray = [NSMutableArray array];
     _roomListDictionary = [NSMutableDictionary dictionary];
@@ -309,6 +308,8 @@
         else {
             [cell setIsLastCellSeparator:NO];
         }
+        
+        [cell setHighlightColor:[TAPUtil getColor:TAP_COLOR_BLACK_19 withAlpha:0.2f]];
         
         return cell;
     }

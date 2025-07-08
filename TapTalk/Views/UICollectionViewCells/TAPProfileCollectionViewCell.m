@@ -17,6 +17,7 @@
 @property (strong, nonatomic) UILabel *userDetailLabel;
 @property (strong, nonatomic) UISwitch *switchButton;
 @property (strong, nonatomic) UIView *separatorView;
+@property (strong, nonatomic) UIView *highlightView;
 
 @end
 
@@ -28,6 +29,12 @@
     
     if (self) {
         self.contentView.backgroundColor = [UIColor whiteColor];
+        
+        _highlightView = [[UIView alloc] initWithFrame:self.contentView.frame];
+        self.highlightView.backgroundColor = [TAPUtil getColor:TAP_COLOR_BLACK_19 withAlpha:0.2f];
+        self.highlightView.alpha = 0.0f;
+        [self.contentView addSubview:self.highlightView];
+        
         _iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8.0f, (CGRectGetHeight(frame) - 32.0f) / 2.0f, 32.0f, 32.0f)];
         self.iconImageView.contentMode = UIViewContentModeCenter;
         [self.contentView addSubview:self.iconImageView];
@@ -129,6 +136,8 @@
 }
 
 - (void)setProfileCollectionViewCellType:(TAPProfileCollectionViewCellType)type {
+    _type = type;
+    
     //DV Temp
     BOOL isMute = NO;
     BOOL isBlocked = NO;
@@ -432,6 +441,20 @@
 - (void)setUserDetailString:(NSString *)title detail:(NSString *)detail {
     self.userDetailLabel.text = detail;
     self.titleLabel.text = title;
+}
+
+- (void)showHighlight:(BOOL)show {
+    CGFloat alpha = 0.0f;
+    if (show) {
+        alpha = 1.0f;
+    }
+    [UIView animateWithDuration:0.1f
+                      delay:0.0f
+                    options:(UIViewAnimationOptionAllowUserInteraction)
+                 animations:^{
+                     self.highlightView.alpha = alpha;
+                 }
+                 completion:nil];
 }
 
 @end

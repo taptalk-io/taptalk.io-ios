@@ -36,7 +36,7 @@ typedef NS_ENUM(NSInteger, TAPMyAccountLoadingType) {
 @property (strong, nonatomic) TAPCustomTextFieldView *usernameTextField;
 @property (strong, nonatomic) TAPCustomTextFieldView *mobileNumberTextField;
 @property (strong, nonatomic) TAPCustomTextFieldView *emailTextField;
-@property (strong, nonatomic) UIView *logoutView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *logoutView;
 @property (strong, nonatomic) UIButton *logoutButton;
 @property (strong, nonatomic) UIButton *deleteAccountButton;
 @property (strong, nonatomic) TAPCustomButtonView *continueButtonView;
@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, TAPMyAccountLoadingType) {
 @property (strong, nonatomic) TAPCustomGrowingTextView *bioTextView;
 
 @property (strong, nonatomic) UIButton *blockedButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *blockedButtonHighlightView;
 
 @property (strong, nonatomic) TAPCustomLabelView *bioLabelField;
 @property (strong, nonatomic) TAPCustomLabelView *usernameLabelField;

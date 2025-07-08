@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TAPBaseTableViewCell.h"
 
-@interface TAPBaseXIBTableViewCell : UITableViewCell
+@interface TAPBaseXIBTableViewCell : TAPBaseTableViewCell
 
 @property (strong, nonatomic) IBOutlet UIView *swipeReplyView;
 @property (strong, nonatomic) IBOutlet UIImageView *swipeReplyImageView;

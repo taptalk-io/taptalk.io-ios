@@ -6,6 +6,7 @@
 //  Copyright © 2019 Moselo. All rights reserved.
 //
 
+#import "AFURLSessionManager.h"
 #import "TAPFileDownloadManager.h"
 #import <TapTalk/Base64.h>
 

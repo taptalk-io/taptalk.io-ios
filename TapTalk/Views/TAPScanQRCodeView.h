@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, ScanQRCodeViewType) {
 
 @property (strong, nonatomic) UIView *cameraView;
 @property (strong, nonatomic) UIButton *QRCodeButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *QRCodeButtonHighlightView;
 @property (strong, nonatomic) UIView *overlayView;
 @property (strong, nonatomic) UIView *showCodeContainerView;
 @property (nonatomic) ScanQRCodeViewType scanQRCodeViewType;

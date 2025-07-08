@@ -6,12 +6,13 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
+#import "AFNetworkReachabilityManager.h"
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
 #import <CoreText/CoreText.h>
 #import <CoreLocation/CoreLocation.h>
 
-@import AFNetworking;
+//@import AFNetworking;
 @import GooglePlaces;
 @import GoogleMaps;
 

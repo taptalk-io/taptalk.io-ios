@@ -7,7 +7,7 @@
 
 #import "TAPConnectionStatusViewController.h"
 #import "TAPConnectionStatusView.h"
-#import <AFNetworking/AFNetworking.h>
+#import "AFNetworking.h"
 
 @interface TAPConnectionStatusViewController ()
 

@@ -31,6 +31,7 @@
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    self.tableView.delaysContentTouches = NO;
     self.view.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
     
     [TAPDataManager callAPIGetGroupsInCommon:self.otherUser.userID success:^(NSMutableArray<TAPRoomModel *> *groupsInCommonRoom) {
@@ -75,7 +76,7 @@
         else {
             [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
         }
-        
+        [cell setGrayHighlightColor];
         return cell;
     }
     UITableViewCell *cell = [[UITableViewCell alloc] init];
@@ -129,6 +130,7 @@
 #pragma mark - Delegate
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     TAPRoomModel *room = [self.groupsInCommonRoom objectAtIndex:indexPath.row];
     
     [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {

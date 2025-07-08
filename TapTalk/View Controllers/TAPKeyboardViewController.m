@@ -11,7 +11,7 @@
 
 @interface TAPKeyboardViewController () <UITableViewDataSource, UITableViewDelegate>
 
-@property (strong, nonatomic) IBOutlet UITableView *tableView;
+@property (strong, nonatomic) IBOutlet TAPBaseTableView *tableView;
 @property (strong, nonatomic) IBOutlet UIInputView *customInputView;
 
 @end
@@ -29,6 +29,7 @@
     self.inputView.allowsSelfSizing = YES;
     self.view.autoresizingMask = UIViewAutoresizingNone;
     self.customInputViewHeightConstraint.constant = self.keyboardHeight;
+    self.tableView.delaysContentTouches = NO;
 }
 
 #pragma mark - Data Source
@@ -65,6 +66,8 @@
         [cell setKeyboardCellWithKeyboardItem:keyboardItem];
     }
     
+    [cell setGrayHighlightColor];
+    
     return cell;
 }
 
@@ -89,7 +92,7 @@
 #pragma mark - Delegate
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     TAPCustomKeyboardItemModel *keyboardItem = [self.customKeyboardArray objectAtIndex:indexPath.row];
     

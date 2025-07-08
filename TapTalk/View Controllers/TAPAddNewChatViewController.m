@@ -62,6 +62,7 @@
     
     self.addNewChatView.contactsTableView.delegate = self;
     self.addNewChatView.contactsTableView.dataSource = self;
+    self.addNewChatView.contactsTableView.delaysContentTouches = NO;
     
     if ([[TapUI sharedInstance] isAddContactEnabled]) {
         self.addNewChatView.searchBarView.delegate = self;
@@ -237,7 +238,7 @@
                 //options Create Group
                 [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewGroup];
             }
-            
+            [cell setGrayHighlightColor];
             return cell;
         }
         else if (indexPath.section <= [[self.indexSectionDictionary allKeys] count]) {
@@ -266,7 +267,7 @@
             else {
                 [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
             }
-            
+            [cell setGrayHighlightColor];
             return cell;
         }
         //DV Note
@@ -294,6 +295,7 @@
             TAPUserModel *user = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
             [cell setContactTableViewCellWithUser:user];
             [cell isRequireSelection:NO];
+            [cell setGrayHighlightColor];
             
             if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
                 [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeFull];
@@ -301,14 +303,12 @@
             else {
                 [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
             }
-            
+            [cell setGrayHighlightColor];
             return cell;
         }
         else if (indexPath.section == 1) {
             static NSString *cellID = @"TAPNewChatAddNewContactTableViewCell";
             TAPNewChatAddNewContactTableViewCell *cell = [[TAPNewChatAddNewContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
             return cell;
         }
     }
@@ -601,17 +601,18 @@
 }
 
 #pragma mark TAPCustomButtonView
-- (void)customButtonViewDidTappedButton {
+- (void)highlightCustomButtonViewDidTappedWithIdentifier {
     //Sync Button Tapped
 //    [self syncContactWithLoading:YES];
     
     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Sync Contact Manually" title:NSLocalizedStringFromTableInBundle(@"Contact Access", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Allow", nil, [TAPUtil currentBundle], @"")];
 }
 
-#pragma mark TAPAddNewContactViewController
+#pragma mark TapHighlightCustomButtonViewDelegate
+
 - (void)addNewContactViewControllerShouldOpenNewRoomWithUser:(TAPUserModel *)user {
     [self dismissViewControllerAnimated:YES completion:^{
-        if([self.delegate respondsToSelector:@selector(addNewChatViewControllerShouldOpenNewRoomWithUser:)]) {
+        if ([self.delegate respondsToSelector:@selector(addNewChatViewControllerShouldOpenNewRoomWithUser:)]) {
             [self.delegate addNewChatViewControllerShouldOpenNewRoomWithUser:user];
         }
     }];

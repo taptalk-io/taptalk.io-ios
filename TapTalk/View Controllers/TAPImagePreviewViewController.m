@@ -80,6 +80,7 @@
     
     self.imagePreviewView.mentionTableView.delegate = self;
     self.imagePreviewView.mentionTableView.dataSource = self;
+    self.imagePreviewView.mentionTableView.delaysContentTouches = NO;
     
     [self.imagePreviewView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.imagePreviewView.morePictureButton addTarget:self action:@selector(morePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -199,6 +200,8 @@
             [cell showSeparatorView:YES];
         }
     }
+    
+    [cell setGrayHighlightColor];
 
     return cell;
 }

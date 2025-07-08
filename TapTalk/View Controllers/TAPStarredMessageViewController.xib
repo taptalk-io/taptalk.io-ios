@@ -19,6 +19,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TAPSecondaryChatViewController">
             <connections>
+                <outlet property="attachmentButton" destination="vM5-KK-2zq" id="E74-ld-o8Q"/>
+                <outlet property="attachmentButtonHighlightView" destination="WQw-m4-k1s" id="Mbl-Iv-Tl7"/>
                 <outlet property="datePickerCancelButton" destination="sHM-m4-uaa" id="srQ-lk-wqS"/>
                 <outlet property="datePickerTitleLabel" destination="5QQ-19-i6R" id="03j-5q-geD"/>
                 <outlet property="emptyStateDescpLabel" destination="yOH-Eo-0ie" id="kBd-y7-ssI"/>
@@ -267,14 +269,14 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="crj-Fr-tKe">
                             <rect key="frame" x="16" y="254" width="382" height="56"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ocs-qZ-E5B">
+                                <button opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ocs-qZ-E5B">
                                     <rect key="frame" x="0.0" y="0.0" width="382" height="56"/>
                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                     <connections>
                                         <action selector="datePickerSendButtonDidTapped:" destination="-1" eventType="touchUpInside" id="8vM-WF-Pcz"/>
                                     </connections>
                                 </button>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IDr-dV-qF2">
+                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IDr-dV-qF2">
                                     <rect key="frame" x="16" y="17.5" width="350" height="21"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -539,14 +541,22 @@
                                         <action selector="attachmentButtonDidTapped:" destination="-1" eventType="touchUpInside" id="O8m-6C-Tw9"/>
                                     </connections>
                                 </button>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WQw-m4-k1s" userLabel="Attachment Button Highlight View">
+                                    <rect key="frame" x="265" y="2" width="32" height="32"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="bottom" secondItem="vM5-KK-2zq" secondAttribute="bottom" constant="2" id="FB8-Gr-9pk"/>
                                 <constraint firstAttribute="bottom" secondItem="9Xf-GP-nhb" secondAttribute="bottom" constant="4" id="FxC-Gy-cTc"/>
+                                <constraint firstItem="vM5-KK-2zq" firstAttribute="top" secondItem="WQw-m4-k1s" secondAttribute="top" id="M5D-IU-eVF"/>
+                                <constraint firstItem="vM5-KK-2zq" firstAttribute="trailing" secondItem="WQw-m4-k1s" secondAttribute="trailing" id="Mlc-NC-SLx"/>
                                 <constraint firstItem="9Xf-GP-nhb" firstAttribute="leading" secondItem="8iQ-Ee-vgg" secondAttribute="leading" constant="12" id="OpL-rF-FMm"/>
                                 <constraint firstAttribute="trailing" secondItem="vM5-KK-2zq" secondAttribute="trailing" constant="8" id="Pay-rN-jAL"/>
                                 <constraint firstItem="vM5-KK-2zq" firstAttribute="leading" secondItem="9Xf-GP-nhb" secondAttribute="trailing" id="SLb-Mb-qfG"/>
+                                <constraint firstItem="vM5-KK-2zq" firstAttribute="bottom" secondItem="WQw-m4-k1s" secondAttribute="bottom" id="XEQ-is-7gR"/>
+                                <constraint firstItem="vM5-KK-2zq" firstAttribute="leading" secondItem="WQw-m4-k1s" secondAttribute="leading" id="cUU-h7-zxf"/>
                                 <constraint firstAttribute="height" constant="36" id="ofh-30-wwl"/>
                                 <constraint firstItem="9Xf-GP-nhb" firstAttribute="top" secondItem="8iQ-Ee-vgg" secondAttribute="top" id="t7x-of-4OA"/>
                             </constraints>

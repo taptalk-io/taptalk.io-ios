@@ -19,7 +19,7 @@
 #import "TapMessageRecipientModel.h"
 #import "TapMessageRecipientModel.h"
 
-@import AFNetworking;
+//@import AFNetworking;
 
 @interface TAPDataManager : NSObject
 

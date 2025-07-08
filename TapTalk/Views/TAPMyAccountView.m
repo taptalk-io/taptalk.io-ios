@@ -65,6 +65,7 @@
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.scrollView.frame));
         self.scrollView.showsVerticalScrollIndicator = NO;
         self.scrollView.showsHorizontalScrollIndicator = NO;
+        self.scrollView.delaysContentTouches = NO;
         self.scrollView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         [self addSubview:self.scrollView];
         
@@ -245,8 +246,13 @@
         blockedContactLabel.font = labelButtonFont;
         [self.blockedContactView addSubview:blockedContactLabel];
         
-        _blockedButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.blockedContactView.frame), CGRectGetHeight(self.blockedContactView.frame))];
-        [self.blockedContactView addSubview:self.blockedButton];
+        _blockedButtonHighlightView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.blockedContactView.frame), CGRectGetHeight(self.blockedContactView.frame))];
+        [self.blockedButtonHighlightView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.blockedContactView addSubview:self.blockedButtonHighlightView];
+        _blockedButton = self.blockedButtonHighlightView.button;
+        
+//        _blockedButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.blockedContactView.frame), CGRectGetHeight(self.blockedContactView.frame))];
+//        [self.blockedContactView addSubview:self.blockedButton];
         
         [self.accountDetailViewContainer addSubview:self.blockedContactView];
         
@@ -338,18 +344,23 @@
         }
 
         if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
-            _logoutView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 50.0f)];
+            _logoutView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame) + 24.0f, CGRectGetWidth(self.frame) - 32.0f, 50.0f)];
             self.logoutView.alpha = 1.0f;
+            [self.logoutView setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableDestructiveLabel]];
+            [self.logoutView setLabelColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel]];
+            [self.logoutView setLabelText:NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"")];
+            [self.logoutView setLeftIconImage:[UIImage imageNamed:@"TAPIconLogoutWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         }
         else {
-            _logoutView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame), CGRectGetWidth(self.frame) - 32.0f, 0.0f)];
+            _logoutView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.emailTextField.frame), CGRectGetWidth(self.frame) - 32.0f, 0.0f)];
             self.logoutView.alpha = 0.0f;
         }
         
-        self.logoutView.backgroundColor = [TAPUtil getColor:@"EF5060"];
-        self.logoutView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
-        self.logoutView.layer.borderWidth = 1.0f;
-        self.logoutView.layer.cornerRadius = 8.0f;
+        [self.logoutView setType:TapHighlightCustomButtonViewTypeDestructive];
+//        self.logoutView.backgroundColor = [TAPUtil getColor:@"EF5060"];
+//        self.logoutView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_GREY_DC].CGColor;
+//        self.logoutView.layer.borderWidth = 1.0f;
+//        self.logoutView.layer.cornerRadius = 8.0f;
         [self.editViewContainer addSubview:self.logoutView];
         
         _logoutSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f, 0.0f, 1.0f, CGRectGetHeight(self.logoutView.frame))];
@@ -357,22 +368,23 @@
         //[self.logoutView addSubview:self.logoutSeparatorView];
         
         UIFont *clickableDestructiveFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableDestructiveLabel];
-        UIColor *colorButtonLabel = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
-        CGFloat logoutLabelWidth = CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f - 15.0f - 15.0f;
-        _logoutLabel = [[UILabel alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.logoutView.frame) / 2.0f) - 20.0f, 0.0f, logoutLabelWidth, CGRectGetHeight(self.logoutView.frame))];
-        self.logoutLabel.text = NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"");
-        self.logoutLabel.textColor = colorButtonLabel;
-        self.logoutLabel.font = clickableDestructiveFont;
-        [self.logoutView addSubview:self.logoutLabel];
+//        UIColor *colorButtonLabel = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+//        CGFloat logoutLabelWidth = CGRectGetWidth(self.logoutView.frame) - 50.0f - 1.0f - 15.0f - 15.0f;
+//        _logoutLabel = [[UILabel alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.logoutView.frame) / 2.0f) - 20.0f, 0.0f, logoutLabelWidth, CGRectGetHeight(self.logoutView.frame))];
+//        self.logoutLabel.text = NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"");
+//        self.logoutLabel.textColor = colorButtonLabel;
+//        self.logoutLabel.font = clickableDestructiveFont;
+//        [self.logoutView addSubview:self.logoutLabel];
         
-        _logoutIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.logoutLabel.frame) - 20.0f - 10.0f, (CGRectGetHeight(self.logoutView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
-        self.logoutIconImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.logoutIconImageView.image = [UIImage imageNamed:@"TAPIconLogoutWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.logoutIconImageView.tintColor = [UIColor whiteColor];
-        [self.logoutView addSubview:self.logoutIconImageView];
+//        _logoutIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.logoutLabel.frame) - 20.0f - 10.0f, (CGRectGetHeight(self.logoutView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
+//        self.logoutIconImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        self.logoutIconImageView.image = [UIImage imageNamed:@"TAPIconLogoutWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+//        self.logoutIconImageView.tintColor = [UIColor whiteColor];
+//        [self.logoutView addSubview:self.logoutIconImageView];
 
-        _logoutButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame))];
-        [self.logoutView addSubview:self.logoutButton];
+        _logoutButton = self.logoutView.button;
+//        _logoutButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.logoutView.frame), CGRectGetHeight(self.logoutView.frame))];
+//        [self.logoutView addSubview:self.logoutButton];
         
         if ([[TapUI sharedInstance] getDeleteAccountButtonVisible]) {
             _deleteAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.logoutView.frame) + 8.0f, CGRectGetWidth(self.frame) - 32.0f, 40.0f)];

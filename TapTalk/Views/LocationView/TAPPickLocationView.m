@@ -15,6 +15,7 @@
 @property (strong, nonatomic) UIImageView *addressIconImageView;
 @property (strong, nonatomic) UIImageView *pinIconImageView;
 @property (strong, nonatomic) UILabel *addressLabel;
+@property (strong, nonatomic) TapHighlightCustomButtonView *goToCurrentLocationHighlightButton;
 
 @end
 
@@ -49,11 +50,10 @@
         self.addressLabel.numberOfLines = 0;
         [self.addressView addSubview:self.addressLabel];
         
-        _sendLocationButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.addressLabel.frame) + 12.0f, CGRectGetWidth(self.frame), 44.0f)];
-        [self.sendLocationButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
-        [self.sendLocationButton setCustomButtonViewType:TAPCustomButtonViewTypeInactive];
-        [self.sendLocationButton setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Location", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconSend" iconPosition:TAPCustomButtonViewIconPosititonLeft];
-        [self.sendLocationButton setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        _sendLocationButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.addressLabel.frame) + 12.0f, CGRectGetWidth(self.frame) - 32.0f, 44.0f)];
+        [self.sendLocationButton setType:TapHighlightCustomButtonViewTypeDisabled];
+        [self.sendLocationButton setLabelText:NSLocalizedStringFromTableInBundle(@"Send Location", nil, [TAPUtil currentBundle], @"")];
+        [self.sendLocationButton setLeftIconImage:[UIImage imageNamed:@"TAPIconSend" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         [self.addressView addSubview:self.sendLocationButton];
         
         _mapContainerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(frame), CGRectGetHeight(frame) - CGRectGetHeight(self.addressView.frame))];
@@ -66,19 +66,18 @@
         self.mapView.autoresizingMask = UIViewAutoresizingNone;
         [self.mapContainerView addSubview:self.mapView];
         
-        _goToCurrentLocationButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(frame) - 16.0f - 56.0f, CGRectGetHeight(frame) - CGRectGetHeight(self.addressView.frame) - 16.0f - 56.0f, 56.0f, 56.0f)];
-        self.goToCurrentLocationButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerRecenterBackground];
-        self.goToCurrentLocationButton.layer.cornerRadius = CGRectGetHeight(self.goToCurrentLocationButton.frame) / 2.0f;
-        self.goToCurrentLocationButton.layer.shadowOffset = CGSizeMake(0.0f, 6.0f);
-        self.goToCurrentLocationButton.layer.shadowColor = [UIColor blackColor].CGColor;
-        self.goToCurrentLocationButton.layer.shadowRadius = 6.0f;
-        self.goToCurrentLocationButton.layer.shadowOpacity = 0.24f;
-        
-        UIImage *getLocationImage = [UIImage imageNamed:@"TAPIconGetLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        getLocationImage = [getLocationImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerRecenter]];
-
-        [self.goToCurrentLocationButton setImage:getLocationImage forState:UIControlStateNormal];
-        [self addSubview:self.goToCurrentLocationButton];
+        _goToCurrentLocationHighlightButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(CGRectGetWidth(frame) - 16.0f - 56.0f, CGRectGetHeight(frame) - CGRectGetHeight(self.addressView.frame) - 16.0f - 56.0f, 56.0f, 56.0f)];
+        [self.goToCurrentLocationHighlightButton setType:TapHighlightCustomButtonViewTypeDefaultSolid];
+        [self.goToCurrentLocationHighlightButton setContainerViewBackgroundColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerRecenterBackground]];
+        [self.goToCurrentLocationHighlightButton setContainerViewRadius:CGRectGetHeight(self.goToCurrentLocationHighlightButton.frame) / 2.0f];
+        [self.goToCurrentLocationHighlightButton setLeftIconImage:[UIImage imageNamed:@"TAPIconGetLocation" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:28.0f margin:14.0f];
+        [self.goToCurrentLocationHighlightButton setLeftIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationPickerRecenter]];
+        self.goToCurrentLocationHighlightButton.layer.shadowOffset = CGSizeMake(0.0f, 6.0f);
+        self.goToCurrentLocationHighlightButton.layer.shadowColor = [UIColor blackColor].CGColor;
+        self.goToCurrentLocationHighlightButton.layer.shadowRadius = 6.0f;
+        self.goToCurrentLocationHighlightButton.layer.shadowOpacity = 0.24f;
+        [self addSubview:self.goToCurrentLocationHighlightButton];
+        self.goToCurrentLocationButton = self.goToCurrentLocationHighlightButton.button;
         
         _searchBarView = [[TAPLocationSearchBarView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(frame) - 16.0f - 16.0f, 36.0f)];
         self.searchBarView.placeholder = NSLocalizedStringFromTableInBundle(@"Search Address", nil, [TAPUtil currentBundle], @"");

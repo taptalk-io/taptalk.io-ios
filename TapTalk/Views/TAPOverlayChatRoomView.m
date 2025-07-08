@@ -8,11 +8,8 @@
 #import "TAPOverlayChatRoomView.h"
 
 @interface TAPOverlayChatRoomView ()
-@property (strong, nonatomic) UIView *scheduleMessageContainerView;
-@property (strong, nonatomic) UIButton *scheduleMessageButton;
-@property (strong, nonatomic) UILabel *scheduleMessageLabel;
-@property (strong, nonatomic) UIImageView *scheduleMessageImageView;
 @property (strong, nonatomic) UIButton *backgroundButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *scheduleMessageHighlightButton;
 @end
 
 @implementation TAPOverlayChatRoomView
@@ -25,29 +22,32 @@
     CGFloat scheduleContainerWidth = 165.0f;
     CGFloat scheduleContainerHeight = 44.0f;
     
-    _backgroundButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
+    _backgroundButton = [[UIButton alloc] initWithFrame:CGRectMake(
+        0.0f,
+        0.0f,
+        CGRectGetWidth(self.frame),
+        CGRectGetHeight(self.frame)
+    )];
     [self.backgroundButton addTarget:self action:@selector(backgroundButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.backgroundButton];
     
-    _scheduleMessageContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.frame) - scheduleContainerWidth - 16.0f, CGRectGetMaxY(self.frame) - scheduleContainerHeight - 110.0f, scheduleContainerWidth, scheduleContainerHeight)];
-    self.scheduleMessageContainerView.layer.cornerRadius = 8.0f;
-    self.scheduleMessageContainerView.backgroundColor = [UIColor whiteColor];
-    [self addSubview:self.scheduleMessageContainerView];
-    
-    _scheduleMessageImageView = [[UIImageView alloc] initWithFrame:CGRectMake(12.0f, (scheduleContainerHeight - 18.0f) /2, 18.0f,18.0f)];
-    self.scheduleMessageImageView.image = [UIImage imageNamed:@"TAPIconReschedule" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    [self.scheduleMessageContainerView addSubview:self.scheduleMessageImageView];
-    
-    _scheduleMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.scheduleMessageImageView.frame) + 8.0f, (scheduleContainerHeight - 20.0f) /2, 130.0f, 20.0f)];
-    self.scheduleMessageLabel.text = @"Schedule Message";
-    self.scheduleMessageLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeletedChatRoomInfoContentLabel];
-    [self.scheduleMessageContainerView addSubview:self.scheduleMessageLabel];
-    
-    _scheduleMessageButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.scheduleMessageContainerView.frame), CGRectGetHeight(self.scheduleMessageContainerView.frame))];
-    [self.scheduleMessageContainerView addSubview:self.scheduleMessageButton];
-    
-    [self.scheduleMessageButton addTarget:self action:@selector(scheduleMessageButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    
+    _scheduleMessageHighlightButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+        CGRectGetMaxX(self.frame) - scheduleContainerWidth - 16.0f,
+        CGRectGetMaxY(self.frame) - scheduleContainerHeight - 110.0f,
+        scheduleContainerWidth,
+        scheduleContainerHeight
+    )];
+    [self.scheduleMessageHighlightButton setType:TapHighlightCustomButtonViewTypeSecondaryGrayBorder];
+    [self.scheduleMessageHighlightButton setContainerViewRadius:8.0f];
+    [self.scheduleMessageHighlightButton setContainerViewBackgroundColor:[UIColor whiteColor]];
+    [self.scheduleMessageHighlightButton setLeftIconImage:[UIImage imageNamed:@"TAPIconReschedule" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    [self.scheduleMessageHighlightButton setLeftIconSize:18.0f];
+    [self.scheduleMessageHighlightButton setLabelText:NSLocalizedStringFromTableInBundle(@"Schedule Message", nil, [TAPUtil currentBundle], @"")];
+    [self.scheduleMessageHighlightButton setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeletedChatRoomInfoContentLabel]];
+    [self.scheduleMessageHighlightButton setLabelColor:[TAPUtil getColor:TAP_COLOR_TEXT_DARK]];
+    [self.scheduleMessageHighlightButton setHighlightColor:[[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.18f]];
+    [self.scheduleMessageHighlightButton setClickAction:@selector(scheduleMessageButtonDidTapped)  target:self];
+    [self addSubview:self.scheduleMessageHighlightButton];
     self.alpha = 0.0f;
     
     return self;
@@ -66,7 +66,7 @@
 }
 
 - (void)showOverlay:(BOOL)isShow {
-    if(isShow) {
+    if (isShow) {
         self.alpha = 1.0f;
     }
     else {

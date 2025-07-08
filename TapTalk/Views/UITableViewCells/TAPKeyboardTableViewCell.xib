@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -20,11 +18,11 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="54"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="53.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="54"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pr6-NK-xCz">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="53.5"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="54"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x8m-l6-0eE">
                                 <rect key="frame" x="48" y="18" width="256" height="18"/>
@@ -43,14 +41,24 @@
                                     <constraint firstAttribute="width" constant="24" id="wo7-Gd-0lA"/>
                                 </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qtc-w3-Pb3" userLabel="Separator View">
+                                <rect key="frame" x="0.0" y="53" width="320" height="1"/>
+                                <color key="backgroundColor" red="0.098039215686274508" green="0.098039215686274508" blue="0.098039215686274508" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="Bet-R8-BUO"/>
+                                </constraints>
+                            </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="x8m-l6-0eE" firstAttribute="centerY" secondItem="Pr6-NK-xCz" secondAttribute="centerY" id="BRg-Ix-Bxe"/>
                             <constraint firstItem="x8m-l6-0eE" firstAttribute="leading" secondItem="Tui-AG-gbL" secondAttribute="trailing" constant="8" id="CmR-X6-nem"/>
+                            <constraint firstAttribute="bottom" secondItem="Qtc-w3-Pb3" secondAttribute="bottom" id="M3B-Pc-taS"/>
                             <constraint firstItem="Tui-AG-gbL" firstAttribute="leading" secondItem="Pr6-NK-xCz" secondAttribute="leading" constant="16" id="Mzp-fq-OGp"/>
                             <constraint firstAttribute="trailing" secondItem="x8m-l6-0eE" secondAttribute="trailing" constant="16" id="TEQ-wT-cKT"/>
                             <constraint firstItem="Tui-AG-gbL" firstAttribute="centerY" secondItem="Pr6-NK-xCz" secondAttribute="centerY" id="iN1-15-aCD"/>
+                            <constraint firstAttribute="trailing" secondItem="Qtc-w3-Pb3" secondAttribute="trailing" id="sM5-st-g4a"/>
+                            <constraint firstItem="Qtc-w3-Pb3" firstAttribute="leading" secondItem="Pr6-NK-xCz" secondAttribute="leading" id="vV6-2m-ZVX"/>
                         </constraints>
                     </view>
                 </subviews>

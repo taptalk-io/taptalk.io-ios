@@ -464,8 +464,14 @@
 }
 
 - (void)setAsErrorState:(BOOL)isError {
-    if(isError) {
-        self.layer.borderColor = [UIColor redColor].CGColor;
+    if (isError) {
+        self.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderError].CGColor;
+    }
+    else if (self.phoneNumberTextField.isFirstResponder) {
+        self.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+    }
+    else {
+        self.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
     }
 }
 

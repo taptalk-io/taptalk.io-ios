@@ -469,9 +469,12 @@
     dispatch_async(queue, ^{
         @autoreleasepool {
             NSMutableArray *resultArray = [NSMutableArray array];
-            for (NSDictionary *dataDictionary in dataArray) {
+            NSInteger count = 0;
+            while (count < 1000 && count < [dataArray count]) {
+                NSDictionary *dataDictionary = [dataArray objectAtIndex:count];
                 id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
                 [resultArray addObject:resultRealmModel];
+                count++;
             }
             
             RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
@@ -479,6 +482,12 @@
             [realm beginWriteTransaction];
             [realm addOrUpdateObjects:resultArray];
             [realm commitWriteTransaction];
+            
+            if ([dataArray count] > count) {
+                NSMutableArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
+                [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:remainingArray tableName:tableName success:success failure:failure];
+                return;
+            }
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -501,9 +510,12 @@
     }
     
     NSMutableArray *resultArray = [NSMutableArray array];
-    for (NSDictionary *dataDictionary in dataArray) {
+    NSInteger count = 0;
+    while (count < 1000 && count < [dataArray count]) {
+        NSDictionary *dataDictionary = [dataArray objectAtIndex:count];
         id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
         [resultArray addObject:resultRealmModel];
+        count++;
     }
     
     RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
@@ -511,6 +523,12 @@
     [realm beginWriteTransaction];
     [realm addOrUpdateObjects:resultArray];
     [realm commitWriteTransaction];
+    
+    if ([dataArray count] > count) {
+        NSMutableArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
+        [TAPDatabaseManager updateOrInsertDataToDatabaseInMainThreadWithData:remainingArray tableName:tableName success:success failure:failure];
+        return;
+    }
     
 //    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
 //        // handle error
@@ -573,9 +591,12 @@
     dispatch_async(queue, ^{
         @autoreleasepool {
             NSMutableArray *resultArray = [NSMutableArray array];
-            for (NSDictionary *dataDictionary in dataArray) {
+            NSInteger count = 0;
+            while (count < 1000 && count < [dataArray count]) {
+                NSDictionary *dataDictionary = [dataArray objectAtIndex:count];
                 id resultRealmModel = [[TAPDatabaseManager sharedManager] convertDictionaryIntoRealmObjectWithData:dataDictionary tableName:tableName];
                 [resultArray addObject:resultRealmModel];
+                count++;
             }
             
             RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
@@ -594,6 +615,12 @@
             [realm beginWriteTransaction];
             [realm deleteObjects:results];
             [realm commitWriteTransaction];
+            
+            if ([dataArray count] > count) {
+                NSMutableArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
+                [TAPDatabaseManager deleteDataInDatabaseWithData:remainingArray tableName:tableName success:success failure:failure];
+                return;
+            }
 
             dispatch_async(dispatch_get_main_queue(), ^{
 //                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {

@@ -115,8 +115,8 @@
 + (CGRect)getStringConstrainedSizeWithString:(NSString *)string withFont:(UIFont *)font withConstrainedSize:(CGSize)size;
 
 #pragma mark - View
-- (void)addSpinAnimation:(UIView *)view;
-- (void)removeSpinAnimation:(UIView *)view;
++ (void)addSpinAnimation:(UIView *)view;
++ (void)removeSpinAnimation:(UIView *)view;
 
 #pragma mark - Device
 + (NSString *)hardwareModel;

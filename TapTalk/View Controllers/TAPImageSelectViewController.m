@@ -561,6 +561,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 //}
 
 - (void)loopFetchThumbnailImageWithIndexCounter:(NSInteger)indexCount selectedResultArray:(NSMutableArray *)array {
+    if (self.selectedMediaDataArray.count <= indexCount) {
+        return;
+    }
     __block NSInteger indexCounter = indexCount;
     
     @autoreleasepool {
@@ -823,7 +826,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         PHImageManager *manager = [PHImageManager defaultManager];
         
-        if([self.tempGalleryImageDataArray count] > 0) {
+        if (self.tempGalleryImageDataArray && [self.tempGalleryImageDataArray count] > 0) {
             // assets contains PHAsset objects.
             PHAsset *currentAsset = [self.tempGalleryImageDataArray objectAtIndex:0];
             __block UIImage *imageResult;
@@ -840,8 +843,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #ifdef DEBUG
                             NSLog(@"[CameraRoll] Image request error: %@",error);
 #endif
-                        } else {
-                            if (imageResult != nil) {
+                        }
+                        else {
+                            if (imageResult != nil && self.loadedImageThumbnailDictionary) {
                                 [self.loadedImageThumbnailDictionary setObject:imageResult forKey:[NSString stringWithFormat:@"%ld", (long)self.indexImageCount]];
                                 [self.imageSelectView.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.indexImageCount inSection:0]]];
                                 [self.imageSelectView endLoadingAnimation];

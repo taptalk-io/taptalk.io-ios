@@ -1015,7 +1015,7 @@
 }
 
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
-    if(recognizer.state = UIGestureRecognizerStateEnded) {
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
         if ([self.delegate respondsToSelector:@selector(yourFileBubbleLongPressedWithMessage:)]) {
             [self.delegate yourFileBubbleLongPressedWithMessage:self.message];
         }

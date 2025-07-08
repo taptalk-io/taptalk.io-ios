@@ -39,7 +39,6 @@
     
     if (self) {
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 64.0f)];
-        self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
         
         _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 6.0f, 52.0f, 52.0f)];
@@ -287,12 +286,12 @@
     if (isRequired) {
         //resize
         self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMinY(self.contactNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 16.0f - 16.0f - 8.0f - CGRectGetMinX(self.contactNameLabel.frame), CGRectGetHeight(self.contactNameLabel.frame));
-        self.selectionStyle = UITableViewCellSelectionStyleNone;
+//        self.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     else {
         //resize
         self.contactNameLabel.frame = CGRectMake(CGRectGetMinX(self.contactNameLabel.frame), CGRectGetMinY(self.contactNameLabel.frame), CGRectGetWidth(self.bgView.frame) - 16.0f - CGRectGetMinX(self.contactNameLabel.frame), CGRectGetHeight(self.contactNameLabel.frame));
-        self.selectionStyle = UITableViewCellSelectionStyleDefault;
+//        self.selectionStyle = UITableViewCellSelectionStyleDefault;
     }
 }
 

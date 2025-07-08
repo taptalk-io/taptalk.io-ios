@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-@import AFNetworking;
+//@import AFNetworking;
 
 #define NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY @"Prefs.NetworkManagerNoConnectionNotificationKey"
 #define NETWORK_MANAGER_NO_CONNECTION_MESSAGE NSLocalizedStringFromTableInBundle(@"Oops! It seems like you are offline, please check your connection.", nil, [TAPUtil currentBundle], @"");

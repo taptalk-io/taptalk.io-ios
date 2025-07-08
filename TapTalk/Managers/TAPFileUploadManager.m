@@ -16,7 +16,7 @@
 #import <Photos/Photos.h>
 #import <CoreServices/UTType.h>
 
-@import AFNetworking;
+//@import AFNetworking;
 
 @interface TAPFileUploadManager ()
 
@@ -228,16 +228,19 @@
                         sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
                         NSString *sizeString = [NSString stringWithFormat:@"%f", [sizeRaw floatValue]];
                         NSNumber *sizeNumber = [NSNumber numberWithFloat:[sizeString floatValue]];
+                        sizeNumber = [TAPUtil nullToEmptyNumber:sizeNumber];
                         
                         NSString *heightRaw = [responseDataDictionary objectForKey:@"height"];
                         heightRaw = [TAPUtil nullToEmptyString:heightRaw];
                         NSString *heightString = [NSString stringWithFormat:@"%f", [heightRaw floatValue]];
                         NSNumber *heightNumber = [NSNumber numberWithFloat:[heightString floatValue]];
+                        heightNumber = [TAPUtil nullToEmptyNumber:heightNumber];
                         
                         NSString *widthRaw = [responseDataDictionary objectForKey:@"width"];
                         widthRaw = [TAPUtil nullToEmptyString:widthRaw];
                         NSString *widthString = [NSString stringWithFormat:@"%f", [widthRaw floatValue]];
                         NSNumber *widthNumber = [NSNumber numberWithFloat:[widthString floatValue]];
+                        widthNumber = [TAPUtil nullToEmptyNumber:widthNumber];
                         
                         [resultDataDictionary setObject:caption forKey:@"caption"];
                         [resultDataDictionary setObject:sizeNumber forKey:@"size"];
@@ -592,6 +595,7 @@
         fileURL = [TAPUtil nullToEmptyString:fileURL];
         
         NSString *fileName = dataFile.fileName;
+        fileName = [TAPUtil nullToEmptyString:fileName];
         
         NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
         sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
@@ -647,7 +651,9 @@
         }
 
         //Remove first object
-        [uploadQueueRoomArray removeObjectAtIndex:0];
+        if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
+            [uploadQueueRoomArray removeObjectAtIndex:0];
+        }
 
         if ([uploadQueueRoomArray count] == 0) {
             [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
@@ -836,6 +842,7 @@
                     
                     NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
                     NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+                    thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
                     
                     NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
                     
@@ -861,16 +868,19 @@
                         sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
                         NSString *sizeString = [NSString stringWithFormat:@"%f", [sizeRaw floatValue]];
                         NSNumber *sizeNumber = [NSNumber numberWithFloat:[sizeString floatValue]];
+                        sizeNumber = [TAPUtil nullToEmptyNumber:sizeNumber];
                         
                         NSString *heightRaw = [responseDataDictionary objectForKey:@"height"];
                         heightRaw = [TAPUtil nullToEmptyString:heightRaw];
                         NSString *heightString = [NSString stringWithFormat:@"%f", [heightRaw floatValue]];
                         NSNumber *heightNumber = [NSNumber numberWithFloat:[heightString floatValue]];
+                        heightNumber = [TAPUtil nullToEmptyNumber:heightNumber];
                         
                         NSString *widthRaw = [responseDataDictionary objectForKey:@"width"];
                         widthRaw = [TAPUtil nullToEmptyString:widthRaw];
                         NSString *widthString = [NSString stringWithFormat:@"%f", [widthRaw floatValue]];
                         NSNumber *widthNumber = [NSNumber numberWithFloat:[widthString floatValue]];
+                        widthNumber = [TAPUtil nullToEmptyNumber:widthNumber];
                         
                         [resultDataDictionary setObject:caption forKey:@"caption"];
                         [resultDataDictionary setObject:sizeNumber forKey:@"size"];
@@ -1643,6 +1653,7 @@
     NSURL *fileUrl = [NSURL URLWithString:filePath];
     NSData *fileData = [NSData dataWithContentsOfURL:fileUrl];
     NSNumber *duration = [dataDictionary objectForKey:@"duration"];
+    duration = [TAPUtil nullToEmptyNumber:duration];
     
     //Call API Upload File
     NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
@@ -1668,6 +1679,7 @@
         fileURL = [TAPUtil nullToEmptyString:fileURL];
         
         NSString *fileName = dataFile.fileName;
+        fileName = [TAPUtil nullToEmptyString:fileName];
         
         NSString *sizeRaw = [responseDataDictionary objectForKey:@"size"];
         sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
@@ -2101,10 +2113,13 @@
     caption = [TAPUtil nullToEmptyString:caption];
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:dataMedia.imageHeight];
+    imageHeight = [TAPUtil nullToEmptyNumber:imageHeight];
     
     NSString *imageWidth = [NSNumber numberWithFloat:dataMedia.imageWidth];
+    imageWidth = [TAPUtil nullToEmptyNumber:imageWidth];
     
     NSString *size = [NSNumber numberWithFloat:dataMedia.size];
+    size = [TAPUtil nullToEmptyNumber:size];
     
     PHAsset *asset = dataMedia.asset;
     
@@ -2115,7 +2130,9 @@
     [dataDictionary setObject:imageHeight forKey:@"height"];
     [dataDictionary setObject:imageWidth forKey:@"width"];
     [dataDictionary setObject:size forKey:@"size"];
-    [dataDictionary setObject:asset forKey:@"asset"];
+    if (asset != nil) {
+        [dataDictionary setObject:asset forKey:@"asset"];
+    }
     
     return dataDictionary;
 }
@@ -2169,6 +2186,7 @@
     mediaType = [TAPUtil nullToEmptyString:mediaType];
     
     NSNumber *size = dataFile.size;
+    size = [TAPUtil nullToEmptyNumber:size];
     
     [dataDictionary setObject:fileID forKey:@"fileID"];
     [dataDictionary setObject:fileURL forKey:@"url"];
@@ -2339,10 +2357,16 @@
 }
 
 - (void)saveToPendingUploadAssetDictionaryWithAsset:(PHAsset *)asset {
+    if (asset == nil) {
+        return;
+    }
     [self.pendingUploadAssetDictionary setObject:asset forKey:asset.localIdentifier];
 }
 
 - (void)saveToPendingUploadAssetDictionaryWithAVAsset:(AVAsset *)asset {
+    if (asset == nil) {
+        return;
+    }
     NSURL *videoAssetURL = [(AVURLAsset *)asset URL];
     NSString *videoAssetURLString = [videoAssetURL absoluteString];
     videoAssetURLString = [TAPUtil nullToEmptyString:videoAssetURLString];
@@ -2427,7 +2451,7 @@
         
         NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
         
-        NSString *fileNameString = fileName;
+        NSString *fileNameString = [TAPUtil nullToEmptyString:fileName];
     
         NSString *caption = [responseDataDictionary objectForKey:@"caption"];
         caption = [TAPUtil nullToEmptyString:caption];
@@ -2448,6 +2472,7 @@
         sizeRaw = [TAPUtil nullToEmptyString:sizeRaw];
         NSString *sizeString = [NSString stringWithFormat:@"%f", [sizeRaw floatValue]];
         NSNumber *sizeNumber = [NSNumber numberWithFloat:[sizeString floatValue]];
+        sizeNumber = [TAPUtil nullToEmptyNumber:sizeNumber];
         
         NSMutableDictionary *appendedDataDictionary = [[NSMutableDictionary alloc] init];
         appendedDataDictionary = [resultMessage.data mutableCopy];

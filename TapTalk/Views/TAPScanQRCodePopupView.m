@@ -14,6 +14,7 @@
 @property (strong, nonatomic) UIVisualEffectView *visualEffectView;
 @property (strong, nonatomic) UIView *backgroundGradientView;
 @property (strong, nonatomic) UIView *whiteBaseView;
+@property (strong, nonatomic) UIView *shadowView;
 @property (strong, nonatomic) UIView *colorGradientView;
 @property (strong, nonatomic) UIView *closePopupView;
 @property (strong, nonatomic) UIImageView *closePopupImageView;
@@ -100,6 +101,18 @@
         self.whiteBaseView.alpha = 0.0f;
         self.whiteBaseView.layer.cornerRadius = 32.0f;
         self.whiteBaseView.clipsToBounds = YES;
+        
+        _shadowView = [[UIView alloc] initWithFrame:self.whiteBaseView.frame];
+        self.shadowView.backgroundColor = [UIColor whiteColor];
+        self.shadowView.layer.cornerRadius = 32.0f;
+        self.shadowView.clipsToBounds = YES;
+        self.shadowView.layer.shadowRadius = 8.0f;
+        self.shadowView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.15f].CGColor;
+        self.shadowView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.shadowView.layer.shadowOpacity = 1.0f;
+        self.shadowView.layer.masksToBounds = NO;
+        [self addSubview:self.shadowView];
+        
         [self addSubview:self.whiteBaseView];
         
         _colorGradientView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(self.whiteBaseView.frame) - 54.0f, CGRectGetWidth(self.whiteBaseView.frame), 54.0f)];
@@ -191,6 +204,10 @@
         _addContactView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame))];
         self.addContactView.backgroundColor = [UIColor clearColor];
         [self.colorGradientView addSubview:self.addContactView];
+        
+        _addContactButton = [[TapHighlightCustomButtonView alloc] initWithFrame:self.addContactView.frame];
+        [self.addContactButton setType:TapHighlightCustomButtonViewTypeClear];
+        [self.colorGradientView addSubview:self.addContactButton];
  
         UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
         UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
@@ -199,7 +216,7 @@
         self.addContactLabel.textColor = buttonLabelColor;
         self.addContactLabel.textAlignment = NSTextAlignmentCenter;
         self.addContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add To Contacts", nil, [TAPUtil currentBundle], @"");
-        [self.addContactView addSubview:self.addContactLabel];
+        [self.addContactButton addSubview:self.addContactLabel];
         
         CGSize addContactDefaultLabelSize = [self.addContactLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.addContactLabel.frame))];
         self.addContactLabel.frame = CGRectMake(CGRectGetMinX(self.addContactLabel.frame), CGRectGetMinY(self.addContactLabel.frame), ceil(addContactDefaultLabelSize.width), CGRectGetHeight(self.addContactLabel.frame));
@@ -211,12 +228,9 @@
         UIImage *addContactLogoImage = [UIImage imageNamed:@"TAPIconPlusWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         addContactLogoImage = [addContactLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.addContactLogoImageView.image = addContactLogoImage;
-        [self.addContactView addSubview:self.addContactLogoImageView];
+        [self.addContactButton addSubview:self.addContactLogoImageView];
         
         self.addContactLabel.frame = CGRectMake(CGRectGetMaxX(self.addContactLogoImageView.frame) + 5.0f, CGRectGetMinY(self.addContactLabel.frame), CGRectGetWidth(self.addContactLabel.frame), CGRectGetHeight(self.addContactLabel.frame));
-        
-        _addContactButton = [[UIButton alloc] initWithFrame:self.addContactView.frame];
-        [self.colorGradientView addSubview:self.addContactButton];
         
         //Chat Now View
         _chatNowView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame))];
@@ -224,12 +238,16 @@
         self.chatNowView.alpha = 0.0f;
         [self.colorGradientView addSubview:self.chatNowView];
         
+        _chatNowButton = [[TapHighlightCustomButtonView alloc] initWithFrame:self.chatNowView.frame];
+        [self.chatNowButton setType:TapHighlightCustomButtonViewTypeClear];
+        [self.colorGradientView addSubview:self.chatNowButton];
+        
         _chatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, (CGRectGetHeight(self.chatNowView.frame) - 22.0f) / 2.0f, 76.0f, 22.0f)];
         self.chatNowLabel.font = buttonLabelFont;
         self.chatNowLabel.textColor = buttonLabelColor;
         self.chatNowLabel.textAlignment = NSTextAlignmentCenter;
         self.chatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
-        [self.chatNowView addSubview:self.chatNowLabel];
+        [self.chatNowButton addSubview:self.chatNowLabel];
         
         CGSize chatNowDefaultLabelSize = [self.chatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.chatNowLabel.frame))];
         self.chatNowLabel.frame = CGRectMake(CGRectGetMinX(self.chatNowLabel.frame), CGRectGetMinY(self.chatNowLabel.frame), ceil(chatNowDefaultLabelSize.width), CGRectGetHeight(self.chatNowLabel.frame));
@@ -241,12 +259,9 @@
         UIImage *chatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         chatNowLogoImage = [chatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.chatNowLogoImageView.image = chatNowLogoImage;
-        [self.chatNowView addSubview:self.chatNowLogoImageView];
+        [self.chatNowButton addSubview:self.chatNowLogoImageView];
         
         self.chatNowLabel.frame = CGRectMake(CGRectGetMaxX(self.chatNowLogoImageView.frame) + 5.0f, CGRectGetMinY(self.chatNowLabel.frame), CGRectGetWidth(self.chatNowLabel.frame), CGRectGetHeight(self.chatNowLabel.frame));
-        
-        _chatNowButton = [[UIButton alloc] initWithFrame:self.chatNowView.frame];
-        [self.colorGradientView addSubview:self.chatNowButton];
         
         _loadingView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
         self.loadingView.backgroundColor = [UIColor blackColor];
@@ -413,6 +428,8 @@
     self.selfInformedLabel.frame = CGRectMake(CGRectGetMinX(self.selfInformedLabel.frame), CGRectGetMaxY(self.addedUserFullnameLabel.frame) + self.selfInformedLabelTopGap, CGRectGetWidth(self.selfInformedLabel.frame), CGRectGetHeight(self.selfInformedLabel.frame));
     
     self.whiteBaseView.frame = CGRectMake(CGRectGetMinX(self.whiteBaseView.frame), (CGRectGetHeight(self.frame) - totalBaseViewHeight) / 2.0f, CGRectGetWidth(self.whiteBaseView.frame), totalBaseViewHeight);
+    
+    self.shadowView.frame = self.whiteBaseView.frame;
 }
 
 - (void)resizeToStandardPopupView {
@@ -434,6 +451,8 @@
     
     self.whiteBaseView.frame = CGRectMake(CGRectGetMinX(self.whiteBaseView.frame), (CGRectGetHeight(self.frame) - totalBaseViewHeight) / 2.0f, CGRectGetWidth(self.whiteBaseView.frame), totalBaseViewHeight);
     
+    self.shadowView.frame = self.whiteBaseView.frame;
+    
     self.colorGradientView.frame = CGRectMake(CGRectGetMinX(self.colorGradientView.frame), CGRectGetHeight(self.whiteBaseView.frame) - CGRectGetHeight(self.colorGradientView.frame), CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame));
 }
 
@@ -445,11 +464,11 @@
 
         self.addContactView.alpha = 1.0f;
         self.addContactButton.alpha = 1.0f;
-        self.addContactButton.userInteractionEnabled = YES;
+        self.addContactButton.button.userInteractionEnabled = YES;
 
         self.chatNowView.alpha = 0.0f;
         self.chatNowButton.alpha = 0.0f;
-        self.chatNowButton.userInteractionEnabled = NO;
+        self.chatNowButton.button.userInteractionEnabled = NO;
     }
     else if (type == ScanQRCodePopupViewTypeAlreadyFriend) {
         self.colorGradientView.alpha = 0.0f;
@@ -457,16 +476,16 @@
         
         self.addContactView.alpha = 0.0f;
         self.addContactButton.alpha = 0.0f;
-        self.addContactButton.userInteractionEnabled = NO;
+        self.addContactButton.button.userInteractionEnabled = NO;
         
         self.chatNowView.alpha = 1.0f;
         self.chatNowButton.alpha = 1.0f;
-        self.chatNowButton.userInteractionEnabled = YES;
+        self.chatNowButton.button.userInteractionEnabled = YES;
     }
     else if (type == ScanQRCodePopupViewTypeSelf) {
         self.colorGradientView.alpha = 0.0f;
-        self.addContactButton.userInteractionEnabled = NO;
-        self.chatNowButton.userInteractionEnabled = NO;
+        self.addContactButton.button.userInteractionEnabled = NO;
+        self.chatNowButton.button.userInteractionEnabled = NO;
         self.selfInformedLabel.alpha = 1.0f;
     }
     
@@ -504,11 +523,11 @@
     CGFloat whiteViewHeight = [self calculateFriendListViewChangingHeight];
     
     self.chatNowButton.alpha = 1.0f;
-    self.chatNowButton.userInteractionEnabled = YES;
+    self.chatNowButton.button.userInteractionEnabled = YES;
     self.chatNowView.alpha = 1.0f;
     
     self.addContactButton.alpha = 0.0f;
-    self.addContactButton.userInteractionEnabled = NO;
+    self.addContactButton.button.userInteractionEnabled = NO;
     self.addContactView.alpha = 0.0f;
     
     //Slow 0.5
@@ -516,6 +535,9 @@
     [UIView animateWithDuration:0.25f animations:^{
         //Animate Base White Frame Changing
         self.whiteBaseView.frame = CGRectMake(CGRectGetMinX(self.whiteBaseView.frame), ((CGRectGetHeight(self.frame) - whiteViewHeight) / 2.0f) - (additionalChangingHeight / 2.0f), CGRectGetWidth(self.whiteBaseView.frame), whiteViewHeight + additionalChangingHeight);
+        
+        self.shadowView.frame = self.whiteBaseView.frame;
+        
         self.colorGradientView.frame = CGRectMake(CGRectGetMinX(self.colorGradientView.frame), CGRectGetHeight(self.whiteBaseView.frame) -  CGRectGetHeight(self.colorGradientView.frame), CGRectGetWidth(self.colorGradientView.frame), CGRectGetHeight(self.colorGradientView.frame));
         
         //Animate User Image Changing

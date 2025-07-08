@@ -8,37 +8,37 @@
 #import "TAPReportUserViewController.h"
 
 @interface TAPReportUserViewController ()<UITextFieldDelegate, UITextViewDelegate, TAPPopUpInfoViewControllerDelegate>
-@property (weak, nonatomic) IBOutlet UIButton *reportReasonSendingFalseButton;
-@property (weak, nonatomic) IBOutlet UILabel *reportReasonSendingFalseLabel;
-@property (weak, nonatomic) IBOutlet UIButton *reportReasonPretendingButton;
-@property (weak, nonatomic) IBOutlet UILabel *reportReasonPretendingLabel;
-@property (weak, nonatomic) IBOutlet UIButton *reportReasonScamButton;
-@property (weak, nonatomic) IBOutlet UILabel *reportReasonScamLabel;
-@property (weak, nonatomic) IBOutlet UIButton *reportReasonDangerousButton;
-@property (weak, nonatomic) IBOutlet UILabel *reportReasonDangerousLabel;
-@property (weak, nonatomic) IBOutlet UIButton *reportReasonOtherButton;
-@property (weak, nonatomic) IBOutlet UILabel *reportReasonOtherLabel;
-@property (weak, nonatomic) IBOutlet UILabel *selectCategoryErrorLabel;
+@property (strong, nonatomic) IBOutlet UIButton *reportReasonSendingFalseButton;
+@property (strong, nonatomic) IBOutlet UILabel *reportReasonSendingFalseLabel;
+@property (strong, nonatomic) IBOutlet UIButton *reportReasonPretendingButton;
+@property (strong, nonatomic) IBOutlet UILabel *reportReasonPretendingLabel;
+@property (strong, nonatomic) IBOutlet UIButton *reportReasonScamButton;
+@property (strong, nonatomic) IBOutlet UILabel *reportReasonScamLabel;
+@property (strong, nonatomic) IBOutlet UIButton *reportReasonDangerousButton;
+@property (strong, nonatomic) IBOutlet UILabel *reportReasonDangerousLabel;
+@property (strong, nonatomic) IBOutlet UIButton *reportReasonOtherButton;
+@property (strong, nonatomic) IBOutlet UILabel *reportReasonOtherLabel;
+@property (strong, nonatomic) IBOutlet UILabel *selectCategoryErrorLabel;
+
+@property (strong, nonatomic) IBOutlet UIView *reportReasonFieldView;
+@property (strong, nonatomic) IBOutlet UILabel *reportTitleLabel;
+@property (strong, nonatomic) IBOutlet UITextField *reportReasonOtherTextField;
+@property (strong, nonatomic) IBOutlet UITextView *reportReasonTextView;
+@property (strong, nonatomic) IBOutlet UILabel *reasonFieldPlaceholderLabel;
+@property (strong, nonatomic) IBOutlet UIView *submitButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *submitHighlightButton;
+@property (strong, nonatomic) IBOutlet UIButton *submitButton;
+@property (strong, nonatomic) IBOutlet UILabel *textViewCounterLabel;
+@property (strong, nonatomic) IBOutlet UILabel *errorTextFieldLabel;
 
 
-@property (weak, nonatomic) IBOutlet UIView *reportReasonFieldView;
-@property (weak, nonatomic) IBOutlet UILabel *reportTitleLabel;
-@property (weak, nonatomic) IBOutlet UITextField *reportReasonOtherTextField;
-@property (weak, nonatomic) IBOutlet UITextView *reportReasonTextView;
-@property (weak, nonatomic) IBOutlet UILabel *reasonFieldPlaceholderLabel;
-@property (weak, nonatomic) IBOutlet UIView *submitButtonView;
-@property (weak, nonatomic) IBOutlet UIButton *submitButton;
-@property (weak, nonatomic) IBOutlet UILabel *textViewCounterLabel;
-@property (weak, nonatomic) IBOutlet UILabel *errorTextFieldLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *loadingIconImageView;
+
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 
 
-@property (weak, nonatomic) IBOutlet UIImageView *loadingIconImageView;
-
-@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-
-
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *reportReasonOtherFieldHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *errorTextFieldLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *reportReasonOtherFieldHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *errorTextFieldLabelHeightConstraint;
 
 @property (strong, nonatomic) NSArray *optionalArray;
 @property (nonatomic) CGFloat keyboardHeight;
@@ -47,7 +47,7 @@
 @property (nonatomic) BOOL isLoadingState;
 @property (strong, nonatomic) TAPPopUpInfoViewController *backLoadingPopupInfoViewController;
 
-@property (weak, nonatomic) IBOutlet UILabel *reportReasonBottomLabel;
+@property (strong, nonatomic) IBOutlet UILabel *reportReasonBottomLabel;
 
 
 @end
@@ -97,13 +97,14 @@
     self.reasonFieldPlaceholderLabel.font = labelFont;
     self.reasonFieldPlaceholderLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
     
-    [self.submitButton setTitle:@"Submit Report" forState:UIControlStateNormal];
-    
-    self.submitButtonView.backgroundColor = [TAPUtil getColor:@"FF3F57"];
+//    [self.submitButton setTitle:@"Submit Report" forState:UIControlStateNormal];
+//    
+//    self.submitButtonView.backgroundColor = [TAPUtil getColor:@"FF3F57"];
     self.submitButtonView.layer.cornerRadius = 8.0f;
+    self.submitButtonView.clipsToBounds = YES;
     
-    self.loadingIconImageView.image = [UIImage imageNamed:@"TAPIconLoadingSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    self.loadingIconImageView.image = [self.loadingIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+//    self.loadingIconImageView.image = [UIImage imageNamed:@"TAPIconLoadingSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+//    self.loadingIconImageView.image = [self.loadingIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                           action:@selector(dismissKeyboard)];
@@ -158,6 +159,32 @@
     [self showLoadingState:NO];
     
     [self setupNavigationView];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self.view layoutIfNeeded];
+    
+    if (!self.submitHighlightButton) {
+        _submitHighlightButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.submitButtonView.frame),
+            CGRectGetHeight(self.submitButtonView.frame)
+        )];
+        [self.submitHighlightButton setType:TapHighlightCustomButtonViewTypeDestructive];
+        [self.submitHighlightButton setLabelText:NSLocalizedStringFromTableInBundle(@"Submit Report", nil, [TAPUtil currentBundle], @"")];
+        [self.submitHighlightButton setClickAction:@selector(submitReportButtonDidTapped) target:self];
+        [self.submitButtonView addSubview:self.submitHighlightButton];
+        
+        self.loadingIconImageView.alpha = 0.0f;
+        self.submitButton.alpha = 0.0f;
+        self.submitButton.userInteractionEnabled = NO;
+        
+        
+        self.submitButtonView.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.5f];
+        self.submitHighlightButton.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.5f];
+    }
 }
 
 #pragma mark Delegates
@@ -358,6 +385,10 @@
 }
 
 - (IBAction)submitReportButtonDidTapped:(id)sender {
+    [self submitReportButtonDidTapped];
+}
+
+- (void)submitReportButtonDidTapped {
     if (self.reportReasonOtherTextField.alpha == 1) {
         if (self.reportReasonOtherTextField.text.length == 0) {
             [self setTextFieldToError:YES];
@@ -507,10 +538,11 @@
 
 - (void)showLoadingState:(BOOL)isLoading {
     [self radioButtonLoadingState:isLoading];
-    if(isLoading) {
-        //ADD ANIMATION
-        self.loadingIconImageView.alpha = 1.0f;
-        self.submitButton.titleLabel.alpha = 0;
+    if (isLoading) {
+//        self.loadingIconImageView.alpha = 1.0f;
+//        self.submitButton.titleLabel.alpha = 0;
+        [self.submitHighlightButton setIsLoading:YES];
+        self.submitHighlightButton.button.userInteractionEnabled = NO;
         [self setTextViewState:NO];
         self.reportReasonFieldView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
@@ -523,20 +555,22 @@
         self.reportReasonOtherTextField.userInteractionEnabled = NO;
         self.reportReasonTextView.userInteractionEnabled = NO;
         
-        if ([self.loadingIconImageView.layer animationForKey:@"SpinAnimation"] == nil) {
-            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-            animation.fromValue = [NSNumber numberWithFloat:0.0f];
-            animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
-            animation.duration = 1.5f;
-            animation.repeatCount = INFINITY;
-            animation.cumulative = YES;
-            animation.removedOnCompletion = NO;
-            [self.loadingIconImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
-        }
+//        if ([self.loadingIconImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+//            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+//            animation.fromValue = [NSNumber numberWithFloat:0.0f];
+//            animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
+//            animation.duration = 1.5f;
+//            animation.repeatCount = INFINITY;
+//            animation.cumulative = YES;
+//            animation.removedOnCompletion = NO;
+//            [self.loadingIconImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+//        }
     }
     else {
-        self.loadingIconImageView.alpha = 0.0f;
-        self.submitButton.titleLabel.alpha = 1.0f;
+//        self.loadingIconImageView.alpha = 0.0f;
+//        self.submitButton.titleLabel.alpha = 1.0f;
+        [self.submitHighlightButton setIsLoading:NO];
+        self.submitHighlightButton.button.userInteractionEnabled = YES;
         self.reportReasonFieldView.backgroundColor = [UIColor whiteColor];
         self.reportReasonSendingFalseButton.userInteractionEnabled = YES;
         self.reportReasonPretendingButton.userInteractionEnabled = YES;
@@ -546,10 +580,10 @@
         
         self.reportReasonOtherTextField.userInteractionEnabled = YES;
         self.reportReasonTextView.userInteractionEnabled = YES;
-        //REMOVE ANIMATION
-        if ([self.loadingIconImageView.layer animationForKey:@"SpinAnimation"] != nil) {
-            [self.loadingIconImageView.layer removeAnimationForKey:@"SpinAnimation"];
-        }
+        
+//        if ([self.loadingIconImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+//            [self.loadingIconImageView.layer removeAnimationForKey:@"SpinAnimation"];
+//        }
     }
 }
 
