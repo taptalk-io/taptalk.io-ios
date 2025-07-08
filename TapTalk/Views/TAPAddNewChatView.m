@@ -106,11 +106,12 @@
         syncContactTopSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.syncContactButtonView addSubview:syncContactTopSeparatorView];
         
-        _syncButton = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, CGRectGetWidth(self.frame), 44.0f)];
-        [self.syncButton setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
-        [self.syncButton setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.syncButton setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Sync Contacts Now", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconSync" iconPosition:TAPCustomButtonViewIconPosititonLeft];
-        [self.syncButton setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        _syncButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, 10.0f, CGRectGetWidth(self.frame) - 32.0f, 44.0f)];
+        [self.syncButton setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.syncButton setLabelText:NSLocalizedStringFromTableInBundle(@"Sync Contacts Now", nil, [TAPUtil currentBundle], @"")];
+        [self.syncButton setLeftIconImage:[UIImage imageNamed:@"TAPIconSync" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.syncButton setLeftIconSize:32.0f];
+        [self.syncButton setLeftIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         [self.syncContactButtonView addSubview:self.syncButton];
         
         _searchResultTableView = [[TAPBaseTableView alloc] initWithFrame:self.contactsTableView.frame];

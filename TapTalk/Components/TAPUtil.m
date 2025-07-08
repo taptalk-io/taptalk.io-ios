@@ -68,6 +68,10 @@ static const char kBundleKey = 0;
 }
 
 + (NSString *)getMessageTimestampText:(NSNumber *)createdTime {
+    if (!createdTime) {
+        return @"";
+    }
+    
     NSDate *currentDate = [NSDate date];
     NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
     NSTimeInterval messageTimeInterval = [createdTime doubleValue] / 1000.0f; //change to second from milisecond
@@ -805,7 +809,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 
 #pragma mark - View
 
-- (void)addSpinAnimation:(UIView *)view {
++ (void)addSpinAnimation:(UIView *)view {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.fromValue = [NSNumber numberWithFloat:0.0f];
     animation.toValue = [NSNumber numberWithFloat:(2 * M_PI)];
@@ -816,7 +820,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     [view.layer addAnimation:animation forKey:@"SpinAnimation"];
 }
 
-- (void)removeSpinAnimation:(UIView *)view {
++ (void)removeSpinAnimation:(UIView *)view {
     if ([view.layer animationForKey:@"SpinAnimation"] != nil) {
         [view.layer removeAnimationForKey:@"SpinAnimation"];
     }

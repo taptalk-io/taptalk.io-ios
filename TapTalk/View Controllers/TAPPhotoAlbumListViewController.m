@@ -54,6 +54,7 @@
     
     self.photoAlbumListView.tableView.dataSource = self;
     self.photoAlbumListView.tableView.delegate = self;
+    self.photoAlbumListView.tableView.delaysContentTouches = NO;
     
     _smartAlbumArray = [[NSMutableArray alloc] init];
     _collectionArray = [[NSMutableArray alloc] init];
@@ -103,7 +104,8 @@
     if(nil == cell) {
         cell = [[TAPPhotoAlbumListItemTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                                         reuseIdentifier:cellID];
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+//        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+        [cell setGrayHighlightColor];
     }
     
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
@@ -172,7 +174,9 @@
 #pragma mark - Delegate
 #pragma mark UITableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    if(indexPath.section == 0) {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    if (indexPath.section == 0) {
         //smart album
         TAPImageSelectViewController *imageSelectViewController = [[TAPImageSelectViewController alloc] init];
         imageSelectViewController.delegate = self;

@@ -763,7 +763,9 @@
     NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:image.size.height];
+    imageHeight = [TAPUtil nullToEmptyNumber:imageHeight];
     NSNumber *imageWidth = [NSNumber numberWithFloat:image.size.width];
+    imageWidth = [TAPUtil nullToEmptyNumber:imageWidth];
     
     [dataDictionary setObject:imageHeight forKey:@"height"];
     [dataDictionary setObject:imageWidth forKey:@"width"];
@@ -855,9 +857,12 @@
     CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:imageHeightFloat];
+    imageHeight = [TAPUtil nullToEmptyNumber:imageHeight];
     NSNumber *imageWidth = [NSNumber numberWithFloat:imageWidthFloat];
+    imageWidth = [TAPUtil nullToEmptyNumber:imageWidth];
     
     NSString *assetIdentifier = asset.localIdentifier;
+    assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
 
     //Save asset to dictionary
     [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAsset:asset];
@@ -1121,14 +1126,18 @@
     CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:imageHeightFloat];
+    imageHeight = [TAPUtil nullToEmptyNumber:imageHeight];
     NSNumber *imageWidth = [NSNumber numberWithFloat:imageWidthFloat];
+    imageWidth = [TAPUtil nullToEmptyNumber:imageWidth];
     
     NSTimeInterval videoDuration = ceil(asset.duration);
     NSInteger videoDurationInteger = videoDuration * 1000; // in miliseconds
     
     NSString *thumbnailImageBase64String = [thumbnailImageData base64EncodedString];
+    thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
     
     NSString *assetIdentifier = asset.localIdentifier;
+    assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
     
 //    PHAsset *obtainedAsset = [[TAPFetchMediaManager sharedManager] getAssetFromUserPreferenceWithKey:assetKey];
     
@@ -1290,13 +1299,16 @@
 //        NSLog(@"error getting size for url %@ error was %@", videoAssetURL, fileSizeError);
         videoAssetURLFileSize = [NSNumber numberWithFloat:0.0f];
     }
+    videoAssetURLFileSize = [TAPUtil nullToEmptyNumber:videoAssetURLFileSize];
     
     CGSize naturalSizeVideo = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject] naturalSize];
     CGFloat videoWidthFloat = (CGFloat)naturalSizeVideo.width;
     CGFloat videoHeightFloat = (CGFloat)naturalSizeVideo.height;
     
     NSNumber *videoHeight = [NSNumber numberWithFloat:videoWidthFloat];
+    videoHeight = [TAPUtil nullToEmptyNumber:videoHeight];
     NSNumber *videoWidth = [NSNumber numberWithFloat:videoHeightFloat];
+    videoWidth = [TAPUtil nullToEmptyNumber:videoWidth];
     
     Float64 videoDurationFloat = floorf(CMTimeGetSeconds(videoAsset.duration));
     Float64 videoDurationInMilisecondsFloat = videoDurationFloat * 1000; // in miliseconds
@@ -1451,6 +1463,8 @@
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
+    filePath = [TAPUtil nullToEmptyString:filePath];
+    
     NSString *fileName = dataFile.fileName;
     fileName = [TAPUtil nullToEmptyString:fileName];
     
@@ -1458,6 +1472,7 @@
     mediaType = [TAPUtil nullToEmptyString:mediaType];
     
     NSNumber *size = dataFile.size;
+    size = [TAPUtil nullToEmptyNumber:size];
     
     NSString *messageBodyString = [NSString stringWithFormat:@"🎤 Voice"];
     
@@ -1524,7 +1539,7 @@
     
     [dataDictionary setObject:[NSNumber numberWithFloat:latitude] forKey:@"latitude"];
     [dataDictionary setObject:[NSNumber numberWithFloat:longitude] forKey:@"longitude"];
-    [dataDictionary setObject:address forKey:@"address"];
+    [dataDictionary setObject:[TAPUtil nullToEmptyString:address] forKey:@"address"];
     
     TAPMessageModel *message = [self createMessageModelWithRoom:room
                                                            body:messageBodyString
@@ -1586,16 +1601,19 @@
     //Check if forward message exist, send forward message
     [self checkAndSendForwardedMessageWithRoom:room];
     
+    filePath = [TAPUtil nullToEmptyString:filePath];
+    
     NSString *fileName = dataFile.fileName;
     fileName = [TAPUtil nullToEmptyString:fileName];
     
     NSString *caption = dataFile.caption;
-        caption = [TAPUtil nullToEmptyString:caption];
+    caption = [TAPUtil nullToEmptyString:caption];
     
     NSString *mediaType = dataFile.mediaType;
     mediaType = [TAPUtil nullToEmptyString:mediaType];
     
     NSNumber *size = dataFile.size;
+    size = [TAPUtil nullToEmptyNumber:size];
     
     NSString *messageBodyString = [NSString stringWithFormat:@"📎 %@", fileName];
     
@@ -2445,15 +2463,16 @@
                                   roomID:(NSString *)roomID {
     
     NSMutableDictionary *storedFilePathPerRoomDictionary = [self.filePathStoredDictionary objectForKey:roomID];
+    storedFilePathPerRoomDictionary = [[TAPUtil nullToEmptyDictionary:storedFilePathPerRoomDictionary] mutableCopy];
     
     if ([storedFilePathPerRoomDictionary count] != 0) {
-        [storedFilePathPerRoomDictionary setObject:path forKey:localID];
-        [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:roomID];
+        [storedFilePathPerRoomDictionary setObject:[TAPUtil nullToEmptyString:path] forKey:[TAPUtil nullToEmptyString:localID]];
+        [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:[TAPUtil nullToEmptyString:roomID]];
     }
     else {
         storedFilePathPerRoomDictionary = [[NSMutableDictionary alloc] init];
-        [storedFilePathPerRoomDictionary setObject:path forKey:localID];
-        [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:roomID];
+        [storedFilePathPerRoomDictionary setObject:[TAPUtil nullToEmptyString:path] forKey:[TAPUtil nullToEmptyString:localID]];
+        [self.filePathStoredDictionary setObject:storedFilePathPerRoomDictionary forKey:[TAPUtil nullToEmptyString:roomID]];
     }
 }
 

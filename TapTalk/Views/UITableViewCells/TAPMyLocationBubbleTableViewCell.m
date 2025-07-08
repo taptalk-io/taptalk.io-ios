@@ -754,7 +754,7 @@
 }
 
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
-    if(recognizer.state = UIGestureRecognizerStateEnded) {
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
         if ([self.delegate respondsToSelector:@selector(myLocationBubbleLongPressedWithMessage:)]) {
             [self.delegate myLocationBubbleLongPressedWithMessage:self.message];
         }

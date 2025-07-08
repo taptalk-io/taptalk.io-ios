@@ -1315,7 +1315,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
         //Add Members
-        [self.createGroupView.continueButtonView setAsLoading:YES animated:NO];
+        [self.createGroupView.continueButtonView setIsLoading:YES];
         self.createGroupView.searchBarView.userInteractionEnabled = NO;
         self.createGroupView.contactsTableView.userInteractionEnabled = NO;
         self.createGroupView.searchResultTableView.userInteractionEnabled = NO;
@@ -1327,14 +1327,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             if ([self.delegate respondsToSelector:@selector(createGroupViewControllerUpdatedRoom:)]) {
                 [self.delegate createGroupViewControllerUpdatedRoom:room];
             }
-            [self.createGroupView.continueButtonView setAsLoading:NO animated:NO];
+            [self.createGroupView.continueButtonView setIsLoading:NO];
             self.createGroupView.searchBarView.userInteractionEnabled = YES;
             self.createGroupView.contactsTableView.userInteractionEnabled = YES;
             self.createGroupView.searchResultTableView.userInteractionEnabled = YES;
             [self dismissViewControllerAnimated:YES completion:nil];
         } failure:^(NSError *error) {
-            [self.createGroupView.continueButtonView setAsLoading:NO animated:NO];
-            [self.createGroupView.continueButtonView setAsLoading:NO animated:NO];
+            [self.createGroupView.continueButtonView setIsLoading:NO];
             self.createGroupView.searchBarView.userInteractionEnabled = YES;
             self.createGroupView.contactsTableView.userInteractionEnabled = YES;
             self.createGroupView.searchResultTableView.userInteractionEnabled = YES;

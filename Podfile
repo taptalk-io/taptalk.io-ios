@@ -3,7 +3,7 @@ platform :ios, '11.0'
 inhibit_all_warnings!
 
 def tapTalk_pods
-    pod 'AFNetworking', '~> 4.0.0', :modular_headers => true
+#    pod 'AFNetworking', '~> 4.0.0', :modular_headers => true
     pod 'SocketRocket'
     pod 'JSONModel', '~> 1.1', :modular_headers => true
     pod 'Realm', '10.1.0'

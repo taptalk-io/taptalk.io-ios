@@ -100,34 +100,34 @@
         self.bottomActionView.backgroundColor = [UIColor whiteColor];
         [self.bgView addSubview:self.bottomActionView];
         
-        _addMembersButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
-        [self.addMembersButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
-        [self.addMembersButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.addMembersButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Add Members", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconAddMembers" iconPosition:TAPCustomButtonViewIconPosititonLeft];
-        [self.addMembersButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        _addMembersButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame) - 32.0f, 44.0f)];
+        [self.addMembersButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.addMembersButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Add Members", nil, [TAPUtil currentBundle], @"")];
+        [self.addMembersButtonView setLeftIconImage:[UIImage imageNamed:@"TAPIconAddMembers" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:32.0f margin:0.0f];
+        [self.addMembersButtonView setLeftIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.addMembersButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.addMembersButtonView];
         
-        _removeMembersButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
-        [self.removeMembersButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeDestructiveWithIcon];
-        [self.removeMembersButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.removeMembersButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconRemoveMemberRed" iconPosition:TAPCustomButtonViewIconPosititonLeft];
-        [self.removeMembersButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconDestructive]];
+        _removeMembersButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame) - 32.0f, 44.0f)];
+        [self.removeMembersButtonView setType:TapHighlightCustomButtonViewTypeDestructive];
+        [self.removeMembersButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"")];
+        [self.removeMembersButtonView setLeftIconImage:[UIImage imageNamed:@"TAPIconRemoveMemberRed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:32.0f margin:0.0f];
+        [self.removeMembersButtonView setLeftIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIconDestructive]];
         self.removeMembersButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.removeMembersButtonView];
         
-        _promoteAdminButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
-        [self.promoteAdminButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
-        [self.promoteAdminButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.promoteAdminButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Promote to Admin", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconAppointAdminWhite" iconPosition:TAPCustomButtonViewIconPosititonLeft];
+        _promoteAdminButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame) - 32.0f, 44.0f)];
+        [self.promoteAdminButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.promoteAdminButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Promote to Admin", nil, [TAPUtil currentBundle], @"")];
+        [self.promoteAdminButtonView setLeftIconImage:[UIImage imageNamed:@"TAPIconAppointAdminWhite" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:32.0f margin:0.0f];
         self.promoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.promoteAdminButtonView];
         
-        _demoteAdminButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame), 44.0f)];
-        [self.demoteAdminButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypeWithIcon];
-        [self.demoteAdminButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.demoteAdminButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Demote from Admin", nil, [TAPUtil currentBundle], @"") andIcon:@"TAPIconDemote" iconPosition:TAPCustomButtonViewIconPosititonLeft];
-        [self.demoteAdminButtonView setButtonIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+        _demoteAdminButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.bottomActionView.frame) - 32.0f, 44.0f)];
+        [self.demoteAdminButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.demoteAdminButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Demote from Admin", nil, [TAPUtil currentBundle], @"")];
+        [self.demoteAdminButtonView setLeftIconImage:[UIImage imageNamed:@"TAPIconDemote" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:32.0f margin:0.0f];
+        [self.demoteAdminButtonView setLeftIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
         self.demoteAdminButtonView.alpha = 0.0f;
         [self.bottomActionView addSubview:self.demoteAdminButtonView];
         
@@ -190,10 +190,10 @@
         self.selectedContactsCollectionView.showsHorizontalScrollIndicator = NO;
         [self.selectedContactsView addSubview:self.selectedContactsCollectionView];
         
-        _continueButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame), 44.0f)];
-        [self.continueButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.continueButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypePlain];
-        [self.continueButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
+        _continueButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame) - 32.0f, 44.0f)];
+        [self.continueButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.continueButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
+        [self.continueButtonView setLoadingStyle:TapHighlightCustomButtonViewLoadingStyleCenterNoText];
         [self.selectedContactsView addSubview:self.continueButtonView];
         
         //Save Loading View
@@ -337,7 +337,7 @@
 - (void)setTapCreateGroupViewType:(TAPCreateGroupViewType)tapCreateGroupViewType {
     _tapCreateGroupViewType = tapCreateGroupViewType;
     if (tapCreateGroupViewType == TAPCreateGroupViewTypeAddMember) {
-        [self.continueButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Add Members", nil, [TAPUtil currentBundle], @"")];
+        [self.continueButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Add Members", nil, [TAPUtil currentBundle], @"")];
         [self showBottomActionButtonView:NO];
     }
     else if (tapCreateGroupViewType == TAPCreateGroupViewTypeMemberList) {

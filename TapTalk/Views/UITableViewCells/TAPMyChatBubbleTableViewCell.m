@@ -524,6 +524,17 @@
             }
         }
     }
+    else if (imageView == self.linkPreviewImageView) {
+        if (imageView.image != nil) {
+            [self setLinkPreviewImage:imageView.image];
+        }
+        else {
+            [self hideLinkPreviewImage];
+        }
+        if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
+            [self.delegate myChatBubbleDidFinishLoadingLinkPreviewImage:imageView.image url:imageView.imageURLString message:self.message];
+        }
+    }
 }
 
 #pragma mark - Custom Method
@@ -757,26 +768,27 @@
             NSURL *urlImage = [NSURL URLWithString:linkPreviewImageUrl];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:urlImage];
             [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
-            [self.linkPreviewImageView setImageWithURLRequest:request
-                                             placeholderImage:nil
-                                                      success:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, UIImage *image) {
-                if (image != nil) {
-                    [self setLinkPreviewImage:image];
-                }
-                else {
-                    [self hideLinkPreviewImage];
-                }
-                
-                if ([self.delegate respondsToSelector:@selector(myChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
-                    [self.delegate myChatBubbleDidFinishLoadingLinkPreviewImage:image url:linkPreviewImageUrl message:message];
-                }
-            } failure:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, NSError *error) {
-                [self hideLinkPreviewImage];
-                
-                if ([self.delegate respondsToSelector:@selector(myChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
-                    [self.delegate myChatBubbleDidFinishLoadingLinkPreviewImage:nil url:linkPreviewImageUrl message:message];
-                }
-            }];
+            [self.linkPreviewImageView setImageWithURLString:linkPreviewImageUrl];
+//            [self.linkPreviewImageView setImageWithURLRequest:request
+//                                             placeholderImage:nil
+//                                                      success:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, UIImage *image) {
+//                if (image != nil) {
+//                    [self setLinkPreviewImage:image];
+//                }
+//                else {
+//                    [self hideLinkPreviewImage];
+//                }
+//                
+//                if ([self.delegate respondsToSelector:@selector(myChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
+//                    [self.delegate myChatBubbleDidFinishLoadingLinkPreviewImage:image url:linkPreviewImageUrl message:message];
+//                }
+//            } failure:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, NSError *error) {
+//                [self hideLinkPreviewImage];
+//                
+//                if ([self.delegate respondsToSelector:@selector(myChatBubbleDidFinishLoadingLinkPreviewImage:url:message:)]) {
+//                    [self.delegate myChatBubbleDidFinishLoadingLinkPreviewImage:nil url:linkPreviewImageUrl message:message];
+//                }
+//            }];
         }
         else {
             [self hideLinkPreviewImage];
@@ -1136,7 +1148,7 @@
 }
 
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
-    if(recognizer.state = UIGestureRecognizerStateEnded) {
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
         if ([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedWithMessage:)]) {
             [self.delegate myChatBubbleLongPressedWithMessage:self.message];
         }

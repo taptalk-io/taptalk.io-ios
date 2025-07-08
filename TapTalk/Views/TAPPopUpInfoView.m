@@ -60,27 +60,28 @@
         self.detailLabel.textAlignment = NSTextAlignmentCenter;
         [self.popupWhiteView addSubview:self.detailLabel];
         
-        UIFont *popupPrimaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextPrimary];
-        UIColor *popupPrimaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
-        
         CGFloat buttonWidth = (CGRectGetWidth(self.popupWhiteView.frame) / 2) - 24.0f - 4.0f;
         
-        _rightButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.popupWhiteView.frame) - buttonWidth - 24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, buttonWidth, 40.0f)];
-        self.rightButton.titleLabel.font = popupPrimaryButtonFont;
-        self.rightButton.layer.cornerRadius = 8.0f;
-        self.rightButton.titleLabel.textColor = popupPrimaryButtonColor;
-        self.rightButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonSuccessBackground];
+        _rightButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            CGRectGetWidth(self.popupWhiteView.frame) - buttonWidth - 24.0f,
+            CGRectGetMaxY(self.detailLabel.frame) + 16.0f,
+            buttonWidth,
+            40.0f
+        )];
+        [self.rightButton setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        self.rightButton.labelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextPrimary];
+        self.rightButton.labelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
         [self.popupWhiteView addSubview:self.rightButton];
         
-        UIFont *popupSecondaryButtonFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextSecondary];
-        UIColor *popupSecondaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
-        _leftButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 8.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
-        self.leftButton.layer.cornerRadius = 8.0f;
-        self.leftButton.layer.borderWidth = 1.0f;
-        self.leftButton.layer.borderColor = popupSecondaryButtonColor.CGColor;
-        self.leftButton.titleLabel.font = popupSecondaryButtonFont;
-        self.leftButton.titleLabel.textColor = popupSecondaryButtonColor;
-        self.leftButton.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogSecondaryButtonBackground];
+        _leftButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            CGRectGetMinX(self.rightButton.frame) - 8.0f - CGRectGetWidth(self.rightButton.frame),
+            CGRectGetMinY(self.rightButton.frame),
+            CGRectGetWidth(self.rightButton.frame),
+            CGRectGetHeight(self.rightButton.frame)
+        )];
+        [self.leftButton setType:TapHighlightCustomButtonViewTypeSecondaryOrangeBorder];
+        self.leftButton.labelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontPopupDialogButtonTextSecondary];
+        self.leftButton.labelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
         [self.popupWhiteView addSubview:self.leftButton];
         
     }
@@ -95,9 +96,9 @@
     self.titleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMinY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), sizeTitle.height);
     self.detailLabel.frame = CGRectMake(CGRectGetMinX(self.detailLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.detailLabel.frame), sizeDetail.height);
     
-    self.rightButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame));
+    [self.rightButton resizeFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame), CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.rightButton.frame), CGRectGetHeight(self.rightButton.frame))];
     
-    self.leftButton.frame = CGRectMake(CGRectGetMinX(self.rightButton.frame) - 8.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.leftButton.frame), CGRectGetHeight(self.leftButton.frame));
+    [self.leftButton resizeFrame:CGRectMake(CGRectGetMinX(self.rightButton.frame) - 8.0f - CGRectGetWidth(self.rightButton.frame), CGRectGetMinY(self.rightButton.frame), CGRectGetWidth(self.leftButton.frame), CGRectGetHeight(self.leftButton.frame))];
 
     CGFloat popupInfoViewHeight = CGRectGetMaxY(self.rightButton.frame) + 16.0f;
     self.popupWhiteView.frame = CGRectMake(CGRectGetMinX(self.popupWhiteView.frame), (CGRectGetHeight(self.frame) - popupInfoViewHeight) / 2.0f, CGRectGetWidth(self.popupWhiteView.frame), popupInfoViewHeight);
@@ -105,27 +106,47 @@
 
 - (void)isShowTwoOptionButton:(BOOL)isShow {
     if (isShow) {
-        self.leftButton.userInteractionEnabled = YES;
+        self.leftButton.button.userInteractionEnabled = YES;
         self.leftButton.alpha = 1.0f;
     }
     else {
-        self.leftButton.userInteractionEnabled = NO;
+        self.leftButton.button.userInteractionEnabled = NO;
         self.leftButton.alpha = 0.0f;
     }
 }
 
-- (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString *)leftOptionTitle singleOrRightOptionButtonTitle:(NSString *)singleOrRightOptionTitle {
+- (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType 
+                   withTitle:(NSString *)title
+           detailInformation:(NSString *)detailInfo
+       leftOptionButtonTitle:(NSString *)leftOptionTitle
+singleOrRightOptionButtonTitle:(NSString *)singleOrRightOptionTitle {
+    
     _popupInfoViewType = popupInfoViewType;
     CGFloat buttonWidth = (CGRectGetWidth(self.popupWhiteView.frame) / 2) - 24.0f - 4.0f;
-    self.rightButton.frame = CGRectMake(CGRectGetWidth(self.popupWhiteView.frame) - buttonWidth - 24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, buttonWidth, 40.0f);
+    [self.rightButton resizeFrame:CGRectMake(
+        CGRectGetWidth(self.popupWhiteView.frame) - buttonWidth - 24.0f,
+        CGRectGetMaxY(self.detailLabel.frame) + 16.0f,
+        buttonWidth,
+        40.0f
+    )];
     
     if (self.popupInfoViewType == TAPPopupInfoViewTypeErrorMessage) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDestructive];
-        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 48.0f, CGRectGetHeight(self.rightButton.frame));
+        [self.rightButton resizeFrame:CGRectMake(
+            24.0f,
+            CGRectGetMaxY(self.detailLabel.frame) + 16.0f,
+            CGRectGetWidth(self.popupWhiteView.frame) - 48.0f,
+            CGRectGetHeight(self.rightButton.frame)
+        )];
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeSuccessMessage) {
-        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
-        self.rightButton.frame = CGRectMake(24.0f, CGRectGetMaxY(self.detailLabel.frame) + 16.0f, CGRectGetWidth(self.popupWhiteView.frame) - 48.0f, CGRectGetHeight(self.rightButton.frame));
+        [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeSuccess];
+        [self.rightButton resizeFrame:CGRectMake(
+            24.0f,
+            CGRectGetMaxY(self.detailLabel.frame) + 16.0f,
+            CGRectGetWidth(self.popupWhiteView.frame) - 48.0f,
+            CGRectGetHeight(self.rightButton.frame)
+        )];
     }
     else if (self.popupInfoViewType == TAPPopupInfoViewTypeInfoDefault) {
         [self setPopupInfoViewThemeType:TAPPopupInfoViewThemeTypeDefault];
@@ -145,40 +166,29 @@
                              range:NSMakeRange(0, [attributedString length])];
     self.detailLabel.attributedText = attributedString;
     
-    [self.leftButton setTitle:leftOptionTitle forState:UIControlStateNormal];
-    [self.rightButton setTitle:singleOrRightOptionTitle forState:UIControlStateNormal];
+    [self.leftButton setLabelText:leftOptionTitle];
+    [self.rightButton setLabelText:singleOrRightOptionTitle];
     
     [self resizeSubview];
 }
 
 
 - (void)setPopupInfoViewThemeType:(TAPPopupInfoViewThemeType)popupInfoViewThemeType {
-    
-    UIColor *popupPrimaryButtonSuccessColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
-    UIColor *popupPrimaryButtonSuccessBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonSuccessBackground];
-    
-    UIColor *popupPrimaryButtonDestructiveColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextPrimary];
-    UIColor *popupPrimaryButtonDestructiveBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogPrimaryButtonErrorBackground];
-    
-    UIColor *popupSecondaryButtonColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogButtonTextSecondary];
-    UIColor *popupSecondaryBackgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPopupDialogSecondaryButtonBackground];
-    
     _popupInfoViewThemeType = popupInfoViewThemeType;
     if (self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeDestructive) {
         //Red theme
-        [self.rightButton setTitleColor:popupPrimaryButtonDestructiveColor forState:UIControlStateNormal];
-        self.rightButton.backgroundColor = popupPrimaryButtonDestructiveBackgroundColor;
-        
-        [self.leftButton setTitleColor:popupSecondaryButtonColor forState:UIControlStateNormal];
-        self.leftButton.backgroundColor = popupSecondaryBackgroundColor;
+        [self.rightButton setType:TapHighlightCustomButtonViewTypeDestructive];
+        [self.leftButton setType:TapHighlightCustomButtonViewTypeSecondaryOrangeBorder];
+    }
+    else if (self.popupInfoViewThemeType == TAPPopupInfoViewThemeTypeSuccess) {
+        //Default green theme
+        [self.rightButton setType:TapHighlightCustomButtonViewTypeSuccess];
+        [self.leftButton setType:TapHighlightCustomButtonViewTypeSecondaryOrangeBorder];
     }
     else {
-        //Default green theme
-        [self.rightButton setTitleColor:popupPrimaryButtonSuccessColor forState:UIControlStateNormal];
-        self.rightButton.backgroundColor = popupPrimaryButtonSuccessBackgroundColor;
-        
-        [self.leftButton setTitleColor:popupSecondaryButtonColor forState:UIControlStateNormal];
-        self.leftButton.backgroundColor = popupSecondaryBackgroundColor;
+        //Default orange theme
+        [self.rightButton setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.leftButton setType:TapHighlightCustomButtonViewTypeSecondaryOrangeBorder];
     }
 }
 

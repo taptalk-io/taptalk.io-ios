@@ -36,11 +36,15 @@ typedef NS_ENUM(NSInteger, TAPProfileCollectionViewCellType) {
 };
 
 @interface TAPProfileCollectionViewCell : TAPBaseCollectionViewCell
+
+@property (nonatomic) TAPProfileCollectionViewCellType type;
+
 - (void)setUserDetail:(NSString *)userDetail;
 - (void)setUserDetailString:(NSString *)title detail:(NSString *)detail;
 - (void)showSeparatorView:(BOOL)isShowed;
 - (void)setProfileCollectionViewCellType:(TAPProfileCollectionViewCellType) type;
 - (void)setMuteDurationInfo:(BOOL)isMuted duration:(NSString *)duration;
+- (void)showHighlight:(BOOL)show;
 
 @end
 

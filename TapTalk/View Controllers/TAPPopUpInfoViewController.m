@@ -25,8 +25,8 @@
     [super loadView];
     
     _popUpInfoView = [[TAPPopUpInfoView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    [self.popUpInfoView.leftButton addTarget:self action:@selector(popUpInfoViewHandleDidTappedLeftButton) forControlEvents:UIControlEventTouchUpInside];
-    [self.popUpInfoView.rightButton addTarget:self action:@selector(popUpInfoViewHandleDidTappedRightButton) forControlEvents:UIControlEventTouchUpInside];
+    [self.popUpInfoView.leftButton.button addTarget:self action:@selector(popUpInfoViewHandleDidTappedLeftButton) forControlEvents:UIControlEventTouchUpInside];
+    [self.popUpInfoView.rightButton.button addTarget:self action:@selector(popUpInfoViewHandleDidTappedRightButton) forControlEvents:UIControlEventTouchUpInside];
     self.popUpInfoView.alpha = 0.0f;
     [self.view addSubview:self.popUpInfoView];
 }

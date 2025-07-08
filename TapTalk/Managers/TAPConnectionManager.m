@@ -7,8 +7,7 @@
 //
 
 #import "TAPConnectionManager.h"
-
-#import <AFNetworking/AFNetworking.h>
+#import "AFNetworking.h"
 
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f

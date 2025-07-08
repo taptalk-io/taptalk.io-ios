@@ -39,37 +39,42 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
 @interface TAPSecondaryChatViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, UINavigationControllerDelegate, TAPGrowingTextViewDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate,TAPPickLocationViewControllerDelegate, TAPChatManagerDelegate>
 
-@property (weak, nonatomic) IBOutlet TAPBaseTableView *tableView;
+@property (strong, nonatomic) IBOutlet TAPBaseTableView *tableView;
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
-@property (weak, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
-@property (weak, nonatomic) IBOutlet UILabel *loadMoreMessageLoadingLabel;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *loadMoreMessageLoadingHeightConstraint;
-@property (weak, nonatomic) IBOutlet UIImageView *loadMoreMessageLoadingViewImageView;
-@property (weak, nonatomic) IBOutlet UIView *emptyStateView;
-@property (weak, nonatomic) IBOutlet UILabel *emptyStateTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *emptyStateDescpLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *emptyStateImageView;
+@property (strong, nonatomic) IBOutlet UIView *loadMoreMessageLoadingView;
+@property (strong, nonatomic) IBOutlet UILabel *loadMoreMessageLoadingLabel;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *loadMoreMessageLoadingHeightConstraint;
+@property (strong, nonatomic) IBOutlet UIImageView *loadMoreMessageLoadingViewImageView;
+@property (strong, nonatomic) IBOutlet UIView *emptyStateView;
+@property (strong, nonatomic) IBOutlet UILabel *emptyStateTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *emptyStateDescpLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *emptyStateImageView;
 
 //pin message
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *unpinViewHeightConstraint;
-@property (weak, nonatomic) IBOutlet UILabel *unpinAllLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *unpinAllImageView;
-@property (weak, nonatomic) IBOutlet UIButton *unpinAllButton;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *unpinViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet UILabel *unpinAllLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *unpinAllImageView;
+@property (strong, nonatomic) IBOutlet UIButton *unpinAllButton;
 
 //loading view
-@property (weak, nonatomic) IBOutlet UIView *loadingBackgroundView;
-@property (weak, nonatomic) IBOutlet UIView *loadingView;
-@property (weak, nonatomic) IBOutlet UIImageView *loadingImageView;
-@property (weak, nonatomic) IBOutlet UILabel *loadingLabel;
+@property (strong, nonatomic) IBOutlet UIView *loadingBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *loadingView;
+@property (strong, nonatomic) IBOutlet UIImageView *loadingImageView;
+@property (strong, nonatomic) IBOutlet UILabel *loadingLabel;
 
 
 //Composer
 @property (strong, nonatomic) IBOutlet TAPCustomAccessoryView *inputMessageAccessoryView;
 @property (strong, nonatomic) IBOutlet TAPGrowingTextView *messageTextView;
-@property (weak, nonatomic) IBOutlet UIView *sendButtonView;
-@property (weak, nonatomic) IBOutlet UIButton *sendButton;
-@property (weak, nonatomic) IBOutlet UIImageView *sendButtonImageView;
-@property (weak, nonatomic) IBOutlet UIView *textViewBorderView;
+@property (strong, nonatomic) IBOutlet UIView *sendButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *sendButtonHighlightView;
+@property (strong, nonatomic) IBOutlet UIButton *sendButton;
+@property (strong, nonatomic) IBOutlet UIImageView *sendButtonImageView;
+@property (strong, nonatomic) IBOutlet UIView *textViewBorderView;
+
+@property (strong, nonatomic) IBOutlet UIButton *attachmentButton;
+@property (strong, nonatomic) IBOutlet UIView *attachmentButtonHighlightView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *attachmentButtonView;
 
 //Extension View
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
@@ -82,28 +87,29 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageMessageLabel;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *inputAccessoryExtensionHeightConstraint;
-@property (weak, nonatomic) IBOutlet UIView *inputAccessoryExtensionView;
-@property (weak, nonatomic) IBOutlet UIView *extensionSeperatorView;
+@property (strong, nonatomic) IBOutlet UIView *inputAccessoryExtensionView;
+@property (strong, nonatomic) IBOutlet UIView *extensionSeperatorView;
 
 //Schedule Message
-@property (weak, nonatomic) IBOutlet UIView *scheduleMessageBackgroundView;
-@property (weak, nonatomic) IBOutlet UIDatePicker *scheduleMessageDatePicker;
-@property (weak, nonatomic) IBOutlet UILabel *datePickerTitleLabel;
-@property (weak, nonatomic) IBOutlet UIButton *datePickerCancelButton;
-@property (weak, nonatomic) IBOutlet UIView *scheduleMessageDatePickerContainerView;
-@property (weak, nonatomic) IBOutlet UIView *scheduleMessageSendView;
-@property (weak, nonatomic) IBOutlet UIButton *scheduleMessageSendButton;
-@property (weak, nonatomic) IBOutlet UILabel *scheduleMessageSendLabel;
-@property (strong, nonatomic) IBOutlet TAPScheduledMessageModel *selectedScheduleMessage;
+@property (strong, nonatomic) IBOutlet UIView *scheduleMessageBackgroundView;
+@property (strong, nonatomic) IBOutlet UIDatePicker *scheduleMessageDatePicker;
+@property (strong, nonatomic) IBOutlet UILabel *datePickerTitleLabel;
+@property (strong, nonatomic) IBOutlet UIButton *datePickerCancelButton;
+@property (strong, nonatomic) IBOutlet UIView *scheduleMessageDatePickerContainerView;
+@property (strong, nonatomic) IBOutlet UIView *scheduleMessageSendView;
+@property (strong, nonatomic) IBOutlet UIButton *scheduleMessageSendButton;
+@property (strong, nonatomic) IBOutlet UILabel *scheduleMessageSendLabel;
+@property (strong, nonatomic) TapHighlightCustomButtonView *scheduleMessageHighlightButton;
+@property (strong, nonatomic) TAPScheduledMessageModel *selectedScheduleMessage;
 
 @property (strong, nonatomic) IBOutlet UIView *senderInitialNameView;
 @property (strong, nonatomic) IBOutlet UILabel *senderInitialNameLabel;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 
 
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *tableViewBottomConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewBottomConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 
 
 @property (strong, nonatomic) UIView *rightBarInitialNameView;
@@ -281,29 +287,29 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         //Setup schedule message date picker
         self.scheduleMessageSendView.layer.cornerRadius = 15.0f;
-        self.scheduleMessageSendButton.layer.masksToBounds = YES;
+//        self.scheduleMessageSendButton.layer.masksToBounds = YES;
         
         UIFont *scheduleFontLabel = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDatePickerTitleLabel];
         
         self.datePickerTitleLabel.font = scheduleFontLabel;
-        self.scheduleMessageSendLabel.font = scheduleFontLabel;
+//        self.scheduleMessageSendLabel.font = scheduleFontLabel;
         self.datePickerCancelButton.titleLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDatePickerCancelLabel];
         
-        NSDate *date = self.scheduleMessageDatePicker.date;
-        
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
-        dateFormatter.dateFormat = @"dd/MM/yy";
-
-        NSString *dateString = [dateFormatter stringFromDate: date];
-        
-        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc]init];
-        timeFormatter.dateFormat = @"HH:mm";
-
-
-        NSString *timeString = [timeFormatter stringFromDate: date];
-        
-        NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
-        self.scheduleMessageSendLabel.text = scheduleSendAtString;
+//        NSDate *date = self.scheduleMessageDatePicker.date;
+//        
+//        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+//        dateFormatter.dateFormat = @"dd/MM/yy";
+//
+//        NSString *dateString = [dateFormatter stringFromDate: date];
+//        
+//        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc]init];
+//        timeFormatter.dateFormat = @"HH:mm";
+//
+//
+//        NSString *timeString = [timeFormatter stringFromDate: date];
+//        
+//        NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
+//        self.scheduleMessageSendLabel.text = scheduleSendAtString;
         
         [[TAPChatManager sharedManager] addDelegate:self];
         
@@ -328,6 +334,44 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFailureNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self.view layoutIfNeeded];
+    
+    if (!self.sendButtonHighlightView) {
+        _sendButtonHighlightView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.sendButtonView.frame),
+            CGRectGetHeight(self.sendButtonView.frame)
+        )];
+        [self.sendButtonHighlightView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.sendButtonHighlightView setLeftIconImage:[UIImage imageNamed:@"TAPIconSend" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.sendButtonHighlightView setLeftIconSize:24.0f];
+        [self.sendButtonHighlightView setClickAction:@selector(sendButtonDidTapped) target:self];
+        [self.sendButtonView addSubview:self.sendButtonHighlightView];
+        
+        self.sendButtonImageView.alpha = 0.0f;
+        self.sendButton.userInteractionEnabled = NO;
+    }
+    
+    if (!self.attachmentButtonView) {
+        self.attachmentButtonHighlightView.layer.cornerRadius = CGRectGetWidth(self.attachmentButtonHighlightView.frame) / 2;
+        self.attachmentButtonHighlightView.clipsToBounds = YES;
+        _attachmentButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.attachmentButtonHighlightView.frame),
+            CGRectGetHeight(self.attachmentButtonHighlightView.frame)
+        )];
+        [self.attachmentButtonView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.attachmentButtonView setClickAction:@selector(attachmentButtonDidTapped) target:self];
+        [self.attachmentButtonHighlightView addSubview:self.attachmentButtonView];
+        
+        self.attachmentButton.userInteractionEnabled = NO;
+    }
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
@@ -349,6 +393,29 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         [self keyboardWillHideWithHeight:0.0f];
     }];
     _isKeyboardShowed = NO;
+    
+    if (!self.scheduleMessageHighlightButton) {
+        _scheduleMessageHighlightButton = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.scheduleMessageSendView.frame),
+            CGRectGetHeight(self.scheduleMessageSendView.frame)
+        )];
+        [self.scheduleMessageHighlightButton setType:TapHighlightCustomButtonViewTypeDefaultSolid];
+        [self.scheduleMessageHighlightButton setContainerViewRadius:15.0f];
+        [self.scheduleMessageHighlightButton setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDatePickerTitleLabel]];
+        NSDate *date = self.scheduleMessageDatePicker.date;
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"dd/MM/yy";
+        NSString *dateString = [dateFormatter stringFromDate: date];
+        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
+        timeFormatter.dateFormat = @"HH:mm";
+        NSString *timeString = [timeFormatter stringFromDate: date];
+        NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
+        [self.scheduleMessageHighlightButton setLabelText:scheduleSendAtString];
+        [self.scheduleMessageHighlightButton setClickAction:@selector(datePickerSendButtonDidTapped) target:self];
+        [self.scheduleMessageSendView addSubview:self.scheduleMessageHighlightButton];
+    }
 }
 
 - (void)loadView {
@@ -2653,13 +2720,15 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 - (void)setSendButtonActive:(BOOL)isActive {
     if (isActive) {
         self.sendButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackground];
-        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSend]];
-        self.sendButton.userInteractionEnabled = YES;
+//        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSend]];
+//        self.sendButton.userInteractionEnabled = YES;
+        self.sendButtonHighlightView.button.userInteractionEnabled = YES;
     }
     else {
         self.sendButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackgroundInactive];
-        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendInactive]];
-        self.sendButton.userInteractionEnabled = NO;
+//        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendInactive]];
+//        self.sendButton.userInteractionEnabled = NO;
+        self.sendButtonHighlightView.button.userInteractionEnabled = NO;
     }
 }
 
@@ -2723,6 +2792,10 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
 
 - (IBAction)attachmentButtonDidTapped:(id)sender {
+    [self attachmentButtonDidTapped];
+}
+
+- (void)attachmentButtonDidTapped {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *documentsAction = [UIAlertAction
@@ -2853,6 +2926,10 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (IBAction)sendButtonDidTapped:(id)sender {
+    [self sendButtonDidTapped];
+}
+
+- (void)sendButtonDidTapped {
     if(self.isEditingMessage) {
         self.isEditingMessage = NO;
         NSInteger index = [self.messageArray indexOfObject:self.currentEditingMessage];
@@ -2875,13 +2952,16 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
 
 - (IBAction)datePickerSendButtonDidTapped:(id)sender {
+    [self datePickerSendButtonDidTapped];
+}
+
+- (void)datePickerSendButtonDidTapped {
     NSDate *date = self.scheduleMessageDatePicker.date;
     NSNumber *scheduleTime = [NSNumber numberWithDouble:[date timeIntervalSince1970] * 1000.0f];
     
     long currentTime = [TAPUtil currentTimeInMillis].longValue;
-    long plusOneMinute = currentTime + 60000;
     
-    if(plusOneMinute > scheduleTime.longValue) {
+    if (currentTime > scheduleTime.longValue) {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Invalid Schedule Time", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         return;
     }
@@ -3031,7 +3111,8 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     NSString *timeString = [timeFormatter stringFromDate: date];
     
     NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
-    self.scheduleMessageSendLabel.text = scheduleSendAtString;
+//    self.scheduleMessageSendLabel.text = scheduleSendAtString;
+    [self.scheduleMessageHighlightButton setLabelText:scheduleSendAtString];
 }
 
 - (void)setAsLoadingState:(BOOL)isLoading{

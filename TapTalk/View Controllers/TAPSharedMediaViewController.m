@@ -125,9 +125,11 @@
     
     self.linksTableView.dataSource = self;
     self.linksTableView.delegate = self;
+    self.linksTableView.delaysContentTouches = NO;
     
     self.documentsTableView.dataSource = self;
     self.documentsTableView.delegate = self;
+    self.documentsTableView.delaysContentTouches = NO;
     
     self.mediaCollectionView.dataSource = self;
     self.mediaCollectionView.delegate = self;
@@ -393,8 +395,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else if (message.type == TAPChatMessageTypeVideo) {
         NSNumber *duration = [message.data objectForKey:@"duration"];
-        NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
-        NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+        NSString *videoDurationString;
+        if ([duration integerValue] > 0) {
+            NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
+            videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+        }
+        else {
+            videoDurationString = @"";
+        }
         
         NSString *fileSize;
         NSNumber *size = [message.data objectForKey:@"size"];
@@ -690,6 +698,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         [cell setLinkLabelWithString:text];
         cell.message = message;
+        [cell setGrayHighlightColor];
         
         return cell;
     }
@@ -784,6 +793,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
             }
         }
+        [cell setGrayHighlightColor];
         
         return cell;
     }
@@ -826,10 +836,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     return view;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
     if (tableView == self.linksTableView) {
         // present in app web view, the app is not installed
-        TAPMessageModel *message = [self.linksMessageArray objectAtIndex:indexPath.row];
+        NSMutableArray *sectionArray = [self.linkMessageWithSectionArray objectAtIndex:indexPath.section];
+        TAPMessageModel *message = [sectionArray objectAtIndex:indexPath.row];
+        if (message == nil) {
+            return;
+        }
         NSString *urlString = [message.data objectForKey:@"url"];
         if ([TAPUtil isEmptyString:urlString]) {
             NSArray<NSString *> *urls = [message.data objectForKey:@"urls"];
@@ -1125,11 +1141,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [cell animateFinishedDownloadingMedia];
                 [cell setAsDownloaded];
                 NSNumber *duration = [currentMessage.data objectForKey:@"duration"];
-                NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
-                NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+                NSString *videoDurationString;
+                if ([duration integerValue] > 0) {
+                    NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
+                    videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
+                }
+                else {
+                    videoDurationString = @"";
+                }
                 [cell setInfoLabelWithString:videoDurationString];
                 [cell setThumbnailImageForVideoWithMessage:currentMessage];
-                
             }
         }
     });

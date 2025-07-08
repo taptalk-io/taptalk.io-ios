@@ -1990,7 +1990,7 @@
 }
 
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer {
-    if(recognizer.state = UIGestureRecognizerStateEnded) {
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
         if ([self.delegate respondsToSelector:@selector(myImageBubbleLongPressedWithMessage:)]) {
             [self.delegate myImageBubbleLongPressedWithMessage:self.message];
         }

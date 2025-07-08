@@ -69,25 +69,31 @@
             additionalBottomGap += [TAPUtil safeAreaBottomPadding];
         }
         
+        _QRCodeButtonHighlightView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(8.0f, CGRectGetHeight(self.frame) - 45.0f - additionalBottomGap, CGRectGetWidth(self.frame) - 16.0f, 45.0f)];
+        [self.QRCodeButtonHighlightView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.QRCodeButtonHighlightView setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel]];
+        [self.QRCodeButtonHighlightView setLabelColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel]];
+        [self addSubview:self.QRCodeButtonHighlightView];
+        _QRCodeButton = self.QRCodeButtonHighlightView.button;
         
-        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
-        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
-        _QRCodeButton = [[UIButton alloc] initWithFrame:CGRectMake(8.0f, CGRectGetHeight(self.frame) - 45.0f - additionalBottomGap, CGRectGetWidth(self.frame) - 16.0f, 45.0f)];
-        self.QRCodeButton.layer.cornerRadius = 6.0f;
-        self.QRCodeButton.clipsToBounds = YES;
-        [self.QRCodeButton setTintColor:buttonLabelColor];
-        self.QRCodeButton.titleLabel.font = buttonLabelFont;
-        self.QRCodeButton.layer.borderWidth = 1.0f;
-        self.QRCodeButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
-        [self addSubview:self.QRCodeButton];
+//        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+//        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+//        _QRCodeButton = [[UIButton alloc] initWithFrame:CGRectMake(8.0f, CGRectGetHeight(self.frame) - 45.0f - additionalBottomGap, CGRectGetWidth(self.frame) - 16.0f, 45.0f)];
+//        self.QRCodeButton.layer.cornerRadius = 6.0f;
+//        self.QRCodeButton.clipsToBounds = YES;
+//        [self.QRCodeButton setTintColor:buttonLabelColor];
+//        self.QRCodeButton.titleLabel.font = buttonLabelFont;
+//        self.QRCodeButton.layer.borderWidth = 1.0f;
+//        self.QRCodeButton.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
+//        [self addSubview:self.QRCodeButton];
         
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = self.QRCodeButton.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
-        gradient.startPoint = CGPointMake(0.0f, 0.0f);
-        gradient.endPoint = CGPointMake(0.0f, 1.0f);
-        gradient.cornerRadius = 6.0f;
-        [self.QRCodeButton.layer insertSublayer:gradient atIndex:0];
+//        CAGradientLayer *gradient = [CAGradientLayer layer];
+//        gradient.frame = self.QRCodeButton.bounds;
+//        gradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+//        gradient.startPoint = CGPointMake(0.0f, 0.0f);
+//        gradient.endPoint = CGPointMake(0.0f, 1.0f);
+//        gradient.cornerRadius = 6.0f;
+//        [self.QRCodeButton.layer insertSublayer:gradient atIndex:0];
         
         UIFont *infoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontInfoLabelBody];
         UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
@@ -123,7 +129,8 @@
             self.rightBlackView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
             
             self.scanBoundImageView.image = [UIImage imageNamed:@"TAPIconQRBounds" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            [self.QRCodeButton setTitle:NSLocalizedStringFromTableInBundle(@"Show QR Code", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
+            [self.QRCodeButtonHighlightView setLabelText:NSLocalizedStringFromTableInBundle(@"Show QR Code", nil, [TAPUtil currentBundle], @"")];
+//            [self.QRCodeButton setTitle:NSLocalizedStringFromTableInBundle(@"Show QR Code", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
             self.descriptionLabel.text = NSLocalizedStringFromTableInBundle(@"Show your QR code by tapping the button below", nil, [TAPUtil currentBundle], @"");
             self.descriptionLabel.textColor = [UIColor whiteColor];
             
@@ -146,8 +153,9 @@
             
             UIColor *infoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorInfoLabelBody];
             self.scanBoundImageView.image = nil;
+            [self.QRCodeButtonHighlightView setLabelText:NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"")];
             self.descriptionLabel.text = NSLocalizedStringFromTableInBundle(@"To scan other's QR code, please tap the button below", nil, [TAPUtil currentBundle], @"");
-            [self.QRCodeButton setTitle:NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
+//            [self.QRCodeButton setTitle:NSLocalizedStringFromTableInBundle(@"Scan QR Code", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
             self.descriptionLabel.textColor = infoLabelColor;
             
             //Resize description label height

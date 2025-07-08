@@ -7,6 +7,8 @@
 //
 
 #import "TAPNetworkManager.h"
+#import "AFHTTPSessionManager.h"
+#import "AFNetworkReachabilityManager.h"
 
 static const NSInteger kAPITimeOut = 60;
 

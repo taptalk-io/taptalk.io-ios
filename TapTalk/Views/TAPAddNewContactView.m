@@ -22,9 +22,9 @@
 @property (strong, nonatomic) TAPImageView *expertVerifiedImageView;
 @property (strong, nonatomic) UILabel *expertNameLabel;
 @property (strong, nonatomic) UILabel *expertCategoryLabel;
-@property (strong, nonatomic) UIView *addExpertToContactButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *addExpertToContactButtonView;
 @property (strong, nonatomic) UILabel *addExpertToContactLabel;
-@property (strong, nonatomic) UIView *expertChatNowButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *expertChatNowButtonView;
 @property (strong, nonatomic) UIImageView *expertChatNowLogoImageView;
 @property (strong, nonatomic) UILabel *expertChatNowLabel;
 @property (strong, nonatomic) UIView *searchSelfExpertView;
@@ -37,9 +37,9 @@
 @property (strong, nonatomic) TAPImageView *userImageView;
 @property (strong, nonatomic) UILabel *userFullNameLabel;
 @property (strong, nonatomic) UILabel *userUsernameLabel;
-@property (strong, nonatomic) UIView *addUserToContactButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *addUserToContactButtonView;
 @property (strong, nonatomic) UILabel *addUserToContactLabel;
-@property (strong, nonatomic) UIView *userChatNowButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *userChatNowButtonView;
 @property (strong, nonatomic) UIImageView *userChatNowLogoImageView;
 @property (strong, nonatomic) UILabel *userChatNowLabel;
 @property (strong, nonatomic) UIView *searchSelfUserView;
@@ -212,76 +212,88 @@
         self.expertCategoryLabel.textColor = usernameLabelColor;
         [self.searchExpertView addSubview:self.expertCategoryLabel];
         
-        _addExpertToContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.expertNameLabel.frame), CGRectGetMaxY(self.expertCategoryLabel.frame) + 26.0f, CGRectGetWidth(self.expertNameLabel.frame), 44.0f)];
+        _addExpertToContactButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.expertNameLabel.frame), CGRectGetMaxY(self.expertCategoryLabel.frame) + 26.0f, CGRectGetWidth(self.expertNameLabel.frame), 44.0f)];
         self.addExpertToContactButtonView.alpha = 0.0f;
-        self.addExpertToContactButtonView.layer.borderWidth = 1.0f;
-        self.addExpertToContactButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
-        self.addExpertToContactButtonView.layer.cornerRadius = 6.0f;
+        [self.addExpertToContactButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.addExpertToContactButtonView setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel]];
+        [self.addExpertToContactButtonView setLabelColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel]];
+        [self.addExpertToContactButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"")];
+//        self.addExpertToContactButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
+//        self.addExpertToContactButtonView.layer.cornerRadius = 6.0f;
         
-        CAGradientLayer *addExpertToContactButtonViewGradient = [CAGradientLayer layer];
-        addExpertToContactButtonViewGradient.frame = self.addExpertToContactButtonView.bounds;
-        addExpertToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
-        
-        addExpertToContactButtonViewGradient.startPoint = CGPointMake(0.0f, 0.0f);
-        addExpertToContactButtonViewGradient.endPoint = CGPointMake(0.0f, 1.0f);
-        addExpertToContactButtonViewGradient.cornerRadius = 6.0f;
-        [self.addExpertToContactButtonView.layer insertSublayer:addExpertToContactButtonViewGradient atIndex:0];
+//        CAGradientLayer *addExpertToContactButtonViewGradient = [CAGradientLayer layer];
+//        addExpertToContactButtonViewGradient.frame = self.addExpertToContactButtonView.bounds;
+//        addExpertToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+//        
+//        addExpertToContactButtonViewGradient.startPoint = CGPointMake(0.0f, 0.0f);
+//        addExpertToContactButtonViewGradient.endPoint = CGPointMake(0.0f, 1.0f);
+//        addExpertToContactButtonViewGradient.cornerRadius = 6.0f;
+//        [self.addExpertToContactButtonView.layer insertSublayer:addExpertToContactButtonViewGradient atIndex:0];
         
         [self.searchExpertView addSubview:self.addExpertToContactButtonView];
         
-        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
-        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
-        _addExpertToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
-        self.addExpertToContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
-        self.addExpertToContactLabel.font = buttonLabelFont;
-        self.addExpertToContactLabel.textColor = buttonLabelColor;
-        self.addExpertToContactLabel.textAlignment = NSTextAlignmentCenter;
-        [self.addExpertToContactButtonView addSubview:self.addExpertToContactLabel];
+//        UIFont *buttonLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel];
+//        UIColor *buttonLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel];
+//        _addExpertToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
+//        self.addExpertToContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
+//        self.addExpertToContactLabel.font = buttonLabelFont;
+//        self.addExpertToContactLabel.textColor = buttonLabelColor;
+//        self.addExpertToContactLabel.textAlignment = NSTextAlignmentCenter;
+//        [self.addExpertToContactButtonView addSubview:self.addExpertToContactLabel];
         
-        _addExpertToContactButton = [[UIButton alloc] initWithFrame:self.addExpertToContactButtonView.frame];
-        self.addExpertToContactButtonView.alpha = 0.0f;
-        self.addExpertToContactButtonView.userInteractionEnabled = NO;
-        [self.searchExpertView addSubview:self.addExpertToContactButton];
+        _addExpertToContactButton = self.addExpertToContactButtonView.button;
+//        _addExpertToContactButton = [[UIButton alloc] initWithFrame:self.addExpertToContactButtonView.frame];
+//        self.addExpertToContactButtonView.alpha = 0.0f;
+//        self.addExpertToContactButtonView.userInteractionEnabled = NO;
+//        [self.searchExpertView addSubview:self.addExpertToContactButton];
         
-        _expertChatNowButtonView = [[UIView alloc] initWithFrame:self.addExpertToContactButtonView.frame];
+        _expertChatNowButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:self.addExpertToContactButtonView.frame];
         self.expertChatNowButtonView.alpha = 0.0f;
-        self.expertChatNowButtonView.layer.borderWidth = 1.0f;
-        self.expertChatNowButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
-        self.expertChatNowButtonView.layer.cornerRadius = 6.0f;
+        [self.expertChatNowButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.expertChatNowButtonView setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel]];
+        [self.expertChatNowButtonView setLabelColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel]];
+        [self.expertChatNowButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"")];
+        [self.expertChatNowButtonView setRightIconImage:[UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:16.0f margin:8.0f];
+        [self.userChatNowButtonView setRightIconSize:16.0f];
+        [self.expertChatNowButtonView setRightIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+//        self.expertChatNowButtonView.layer.borderWidth = 1.0f;
+//        self.expertChatNowButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
+//        self.expertChatNowButtonView.layer.cornerRadius = 6.0f;
         
-        CAGradientLayer *expertChatNowGradient = [CAGradientLayer layer];
-        expertChatNowGradient.frame = self.expertChatNowButtonView.bounds;
-        expertChatNowGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
-        expertChatNowGradient.startPoint = CGPointMake(0.0f, 0.0f);
-        expertChatNowGradient.endPoint = CGPointMake(0.0f, 1.0f);
-        expertChatNowGradient.cornerRadius = 6.0f;
-        [self.expertChatNowButtonView.layer insertSublayer:expertChatNowGradient atIndex:0];
+//        CAGradientLayer *expertChatNowGradient = [CAGradientLayer layer];
+//        expertChatNowGradient.frame = self.expertChatNowButtonView.bounds;
+//        expertChatNowGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+//        expertChatNowGradient.startPoint = CGPointMake(0.0f, 0.0f);
+//        expertChatNowGradient.endPoint = CGPointMake(0.0f, 1.0f);
+//        expertChatNowGradient.cornerRadius = 6.0f;
+//        [self.expertChatNowButtonView.layer insertSublayer:expertChatNowGradient atIndex:0];
         [self.searchExpertView addSubview:self.expertChatNowButtonView];
         
-        _expertChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
-        self.expertChatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
-        self.expertChatNowLabel.font = buttonLabelFont;
-        self.expertChatNowLabel.textColor = buttonLabelColor;
-        self.expertChatNowLabel.textAlignment = NSTextAlignmentCenter;
+//        _expertChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addExpertToContactButtonView.frame), CGRectGetHeight(self.addExpertToContactButtonView.frame))];
+//        self.expertChatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
+//        self.expertChatNowLabel.font = buttonLabelFont;
+//        self.expertChatNowLabel.textColor = buttonLabelColor;
+//        self.expertChatNowLabel.textAlignment = NSTextAlignmentCenter;
         
-        CGSize expertChatNowLabelSize = [self.expertChatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.expertChatNowLabel.frame))];
-        // 16.0f is the chat image logo and 8.0f is the gap between text and image
-        CGFloat expertChatNowLabelMinX = (CGRectGetWidth(self.expertChatNowButtonView.frame) - expertChatNowLabelSize.width - 8.0f - 16.0f) / 2.0f;
-        self.expertChatNowLabel.frame = CGRectMake(expertChatNowLabelMinX, CGRectGetMinY(self.expertChatNowLabel.frame), expertChatNowLabelSize.width, CGRectGetHeight(self.expertChatNowLabel.frame));
-        [self.expertChatNowButtonView addSubview:self.expertChatNowLabel];
+//        CGSize expertChatNowLabelSize = [self.expertChatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.expertChatNowLabel.frame))];
+//        // 16.0f is the chat image logo and 8.0f is the gap between text and image
+//        CGFloat expertChatNowLabelMinX = (CGRectGetWidth(self.expertChatNowButtonView.frame) - expertChatNowLabelSize.width - 8.0f - 16.0f) / 2.0f;
+//        self.expertChatNowLabel.frame = CGRectMake(expertChatNowLabelMinX, CGRectGetMinY(self.expertChatNowLabel.frame), expertChatNowLabelSize.width, CGRectGetHeight(self.expertChatNowLabel.frame));
+//        [self.expertChatNowButtonView addSubview:self.expertChatNowLabel];
         
-        _expertChatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.expertChatNowLabel.frame) + 8.0f, ((CGRectGetHeight(self.addExpertToContactButtonView.frame) - 16.0f) / 2.0f) + 2.0f, 16.0f, 16.0f)];
-        UIImage *expertChatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        expertChatNowLogoImage = [expertChatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
-        self.expertChatNowLogoImageView.image = expertChatNowLogoImage;
-        self.expertChatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
-        [self.expertChatNowButtonView addSubview:self.expertChatNowLogoImageView];
+//        _expertChatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.expertChatNowLabel.frame) + 8.0f, ((CGRectGetHeight(self.addExpertToContactButtonView.frame) - 16.0f) / 2.0f) + 2.0f, 16.0f, 16.0f)];
+//        UIImage *expertChatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+//        expertChatNowLogoImage = [expertChatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+//        self.expertChatNowLogoImageView.image = expertChatNowLogoImage;
+//        self.expertChatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        [self.expertChatNowButtonView addSubview:self.expertChatNowLogoImageView];
         
-        _expertChatNowButton = [[UIButton alloc] initWithFrame:self.expertChatNowButtonView.frame];
-        self.expertChatNowButton.backgroundColor = [UIColor clearColor];
-        self.expertChatNowButton.alpha = 0.0f;
-        self.expertChatNowButton.userInteractionEnabled = NO;
-        [self.searchExpertView addSubview:self.expertChatNowButton];
+        _expertChatNowButton = self.expertChatNowButtonView.button;
+//        _expertChatNowButton = [[UIButton alloc] initWithFrame:self.expertChatNowButtonView.frame];
+//        self.expertChatNowButton.backgroundColor = [UIColor clearColor];
+//        self.expertChatNowButton.alpha = 0.0f;
+//        self.expertChatNowButton.userInteractionEnabled = NO;
+//        [self.searchExpertView addSubview:self.expertChatNowButton];
         
         _searchSelfExpertView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.expertNameLabel.frame), CGRectGetMaxY(self.expertCategoryLabel.frame) + 26.0f, CGRectGetWidth(self.expertNameLabel.frame), 44.0f)];
         self.searchSelfExpertView.alpha = 0.0f;
@@ -350,74 +362,86 @@
         self.userUsernameLabel.textColor = usernameLabelColor;
         [self.searchUserView addSubview:self.userUsernameLabel];
         
-        _addUserToContactButtonView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.userUsernameLabel.frame) + 16.0f, CGRectGetWidth(self.userFullNameLabel.frame) - 16.0f, 44.0f)];
+        _addUserToContactButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.userUsernameLabel.frame) + 16.0f, CGRectGetWidth(self.userFullNameLabel.frame) - 16.0f, 44.0f)];
         self.addUserToContactButtonView.alpha = 0.0f;
-        self.addUserToContactButtonView.layer.borderWidth = 1.0f;
-        self.addUserToContactButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
-        self.addUserToContactButtonView.layer.cornerRadius = 6.0f;
+        [self.addUserToContactButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.addUserToContactButtonView setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel]];
+        [self.addUserToContactButtonView setLabelColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel]];
+        [self.addUserToContactButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"")];
+//        self.addUserToContactButtonView.layer.borderWidth = 1.0f;
+//        self.addUserToContactButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
+//        self.addUserToContactButtonView.layer.cornerRadius = 6.0f;
         
-        CAGradientLayer *addUserToContactButtonViewGradient = [CAGradientLayer layer];
-        addUserToContactButtonViewGradient.frame = self.addUserToContactButtonView.bounds;
-        addUserToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
-        addUserToContactButtonViewGradient.startPoint = CGPointMake(0.0f, 0.0f);
-        addUserToContactButtonViewGradient.endPoint = CGPointMake(0.0f, 1.0f);
-        addUserToContactButtonViewGradient.cornerRadius = 6.0f;
-        [self.addUserToContactButtonView.layer insertSublayer:addUserToContactButtonViewGradient atIndex:0];
+//        CAGradientLayer *addUserToContactButtonViewGradient = [CAGradientLayer layer];
+//        addUserToContactButtonViewGradient.frame = self.addUserToContactButtonView.bounds;
+//        addUserToContactButtonViewGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+//        addUserToContactButtonViewGradient.startPoint = CGPointMake(0.0f, 0.0f);
+//        addUserToContactButtonViewGradient.endPoint = CGPointMake(0.0f, 1.0f);
+//        addUserToContactButtonViewGradient.cornerRadius = 6.0f;
+//        [self.addUserToContactButtonView.layer insertSublayer:addUserToContactButtonViewGradient atIndex:0];
         
         [self.searchUserView addSubview:self.addUserToContactButtonView];
         
-        _addUserToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
-        self.addUserToContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
-        self.addUserToContactLabel.font = buttonLabelFont;
-        self.addUserToContactLabel.textColor = buttonLabelColor;
-        self.addUserToContactLabel.textAlignment = NSTextAlignmentCenter;
-        [self.addUserToContactButtonView addSubview:self.addUserToContactLabel];
+//        _addUserToContactLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
+//        self.addUserToContactLabel.text = NSLocalizedStringFromTableInBundle(@"Add to Contacts", nil, [TAPUtil currentBundle], @"");
+//        self.addUserToContactLabel.font = buttonLabelFont;
+//        self.addUserToContactLabel.textColor = buttonLabelColor;
+//        self.addUserToContactLabel.textAlignment = NSTextAlignmentCenter;
+//        [self.addUserToContactButtonView addSubview:self.addUserToContactLabel];
         
-        _addUserToContactButton = [[UIButton alloc] initWithFrame:self.addUserToContactButtonView.frame];
-        self.addUserToContactButtonView.backgroundColor = [UIColor clearColor];
-        self.addUserToContactButton.alpha = 0.0f;
-        self.addUserToContactButton.userInteractionEnabled = NO;
-        [self.searchUserView addSubview:self.addUserToContactButton];
+        _addUserToContactButton = self.addUserToContactButtonView.button;
+//        _addUserToContactButton = [[UIButton alloc] initWithFrame:self.addUserToContactButtonView.frame];
+//        self.addUserToContactButtonView.backgroundColor = [UIColor clearColor];
+//        self.addUserToContactButton.alpha = 0.0f;
+//        self.addUserToContactButton.userInteractionEnabled = NO;
+//        [self.searchUserView addSubview:self.addUserToContactButton];
         
-        _userChatNowButtonView = [[UIView alloc] initWithFrame:self.addUserToContactButtonView.frame];
+        _userChatNowButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:self.addUserToContactButtonView.frame];
         self.userChatNowButtonView.alpha = 0.0f;
-        self.userChatNowButtonView.layer.borderWidth = 1.0f;
-        self.userChatNowButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
-        self.userChatNowButtonView.layer.cornerRadius = 6.0f;
+        [self.userChatNowButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.userChatNowButtonView setLabelFont:[[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontButtonLabel]];
+        [self.userChatNowButtonView setLabelColor:[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorButtonLabel]];
+        [self.userChatNowButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"")];
+        [self.userChatNowButtonView setRightIconImage:[UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] size:16.0f margin:8.0f];
+        [self.userChatNowButtonView setRightIconTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+//        self.userChatNowButtonView.layer.borderWidth = 1.0f;
+//        self.userChatNowButtonView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBorder].CGColor;
+//        self.userChatNowButtonView.layer.cornerRadius = 6.0f;
         
-        CAGradientLayer *userChatNowGradient = [CAGradientLayer layer];
-        userChatNowGradient.frame = self.userChatNowButtonView.bounds;
-        userChatNowGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
-        userChatNowGradient.startPoint = CGPointMake(0.0f, 0.0f);
-        userChatNowGradient.endPoint = CGPointMake(0.0f, 1.0f);
-        userChatNowGradient.cornerRadius = 6.0f;
-        [self.userChatNowButtonView.layer insertSublayer:userChatNowGradient atIndex:0];
+//        CAGradientLayer *userChatNowGradient = [CAGradientLayer layer];
+//        userChatNowGradient.frame = self.userChatNowButtonView.bounds;
+//        userChatNowGradient.colors = [NSArray arrayWithObjects:(id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+//        userChatNowGradient.startPoint = CGPointMake(0.0f, 0.0f);
+//        userChatNowGradient.endPoint = CGPointMake(0.0f, 1.0f);
+//        userChatNowGradient.cornerRadius = 6.0f;
+//        [self.userChatNowButtonView.layer insertSublayer:userChatNowGradient atIndex:0];
         [self.searchUserView addSubview:self.userChatNowButtonView];
         
-        _userChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
-        self.userChatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
-        self.userChatNowLabel.font = buttonLabelFont;
-        self.userChatNowLabel.textColor = buttonLabelColor;
-        self.userChatNowLabel.textAlignment = NSTextAlignmentCenter;
+//        _userChatNowLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.addUserToContactButtonView.frame), CGRectGetHeight(self.addUserToContactButtonView.frame))];
+//        self.userChatNowLabel.text = NSLocalizedStringFromTableInBundle(@"Chat Now", nil, [TAPUtil currentBundle], @"");
+//        self.userChatNowLabel.font = buttonLabelFont;
+//        self.userChatNowLabel.textColor = buttonLabelColor;
+//        self.userChatNowLabel.textAlignment = NSTextAlignmentCenter;
         
-        CGSize userChatNowLabelSize = [self.userChatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.userChatNowLabel.frame))];
-        // 16.0f is the chat image logo and 8.0f is the gap between text and image
-        CGFloat userChatNowLabelMinX = (CGRectGetWidth(self.userChatNowButtonView.frame) - userChatNowLabelSize.width - 8.0f - 16.0f) / 2.0f;
-        self.userChatNowLabel.frame = CGRectMake(userChatNowLabelMinX, CGRectGetMinY(self.userChatNowLabel.frame), userChatNowLabelSize.width, CGRectGetHeight(self.userChatNowLabel.frame));
-        [self.userChatNowButtonView addSubview:self.userChatNowLabel];
+//        CGSize userChatNowLabelSize = [self.userChatNowLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.userChatNowLabel.frame))];
+//        // 16.0f is the chat image logo and 8.0f is the gap between text and image
+//        CGFloat userChatNowLabelMinX = (CGRectGetWidth(self.userChatNowButtonView.frame) - userChatNowLabelSize.width - 8.0f - 16.0f) / 2.0f;
+//        self.userChatNowLabel.frame = CGRectMake(userChatNowLabelMinX, CGRectGetMinY(self.userChatNowLabel.frame), userChatNowLabelSize.width, CGRectGetHeight(self.userChatNowLabel.frame));
+//        [self.userChatNowButtonView addSubview:self.userChatNowLabel];
         
-        _userChatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userChatNowLabel.frame) + 8.0f, ((CGRectGetHeight(self.addUserToContactButtonView.frame) - 16.0f) / 2.0f) + 2.0f, 16.0f, 16.0f)];
-        UIImage *userChatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        userChatNowLogoImage = [userChatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
-        self.userChatNowLogoImageView.image = userChatNowLogoImage;
-        self.userChatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
-        [self.userChatNowButtonView addSubview:self.userChatNowLogoImageView];
+//        _userChatNowLogoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.userChatNowLabel.frame) + 8.0f, ((CGRectGetHeight(self.addUserToContactButtonView.frame) - 16.0f) / 2.0f) + 2.0f, 16.0f, 16.0f)];
+//        UIImage *userChatNowLogoImage = [UIImage imageNamed:@"TAPIconChatNow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+//        userChatNowLogoImage = [userChatNowLogoImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorButtonIcon]];
+//        self.userChatNowLogoImageView.image = userChatNowLogoImage;
+//        self.userChatNowLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        [self.userChatNowButtonView addSubview:self.userChatNowLogoImageView];
         
-        _userChatNowButton = [[UIButton alloc] initWithFrame:self.userChatNowButtonView.frame];
-        self.userChatNowButton.backgroundColor = [UIColor clearColor];
-        self.userChatNowButton.alpha = 0.0f;
-        self.userChatNowButton.userInteractionEnabled = NO;
-        [self.searchUserView addSubview:self.userChatNowButton];
+        _userChatNowButton = self.userChatNowButtonView.button;
+//        _userChatNowButton = [[UIButton alloc] initWithFrame:self.userChatNowButtonView.frame];
+//        self.userChatNowButton.backgroundColor = [UIColor clearColor];
+//        self.userChatNowButton.alpha = 0.0f;
+//        self.userChatNowButton.userInteractionEnabled = NO;
+//        [self.searchUserView addSubview:self.userChatNowButton];
         
         _searchSelfUserView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.userFullNameLabel.frame), CGRectGetMaxY(self.userUsernameLabel.frame) + 16.0f, CGRectGetWidth(self.userFullNameLabel.frame), 44.0f)];
         self.searchSelfUserView.alpha = 0.0f;

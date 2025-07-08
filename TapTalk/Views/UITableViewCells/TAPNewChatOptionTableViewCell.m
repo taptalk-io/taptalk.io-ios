@@ -25,7 +25,6 @@
     
     if (self) {
         _bgView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 56.0f)];
-        self.bgView.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:self.bgView];
         
         _iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(14.0f, 18.0f, 20.0f, 20.0f)];

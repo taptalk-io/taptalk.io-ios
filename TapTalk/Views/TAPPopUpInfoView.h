@@ -7,6 +7,7 @@
 //
 
 #import "TAPBaseView.h"
+#import "TapHighlightCustomButtonView.h"
 
 typedef NS_ENUM(NSInteger, TAPPopupInfoViewType) {
     TAPPopupInfoViewTypeErrorMessage, // 1 button red
@@ -16,7 +17,8 @@ typedef NS_ENUM(NSInteger, TAPPopupInfoViewType) {
 };
 
 typedef NS_ENUM(NSInteger, TAPPopupInfoViewThemeType) {
-    TAPPopupInfoViewThemeTypeDefault, //Green theme
+    TAPPopupInfoViewThemeTypeDefault, //Orange theme
+    TAPPopupInfoViewThemeTypeSuccess, //Green theme
     TAPPopupInfoViewThemeTypeDestructive //Red theme
 };
 
@@ -26,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) TAPPopupInfoViewType popupInfoViewType;
 @property (nonatomic) TAPPopupInfoViewThemeType popupInfoViewThemeType;
-@property (strong, nonatomic) UIButton *leftButton;
-@property (strong, nonatomic) UIButton *rightButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *leftButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *rightButton;
 
 - (void)isShowTwoOptionButton:(BOOL)isShow;
 - (void)setPopupInfoViewType:(TAPPopupInfoViewType)popupInfoViewType withTitle:(NSString *)title detailInformation:(NSString *)detailInfo leftOptionButtonTitle:(NSString *)leftOptionTitle singleOrRightOptionButtonTitle:(NSString *)singleOrRightOptionTitle;

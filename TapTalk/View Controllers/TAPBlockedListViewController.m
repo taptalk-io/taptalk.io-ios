@@ -56,6 +56,7 @@
     self.blockedListView.tableView.delegate = self;
     self.blockedListView.tableView.dataSource = self;
     self.blockedListView.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
+    self.blockedListView.tableView.delaysContentTouches = NO;
     // Do any additional setup after loading the view.
     
     self.blockedListView.emptyStateView.alpha = 0.0f;
@@ -158,7 +159,7 @@
         else {
             [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
         }
-        
+        [cell setGrayHighlightColor];
         return cell;
     }
     UITableViewCell *cell = [[UITableViewCell alloc] init];
@@ -186,6 +187,7 @@
 #pragma mark - Delegate
 #pragma mark TableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if(self.isEditState) {
         self.selectedContact = [self.blockedUserList objectAtIndex:indexPath.row];
         NSString *blockTitleString = [NSString stringWithFormat:@"Unblock %@?", self.selectedContact.fullname];

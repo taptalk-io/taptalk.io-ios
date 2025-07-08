@@ -244,7 +244,7 @@
             }
             
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageSent]];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageSent]];
             break;
         }
         case TAPSearchResultMessageStatusTypeDelivered:
@@ -257,7 +257,7 @@
             }
             
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageDelivered]];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageDelivered]];
             break;
         }
         case TAPSearchResultMessageStatusTypeRead:
@@ -274,12 +274,12 @@
             if (isHideReadStatus) {
                 //Set to delivered icon
                 self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-                self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageDelivered]];
+                self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageDelivered]];
             }
             else {
                 //Set to read icon
                 self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-                self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageRead]];
+                self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageRead]];
             }
             
             break;
@@ -294,7 +294,7 @@
             }
             
             self.messageStatusImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatRoomMessageFailed]];
+            self.messageStatusImageView.image = [self.messageStatusImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListMessageFailed]];
             break;
         }
         default:

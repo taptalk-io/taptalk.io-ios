@@ -49,8 +49,10 @@
     
     self.searchView.recentSearchTableView.delegate = self;
     self.searchView.recentSearchTableView.dataSource = self;
+    self.searchView.recentSearchTableView.delaysContentTouches = NO;
     self.searchView.searchResultTableView.delegate = self;
     self.searchView.searchResultTableView.dataSource = self;
+    self.searchView.searchResultTableView.delaysContentTouches = NO;
     [self.searchView.clearHistoryButton addTarget:self action:@selector(clearHistoryButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
 }
 
@@ -185,6 +187,8 @@
                                 numberOfUnreadMessages:[self.recentSearchUnreadCountArray objectAtIndex:indexPath.row]
                                             hasMention:hasMention];
         
+        [cell setHighlightColor:[TAPUtil getColor:TAP_COLOR_BLACK_19 withAlpha:0.2f]];
+
         return cell;
     }
     else if (tableView == self.searchView.searchResultTableView) {
@@ -208,7 +212,9 @@
             else {
                 [cell hideSeparatorView:NO];
             }
-            
+
+            [cell setHighlightColor:[TAPUtil getColor:TAP_COLOR_BLACK_19 withAlpha:0.2f]];
+
             return cell;
         }
         else if (indexPath.section == 1) {
@@ -219,6 +225,8 @@
             [cell setSearchResultMessageTableViewCell:message
                                        searchedString:self.updatedString];
             
+            [cell setHighlightColor:[TAPUtil getColor:TAP_COLOR_BLACK_19 withAlpha:0.2f]];
+
             return cell;
         }
     }

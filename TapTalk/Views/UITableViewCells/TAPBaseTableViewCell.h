@@ -10,4 +10,8 @@
 
 @interface TAPBaseTableViewCell : UITableViewCell
 
+- (void)setGrayHighlightColor;
+- (void)setOrangeHighlightColor;
+- (void)setHighlightColor:(UIColor *)color;
+
 @end

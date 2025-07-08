@@ -142,6 +142,7 @@
     
     self.photoListArray = [NSMutableArray array];
     
+    self.profileView.collectionView.delaysContentTouches = NO;
     self.profileView.profilImageCollectionView.dataSource = self;
     self.profileView.profilImageCollectionView.delegate = self;
     self.profileView.pageIndicatorCollectionView.dataSource = self;
@@ -1814,6 +1815,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
    
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    if (cell == nil || ![cell isKindOfClass:[TAPProfileCollectionViewCell class]]) {
+        return;
+    }
+    TAPProfileCollectionViewCell *profileCell = (TAPProfileCollectionViewCell *) cell;
+    [profileCell showHighlight:profileCell.type != profileCollectionViewCellTypeUserDetail];
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    if (cell == nil || ![cell isKindOfClass:[TAPProfileCollectionViewCell class]]) {
+        return;
+    }
+    [((TAPProfileCollectionViewCell *) cell) showHighlight:NO];
 }
 
 /**

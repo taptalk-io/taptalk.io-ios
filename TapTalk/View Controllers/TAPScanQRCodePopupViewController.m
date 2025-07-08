@@ -24,8 +24,8 @@
     
     _scanQRCodePopupView = [[TAPScanQRCodePopupView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.scanQRCodePopupView.closePopupButton addTarget:self action:@selector(closePopupButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.scanQRCodePopupView.addContactButton addTarget:self action:@selector(addContactButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.scanQRCodePopupView.chatNowButton addTarget:self action:@selector(chatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.scanQRCodePopupView.addContactButton.button addTarget:self action:@selector(addContactButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.scanQRCodePopupView.chatNowButton.button addTarget:self action:@selector(chatNowButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.scanQRCodePopupView showPopupView:NO animated:NO];
     [self.view addSubview:self.scanQRCodePopupView];
     [self.view bringSubviewToFront:self.scanQRCodePopupView];

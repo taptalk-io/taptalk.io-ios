@@ -71,8 +71,10 @@
     self.countryPickerView.searchBarView.delegate = self;
     self.countryPickerView.tableView.delegate = self;
     self.countryPickerView.tableView.dataSource = self;
+    self.countryPickerView.tableView.delaysContentTouches = NO;
     self.countryPickerView.searchResultTableView.delegate = self;
     self.countryPickerView.searchResultTableView.dataSource = self;
+    self.countryPickerView.searchResultTableView.delaysContentTouches = NO;
     
     _alphabetSectionTitles = [NSArray arrayWithObjects:@"A", @"B", @"C", @"D", @"E", @"F", @"G", @"H", @"I", @"J", @"K", @"L", @"M", @"N", @"O", @"P", @"Q", @"R", @"S", @"T", @"U", @"V", @"W", @"X", @"Y", @"Z", nil];
     
@@ -161,7 +163,7 @@
                 [cell setAsSelected:NO animated:NO];
             }
         }
-        
+        [cell setGrayHighlightColor];
         return cell;
     }
     else if (tableView == self.countryPickerView.searchResultTableView) {
@@ -194,7 +196,7 @@
                 [cell setAsSelected:NO animated:NO];
             }
         }
-        
+        [cell setGrayHighlightColor];
         return cell;
     }
     
@@ -331,6 +333,7 @@
 
 #pragma mark UITableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     TAPCountryModel *currentCountry;
     if (tableView == self.countryPickerView.tableView) {

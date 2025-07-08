@@ -1,19 +1,4 @@
 PODS:
-  - AFNetworking (4.0.1):
-    - AFNetworking/NSURLSession (= 4.0.1)
-    - AFNetworking/Reachability (= 4.0.1)
-    - AFNetworking/Security (= 4.0.1)
-    - AFNetworking/Serialization (= 4.0.1)
-    - AFNetworking/UIKit (= 4.0.1)
-  - AFNetworking/NSURLSession (4.0.1):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/Reachability (4.0.1)
-  - AFNetworking/Security (4.0.1)
-  - AFNetworking/Serialization (4.0.1)
-  - AFNetworking/UIKit (4.0.1):
-    - AFNetworking/NSURLSession
   - GoogleMaps (4.1.0):
     - GoogleMaps/Maps (= 4.1.0)
   - GoogleMaps/Base (4.1.0)
@@ -33,7 +18,6 @@ PODS:
   - ZSWTappableLabel (2.0)
 
 DEPENDENCIES:
-  - AFNetworking (~> 4.0.0)
   - GoogleMaps
   - GooglePlaces
   - JSONModel (~> 1.1)
@@ -45,7 +29,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - AFNetworking
     - GoogleMaps
     - GooglePlaces
     - JSONModel
@@ -56,7 +39,6 @@ SPEC REPOS:
     - ZSWTappableLabel
 
 SPEC CHECKSUMS:
-  AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   GoogleMaps: 008e2c80e38605b56b560e8deb73d4194ff30bef
   GooglePlaces: a058b776259c13e1323c9ff135549cb1b13ad8e7
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
@@ -66,6 +48,6 @@ SPEC CHECKSUMS:
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: 82ec78894599750b85dbccc9cc74ec435a8a496f
+PODFILE CHECKSUM: b62ab7a93b93ca324c241897c390e1b6b8c99355
 
 COCOAPODS: 1.15.2

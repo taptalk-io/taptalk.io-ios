@@ -8,7 +8,7 @@
 
 #import "TapUIChatViewController.h"
 
-#import <AFNetworking/AFNetworking.h>
+#import "AFNetworking.h"
 #import <Photos/Photos.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
@@ -112,9 +112,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, nonatomic) IBOutlet UIImageView *inputMessageAccessoryCloseImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *inputMessageAccessoryDocumentsImageView;
 @property (strong, nonatomic) IBOutlet UIView *sendButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *sendButtonHighlightView;
 @property (strong, nonatomic) IBOutlet UIImageView *sendButtonImageView;
 @property (strong, nonatomic) IBOutlet UIButton *sendButton;
 @property (strong, nonatomic) IBOutlet UIView *keyboardOptionButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *keyboardOptionButtonHighlightView;
 @property (strong, nonatomic) IBOutlet UIImageView *keyboardOptionButtonImageView;
 @property (strong, nonatomic) IBOutlet UIButton *keyboardOptionButton;
 @property (strong, nonatomic) IBOutlet UIView *quoteStandingSeparatorView;
@@ -174,9 +176,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (strong, nonatomic) IBOutlet UIButton *attachmentButton;
 @property (strong, nonatomic) IBOutlet UIButton *scheduleMessageButton;
+@property (strong, nonatomic) IBOutlet UIView *attachmentButtonHighlightView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *attachmentButtonView;
 
 @property (nonatomic) TopFloatingIndicatorViewType topFloatingIndicatorViewType;
-
 
 @property (strong, nonatomic) UIView *titleView;
 @property (strong, nonatomic) UILabel *nameLabel;
@@ -331,7 +334,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)addContactButtonDidTapped:(id)sender;
 - (IBAction)closeAddContactButtonDidTapped:(id)sender;
 
-
 //Schedule Message
 @property (weak, nonatomic) IBOutlet UIView *scheduleMessageBackgroundView;
 @property (weak, nonatomic) IBOutlet UIDatePicker *scheduleMessageDatePicker;
@@ -341,9 +343,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (weak, nonatomic) IBOutlet UIView *scheduleMessageSendView;
 @property (weak, nonatomic) IBOutlet UIButton *scheduleMessageSendButton;
 @property (weak, nonatomic) IBOutlet UILabel *scheduleMessageSendLabel;
-
-
-
+@property (strong, nonatomic) IBOutlet UIView *scheduledMessageButtonHighlightView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *scheduledMessageButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *sendScheduledMessageButtonView;
 
 //Voice Note
 @property (weak, nonatomic) IBOutlet UIView *recordingCircleView;
@@ -363,6 +365,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (weak, nonatomic) IBOutlet UIImageView *playIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *playIconButton;
 @property (weak, nonatomic) IBOutlet UISlider *voiceNoteAudioSlider;
+@property (strong, nonatomic) IBOutlet UIView *voiceNoteButtonHighlightView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *voiceNoteButtonView;
+
 @property (nonatomic) BOOL isPlayerSliding;
 @property (strong, nonatomic) NSTimer *seekBarUpdateTimer;
 @property (strong, nonatomic) NSTimer *recorderCircleBlinkTimer;
@@ -677,19 +682,6 @@ CGPoint center;
     self.mentionAnchorBadgeView.layer.borderWidth = 1.0f;
     self.mentionAnchorBadgeView.layer.cornerRadius = CGRectGetHeight(self.mentionAnchorBadgeView.frame) / 2.0f;
     self.mentionAnchorBackgroundView.layer.cornerRadius = CGRectGetHeight(self.mentionAnchorBackgroundView.frame) / 2.0f;
-    
-    
-    //Send button longpress
-    UILongPressGestureRecognizer *sendButtonLongPressGesture = [[UILongPressGestureRecognizer alloc] init];
-    [sendButtonLongPressGesture addTarget:self action:@selector(sendButtonLongPressAction:)];
-    //gestureRecognizer.delegate = self;
-    [self.sendButton addGestureRecognizer: sendButtonLongPressGesture];
-    
-    //Send button longpress
-    UITapGestureRecognizer *sendButtonTapGesture = [[UITapGestureRecognizer alloc] init];
-    [sendButtonTapGesture addTarget:self action:@selector(sendButtonAction)];
-    //gestureRecognizer.delegate = self;
-    [self.sendButton addGestureRecognizer: sendButtonTapGesture];
 
     //Rotate table view and commit animation
     [UIView beginAnimations:nil context:nil];
@@ -707,6 +699,7 @@ CGPoint center;
     self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
     
     self.mentionListTableViewHeightConstraint.constant = 150.0f;
+    self.mentionListTableView.delaysContentTouches = NO;
     self.mentionListTableView.clipsToBounds = YES;
     self.mentionListTableView.layer.cornerRadius = 8.0f;
     self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
@@ -775,11 +768,7 @@ CGPoint center;
     else {
         //There's no custom keyboard for this type
         _isCustomKeyboardAvailable = NO;
-        self.keyboardOptionButtonView.alpha = 0.0f;
-        self.keyboardOptionButton.alpha = 0.0f;
-        self.keyboardOptionButton.userInteractionEnabled = NO;
-        self.messageViewLeftConstraint.constant = -38.0f;
-        self.keyboardOptionViewRightConstraint.constant = -26.0f;
+        [self showKeyboardOptionButton:NO];
     }
     //END Custom Keyboard
     
@@ -968,6 +957,11 @@ CGPoint center;
     UIColor *recordingTimeColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRecordingTimeLabel];
     UIColor *slideLeftLabelColor = [[[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatComposerTextField]colorWithAlphaComponent:0.6f];
     
+    self.textViewBorderView.clipsToBounds = NO;
+    self.textViewBorderView.layer.masksToBounds = NO;
+    self.voiceNoteContainerView.clipsToBounds = NO;
+    self.voiceNoteContainerView.layer.masksToBounds = NO;
+    
     [self.stopButton addTarget:self action:@selector(stopButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.playIconButton addTarget:self action:@selector(playVoiceNoteAudio) forControlEvents:UIControlEventTouchUpInside];
     [self.cancelRecordingButton addTarget:self action:@selector(cancelRecordingButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -1012,9 +1006,9 @@ CGPoint center;
     //gestureRecognizer.delegate = self;
     [self.voiceNoteDragView addGestureRecognizer: tapGestureRecognizer];
     
-    _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureAction:)];
-    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
-    [panGestureRecognizer addTarget:self action:@selector(handlePanGestureAction:)];
+//    _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureAction:)];
+//    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+//    [panGestureRecognizer addTarget:self action:@selector(handlePanGestureAction:)];
   //  panGestureRecognizer.delegate = self;
     //[self.voiceNoteContainerView addGestureRecognizer:panGestureRecognizer];
     
@@ -1026,10 +1020,145 @@ CGPoint center;
         self.voiceNoteSpaceConstraint2.constant = 6.0f;
         self.voiceNoteMicButtonWidthConstraint.constant = 0.0f;
     }
-
-    
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self.view layoutIfNeeded];
+    
+    if (!self.sendButtonHighlightView) {
+        _sendButtonHighlightView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.sendButtonView.frame),
+            CGRectGetHeight(self.sendButtonView.frame)
+        )];
+        [self.sendButtonHighlightView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.sendButtonHighlightView setLeftIconImage:[UIImage imageNamed:@"TAPIconSend" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.sendButtonHighlightView setLeftIconSize:24.0f];
+//        [self.sendButtonHighlightView setClickAction:@selector(sendButtonAction) target:self];
+        [self.sendButtonView addSubview:self.sendButtonHighlightView];
+        
+        self.sendButtonImageView.alpha = 0.0f;
+        self.sendButton.userInteractionEnabled = NO;
+        
+        //Send button longpress
+        UILongPressGestureRecognizer *sendButtonLongPressGesture = [[UILongPressGestureRecognizer alloc] init];
+        [sendButtonLongPressGesture addTarget:self action:@selector(sendButtonLongPressAction:)];
+        //gestureRecognizer.delegate = self;
+        [self.sendButtonHighlightView.button addGestureRecognizer:sendButtonLongPressGesture];
+        
+        //Send button longpress
+        UITapGestureRecognizer *sendButtonTapGesture = [[UITapGestureRecognizer alloc] init];
+        [sendButtonTapGesture addTarget:self action:@selector(sendButtonAction)];
+        //gestureRecognizer.delegate = self;
+        [self.sendButtonHighlightView.button addGestureRecognizer:sendButtonTapGesture];
+    }
+
+    if (!self.keyboardOptionButtonHighlightView) {
+        _keyboardOptionButtonHighlightView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.keyboardOptionButtonView.frame),
+            CGRectGetHeight(self.keyboardOptionButtonView.frame)
+        )];
+        [self.keyboardOptionButtonHighlightView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.keyboardOptionButtonHighlightView setLeftIconImage:[UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self.keyboardOptionButtonHighlightView setLeftIconSize:24.0f];
+        [self.keyboardOptionButtonHighlightView setClickAction:@selector(keyboardOptionButtonDidTapped) target:self];
+        [self.keyboardOptionButtonView addSubview:self.keyboardOptionButtonHighlightView];
+        
+        self.keyboardOptionButtonImageView.alpha = 0.0f;
+        self.keyboardOptionButton.userInteractionEnabled = NO;
+    }
+    
+    if (!self.attachmentButtonView) {
+        self.attachmentButtonHighlightView.layer.cornerRadius = CGRectGetWidth(self.attachmentButtonHighlightView.frame) / 2;
+        self.attachmentButtonHighlightView.clipsToBounds = YES;
+        _attachmentButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.attachmentButtonHighlightView.frame),
+            CGRectGetHeight(self.attachmentButtonHighlightView.frame)
+        )];
+        [self.attachmentButtonView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.attachmentButtonView setClickAction:@selector(attachmentButtonDidTapped) target:self];
+        [self.attachmentButtonHighlightView addSubview:self.attachmentButtonView];
+        
+        self.attachmentButton.userInteractionEnabled = NO;
+    }
+    
+    if (!self.scheduledMessageButtonView) {
+        self.scheduledMessageButtonHighlightView.layer.cornerRadius = CGRectGetWidth(self.scheduledMessageButtonHighlightView.frame) / 2;
+        self.scheduledMessageButtonHighlightView.clipsToBounds = YES;
+        _scheduledMessageButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            32.0f,
+            32.0f
+        )];
+        [self.scheduledMessageButtonView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.scheduledMessageButtonView setClickAction:@selector(scheduleMessageComposerButtonDidTapped) target:self];
+        [self.scheduledMessageButtonHighlightView addSubview:self.scheduledMessageButtonView];
+        
+        self.scheduledMessageButtonView.alpha = 0.0f;
+        self.scheduledMessageButtonView.button.userInteractionEnabled = NO;
+        self.scheduleMessageButton.userInteractionEnabled = NO;
+    }
+
+    if (!self.sendScheduledMessageButtonView) {
+        _sendScheduledMessageButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.scheduleMessageSendView.frame),
+            CGRectGetHeight(self.scheduleMessageSendView.frame)
+        )];
+        [self.sendScheduledMessageButtonView setType:TapHighlightCustomButtonViewTypeDefaultSolid];
+        
+        //Setup schedule message date picker
+        UIFont *scheduleFontLabel = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDatePickerTitleLabel];
+        
+        [self.sendScheduledMessageButtonView setLabelFont:scheduleFontLabel];
+        [self.sendScheduledMessageButtonView setContainerViewRadius:15.0f];
+        
+        NSDate *date = self.scheduleMessageDatePicker.date;
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+        dateFormatter.dateFormat = @"dd/MM/yy";
+        NSString *dateString = [dateFormatter stringFromDate:date];
+        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc]init];
+        timeFormatter.dateFormat = @"HH:mm";
+        NSString *timeString = [timeFormatter stringFromDate: date];
+        NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
+        [self.sendScheduledMessageButtonView setLabelText:scheduleSendAtString];
+        
+        [self.sendScheduledMessageButtonView setClickAction:@selector(scheduleMessageButtonDidTapped) target:self];
+        [self.scheduleMessageSendView addSubview:self.sendScheduledMessageButtonView];
+        
+        self.scheduleMessageSendLabel.alpha = 0.0f;
+        self.scheduleMessageSendButton.alpha = 0.0f;
+        self.scheduleMessageSendButton.userInteractionEnabled = NO;
+    }
+    
+    if (!self.voiceNoteButtonView && [[TapUI sharedInstance] isSendVoiceNoteMenuEnabled]) {
+        self.voiceNoteButtonHighlightView.layer.cornerRadius = CGRectGetWidth(self.voiceNoteButtonHighlightView.frame) / 2;
+        self.voiceNoteButtonHighlightView.clipsToBounds = YES;
+        _voiceNoteButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.voiceNoteButtonHighlightView.frame),
+            CGRectGetHeight(self.voiceNoteButtonHighlightView.frame)
+        )];
+        [self.voiceNoteButtonView setType:TapHighlightCustomButtonViewTypeClear];
+        [self.voiceNoteButtonView setClickAction:@selector(handleVoiceNoteViewTap) target:self];
+        [self.voiceNoteButtonHighlightView addSubview:self.voiceNoteButtonView];
+        
+        self.voiceNoteDragView.userInteractionEnabled = NO;
+        
+        UILongPressGestureRecognizer *gestureRecognizer = [[UILongPressGestureRecognizer alloc] init];
+        [gestureRecognizer addTarget:self action:@selector(handleVoiceNoteViewLongPress:)];
+        [self.voiceNoteButtonView addGestureRecognizer: gestureRecognizer];
+    }
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -1089,17 +1218,8 @@ CGPoint center;
     if (![self.messageTextView.text isEqualToString:@""]) {
         [self setSendButtonActive:YES];
         
-        if(self.isCustomKeyboardAvailable) {
-            [UIView animateWithDuration:0.2f animations:^{
-                self.keyboardOptionButtonView.alpha = 1.0f;
-                self.keyboardOptionButton.alpha = 1.0f;
-                self.keyboardOptionButton.userInteractionEnabled = YES;
-                self.messageViewLeftConstraint.constant = 4.0f;
-                self.keyboardOptionViewRightConstraint.constant = 16.0f;
-                [self.view layoutIfNeeded];
-            } completion:^(BOOL finished) {
-                //Do something after animation completed.
-            }];
+        if (self.isCustomKeyboardAvailable) {
+            [self showKeyboardOptionButton:YES];
         }
     }
     else if (self.playIconImageView.alpha == 1.0f) {
@@ -1133,11 +1253,21 @@ CGPoint center;
 //    }];
     if (![[TapUI sharedInstance] getScheduledMessageFeatureEnabled]) {
         self.scheduleMessageButtonWidthConstraint.constant = 0.0f;
+        self.scheduledMessageButtonView.alpha = 0.0f;
+        self.scheduledMessageButtonView.button.userInteractionEnabled = NO;
     }
     else {
         self.scheduleMessageButtonWidthConstraint.constant = 32.0f;
+        self.scheduledMessageButtonView.alpha = 1.0f;
+        self.scheduledMessageButtonView.button.userInteractionEnabled = YES;
     }
     
+    [self.scheduledMessageButtonView resizeFrame:CGRectMake(
+        0.0f,
+        0.0f,
+        CGRectGetWidth(self.scheduledMessageButtonHighlightView.frame),
+        CGRectGetHeight(self.scheduledMessageButtonHighlightView.frame)
+    )];
     self.isSavedMesasgeArrowClicked = NO;
     
 }
@@ -1415,7 +1545,8 @@ CGPoint center;
     if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
         [tableView registerNib:[TAPMentionListXIBTableViewCell cellNib] forCellReuseIdentifier:[TAPMentionListXIBTableViewCell description]];
         TAPMentionListXIBTableViewCell *cell = (TAPMentionListXIBTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TAPMentionListXIBTableViewCell description] forIndexPath:indexPath];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        [cell setGrayHighlightColor];
         
         if ([self.filteredMentionListArray count] != 0) {
             TAPUserModel *user = [self.filteredMentionListArray objectAtIndex:indexPath.row];
@@ -3034,7 +3165,7 @@ CGPoint center;
 #pragma mark - Delegate
 #pragma mark UITableView
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (tableView == self.mentionListTableView) {
+    if (tableView == self.mentionListTableView && self.filteredMentionListArray.count > indexPath.row) {
         TAPUserModel *user = [self.filteredMentionListArray objectAtIndex:indexPath.row];
         NSString *username = user.username;
         username = [TAPUtil nullToEmptyString:username];
@@ -6570,17 +6701,8 @@ CGPoint center;
     
     if (textView.text != nil) {
         if (![textView.text isEqualToString:@""]) {
-            if(self.isCustomKeyboardAvailable) {
-                [UIView animateWithDuration:0.2f animations:^{
-                    self.keyboardOptionButtonView.alpha = 0.0f;
-                    self.keyboardOptionButton.alpha = 0.0f;
-                    self.keyboardOptionButton.userInteractionEnabled = NO;
-                    self.messageViewLeftConstraint.constant = -38.0f;
-                    self.keyboardOptionViewRightConstraint.constant = -26.0f;
-                    [self.messageTextView layoutIfNeeded];
-                    [self.inputMessageAccessoryView layoutIfNeeded];
-                    [self.view layoutIfNeeded];
-                }];
+            if (self.isCustomKeyboardAvailable) {
+                [self showKeyboardOptionButton:NO];
             }
         }
     }
@@ -6596,15 +6718,7 @@ CGPoint center;
     }
     
     if (self.isCustomKeyboardAvailable) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.keyboardOptionButtonView.alpha = 0.0f;
-            self.keyboardOptionButton.alpha = 0.0f;
-            self.keyboardOptionButton.userInteractionEnabled = NO;
-            self.messageViewLeftConstraint.constant = -38.0f;
-            self.keyboardOptionViewRightConstraint.constant = -26.0f;
-            [self.messageTextView layoutIfNeeded];
-            [self.inputMessageAccessoryView layoutIfNeeded];
-        }];
+        [self showKeyboardOptionButton:NO];
     }
     [[TAPChatManager sharedManager] startTyping];
 }
@@ -6617,18 +6731,8 @@ CGPoint center;
         [self setSendButtonActive:NO];
     }
     
-    
     if (self.isCustomKeyboardAvailable) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.keyboardOptionButtonView.alpha = 1.0f;
-            self.keyboardOptionButton.alpha = 1.0f;
-            self.keyboardOptionButton.userInteractionEnabled = YES;
-            self.messageViewLeftConstraint.constant = 4.0f;
-            self.keyboardOptionViewRightConstraint.constant = 16.0f;
-            [self.messageTextView layoutIfNeeded];
-            [self.inputMessageAccessoryView layoutIfNeeded];
-            [self.view layoutIfNeeded];
-        }];
+        [self showKeyboardOptionButton:YES];
     }
     [[TAPChatManager sharedManager] stopTyping];
 }
@@ -7472,13 +7576,15 @@ CGPoint center;
 - (void)setSendButtonActive:(BOOL)isActive {
     if (isActive) {
         self.sendButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackground];
-        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSend]];
-        self.sendButton.userInteractionEnabled = YES;
+//        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSend]];
+//        self.sendButton.userInteractionEnabled = YES;
+        self.sendButtonHighlightView.button.userInteractionEnabled = YES;
     }
     else {
         self.sendButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendBackgroundInactive];
-        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendInactive]];
-        self.sendButton.userInteractionEnabled = NO;
+//        self.sendButtonImageView.image = [self.sendButtonImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerSendInactive]];
+//        self.sendButton.userInteractionEnabled = NO;
+        self.sendButtonHighlightView.button.userInteractionEnabled = NO;
     }
 }
 
@@ -8482,6 +8588,10 @@ CGPoint center;
 
 #pragma mark Attachment
 - (IBAction)attachmentButtonDidTapped:(id)sender {
+    [self attachmentButtonDidTapped];
+}
+
+- (void)attachmentButtonDidTapped {
     
     //Hide unread message indicator top view
     if (self.topFloatingIndicatorViewType == TopFloatingIndicatorViewTypeUnreadMessage && self.topFloatingIndicatorView.alpha == 1.0f) {
@@ -10289,6 +10399,10 @@ CGPoint center;
     }
 }
 
+- (void)handleVoiceNoteViewTap {
+    [self showSnackBar:TapTalkSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Long press mic to record.", nil, [TAPUtil currentBundle], @"") iconName:@""];
+}
+
 - (void)handleVoiceNoteViewLongPress:(UILongPressGestureRecognizer *)recognizer {
     UIView *view =(UIView*) recognizer.view;
     CGPoint point = [recognizer locationInView:view.superview];
@@ -10370,8 +10484,8 @@ CGPoint center;
     NSString *timeString = [timeFormatter stringFromDate: date];
     
     NSString *scheduleSendAtString = [NSString stringWithFormat:@"Send %@ at %@", dateString, timeString];
-    self.scheduleMessageSendLabel.text = scheduleSendAtString;
-    
+//    self.scheduleMessageSendLabel.text = scheduleSendAtString;
+    [self.sendScheduledMessageButtonView setLabelText:scheduleSendAtString];
 }
 
 
@@ -10390,22 +10504,17 @@ CGPoint center;
 }
 
 - (void)showInputAccessoryRecordView:(BOOL)show {
-    if (show){
+    if (show) {
         [self.view endEditing:YES];
         [self.messageTextView resignFirstResponder];
         self.recordingContainerView.alpha = 1.0;
         self.textViewBorderView.alpha = 0.0f;
         UIColor *micPrimaryColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFilePrimary];
         self.micIconImageView.image = [self.micIconImageView.image setImageTintColor:micPrimaryColor];
-
-        self.keyboardOptionButtonView.alpha = 0.0f;
-        self.keyboardOptionButton.alpha = 0.0f;
-        self.keyboardOptionButton.userInteractionEnabled = NO;
-        self.messageViewLeftConstraint.constant = -38.0f;
-        self.keyboardOptionViewRightConstraint.constant = -26.0f;
         
+        [self showKeyboardOptionButton:NO];
     }
-    else{
+    else {
         self.recordingContainerView.alpha = 0.0;
         self.textViewBorderView.alpha = 1.0f;
         self.micIconImageView.image = [self.micIconImageView.image setImageTintColor:[UIColor blackColor]];
@@ -10418,17 +10527,44 @@ CGPoint center;
         self.voiceNoteAudioSlider.alpha = 0.0f;
         self.isRecording = NO;
         
-        if(self.isCustomKeyboardAvailable) {
+        [self.voiceNoteButtonView resizeFrame:CGRectMake(
+            0.0f,
+            0.0f,
+            CGRectGetWidth(self.voiceNoteButtonHighlightView.frame),
+            CGRectGetHeight(self.voiceNoteButtonHighlightView.frame)
+        )];
+        
+        if (self.isCustomKeyboardAvailable) {
             //There's custom keyboard for this type
-            
+            [self showKeyboardOptionButton:YES];
+        }
+    }
+}
+
+- (void)showKeyboardOptionButton:(BOOL)show {
+    [UIView animateWithDuration:0.2f animations:^{
+        if (show) {
             self.keyboardOptionButtonView.alpha = 1.0f;
-            self.keyboardOptionButton.alpha = 1.0f;
-            self.keyboardOptionButton.userInteractionEnabled = YES;
+//            self.keyboardOptionButton.alpha = 1.0f;
+//            self.keyboardOptionButton.userInteractionEnabled = YES;
+            self.keyboardOptionButtonHighlightView.alpha = 1.0f;
+            self.keyboardOptionButtonHighlightView.button.userInteractionEnabled = YES;
             self.messageViewLeftConstraint.constant = 4.0f;
             self.keyboardOptionViewRightConstraint.constant = 16.0f;
         }
-       
-    }
+        else {
+            self.keyboardOptionButtonView.alpha = 0.0f;
+            self.keyboardOptionButton.alpha = 0.0f;
+            self.keyboardOptionButton.userInteractionEnabled = NO;
+            self.keyboardOptionButtonHighlightView.alpha = 0.0f;
+            self.keyboardOptionButtonHighlightView.button.userInteractionEnabled = NO;
+            self.messageViewLeftConstraint.constant = -38.0f;
+            self.keyboardOptionViewRightConstraint.constant = -26.0f;
+        }
+        [self.messageTextView layoutIfNeeded];
+        [self.inputMessageAccessoryView layoutIfNeeded];
+        [self.view layoutIfNeeded];
+    }];
 }
 
 - (void)showInputAccessoryExtensionView:(BOOL)show {
@@ -12041,13 +12177,8 @@ CGPoint center;
     self.savedEmptyViewBottomConstraint.constant = mentionListTableViewBottomValue;
     
     [UIView animateWithDuration:0.2f animations:^{
-        if(self.isCustomKeyboardAvailable) {
-            self.keyboardOptionButtonView.alpha = 1.0f;
-            self.keyboardOptionButton.alpha = 1.0f;
-            self.keyboardOptionButton.userInteractionEnabled = YES;
-            self.messageViewLeftConstraint.constant = 4.0f;
-            self.keyboardOptionViewRightConstraint.constant = 16.0f;
-            [self.inputMessageAccessoryView layoutIfNeeded];
+        if (self.isCustomKeyboardAvailable) {
+            [self showKeyboardOptionButton:YES];
         }
         
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + messageViewHeightDifference;
@@ -12087,6 +12218,7 @@ CGPoint center;
     self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenuBackground];
     UIImage *hamburgerIconImage = [UIImage imageNamed:@"TAPIconHamburger" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.keyboardOptionButtonImageView.image = [hamburgerIconImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerBurgerMenu]];
+    [self.keyboardOptionButtonHighlightView setLeftIconImage:self.keyboardOptionButtonImageView.image];
 }
 
 - (void)setKeyboardStateOption {
@@ -12095,9 +12227,14 @@ CGPoint center;
     self.keyboardOptionButtonView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboardBackground];
     UIImage *keyboardIconImage = [UIImage imageNamed:@"TAPIconKeyboard" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.keyboardOptionButtonImageView.image = [keyboardIconImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatComposerShowKeyboard]];
+    [self.keyboardOptionButtonHighlightView setLeftIconImage:self.keyboardOptionButtonImageView.image];
 }
 
 - (IBAction)keyboardOptionButtonDidTapped:(id)sender {
+    [self keyboardOptionButtonDidTapped];
+}
+
+- (void)keyboardOptionButtonDidTapped {
         
     _isKeyboardOptionTapped = YES;
     
@@ -13477,9 +13614,12 @@ CGPoint center;
     [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"unblock confirmation" title:blockTitleString detailInformation:@"Unblocking lets user send messages and calls from this contact . Are you sure you want to continue?" leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Yes"];
 }
 - (IBAction)scheduleMessageButtonDidTapped:(id)sender {
-    self.scheduleMessageDatePickerContainerView.alpha = 0.0;
+    [self scheduleMessageButtonDidTapped];
+}
+
+- (void)scheduleMessageButtonDidTapped {
+    self.scheduleMessageDatePickerContainerView.alpha = 0.0f;
   
-    
     NSDate *date = self.scheduleMessageDatePicker.date;
     NSNumber *scheduleTime = [NSNumber numberWithDouble:[date timeIntervalSince1970] * 1000.0f];
     long currentTime = [TAPUtil currentTimeInMillis].longValue;
@@ -13509,6 +13649,10 @@ CGPoint center;
 }
 
 - (IBAction)scheduleMessageComposerButtonDidTapped:(id)sender {
+    [self scheduleMessageComposerButtonDidTapped];
+}
+
+- (void)scheduleMessageComposerButtonDidTapped {
     
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];

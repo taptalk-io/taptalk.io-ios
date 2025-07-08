@@ -229,8 +229,10 @@
     
     if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction || self.isScheduleMessage) {
         nameString = message.room.name;
-        profilePictureURL = message.room.imageURL.thumbnail;
-        if(self.isScheduleMessage) {
+        if (![TAPUtil isEmptyString:message.room.imageURL.thumbnail]) {
+            profilePictureURL = message.room.imageURL.thumbnail;
+        }
+        if (self.isScheduleMessage) {
             nameString = [NSString stringWithFormat:@"🗓 You@%@",nameString];
         }
     }

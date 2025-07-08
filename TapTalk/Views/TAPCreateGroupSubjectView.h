@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupSubjectViewType) {
 };
 
 @interface TAPCreateGroupSubjectView : TAPBaseView
+
 @property (strong, nonatomic) UIView *selectedContactsView;
 
 @property (strong, nonatomic) UIView *additionalWhiteBounceView;
@@ -28,7 +29,7 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupSubjectViewType) {
 @property (strong, nonatomic) UIScrollView *bgScrollView;
 @property (strong, nonatomic) UIButton *groupPictureButton;
 
-@property (strong, nonatomic) TAPCustomButtonView *createButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *createButtonView;
 
 @property (strong, nonatomic) UIView *removePictureView;
 @property (strong, nonatomic) UIButton *removePictureButton;

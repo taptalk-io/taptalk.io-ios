@@ -3619,8 +3619,8 @@
           needToSaveLastUpdatedTimestamp:(BOOL)needToSaveLastUpdatedTimestamp
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure {
-    if(roomID == nil || [roomID isEqualToString:@""]) {
-        
+    
+    if (roomID == nil || [roomID isEqualToString:@""]) {
         NSError *localizedError = [NSError errorWithDomain:@"Input Error" code:999 userInfo:@{@"message": @"Room not found"}];
         failure(localizedError);
         return;
@@ -3629,9 +3629,9 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageRoomListAfter];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:minCreated forKey:@"minCreated"];
-    [parameterDictionary setObject:lastUpdated forKey:@"lastUpdated"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:minCreated] forKey:@"minCreated"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:lastUpdated] forKey:@"lastUpdated"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -3728,9 +3728,9 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageRoomListBefore];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:maxCreated forKey:@"maxCreated"];
-    [parameterDictionary setObject:numberOfItems forKey:@"limit"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:maxCreated] forKey:@"maxCreated"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:numberOfItems] forKey:@"limit"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -3857,11 +3857,11 @@
     if (![dataString isEqualToString:@""]) {
         [parameterDictionary setObject:dataString forKey:@"data"];
     }
-    [parameterDictionary setObject:localID forKey:@"localID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:localID] forKey:@"localID"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:messageType] forKey:@"messageType"];
-    [parameterDictionary setObject:body forKey:@"body"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:body] forKey:@"body"];
     [parameterDictionary setObject:[NSNumber numberWithBool:isHidden] forKey:@"isHidden"];
-    [parameterDictionary setObject:filterID forKey:@"filterID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:filterID] forKey:@"filterID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -3934,8 +3934,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDeleteMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:messageIDArray forKey:@"messageIDs"];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:messageIDArray] forKey:@"messageIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     [parameterDictionary setObject:[NSNumber numberWithBool:isDeletedForEveryone] forKey:@"forEveryone"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -4178,7 +4178,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeAddContact];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4354,7 +4354,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRemoveContact];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4425,7 +4425,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetUserByUserID];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"id"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"id"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4497,10 +4497,11 @@
 + (void)callAPIGetUserByXCUserID:(NSString *)XCUserID
                          success:(void (^)(TAPUserModel *user))success
                          failure:(void (^)(NSError *error))failure; {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetUserByXCUserID];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:XCUserID forKey:@"xcUserID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:XCUserID] forKey:@"xcUserID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4578,7 +4579,7 @@
     BOOL isIgnoreCase = projectConfigs.usernameIgnoreCase;
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:username forKey:@"username"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:username] forKey:@"username"];
     [parameterDictionary setObject:[NSNumber numberWithBool:isIgnoreCase] forKey:@"ignoreCase"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -4657,7 +4658,7 @@
         BOOL isIgnoreCase = projectConfigs.usernameIgnoreCase;
         
         NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-        [parameterDictionary setObject:username forKey:@"username"];
+        [parameterDictionary setObject:[TAPUtil nullToEmptyString:username] forKey:@"username"];
         [parameterDictionary setObject:[NSNumber numberWithBool:isIgnoreCase] forKey:@"ignoreCase"];
         
         [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -4737,7 +4738,7 @@
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:@"" forKey:@"fcmToken"];
-    [parameterDictionary setObject:token forKey:@"apnToken"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:token] forKey:@"apnToken"];
     
     NSInteger isDebugInteger = 0;
     if (isDebug) {
@@ -4816,7 +4817,7 @@
     }
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:messageIDsArray forKey:@"messageIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:messageIDsArray] forKey:@"messageIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4981,8 +4982,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUploadFile];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:fileType forKey:@"fileType"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:fileType] forKey:@"fileType"];
     
     if (caption != nil && ![caption isEqualToString:@""]) {
         [parameterDictionary setObject:caption forKey:@"caption"];
@@ -5001,21 +5002,22 @@
 }
 
 + (NSURLSessionUploadTask *)callAPIUploadVoiceWithFileData:(NSData *)fileData
-                                                   roomID:(NSString *)roomID
-                                                 fileName:(NSString *)fileName
-                                                 fileType:(NSString *)fileType
+                                                    roomID:(NSString *)roomID
+                                                  fileName:(NSString *)fileName
+                                                  fileType:(NSString *)fileType
                                                   duration:(NSString *)duration
-                                                 mimeType:(NSString *)mimeType
-                                                  caption:(NSString *)caption
-                                          completionBlock:(void (^)(NSDictionary *responseObject))successBlock
-                                            progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
-                                             failureBlock:(void(^)(NSError *error))failureBlock {
+                                                  mimeType:(NSString *)mimeType
+                                                   caption:(NSString *)caption
+                                           completionBlock:(void (^)(NSDictionary *responseObject))successBlock
+                                             progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
+                                              failureBlock:(void(^)(NSError *error))failureBlock {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUploadFile];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:fileType forKey:@"fileType"];
-    [parameterDictionary setObject:duration forKey:@"duration"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:fileType] forKey:@"fileType"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:duration] forKey:@"duration"];
     
     if (caption != nil && ![caption isEqualToString:@""]) {
         [parameterDictionary setObject:caption forKey:@"caption"];
@@ -5067,8 +5069,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDownloadFile];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:fileID forKey:@"fileID"];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:fileID] forKey:@"fileID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     [parameterDictionary setObject:[NSNumber numberWithBool:isThumbnail] forKey:@"isThumbnail"];
     
     [[TAPNetworkManager sharedManager] download:requestURL parameters:parameterDictionary progress:^(NSProgress *downloadProgress) {
@@ -5090,8 +5092,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDownloadFile];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:fileID forKey:@"fileID"];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:fileID] forKey:@"fileID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     
     [[TAPNetworkManager sharedManager] download:requestURL parameters:parameterDictionary progress:^(NSProgress *downloadProgress) {
         CGFloat progress = downloadProgress.completedUnitCount;
@@ -5109,7 +5111,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetBulkUserByID];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userIDArray forKey:@"ids"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:userIDArray] forKey:@"ids"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -5321,10 +5323,10 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestOTP];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:phoneNumber forKey:@"phone"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:phoneNumber] forKey:@"phone"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:[countryID integerValue]] forKey:@"countryID"];
-    [parameterDictionary setObject:method forKey:@"method"]; //method should be phone or email
-    [parameterDictionary setObject:channel forKey:@"channel"]; //channel should be `sms` or `whatsapp`
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:method] forKey:@"method"]; //method should be phone or email
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:channel] forKey:@"channel"]; //channel should be `sms` or `whatsapp`
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -5430,8 +5432,8 @@
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     [parameterDictionary setObject:[NSNumber numberWithInteger:[OTPID integerValue]] forKey:@"otpID"];
-    [parameterDictionary setObject:OTPKey forKey:@"otpKey"];
-    [parameterDictionary setObject:OTPcode forKey:@"otpCode"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:OTPKey] forKey:@"otpKey"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:OTPcode] forKey:@"otpCode"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -5508,7 +5510,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeCheckUsername];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:username forKey:@"username"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:username] forKey:@"username"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -5584,10 +5586,10 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRegister];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:fullName forKey:@"fullname"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:fullName] forKey:@"fullname"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:[countryID integerValue]] forKey:@"countryID"];
-    [parameterDictionary setObject:phone forKey:@"phone"];
-    [parameterDictionary setObject:username forKey:@"username"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:phone] forKey:@"phone"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:username] forKey:@"username"];
     
     if (![TAPUtil isEmptyString:email]) {
         [parameterDictionary setObject:email forKey:@"email"];
@@ -5679,16 +5681,16 @@
 }
 
 + (void)callAPIRequestVerificationWithPhoneNumber:(NSString *)phoneNumber
-                                            countryID:(NSString *)countryID
-                                              languageCode:(NSString *)languageCode
-                                              success:(void (^)(BOOL isSuccess,NSString *verifID, NSString *waLink, NSString *waMessage, NSString *qrCode, NSString *message, NSInteger nextRequestSeconds))success
-                                              failure:(void (^)(NSError *error))failure {
+                                        countryID:(NSString *)countryID
+                                     languageCode:(NSString *)languageCode
+                                          success:(void (^)(BOOL isSuccess,NSString *verifID, NSString *waLink, NSString *waMessage, NSString *qrCode, NSString *message, NSInteger nextRequestSeconds))success
+                                          failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestVerification];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:phoneNumber forKey:@"phone"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:phoneNumber] forKey:@"phone"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:[countryID integerValue]] forKey:@"countryID"];
-    [parameterDictionary setObject:languageCode forKey:@"languageCode"]; //channel should be `sms` or `whatsapp`
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:languageCode] forKey:@"languageCode"]; //channel should be `sms` or `whatsapp`
     [parameterDictionary setObject:@"https://web.taptalk.io/" forKey:@"appLink"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -5780,8 +5782,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeCheckVerification];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:phoneWithCode forKey:@"phoneWithCode"];
-    [parameterDictionary setObject:verificationID forKey:@"verificationID"]; //channel should be `sms` or `whatsapp`
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:phoneWithCode] forKey:@"phoneWithCode"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:verificationID] forKey:@"verificationID"]; //channel should be `sms` or `whatsapp`
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -5863,7 +5865,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeAddContactByPhones];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:phoneNumbers forKey:@"phones"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:phoneNumbers] forKey:@"phones"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6043,9 +6045,9 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeCreateRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomName forKey:@"name"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomName] forKey:@"name"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:roomType] forKey:@"type"];
-    [parameterDictionary setObject:userIDArray forKey:@"userIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:userIDArray] forKey:@"userIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6155,8 +6157,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomName forKey:@"name"];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomName] forKey:@"name"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6225,7 +6227,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6307,7 +6309,7 @@
         NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetXCRoom];
         
         NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-        [parameterDictionary setObject:xcRoomID forKey:@"xcRoomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:xcRoomID] forKey:@"xcRoomID"];
         
         [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
             
@@ -6390,8 +6392,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeAddRoomParticipants];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:userIDArray forKey:@"userIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:userIDArray] forKey:@"userIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6474,8 +6476,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRemoveRoomParticipants];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:userIDArray forKey:@"userIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:userIDArray] forKey:@"userIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6558,8 +6560,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypePromoteRoomAdmins];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:userIDArray forKey:@"userIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:userIDArray] forKey:@"userIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6641,8 +6643,8 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDemoteRoomAdmins];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:userIDArray forKey:@"userIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:userIDArray] forKey:@"userIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6723,7 +6725,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeLeaveRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6814,8 +6816,8 @@
     
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDeleteRoom];
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:room.roomID forKey:@"roomID"];
-    [parameterDictionary setObject:generatedMD5String forKey:@"checksum"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:room.roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:generatedMD5String] forKey:@"checksum"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -6978,12 +6980,13 @@
 }
 
 + (void)callAPIUpdateBio:(NSString *)bioContent
-                            success:(void (^)(TAPUserModel *user))success
-                            failure:(void (^)(NSError *error))failure {
+                 success:(void (^)(TAPUserModel *user))success
+                 failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUpdateBio];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:bioContent forKey:@"bio"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:bioContent] forKey:@"bio"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -7052,12 +7055,14 @@
     }];
 }
 
-+ (void)callAPIGetPhotoList:(NSString *)userID success:(void (^)(NSMutableArray<TAPPhotoListModel *> * photoListArray))success
-                      failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetPhotoList:(NSString *)userID 
+                    success:(void (^)(NSMutableArray<TAPPhotoListModel *> * photoListArray))success
+                    failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetPhotoList];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -7282,9 +7287,10 @@
 + (void)callAPIMarkChatRoomAsUnread:(NSArray<NSString *> *)roomIDs
                             success:(void (^)(NSArray<NSString *> *unreadRoomIDs))success
                             failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeMarkAsUnread];
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:roomIDs] forKey:@"roomIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -7424,12 +7430,16 @@
 }
     
 
-+ (void)callAPIStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIStarMessage:(NSString *)roomID 
+                 messageID:(NSArray<NSString *> *)messageID
+                   success:(void (^)(NSArray *starredMessageIDs))success
+                   failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeStarMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:messageID forKey:@"messageIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:messageID] forKey:@"messageIDs"];
 
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -7494,12 +7504,16 @@
 
 
 
-+ (void)callAPIUnStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIUnStarMessage:(NSString *)roomID 
+                   messageID:(NSArray<NSString *> *)messageID
+                     success:(void (^)(NSArray *messagesArray))success
+                     failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnStarMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:messageID forKey:@"messageIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:messageID] forKey:@"messageIDs"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -7557,12 +7571,17 @@
     }];
 }
 
-+ (void)callAPIGetStarredMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSArray *starredMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetStarredMessages:(NSString *)roomID 
+                       pageNumber:(NSInteger)pageNumber
+                    numberOfItems:(NSInteger)numberOfItems
+                          success:(void (^)(NSArray *starredMessageIDs,BOOL hasMoreData))success
+                          failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetStarredMessages];
     
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     [parameterDictionary setObject:@(pageNumber) forKey:@"pageNumber"];
     [parameterDictionary setObject:@(numberOfItems) forKey:@"pageSize"];
 
@@ -7634,12 +7653,15 @@
     }];
 }
 
-+ (void)callAPIGetStarredMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetStarredMessageIDs:(NSString *)roomID 
+                            success:(void (^)(NSMutableArray *starredMessageIDs))success
+                            failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetStarredMessagesIDs];
     
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -7705,12 +7727,16 @@
     }];
 }
 
-+ (void)callAPIPinMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageIDs success:(void (^)(NSArray *messageIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIPinMessage:(NSString *)roomID 
+                messageID:(NSArray<NSString *> *)messageIDs
+                  success:(void (^)(NSArray *messageIDs))success
+                  failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypePinMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:messageIDs forKey:@"messageIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:messageIDs] forKey:@"messageIDs"];
 
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -7775,12 +7801,16 @@
 
 
 
-+ (void)callAPIUnPinMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageIDs success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIUnPinMessage:(NSString *)roomID 
+                  messageID:(NSArray<NSString *> *)messageIDs
+                    success:(void (^)(NSArray *messagesArray))success
+                    failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnPinMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:messageIDs forKey:@"messageIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:messageIDs] forKey:@"messageIDs"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -7838,12 +7868,17 @@
     }];
 }
 
-+ (void)callAPIGetPinnedMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSMutableArray *pinnedMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetPinnedMessages:(NSString *)roomID 
+                      pageNumber:(NSInteger)pageNumber
+                   numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSMutableArray *pinnedMessageIDs,BOOL hasMoreData))success
+                         failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetPinnedMessages];
     
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     [parameterDictionary setObject:@(pageNumber) forKey:@"pageNumber"];
     [parameterDictionary setObject:@(numberOfItems) forKey:@"pageSize"];
 
@@ -7915,12 +7950,15 @@
     }];
 }
 
-+ (void)callAPIGetPinnedMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *pinnedMessageIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetPinnedMessageIDs:(NSString *)roomID 
+                           success:(void (^)(NSMutableArray *pinnedMessageIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetPinnedMessagesIDs];
     
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8055,7 +8093,7 @@
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestDeleteAccountOTP];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:channel forKey:@"channel"]; //channel should be `sms` or `whatsapp`
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:channel] forKey:@"channel"]; //channel should be `sms` or `whatsapp`
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8154,16 +8192,19 @@
 
 + (void)callAPIVerifyDeleteAccoutOTP:(NSString *)OTPcode
                                OTPID:(NSString *)OTPID
-                              OTPKey:(NSString *)OTPKey deletionReason:(NSString *)deletionReason success:(void (^)(NSNumber *isSuccess))success
-                            failure:(void (^)(NSError *error))failure {
+                              OTPKey:(NSString *)OTPKey 
+                      deletionReason:(NSString *)deletionReason
+                             success:(void (^)(NSNumber *isSuccess))success
+                             failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeVerifyDeleteAccountOTP];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     
     [parameterDictionary setObject:[NSNumber numberWithInteger:[OTPID integerValue]] forKey:@"otpID"];
-    [parameterDictionary setObject:OTPKey forKey:@"otpKey"];
-    [parameterDictionary setObject:OTPcode forKey:@"otpCode"];
-    [parameterDictionary setObject:deletionReason forKey:@"reason"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:OTPKey] forKey:@"otpKey"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:OTPcode] forKey:@"otpCode"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:deletionReason] forKey:@"reason"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8223,13 +8264,15 @@
 
 + (void)callAPIGetSharedContent:(NSString *)roomID
                      maxCreated:(long)maxCreated
-                     minCreated:(long)minCreated success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
-                            failure:(void (^)(NSError *error))failure {
+                     minCreated:(long)minCreated 
+                        success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                        failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetSharedContent];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     [parameterDictionary setObject:@(maxCreated) forKey:@"maxCreated"];
     [parameterDictionary setObject:@(minCreated) forKey:@"minCreated"];
     [parameterDictionary setObject:@"DESC" forKey:@"sortOrder"];
@@ -8344,12 +8387,16 @@
 }
     
 
-+ (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs expiredAt:(NSNumber *)expiredAt success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs 
+              expiredAt:(NSNumber *)expiredAt
+                success:(void (^)(NSArray *roomIDs))success
+                failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeMuteRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
-    if(expiredAt != nil) {
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:roomIDs] forKey:@"roomIDs"];
+    if (expiredAt != nil) {
         [parameterDictionary setObject:expiredAt forKey:@"expiredAt"];
     }
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -8413,11 +8460,14 @@
     }];
 }
 
-+ (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs 
+                  success:(void (^)(NSArray *roomIDs))success
+                  failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnMuteRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:roomIDs] forKey:@"roomIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8561,11 +8611,14 @@
     }];
 }
 
-+ (void)callAPIPinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIPinRoom:(NSArray<NSString *> *)roomIDs 
+               success:(void (^)(NSArray *roomIDs))success
+               failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypePinRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:roomIDs] forKey:@"roomIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8628,11 +8681,14 @@
     }];
 }
 
-+ (void)callAPIUnpinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIUnpinRoom:(NSArray<NSString *> *)roomIDs 
+                 success:(void (^)(NSArray *roomIDs))success
+                 failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnpinRoom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:roomIDs] forKey:@"roomIDs"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8761,11 +8817,14 @@
     
 }
 
-+ (void)callAPIGetGroupsInCommon:(NSString *)userID success:(void (^)(NSMutableArray <TAPRoomModel *> *groupsInCommonRoom))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetGroupsInCommon:(NSString *)userID 
+                         success:(void (^)(NSMutableArray <TAPRoomModel *> *groupsInCommonRoom))success
+                         failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetGroupsInCommon];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -8836,11 +8895,14 @@
     }];
 }
 
-+ (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs 
+                      success:(void (^)(NSArray *roomIDs))success
+                      failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDeleteChatroom];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomIDs forKey:@"roomIDs"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:roomIDs] forKey:@"roomIDs"];
 
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -8904,13 +8966,14 @@
 }
 
 + (void)callAPIGetMessageDetails:(NSString *)messageID
-                     success:(void (^)(TAPMessageModel *message, NSArray <TapMessageRecipientModel *> *deliveredTo, NSArray <TapMessageRecipientModel *> *readBy))success
-                            failure:(void (^)(NSError *error))failure {
+                         success:(void (^)(TAPMessageModel *message, NSArray <TapMessageRecipientModel *> *deliveredTo, NSArray <TapMessageRecipientModel *> *readBy))success
+                         failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageDetails];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     
-    [parameterDictionary setObject:messageID forKey:@"messageID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:messageID] forKey:@"messageID"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9010,13 +9073,14 @@
 }
 
 + (void)callAPIGetMessageTotalRead:(NSString *)messageID
-                     success:(void (^)(NSInteger readCount))success
-                            failure:(void (^)(NSError *error))failure {
+                           success:(void (^)(NSInteger readCount))success
+                           failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetMessageTotalRead];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
     
-    [parameterDictionary setObject:messageID forKey:@"messageID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:messageID] forKey:@"messageID"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9182,11 +9246,15 @@
     }];
 }
 
-+ (void)callAPICreateScheduleMessage:(NSDictionary *)message scheduledTime:(NSNumber *)scheduledTime success:(void (^)(TAPMessageModel *scheduledMessage))success failure:(void (^)(NSError *error))failure {
++ (void)callAPICreateScheduleMessage:(NSDictionary *)message 
+                       scheduledTime:(NSNumber *)scheduledTime
+                             success:(void (^)(TAPMessageModel *scheduledMessage))success
+                             failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeCreateScheduleMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:message forKey:@"message"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyDictionary:message] forKey:@"message"];
     [parameterDictionary setObject:@(scheduledTime.longValue) forKey:@"scheduledTime"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -9250,11 +9318,14 @@
     }];
 }
 
-+ (void)callAPIGetScheduleMessage:(NSString *)roomID success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIGetScheduleMessage:(NSString *)roomID 
+                          success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success
+                          failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeGetScheduleMessages];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9333,12 +9404,16 @@
     }];
 }
 
-+ (void)callAPIScheduleMessageSendNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *scheduleIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIScheduleMessageSendNow:(NSArray<NSNumber *> *)scheduleIDs 
+                               roomID:(NSString *)roomID
+                              success:(void (^)(NSArray *scheduleIDs))success
+                              failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeScheduleMessageSendNow];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:scheduleIDs forKey:@"ids"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:scheduleIDs] forKey:@"ids"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9396,12 +9471,16 @@
     }];
 }
 
-+ (void)callAPIEditScheduleMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime success:(void (^)(BOOL isEditTimeSuccess))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIEditScheduleMessageTime:(NSNumber *)scheduleID 
+                         scheduledTime:(NSNumber *)scheduledTime
+                               success:(void (^)(BOOL isEditTimeSuccess))success
+                               failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeScheduleMessageEditTime];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:scheduleID forKey:@"id"];
-    [parameterDictionary setObject:scheduledTime forKey:@"scheduledTime"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:scheduleID] forKey:@"id"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:scheduledTime] forKey:@"scheduledTime"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9459,12 +9538,16 @@
     }];
 }
 
-+ (void)callAPIEditScheduleMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage success:(void (^)(BOOL isEditContentSuccess))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIEditScheduleMessageContent:(NSNumber *)scheduleID 
+                           updatedMessage:(TAPMessageModel *)updatedMessage
+                                  success:(void (^)(BOOL isEditContentSuccess))success
+                                  failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeEditScheduleMessageContent];
     NSDictionary *encyrptedMessage = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:updatedMessage];
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:scheduleID forKey:@"id"];
-    [parameterDictionary setObject:encyrptedMessage forKey:@"message"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyNumber:scheduleID] forKey:@"id"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyDictionary:encyrptedMessage] forKey:@"message"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9522,12 +9605,16 @@
     }];
 }
 
-+ (void)callAPIDeleteScheduleMessage:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *deletedIDs))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIDeleteScheduleMessage:(NSArray<NSNumber *> *)scheduleIDs 
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray *deletedIDs))success
+                             failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeDeleteScheduleMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:scheduleIDs forKey:@"ids"];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyArray:scheduleIDs] forKey:@"ids"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9586,14 +9673,20 @@
 }
 
 
-+ (void)callAPIReportUser:(NSString *)userID category:(NSString *)category isOtherCategory:(BOOL)isOtherCategory reason:(NSString *)reason success:(void (^)(BOOL iSsuccess))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIReportUser:(NSString *)userID 
+                 category:(NSString *)category
+          isOtherCategory:(BOOL)isOtherCategory
+                   reason:(NSString *)reason
+                  success:(void (^)(BOOL iSsuccess))success
+                  failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeReportUser];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
-    [parameterDictionary setObject:category forKey:@"category"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:category] forKey:@"category"];
     [parameterDictionary setObject:@(isOtherCategory) forKey:@"isOtherCategory"];
-    [parameterDictionary setObject:reason forKey:@"reason"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:reason] forKey:@"reason"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9655,15 +9748,22 @@
     }];
 }
 
-+ (void)callAPIReportMessage:(NSString *)messageID roomID:(NSString *)roomID category:(NSString *)category isOtherCategory:(BOOL)isOtherCategory reason:(NSString *)reason success:(void (^)(BOOL isSuccess))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIReportMessage:(NSString *)messageID 
+                      roomID:(NSString *)roomID
+                    category:(NSString *)category
+             isOtherCategory:(BOOL)isOtherCategory
+                      reason:(NSString *)reason
+                     success:(void (^)(BOOL isSuccess))success
+                     failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeReportMessage];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:messageID forKey:@"messageID"];
-    [parameterDictionary setObject:roomID forKey:@"roomID"];
-    [parameterDictionary setObject:category forKey:@"category"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:messageID] forKey:@"messageID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:roomID] forKey:@"roomID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:category] forKey:@"category"];
     [parameterDictionary setObject:@(isOtherCategory) forKey:@"isOtherCategory"];
-    [parameterDictionary setObject:reason forKey:@"reason"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:reason] forKey:@"reason"];
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -9726,11 +9826,14 @@
 }
 
 
-+ (void)callAPIBlockUser:(NSString *)userID success:(void (^)(TAPUserModel *blockedUser))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIBlockUser:(NSString *)userID 
+                 success:(void (^)(TAPUserModel *blockedUser))success
+                 failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeBlockUser];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
 
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
@@ -9792,11 +9895,14 @@
     }];
 }
 
-+ (void)callAPIUnblockUser:(NSString *)userID success:(void (^)(BOOL isSuccess))success failure:(void (^)(NSError *error))failure {
++ (void)callAPIUnblockUser:(NSString *)userID 
+                   success:(void (^)(BOOL isSuccess))success
+                   failure:(void (^)(NSError *error))failure {
+    
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeUnblockUser];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    [parameterDictionary setObject:userID forKey:@"userID"];
+    [parameterDictionary setObject:[TAPUtil nullToEmptyString:userID] forKey:@"userID"];
 
 
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {

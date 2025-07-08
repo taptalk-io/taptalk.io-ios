@@ -233,10 +233,9 @@
         self.selectedContactsCollectionView.showsHorizontalScrollIndicator = NO;
         [self.selectedContactsView addSubview:self.selectedContactsCollectionView];
         
-        _createButtonView = [[TAPCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame), 44.0f)];
-        [self.createButtonView setCustomButtonViewType:TAPCustomButtonViewTypeActive];
-        [self.createButtonView setCustomButtonViewStyleType:TAPCustomButtonViewStyleTypePlain];
-        [self.createButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
+        _createButtonView = [[TapHighlightCustomButtonView alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.selectedContactsCollectionView.frame) + 16.0f, CGRectGetWidth(self.selectedContactsView.frame) - 32.0f, 44.0f)];
+        [self.createButtonView setType:TapHighlightCustomButtonViewTypeDefaultGradient];
+        [self.createButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Continue", nil, [TAPUtil currentBundle], @"")];
         [self.selectedContactsView addSubview:self.createButtonView];
         
 //        TAPStyleModel *buttonLabelStyle = [[TAPStyleManager sharedManager] getComponentStyleForType:TAPComponentStyleButtonLabel];
@@ -303,7 +302,7 @@
         self.selectedContactsShadowView.alpha = 0.0f;
         self.selectedContactsView.backgroundColor = [UIColor clearColor];
         self.selectedContactsTitleLabel.alpha = 0.0f;
-        [self.createButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Update", nil, [TAPUtil currentBundle], @"")];
+        [self.createButtonView setLabelText:NSLocalizedStringFromTableInBundle(@"Update", nil, [TAPUtil currentBundle], @"")];
     }
 }
 
