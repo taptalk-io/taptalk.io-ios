@@ -35,42 +35,33 @@ class AutocompleteBaseViewController: UIViewController {
     return photoView
   }()
 
+  var autocompleteConfiguration: AutocompleteConfiguration?
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    view.backgroundColor = .white
+    if #available(iOS 13.0, *) {
+      view.backgroundColor = .systemBackground
+    } else {
+      view.backgroundColor = .white
+    }
     view.addSubview(textView)
     textView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(pagingPhotoView)
     pagingPhotoView.translatesAutoresizingMaskIntoConstraints = false
-    if #available(iOS 11, *) {
-      let guide = view.safeAreaLayoutGuide
-      NSLayoutConstraint.activate([
-        textView.topAnchor.constraint(equalTo: guide.topAnchor),
-        textView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
-        textView.leftAnchor.constraint(equalTo: guide.leftAnchor),
-        textView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
-      ])
-      NSLayoutConstraint.activate([
-        pagingPhotoView.topAnchor.constraint(equalTo: guide.topAnchor),
-        pagingPhotoView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
-        pagingPhotoView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
-        pagingPhotoView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        textView.topAnchor.constraint(equalTo: view.topAnchor),
-        textView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        textView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      ])
-      NSLayoutConstraint.activate([
-        pagingPhotoView.topAnchor.constraint(equalTo: view.topAnchor),
-        pagingPhotoView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        pagingPhotoView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        pagingPhotoView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      ])
-    }
+    let guide = view.safeAreaLayoutGuide
+    NSLayoutConstraint.activate([
+      textView.topAnchor.constraint(equalTo: guide.topAnchor),
+      textView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
+      textView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+      textView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+    ])
+    NSLayoutConstraint.activate([
+      pagingPhotoView.topAnchor.constraint(equalTo: guide.topAnchor),
+      pagingPhotoView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
+      pagingPhotoView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+      pagingPhotoView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+    ])
   }
 
   @objc func showPhotos() {
@@ -86,6 +77,10 @@ class AutocompleteBaseViewController: UIViewController {
     if let attributions = place.attributions {
       text.append(NSAttributedString(string: "\n\n"))
       text.append(attributions)
+    }
+
+    if #available(iOS 13.0, *) {
+      text.addAttribute(.foregroundColor, value: UIColor.label, range: NSMakeRange(0, text.length))
     }
     textView.attributedText = text
     textView.isHidden = false
@@ -106,6 +101,13 @@ class AutocompleteBaseViewController: UIViewController {
     textView.text = NSLocalizedString(
       "Demo.Content.Autocomplete.WasCanceledMessage",
       comment: "String for 'autocomplete canceled message'")
+  }
+
+  override func viewWillTransition(
+    to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator
+  ) {
+    super.viewWillTransition(to: size, with: coordinator)
+    pagingPhotoView.shouldRedraw = true
   }
 }
 

@@ -54,6 +54,7 @@
 #import "TAPSecondaryChatViewController.h"
 #import "TAPOverlayChatRoomView.h"
 #import "TAPSetupRoomListView.h"
+#import "TapHighlightCustomButtonView.h"
 
 #import <LinkPresentation/LPMetadataProvider.h>
 #import <LinkPresentation/LPLinkMetadata.h>

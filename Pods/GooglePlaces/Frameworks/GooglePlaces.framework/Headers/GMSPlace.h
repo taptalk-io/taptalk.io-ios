@@ -9,13 +9,14 @@
 //
 
 #import <CoreLocation/CoreLocation.h>
+#import <UIKit/UIKit.h>
 
 #import "GMSPlacesDeprecationUtils.h"
 
 @class GMSAddressComponent;
-@class GMSCoordinateBounds;
 @class GMSOpeningHours;
 @class GMSPlacePhotoMetadata;
+@class GMSPlaceViewportInfo;
 @class GMSPlusCode;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -154,7 +155,7 @@ typedef NS_ENUM(NSInteger, GMSPlacesBusinessStatus) {
  * |GMSPlace| object representing a store may have a relatively small viewport, while a |GMSPlace|
  * object representing a country may have a very large viewport.
  */
-@property(nonatomic, strong, readonly, nullable) GMSCoordinateBounds *viewport;
+@property(nonatomic, strong, readonly, nullable) GMSPlaceViewportInfo *viewportInfo;
 
 /**
  * An array of |GMSAddressComponent| objects representing the components in the place's address.
@@ -219,6 +220,18 @@ typedef NS_ENUM(NSInteger, GMSPlacesBusinessStatus) {
  *     closed, and GMSPlaceOpenStatusUnknown if the open status is unknown.
  */
 - (GMSPlaceOpenStatus)isOpen;
+
+/**
+ * Background color of the icon according to Place type, to color the view behind the icon.
+ */
+@property(nonatomic, readonly, nullable) UIColor *iconBackgroundColor;
+
+/**
+ * The URL according to Place type, which you can use to retrieve the NSData of the Place icon.
+ * NOTES: URL link does not expire and the image size aspect ratio may be different depending on
+ * type.
+ */
+@property(nonatomic, readonly, nullable) NSURL *iconImageURL;
 
 @end
 

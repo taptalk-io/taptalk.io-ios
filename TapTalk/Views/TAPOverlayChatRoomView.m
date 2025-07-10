@@ -6,6 +6,7 @@
 //
 
 #import "TAPOverlayChatRoomView.h"
+#import "TapHighlightCustomButtonView.h"
 
 @interface TAPOverlayChatRoomView ()
 @property (strong, nonatomic) UIButton *backgroundButton;

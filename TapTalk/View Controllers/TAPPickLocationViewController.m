@@ -9,6 +9,7 @@
 #import "TAPPickLocationViewController.h"
 #import "TAPPickLocationView.h"
 #import "TAPPinLocationSearchResultTableViewCell.h"
+#import "TapHighlightCustomButtonView.h"
 #import <MapKit/MapKit.h>
 #import <Contacts/CNPostalAddressFormatter.h>
 

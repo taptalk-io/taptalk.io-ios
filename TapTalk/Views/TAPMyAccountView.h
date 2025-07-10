@@ -12,6 +12,7 @@
 #import "TAPImageView.h"
 #import "TAPCustomLabelView.h"
 #import "TAPCustomGrowingTextView.h"
+#import "TapHighlightCustomButtonView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

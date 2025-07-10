@@ -8,6 +8,7 @@
 
 #import "TAPBaseView.h"
 #import "TAPCustomButtonView.h"
+#import "TapHighlightCustomButtonView.h"
 
 typedef NS_ENUM(NSInteger, TAPCreateGroupViewType) {
     TAPCreateGroupViewTypeDefault = 0,

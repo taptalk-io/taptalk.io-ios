@@ -1,6 +1,0 @@
-framework module Pods_TapTalk {
-  umbrella header "Pods-TapTalk-umbrella.h"
-
-  export *
-  module * { export * }
-}

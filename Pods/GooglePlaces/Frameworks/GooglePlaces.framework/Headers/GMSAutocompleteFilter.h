@@ -31,7 +31,7 @@ typedef NS_ENUM(NSInteger, GMSPlacesAutocompleteTypeFilter) {
    */
   kGMSPlacesAutocompleteTypeFilterNoFilter,
   /**
-   * Geeocoding results, as opposed to business results.
+   * Geocoding results, as opposed to business results.
    */
   kGMSPlacesAutocompleteTypeFilterGeocode,
   /**
@@ -91,7 +91,7 @@ typedef NS_ENUM(NSInteger, GMSPlacesAutocompleteTypeFilter) {
 @property(nonatomic, copy, nullable) NSArray<NSString *> *countries;
 
 /**
- * The staight line distance origin location for measuring the straight line distance between the
+ * The straight line distance origin location for measuring the straight line distance between the
  * origin location and autocomplete predictions.
  */
 @property(nonatomic, nullable) CLLocation *origin;

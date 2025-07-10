@@ -7,6 +7,7 @@
 //
 
 #import "TAPBaseView.h"
+#import "TapHighlightCustomButtonView.h"
 #import <AVFoundation/AVFoundation.h>
 
 typedef NS_ENUM(NSInteger, ScanQRCodeViewType) {

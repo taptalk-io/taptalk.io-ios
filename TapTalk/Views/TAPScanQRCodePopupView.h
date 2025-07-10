@@ -8,6 +8,7 @@
 
 #import "TAPBaseView.h"
 #import "TAPUserModel.h"
+#import "TapHighlightCustomButtonView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

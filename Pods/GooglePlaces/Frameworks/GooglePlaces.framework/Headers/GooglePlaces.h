@@ -16,6 +16,7 @@
 #import "GMSPlacePhotoMetadata.h"
 #import "GMSPlacePhotoMetadataList.h"
 #import "GMSPlaceTypes.h"
+#import "GMSPlaceViewportInfo.h"
 #import "GMSPlacesClient.h"
 #import "GMSPlacesDeprecationUtils.h"
 #import "GMSPlacesErrors.h"

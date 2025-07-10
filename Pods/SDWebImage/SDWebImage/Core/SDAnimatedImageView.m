@@ -15,6 +15,70 @@
 #import "SDInternalMacros.h"
 #import "objc/runtime.h"
 
+// A wrapper to implements the transformer on animated image, like tint color
+@interface SDAnimatedImageFrameProvider : NSObject <SDAnimatedImageProvider>
+@property (nonatomic, strong) id<SDAnimatedImageProvider> provider;
+@property (nonatomic, strong) id<SDImageTransformer> transformer;
+@end
+
+@implementation SDAnimatedImageFrameProvider
+
+- (instancetype)initWithProvider:(id<SDAnimatedImageProvider>)provider transformer:(id<SDImageTransformer>)transformer {
+    self = [super init];
+    if (self) {
+        _provider = provider;
+        _transformer = transformer;
+    }
+    return self;
+}
+
+- (NSUInteger)hash {
+    NSUInteger prime = 31;
+    NSUInteger result = 1;
+    NSUInteger providerHash = self.provider.hash;
+    NSUInteger transformerHash = self.transformer.transformerKey.hash;
+    result = prime * result + providerHash;
+    result = prime * result + transformerHash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)object {
+    if (nil == object) {
+      return NO;
+    }
+    if (self == object) {
+      return YES;
+    }
+    if (![object isKindOfClass:[self class]]) {
+      return NO;
+    }
+    return self.provider == [object provider]
+    && [self.transformer.transformerKey isEqualToString:[object transformer].transformerKey];
+}
+
+- (NSData *)animatedImageData {
+    return self.provider.animatedImageData;
+}
+
+- (NSUInteger)animatedImageFrameCount {
+    return self.provider.animatedImageFrameCount;
+}
+
+- (NSUInteger)animatedImageLoopCount {
+    return self.provider.animatedImageLoopCount;
+}
+
+- (NSTimeInterval)animatedImageDurationAtIndex:(NSUInteger)index {
+    return [self.provider animatedImageDurationAtIndex:index];
+}
+
+- (UIImage *)animatedImageFrameAtIndex:(NSUInteger)index {
+    UIImage *frame = [self.provider animatedImageFrameAtIndex:index];
+    return [self.transformer transformedImageWithImage:frame forKey:@""];
+}
+
+@end
+
 @interface UIImageView () <CALayerDelegate>
 @end
 
@@ -129,17 +193,24 @@
     
     // We need call super method to keep function. This will impliedly call `setNeedsDisplay`. But we have no way to avoid this when using animated image. So we call `setNeedsDisplay` again at the end.
     super.image = image;
-    if ([image.class conformsToProtocol:@protocol(SDAnimatedImage)]) {
+    if ([image.class conformsToProtocol:@protocol(SDAnimatedImage)] && [(id<SDAnimatedImage>)image animatedImageFrameCount] > 1) {
         if (!self.player) {
             id<SDAnimatedImageProvider> provider;
             // Check progressive loading
             if (self.isProgressive) {
-                provider = [self progressiveAnimatedCoderForImage:image];
+                provider = [(id<SDAnimatedImage>)image animatedCoder];
             } else {
                 provider = (id<SDAnimatedImage>)image;
             }
             // Create animated player
-            self.player = [SDAnimatedImagePlayer playerWithProvider:provider];
+            if (self.animationTransformer) {
+                // Check if post-transform animation available
+                provider = [[SDAnimatedImageFrameProvider alloc] initWithProvider:provider transformer:self.animationTransformer];
+                self.player = [SDAnimatedImagePlayer playerWithProvider:provider];
+            } else {
+                // Normal animation without post-transform
+                self.player = [SDAnimatedImagePlayer playerWithProvider:provider];
+            }
         } else {
             // Update Frame Count
             self.player.totalFrameCount = [(id<SDAnimatedImage>)image animatedImageFrameCount];
@@ -192,9 +263,8 @@
         
         [self stopAnimating];
         [self checkPlay];
-
-        [self.imageViewLayer setNeedsDisplay];
     }
+    [self.imageViewLayer setNeedsDisplay];
 }
 
 #pragma mark - Configuration
@@ -472,7 +542,7 @@
 {
     if ([image.class conformsToProtocol:@protocol(SDAnimatedImage)] && image.sd_isIncremental && [image respondsToSelector:@selector(animatedCoder)]) {
         id<SDAnimatedImageCoder> animatedCoder = [(id<SDAnimatedImage>)image animatedCoder];
-        if ([animatedCoder conformsToProtocol:@protocol(SDProgressiveImageCoder)]) {
+        if ([animatedCoder respondsToSelector:@selector(initIncrementalWithOptions:)]) {
             return (id<SDAnimatedImageCoder, SDProgressiveImageCoder>)animatedCoder;
         }
     }
@@ -493,9 +563,25 @@
         // If we have no animation frames, call super implementation. iOS 14+ UIImageView use this delegate method for rendering.
         if ([UIImageView instancesRespondToSelector:@selector(displayLayer:)]) {
             [super displayLayer:layer];
+        } else {
+            // Fallback to implements the static image rendering by ourselves (like macOS or before iOS 14)
+            currentFrame = super.image;
+            layer.contentsScale = currentFrame.scale;
+            layer.contents = (__bridge id)currentFrame.CGImage;
         }
     }
 }
+
+#if SD_UIKIT
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    // See: #3635
+    // From iOS 17, when UIImageView entering the background, it will receive the trait collection changes, and modify the CALayer.contents by `self.image.CGImage`
+    // However, For animated image, `self.image.CGImge != self.currentFrame.CGImage`, right ?
+    // So this cause the render issue, we need to reset the CALayer.contents again
+    [super traitCollectionDidChange:previousTraitCollection];
+    [self.imageViewLayer setNeedsDisplay];
+}
+#endif
 
 #if SD_MAC
 // NSImageView use a subview. We need this subview's layer for actual rendering.
