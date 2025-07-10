@@ -50,7 +50,7 @@ static const CGFloat kEdgeBuffer = 8;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-  // Clear the title to make room for next view to share the header space in splitsreen view.
+  // Clear the title to make room for next view to share the header space in splitscreen view.
   self.title = nil;
   [super viewWillDisappear:animated];
 }
@@ -86,7 +86,7 @@ static const CGFloat kEdgeBuffer = 8;
 - (void)showDemo:(Demo *)demo {
   CLLocationCoordinate2D northEast = kCLLocationCoordinate2DInvalid;
   CLLocationCoordinate2D southWest = kCLLocationCoordinate2DInvalid;
-  GMSAutocompleteFilter *autocompleteFilter = [self autcompleteFilter];
+  GMSAutocompleteFilter *autocompleteFilter = [self autocompleteFilter];
 
   // Check for restriction bounds settings.
   if (_restrictionBoundsMap[@"Kansas"].on) {
@@ -129,7 +129,7 @@ static const CGFloat kEdgeBuffer = 8;
 
   // Add heading for the autocomplete type filters.
   _nextSelectionYPos = [UIApplication sharedApplication].statusBarFrame.size.height;
-  [scrollView addSubview:[self headerLabelForTitle:@"Autcomplete Filters"]];
+  [scrollView addSubview:[self headerLabelForTitle:@"Autocomplete Filters"]];
 
   // Set up the individual autocomplete type filters we can limit the results to.
   // Add a heading for the place fields that we can request.
@@ -142,7 +142,7 @@ static const CGFloat kEdgeBuffer = 8;
   }
 
   // Add heading for the autocomplete restriction bounds.
-  [scrollView addSubview:[self headerLabelForTitle:@"Autcomplete Restriction Bounds"]];
+  [scrollView addSubview:[self headerLabelForTitle:@"Autocomplete Restriction Bounds"]];
 
   // Set up the restriction bounds for testing purposes.
   _nextSelectionYPos += kSelectionHeight;
@@ -157,11 +157,10 @@ static const CGFloat kEdgeBuffer = 8;
 
   // Set up the individual place fields that we can request.
   _nextSelectionYPos += kSelectionHeight;
-  for (NSUInteger placeField = GMSPlaceFieldName; placeField <= GMSPlaceFieldBusinessStatus;
+  for (NSUInteger placeField = GMSPlaceFieldName; placeField <= GMSPlaceFieldIconBackgroundColor;
        placeField <<= 1) {
     [scrollView addSubview:[self selectionButtonForPlaceField:(GMSPlaceField)placeField]];
   }
-
 
   // Add the close button to dismiss the selection UI.
   UIButton *close =
@@ -248,6 +247,8 @@ static const CGFloat kEdgeBuffer = 8;
     @(GMSPlaceFieldPhotos) : @"Photos",
     @(GMSPlaceFieldUTCOffsetMinutes) : @"UTC Offset Minutes",
     @(GMSPlaceFieldBusinessStatus) : @"Business Status",
+    @(GMSPlaceFieldIconImageURL) : @"Icon Image URL",
+    @(GMSPlaceFieldIconBackgroundColor) : @"Icon Background Color",
   };
   UIButton *selectionButton = [self selectionButtonForTitle:fieldsMapping[@(placeField)]];
   UISwitch *selectionSwitch = [self switchFromButton:selectionButton];
@@ -341,7 +342,7 @@ static const CGFloat kEdgeBuffer = 8;
   [_editSelectionsViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (GMSAutocompleteFilter *)autcompleteFilter {
+- (GMSAutocompleteFilter *)autocompleteFilter {
   GMSAutocompleteFilter *filter = [[GMSAutocompleteFilter alloc] init];
   for (NSNumber *number in _autocompleteFiltersSelectionMap) {
     UISwitch *selectionSwitch = _autocompleteFiltersSelectionMap[number];
@@ -365,13 +366,8 @@ static const CGFloat kEdgeBuffer = 8;
 }
 
 - (CGFloat)horizontalInset {
-#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
   // Take into account the safe areas of the device screen and do not use that space.
-  if (@available(iOS 11.0, *)) {
-    return MAX(self.view.safeAreaInsets.left, self.view.safeAreaInsets.right) + kEdgeBuffer;
-  }
-#endif
-  return kEdgeBuffer;
+  return MAX(self.view.safeAreaInsets.left, self.view.safeAreaInsets.right) + kEdgeBuffer;
 }
 
 #pragma mark - UITableViewDataSource/Delegate

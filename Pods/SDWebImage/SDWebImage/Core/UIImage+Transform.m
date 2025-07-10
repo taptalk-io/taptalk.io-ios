@@ -11,6 +11,7 @@
 #import "SDImageGraphics.h"
 #import "SDGraphicsImageRenderer.h"
 #import "NSBezierPath+SDRoundedCorners.h"
+#import "SDInternalMacros.h"
 #import <Accelerate/Accelerate.h>
 #if SD_UIKIT || SD_MAC
 #import <CoreImage/CoreImage.h>
@@ -57,7 +58,98 @@ static inline CGRect SDCGRectFitWithScaleMode(CGRect rect, CGSize size, SDImageS
     return rect;
 }
 
-static inline UIColor * SDGetColorFromPixel(Pixel_8888 pixel, CGBitmapInfo bitmapInfo) {
+static inline UIColor * SDGetColorFromGrayscale(Pixel_88 pixel, CGBitmapInfo bitmapInfo, CGColorSpaceRef cgColorSpace) {
+    // Get alpha info, byteOrder info
+    CGImageAlphaInfo alphaInfo = bitmapInfo & kCGBitmapAlphaInfoMask;
+    CGBitmapInfo byteOrderInfo = bitmapInfo & kCGBitmapByteOrderMask;
+    CGFloat w = 0, a = 1;
+    
+    BOOL byteOrderNormal = NO;
+    switch (byteOrderInfo) {
+        case kCGBitmapByteOrderDefault: {
+            byteOrderNormal = YES;
+        } break;
+        case kCGBitmapByteOrder16Little:
+        case kCGBitmapByteOrder32Little: {
+        } break;
+        case kCGBitmapByteOrder16Big:
+        case kCGBitmapByteOrder32Big: {
+            byteOrderNormal = YES;
+        } break;
+        default: break;
+    }
+    switch (alphaInfo) {
+        case kCGImageAlphaPremultipliedFirst:
+        case kCGImageAlphaFirst: {
+            if (byteOrderNormal) {
+                // AW
+                a = pixel[0] / 255.0;
+                w = pixel[1] / 255.0;
+            } else {
+                // WA
+                w = pixel[0] / 255.0;
+                a = pixel[1] / 255.0;
+            }
+        }
+            break;
+        case kCGImageAlphaPremultipliedLast:
+        case kCGImageAlphaLast: {
+            if (byteOrderNormal) {
+                // WA
+                w = pixel[0] / 255.0;
+                a = pixel[1] / 255.0;
+            } else {
+                // AW
+                a = pixel[0] / 255.0;
+                w = pixel[1] / 255.0;
+            }
+        }
+            break;
+        case kCGImageAlphaNone: {
+            // W
+            w = pixel[0] / 255.0;
+        }
+            break;
+        case kCGImageAlphaNoneSkipLast: {
+            if (byteOrderNormal) {
+                // WX
+                w = pixel[0] / 255.0;
+            } else {
+                // XW
+                a = pixel[1] / 255.0;
+            }
+        }
+            break;
+        case kCGImageAlphaNoneSkipFirst: {
+            if (byteOrderNormal) {
+                // XW
+                a = pixel[1] / 255.0;
+            } else {
+                // WX
+                a = pixel[0] / 255.0;
+            }
+        }
+            break;
+        case kCGImageAlphaOnly: {
+            // A
+            a = pixel[0] / 255.0;
+        }
+            break;
+        default:
+            break;
+    }
+#if SD_MAC
+    // Mac supports ColorSync, to ensure the same bahvior, we convert color to sRGB
+    NSColorSpace *colorSpace = [[NSColorSpace alloc] initWithCGColorSpace:cgColorSpace];
+    CGFloat components[2] = {w, a};
+    NSColor *color = [NSColor colorWithColorSpace:colorSpace components:components count:2];
+    return [color colorUsingColorSpace:NSColorSpace.genericGamma22GrayColorSpace];
+#else
+    return [UIColor colorWithWhite:w alpha:a];
+#endif
+}
+
+static inline UIColor * SDGetColorFromRGBA8(Pixel_8888 pixel, CGBitmapInfo bitmapInfo, CGColorSpaceRef cgColorSpace) {
     // Get alpha info, byteOrder info
     CGImageAlphaInfo alphaInfo = bitmapInfo & kCGBitmapAlphaInfoMask;
     CGBitmapInfo byteOrderInfo = bitmapInfo & kCGBitmapByteOrderMask;
@@ -68,15 +160,42 @@ static inline UIColor * SDGetColorFromPixel(Pixel_8888 pixel, CGBitmapInfo bitma
         case kCGBitmapByteOrderDefault: {
             byteOrderNormal = YES;
         } break;
+        case kCGBitmapByteOrder16Little:
         case kCGBitmapByteOrder32Little: {
         } break;
+        case kCGBitmapByteOrder16Big:
         case kCGBitmapByteOrder32Big: {
             byteOrderNormal = YES;
         } break;
         default: break;
     }
     switch (alphaInfo) {
-        case kCGImageAlphaPremultipliedFirst:
+        case kCGImageAlphaPremultipliedFirst: {
+            if (byteOrderNormal) {
+                // ARGB8888-premultiplied
+                a = pixel[0] / 255.0;
+                r = pixel[1] / 255.0;
+                g = pixel[2] / 255.0;
+                b = pixel[3] / 255.0;
+                if (a > 0) {
+                    r /= a;
+                    g /= a;
+                    b /= a;
+                }
+            } else {
+                // BGRA8888-premultiplied
+                b = pixel[0] / 255.0;
+                g = pixel[1] / 255.0;
+                r = pixel[2] / 255.0;
+                a = pixel[3] / 255.0;
+                if (a > 0) {
+                    r /= a;
+                    g /= a;
+                    b /= a;
+                }
+            }
+            break;
+        }
         case kCGImageAlphaFirst: {
             if (byteOrderNormal) {
                 // ARGB8888
@@ -93,7 +212,32 @@ static inline UIColor * SDGetColorFromPixel(Pixel_8888 pixel, CGBitmapInfo bitma
             }
         }
             break;
-        case kCGImageAlphaPremultipliedLast:
+        case kCGImageAlphaPremultipliedLast: {
+            if (byteOrderNormal) {
+                // RGBA8888-premultiplied
+                r = pixel[0] / 255.0;
+                g = pixel[1] / 255.0;
+                b = pixel[2] / 255.0;
+                a = pixel[3] / 255.0;
+                if (a > 0) {
+                    r /= a;
+                    g /= a;
+                    b /= a;
+                }
+            } else {
+                // ABGR8888-premultiplied
+                a = pixel[0] / 255.0;
+                b = pixel[1] / 255.0;
+                g = pixel[2] / 255.0;
+                r = pixel[3] / 255.0;
+                if (a > 0) {
+                    r /= a;
+                    g /= a;
+                    b /= a;
+                }
+            }
+            break;
+        }
         case kCGImageAlphaLast: {
             if (byteOrderNormal) {
                 // RGBA8888
@@ -160,8 +304,15 @@ static inline UIColor * SDGetColorFromPixel(Pixel_8888 pixel, CGBitmapInfo bitma
         default:
             break;
     }
-    
+#if SD_MAC
+    // Mac supports ColorSync, to ensure the same bahvior, we convert color to sRGB
+    NSColorSpace *colorSpace = [[NSColorSpace alloc] initWithCGColorSpace:cgColorSpace];
+    CGFloat components[4] = {r, g, b, a};
+    NSColor *color = [NSColor colorWithColorSpace:colorSpace components:components count:4];
+    return [color colorUsingColorSpace:NSColorSpace.sRGBColorSpace];
+#else
     return [UIColor colorWithRed:r green:g blue:b alpha:a];
+#endif
 }
 
 #if SD_UIKIT || SD_MAC
@@ -385,37 +536,185 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
 
 #pragma mark - Image Blending
 
+#if SD_UIKIT || SD_MAC
+static NSString * _Nullable SDGetCIFilterNameFromBlendMode(CGBlendMode blendMode) {
+    // CGBlendMode: https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_images/dq_images.html#//apple_ref/doc/uid/TP30001066-CH212-CJBIJEFG
+    // CIFilter: https://developer.apple.com/library/archive/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html#//apple_ref/doc/uid/TP30000136-SW71
+    NSString *filterName;
+    switch (blendMode) {
+        case kCGBlendModeMultiply:
+            filterName = @"CIMultiplyBlendMode";
+            break;
+        case kCGBlendModeScreen:
+            filterName = @"CIScreenBlendMode";
+            break;
+        case kCGBlendModeOverlay:
+            filterName = @"CIOverlayBlendMode";
+            break;
+        case kCGBlendModeDarken:
+            filterName = @"CIDarkenBlendMode";
+            break;
+        case kCGBlendModeLighten:
+            filterName = @"CILightenBlendMode";
+            break;
+        case kCGBlendModeColorDodge:
+            filterName = @"CIColorDodgeBlendMode";
+            break;
+        case kCGBlendModeColorBurn:
+            filterName = @"CIColorBurnBlendMode";
+            break;
+        case kCGBlendModeSoftLight:
+            filterName = @"CISoftLightBlendMode";
+            break;
+        case kCGBlendModeHardLight:
+            filterName = @"CIHardLightBlendMode";
+            break;
+        case kCGBlendModeDifference:
+            filterName = @"CIDifferenceBlendMode";
+            break;
+        case kCGBlendModeExclusion:
+            filterName = @"CIExclusionBlendMode";
+            break;
+        case kCGBlendModeHue:
+            filterName = @"CIHueBlendMode";
+            break;
+        case kCGBlendModeSaturation:
+            filterName = @"CISaturationBlendMode";
+            break;
+        case kCGBlendModeColor:
+            // Color blend mode uses the luminance values of the background with the hue and saturation values of the source image.
+            filterName = @"CIColorBlendMode";
+            break;
+        case kCGBlendModeLuminosity:
+            filterName = @"CILuminosityBlendMode";
+            break;
+            
+        // macOS 10.5+
+        case kCGBlendModeSourceAtop:
+        case kCGBlendModeDestinationAtop:
+            filterName = @"CISourceAtopCompositing";
+            break;
+        case kCGBlendModeSourceIn:
+        case kCGBlendModeDestinationIn:
+            filterName = @"CISourceInCompositing";
+            break;
+        case kCGBlendModeSourceOut:
+        case kCGBlendModeDestinationOut:
+            filterName = @"CISourceOutCompositing";
+            break;
+        case kCGBlendModeNormal: // SourceOver
+        case kCGBlendModeDestinationOver:
+            filterName = @"CISourceOverCompositing";
+            break;
+        
+        // need special handling
+        case kCGBlendModeClear:
+            // use clear color instead
+            break;
+        case kCGBlendModeCopy:
+            // use input color instead
+            break;
+        case kCGBlendModeXOR:
+            // unsupported
+            break;
+        case kCGBlendModePlusDarker:
+            // chain filters
+            break;
+        case kCGBlendModePlusLighter:
+            // chain filters
+            break;
+    }
+    return filterName;
+}
+#endif
+
 - (nullable UIImage *)sd_tintedImageWithColor:(nonnull UIColor *)tintColor {
+    return [self sd_tintedImageWithColor:tintColor blendMode:kCGBlendModeSourceIn];
+}
+
+- (nullable UIImage *)sd_tintedImageWithColor:(nonnull UIColor *)tintColor blendMode:(CGBlendMode)blendMode {
     BOOL hasTint = CGColorGetAlpha(tintColor.CGColor) > __FLT_EPSILON__;
     if (!hasTint) {
         return self;
     }
     
+    // blend mode, see https://en.wikipedia.org/wiki/Alpha_compositing
 #if SD_UIKIT || SD_MAC
     // CIImage shortcut
-    if (self.CIImage) {
-        CIImage *ciImage = self.CIImage;
+    CIImage *ciImage = self.CIImage;
+    if (ciImage) {
         CIImage *colorImage = [CIImage imageWithColor:[[CIColor alloc] initWithColor:tintColor]];
         colorImage = [colorImage imageByCroppingToRect:ciImage.extent];
-        CIFilter *filter = [CIFilter filterWithName:@"CISourceAtopCompositing"];
-        [filter setValue:colorImage forKey:kCIInputImageKey];
-        [filter setValue:ciImage forKey:kCIInputBackgroundImageKey];
-        ciImage = filter.outputImage;
+        NSString *filterName = SDGetCIFilterNameFromBlendMode(blendMode);
+        // Some blend mode is not nativelly supported
+        if (filterName) {
+            CIFilter *filter = [CIFilter filterWithName:filterName];
+            [filter setValue:colorImage forKey:kCIInputImageKey];
+            [filter setValue:ciImage forKey:kCIInputBackgroundImageKey];
+            ciImage = filter.outputImage;
+        } else {
+            if (blendMode == kCGBlendModeClear) {
+                // R = 0
+                CIColor *clearColor;
+                if (@available(iOS 10.0, macOS 10.12, tvOS 10.0, *)) {
+                    clearColor = CIColor.clearColor;
+                } else {
+                    clearColor = [[CIColor alloc] initWithColor:UIColor.clearColor];
+                }
+                colorImage = [CIImage imageWithColor:clearColor];
+                colorImage = [colorImage imageByCroppingToRect:ciImage.extent];
+                ciImage = colorImage;
+            } else if (blendMode == kCGBlendModeCopy) {
+                // R = S
+                ciImage = colorImage;
+            } else if (blendMode == kCGBlendModePlusLighter) {
+                // R = MIN(1, S + D)
+                // S + D
+                CIFilter *filter = [CIFilter filterWithName:@"CIAdditionCompositing"];
+                [filter setValue:colorImage forKey:kCIInputImageKey];
+                [filter setValue:ciImage forKey:kCIInputBackgroundImageKey];
+                ciImage = filter.outputImage;
+                // MIN
+                ciImage = [ciImage imageByApplyingFilter:@"CIColorClamp" withInputParameters:nil];
+            } else if (blendMode == kCGBlendModePlusDarker) {
+                // R = MAX(0, (1 - D) + (1 - S))
+                // (1 - D)
+                CIFilter *filter1 = [CIFilter filterWithName:@"CIColorControls"];
+                [filter1 setValue:ciImage forKey:kCIInputImageKey];
+                [filter1 setValue:@(-0.5) forKey:kCIInputBrightnessKey];
+                ciImage = filter1.outputImage;
+                // (1 - S)
+                CIFilter *filter2 = [CIFilter filterWithName:@"CIColorControls"];
+                [filter2 setValue:colorImage forKey:kCIInputImageKey];
+                [filter2 setValue:@(-0.5) forKey:kCIInputBrightnessKey];
+                colorImage = filter2.outputImage;
+                // +
+                CIFilter *filter = [CIFilter filterWithName:@"CIAdditionCompositing"];
+                [filter setValue:colorImage forKey:kCIInputImageKey];
+                [filter setValue:ciImage forKey:kCIInputBackgroundImageKey];
+                ciImage = filter.outputImage;
+                // MAX
+                ciImage = [ciImage imageByApplyingFilter:@"CIColorClamp" withInputParameters:nil];
+            } else {
+                SD_LOG("UIImage+Transform error: Unsupported blend mode: %d", blendMode);
+                ciImage = nil;
+            }
+        }
+        
+        if (ciImage) {
 #if SD_UIKIT
         UIImage *image = [UIImage imageWithCIImage:ciImage scale:self.scale orientation:self.imageOrientation];
 #else
         UIImage *image = [[UIImage alloc] initWithCIImage:ciImage scale:self.scale orientation:kCGImagePropertyOrientationUp];
 #endif
         return image;
+        }
     }
 #endif
     
     CGSize size = self.size;
     CGRect rect = { CGPointZero, size };
     CGFloat scale = self.scale;
-    
-    // blend mode, see https://en.wikipedia.org/wiki/Alpha_compositing
-    CGBlendMode blendMode = kCGBlendModeSourceAtop;
     
     SDGraphicsImageRendererFormat *format = [[SDGraphicsImageRendererFormat alloc] init];
     format.scale = scale;
@@ -446,11 +745,26 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
     }
     
     // Check point
-    CGFloat width = CGImageGetWidth(imageRef);
-    CGFloat height = CGImageGetHeight(imageRef);
-    if (point.x < 0 || point.y < 0 || point.x >= width || point.y >= height) {
+    size_t width = CGImageGetWidth(imageRef);
+    size_t height = CGImageGetHeight(imageRef);
+    size_t x = point.x;
+    size_t y = point.y;
+    if (x < 0 || y < 0 || x >= width || y >= height) {
         CGImageRelease(imageRef);
         return nil;
+    }
+    
+    // Check pixel format
+    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(imageRef);
+    size_t bitsPerComponent = CGImageGetBitsPerComponent(imageRef);
+    if (@available(iOS 12.0, tvOS 12.0, macOS 10.14, watchOS 5.0, *)) {
+        CGImagePixelFormatInfo pixelFormat = (bitmapInfo & kCGImagePixelFormatMask);
+        if (pixelFormat != kCGImagePixelFormatPacked || bitsPerComponent > 8) {
+            // like RGBA1010102, need bitwise to extract pixel from single uint32_t, we don't support currently
+            SD_LOG("Unsupported pixel format: %u, bpc: %zu for CGImage: %@", pixelFormat, bitsPerComponent, imageRef);
+            CGImageRelease(imageRef);
+            return nil;
+        }
     }
     
     // Get pixels
@@ -467,21 +781,39 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
     
     // Get pixel at point
     size_t bytesPerRow = CGImageGetBytesPerRow(imageRef);
-    size_t components = CGImageGetBitsPerPixel(imageRef) / CGImageGetBitsPerComponent(imageRef);
-    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(imageRef);
+    size_t components = CGImageGetBitsPerPixel(imageRef) / bitsPerComponent;
     
-    CFRange range = CFRangeMake(bytesPerRow * point.y + components * point.x, 4);
+    CFRange range = CFRangeMake(bytesPerRow * y + components * x, components);
     if (CFDataGetLength(data) < range.location + range.length) {
         CFRelease(data);
         CGImageRelease(imageRef);
         return nil;
     }
-    Pixel_8888 pixel = {0};
-    CFDataGetBytes(data, range, pixel);
-    CFRelease(data);
-    CGImageRelease(imageRef);
-    // Convert to color
-    return SDGetColorFromPixel(pixel, bitmapInfo);
+    // Get color space for transform
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(imageRef);
+    
+    // greyscale
+    if (components == 2) {
+        Pixel_88 pixel = {0};
+        CFDataGetBytes(data, range, pixel);
+        CFRelease(data);
+        CGImageRelease(imageRef);
+        // Convert to color
+        return SDGetColorFromGrayscale(pixel, bitmapInfo, colorSpace);
+    } else if (components == 3 || components == 4) {
+        // RGB/RGBA
+        Pixel_8888 pixel = {0};
+        CFDataGetBytes(data, range, pixel);
+        CFRelease(data);
+        CGImageRelease(imageRef);
+        // Convert to color
+        return SDGetColorFromRGBA8(pixel, bitmapInfo, colorSpace);
+    } else {
+        SD_LOG("Unsupported components: %zu for CGImage: %@", components, imageRef);
+        CFRelease(data);
+        CGImageRelease(imageRef);
+        return nil;
+    }
 }
 
 - (nullable NSArray<UIColor *> *)sd_colorsWithRect:(CGRect)rect {
@@ -501,11 +833,24 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
     }
     
     // Check rect
-    CGFloat width = CGImageGetWidth(imageRef);
-    CGFloat height = CGImageGetHeight(imageRef);
+    size_t width = CGImageGetWidth(imageRef);
+    size_t height = CGImageGetHeight(imageRef);
     if (CGRectGetWidth(rect) <= 0 || CGRectGetHeight(rect) <= 0 || CGRectGetMinX(rect) < 0 || CGRectGetMinY(rect) < 0 || CGRectGetMaxX(rect) > width || CGRectGetMaxY(rect) > height) {
         CGImageRelease(imageRef);
         return nil;
+    }
+    
+    // Check pixel format
+    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(imageRef);
+    size_t bitsPerComponent = CGImageGetBitsPerComponent(imageRef);
+    if (@available(iOS 12.0, tvOS 12.0, macOS 10.14, watchOS 5.0, *)) {
+        CGImagePixelFormatInfo pixelFormat = (bitmapInfo & kCGImagePixelFormatMask);
+        if (pixelFormat != kCGImagePixelFormatPacked || bitsPerComponent > 8) {
+            // like RGBA1010102, need bitwise to extract pixel from single uint32_t, we don't support currently
+            SD_LOG("Unsupported pixel format: %u, bpc: %zu for CGImage: %@", pixelFormat, bitsPerComponent, imageRef);
+            CGImageRelease(imageRef);
+            return nil;
+        }
     }
     
     // Get pixels
@@ -522,7 +867,7 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
     
     // Get pixels with rect
     size_t bytesPerRow = CGImageGetBytesPerRow(imageRef);
-    size_t components = CGImageGetBitsPerPixel(imageRef) / CGImageGetBitsPerComponent(imageRef);
+    size_t components = CGImageGetBitsPerPixel(imageRef) / bitsPerComponent;
     
     size_t start = bytesPerRow * CGRectGetMinY(rect) + components * CGRectGetMinX(rect);
     size_t end = bytesPerRow * (CGRectGetMaxY(rect) - 1) + components * CGRectGetMaxX(rect);
@@ -537,19 +882,36 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
     size_t col = CGRectGetMaxX(rect);
     
     // Convert to color
-    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(imageRef);
     NSMutableArray<UIColor *> *colors = [NSMutableArray arrayWithCapacity:CGRectGetWidth(rect) * CGRectGetHeight(rect)];
-    for (size_t index = start; index < end; index += 4) {
+    // ColorSpace
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(imageRef);
+    for (size_t index = start; index < end; index += components) {
         if (index >= row * bytesPerRow + col * components) {
             // Index beyond the end of current row, go next row
             row++;
             index = row * bytesPerRow + CGRectGetMinX(rect) * components;
-            index -= 4;
+            index -= components;
             continue;
         }
-        Pixel_8888 pixel = {pixels[index], pixels[index+1], pixels[index+2], pixels[index+3]};
-        UIColor *color = SDGetColorFromPixel(pixel, bitmapInfo);
-        [colors addObject:color];
+        UIColor *color;
+        if (components == 2) {
+            Pixel_88 pixel = {pixels[index], pixel[index+1]};
+            color = SDGetColorFromGrayscale(pixel, bitmapInfo, colorSpace);
+        } else {
+            if (components == 3) {
+                Pixel_8888 pixel = {pixels[index], pixels[index+1], pixels[index+2], 0};
+                color = SDGetColorFromRGBA8(pixel, bitmapInfo, colorSpace);
+            } else if (components == 4) {
+                Pixel_8888 pixel = {pixels[index], pixels[index+1], pixels[index+2], pixels[index+3]};
+                color = SDGetColorFromRGBA8(pixel, bitmapInfo, colorSpace);
+            } else {
+                SD_LOG("Unsupported components: %zu for CGImage: %@", components, imageRef);
+                break;
+            }
+        }
+        if (color) {
+            [colors addObject:color];
+        }
     }
     CFRelease(data);
     CGImageRelease(imageRef);
@@ -588,15 +950,8 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
 #endif
     
     CGImageRef imageRef = self.CGImage;
-    
-    //convert to BGRA if it isn't
-    if (CGImageGetBitsPerPixel(imageRef) != 32 ||
-        CGImageGetBitsPerComponent(imageRef) != 8 ||
-        !((CGImageGetBitmapInfo(imageRef) & kCGBitmapAlphaInfoMask))) {
-        SDGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);
-        [self drawInRect:CGRectMake(0, 0, self.size.width, self.size.height)];
-        imageRef = SDGraphicsGetImageFromCurrentImageContext().CGImage;
-        SDGraphicsEndImageContext();
+    if (!imageRef) {
+        return nil;
     }
     
     vImage_Buffer effect = {}, scratch = {};
@@ -609,24 +964,25 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
         .bitmapInfo = kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host, //requests a BGRA buffer.
         .version = 0,
         .decode = NULL,
-        .renderingIntent = kCGRenderingIntentDefault
+        .renderingIntent = CGImageGetRenderingIntent(imageRef)
     };
     
     vImage_Error err;
-    err = vImageBuffer_InitWithCGImage(&effect, &format, NULL, imageRef, kvImageNoFlags);
+    err = vImageBuffer_InitWithCGImage(&effect, &format, NULL, imageRef, kvImageNoFlags); // vImage will convert to format we requests, no need `vImageConvert`
     if (err != kvImageNoError) {
-        NSLog(@"UIImage+Transform error: vImageBuffer_InitWithCGImage returned error code %zi for inputImage: %@", err, self);
+        SD_LOG("UIImage+Transform error: vImageBuffer_InitWithCGImage returned error code %zi for inputImage: %@", err, self);
         return nil;
     }
     err = vImageBuffer_Init(&scratch, effect.height, effect.width, format.bitsPerPixel, kvImageNoFlags);
     if (err != kvImageNoError) {
-        NSLog(@"UIImage+Transform error: vImageBuffer_Init returned error code %zi for inputImage: %@", err, self);
+        SD_LOG("UIImage+Transform error: vImageBuffer_Init returned error code %zi for inputImage: %@", err, self);
         return nil;
     }
     
     input = &effect;
     output = &scratch;
     
+    // See: https://developer.apple.com/library/archive/samplecode/UIImageEffects/Introduction/Intro.html
     if (hasBlur) {
         // A description of how to compute the box kernel width from the Gaussian
         // radius (aka standard deviation) appears in the SVG spec:
@@ -643,19 +999,16 @@ static inline CGImageRef _Nullable SDCreateCGImageFromCIImage(CIImage * _Nonnull
         if (inputRadius - 2.0 < __FLT_EPSILON__) inputRadius = 2.0;
         uint32_t radius = floor(inputRadius * 3.0 * sqrt(2 * M_PI) / 4 + 0.5);
         radius |= 1; // force radius to be odd so that the three box-blur methodology works.
-        int iterations;
-        if (blurRadius * scale < 0.5) iterations = 1;
-        else if (blurRadius * scale < 1.5) iterations = 2;
-        else iterations = 3;
         NSInteger tempSize = vImageBoxConvolve_ARGB8888(input, output, NULL, 0, 0, radius, radius, NULL, kvImageGetTempBufferSize | kvImageEdgeExtend);
         void *temp = malloc(tempSize);
-        for (int i = 0; i < iterations; i++) {
-            vImageBoxConvolve_ARGB8888(input, output, temp, 0, 0, radius, radius, NULL, kvImageEdgeExtend);
-            vImage_Buffer *tmp = input;
-            input = output;
-            output = tmp;
-        }
+        vImageBoxConvolve_ARGB8888(input, output, temp, 0, 0, radius, radius, NULL, kvImageEdgeExtend);
+        vImageBoxConvolve_ARGB8888(output, input, temp, 0, 0, radius, radius, NULL, kvImageEdgeExtend);
+        vImageBoxConvolve_ARGB8888(input, output, temp, 0, 0, radius, radius, NULL, kvImageEdgeExtend);
         free(temp);
+        
+        vImage_Buffer *tmp = input;
+        input = output;
+        output = tmp;
     }
     
     CGImageRef effectCGImage = NULL;

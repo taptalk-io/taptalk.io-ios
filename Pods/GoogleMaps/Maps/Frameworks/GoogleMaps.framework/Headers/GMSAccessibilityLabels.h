@@ -13,3 +13,10 @@ extern NSString *const kGMSAccessibilityCompass;
  * @related GMSMapView
  */
 extern NSString *const kGMSAccessibilityMyLocation;
+
+/**
+ * Accessibility identifier for the "out of quota" error label.
+ *
+ * @related GMSMapView
+ */
+extern NSString *const kGMSAccessiblityOutOfQuota;

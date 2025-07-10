@@ -9,6 +9,7 @@
 #import "TAPBaseView.h"
 #import "TAPCustomTextFieldView.h"
 #import "TAPCustomButtonView.h"
+#import "TapHighlightCustomButtonView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

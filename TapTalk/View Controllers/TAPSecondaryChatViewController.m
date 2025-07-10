@@ -30,6 +30,7 @@
 #import "TAPForwardListViewController.h"
 #import "TAPWebViewViewController.h"
 #import "TAPMediaDetailViewController.h"
+#import "TapHighlightCustomButtonView.h"
 
 #import <TapTalk/Base64.h>
 static const NSInteger kShowChatAnchorOffset = 70.0f;

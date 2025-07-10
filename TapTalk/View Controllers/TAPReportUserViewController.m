@@ -6,6 +6,7 @@
 //
 
 #import "TAPReportUserViewController.h"
+#import "TapHighlightCustomButtonView.h"
 
 @interface TAPReportUserViewController ()<UITextFieldDelegate, UITextViewDelegate, TAPPopUpInfoViewControllerDelegate>
 @property (strong, nonatomic) IBOutlet UIButton *reportReasonSendingFalseButton;

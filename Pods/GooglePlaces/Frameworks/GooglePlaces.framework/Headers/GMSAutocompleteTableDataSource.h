@@ -132,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * The |GMSPlaceField| for specifying explicit place details to be requested. Default returns
- * all avilable fields.
+ * all available fields.
  */
 @property(nonatomic, assign) GMSPlaceField placeFields;
 

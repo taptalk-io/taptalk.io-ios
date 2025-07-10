@@ -7,22 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		12551882AE7452A63E00872E /* AutocompleteModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF8E968A1C74354A3486DF3 /* AutocompleteModalViewController.swift */; };
+		040B70AFAB357FBB6182FF77 /* FindPlaceLikelihoodListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3132BF7D4FF950035CCF22B /* FindPlaceLikelihoodListViewController.swift */; };
+		12478E1DC9845001A8193847 /* AutocompleteWithCustomColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12FAF36EF6DF671EE77872 /* AutocompleteWithCustomColors.swift */; };
 		1FDACB7AA1C4DB5417897A8D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A92A7858DB2177E7A91F30B5 /* LaunchScreen.storyboard */; };
-		33B31046FE1726120C708B1C /* AutocompleteWithTextFieldController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD305E3260332F5AAB435A2 /* AutocompleteWithTextFieldController.swift */; };
-		4C0069B8C8216DCE7E50B3E6 /* AutocompleteWithSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7768476D0A38D7A7670CCD1B /* AutocompleteWithSearchViewController.swift */; };
-		5A82C05D78C9D5E6256ECE87 /* SampleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAA7239884CB4157BC2C5FF /* SampleListViewController.swift */; };
-		5D84B4919EF41C015EDE7490 /* FindPlaceLikelihoodListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3132BF7D4FF950035CCF22B /* FindPlaceLikelihoodListViewController.swift */; };
+		246F9937B21EA01519CFE0C1 /* AutocompleteWithTextFieldController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD305E3260332F5AAB435A2 /* AutocompleteWithTextFieldController.swift */; };
+		26EE520238A84E904B69C2FF /* SampleDatas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0F1EF7458BEAB01DE68663 /* SampleDatas.swift */; };
+		2FA7ACDDB66E02D2D22E2967 /* AutocompletePushViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F497012428CC54B7C4F56083 /* AutocompletePushViewController.swift */; };
+		44B7ACE56F2A03AA964BD701 /* SDKDemoAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B665D719F951D76696D33BC /* SDKDemoAPIKey.swift */; };
+		6387439DECC0B84213932CC2 /* AutocompleteBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0288ED3B967A57B6410B96F8 /* AutocompleteBaseViewController.swift */; };
 		84B2F5C9539E9F7D3D330A98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2C0B4FDDB3ADB0D6C58B163F /* Localizable.strings */; };
-		8F36AF5212D677C53A821830 /* AutocompleteBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0288ED3B967A57B6410B96F8 /* AutocompleteBaseViewController.swift */; };
-		A73EE4533349AEF0A4C34C0D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 909B59B2299866076C468ED7 /* UIKit.framework */; };
-		B6246D8167D0188DA43CE4CB /* AutocompletePushViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F497012428CC54B7C4F56083 /* AutocompletePushViewController.swift */; };
-		CE5829EA0ACC016148AE87CA /* SDKDemoAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B665D719F951D76696D33BC /* SDKDemoAPIKey.swift */; };
-		D09B24C363FF41C043D0F3D6 /* SampleDatas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0F1EF7458BEAB01DE68663 /* SampleDatas.swift */; };
-		D7062C643520223BDCFCB20A /* AutocompleteWithCustomColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C12FAF36EF6DF671EE77872 /* AutocompleteWithCustomColors.swift */; };
-		DAD5C1562B74719D0E2BC3E8 /* PagingPhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C092A8A676304070F968409 /* PagingPhotoView.swift */; };
+		8CF80785851E4F461698D404 /* AutocompleteConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ADC3E2B685EB704BFB0A427 /* AutocompleteConfiguration.swift */; };
+		9170F3CE79ED3807B2301B8B /* PagingPhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C092A8A676304070F968409 /* PagingPhotoView.swift */; };
+		ABBCAE19F0CEA3A3C8A95D1E /* AutocompleteWithSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7768476D0A38D7A7670CCD1B /* AutocompleteWithSearchViewController.swift */; };
+		CA002F2AD5400BA93DF5986A /* AutocompleteModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF8E968A1C74354A3486DF3 /* AutocompleteModalViewController.swift */; };
+		D248A9237F51145B3A03A71F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 909B59B2299866076C468ED7 /* UIKit.framework */; };
 		E0F36B0E72285A3AB896E53A /* PlacesDemoAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6EA6980061CFCF840AFCEDC2 /* PlacesDemoAssets.xcassets */; };
-		E1A25B65AA4058BE01EBE11B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E58F93255E608F3E70DF9E /* AppDelegate.swift */; };
+		F07C1584A8743E6AB7A86FF5 /* SampleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAA7239884CB4157BC2C5FF /* SampleListViewController.swift */; };
+		F31F97915551199CB1E725D7 /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1508D3D314E8989F6A8B1386 /* ConfigurationViewController.swift */; };
+		F32E21EB40F6A3B606A84C5F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E58F93255E608F3E70DF9E /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,9 +35,11 @@
 		0D74D64B9CD42B2FDF7EE015 /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0D889387B0B1BD3F73F8E146 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0E2A6EA83A2B6BE60F8631EA /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		1508D3D314E8989F6A8B1386 /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		1B25F0846D9BEA0ACB3F71D2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1E734E67258D377F8B1D5CE5 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
 		276DCC46CD2ED5E1134AB1A4 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		2ADC3E2B685EB704BFB0A427 /* AutocompleteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutocompleteConfiguration.swift; sourceTree = "<group>"; };
 		2CD305E3260332F5AAB435A2 /* AutocompleteWithTextFieldController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutocompleteWithTextFieldController.swift; sourceTree = "<group>"; };
 		2D40CD2D32AC5354B8D8C544 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		322EDC4BDDF0F416B3887BB7 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -91,14 +95,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A73EE4533349AEF0A4C34C0D /* UIKit.framework in Frameworks */,
+				D248A9237F51145B3A03A71F /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0E7696E867CA96612E6688BA /* Frameworks */ = {
+		64686740F39E131CEB63787F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				909B59B2299866076C468ED7 /* UIKit.framework */,
@@ -127,7 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				ACC70AABB425F4696F805F27 /* Resources */,
-				D4867680840169F3979C5C18 /* Swift */,
+				DA1F526C7EF81E5F06E7D283 /* Swift */,
 			);
 			path = GooglePlacesSwiftDemos;
 			sourceTree = "<group>";
@@ -146,21 +150,9 @@
 			isa = PBXGroup;
 			children = (
 				A7DC475C5DF48F75B36886C4 /* Source */,
-				0E7696E867CA96612E6688BA /* Frameworks */,
+				64686740F39E131CEB63787F /* Frameworks */,
 				FFA58D2498A93FE9768A06C4 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		D4867680840169F3979C5C18 /* Swift */ = {
-			isa = PBXGroup;
-			children = (
-				9039998DD3BBE0A36049B8EB /* Samples */,
-				D1E58F93255E608F3E70DF9E /* AppDelegate.swift */,
-				4B665D719F951D76696D33BC /* SDKDemoAPIKey.swift */,
-				7F0F1EF7458BEAB01DE68663 /* SampleDatas.swift */,
-				3FAA7239884CB4157BC2C5FF /* SampleListViewController.swift */,
-			);
-			path = Swift;
 			sourceTree = "<group>";
 		};
 		D7CCD2BF8ED9F3E2238CC18F /* Autocomplete */ = {
@@ -175,6 +167,20 @@
 				3C092A8A676304070F968409 /* PagingPhotoView.swift */,
 			);
 			path = Autocomplete;
+			sourceTree = "<group>";
+		};
+		DA1F526C7EF81E5F06E7D283 /* Swift */ = {
+			isa = PBXGroup;
+			children = (
+				9039998DD3BBE0A36049B8EB /* Samples */,
+				D1E58F93255E608F3E70DF9E /* AppDelegate.swift */,
+				2ADC3E2B685EB704BFB0A427 /* AutocompleteConfiguration.swift */,
+				1508D3D314E8989F6A8B1386 /* ConfigurationViewController.swift */,
+				4B665D719F951D76696D33BC /* SDKDemoAPIKey.swift */,
+				7F0F1EF7458BEAB01DE68663 /* SampleDatas.swift */,
+				3FAA7239884CB4157BC2C5FF /* SampleListViewController.swift */,
+			);
+			path = Swift;
 			sourceTree = "<group>";
 		};
 		FFA58D2498A93FE9768A06C4 /* Products */ = {
@@ -288,18 +294,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D09B24C363FF41C043D0F3D6 /* SampleDatas.swift in Sources */,
-				DAD5C1562B74719D0E2BC3E8 /* PagingPhotoView.swift in Sources */,
-				8F36AF5212D677C53A821830 /* AutocompleteBaseViewController.swift in Sources */,
-				D7062C643520223BDCFCB20A /* AutocompleteWithCustomColors.swift in Sources */,
-				4C0069B8C8216DCE7E50B3E6 /* AutocompleteWithSearchViewController.swift in Sources */,
-				33B31046FE1726120C708B1C /* AutocompleteWithTextFieldController.swift in Sources */,
-				12551882AE7452A63E00872E /* AutocompleteModalViewController.swift in Sources */,
-				B6246D8167D0188DA43CE4CB /* AutocompletePushViewController.swift in Sources */,
-				5D84B4919EF41C015EDE7490 /* FindPlaceLikelihoodListViewController.swift in Sources */,
-				5A82C05D78C9D5E6256ECE87 /* SampleListViewController.swift in Sources */,
-				E1A25B65AA4058BE01EBE11B /* AppDelegate.swift in Sources */,
-				CE5829EA0ACC016148AE87CA /* SDKDemoAPIKey.swift in Sources */,
+				26EE520238A84E904B69C2FF /* SampleDatas.swift in Sources */,
+				F31F97915551199CB1E725D7 /* ConfigurationViewController.swift in Sources */,
+				9170F3CE79ED3807B2301B8B /* PagingPhotoView.swift in Sources */,
+				6387439DECC0B84213932CC2 /* AutocompleteBaseViewController.swift in Sources */,
+				12478E1DC9845001A8193847 /* AutocompleteWithCustomColors.swift in Sources */,
+				ABBCAE19F0CEA3A3C8A95D1E /* AutocompleteWithSearchViewController.swift in Sources */,
+				246F9937B21EA01519CFE0C1 /* AutocompleteWithTextFieldController.swift in Sources */,
+				CA002F2AD5400BA93DF5986A /* AutocompleteModalViewController.swift in Sources */,
+				2FA7ACDDB66E02D2D22E2967 /* AutocompletePushViewController.swift in Sources */,
+				040B70AFAB357FBB6182FF77 /* FindPlaceLikelihoodListViewController.swift in Sources */,
+				F07C1584A8743E6AB7A86FF5 /* SampleListViewController.swift in Sources */,
+				F32E21EB40F6A3B606A84C5F /* AppDelegate.swift in Sources */,
+				44B7ACE56F2A03AA964BD701 /* SDKDemoAPIKey.swift in Sources */,
+				8CF80785851E4F461698D404 /* AutocompleteConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,15 +386,13 @@
 		8BE6213F076EE7282AFFB455 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"ARCHS[sdk=iphonesimulator*]" = (
-					i386,
-					x86_64,
-				);
+				"ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = ./GooglePlacesSwiftDemos/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					.,
 					"$(SDKROOT)/System/Library/Frameworks",

@@ -7,6 +7,7 @@
 //
 
 #import "TAPAddNewContactView.h"
+#import "TapHighlightCustomButtonView.h"
 
 @interface TAPAddNewContactView ()
 

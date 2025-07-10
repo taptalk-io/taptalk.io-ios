@@ -12,8 +12,8 @@
 #import "TAPBlockedListViewController.h"
 #import "TAPAddNewContactViewController.h"
 #import "TAPCreateGroupViewController.h"
-
 #import "TapUIChatViewController.h"
+#import "TapHighlightCustomButtonView.h"
 #import <Photos/Photos.h>
 #import <Contacts/Contacts.h>
 
