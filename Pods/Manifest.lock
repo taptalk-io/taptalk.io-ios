@@ -19,12 +19,12 @@ PODS:
 DEPENDENCIES:
   - GoogleMaps
   - GooglePlaces
-  - JSONModel (~> 1.1)
+  - JSONModel (= 1.8.0)
   - PodAsset
   - Realm (= 10.1.0)
   - SDWebImage
   - SocketRocket
-  - ZSWTappableLabel (~> 2.0)
+  - ZSWTappableLabel (= 2.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -47,6 +47,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: b62ab7a93b93ca324c241897c390e1b6b8c99355
+PODFILE CHECKSUM: d6db75d939ab42e7dba7d19048d321d516ae2484
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

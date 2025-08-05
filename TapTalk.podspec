@@ -17,7 +17,9 @@ Pod::Spec.new do |s|
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.platform     = :ios, "15.0"
+    s.platform     = :ios, "11.0"
+    #s.ios.deployment_target = '11.0'
+
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
@@ -39,13 +41,13 @@ Pod::Spec.new do |s|
 
     #s.dependency "AFNetworking", "~> 4.0.0"
     s.dependency "SocketRocket"
-    s.dependency "JSONModel", "~> 1.1"
+    s.dependency "JSONModel", "1.8.0"
     s.dependency "Realm", "10.1.0"
     s.dependency "SDWebImage"
     s.dependency "PodAsset"
     s.dependency "GooglePlaces"
     s.dependency "GoogleMaps"
-    s.dependency "ZSWTappableLabel", "~> 2.0"
+    s.dependency "ZSWTappableLabel", "2.0"
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
@@ -66,8 +68,8 @@ Pod::Spec.new do |s|
     }
 
     # ――― XCConfig ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-    s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
-    #s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-    #s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    #s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
+    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
 end

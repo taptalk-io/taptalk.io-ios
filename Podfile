@@ -5,13 +5,13 @@ inhibit_all_warnings!
 def tapTalk_pods
 #    pod 'AFNetworking', '~> 4.0.0', :modular_headers => true
     pod 'SocketRocket'
-    pod 'JSONModel', '~> 1.1', :modular_headers => true
+    pod 'JSONModel', '1.8.0', :modular_headers => true
     pod 'Realm', '10.1.0'
     pod 'PodAsset'
     pod 'SDWebImage'
     pod 'GooglePlaces'
     pod 'GoogleMaps'
-    pod 'ZSWTappableLabel', '~> 2.0'
+    pod 'ZSWTappableLabel', '2.0'
 end
 
 target "TapTalk" do
@@ -22,31 +22,7 @@ post_install do |installer|
     installer.pods_project.targets.each do |target|
         target.build_configurations.each do |config|
             target.build_settings(config.name)['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-            #config.build_settings['BITCODE_GENERATION_MODE'] = 'bitcode'
-            #config.build_settings['ENABLE_BITCODE'] = 'YES'
+            config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
         end
     end
 end
-
-#libwebp framework is currently doesn't support bitcode, must disable all bitcode for project, please check it gradually and remove below line to enable bitcode once libwebp have support bitcode
-#post_install do |installer|
-#    installer.pods_project.targets.each do |target|
-#        target.build_configurations.each do |config|
-#            config.build_settings['ENABLE_BITCODE'] = 'NO'
-#            config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf'
-#        end
-#    end
-#end
-
-
-#add to remove arm64 because xcode 12 problems in realm
-#post_install do |installer|
-#     installer.pods_project.targets.each do |target|
-#         target.build_configurations.each do |config|
-#             config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-#             config.build_settings['EXCLUDED_ARCHS[sdk=watchsimulator*]'] = 'arm64'
-#             config.build_settings['EXCLUDED_ARCHS[sdk=appletvsimulator*]'] = 'arm64'
-#    
-#         end
-#     end
-# end
