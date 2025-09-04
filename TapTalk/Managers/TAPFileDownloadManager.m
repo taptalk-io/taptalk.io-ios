@@ -6,7 +6,7 @@
 //  Copyright © 2019 Moselo. All rights reserved.
 //
 
-#import "AFURLSessionManager.h"
+#import "TapAFURLSessionManager.h"
 #import "TAPFileDownloadManager.h"
 #import <TapTalk/Base64.h>
 
@@ -201,7 +201,7 @@
     
     if (![TAPUtil isEmptyString:currentFileURL]) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+        TapAFURLSessionManager *manager = [[TapAFURLSessionManager alloc] initWithSessionConfiguration:configuration];
 
         NSURL *url = [NSURL URLWithString:currentFileURL];
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -330,7 +330,7 @@
     
     if (![TAPUtil isEmptyString:currentFileURL]) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+        TapAFURLSessionManager *manager = [[TapAFURLSessionManager alloc] initWithSessionConfiguration:configuration];
 
         NSURL *url = [NSURL URLWithString:currentFileURL];
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -645,7 +645,7 @@
     
     if (currentFileURL != nil && ![currentFileURL isEqualToString:@""]) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+        TapAFURLSessionManager *manager = [[TapAFURLSessionManager alloc] initWithSessionConfiguration:configuration];
 
         NSURL *url = [NSURL URLWithString:currentFileURL];
         NSURLRequest *request = [NSURLRequest requestWithURL:url];

@@ -7,7 +7,7 @@
 //
 
 #import "TAPBaseViewController.h"
-#import "AFNetworking.h"
+#import "TapAFNetworking.h"
 #import "TAPPopUpInfoViewController.h"
 #import "TAPLeftCustomNavigationButton.h"
 

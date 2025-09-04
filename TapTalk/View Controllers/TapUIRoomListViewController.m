@@ -6,7 +6,7 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
-#import "AFNetworking.h"
+#import "TapAFNetworking.h"
 #import "TapUIRoomListViewController.h"
 #import "TAPRoomListView.h"
 #import "TAPAddNewChatViewController.h"
@@ -2210,7 +2210,7 @@
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         if (self.isNeedRefreshOnNetworkDown) {
             //Reload new data from API
             _isShouldNotLoadFromAPI = NO;

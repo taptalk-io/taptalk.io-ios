@@ -7,7 +7,7 @@
 
 #import "TAPConnectionStatusViewController.h"
 #import "TAPConnectionStatusView.h"
-#import "AFNetworking.h"
+#import "TapAFNetworking.h"
 
 @interface TAPConnectionStatusViewController ()
 
@@ -36,7 +36,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         _statusType = [TAPConnectionManager sharedManager].tapConnectionStatus;
         if (self.statusType == TAPConnectionManagerStatusTypeNotConnected) {
             [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeNone];
@@ -109,7 +109,7 @@
 }
 
 - (void)socketConnectingNotification:(NSNotification *)notification {
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeConnecting];
     }
     else {
@@ -131,7 +131,7 @@
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         if ([TAPConnectionManager sharedManager].tapConnectionStatus == TAPConnectionManagerStatusTypeNotConnected) {
             [self.connectionStatusView setConnectionStatusType:TAPConnectionStatusTypeNone];
         }

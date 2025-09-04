@@ -8,6 +8,12 @@
 
 #import "TAPBaseTableViewCell.h"
 
+@interface TAPBaseTableViewCell ()
+
+@property (strong, nonatomic) UITableView *tableView;
+
+@end
+
 @implementation TAPBaseTableViewCell
 
 - (void)awakeFromNib {
@@ -33,6 +39,22 @@
     [self setSelectionStyle:UITableViewCellSelectionStyleDefault];
     [self setSelectedBackgroundView:[[UIView alloc] init]];
     self.selectedBackgroundView.backgroundColor = color;
+}
+
+- (UITableView * _Nullable)getTableView {
+    if (self.tableView != nil) {
+        return self.tableView;
+    }
+    id view = [self superview];
+    while (view && [view isKindOfClass:[UITableView class]] == NO) {
+        view = [view superview];
+    }
+    if (view != nil && [view isKindOfClass:[UITableView class]]) {
+        UITableView *tableView = (UITableView *)view;
+        _tableView = tableView;
+        return tableView;
+    }
+    return nil;
 }
 
 @end
