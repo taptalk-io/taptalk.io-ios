@@ -9,7 +9,7 @@
 #import "TAPAddNewContactViewController.h"
 #import "TAPAddNewContactView.h"
 #import "TAPScanQRCodePopupView.h"
-#import "AFNetworking.h"
+#import "TapAFNetworking.h"
 
 @interface TAPAddNewContactViewController () <TAPSearchBarViewDelegate>
 
@@ -328,7 +328,7 @@
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         //CONNECTION AVAILABLE
         if (self.wasFailedGetData) {
             //RE-CALL API

@@ -7,7 +7,7 @@
 //
 
 #import "TAPConnectionManager.h"
-#import "AFNetworking.h"
+#import "TapAFNetworking.h"
 
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f
@@ -157,7 +157,7 @@
     
     if ((self.tapConnectionStatus != TAPConnectionManagerStatusTypeDisconnected &&
          self.tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) ||
-        [[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable
+        [[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable
     ) {
         return;
     }

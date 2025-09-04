@@ -7,8 +7,8 @@
 //
 
 #import "TAPNetworkManager.h"
-#import "AFHTTPSessionManager.h"
-#import "AFNetworkReachabilityManager.h"
+#import "TapAFHTTPSessionManager.h"
+#import "TapAFNetworkReachabilityManager.h"
 
 static const NSInteger kAPITimeOut = 60;
 
@@ -17,7 +17,7 @@ static const NSInteger kAPITimeOut = 60;
 @property (strong, nonatomic) NSString *appKey;
 @property (strong, nonatomic) NSMutableDictionary *currentDownloadTaskDictionary;
 
-- (AFHTTPSessionManager *)defaultManager;
+- (TapAFHTTPSessionManager *)defaultManager;
 - (NSString *)urlEncodeForString:(NSString *)stringToEncode;
 
 @end
@@ -38,8 +38,8 @@ static const NSInteger kAPITimeOut = 60;
     self = [super init];
     
     if (self) {
-        [[AFNetworkReachabilityManager sharedManager] startMonitoring];
-        [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        [[TapAFNetworkReachabilityManager sharedManager] startMonitoring];
+        [[TapAFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
             NSDictionary *statusDictionary = @{@"AFNetworkReachabilityNotificationStatusItem" : [NSNumber numberWithInteger:status]};
             [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:statusDictionary userInfo:statusDictionary];
             
@@ -67,7 +67,7 @@ static const NSInteger kAPITimeOut = 60;
 }
 
 #pragma mark - Custom Method
-- (AFHTTPSessionManager *)defaultManager {
+- (TapAFHTTPSessionManager *)defaultManager {
     
     NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
     if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
@@ -75,9 +75,9 @@ static const NSInteger kAPITimeOut = 60;
     }
     
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    TapAFHTTPSessionManager *manager = [TapAFHTTPSessionManager manager];
+    manager.responseSerializer = [TapAFJSONResponseSerializer serializer];
+    manager.requestSerializer = [TapAFJSONRequestSerializer serializer];
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [manager.requestSerializer setValue:self.appKey forHTTPHeaderField:@"App-Key"];
     [manager.requestSerializer setValue:bundleIdentifier forHTTPHeaderField:@"App-Identifier"];
@@ -103,7 +103,7 @@ static const NSInteger kAPITimeOut = 60;
     NSLog(@"App-Version: %@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]);
 #endif
     
-    AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
+    TapAFSecurityPolicy *securityPolicy = [TapAFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
     [securityPolicy setAllowInvalidCertificates:YES];
     
     return manager;
@@ -126,7 +126,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -173,7 +173,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -219,7 +219,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     }
@@ -257,7 +257,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     }
@@ -342,7 +342,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -352,7 +352,7 @@ static const NSInteger kAPITimeOut = 60;
         failure (nil, error);
     }
     
-    AFHTTPSessionManager *manager = [[TAPNetworkManager sharedManager] defaultManager];
+    TapAFHTTPSessionManager *manager = [[TAPNetworkManager sharedManager] defaultManager];
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", authTicket];
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
@@ -390,7 +390,7 @@ refreshToken:(NSString *)refreshToken
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -400,7 +400,7 @@ refreshToken:(NSString *)refreshToken
         failure (nil, error);
     }
     
-    AFHTTPSessionManager *manager = [[TAPNetworkManager sharedManager] defaultManager];
+    TapAFHTTPSessionManager *manager = [[TAPNetworkManager sharedManager] defaultManager];
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", refreshToken];
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
@@ -439,7 +439,7 @@ refreshToken:(NSString *)refreshToken
     NSLog(@"POST URL: %@", urlString);
 #endif
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -452,7 +452,7 @@ refreshToken:(NSString *)refreshToken
     NSData *parameterData = [NSKeyedArchiver archivedDataWithRootObject:parameters];
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
     
-    NSMutableURLRequest *request = [[self defaultManager].requestSerializer multipartFormRequestWithMethod:@"POST" URLString:urlString parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    NSMutableURLRequest *request = [[self defaultManager].requestSerializer multipartFormRequestWithMethod:@"POST" URLString:urlString parameters:nil constructingBodyWithBlock:^(id<TapAFMultipartFormData> formData) {
 
         if ([filetype isEqualToString:@"image"]) {
             
@@ -526,7 +526,7 @@ refreshToken:(NSString *)refreshToken
     
     [request setTimeoutInterval:20000];
 
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    TapAFURLSessionManager *manager = [[TapAFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
 
     NSURLSessionUploadTask *uploadTask;
     uploadTask = [manager
@@ -570,7 +570,7 @@ refreshToken:(NSString *)refreshToken
     NSLog(@"POST URL: %@", urlString);
 #endif
     
-    if([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -583,7 +583,7 @@ refreshToken:(NSString *)refreshToken
     NSData *parameterData = [NSKeyedArchiver archivedDataWithRootObject:parameters];
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
     
-    NSMutableURLRequest *request = [[self defaultManager].requestSerializer multipartFormRequestWithMethod:@"POST" URLString:urlString parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    NSMutableURLRequest *request = [[self defaultManager].requestSerializer multipartFormRequestWithMethod:@"POST" URLString:urlString parameters:nil constructingBodyWithBlock:^(id<TapAFMultipartFormData> formData) {
         
     [formData appendPartWithFileData:fileData name:@"file" fileName:@"images.png" mimeType:@"image/jpeg"];
         
@@ -597,7 +597,7 @@ refreshToken:(NSString *)refreshToken
     
     [request setTimeoutInterval:20000];
     
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    TapAFURLSessionManager *manager = [[TapAFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
     NSURLSessionUploadTask *uploadTask;
     uploadTask = [manager
@@ -650,7 +650,7 @@ refreshToken:(NSString *)refreshToken
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -670,7 +670,7 @@ refreshToken:(NSString *)refreshToken
     
     NSMutableURLRequest *request = [[self defaultManager].requestSerializer requestWithMethod:@"POST" URLString:urlString parameters:parameters error:nil];
     
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    TapAFURLSessionManager *manager = [[TapAFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
     NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:^(NSProgress * _Nonnull downloadProgress) {
         progress(downloadProgress);

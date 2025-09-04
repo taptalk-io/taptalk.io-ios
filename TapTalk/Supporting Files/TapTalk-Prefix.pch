@@ -14,7 +14,7 @@
 
 #import "Configs.h"
 #import "TAPStyle.h"
-#import "AFNetworkActivityIndicatorManager.h"
+#import "TapAFNetworkActivityIndicatorManager.h"
 #import "NSBundle+Language.h"
 #import "NSUserDefaults+MPSecureUserDefaults.h"
 #import "PodAsset.h"

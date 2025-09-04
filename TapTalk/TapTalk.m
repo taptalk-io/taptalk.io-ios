@@ -6,7 +6,7 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
-#import "AFNetworkReachabilityManager.h"
+#import "TapAFNetworkReachabilityManager.h"
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
 #import <CoreText/CoreText.h>
@@ -395,7 +395,7 @@
     
     //Other initialization
     [TAPNetworkManager sharedManager];
-    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [[TapAFNetworkReachabilityManager sharedManager] startMonitoring];
 }
 
 - (void)resetPersistent {

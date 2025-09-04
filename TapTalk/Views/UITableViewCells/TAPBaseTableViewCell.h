@@ -13,5 +13,7 @@
 - (void)setGrayHighlightColor;
 - (void)setOrangeHighlightColor;
 - (void)setHighlightColor:(UIColor *)color;
+- (UITableView * _Nullable)getTableView;
+- (void)refreshCellHeight;
 
 @end
