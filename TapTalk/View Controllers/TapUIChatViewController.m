@@ -11367,21 +11367,23 @@ CGPoint center;
 //                           [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
 //                       } completion:^(BOOL finished) {
 //                       }];
-                       @try {
-                           [self.tableView performBatchUpdates:^{
-                               //changing beginUpdates and endUpdates with this because of deprecation
-                               NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                               [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                           } completion:^(BOOL finished) {
-                           }];
-                       }
-                       @catch (NSException *exception) {
-                           NSLog(@"%@", exception.reason);
-                           [self.tableView reloadData];
-                       }
-                       @finally {
-                           
-                       }
+                       // FIXME: CRASH
+//                       @try {
+//                           [self.tableView performBatchUpdates:^{
+//                               //changing beginUpdates and endUpdates with this because of deprecation
+//                               NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+//                               [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+//                           } completion:^(BOOL finished) {
+//                           }];
+//                       }
+//                       @catch (NSException *exception) {
+//                           NSLog(@"%@", exception.reason);
+//                           [self.tableView reloadData];
+//                       }
+//                       @finally {
+//                           
+//                       }
+                       [self.tableView reloadData];
                    }
                }
            }

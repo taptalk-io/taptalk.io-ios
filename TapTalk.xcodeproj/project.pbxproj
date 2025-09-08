@@ -79,7 +79,6 @@
 		5286131E2E694FAF00AE5605 /* TapAFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 528612EE2E694FAF00AE5605 /* TapAFURLResponseSerialization.m */; };
 		5286131F2E694FAF00AE5605 /* UIButton+TapAFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 528613022E694FAF00AE5605 /* UIButton+TapAFNetworking.m */; };
 		528613202E694FAF00AE5605 /* UIRefreshControl+TapAFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 528613092E694FAF00AE5605 /* UIRefreshControl+TapAFNetworking.m */; };
-		528613212E694FAF00AE5605 /* UIButton+AFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 528613002E694FAF00AE5605 /* UIButton+AFNetworking.h */; };
 		528613222E694FAF00AE5605 /* UIRefreshControl+TapAFNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 528613082E694FAF00AE5605 /* UIRefreshControl+TapAFNetworking.h */; };
 		528613232E694FAF00AE5605 /* TapAFAutoPurgingImageCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 528612F82E694FAF00AE5605 /* TapAFAutoPurgingImageCache.h */; };
 		528613242E694FAF00AE5605 /* TapAFHTTPSessionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 528612E02E694FAF00AE5605 /* TapAFHTTPSessionManager.h */; };
@@ -591,7 +590,6 @@
 		528612FD2E694FAF00AE5605 /* TapAFNetworkActivityIndicatorManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapAFNetworkActivityIndicatorManager.m; sourceTree = "<group>"; };
 		528612FE2E694FAF00AE5605 /* UIActivityIndicatorView+TapAFNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIActivityIndicatorView+TapAFNetworking.h"; sourceTree = "<group>"; };
 		528612FF2E694FAF00AE5605 /* UIActivityIndicatorView+TapAFNetworking.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIActivityIndicatorView+TapAFNetworking.m"; sourceTree = "<group>"; };
-		528613002E694FAF00AE5605 /* UIButton+AFNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIButton+AFNetworking.h"; sourceTree = "<group>"; };
 		528613012E694FAF00AE5605 /* UIButton+TapAFNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIButton+TapAFNetworking.h"; sourceTree = "<group>"; };
 		528613022E694FAF00AE5605 /* UIButton+TapAFNetworking.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIButton+TapAFNetworking.m"; sourceTree = "<group>"; };
 		528613032E694FAF00AE5605 /* UIImageView+TapAFNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+TapAFNetworking.h"; sourceTree = "<group>"; };
@@ -1090,7 +1088,6 @@
 				528612FD2E694FAF00AE5605 /* TapAFNetworkActivityIndicatorManager.m */,
 				528612FE2E694FAF00AE5605 /* UIActivityIndicatorView+TapAFNetworking.h */,
 				528612FF2E694FAF00AE5605 /* UIActivityIndicatorView+TapAFNetworking.m */,
-				528613002E694FAF00AE5605 /* UIButton+AFNetworking.h */,
 				528613012E694FAF00AE5605 /* UIButton+TapAFNetworking.h */,
 				528613022E694FAF00AE5605 /* UIButton+TapAFNetworking.m */,
 				528613032E694FAF00AE5605 /* UIImageView+TapAFNetworking.h */,
@@ -1878,27 +1875,26 @@
 				D7D3B44322FD7D7B00D1DFF7 /* TAPCoreConfigsModel.h in Headers */,
 				D78364052158E3DD008AF7F5 /* NSUserDefaults+MPSecureUserDefaults.h in Headers */,
 				0ABD955128DB154B00BAD126 /* TAPMutedRoomModel.h in Headers */,
-				528613212E694FAF00AE5605 /* UIButton+AFNetworking.h in Headers */,
-				528613222E694FAF00AE5605 /* UIRefreshControl+TapAFNetworking.h in Headers */,
-				528613232E694FAF00AE5605 /* TapAFAutoPurgingImageCache.h in Headers */,
-				528613242E694FAF00AE5605 /* TapAFHTTPSessionManager.h in Headers */,
-				528613252E694FAF00AE5605 /* UIProgressView+TapAFNetworking.h in Headers */,
-				528613262E694FAF00AE5605 /* TapAFSecurityPolicy.h in Headers */,
 				528613272E694FAF00AE5605 /* TapAFNetworking.h in Headers */,
-				528613282E694FAF00AE5605 /* TapAFNetworking-umbrella.h in Headers */,
 				528613292E694FAF00AE5605 /* TapAFCompatibilityMacros.h in Headers */,
+				528613242E694FAF00AE5605 /* TapAFHTTPSessionManager.h in Headers */,
 				5286132A2E694FAF00AE5605 /* TapAFURLSessionManager.h in Headers */,
-				5286132B2E694FAF00AE5605 /* TapAFNetworking-prefix.pch in Headers */,
-				5286132C2E694FAF00AE5605 /* UIImageView+TapAFNetworking.h in Headers */,
-				5286132E2E694FAF00AE5605 /* WKWebView+TapAFNetworking.h in Headers */,
 				5286132F2E694FAF00AE5605 /* TapAFNetworkReachabilityManager.h in Headers */,
+				528613262E694FAF00AE5605 /* TapAFSecurityPolicy.h in Headers */,
+				528613352E694FAF00AE5605 /* TapAFURLRequestSerialization.h in Headers */,
 				528613302E694FAF00AE5605 /* TapAFURLResponseSerialization.h in Headers */,
-				528613312E694FAF00AE5605 /* UIActivityIndicatorView+TapAFNetworking.h in Headers */,
+				5286132B2E694FAF00AE5605 /* TapAFNetworking-prefix.pch in Headers */,
+				528613282E694FAF00AE5605 /* TapAFNetworking-umbrella.h in Headers */,
+				528613232E694FAF00AE5605 /* TapAFAutoPurgingImageCache.h in Headers */,
 				528613322E694FAF00AE5605 /* TapAFImageDownloader.h in Headers */,
 				528613332E694FAF00AE5605 /* TapAFNetworkActivityIndicatorManager.h in Headers */,
+				528613312E694FAF00AE5605 /* UIActivityIndicatorView+TapAFNetworking.h in Headers */,
 				528613342E694FAF00AE5605 /* UIButton+TapAFNetworking.h in Headers */,
-				528613352E694FAF00AE5605 /* TapAFURLRequestSerialization.h in Headers */,
+				5286132C2E694FAF00AE5605 /* UIImageView+TapAFNetworking.h in Headers */,
 				528613362E694FAF00AE5605 /* UIKit+TapAFNetworking.h in Headers */,
+				528613252E694FAF00AE5605 /* UIProgressView+TapAFNetworking.h in Headers */,
+				528613222E694FAF00AE5605 /* UIRefreshControl+TapAFNetworking.h in Headers */,
+				5286132E2E694FAF00AE5605 /* WKWebView+TapAFNetworking.h in Headers */,
 				0A9997A728F5575C0063DDE0 /* TAPClearedRoomModel.h in Headers */,
 				D7115364222E54A90033C082 /* TAPDataFileModel.h in Headers */,
 				0AC06E112915139B00CB55F5 /* TAPSecondaryChatViewController.h in Headers */,

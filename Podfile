@@ -10,7 +10,7 @@ def tapTalk_pods
     pod 'PodAsset'
     pod 'SDWebImage'
     pod 'GooglePlaces'
-    pod 'GoogleMaps'
+    pod 'GoogleMaps', '5.2.0'
     pod 'ZSWTappableLabel', '2.0'
 end
 
