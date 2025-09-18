@@ -1,4 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-TapTalk/Pods-TapTalk-resources.sh
 ${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle
 ${PODS_ROOT}/GooglePlaces/Frameworks/GooglePlaces.framework/Resources/GooglePlaces.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/Realm/realm_objc_privacy.bundle
 ${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.bundle

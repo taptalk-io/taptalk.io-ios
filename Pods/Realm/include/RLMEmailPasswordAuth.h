@@ -20,16 +20,18 @@
 
 @protocol RLMBSON;
 
-/// A block type used to report an error
-typedef void(^RLMEmailPasswordAuthOptionalErrorBlock)(NSError * _Nullable);
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-NS_ASSUME_NONNULL_BEGIN
+/// A block type used to report an error
+RLM_SWIFT_SENDABLE // invoked on a background thread
+typedef void(^RLMEmailPasswordAuthOptionalErrorBlock)(NSError * _Nullable);
 
 /**
   A client for the email/password authentication provider which
   can be used to obtain a credential for logging in,
   and to perform requests specifically related to the email/password provider.
 */
+RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMEmailPasswordAuth : RLMProviderClient
 
 /**
@@ -67,6 +69,15 @@ NS_ASSUME_NONNULL_BEGIN
                      completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
+ Retries custom confirmation function for a given email address.
+
+ @param email The email address of the user to retry custom confirmation logic.
+ @param completionHandler A callback to be invoked once the call is complete.
+ */
+- (void)retryCustomConfirmation:(NSString *)email
+                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+
+/**
  Sends a password reset email to the given email address.
 
  @param email The email address of the user to send a password reset email for.
@@ -87,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetPasswordTo:(NSString *)password
                   token:(NSString *)token
                 tokenId:(NSString *)tokenId
-      completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+             completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
@@ -105,5 +116,5 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
 

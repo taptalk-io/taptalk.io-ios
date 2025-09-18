@@ -16,70 +16,74 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMongoCollection_Private.hpp"
+#import "RLMMongoCollection_Private.h"
 
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMError_Private.hpp"
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMFindOptions_Private.hpp"
 #import "RLMNetworkTransport_Private.hpp"
 #import "RLMUpdateResult_Private.hpp"
 #import "RLMUser_Private.hpp"
 
-#import "sync/remote_mongo_client.hpp"
-#import "sync/remote_mongo_collection.hpp"
-#import "sync/remote_mongo_database.hpp"
+#import <realm/object-store/sync/app_user.hpp>
+#import <realm/object-store/sync/mongo_client.hpp>
+#import <realm/object-store/sync/mongo_collection.hpp>
+#import <realm/object-store/sync/mongo_database.hpp>
 
+__attribute__((objc_direct_members))
 @implementation RLMChangeStream {
+@public
     realm::app::WatchStream _watchStream;
     id<RLMChangeEventDelegate> _subscriber;
     __weak NSURLSession *_session;
-    _Nonnull dispatch_queue_t _queue;
+    void (^_schedule)(dispatch_block_t);
 }
 
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
-                                delegateQueue:(nullable dispatch_queue_t)queue {
+                                    scheduler:(void (^)(dispatch_block_t))scheduler {
     if (self = [super init]) {
         _subscriber = subscriber;
-        _queue = queue ?: dispatch_get_main_queue();
-        return self;
+        _schedule = scheduler;
     }
-    return nil;
+    return self;
 }
 
 - (void)didCloseWithError:(NSError *)error {
-    dispatch_async(_queue, ^{
+    _schedule(^{
         [_subscriber changeStreamDidCloseWithError:error];
     });
 }
 
 - (void)didOpen {
-    dispatch_async(_queue, ^{
+    _schedule(^{
         [_subscriber changeStreamDidOpen:self];
     });
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    dispatch_async(_queue, ^{
+    _schedule(^{
         [_subscriber changeStreamDidReceiveError:error];
     });
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
-    std::string_view str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
-    if (!str.empty() && _watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
-        _watchStream.feed_buffer(str);
+    if (_watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
+        [event enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *) {
+            _watchStream.feed_buffer(std::string_view(static_cast<const char *>(bytes), byteRange.length));
+        }];
     }
 
     while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
         id<RLMBSON> event = RLMConvertBsonToRLMBSON(_watchStream.next_event());
-        dispatch_async(_queue, ^{
+        _schedule(^{
             [_subscriber changeStreamDidReceiveChangeEvent:event];
         });
     }
 
     if (_watchStream.state() == realm::app::WatchStream::State::HAVE_ERROR) {
-        [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
+        [self didReceiveError:makeError(_watchStream.error())];
     }
 }
 
@@ -90,10 +94,7 @@
 - (void)close {
     [_session invalidateAndCancel];
 }
-
 @end
-
-@implementation RLMMongoCollection
 
 static realm::bson::BsonDocument toBsonDocument(id<RLMBSON> bson) {
     return realm::bson::BsonDocument(RLMConvertRLMBSONToBson(bson));
@@ -102,6 +103,15 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
     return realm::bson::BsonArray(RLMConvertRLMBSONToBson(bson));
 }
 
+__attribute__((objc_direct_members))
+@interface RLMMongoCollection ()
+@property (nonatomic, strong) RLMUser *user;
+@property (nonatomic, strong) NSString *serviceName;
+@property (nonatomic, strong) NSString *databaseName;
+@end
+
+__attribute__((objc_direct_members))
+@implementation RLMMongoCollection
 - (instancetype)initWithUser:(RLMUser *)user
                  serviceName:(NSString *)serviceName
                 databaseName:(NSString *)databaseName
@@ -116,7 +126,7 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
 }
 
 - (realm::app::MongoCollection)collection:(NSString *)name {
-    return _user._syncUser->mongo_client(self.serviceName.UTF8String)
+    return _user.user->mongo_client(self.serviceName.UTF8String)
         .db(self.databaseName.UTF8String).collection(name.UTF8String);
 }
 
@@ -128,10 +138,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
           options:(RLMFindOptions *)options
        completion:(RLMMongoFindBlock)completion {
     self.collection.find(toBsonDocument(document), [options _findOptions],
-                         [completion](realm::util::Optional<realm::bson::BsonArray> documents,
-                                      realm::util::Optional<realm::app::AppError> error) {
+                         [completion](std::optional<realm::bson::BsonArray> documents,
+                                      std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
         completion((NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)RLMConvertBsonToRLMBSON(*documents), nil);
     });
@@ -146,12 +156,16 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                      options:(RLMFindOptions *)options
                   completion:(RLMMongoFindOneBlock)completion {
     self.collection.find_one(toBsonDocument(document), [options _findOptions],
-                             [completion](realm::util::Optional<realm::bson::BsonDocument> document,
-                                          realm::util::Optional<realm::app::AppError> error) {
+                             [completion](std::optional<realm::bson::BsonDocument> document,
+                                          std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
-        completion((NSDictionary<NSString *, id<RLMBSON>> *)RLMConvertBsonToRLMBSON(*document), nil);
+        if (document) {
+            completion((NSDictionary<NSString *, id<RLMBSON>> *)RLMConvertBsonToRLMBSON(*document), nil);
+        } else {
+            completion(nil, nil);
+        }
     });
 }
 
@@ -163,10 +177,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
 - (void)insertOneDocument:(NSDictionary<NSString *, id<RLMBSON>> *)document
                completion:(RLMMongoInsertBlock)completion {
     self.collection.insert_one(toBsonDocument(document),
-                               [completion](realm::util::Optional<realm::bson::Bson> objectId,
-                                            realm::util::Optional<realm::app::AppError> error) {
+                               [completion](std::optional<realm::bson::Bson> objectId,
+                                            std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
         completion(RLMConvertBsonToRLMBSON(*objectId), nil);
     });
@@ -175,10 +189,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
 - (void)insertManyDocuments:(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)documents
                  completion:(RLMMongoInsertManyBlock)completion {
     self.collection.insert_many(toBsonArray(documents),
-                                [completion](std::vector<realm::bson::Bson> insertedIds,
-                                             realm::util::Optional<realm::app::AppError> error) {
+                                [completion](realm::bson::BsonArray insertedIds,
+                                             std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
         NSMutableArray *insertedArr = [[NSMutableArray alloc] initWithCapacity:insertedIds.size()];
         for (auto& objectId : insertedIds) {
@@ -191,10 +205,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
 - (void)aggregateWithPipeline:(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)pipeline
                    completion:(RLMMongoFindBlock)completion {
     self.collection.aggregate(toBsonArray(pipeline),
-                              [completion](realm::util::Optional<realm::bson::BsonArray> documents,
-                                           realm::util::Optional<realm::app::AppError> error) {
+                              [completion](std::optional<realm::bson::BsonArray> documents,
+                                           std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
         completion((NSArray<id> *)RLMConvertBsonToRLMBSON(*documents), nil);
     });
@@ -203,13 +217,17 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
 - (void)countWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
              limit:(NSInteger)limit
         completion:(RLMMongoCountBlock)completion {
-    self.collection.count(toBsonDocument(document), limit,
-                          [completion](uint64_t count,
-                                       realm::util::Optional<realm::app::AppError> error) {
+    self.collection.count_bson(toBsonDocument(document), limit,
+                               [completion](std::optional<realm::bson::Bson>&& value,
+                                            std::optional<realm::app::AppError>&& error) {
         if (error) {
-            return completion(0, RLMAppErrorToNSError(*error));
+            return completion(0, makeError(*error));
         }
-        completion(static_cast<NSInteger>(count), nil);
+        if (value->type() == realm::bson::Bson::Type::Int64) {
+            return completion(static_cast<NSInteger>(static_cast<int64_t>(*value)), nil);
+        }
+        // If the collection does not exist the call returns undefined
+        return completion(0, nil);
     });
 }
 
@@ -222,9 +240,9 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                     completion:(RLMMongoCountBlock)completion {
     self.collection.delete_one(toBsonDocument(document),
                                [completion](uint64_t count,
-                                            realm::util::Optional<realm::app::AppError> error) {
+                                            std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(0, RLMAppErrorToNSError(*error));
+            return completion(0, makeError(*error));
         }
         completion(static_cast<NSInteger>(count), nil);
     });
@@ -234,9 +252,9 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                       completion:(RLMMongoCountBlock)completion {
     self.collection.delete_many(toBsonDocument(document),
                                 [completion](uint64_t count,
-                                             realm::util::Optional<realm::app::AppError> error) {
+                                             std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(0, RLMAppErrorToNSError(*error));
+            return completion(0, makeError(*error));
         }
         completion(static_cast<NSInteger>(count), nil);
     });
@@ -249,9 +267,9 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
     self.collection.update_one(toBsonDocument(filterDocument), toBsonDocument(updateDocument),
                                upsert,
                                [completion](realm::app::MongoCollection::UpdateResult result,
-                                            realm::util::Optional<realm::app::AppError> error) {
+                                            std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
         completion([[RLMUpdateResult alloc] initWithUpdateResult:result], nil);
     });
@@ -273,9 +291,9 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
     self.collection.update_many(toBsonDocument(filterDocument), toBsonDocument(updateDocument),
                                 upsert,
                                 [completion](realm::app::MongoCollection::UpdateResult result,
-                                             realm::util::Optional<realm::app::AppError> error) {
+                                             std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
         completion([[RLMUpdateResult alloc] initWithUpdateResult:result], nil);
     });
@@ -296,10 +314,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                    completion:(RLMMongoFindOneBlock)completion {
     self.collection.find_one_and_update(toBsonDocument(filterDocument), toBsonDocument(updateDocument),
                                         [options _findOneAndModifyOptions],
-                                        [completion](realm::util::Optional<realm::bson::BsonDocument> document,
-                                                     realm::util::Optional<realm::app::AppError> error) {
+                                        [completion](std::optional<realm::bson::BsonDocument> document,
+                                                     std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
 
         return completion((NSDictionary *)RLMConvertBsonDocumentToRLMBSON(document), nil);
@@ -321,10 +339,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                     completion:(RLMMongoFindOneBlock)completion {
     self.collection.find_one_and_replace(toBsonDocument(filterDocument), toBsonDocument(replacementDocument),
                                          [options _findOneAndModifyOptions],
-                                         [completion](realm::util::Optional<realm::bson::BsonDocument> document,
-                                                      realm::util::Optional<realm::app::AppError> error) {
+                                         [completion](std::optional<realm::bson::BsonDocument> document,
+                                                      std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
 
         return completion((NSDictionary *)RLMConvertBsonDocumentToRLMBSON(document), nil);
@@ -345,10 +363,10 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                    completion:(RLMMongoDeleteBlock)completion {
     self.collection.find_one_and_delete(toBsonDocument(filterDocument),
                                         [options _findOneAndModifyOptions],
-                                        [completion](realm::util::Optional<realm::bson::BsonDocument> document,
-                                                     realm::util::Optional<realm::app::AppError> error) {
+                                        [completion](std::optional<realm::bson::BsonDocument> document,
+                                                     std::optional<realm::app::AppError> error) {
         if (error) {
-            return completion(nil, RLMAppErrorToNSError(*error));
+            return completion(nil, makeError(*error));
         }
 
         return completion((NSDictionary *)RLMConvertBsonDocumentToRLMBSON(document), nil);
@@ -392,6 +410,17 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
                                  idFilter:(nullable id<RLMBSON>)idFilter
                                  delegate:(id<RLMChangeEventDelegate>)delegate
                             delegateQueue:(nullable dispatch_queue_t)queue {
+    queue = queue ?: dispatch_get_main_queue();
+    return [self watchWithMatchFilter:matchFilter
+                             idFilter:idFilter
+                             delegate:delegate
+                            scheduler:^(dispatch_block_t block) { dispatch_async(queue, block); }];
+}
+
+- (RLMChangeStream *)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
+                                 idFilter:(nullable id<RLMBSON>)idFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                                scheduler:(void (^)(dispatch_block_t))scheduler {
     realm::bson::BsonDocument baseArgs = {
         {"database", self.databaseName.UTF8String},
         {"collection", self.name.UTF8String}
@@ -404,16 +433,13 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
         baseArgs["ids"] = RLMConvertRLMBSONToBson(idFilter);
     }
     auto args = realm::bson::BsonArray{baseArgs};
-    auto app = self.user.app._realmApp;
+    auto app = self.user.user->app();
     auto request = app->make_streaming_request(app->current_user(), "watch", args,
-                                               realm::util::Optional<std::string>(self.serviceName.UTF8String));
-    RLMChangeStream *changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate delegateQueue:queue];
+                                               std::optional<std::string>(self.serviceName.UTF8String));
+    auto changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate scheduler:scheduler];
     RLMNetworkTransport *transport = self.user.app.configuration.transport;
-    RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
-    NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
-                                            eventSubscriber:changeStream];
-    [changeStream attachURLSession:watchSession];
+    RLMRequest *rlmRequest = RLMRequestFromRequest(request);
+    changeStream->_session = [transport doStreamRequest:rlmRequest eventSubscriber:changeStream];
     return changeStream;
 }
-
 @end

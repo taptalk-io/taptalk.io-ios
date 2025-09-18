@@ -19,6 +19,7 @@
 
 
 // The cell reuse identifier we are going to use.
+static NSString *gOverrideVersion = nil;
 static NSString *const kCellIdentifier = @"DemoCellIdentifier";
 static const CGFloat kSelectionHeight = 40;
 static const CGFloat kSelectionSwitchWidth = 50;
@@ -58,7 +59,19 @@ static const CGFloat kEdgeBuffer = 8;
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  // Set up the edit selections UI.
+  UINavigationBar *navBar = self.navigationController.navigationBar;
+  if (@available(iOS 13, *)) {
+    UINavigationBarAppearance *navBarAppearance = [[UINavigationBarAppearance alloc] init];
+    [navBarAppearance configureWithOpaqueBackground];
+    navBarAppearance.backgroundColor = [UIColor systemBackgroundColor];
+    [navBarAppearance
+        setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor labelColor]}];
+
+    navBar.standardAppearance = navBarAppearance;
+    navBar.scrollEdgeAppearance = navBarAppearance;
+  } else {
+    navBar.translucent = NO;
+  }
   [self setUpEditSelectionsUI];
 
   // Add button to the header to edit the place field selections.
@@ -383,8 +396,8 @@ static const CGFloat kEdgeBuffer = 8;
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath {
   // Dequeue a table view cell to use.
-  UITableViewCell *cell =
-      [tableView dequeueReusableCellWithIdentifier:kCellIdentifier forIndexPath:indexPath];
+  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier
+                                                          forIndexPath:indexPath];
 
   // Grab the demo object.
   Demo *demo = _demoData.sections[indexPath.section].demos[indexPath.row];
@@ -405,11 +418,16 @@ static const CGFloat kEdgeBuffer = 8;
   [self showDemo:demo];
 }
 
++ (NSString *)overrideVersion {
+  return [[[NSProcessInfo processInfo] environment] objectForKey:@"PLACES_VERSION_NUMBER_OVERRIDE"];
+}
+
 + (NSString *)titleText {
   NSString *titleFormat = NSLocalizedString(
       @"App.NameAndVersion", @"The name of the app to display in a navigation bar along with a "
                              @"placeholder for the SDK version number");
-  return [NSString stringWithFormat:titleFormat, [GMSPlacesClient SDKLongVersion]];
+  return [NSString
+      stringWithFormat:titleFormat, [self overrideVersion] ?: [GMSPlacesClient SDKLongVersion]];
 }
 
 #pragma mark - Handle Orientation Changes

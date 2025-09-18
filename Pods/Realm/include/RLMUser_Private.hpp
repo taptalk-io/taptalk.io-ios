@@ -16,36 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser.h"
+#import "RLMUser_Private.h"
 
-#import "sync/sync_user.hpp"
+#import "RLMSyncConfiguration.h"
 
-@class RLMSyncConfiguration, RLMSyncSessionRefreshHandle, RLMApp;
+#import <realm/sync/config.hpp>
 
-NS_ASSUME_NONNULL_BEGIN
+@class RLMSyncConfiguration, RLMApp;
 
-class CocoaSyncUserContext : public realm::SyncUserContext {
-public:
+namespace realm::app {
+class User;
+struct UserProfile;
+}
 
-private:
-    /**
-     A map of paths to 'refresh handles'.
-
-     A refresh handle is an object that encapsulates the concept of periodically
-     refreshing the Realm's access token before it expires. Tokens are indexed by their
-     paths (e.g. `/~/path/to/realm`).
-     */
-    std::unordered_map<std::string, RLMSyncSessionRefreshHandle *> m_refresh_handles;
-    std::mutex m_mutex;
-};
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMUser ()
-- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app;
-- (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue;
-- (std::shared_ptr<realm::SyncUser>)_syncUser;
-+ (void)_setUpBindingContextFactory;
-@property (weak, readonly) RLMApp *app;
-
+@property (nonatomic, readonly) std::shared_ptr<realm::app::User> user;
+- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user;
+- (std::string)pathForPartitionValue:(std::string const&)partitionValue;
+- (std::string)pathForFlexibleSync;
 @end
 
-NS_ASSUME_NONNULL_END
+@interface RLMUserProfile ()
+- (instancetype)initWithUserProfile:(realm::app::UserProfile)userProfile;
+@end
+
+RLM_HEADER_AUDIT_END(nullability, sendability)

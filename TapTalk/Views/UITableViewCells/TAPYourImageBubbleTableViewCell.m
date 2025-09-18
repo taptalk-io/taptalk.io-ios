@@ -1698,7 +1698,7 @@
     [self getImageSizeFromImage:image];
     self.bubbleImageView.alpha = 1.0f;
     self.thumbnailBubbleImageView.alpha = 0.0f;
-    [self refreshCellHeight];
+//    [self refreshCellHeight];
 //    [self.contentView layoutIfNeeded];
 }
 

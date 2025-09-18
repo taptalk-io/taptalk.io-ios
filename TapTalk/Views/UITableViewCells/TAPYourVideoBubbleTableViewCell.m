@@ -1914,7 +1914,7 @@
     success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
         [self.bubbleImageView setImage:savedImage];
         [self getImageSizeFromImage:savedImage];
-        [self refreshCellHeight];
+//        [self refreshCellHeight];
 //        [self.contentView layoutIfNeeded];
     }
     failure:^(NSError *error, TAPMessageModel *receivedMessage) {

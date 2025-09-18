@@ -8,3 +8,9 @@ Pods/Realm/core/realm-sync.xcframework/tvos-arm64/librealm-sync.a filter=lfs dif
 Pods/Realm/core/realm-sync.xcframework/tvos-arm64_x86_64-simulator/librealm-sync.a filter=lfs diff=lfs merge=lfs -text
 Pods/Realm/core/realm-sync.xcframework/watchos-arm64_i386_x86_64-simulator/librealm-sync.a filter=lfs diff=lfs merge=lfs -text
 Pods/Realm/core/realm-sync.xcframework/watchos-armv7k_arm64_32/librealm-sync.a filter=lfs diff=lfs merge=lfs -text
+Pods/Realm/core/realm-monorepo.xcframework/ios-arm64/librealm-monorepo.a filter=lfs diff=lfs merge=lfs -text
+Pods/Realm/core/realm-monorepo.xcframework/ios-arm64_x86_64-maccatalyst/librealm-monorepo.a filter=lfs diff=lfs merge=lfs -text
+Pods/Realm/core/realm-monorepo.xcframework/ios-arm64_x86_64-simulator/librealm-monorepo.a filter=lfs diff=lfs merge=lfs -text
+Pods/Realm/core/realm-monorepo.xcframework/macos-x86_64_arm64/librealm-monorepo.a filter=lfs diff=lfs merge=lfs -text
+Pods/Realm/core/realm-monorepo.xcframework/watchos-arm64_i386_x86_64-simulator/librealm-monorepo.a filter=lfs diff=lfs merge=lfs -text
+Pods/Realm/core/realm-monorepo.xcframework/xros-arm64_x86_64-simulator/librealm-monorepo.a filter=lfs diff=lfs merge=lfs -text

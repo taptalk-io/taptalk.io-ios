@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "NSError+RLMSync.h"
+#import <Realm/NSError+RLMSync.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMError.h"
 
 @implementation NSError (RLMSync)
 
