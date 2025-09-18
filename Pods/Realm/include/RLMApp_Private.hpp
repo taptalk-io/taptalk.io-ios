@@ -16,30 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMApp.h>
+#import <Realm/RLMApp_Private.h>
+
+#import <realm/object-store/sync/app.hpp>
+
 #import <memory>
-#import "sync/app.hpp"
 
-@interface RLMAppConfiguration()
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-- (realm::app::App::Config&)config;
-
-- (void)setAppId:(nonnull NSString *)appId;
-
-- (nonnull instancetype)initWithConfig:(const realm::app::App::Config&)config;
-
+RLM_DIRECT_MEMBERS
+@interface RLMAppConfiguration ()
+- (const realm::app::AppConfig&)config;
 @end
 
+RLM_DIRECT_MEMBERS
 @interface RLMApp ()
-
 - (std::shared_ptr<realm::app::App>)_realmApp;
-
-+ (nonnull instancetype)appWithId:(nonnull NSString *)appId
-                    configuration:(nonnull RLMAppConfiguration *)configuration
-                    rootDirectory:(nullable NSURL *)rootDirectory;
-
-- (nonnull instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
-
 @end
 
-NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);
+NSError *makeError(realm::app::AppError const& appError);
+
+RLM_HEADER_AUDIT_END(nullability, sendability)

@@ -56,7 +56,9 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
     /// BSON Document type
     RLMBSONTypeDocument,
     /// BSON Array type
-    RLMBSONTypeArray
+    RLMBSONTypeArray,
+    /// BSON UUID type
+    RLMBSONTypeUUID
 };
 
 #pragma mark RLMBSON
@@ -80,6 +82,7 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
  `RLMMinKey`
  `NSDictionary`
  `NSArray`
+ `NSUUID`
  
  @see RLMBSONType
  @see bsonspec.org
@@ -137,10 +140,12 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 @end
 
 /// MaxKey will always be the greatest value when comparing to other BSON types
+RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMMaxKey : NSObject
 @end
 
 /// MinKey will always be the smallest value when comparing to other BSON types
+RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMMinKey : NSObject
 @end
 
@@ -162,4 +167,8 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 
 /// :nodoc:
 @interface NSArray (RLMBSON)<RLMBSON>
+@end
+
+/// :nodoc:
+@interface NSUUID (RLMBSON)<RLMBSON>
 @end

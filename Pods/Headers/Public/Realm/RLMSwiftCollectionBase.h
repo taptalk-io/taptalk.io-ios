@@ -1,0 +1,1 @@
+../../../Realm/include/RLMSwiftCollectionBase.h

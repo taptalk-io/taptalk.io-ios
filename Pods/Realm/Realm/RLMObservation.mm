@@ -20,11 +20,15 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
+#import "RLMSwiftValueStorage.h"
 
 #import <realm/group.hpp>
 
@@ -181,16 +185,11 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     NSUInteger sep = [keyPath rangeOfString:@"."].location;
     NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
     RLMProperty *prop = objectSchema[key];
-    if (prop && prop.array) {
-        id value = valueForKey(key);
-        RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
-        array->_key = key;
-        array->_parentObject = object;
+    if (auto swiftAccessor = prop.swiftAccessor) {
+        [swiftAccessor observe:prop on:object];
     }
-    else if (auto swiftIvar = prop.swiftIvar) {
-        if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
-            RLMInitializeUnmanagedOptional(optional, object, prop);
-        }
+    else if (prop.collection) {
+        [valueForKey(key) setParent:object property:prop];
     }
 }
 
@@ -224,8 +223,8 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     // We need to return the same object each time for observing over keypaths
     // to work, so we store a cache of them here. We can't just cache them on
     // the object as that leads to retain cycles.
-    if (lastProp.array) {
-        RLMArray *value = cachedObjects[key];
+    if (lastProp.collection) {
+        id value = cachedObjects[key];
         if (!value) {
             value = getSuper();
             if (!cachedObjects) {
@@ -274,6 +273,13 @@ RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, realm::ObjKe
 }
 
 void RLMClearTable(RLMClassInfo &objectSchema) {
+    if (!objectSchema.table()) {
+        // Orphaned embedded object types are included in the schema but do not
+        // create a table at all, so we may not have a table here and just
+        // don't need to do anything
+        return;
+    }
+
     for (auto info : objectSchema.observedObjects) {
         info->willChange(RLMInvalidatedKey);
     }
@@ -335,7 +341,7 @@ void RLMObservationTracker::trackDeletions() {
         return;
     }
 
-    _group.set_cascade_notification_handler([=](realm::Group::CascadeNotification const& cs) {
+    _group.set_cascade_notification_handler([this](realm::Group::CascadeNotification const& cs) {
         cascadeNotification(cs);
     });
 }
@@ -368,7 +374,7 @@ void RLMObservationTracker::cascadeNotification(CascadeNotification const& cs) {
             }
 
             NSString *name = observer->columnName(link.origin_col_key);
-            if (observer->getRow().get_table()->get_column_type(link.origin_col_key) != type_LinkList) {
+            if (!link.origin_col_key.is_list()) {
                 _changes.push_back({observer, name});
                 continue;
             }
@@ -478,7 +484,7 @@ std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaIn
                 continue;
             observers.push_back({
                 row.get_table()->get_key(),
-                row.get_key().value,
+                row.get_key(),
                 info});
         }
     }

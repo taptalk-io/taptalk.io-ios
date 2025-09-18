@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import <Realm/RLMRealm.h>
 
 /**
@@ -25,7 +23,7 @@
  */
 typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
     /// The sync session is actively communicating or attempting to communicate
-    /// with MongoDB Realm. A session is considered Active even if
+    /// with Atlas App Services. A session is considered Active even if
     /// it is not currently connected. Check the connection state instead if you
     /// wish to know if the connection is currently online.
     RLMSyncSessionStateActive,
@@ -45,9 +43,9 @@ typedef NS_ENUM(NSUInteger, RLMSyncConnectionState) {
     /// to connect, either because the session is inactive or because it is
     /// waiting to retry after a failed connection.
     RLMSyncConnectionStateDisconnected,
-    /// The sync session is attempting to connect to MongoDB Realm.
+    /// The sync session is attempting to connect to Atlas App Services.
     RLMSyncConnectionStateConnecting,
-    /// The sync session is currently connected to MongoDB Realm.
+    /// The sync session is currently connected to Atlas App Services.
     RLMSyncConnectionStateConnected,
 };
 
@@ -99,9 +97,39 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
  `transferredBytes` refers to the number of bytes that have been uploaded or downloaded.
  `transferrableBytes` refers to the total number of bytes transferred, and pending transfer.
  */
-typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes);
+typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes) __attribute__((deprecated("Use RLMSyncProgressNotificationBlock instead", "RLMSyncProgressNotificationBlock")));
 
-NS_ASSUME_NONNULL_BEGIN
+/**
+ A struct encapsulating progress information.
+ */
+typedef struct RLMSyncProgress {
+    /// The number of bytes that have been transferred.
+    NSUInteger transferredBytes;
+    
+    /**
+     The total number of transferrable bytes (bytes that have been transferred,
+     plus bytes pending transfer).
+     */
+    NSUInteger transferrableBytes;
+    
+    /**
+     A value between 0.0 and 1.0 representing the estimated transfer progress. This value is precise for
+     uploads, but will be based on historical data and certain heuristics applied by the server for downloads.
+     
+     Whenever the progress reporting mode is `forCurrentlyOutstandingWork`, that value
+     will monotonically increase until it reaches 1.0. If the progress mode is `reportIndefinitely`, the
+     value may either increase or decrease as new data needs to be transferred.
+     */
+    double progressEstimate;
+} RLMSyncProgress;
+
+/**
+ The type of a progress notification block intended for reporting a session's network
+ activity to the user.
+ */
+typedef void(^RLMSyncProgressNotificationBlock)(RLMSyncProgress progress);
+
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
  A token object corresponding to a progress notification block on a session object.
@@ -109,18 +137,20 @@ NS_ASSUME_NONNULL_BEGIN
  To stop notifications manually, call `-invalidate` on it. Notifications should be stopped before
  the token goes out of scope or is destroyed.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMProgressNotificationToken : RLMNotificationToken
 @end
 
 /**
- An object encapsulating a MongoDB Realm "session". Sessions represent the
+ An object encapsulating an Atlas App Services "session". Sessions represent the
  communication between the client (and a local Realm file on disk), and the server
- (and a remote Realm with a given partition value stored on MongoDB Realm).
+ (and a remote Realm with a given partition value stored on Atlas App Services).
 
  Sessions are always created by the SDK and vended out through various APIs. The
  lifespans of sessions associated with Realms are managed automatically. Session
  objects can be accessed from any thread.
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMSyncSession : NSObject
 
 /// The session's current state.
@@ -147,18 +177,35 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Temporarily suspend syncronization and disconnect from the server.
 
- The session will not attempt to connect to MongoDB Realm until `resume`
+ The session will not attempt to connect to Atlas App Services until `resume`
  is called or the Realm file is closed and re-opened.
  */
 - (void)suspend;
 
 /**
- Resume syncronization and reconnect to MongoDB Realm after suspending.
+ Resume syncronization and reconnect to Atlas App Services after suspending.
 
  This is a no-op if the session was already active or if the session is invalid.
  Newly created sessions begin in the Active state and do not need to be resumed.
  */
 - (void)resume;
+
+/**
+ Request an immediate reconnection to the server if the session is disconnected.
+
+ Realm automatically reconnects after disconnects with an exponential backoff,
+ which is reset when the reachability handler reports a network status change.
+ In some scenarios an application may wish to skip the reconnect delay, such as
+ when an application receives the DidBecomeActive notification, which can be
+ done by calling this method. Calling this method is never required.
+
+ This method is asynchronous and merely skips the current reconnect delay, so
+ the connection state will still normally be disconnected immediately after
+ calling it.
+
+ Has no effect if the session is currently connected.
+ */
+- (void)reconnect;
 
 /**
  Register a progress notification block.
@@ -192,15 +239,62 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                           mode:(RLMSyncProgressMode)mode
-                                                                         block:(RLMProgressNotificationBlock)block
-NS_REFINED_FOR_SWIFT;
+block:(RLMProgressNotificationBlock)block __attribute__((deprecated("Use addSyncProgressNotificationForDirection instead", "addSyncProgressNotificationForDirection")))
+    NS_REFINED_FOR_SWIFT;
+
+
+/**
+ Register a progress notification block.
+
+ Multiple blocks can be registered with the same session at once. Each block
+ will be invoked on a side queue devoted to progress notifications.
+
+ If the session has already received progress information from the
+ synchronization subsystem, the block will be called immediately. Otherwise, it
+ will be called as soon as progress information becomes available.
+
+ The token returned by this method must be retained as long as progress
+ notifications are desired, and the `-invalidate` method should be called on it
+ when notifications are no longer needed and before the token is destroyed.
+
+ If no token is returned, the notification block will never be called again.
+ There are a number of reasons this might be true. If the session has previously
+ experienced a fatal error it will not accept progress notification blocks. If
+ the block was configured in the `RLMSyncProgressForCurrentlyOutstandingWork`
+ mode but there is no additional progress to report (for example, the number
+ of transferrable bytes and transferred bytes are equal), the block will not be
+ called again.
+
+ @param direction The transfer direction (upload or download) to track in this progress notification block.
+ @param mode      The desired behavior of this progress notification block.
+ @param block     The block to invoke when notifications are available.
+
+ @return A token which must be held for as long as you want notifications to be delivered.
+
+ @see ``RLMSyncProgressDirection``, ``RLMSyncProgress``, ``RLMSyncProgressNotificationBlock``, ``RLMProgressNotificationToken``
+ */
+- (nullable RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                              mode:(RLMSyncProgressMode)mode
+                                                                             block:(RLMSyncProgressNotificationBlock)block
+    NS_REFINED_FOR_SWIFT;
+
+
+/// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
+- (BOOL)waitForUploadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback NS_REFINED_FOR_SWIFT;
+
+/// Wait for pending downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
+- (BOOL)waitForDownloadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback NS_REFINED_FOR_SWIFT;
+
+/// :nodoc:
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager
+    __attribute__((deprecated("The syncManager: parameter is no longer required")));
 
 /**
  Given an error action token, immediately handle the corresponding action.
- 
- @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+
+ @see ```RLMSyncErrorClientResetError``, ``RLMSyncErrorPermissionDeniedError``
  */
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager;
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
 
 /**
  Get the sync session for the given Realm if it is a synchronized Realm, or `nil`
@@ -220,56 +314,13 @@ NS_REFINED_FOR_SWIFT;
 
  @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
  */
+RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMSyncErrorActionToken : NSObject
-
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
 
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
-
 @end
 
-/**
- A task object which can be used to observe or cancel an async open.
-
- When a synchronized Realm is opened asynchronously, the latest state of the
- Realm is downloaded from the server before the completion callback is invoked.
- This task object can be used to observe the state of the download or to cancel
- it. This should be used instead of trying to observe the download via the sync
- session as the sync session itself is created asynchronously, and may not exist
- yet when -[RLMRealm asyncOpenWithConfiguration:completion:] returns.
- */
-@interface RLMAsyncOpenTask : NSObject
-/**
- Register a progress notification block.
-
- Each registered progress notification block is called whenever the sync
- subsystem has new progress data to report until the task is either cancelled
- or the completion callback is called. Progress notifications are delivered on
- the main queue.
- */
-- (void)addProgressNotificationBlock:(RLMProgressNotificationBlock)block;
-
-/**
- Register a progress notification block which is called on the given queue.
-
- Each registered progress notification block is called whenever the sync
- subsystem has new progress data to report until the task is either cancelled
- or the completion callback is called. Progress notifications are delivered on
- the supplied queue.
- */
-- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue
-                                 block:(RLMProgressNotificationBlock)block;
-
-/**
- Cancel the asynchronous open.
-
- Any download in progress will be cancelled, and the completion block for this
- async open will never be called. If multiple async opens on the same Realm are
- happening concurrently, all other opens will fail with the error "operation cancelled".
- */
-- (void)cancel;
-@end
-
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)

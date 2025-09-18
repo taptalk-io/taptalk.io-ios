@@ -18,6 +18,7 @@
 
 #import "RLMObjectId_Private.hpp"
 
+#import "RLMError_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/object_id.hpp>
@@ -82,8 +83,13 @@
     return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    // RLMObjectID is immutable so we don't have to actually copy
+    return self;
+}
+
 + (instancetype)objectId {
-    return [[RLMObjectId alloc] initWithValue:realm::ObjectId::gen()];
+    return [[self alloc] initWithValue:realm::ObjectId::gen()];
 }
 
 - (BOOL)isEqual:(id)object {

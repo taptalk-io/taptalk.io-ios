@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <sstream>
+#import "RLMBSON_Private.hpp"
 
-#import "RLMUtil.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
-#import "RLMBSON_Private.hpp"
-#import "util/bson/bson.hpp"
+#import "RLMUUID_Private.hpp"
+#import "RLMUtil.hpp"
+
+#import <realm/util/bson/bson.hpp>
 
 using namespace realm;
 using namespace bson;
@@ -209,6 +209,16 @@ using namespace bson;
 
 @end
 
+#pragma mark NSUUID
+
+@implementation NSUUID (RLMBSON)
+
+- (RLMBSONType)bsonType {
+    return RLMBSONTypeUUID;
+}
+
+@end
+
 #pragma mark NSRegularExpression
 
 @implementation NSRegularExpression (RLMBSON)
@@ -323,9 +333,11 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
             return std::vector<char>((char*)((NSData *)b).bytes,
                                      ((char*)((NSData *)b).bytes) + (int)((NSData *)b).length);
         case RLMBSONTypeTimestamp:
-            return RLMTimestampForNSDate((NSDate *)b);
-        case RLMBSONTypeDatetime:
+            // This represents a value of `Timestamp` in a MongoDB Collection.
             return MongoTimestamp(((NSDate *)b).timeIntervalSince1970, 0);
+        case RLMBSONTypeDatetime:
+            // This represents a value of `Date` in a MongoDB Collection.
+            return RLMTimestampForNSDate((NSDate *)b);
         case RLMBSONTypeDecimal128:
             return [((RLMDecimal128 *)b) decimal128Value];
         case RLMBSONTypeRegularExpression:
@@ -338,7 +350,19 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
             return [((NSDictionary *)b) bsonDocumentValue];
         case RLMBSONTypeArray:
             return [((NSArray *)b) bsonArrayValue];
+        case RLMBSONTypeUUID:
+            return [((NSUUID *)b) rlm_uuidValue];
     }
+}
+
+BsonDocument RLMConvertRLMBSONArrayToBsonDocument(NSArray<id<RLMBSON>> *array) {
+    BsonDocument bsonDocument = BsonDocument{};
+    for (NSDictionary<NSString *, id<RLMBSON>> *item in array) {
+        [item enumerateKeysAndObjectsUsingBlock:[&](NSString *key, id<RLMBSON> bson, BOOL *) {
+            bsonDocument[key.UTF8String] = RLMConvertRLMBSONToBson(bson);
+        }];
+    }
+    return bsonDocument;
 }
 
 #pragma mark BsonToRLMBSON
@@ -356,7 +380,7 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
         case realm::bson::Bson::Type::Double:
             return @(static_cast<double>(b));
         case realm::bson::Bson::Type::String:
-            return RLMStringDataToNSString(static_cast<std::string>(b).c_str());
+            return @(static_cast<std::string>(b).c_str());
         case realm::bson::Bson::Type::Binary:
             return [[NSData alloc] initWithBsonBinary:static_cast<std::vector<char>>(b)];
         case realm::bson::Bson::Type::Timestamp:
@@ -377,10 +401,23 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
             return [[NSMutableDictionary alloc] initWithBsonDocument:static_cast<BsonDocument>(b)];
         case realm::bson::Bson::Type::Array:
             return [[NSMutableArray alloc] initWithBsonArray:static_cast<BsonArray>(b)];
+        case realm::bson::Bson::Type::Uuid:
+            return [[NSUUID alloc] initWithRealmUUID:static_cast<realm::UUID>(b)];
     }
     return nil;
 }
 
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<BsonDocument> b) {
+id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(std::optional<BsonDocument> b) {
     return b ? RLMConvertBsonToRLMBSON(*b) : nil;
+}
+
+NSArray<id<RLMBSON>> *RLMConvertBsonDocumentToRLMBSONArray(std::optional<BsonDocument> b) {
+    if (!b) {
+        return @[];
+    }
+    NSMutableArray<id<RLMBSON>> *array = [[NSMutableArray alloc] init];
+    for (const auto& [key, value] : *b) {
+        [array addObject:@{@(key.c_str()): RLMConvertBsonToRLMBSON(value)}];
+    }
+    return array;
 }

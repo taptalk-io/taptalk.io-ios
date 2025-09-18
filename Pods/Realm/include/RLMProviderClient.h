@@ -16,24 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
-NS_ASSUME_NONNULL_BEGIN
+RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @class RLMApp;
 
 /// Base provider client interface.
+RLM_SWIFT_SENDABLE
 @interface RLMProviderClient : NSObject
-
 /// The app associated with this provider client.
-@property (nonatomic, strong) RLMApp *app;
-
-/**
- Initialize a provider client with a given app.
- @param app The app for this provider client.
- */
-- (instancetype)initWithApp:(RLMApp *)app;
-
+@property (nonatomic, strong, readonly) RLMApp *app;
 @end
 
-NS_ASSUME_NONNULL_END
+RLM_HEADER_AUDIT_END(nullability, sendability)
