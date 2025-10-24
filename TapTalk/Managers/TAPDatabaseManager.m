@@ -59,6 +59,7 @@
                                ascending:(BOOL)isAscending
                                  success:(void (^)(NSArray *resultArray))success
                                  failure:(void (^)(NSError *error))failure {
+    
     RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
     
     RLMResults *results = [NSClassFromString(tableName) allObjectsInRealm:realm];
@@ -98,87 +99,91 @@
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
-        
-        RLMResults *results = [NSClassFromString(tableName) allObjectsInRealm:realm];
-        
-        if ([whereClauseQuery isEqualToString:@""]) {
-            //NO FILTER REQUIRED
-            if (![columnName isEqualToString:@""]) {
-                //NO SORTING
-                results = [results sortedResultsUsingKeyPath:columnName ascending:isAscending];
+        @autoreleasepool {
+            RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+            
+            RLMResults *results = [NSClassFromString(tableName) allObjectsInRealm:realm];
+            
+            if ([whereClauseQuery isEqualToString:@""]) {
+                //NO FILTER REQUIRED
+                if (![columnName isEqualToString:@""]) {
+                    //NO SORTING
+                    results = [results sortedResultsUsingKeyPath:columnName ascending:isAscending];
+                }
             }
-        }
-        else {
-            //FILTER REQUIRED
-            results = [TAPDatabaseManager filterResultsWithWhereClauseQuery:whereClauseQuery results:results];
-            if (![columnName isEqualToString:@""]) {
-                //SORTING
-                results = [TAPDatabaseManager sortResultsWithColumnName:columnName isAscending:isAscending results:results];
+            else {
+                //FILTER REQUIRED
+                results = [TAPDatabaseManager filterResultsWithWhereClauseQuery:whereClauseQuery results:results];
+                if (![columnName isEqualToString:@""]) {
+                    //SORTING
+                    results = [TAPDatabaseManager sortResultsWithColumnName:columnName isAscending:isAscending results:results];
+                }
             }
-        }
-        
-        NSArray *resultArray = [NSArray array];
-        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
-
+            
+            NSArray *resultArray = [NSArray array];
+            resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+            
 //        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
 //            // handle error
 //             dispatch_async(dispatch_get_main_queue(), ^{
 //                failure(error);
 //             });
 //        }];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            success(resultArray);
-        });
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                success(resultArray);
+            });
+        }
     });
 }
 
 + (void)loadDataFromTableName:(NSString *)tableName
-                  whereClauseQuery:(NSString *)whereClauseQuery
-                  sortByColumnName:(NSString *)columnName
-                       isAscending:(BOOL)isAscending
-                        distinctBy:(NSString *)distinctKey
+             whereClauseQuery:(NSString *)whereClauseQuery
+             sortByColumnName:(NSString *)columnName
+                  isAscending:(BOOL)isAscending
+                   distinctBy:(NSString *)distinctKey
                       success:(void (^)(NSArray *resultArray))success
                       failure:(void (^)(NSError *error))failure {
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
-        
-        RLMResults *results = [NSClassFromString(tableName) allObjectsInRealm:realm];
-        
-        if ([whereClauseQuery isEqualToString:@""]) {
-            //NO FILTER REQUIRED
-            if (![columnName isEqualToString:@""]) {
-                //NO SORTING
-                results = [results sortedResultsUsingKeyPath:columnName ascending:isAscending];
+        @autoreleasepool {
+            RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+            
+            RLMResults *results = [NSClassFromString(tableName) allObjectsInRealm:realm];
+            
+            if ([whereClauseQuery isEqualToString:@""]) {
+                //NO FILTER REQUIRED
+                if (![columnName isEqualToString:@""]) {
+                    //NO SORTING
+                    results = [results sortedResultsUsingKeyPath:columnName ascending:isAscending];
+                }
             }
-        }
-        else {
-            //FILTER REQUIRED
-            results = [TAPDatabaseManager filterResultsWithWhereClauseQuery:whereClauseQuery results:results];
-            if (![columnName isEqualToString:@""]) {
-                //SORTING
-                results = [TAPDatabaseManager sortResultsWithColumnName:columnName isAscending:isAscending results:results];
+            else {
+                //FILTER REQUIRED
+                results = [TAPDatabaseManager filterResultsWithWhereClauseQuery:whereClauseQuery results:results];
+                if (![columnName isEqualToString:@""]) {
+                    //SORTING
+                    results = [TAPDatabaseManager sortResultsWithColumnName:columnName isAscending:isAscending results:results];
+                }
             }
-        }
-        
-        results = [results distinctResultsUsingKeyPaths:@[distinctKey]];
-        
-        NSArray *resultArray = [NSArray array];
-        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
-
+            
+            results = [results distinctResultsUsingKeyPaths:@[distinctKey]];
+            
+            NSArray *resultArray = [NSArray array];
+            resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+            
 //        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
 //            // handle error
 //            dispatch_async(dispatch_get_main_queue(), ^{
 //                failure(error);
 //            });
 //        }];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            success(resultArray);
-        });
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                success(resultArray);
+            });
+        }
     });
 }
 
@@ -188,125 +193,127 @@
                       success:(void (^)(NSArray *resultArray))success
                       failure:(void (^)(NSError *error))failure {
 //RN Note - Somehow the performance is better when the load is not thrown to async, if thrown to async, sometimes it caused stuck on tableview scroll, so temporarily disabling async
-//    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-//    dispatch_async(queue, ^{
-        RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
-        
-        RLMResults *results = [TAPMessageRealmModel allObjectsInRealm:realm];
-        results = [results objectsWhere:[NSString stringWithFormat:@"roomID == '%@'", roomID]];
-        results = [results sortedResultsUsingKeyPath:@"created" ascending:NO];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateString];
-        results = [results objectsWithPredicate:predicate];
-        if ([results count] == 0) {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-                success([NSArray array]);
-//            });
-        }
-        else {
-            if (numberOfItems == 0) {
-                //No limit
-                NSArray *resultArray = [NSArray array];
-                resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
-                
-//                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-//                    // handle error
-//                    //                dispatch_async(dispatch_get_main_queue(), ^{
-//                    failure(error);
-//                    //                });
-//                }];
-                //            dispatch_async(dispatch_get_main_queue(), ^{
-                success(resultArray);
-                //            });
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        @autoreleasepool {
+            RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+            
+            RLMResults *results = [TAPMessageRealmModel allObjectsInRealm:realm];
+            results = [results objectsWhere:[NSString stringWithFormat:@"roomID == '%@'", roomID]];
+            results = [results sortedResultsUsingKeyPath:@"created" ascending:NO];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateString];
+            results = [results objectsWithPredicate:predicate];
+            if ([results count] == 0) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    success([NSArray array]);
+                });
             }
             else {
-                //with limit
-                if ([results count] < numberOfItems) {
-                    //Result is less than limit
-                    TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:[results count] - 1];
-                    NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
-                    //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
-                    predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
-                    results = [results objectsWithPredicate:predicate];
-                    
+                if (numberOfItems == 0) {
+                    //No limit
                     NSArray *resultArray = [NSArray array];
                     resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
                     
-//                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-//                        // handle error
-//                        //                dispatch_async(dispatch_get_main_queue(), ^{
-//                        failure(error);
-//                        //                });
-//                    }];
-                    
-                    //            dispatch_async(dispatch_get_main_queue(), ^{
-                    success(resultArray);
-                    //            });
+                    //                [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+                    //                    // handle error
+                    //                    //                dispatch_async(dispatch_get_main_queue(), ^{
+                    //                    failure(error);
+                    //                    //                });
+                    //                }];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        success(resultArray);
+                    });
                 }
                 else {
-                    //Result is greater or equal to limit
-                    TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:numberOfItems - 1];
-                    NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
-                    //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
-                    predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
-                    results = [results objectsWithPredicate:predicate];
-                    
-                    NSArray *resultArray = [NSArray array];
-                    resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
-                    
-//                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-//                        // handle error
-//                        //                dispatch_async(dispatch_get_main_queue(), ^{
-//                        failure(error);
-//                        //                });
-//                    }];
-                    //            dispatch_async(dispatch_get_main_queue(), ^{
-                    success(resultArray);
-                    //            });
+                    //with limit
+                    if ([results count] < numberOfItems) {
+                        //Result is less than limit
+                        TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:[results count] - 1];
+                        NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
+                        //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
+                        predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
+                        results = [results objectsWithPredicate:predicate];
+                        
+                        NSArray *resultArray = [NSArray array];
+                        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+                        
+                        //                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+                        //                        // handle error
+                        //                        //                dispatch_async(dispatch_get_main_queue(), ^{
+                        //                        failure(error);
+                        //                        //                });
+                        //                    }];
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            success(resultArray);
+                        });
+                    }
+                    else {
+                        //Result is greater or equal to limit
+                        TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:numberOfItems - 1];
+                        NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
+                        //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
+                        predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
+                        results = [results objectsWithPredicate:predicate];
+                        
+                        NSArray *resultArray = [NSArray array];
+                        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+                        
+                        //                    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+                        //                        // handle error
+                        //                        //                dispatch_async(dispatch_get_main_queue(), ^{
+                        //                        failure(error);
+                        //                        //                });
+                        //                    }];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            success(resultArray);
+                        });
+                    }
                 }
             }
+            //        else if ([results count] < numberOfItems) {
+            //            TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:[results count] - 1];
+            //            NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
+            //            //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
+            //            predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
+            //            results = [results objectsWithPredicate:predicate];
+            //
+            //            NSArray *resultArray = [NSArray array];
+            //            resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+            //
+            //            [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+            //                // handle error
+            ////                dispatch_async(dispatch_get_main_queue(), ^{
+            //                    failure(error);
+            ////                });
+            //            }];
+            //
+            ////            dispatch_async(dispatch_get_main_queue(), ^{
+            //                success(resultArray);
+            ////            });
+            //        }
+            //        else {
+            //            TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:numberOfItems - 1];
+            //            NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
+            //            //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
+            //            predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
+            //            results = [results objectsWithPredicate:predicate];
+            //
+            //            NSArray *resultArray = [NSArray array];
+            //            resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+            //
+            //            [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+            //                // handle error
+            ////                dispatch_async(dispatch_get_main_queue(), ^{
+            //                    failure(error);
+            ////                });
+            //            }];
+            ////            dispatch_async(dispatch_get_main_queue(), ^{
+            //                success(resultArray);
+            ////            });
+            //        }
         }
-//        else if ([results count] < numberOfItems) {
-//            TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:[results count] - 1];
-//            NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
-//            //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
-//            predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
-//            results = [results objectsWithPredicate:predicate];
-//
-//            NSArray *resultArray = [NSArray array];
-//            resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
-//
-//            [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-//                // handle error
-////                dispatch_async(dispatch_get_main_queue(), ^{
-//                    failure(error);
-////                });
-//            }];
-//
-////            dispatch_async(dispatch_get_main_queue(), ^{
-//                success(resultArray);
-////            });
-//        }
-//        else {
-//            TAPMessageRealmModel *tempMessageModel = [results objectAtIndex:numberOfItems - 1];
-//            NSString *secondLimiterPredicateString = [NSString stringWithFormat:@"created >= %lf", [tempMessageModel.created doubleValue]];
-//            //    NSString *combinedPredicateString = [NSString stringWithFormat:@"%@ %@", predicateString, secondLimiterPredicateString];
-//            predicate = [NSPredicate predicateWithFormat:secondLimiterPredicateString];
-//            results = [results objectsWithPredicate:predicate];
-//
-//            NSArray *resultArray = [NSArray array];
-//            resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
-//
-//            [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
-//                // handle error
-////                dispatch_async(dispatch_get_main_queue(), ^{
-//                    failure(error);
-////                });
-//            }];
-////            dispatch_async(dispatch_get_main_queue(), ^{
-//                success(resultArray);
-////            });
-//        }
-//    });
+    });
 }
 
 + (void)loadMessageWithRoomID:(NSString *)roomID

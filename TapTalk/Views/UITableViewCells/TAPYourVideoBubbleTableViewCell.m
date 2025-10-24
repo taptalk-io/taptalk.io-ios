@@ -2179,4 +2179,24 @@
     [self.contentView layoutIfNeeded];
 }
 
+- (void)refreshCellHeight {
+    UITableView *tableView = [self getTableView];
+    if (tableView != nil) {
+        @try {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [tableView performBatchUpdates:nil completion:nil];
+            });
+        }
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception.reason);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [tableView reloadData];
+            });
+        }
+        @finally {
+            
+        }
+    }
+}
+
 @end
