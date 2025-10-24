@@ -15,7 +15,9 @@
 @end
 
 @implementation TAPGroupManager
+
 #pragma mark - Lifecycle
+
 + (TAPGroupManager *)sharedManager {
     static TAPGroupManager *sharedManager = nil;
     static dispatch_once_t onceToken;
@@ -41,6 +43,7 @@
 }
 
 #pragma mark - Custom Method
+
 - (TAPRoomModel *)getRoomWithRoomID:(NSString *)roomID {
     TAPRoomModel *room = [self.roomModelDictionary objectForKey:roomID];
     return room;
@@ -59,10 +62,18 @@
 }
 
 - (void)saveRoomToPreference {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.roomModelDictionary];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setSecureObject:encodedObject forKey:TAP_PREFS_ROOM_MODEL_DICTIONARY];
-    [defaults synchronize];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.roomModelDictionary];
+        if (encodedObject && encodedObject.length > 1000000) {
+            // FIXME: SAVING LARGE DATA TO PREFERENCE MAY CAUSE CRASH
+            [self.roomModelDictionary removeAllObjects];
+        }
+        else {
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            [defaults setSecureObject:encodedObject forKey:TAP_PREFS_ROOM_MODEL_DICTIONARY];
+            [defaults synchronize];
+        }
+    });
 }
 
 - (void)populateRoomFromPreference {
@@ -74,4 +85,5 @@
     }
     
 }
+
 @end
