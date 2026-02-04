@@ -89,7 +89,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TopFloatingIndicatorViewTypeLoading = 1
 };
 
-@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPOverlayChatRoomViewDelegate>
+@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPBaseTableViewCellDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPOverlayChatRoomViewDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -204,6 +204,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
 
 @property (strong, nonatomic) NSMutableDictionary *cellHeightsDictionary;
+@property (strong, nonatomic) NSMutableDictionary<NSString *, UIImage *> *bubbleImageDataDictionary;
 @property (strong, nonatomic) TAPMessageModel *selectedMessage;
 @property (strong, nonatomic) TAPOnlineStatusModel *onlineStatus;
 
@@ -461,6 +462,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) NSInteger pinPagenationCounter;
 
 @property (nonatomic) BOOL isBlockedUser;
+@property (nonatomic) BOOL isRefreshingTableViewCells;
 
 @property (strong, nonatomic) UIViewController *currentPresentedViewController;
 
@@ -544,6 +546,7 @@ CGPoint center;
     _messageArray = [[NSMutableArray alloc] init];
     _messageDictionary = [[NSMutableDictionary alloc] init];
     _cellHeightsDictionary = [[NSMutableDictionary alloc] init];
+    _bubbleImageDataDictionary = [[NSMutableDictionary alloc] init];
     _anchorUnreadMessageArray = [[NSMutableArray alloc] init];
     _anchorMentionMessageDictionary = [[NSMutableDictionary alloc] init];
     _anchorMentionMessageArray = [[NSMutableArray alloc] init];
@@ -1857,10 +1860,16 @@ CGPoint center;
                     }
                     
                     if (message.isFailedSend) {
-                        //Update view to failed send
-                        
-                        // Fetch image data, get from cache or download if needed
-                        [self fetchImageDataWithMessage:message];
+                        // Update view to failed send
+                        if ([self.bubbleImageDataDictionary objectForKey:message.localID] != nil) {
+                            if (cell.bubbleImageView.image == nil) {
+                                [cell setFullImage:[self.bubbleImageDataDictionary objectForKey:message.localID]];
+                            }
+                        }
+                        else {
+                            // Fetch image data, get from cache or download if needed
+                            [self fetchImageDataWithMessage:message];
+                        }
                         [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeFailed];
                     }
                     else {
@@ -1880,8 +1889,21 @@ CGPoint center;
                             }
                         }
                         else {
-                            // Fetch image data, get from cache or download if needed
-                            [self fetchImageDataWithMessage:message];
+                            if ([self.bubbleImageDataDictionary objectForKey:message.localID] != nil) {
+                                if (cell.bubbleImageView.image == nil) {
+                                    [cell setFullImage:[self.bubbleImageDataDictionary objectForKey:message.localID]];
+                                    NSLog(@">>>>>> setFullImage dict %@", message.messageID);
+                                }
+                                else {
+                                    
+                                    NSLog(@">>>>>> has Full Image %@", message.messageID);
+                                }
+                            }
+                            else {
+                                // Fetch image data, get from cache or download if needed
+                                NSLog(@">>>>>> fetchImageDataWithMessage %@", message.messageID);
+                                [self fetchImageDataWithMessage:message];
+                            }
                         }
                     }
                     
@@ -2641,8 +2663,15 @@ CGPoint center;
                         [cell animateProgressDownloadingImageWithProgress:progress total:total];
                     }
                     else {
-                        //Fetch image data, get from cache or download if needed
-                        [self fetchImageDataWithMessage:message];
+                        if ([self.bubbleImageDataDictionary objectForKey:message.localID] != nil) {
+                            if (cell.bubbleImageView.image == nil) {
+                                [cell setFullImage:[self.bubbleImageDataDictionary objectForKey:message.localID]];
+                            }
+                        }
+                        else {
+                            // Fetch image data, get from cache or download if needed
+                            [self fetchImageDataWithMessage:message];
+                        }
                     }
                     
                     return cell;
@@ -3963,6 +3992,23 @@ CGPoint center;
     }
 }
 
+#pragma mark TAPBaseTableViewCellDelegate
+
+- (void)baseTableViewCellDidRequestRefreshCellHeight {
+    if (self.isRefreshingTableViewCells) {
+        return;
+    }
+    _isRefreshingTableViewCells = YES;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView reloadData];
+    });
+    
+    [TAPUtil performBlock:^{
+        self->_isRefreshingTableViewCells = NO;
+    } afterDelay:3.0f];
+}
+
 #pragma mark TAPMyChatBubbleTableViewCell
 - (void)myChatCheckmarkDidTapped:(TAPMessageModel *)tappedMessage {
     if(self.isSelectingForwardMessage){
@@ -4360,24 +4406,7 @@ CGPoint center;
 }
 
 - (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message {
-    
-    //Cancel uploading task
-    [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
-    
-    //Remove message from array and dictionary in ChatViewController
-    TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
-    [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
-    }];
-    
-    //Remove from WaitingUploadDictionary in ChatManager
-    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
-    
-    //Remove message from database
-    [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
-        
-    } failure:^(NSError *error) {
-        
-    }];
+    [self handleCancelUploadWithMessage:message];
 }
 
 - (void)myImageReplyDidTappedWithMessage:(TAPMessageModel *)message {
@@ -4818,37 +4847,7 @@ CGPoint center;
     
     if ([key isEqualToString:@""]) {
         //File exist, uploading file state
-        //Cancel uploading task
-        [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:tappedMessage];
-        
-        //Remove message from array and dictionary in ChatViewController
-        TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:tappedMessage.localID];
-        NSInteger deletedIndex = [[self.messageArray copy] indexOfObject:currentDeletedMessage];
-        [self removeMessageFromArrayAndDictionaryWithLocalID:tappedMessage.localID];
-        
-        //Remove from WaitingUploadDictionary in ChatManager
-        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
-        
-        //Remove message from database
-        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            
-        } failure:^(NSError *error) {
-            
-        }];
-        
-        //Update chat room UI
-        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
-        }
+        [self handleCancelUploadWithMessage:tappedMessage];
     }
     else {
         //File not exist, download file
@@ -5003,23 +5002,7 @@ CGPoint center;
     
     if ([key isEqualToString:@""]) {
         //File exist, uploading file state
-        //Cancel uploading task
-        [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:tappedMessage];
-        
-        //Remove message from array and dictionary in ChatViewController
-        TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:tappedMessage.localID];
-        [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
-        }];
-        
-        //Remove from WaitingUploadDictionary in ChatManager
-        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
-        
-        //Remove message from database
-        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
-            
-        } failure:^(NSError *error) {
-            
-        }];
+        [self handleCancelUploadWithMessage:tappedMessage];
     }
     else {
         //File not exist, download file
@@ -5270,23 +5253,7 @@ CGPoint center;
     
     if ([key isEqualToString:@""]) {
         //Video exist, uploading file state
-        //Cancel uploading task
-        [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
-        
-        //Remove message from array and dictionary in ChatViewController
-        TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
-        [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
-        }];
-        
-        //Remove from WaitingUploadDictionary in ChatManager
-        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
-        
-        //Remove message from database
-        [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
-            
-        } failure:^(NSError *error) {
-            
-        }];
+        [self handleCancelUploadWithMessage:message];
     }
     else {
         //Video not exist, download file
@@ -6426,37 +6393,7 @@ CGPoint center;
     
     if ([key isEqualToString:@""]) {
         //Video exist, uploading file state
-        //Cancel uploading task
-        [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
-        
-        //Remove message from array and dictionary in ChatViewController
-        TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
-        NSInteger deletedIndex = [[self.messageArray copy] indexOfObject:currentDeletedMessage];
-        [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
-        
-        //Remove from WaitingUploadDictionary in ChatManager
-        [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
-        
-        //Remove message from database
-        [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
-            
-        } failure:^(NSError *error) {
-            
-        }];
-        
-        //Update chat room UI
-        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
-        @try {
-            [self.tableView performBatchUpdates:^{
-                //changing beginUpdates and endUpdates with this because of deprecation
-                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            [self.tableView reloadData];
-        }
+        [self handleCancelUploadWithMessage:message];
     }
     else {
         //Video not exist, download file
@@ -6714,10 +6651,9 @@ CGPoint center;
 }
 
 - (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView {
-    if(!self.isEditingMessage){
+    if (!self.isEditingMessage) {
         [self setSendButtonActive:YES];
     }
-    
     if (self.isCustomKeyboardAvailable) {
         [self showKeyboardOptionButton:NO];
     }
@@ -6725,10 +6661,10 @@ CGPoint center;
 }
 
 - (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView {
-    if(self.isEditingMessage && (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo)){
+    if (self.isEditingMessage && (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo)) {
         [self setSendButtonActive:YES];
     }
-    else{
+    else {
         [self setSendButtonActive:NO];
     }
     
@@ -7855,9 +7791,8 @@ CGPoint center;
     }
     else if (type == TAPChatMessageTypeVideo) {
         TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        cell.message = obtainedMessage;
-        
         if (cell != nil && [cell isKindOfClass:[TAPMyVideoBubbleTableViewCell class]]) {
+            cell.message = obtainedMessage;
             @try {
                 [self.tableView performBatchUpdates:^{
                     //changing beginUpdates and endUpdates with this because of deprecation
@@ -8239,8 +8174,8 @@ CGPoint center;
         
         TAPChatMessageType type = currentMessage.type;
         if (type == TAPChatMessageTypeImage) {
-            
             UIImage *fullImage = [notificationParameterDictionary objectForKey:@"fullImage"];
+            [self.bubbleImageDataDictionary setObject:fullImage forKey:currentMessage.localID];
             
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && !isForwardedSavedMessage) {
                 //My Chat
@@ -8765,6 +8700,11 @@ CGPoint center;
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     
     if (status == AVAuthorizationStatusAuthorized) {
+        if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [self showSnackBar:TapTalkSnackBarTypeError message:NSLocalizedString(@"Camera not available", @"") iconName:@"TAPIconWarningCircle"];
+            [self showInputAccessoryView];
+            return;
+        }
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         imagePicker.allowsEditing = NO;
         imagePicker.delegate = self;
@@ -9532,16 +9472,20 @@ CGPoint center;
         }
     }];
     
-    UIAlertAction *copyAction = [UIAlertAction
-                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
-                                 style:UIAlertActionStyleDefault
-                                 handler:^(UIAlertAction * action) {
-                                     [self checkAndShowInputAccessoryView];
-                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                                     if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
-                                         [pasteboard setString:message.body];
-                                     }
-                                 }];
+    NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:message.data];
+    NSString *captionString = [TAPUtil nullToEmptyString:[dataDictionary objectForKey:@"caption"]];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action) {
+        [self checkAndShowInputAccessoryView];
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        if (![TAPUtil isEmptyString:captionString]) {
+            [pasteboard setString:captionString];
+        }
+        else if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
+         [pasteboard setString:message.body];
+        }
+    }];
     
     NSString *starMenuString;
     UIImage *starMenuImage;
@@ -9854,8 +9798,8 @@ CGPoint center;
         }
     }
     
-    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink)) {
-        //Show copy action for chat type text only
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && (![TAPUtil isEmptyString:captionString] || (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink))) {
+        // Show copy action
         [alertController addAction:copyAction];
     }
     
@@ -9864,7 +9808,11 @@ CGPoint center;
         [alertController addAction:starAction];
     }
     
-    if([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && ([message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom == nil) && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) && [[TapUI sharedInstance] isEditMessageMenuEnabled]){
+    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] &&
+        ([message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom == nil) &&
+        (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) &&
+        [[TapUI sharedInstance] isEditMessageMenuEnabled]
+    ) {
         //Show edit message for our bubble (my bubble) only and non forward
         
         long messageTimeStamp = message.created.longLongValue;
@@ -9888,7 +9836,6 @@ CGPoint center;
         //Show delete message for our bubble (my bubble) only
         [alertController addAction:deleteMessageAction];
     }
-    
 
     if(message.room.type == RoomTypeGroup && [message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
         [alertController addAction:messageInfoAction];
@@ -9916,6 +9863,29 @@ CGPoint center;
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
         }];
+    }];
+}
+
+- (void)handleCancelUploadWithMessage:(TAPMessageModel *)message {
+    // Cancel uploading task
+    [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
+    
+    // Remove message from array and dictionary in ChatViewController
+    TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
+    [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
+    }];
+    
+//    NSInteger deletedIndex = [[self.messageArray copy] indexOfObject:currentDeletedMessage];
+//    [self removeMessageFromArrayAndDictionaryWithLocalID:message.localID];
+    
+    //Remove from WaitingUploadDictionary in ChatManager
+    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
+    
+    //Remove message from database
+    [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
+        
+    } failure:^(NSError *error) {
+        
     }];
 }
 

@@ -97,6 +97,7 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
 - (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room success:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendLinkMessage:(NSString *)textMessage messageData:(NSDictionary *)messageData room:(TAPRoomModel *)room scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))successGenerateMessage failure:(void (^)(NSError *error))failure;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption;
+- (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption scheduleTime:(NSNumber *)scheduleTime;
 - (void)sendImageMessage:(UIImage *)image caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption;
 - (void)sendImageMessageWithPHAsset:(PHAsset *)asset caption:(NSString *)caption room:(TAPRoomModel *)room successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage;
@@ -137,8 +138,11 @@ typedef NS_ENUM(NSInteger, TAPChatManagerQuoteActionType) {
                 success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
 - (void)sendCustomMessage:(TAPMessageModel *)customMessage;
 - (void)saveMessageToPendingMessageArray:(TAPMessageModel *)message;
+
+- (NSMutableArray<TAPScheduledMessageModel *> *)getPendingScheduledMessageArray;
 - (void)saveScheduleMessageToPendingMessageArray:(TAPScheduledMessageModel *)scheduleMessage;
 - (void)removeScheduleMessagesFromPendingMessagesArrayWithLocalID:(NSString *)localID;
+
 - (void)sendEmitWithMessage:(TAPMessageModel *)message;
 - (void)sendEmitWithEditedMessage:(TAPMessageModel *)message;
 - (TAPMessageModel *)generateUnreadMessageIdentifierWithRoom:(TAPRoomModel *)room created:(NSNumber *)created indexPosition:(NSInteger)index;

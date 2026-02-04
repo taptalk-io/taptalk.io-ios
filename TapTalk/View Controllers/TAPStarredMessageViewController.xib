@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -339,11 +339,11 @@
             </constraints>
             <point key="canvasLocation" x="131.8840579710145" y="80.357142857142847"/>
         </view>
-        <view clipsSubviews="YES" contentMode="scaleToFill" id="vKa-e4-ZY4" customClass="TAPCustomAccessoryView">
+        <view clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" id="vKa-e4-ZY4" customClass="TAPCustomAccessoryView">
             <rect key="frame" x="0.0" y="0.0" width="375" height="160"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vqz-cg-DVi" userLabel="ExtensionView">
+                <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vqz-cg-DVi" userLabel="ExtensionView">
                     <rect key="frame" x="0.0" y="8" width="375" height="64"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wxf-Em-OZe">
@@ -369,7 +369,7 @@
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yLQ-2I-KHq">
                                     <rect key="frame" x="48" y="6" width="279" height="52"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="yAd-SV-0VR" customClass="TAPImageView">
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="yAd-SV-0VR" customClass="TAPImageView">
                                             <rect key="frame" x="0.0" y="0.0" width="52" height="52"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="52" id="gm1-pj-c5h"/>
@@ -510,7 +510,7 @@
                         <constraint firstItem="Wxf-Em-OZe" firstAttribute="top" secondItem="Vqz-cg-DVi" secondAttribute="top" id="p2b-rJ-LBB"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" verticalHuggingPriority="249" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QY9-kP-syJ">
+                <view contentMode="scaleToFill" verticalHuggingPriority="249" ambiguous="YES" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QY9-kP-syJ">
                     <rect key="frame" x="0.0" y="74" width="375" height="52"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xbc-qN-rnv">

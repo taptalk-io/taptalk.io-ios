@@ -58,22 +58,15 @@
 }
 
 - (void)refreshCellHeight {
+    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(baseTableViewCellDidRequestRefreshCellHeight)]) {
+        [self.delegate baseTableViewCellDidRequestRefreshCellHeight];
+        return;
+    }
     UITableView *tableView = [self getTableView];
     if (tableView != nil) {
-        @try {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [tableView performBatchUpdates:nil completion:nil];
-            });
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception.reason);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [tableView reloadData];
-            });
-        }
-        @finally {
-            
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [tableView reloadData];
+        });
     }
 }
 

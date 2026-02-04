@@ -33,12 +33,15 @@
 #import "TapHighlightCustomButtonView.h"
 
 #import <TapTalk/Base64.h>
+
+@import QuickLook;
+
 static const NSInteger kShowChatAnchorOffset = 70.0f;
 static const NSInteger kChatAnchorDefaultBottomConstraint = 63.0f;
 static const NSInteger kInputMessageAccessoryViewHeight = 52.0f;
 static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
-@interface TAPSecondaryChatViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, UINavigationControllerDelegate, TAPGrowingTextViewDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate,TAPPickLocationViewControllerDelegate, TAPChatManagerDelegate>
+@interface TAPSecondaryChatViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, UINavigationControllerDelegate, TAPGrowingTextViewDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate,TAPPickLocationViewControllerDelegate, TAPChatManagerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, TAPMediaDetailViewControllerDelegate, TAPImagePreviewViewControllerDelegate>
 
 @property (strong, nonatomic) IBOutlet TAPBaseTableView *tableView;
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
@@ -156,8 +159,13 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 @property (nonatomic) BOOL isEditScheduleMessageTimeState;
 @property (nonatomic) BOOL isInputAccessoryExtensionShowedFirstTimeOpen;
 @property (nonatomic) BOOL isEditingMessage;
+@property (nonatomic) BOOL isLoadingScheduledMessages;
 
 @property (strong, nonatomic) NSArray *mediaPreviewDataArray;
+
+@property (strong, nonatomic) NSURL *currentSelectedFileURL;
+
+@property (weak, nonatomic) id openedBubbleCell;
 
 - (void)fileDownloadManagerFinishNotification:(NSNotification *)notification;
 - (void)addIncomingMessageToArrayAndDictionaryWithMessage:(TAPMessageModel *)message atIndex:(NSInteger)index;
@@ -202,20 +210,19 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     self.loadingView.layer.cornerRadius = 6.0f;
     self.loadingView.clipsToBounds = YES;
     
-    
     [self setupNavigationView];
-    if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+    if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
         [self showLoadMoreMessageLoadingView:YES];
         
         NSString *roomID = self.currentRoom.roomID;
         
         [TAPDataManager callAPIGetStarredMessages:roomID pageNumber:1 numberOfItems:50 success:^(NSArray *starredMessages, BOOL hasMore) {
             self.messageArray = starredMessages;
-            for (TAPMessageModel *message in starredMessages){
+            for (TAPMessageModel *message in starredMessages) {
                 [self.messageDictionary setObject:message forKey:message.localID];
             }
             
-            if(starredMessages.count == 0){
+            if (starredMessages.count == 0) {
                 self.emptyStateView.alpha = 1.0f;
             }
             
@@ -227,8 +234,8 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             [self showLoadMoreMessageLoadingView:NO];
         }];
     }
-    else if(self.messageListType == TAPSecondaryChatTypePinMessage){
-        for (TAPMessageModel *message in self.messageArray){
+    else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
+        for (TAPMessageModel *message in self.messageArray) {
             [self.messageDictionary setObject:message forKey:message.localID];
         }
         
@@ -243,7 +250,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         [self.unpinAllButton addTarget:self action:@selector(unPinAllButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     }
-    else if(self.messageListType == TAPSecondaryChatTypeScheduleMessage){
+    else if (self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
         NSString *roomID = self.currentRoom.roomID;
         [self showLoadMoreMessageLoadingView:YES];
         self.messageArray = [NSMutableArray new];
@@ -327,8 +334,8 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerStartNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_START object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerFinishNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerFailureNotification:) name:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploadManagerCreateScheduledMessage:) name:TAP_NOTIFICATION_CREATE_MEDIA_SCHEDULED_MESSAGE_COMPLETE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerProgressNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerProgressNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerStartNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_START object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDownloadManagerFinishNotification:) name:TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH object:nil];
@@ -459,13 +466,13 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     UIFont *chatRoomNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatRoomNameLabel];
     UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
     
-    if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+    if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
         nameLabel.text = NSLocalizedStringFromTableInBundle(@"Starred Messages", nil, [TAPUtil currentBundle], @"");
     }
-    else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+    else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
         nameLabel.text = NSLocalizedStringFromTableInBundle(@"Pinned Messages", nil, [TAPUtil currentBundle], @"");
     }
-    else if(self.messageListType == TAPSecondaryChatTypeScheduleMessage){
+    else if (self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
         nameLabel.text = NSLocalizedStringFromTableInBundle(@"Scheduled Message", nil, [TAPUtil currentBundle], @"");
         
         //Right Bar Button
@@ -507,7 +514,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             
             BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
 
-            if(self.currentRoom.deleted.longValue > 0){
+            if (self.currentRoom.deleted.longValue > 0) {
                 //set deleted account profil pict
                 self.rightBarInitialNameView.alpha = 1.0f;
                 self.rightBarImageView.alpha = 0.0f;
@@ -515,7 +522,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
                 self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
                 self.rightBarInitialNameLabel.text =@"";
             }
-            else if(isSavedMessageRoom){
+            else if (isSavedMessageRoom) {
                 //set saved message profil pict
                 self.rightBarInitialNameView.alpha = 1.0f;
                 self.rightBarImageView.alpha = 0.0f;
@@ -662,7 +669,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:self.currentRoom.roomID];
     BOOL isForwardedSavedMessage = NO;
     
-    if((![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) && isSavedMessageRoom){
+    if ((![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) && isSavedMessageRoom) {
         isForwardedSavedMessage = YES;
     }
     
@@ -676,12 +683,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageIconView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -706,12 +713,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperatorView];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -766,12 +773,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -872,12 +879,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -902,12 +909,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1002,12 +1009,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.delegate = self;
             cell.message = message;
             
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1039,12 +1046,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1070,12 +1077,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1111,12 +1118,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.userInteractionEnabled = YES;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1192,12 +1199,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1222,12 +1229,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.contentView.userInteractionEnabled = YES;
             cell.delegate = self;
             cell.message = message;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1296,12 +1303,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.delegate = self;
             cell.message = message;
-            if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+            if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
                 [cell setRotaionToDefault];
                 [cell showStarMessageView];
                 [cell showSeperator];
             }
-            else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+            else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
                 [cell showPinIcon:YES];
                 [cell setSwipeGestureEnable:NO];
             }
@@ -1341,12 +1348,53 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [self goBackToMessage:message];
 }
 
-- (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell{
-    [self goBackToMessage:myImageBubbleCell.message];
+- (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
+    CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
+    
+    TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+    [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+    mediaDetailViewController.delegate = self;
+    mediaDetailViewController.message = myImageBubbleCell.message;
+    
+    UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
+    NSArray *imageSliderImage = [NSArray array];
+    if(cellImage != nil) {
+        [self.messageTextView resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
+        
+        _isShowAccessoryView = NO;
+        [self reloadInputViews];
+        
+        imageSliderImage = @[cellImage];
+        
+        [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
+        [mediaDetailViewController setImageArray:@[cellImage]];
+        
+        [mediaDetailViewController setActiveIndex:0];
+        
+        NSInteger selectedRow = [[self.messageArray copy] indexOfObject:myImageBubbleCell.message];
+        NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
+        CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
+        CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
+        CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        
+        [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
+//        _currentPresentedViewController = mediaDetailViewController;
+        myImageBubbleCell.bubbleImageView.alpha = 0.0f;
+        _openedBubbleCell = myImageBubbleCell;
+    }
 }
 
 - (void)myImageBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage {
     [self handleLongPressedWithMessage:longPressedMessage];
+}
+
+- (void)myImageCancelDidTappedWithMessage:(TAPMessageModel *)message {
+    [self handleCancelUploadWithMessage:message];
+}
+
+- (void)myVideoPlayDidTappedWithMessage:(TAPMessageModel *)message {
+    [self playVideoWithMessage:message];
 }
 
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage{
@@ -1357,6 +1405,24 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [self handleLongPressedWithMessage:longPressedMessage];
 }
 
+- (void)myVideoDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    [self fetchVideoDataWithMessage:tappedMessage];
+}
+
+- (void)myVideoCancelDidTappedWithMessage:(TAPMessageModel *)message {
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+    
+    if ([key isEqualToString:@""]) {
+        //Video exist, uploading file state
+        [self handleCancelUploadWithMessage:message];
+    }
+    else {
+        //Video not exist, download file
+        //Cancel downloading task
+        [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:message];
+    }
+}
+
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
     [self goBackToMessage:tappedMessage];
 }
@@ -1365,12 +1431,27 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [self handleLongPressedWithMessage:longPressedMessage];
 }
 
-- (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [self goBackToMessage:tappedMessage];
+- (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    [self openFilePreviewViewControllerWithMessage:tappedMessage];
 }
 
-- (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage{
-    [self goBackToMessage:tappedMessage];
+- (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    [self fetchFileDataWithMessage:tappedMessage];
+}
+
+- (void)myFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    NSDictionary *dataDictionary = tappedMessage.data;
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    
+    if ([key isEqualToString:@""]) {
+        //File exist, uploading file state
+        [self handleCancelUploadWithMessage:tappedMessage];
+    }
+    else {
+        //File not exist, download file
+        //Cancel downloading task
+        [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:tappedMessage];
+    }
 }
 
 - (void)myLocationBubbleViewDidTapped:(TAPMessageModel *)tappedMessage{
@@ -1395,6 +1476,21 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [self.navigationController popViewControllerAnimated:YES];
     if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
         [self.delegate starMessageBubbleCliked:tappedMessage];
+    }
+}
+
+- (void)myVoiceNoteCancelButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    NSDictionary *dataDictionary = tappedMessage.data;
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    
+    if ([key isEqualToString:@""]) {
+        //File exist, uploading file state
+        [self handleCancelUploadWithMessage:tappedMessage];
+    }
+    else {
+        //File not exist, download file
+        //Cancel downloading task
+        [[TAPFileDownloadManager sharedManager] cancelDownloadWithMessage:tappedMessage];
     }
 }
 
@@ -1459,10 +1555,9 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
                 self.messageTextView.text = updatedNewText;
                 [self.messageTextView setTypingEnabled:NO];
             }
-            else{
+            else {
                 [self.messageTextView setTypingEnabled:YES];
             }
-            
         }
         else if (self.currentEditingMessage.type == TAPChatMessageTypeText || self.currentEditingMessage.type == TAPChatMessageTypeLink) {
             captionString = self.currentEditingMessage.body;
@@ -1517,7 +1612,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     for (NSInteger counter = 0; counter < [wordArray count]; counter++) {
         NSString *word = [wordArray objectAtIndex:counter];
         currentWordLength = currentWordLength + [word length];
-        if(indexChar - (numberOfSeparator - 1) <= currentWordLength) {
+        if (indexChar - (numberOfSeparator - 1) <= currentWordLength) {
             selectedWord = word;
             _lastTypingWordArrayStartIndex = counter;
             _lastTypingWordString = selectedWord;
@@ -1567,25 +1662,19 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)growingTextViewDidStartTyping:(TAPGrowingTextView *)textView {
-    /**
-    if(!self.isEditingMessage){
+    if (!self.isEditingMessage) {
         [self setSendButtonActive:YES];
     }
-    */
     [self setSendButtonActive:YES];
 }
 
 - (void)growingTextViewDidStopTyping:(TAPGrowingTextView *)textView {
-    /**
-    if(self.isEditingMessage && (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo)){
+    if (self.isEditingMessage && (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo)) {
         [self setSendButtonActive:YES];
     }
-    else{
+    else {
         [self setSendButtonActive:NO];
     }
-    */
-    [self setSendButtonActive:NO];
-
 }
 
 #pragma mark UIScrollView
@@ -1661,12 +1750,12 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)setEditMessageWithMessage:(TAPMessageModel *)message {
-    if(message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink){
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
         self.replyMessageMessageLabel.text = [TAPUtil nullToEmptyString:message.body];
         self.messageTextView.text = [TAPUtil nullToEmptyString:message.body];
         self.replyMessageNameLabel.text = NSLocalizedStringFromTableInBundle(@"Edit Message", nil, [TAPUtil currentBundle], @"");
     }
-    else if(message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo){
+    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
         NSDictionary *dataDictionary = message.data;
         dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
         NSString *captionString = [dataDictionary objectForKey:@"caption"];
@@ -1783,6 +1872,13 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 #pragma mark TAPChatManagerDelegate
+
+- (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
+    if ([message.room.roomID isEqualToString:self.currentRoom.roomID] && [self.messageDictionary objectForKey:message.localID] != nil) {
+        [self callAPIGetScheduleMessage:message.room.roomID];
+    }
+}
+
 - (void)chatManagerDidReceiveUpdateScheduleMessage:(NSString *)eventName data:(NSDictionary *)data {
     NSDictionary *room = [data objectForKey:@"room"];
     NSString *roomID = [room objectForKey:@"roomID"];
@@ -1791,32 +1887,32 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)chatManagerDidReceiveGenerateScheduleMessage:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime {
+    if (message == nil || (scheduleTime.longValue < [TAPUtil currentTimeInMillis].longValue && !message.isSending)) {
+        return;
+    }
+    
     self.emptyStateView.alpha = 0.0f;
     TAPMessageModel *obtainedMessage = message;
-    
     obtainedMessage.created = scheduleTime;
     
-    NSInteger counter = 0;
-    for(TAPMessageModel *message in self.messageArray) {
-        if(obtainedMessage.created.longValue < message.created.longValue) {
-            
+    NSInteger insertIndex = 0;
+    for (TAPMessageModel *loopMessage in self.messageArray) {
+        if (obtainedMessage.created.longValue > loopMessage.created.longValue) {
             break;
         }
-        counter += 1;
+        insertIndex += 1;
     }
     
     TAPScheduledMessageModel *scheduleMessage = [TAPScheduledMessageModel new];
-    
     scheduleMessage.message = obtainedMessage;
     scheduleMessage.scheduleTime = scheduleTime;
     
   //  [[TAPChatManager sharedManager] saveScheduleMessageToPendingMessageArray:scheduleMessage];
     
-    [self.messageArray insertObject:obtainedMessage atIndex:counter];
+    [self.messageDictionary setObject:obtainedMessage forKey:obtainedMessage.localID];
+    [self.messageArray insertObject:obtainedMessage atIndex:insertIndex];
     
     [self.tableView reloadData];
-    [self.messageDictionary setObject:obtainedMessage forKey:obtainedMessage.localID];
-    
 }
 
 #pragma mark Attachment
@@ -1880,6 +1976,11 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     
     if (status == AVAuthorizationStatusAuthorized) {
+        if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [self showSnackBar:TapTalkSnackBarTypeError message:NSLocalizedString(@"Camera not available", @"") iconName:@"TAPIconWarningCircle"];
+            [self showInputAccessoryView];
+            return;
+        }
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         imagePicker.allowsEditing = NO;
         imagePicker.delegate = self;
@@ -1952,7 +2053,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         NSError *err = nil;
         NSNumber *fileSize;
-        if(![[urls firstObject] getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
+        if (![[urls firstObject] getPromisedItemResourceValue:&fileSize forKey:NSURLFileSizeKey error:&err]) {
             NSLog(@"Failed error: %@", error);
             return;
         } else {
@@ -2053,6 +2154,33 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     }];
 }
 
+- (void)showImagePreviewControllerWithSelectedImage:(UIImage *)image {
+    TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+    imagePreviewViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    imagePreviewViewController.delegate = self;
+
+
+    if (self.currentRoom.type != RoomTypeChannel) {
+        imagePreviewViewController.isNotFromPersonalRoom = YES;
+    }
+    
+    TAPMediaPreviewModel *imagePreview = [TAPMediaPreviewModel new];
+    imagePreview.image = image;
+    
+    [imagePreviewViewController setMediaPreviewDataWithData:imagePreview];
+    [imagePreviewViewController setParticipantListArray:self.currentRoom.participants];
+    
+    UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
+    imagePreviewNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:imagePreviewNavigationController animated:YES completion:^{
+        
+    }];
+//    [self.navigationController presentViewController:imagePreviewNavigationController animated:YES completion:^{
+//        [self.messageTextView resignFirstResponder];
+//        [self hideInputAccessoryView];
+//    }];
+}
+
 #pragma mark TAPPhotoAlbumListViewController
 - (void)photoAlbumListViewControllerSelectImageWithDataArray:(NSArray *)dataArray {
     
@@ -2061,7 +2189,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 - (void)photoAlbumListViewControllerDidFinishAndSendImageWithDataArray:(NSArray *)dataArray {
     //Handle send image from gallery
     /**
-    if(self.currentInputAccessoryExtensionHeight > 0.0f) {
+    if (self.currentInputAccessoryExtensionHeight > 0.0f) {
         [self showInputAccessoryExtensionView:NO];
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
@@ -2096,6 +2224,13 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     //check if keyboard was showed
     //CS NOTE- need to add delay to prevent wrong inset because keyboardwillshow did not called if the method called directly
     //[self performSelector:@selector(checkKeyboard) withObject:nil afterDelay:0.05f];
+}
+
+#pragma mark TAPImagePreviewViewControllerDelegate
+
+- (void)imagePreviewDidTapSendButtonWithData:(NSArray *)dataArray {
+    self.mediaPreviewDataArray = dataArray;
+    [self showDatePicker:YES];
 }
 
 - (void)sendVidioMessage:(PHAsset *)asset caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
@@ -2133,7 +2268,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 //
 //    [allMedia enumerateObjectsUsingBlock:^(PHAsset * _Nonnull resultAsset, NSUInteger idx, BOOL * _Nonnull stop) {
 //
-//        if([assetIdentifier isEqualToString:resultAsset.localIdentifier]) {
+//        if ([assetIdentifier isEqualToString:resultAsset.localIdentifier]) {
 //            // asset here
 //        }
 //    }];
@@ -2201,7 +2336,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     self.pickedLocationAddress = address;
     [self showDatePicker:YES];
     /**
-    if(self.currentInputAccessoryExtensionHeight > 0.0f) {
+    if (self.currentInputAccessoryExtensionHeight > 0.0f) {
         [self showInputAccessoryExtensionView:NO];
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
         self.chatAnchorBackgroundViewBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
@@ -2244,9 +2379,36 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     
 }
 
+#pragma mark TAPMediaDetailViewController
+- (void)mediaDetailViewControllerWillStartClosingAnimation {
+    //need to reload inputView after presenting another vc on top
+    [self showInputAccessoryView];
+}
+
+- (void)mediaDetailViewControllerDidFinishClosingAnimation {
+    if ([self.openedBubbleCell isKindOfClass:[TAPMyImageBubbleTableViewCell class]]) {
+        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)self.openedBubbleCell;
+        cell.bubbleImageView.alpha = 1.0f;
+    }
+    else if ([self.openedBubbleCell isKindOfClass:[TAPYourImageBubbleTableViewCell class]]) {
+        TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)self.openedBubbleCell;
+        cell.bubbleImageView.alpha = 1.0f;
+    }
+    [self showInputAccessoryView];
+}
+
+#pragma mark QLPreviewController
+- (NSInteger) numberOfPreviewItemsInPreviewController: (QLPreviewController *) controller {
+    return 1;
+}
+
+- (id <QLPreviewItem>) previewController:(QLPreviewController *)controller previewItemAtIndex: (NSInteger) index {
+    return self.currentSelectedFileURL;
+}
+
 #pragma mark Keyboard
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
-    if(!self.isKeyboardShowedForFirstTime) {
+    if (!self.isKeyboardShowedForFirstTime) {
         _isKeyboardShowedForFirstTime = YES;
         
         return;
@@ -2377,7 +2539,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             newYContentOffset = self.tableView.contentOffset.y + lastTableViewYContentInset - tableViewYContentInset;
         }
         */
-        if(self.isKeyboardShowed) {
+        if (self.isKeyboardShowed) {
             if (self.keyboardHeight > self.lastKeyboardHeight) {
                 newYContentOffset = self.tableView.contentOffset.y + (self.lastKeyboardHeight - self.keyboardHeight);
             }
@@ -2386,7 +2548,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             }
         }
         
-        if(self.tableView.contentOffset.y == 0.0f) {
+        if (self.tableView.contentOffset.y == 0.0f) {
             newYContentOffset = 0.0f;
         }
         
@@ -2455,7 +2617,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     
     [UIView animateWithDuration:0.2f animations:^{
         /**
-        if(self.isCustomKeyboardAvailable) {
+        if (self.isCustomKeyboardAvailable) {
             self.keyboardOptionButtonView.alpha = 1.0f;
             self.keyboardOptionButton.alpha = 1.0f;
             self.keyboardOptionButton.userInteractionEnabled = YES;
@@ -2482,10 +2644,14 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     _isKeyboardShowed = NO;
 }
 
-#pragma mark Custom Method
+#pragma mark - Custom Method
+
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
+#ifdef DEBUG
+    NSLog(@"Message model: %@", [message toJSONString]);
+#endif
     
-    if(!self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
+    if (!self.messageListType == TAPSecondaryChatTypeScheduleMessage) {
         return;
     }
     
@@ -2522,36 +2688,34 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Edit", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
+        
+        [self showInputAccessoryExtensionView:NO];
         if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
-            [self showInputAccessoryExtensionView:NO];
             self.quoteView.alpha = 0.0f;
             self.replyMessageView.alpha = 1.0f;
-            [self setEditMessageWithMessage:message];
-            [self showInputAccessoryExtensionView:YES];
-      
-            TAPMessageModel *quotedMessageModel = [message copy];
         }
         else {
-            TAPMessageModel *quotedMessageModel = [message copy];
-            
-            [self showInputAccessoryExtensionView:NO];
             self.quoteView.alpha = 1.0f;
             self.replyMessageView.alpha = 0.0f;
-            [self showInputAccessoryExtensionView:YES];
-            [self setEditMessageWithMessage:message];
         }
+        [self setEditMessageWithMessage:message];
+        [self showInputAccessoryExtensionView:YES];
         self.currentEditingMessage = message;
     }];
     
-    UIAlertAction *copyAction = [UIAlertAction
-                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
-                                 style:UIAlertActionStyleDefault
-                                 handler:^(UIAlertAction * action) {
-                                     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                                     if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
-                                         [pasteboard setString:message.body];
-                                     }
-                                 }];
+    NSDictionary *dataDictionary = [TAPUtil nullToEmptyDictionary:message.data];
+    NSString *captionString = [TAPUtil nullToEmptyString:[dataDictionary objectForKey:@"caption"]];
+    UIAlertAction *copyAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action) {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        if (![TAPUtil isEmptyString:captionString]) {
+            [pasteboard setString:captionString];
+        }
+        else if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink) {
+         [pasteboard setString:message.body];
+        }
+    }];
     
     UIAlertAction *deleteMessageAction = [UIAlertAction
                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Delete", nil, [TAPUtil currentBundle], @"")
@@ -2564,7 +2728,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         [self.tableView reloadData];
         
-        if(self.messageArray.count == 0) {
+        if (self.messageArray.count == 0) {
             self.emptyStateView.alpha = 1.0f;
         }
         
@@ -2622,12 +2786,21 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     [deleteMessageAction setValue:actionSheetDestructiveColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:sendNowAction];
-    [alertController addAction:rescheduleAction];
-    [alertController addAction:editAction];
+    if (!message.isSending) {
+        [alertController addAction:sendNowAction];
+        [alertController addAction:rescheduleAction];
+    }
     
-    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink)) {
-        //Show copy action for chat type text only
+    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] &&
+        (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) &&
+        [[TapUI sharedInstance] isEditMessageMenuEnabled] &&
+        !message.isSending
+    ) {
+        [alertController addAction:editAction];
+    }
+    
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && (![TAPUtil isEmptyString:captionString] || (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink))) {
+        // Show copy action
         [alertController addAction:copyAction];
     }
     
@@ -2648,14 +2821,64 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     }];
 }
 
--(void)goBackToMessage:(TAPMessageModel *)message {
-    if(self.messageListType == TAPSecondaryChatTypeStarMessage){
+- (void)handleCancelUploadWithMessage:(TAPMessageModel *)message {
+    // Cancel uploading task
+    [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
+    
+    // Remove message from array and dictionary in ChatViewController
+    TAPMessageModel *currentDeletedMessage = [self.messageDictionary objectForKey:message.localID];
+    [self removeMessageFromTable:currentDeletedMessage completion:^(BOOL isFinished) {
+    }];
+    
+    //Remove from WaitingUploadDictionary in ChatManager
+    [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:message];
+    
+    //Remove message from database
+    [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)removeMessageFromTable:(TAPMessageModel *)message completion:(void (^)(BOOL isFinished))completion {
+    if (message == nil) {
+        completion(NO);
+        return;
+    }
+    [self.messageDictionary removeObjectForKey:message.localID];
+    NSInteger messageIndex = [[self.messageArray copy] indexOfObject:message];
+    if (messageIndex >= 0 && messageIndex < [self.messageArray count]) {
+        [self.messageArray removeObjectAtIndex:messageIndex];
+        NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+        if ([self.tableView numberOfRowsInSection:0] > messageIndex) {
+            @try {
+                [self.tableView performBatchUpdates:^{
+                    [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+                } completion:^(BOOL finished) {
+                    completion(YES);
+                }];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", exception.reason);
+                [self.tableView reloadData];
+                completion(YES);
+            }
+            return;
+        }
+        return;
+    }
+    completion(NO);
+}
+
+- (void)goBackToMessage:(TAPMessageModel *)message {
+    if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
         [self.navigationController popViewControllerAnimated:NO];
         if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
             [self.delegate starMessageBubbleCliked:message];
         }
     }
-    else if(self.messageListType == TAPSecondaryChatTypePinMessage){
+    else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
         [self.navigationController popViewControllerAnimated:YES];
         if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
             [self.delegate starMessageBubbleCliked:message];
@@ -2674,10 +2897,14 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)callAPIGetScheduleMessage:(NSString *)roomID {
+    if (self.isLoadingScheduledMessages) {
+        return;
+    }
+    _isLoadingScheduledMessages = YES;
     [TAPDataManager callAPIGetScheduleMessage:roomID success:^(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray) {
         self.scheduleMessageArray = [scheduleMessageArray mutableCopy];
         
-        if(scheduleMessageArray.count == 0) {
+        if (scheduleMessageArray.count == 0) {
             self.emptyStateView.alpha = 1.0f;
         }
         else {
@@ -2686,24 +2913,27 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         [self.messageArray removeAllObjects];
         [self.messageDictionary removeAllObjects];
-        for(TAPScheduledMessageModel *scheduleMessage in scheduleMessageArray) {
+        for (TAPScheduledMessageModel *scheduleMessage in scheduleMessageArray) {
             NSInteger counter = 0;
             NSNumber *scheduledTime = scheduleMessage.scheduleTime;
-            for(TAPScheduledMessageModel *schduleMessage in self.scheduleMessageArray){
-                if(scheduledTime > scheduleMessage.scheduleTime) {
+            for (TAPScheduledMessageModel *schduleMessage in self.scheduleMessageArray) {
+                if (scheduledTime > scheduleMessage.scheduleTime) {
                     break;
                 }
                 counter += 1;
             }
             scheduleMessage.message.created = scheduleMessage.scheduleTime;
+            scheduleMessage.message.isSending = NO;
             [self.messageArray addObject:scheduleMessage.message];
             [self.messageDictionary setObject: scheduleMessage.message forKey: scheduleMessage.message.localID];
         }
         
-       // for(TAPScheduleMessageModel *scheduleMessage in [[TAPChatManager sharedManager] pending])
+        for (TAPScheduledMessageModel *scheduledMessage in [[TAPChatManager sharedManager] getPendingScheduledMessageArray]) {
+            [self chatManagerDidReceiveGenerateScheduleMessage:scheduledMessage.message scheduleTime:scheduledMessage.scheduleTime];
+        }
     
         [TAPUtil performBlock:^{
-            if(self.chatroomScheduleContentString != nil && ![self.chatroomScheduleContentString isEqualToString:@""]) {
+            if (self.chatroomScheduleContentString != nil && ![self.chatroomScheduleContentString isEqualToString:@""]) {
                 [self sendScheduleText:self.chatroomScheduleContentString scheduleTime:self.chatRoomScheduleTimne];
                 self.chatroomScheduleContentString = nil;
             }
@@ -2712,9 +2942,11 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         [self.tableView reloadData];
         [self showLoadMoreMessageLoadingView:NO];
+        _isLoadingScheduledMessages = NO;
         
     } failure:^(NSError *error) {
         [self showLoadMoreMessageLoadingView:NO];
+        _isLoadingScheduledMessages = NO;
     }];
 }
 
@@ -2903,14 +3135,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)showDatePicker:(BOOL)isShow {
-    if(isShow) {
-        if(self.isEditScheduleMessageTimeState) {
-            
-        }
-        else {
-            
-        }
-        
+    if (isShow) {
         long currentTime = [TAPUtil currentTimeInMillis].longValue;
         long plusOneMinute = currentTime + 60000;
         [self.scheduleMessageDatePicker setDate:[NSDate dateWithTimeIntervalSince1970:plusOneMinute/1000]animated:NO];
@@ -2931,11 +3156,43 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)sendButtonDidTapped {
-    if(self.isEditingMessage) {
+    if (self.isEditingMessage && self.currentEditingMessage != nil) {
         self.isEditingMessage = NO;
         NSInteger index = [self.messageArray indexOfObject:self.currentEditingMessage];
+        if (self.scheduleMessageArray.count <= index) {
+            return;
+        }
         TAPScheduledMessageModel *scheduleMessage = [self.scheduleMessageArray objectAtIndex:index];
-        self.currentEditingMessage.body = self.messageTextView.text;
+        
+        NSString *messageText = [TAPUtil nullToEmptyString:self.messageTextView.text];
+        messageText = [messageText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (self.currentEditingMessage.type == TAPChatMessageTypeImage || self.currentEditingMessage.type == TAPChatMessageTypeVideo) {
+            NSString *body = self.currentEditingMessage.body;
+            if ([TAPUtil isEmptyString:messageText]) {
+                if (self.currentEditingMessage.type == TAPChatMessageTypeImage) {
+                    body = NSLocalizedString(@"🖼 Photo", @"");
+                }
+                else if (self.currentEditingMessage.type == TAPChatMessageTypeVideo) {
+                    body = NSLocalizedString(@"🎥 Video", @"");
+                }
+            }
+            else {
+                if (self.currentEditingMessage.type == TAPChatMessageTypeImage) {
+                    body = [NSString stringWithFormat:@"🖼 %@", messageText];
+                }
+                else if (self.currentEditingMessage.type == TAPChatMessageTypeVideo) {
+                    body = [NSString stringWithFormat:@"🎥 %@", messageText];
+                }
+            }
+            self.currentEditingMessage.body = body;
+            
+            NSMutableDictionary *dataDictionary = [[TAPUtil nullToEmptyDictionary:self.currentEditingMessage.data] mutableCopy];
+            [dataDictionary setObject:messageText forKey:@"caption"];
+            self.currentEditingMessage.data = dataDictionary;
+        }
+        else {
+            self.currentEditingMessage.body = messageText;
+        }
         [TAPDataManager callAPIEditScheduleMessageContent:scheduleMessage.scheduleID updatedMessage:self.currentEditingMessage success:^(BOOL isEditContentSuccess) {
             
         } failure:^(NSError *error) {
@@ -2948,9 +3205,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     else {
         [self showDatePicker:YES];
     }
-    
 }
-
 
 - (IBAction)datePickerSendButtonDidTapped:(id)sender {
     [self datePickerSendButtonDidTapped];
@@ -2967,8 +3222,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         return;
     }
     
-    
-    if(self.mediaPreviewDataArray != nil) {
+    if (self.mediaPreviewDataArray != nil) {
         for (TAPMediaPreviewModel *mediaPreview in self.mediaPreviewDataArray) {
             PHAsset *asset = mediaPreview.asset;
             
@@ -2978,7 +3232,10 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             NSString *caption = mediaPreview.caption;
             caption = [TAPUtil nullToEmptyString:caption];
             
-            if (asset.mediaType == PHAssetMediaTypeImage) {
+            if (mediaPreview.image != nil) {
+                [[TAPChatManager sharedManager] sendImageMessage:mediaPreview.image caption:caption scheduleTime:scheduleTime];
+            }
+            else if (asset.mediaType == PHAssetMediaTypeImage) {
                 [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption room:[TAPChatManager sharedManager].activeRoom scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
                     
                 } failure:^(NSError *error) {
@@ -2988,12 +3245,10 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             else if (asset.mediaType == PHAssetMediaTypeVideo) {
                 [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData scheduleTime:scheduleTime];
             }
-            
         }
-        
         self.mediaPreviewDataArray = nil;
     }
-    else if(self.pickedLocation != nil) {
+    else if (self.pickedLocation != nil) {
         CLLocationCoordinate2D coordinate = [self.pickedLocation coordinate];
         [[TAPChatManager sharedManager] sendLocationMessage:coordinate.latitude longitude:coordinate.longitude address:self.pickedLocationAddress room:[TAPChatManager sharedManager].activeRoom scheduleTime:scheduleTime success:^(TAPMessageModel *message) {
         
@@ -3002,19 +3257,19 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         }];
         self.pickedLocation = nil;
     }
-    else if(self.selectedFileScheduleMessage != nil){
+    else if (self.selectedFileScheduleMessage != nil) {
         [[TAPChatManager sharedManager] sendFileMessage:self.selectedFileScheduleMessage filePath:self.selectedFilePathScheduleMessage scheduleTime:scheduleTime];
         self.selectedFileScheduleMessage = nil;
     }
-    else if(self.isEditScheduleMessageTimeState) {
+    else if (self.isEditScheduleMessageTimeState) {
         self.isEditScheduleMessageTimeState = NO;
         
         NSInteger counter = 0;
         TAPMessageModel *scheduleMessage = self.selectedScheduleMessage.message;
         [self.messageArray removeObject:scheduleMessage];
         scheduleMessage.created = scheduleTime;
-        for(TAPMessageModel *message in self.messageArray) {
-            if(scheduleMessage.created.longValue < message.created.longValue) {
+        for (TAPMessageModel *message in self.messageArray) {
+            if (scheduleMessage.created.longValue < message.created.longValue) {
                 
                 break;
             }
@@ -3026,7 +3281,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         [self.tableView reloadData];
         
         [TAPDataManager callAPIEditScheduleMessageTime:self.selectedScheduleMessage.scheduleID scheduledTime:scheduleTime success:^(BOOL isEditTimeSuccess) {
-            if(isEditTimeSuccess) {
+            if (isEditTimeSuccess) {
                 
             }
         } failure:^(NSError *error) {
@@ -3092,7 +3347,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     NSNumber *scheduleTime = [NSNumber numberWithDouble:[date timeIntervalSince1970] * 1000.0f];
     long scheduleTimeLong  = scheduleTime.longValue;
     long plusOneMinute = currentTime + 60000;
-    if(plusOneMinute > scheduleTimeLong) {
+    if (plusOneMinute > scheduleTimeLong) {
         //self.scheduleMessageSendButton.userInteractionEnabled = NO;
         [self.scheduleMessageDatePicker setDate:[NSDate dateWithTimeIntervalSince1970:plusOneMinute/1000]animated:YES];
         date = [NSDate dateWithTimeIntervalSince1970:plusOneMinute/1000];
@@ -3225,7 +3480,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             profileViewController.room = self.currentRoom;
             profileViewController.otherUserID = otherUserID;
             profileViewController.delegate = self;
-            if([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]){
+            if ([TAPUtil isSaveMessageRoom:self.currentRoom.roomID]) {
                 profileViewController.tapProfileViewControllerType = TAPProfileViewControllerTypeSavedMessageProfile;
             }
             [self.navigationController pushViewController:profileViewController animated:YES];
@@ -3495,6 +3750,17 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     });
 }
 
+- (void)fileUploadManagerCreateScheduledMessage:(NSNotification *)notification {
+    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
+    if (obtainedMessage != nil) {
+        NSString *roomID = [TAPUtil nullToEmptyString:obtainedMessage.room.roomID];
+        if ([roomID isEqualToString:self.currentRoom.roomID]) {
+            [self callAPIGetScheduleMessage:roomID];
+        }
+    }
+}
+
 #pragma mark Download Notification
 - (void)fileDownloadManagerProgressNotification:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -3516,7 +3782,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
         BOOL isForwardedSavedMessage = NO;
         
-        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+        if ((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom) {
             isForwardedSavedMessage = YES;
         }
         
@@ -3607,7 +3873,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
         BOOL isForwardedSavedMessage = NO;
         
-        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+        if ((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom) {
             isForwardedSavedMessage = YES;
         }
         
@@ -3847,6 +4113,29 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     }];
 }
 
+- (void)fetchVideoDataWithMessage:(TAPMessageModel *)message {
+    [[TAPFileDownloadManager sharedManager] receiveVideoDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
+        //Already Handled via Notification
+    } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
+        //Already Handled via Notification
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
+        //Already Handled via Notification
+    } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+        //Already Handled via Notification
+    }];
+}
+
+- (void)fetchFileDataWithMessage:(TAPMessageModel *)message {
+    [[TAPFileDownloadManager sharedManager] receiveFileDataWithMessage:message start:^(TAPMessageModel * _Nonnull receivedMessage) {
+        //Already Handled via Notification
+    } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
+        //Already Handled via Notification
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
+        //Already Handled via Notification
+    } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
+        //Already Handled via Notification
+    }];
+}
 
 - (void)fileDownloadManagerFinishNotification:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -3874,7 +4163,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
         BOOL isForwardedSavedMessage = NO;
         
-        if((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom){
+        if ((![obtainedMessage.forwardFrom.localID isEqualToString:@""] && obtainedMessage.forwardFrom != nil) && isSavedMessageRoom) {
             isForwardedSavedMessage = YES;
         }
         
@@ -3945,4 +4234,93 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         }
     });
 }
+
+- (void)playVideoWithMessage:(TAPMessageModel *)message {
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]
+        //|| ![[NSFileManager defaultManager] fileExistsAtPath:filePath]
+        ) {
+        return;
+    }
+    
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    AVAsset *asset = [AVAsset assetWithURL:url];
+    
+    if (asset == nil) {
+        return;
+    }
+    
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    
+    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+    AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+    
+    AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+    controller.delegate = self;
+    controller.showsPlaybackControls = YES;
+    [self presentViewController:controller animated:YES completion:nil];
+    controller.player = player;
+    [player play];
+}
+
+- (void)openFilePreviewViewControllerWithMessage:(TAPMessageModel *)tappedMessage {
+    NSString *roomID = tappedMessage.room.roomID;
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]/* || ![[NSFileManager defaultManager] fileExistsAtPath:filePath]*/) {
+        return;
+    }
+    
+    self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
+    
+    QLPreviewController *preview = [[QLPreviewController alloc] init];
+    preview.dataSource = self;
+    preview.delegate = self;
+    
+    [self presentViewController:preview animated:YES completion:nil];
+}
+
 @end

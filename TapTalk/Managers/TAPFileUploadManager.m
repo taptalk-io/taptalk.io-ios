@@ -21,34 +21,9 @@
 @interface TAPFileUploadManager ()
 
 @property (strong, nonatomic) NSMutableDictionary *uploadQueueDictionary;
+@property (strong, nonatomic) NSMutableDictionary *uploadQueueScheduledTimeDictionary;
 @property (strong, nonatomic) NSMutableDictionary *uploadProgressDictionary;
 @property (strong, nonatomic) NSMutableDictionary *pendingUploadAssetDictionary;
-
-@property (nonatomic) NSNumber *scheduleTime;
-
-- (void)runUploadImageWithRoomID:(NSString *)roomID;
-- (void)runUploadFileWithRoomID:(NSString *)roomID;
-- (void)runUploadImageAsAssetWithRoomID:(NSString *)roomID;
-- (void)runUploadVideoAsAssetWithRoomID:(NSString *)roomID;
-
-- (TAPDataMediaModel *)convertDictionaryToDataMediaModel:(NSDictionary *)dictionary;
-- (NSDictionary *)convertDataMediaModelToDictionary:(TAPDataMediaModel *)dataImage;
-- (TAPDataFileModel *)convertDictionaryToDataFileModel:(NSDictionary *)dictionary;
-- (NSDictionary *)convertDataFileModelToDictionary:(TAPDataFileModel *)dataFile;
-
-- (void)resizeImage:(UIImage *)image message:(TAPMessageModel *)message maxImageSize:(CGFloat)maxImageSize success:(void (^)(UIImage *resizedImage, TAPMessageModel *resultMessage))success;
-
-- (void)callAPIUploadFileWithUploadQueueRoomArray:(NSMutableArray *)uploadQueueRoomArray
-                                   currentMessage:(TAPMessageModel *)currentMessage
-                                    resultMessage:(TAPMessageModel *)resultMessage
-                                     resizedImage:(UIImage *)resizedImage
-                                   filePathString:(NSString *)filePathString
-                                        AssetData:(NSData *)assetData
-                                     roomIDString:(NSString *)roomIDString
-                                         fileName:(NSString *)fileName
-                                   fileTypeString:(NSString *)fileTypeString
-                                   mimeTypeString:(NSString *)mimeTypeString
-                                    captionString:(NSString *)captionString;
 
 @end
 
@@ -69,6 +44,7 @@
     
     if (self) {
         _uploadQueueDictionary = [[NSMutableDictionary alloc] init];
+        _uploadQueueScheduledTimeDictionary = [[NSMutableDictionary alloc] init];
         _uploadProgressDictionary = [[NSMutableDictionary alloc] init];
         _pendingUploadAssetDictionary = [[NSMutableDictionary alloc] init];
     }
@@ -81,9 +57,8 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)sendFileWithData:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime {
-    
-    self.scheduleTime = scheduleTime;
     NSString *roomID = message.room.roomID;
     if (roomID == nil || [roomID isEqualToString:@""]) {
         return;
@@ -93,35 +68,31 @@
     if (uploadQueueRoomArray == nil) {
         uploadQueueRoomArray = [NSMutableArray array];
     }
+    [uploadQueueRoomArray addObject:message];
+    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
     
-    if ([uploadQueueRoomArray count] > 0 && uploadQueueRoomArray != nil) {
-        //uploading in progress
-        [uploadQueueRoomArray addObject:message];
-        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
+    if (scheduleTime.longValue > 0) {
+        [self.uploadQueueScheduledTimeDictionary setObject:scheduleTime forKey:message.localID];
     }
-    else {
-        [uploadQueueRoomArray addObject:message];
-        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
-        
+    
+    if ([uploadQueueRoomArray count] <= 1) {
         if (message.type == TAPChatMessageTypeImage) {
-            //Upload image
+            // Upload image
             [self runUploadImageWithRoomID:message.room.roomID];
         }
         else if (message.type == TAPChatMessageTypeFile) {
-            //Upload File
+            // Upload File
             [self runUploadFileWithRoomID:message.room.roomID];
         }
-        else if (message.type == TAPChatMessageTypeVoice){
-            //Upload Voice
+        else if (message.type == TAPChatMessageTypeVoice) {
+            // Upload Voice
             [self runUploadVoiceAsAssetWithRoomID:message.room.roomID];
         }
     }
 }
 
 - (void)sendFileAsAssetWithData:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime {
-    
     NSString *roomID = message.room.roomID;
-    self.scheduleTime = scheduleTime;
     if (roomID == nil || [roomID isEqualToString:@""]) {
         return;
     }
@@ -130,16 +101,14 @@
     if (uploadQueueRoomArray == nil) {
         uploadQueueRoomArray = [NSMutableArray array];
     }
+    [uploadQueueRoomArray addObject:message];
+    [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
     
-    if ([uploadQueueRoomArray count] > 0 && uploadQueueRoomArray != nil) {
-        //uploading in progress
-        [uploadQueueRoomArray addObject:message];
-        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
+    if (scheduleTime.longValue > 0) {
+        [self.uploadQueueScheduledTimeDictionary setObject:scheduleTime forKey:message.localID];
     }
-    else {
-        [uploadQueueRoomArray addObject:message];
-        [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:roomID];
-        
+    
+    if ([uploadQueueRoomArray count] <= 1) {
         if (message.type == TAPChatMessageTypeImage) {
             //Upload image
             [self runUploadImageAsAssetWithRoomID:message.room.roomID];
@@ -148,7 +117,7 @@
             //Upload Video
             [self runUploadVideoAsAssetWithRoomID:message.room.roomID];
         }
-        else if (message.type == TAPChatMessageTypeVoice){
+        else if (message.type == TAPChatMessageTypeVoice) {
             //Upload Voice
             [self runUploadVoiceAsAssetWithRoomID:message.room.roomID];
         }
@@ -265,16 +234,19 @@
                     [TAPImageView saveImageToCache:resultImage withKey:fileURL];
                     [TAPImageView saveImageToCache:resultImage withKey:resultMessage.localID];
                     
-                    if(self.scheduleTime == 0) {
-                        //Send emit
+                    NSNumber *scheduledTime = [TAPUtil nullToEmptyNumber:[self.uploadQueueScheduledTimeDictionary objectForKey:currentMessage.localID]];
+                    if (scheduledTime.longValue == 0) {
+                        // Send emit
                         [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
                     }
                     else {
-                        [self callAPICreateScheduleMessage:currentMessage];
+                        [self callAPICreateScheduleMessage:currentMessage scheduledTime:scheduledTime];
                     }
                     
                     //Remove first object
-                    [uploadQueueRoomArray removeObjectAtIndex:0];
+                    if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
+                        [uploadQueueRoomArray removeObjectAtIndex:0];
+                    }
                     
                     if ([uploadQueueRoomArray count] == 0) {
                         [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
@@ -294,36 +266,7 @@
                     
                     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
                     
-                    // Check if queue array is exist, run upload again
-                    if ([uploadQueueRoomArray count] > 0) {
-                        TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-                        NSString *nextRoomID = nextUploadMessage.room.roomID;
-                        
-                        if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                            NSDictionary *dataDictionary = [NSDictionary dictionary];
-                            dataDictionary = nextUploadMessage.data;
-                            
-                            //Convert data dictionary to model
-                            TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                            mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                            
-                            if (mediaData.asset == nil) {
-                                //upload UIImage
-                                [self runUploadImageWithRoomID:nextRoomID];
-                            }
-                            else {
-                                //Upload PHAsset
-                                [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                            }
-                        }
-                        else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                            [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-                        }
-                        else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                            [self runUploadFileWithRoomID:nextRoomID];
-                        }
-
-                    }
+                    [self runNextUploadQueue:uploadQueueRoomArray];
                 }];
                 
             } progressBlock:^(CGFloat progress, CGFloat total) {
@@ -353,9 +296,8 @@
                     //Update isFailedSend to 1 and isSending to 0
                     //[[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
                     
-                    //Remove first object
-                    if ([uploadQueueRoomArray count] > 0) {
-                        
+                    // Remove first object
+                    if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
                         [uploadQueueRoomArray removeObjectAtIndex:0];
                         
                         if ([uploadQueueRoomArray count] == 0) {
@@ -365,6 +307,7 @@
                             [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
                         }
                     }
+                    [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:obtainedMesage.localID];
                 }
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
@@ -384,7 +327,7 @@
         }];
     }
     failure:^(NSError *error, TAPMessageModel *resultMessage) {
-        
+        [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:resultMessage.localID];
     }];
 }
 
@@ -572,7 +515,7 @@
     NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
     [objectDictionary setObject:currentMessage forKey:@"message"];
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_START object:objectDictionary];
-
+    
     NSURLSessionUploadTask *uploadTask = [TAPDataManager callAPIUploadFileWithFileData:fileData roomID:currentMessage.room.roomID fileName:dataFile.fileName fileType:@"file" mimeType:dataFile.mediaType caption:@"" completionBlock:^(NSDictionary *responseObject) {
         
         NSDictionary *responseDataDictionary = [responseObject objectForKey:@"data"];
@@ -642,12 +585,14 @@
         //Save file path to cache
 //        [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:fileUrl.path roomID:currentMessage.room.roomID fileID:key];
         
-        if(self.scheduleTime.longValue == 0) {
-            //Send emit
-            [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
+        NSNumber *scheduledTime = [TAPUtil nullToEmptyNumber:[self.uploadQueueScheduledTimeDictionary objectForKey:currentMessage.localID]];
+        if (scheduledTime.longValue > [TAPUtil currentTimeInMillis].longValue) {
+            // Create scheduled message
+            [self callAPICreateScheduleMessage:currentMessage scheduledTime:scheduledTime];
         }
         else {
-            [self callAPICreateScheduleMessage:currentMessage];
+            // Send emit
+            [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
         }
 
         //Remove first object
@@ -673,37 +618,7 @@
 
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
 
-        // Check if queue array is exist, run upload again
-        if ([uploadQueueRoomArray count] > 0) {
-            TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-            NSString *nextRoomID = nextUploadMessage.room.roomID;
-            
-            if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                NSDictionary *dataDictionary = [NSDictionary dictionary];
-                dataDictionary = nextUploadMessage.data;
-                
-                //Convert data dictionary to model
-                TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                
-                if (mediaData.asset == nil) {
-                    //upload UIImage
-                    [self runUploadImageWithRoomID:nextRoomID];
-                }
-                else {
-                    //Upload PHAsset
-                    [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                }
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                [self runUploadFileWithRoomID:nextRoomID];
-            }
-
-        }
-        
+        [self runNextUploadQueue:uploadQueueRoomArray];
     } progressBlock:^(CGFloat progress, CGFloat total) {
         NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
         obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
@@ -727,12 +642,11 @@
         
         TAPMessageModel *obtainedMesage = [[TAPChatManager sharedManager] getMessageFromWaitingUploadDictionaryWithKey:currentMessage.localID];
         if (obtainedMesage != nil) {
-            
             //Update isFailedSend to 1 and isSending to 0
             [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
             
             //Remove first object
-            if ([uploadQueueRoomArray count] > 0) {
+            if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
                 [uploadQueueRoomArray removeObjectAtIndex:0];
                 
                 if ([uploadQueueRoomArray count] == 0) {
@@ -742,6 +656,7 @@
                     [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentMessage.room.roomID];
                 }
             }
+            [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:obtainedMesage.localID];
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
@@ -807,7 +722,7 @@
         [self.uploadProgressDictionary setObject:obtainedDictionary forKey:currentMessage.localID];
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:obtainedDictionary];
         
-    }resultHandler:^(UIImage * _Nonnull resultImage) {
+    } resultHandler:^(UIImage * _Nonnull resultImage) {
         
         //Set 20% of total progress when finish fetch data
         CGFloat progress = 0.2f;
@@ -903,16 +818,20 @@
                     //Remove dummy image with localID key from cache
                     //[TAPDataManager removeImageFromCacheWithMessage:resultMessage];
                     
-                    //Send emit
-                    if(self.scheduleTime.longValue == 0){
-                        [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+                    NSNumber *scheduledTime = [TAPUtil nullToEmptyNumber:[self.uploadQueueScheduledTimeDictionary objectForKey:currentMessage.localID]];
+                    if (scheduledTime.longValue > [TAPUtil currentTimeInMillis].longValue) {
+                        // Create scheduled message
+                        [self callAPICreateScheduleMessage:currentMessage scheduledTime:scheduledTime];
                     }
                     else {
-                        [self callAPICreateScheduleMessage:currentMessage];
+                        // Send emit
+                        [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
                     }
                     
                     //Remove first object
-                    [uploadQueueRoomArray removeObjectAtIndex:0];
+                    if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
+                        [uploadQueueRoomArray removeObjectAtIndex:0];
+                    }
                     
                     if ([uploadQueueRoomArray count] == 0) {
                         [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
@@ -932,35 +851,7 @@
                     
                     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
                     
-                    // Check if queue array is exist, run upload again
-                    if ([uploadQueueRoomArray count] > 0) {
-                        TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-                        NSString *nextRoomID = nextUploadMessage.room.roomID;
-
-                        if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                            NSDictionary *dataDictionary = [NSDictionary dictionary];
-                            dataDictionary = nextUploadMessage.data;
-
-                            //Convert data dictionary to model
-                            TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                            mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                            
-                            if (mediaData.asset == nil) {
-                                //upload UIImage
-                                [self runUploadImageWithRoomID:nextRoomID];
-                            }
-                            else {
-                                //Upload PHAsset
-                                [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                            }
-                        }
-                        else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                            [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-                        }
-                        else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                            [self runUploadFileWithRoomID:nextRoomID];
-                        }
-                    }
+                    [self runNextUploadQueue:uploadQueueRoomArray];
                 }];
                 
             } progressBlock:^(CGFloat progress, CGFloat total) {
@@ -973,7 +864,7 @@
                 if (obtainedDictionary == nil) {
                     obtainedDictionary = [NSMutableDictionary dictionary];
                     
-                    if ([uploadQueueRoomArray count] > 0) {
+                    if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
                         //Remove first object
                         [uploadQueueRoomArray removeObjectAtIndex:0];
                         
@@ -1019,35 +910,7 @@
                 
                 [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
                 
-                // Check if queue array is exist, run upload again
-                if ([uploadQueueRoomArray count] > 0) {
-                    TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-                    NSString *nextRoomID = nextUploadMessage.room.roomID;
-
-                    if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                        NSDictionary *dataDictionary = [NSDictionary dictionary];
-                        dataDictionary = nextUploadMessage.data;
-
-                        //Convert data dictionary to model
-                        TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                        mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                        
-                        if (mediaData.asset == nil) {
-                            //upload UIImage
-                            [self runUploadImageWithRoomID:nextRoomID];
-                        }
-                        else {
-                            //Upload PHAsset
-                            [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                        }
-                    }
-                    else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                        [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-                    }
-                    else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                        [self runUploadFileWithRoomID:nextRoomID];
-                    }
-                }
+                [self runNextUploadQueue:uploadQueueRoomArray];
             }];
             
             NSMutableDictionary *obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
@@ -1080,35 +943,7 @@
         
         [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
         
-        // Check if queue array is exist, run upload again
-        if ([uploadQueueRoomArray count] > 0) {
-            TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-            NSString *nextRoomID = nextUploadMessage.room.roomID;
-
-            if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                NSDictionary *dataDictionary = [NSDictionary dictionary];
-                dataDictionary = nextUploadMessage.data;
-
-                //Convert data dictionary to model
-                TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                
-                if (mediaData.asset == nil) {
-                    //upload UIImage
-                    [self runUploadImageWithRoomID:nextRoomID];
-                }
-                else {
-                    //Upload PHAsset
-                    [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                }
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                [self runUploadFileWithRoomID:nextRoomID];
-            }
-        }
+        [self runNextUploadQueue:uploadQueueRoomArray];
     }];
 }
 
@@ -1393,7 +1228,7 @@
                     //Update isFailedSend to 1 and isSending to 0
                     [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
                     
-                    if ([uploadQueueRoomArray count] > 0) {
+                    if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
                         //Remove first object
                         [uploadQueueRoomArray removeObjectAtIndex:0];
                         
@@ -1404,6 +1239,8 @@
                             [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
                         }
                     }
+                    
+                    [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:obtainedMesage.localID];
                 }
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];
@@ -1709,7 +1546,9 @@
         [[TAPChatManager sharedManager] sendEmitFileMessage:currentMessage];
 
         //Remove first object
-        [uploadQueueRoomArray removeObjectAtIndex:0];
+        if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
+            [uploadQueueRoomArray removeObjectAtIndex:0];
+        }
 
         if ([uploadQueueRoomArray count] == 0) {
             [self.uploadQueueDictionary removeObjectForKey:currentMessage.room.roomID];
@@ -1728,41 +1567,8 @@
         [self.uploadProgressDictionary removeObjectForKey:currentMessage.localID];
 
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
-
-        // Check if queue array is exist, run upload again
-        if ([uploadQueueRoomArray count] > 0) {
-            TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-            NSString *nextRoomID = nextUploadMessage.room.roomID;
-            
-            if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                NSDictionary *dataDictionary = [NSDictionary dictionary];
-                dataDictionary = nextUploadMessage.data;
-                
-                //Convert data dictionary to model
-                TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                
-                if (mediaData.asset == nil) {
-                    //upload UIImage
-                    [self runUploadImageWithRoomID:nextRoomID];
-                }
-                else {
-                    //Upload PHAsset
-                    [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                }
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                [self runUploadFileWithRoomID:nextRoomID];
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeVoice) {
-                [self runUploadVoiceAsAssetWithRoomID:nextRoomID];
-            }
-
-        }
         
+        [self runNextUploadQueue:uploadQueueRoomArray];
     } progressBlock:^(CGFloat progress, CGFloat total) {
         NSMutableDictionary *obtainedDictionary = [NSMutableDictionary dictionary];
         obtainedDictionary = [self.uploadProgressDictionary objectForKey:currentMessage.localID];
@@ -1790,7 +1596,7 @@
             [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
             
             //Remove first object
-            if ([uploadQueueRoomArray count] > 0) {
+            if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
                 [uploadQueueRoomArray removeObjectAtIndex:0];
                 
                 if ([uploadQueueRoomArray count] == 0) {
@@ -2042,6 +1848,37 @@
             return;
         }
     */
+}
+
+- (void)runNextUploadQueue:(NSMutableArray *)uploadQueueRoomArray {
+    if ([uploadQueueRoomArray count] == 0) {
+        return;
+    }
+    TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
+    NSString *nextRoomID = nextUploadMessage.room.roomID;
+    if (nextUploadMessage.type == TAPChatMessageTypeImage) {
+        NSDictionary *dataDictionary = [NSDictionary dictionary];
+        dataDictionary = nextUploadMessage.data;
+        
+        // Convert data dictionary to model
+        TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
+        mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
+        
+        if (mediaData.asset == nil) {
+            // Upload UIImage
+            [self runUploadImageWithRoomID:nextRoomID];
+        }
+        else {
+            // Upload PHAsset
+            [self runUploadImageAsAssetWithRoomID:nextRoomID];
+        }
+    }
+    else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
+        [self runUploadVideoAsAssetWithRoomID:nextRoomID];
+    }
+    else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
+        [self runUploadFileWithRoomID:nextRoomID];
+    }
 }
 
 - (TAPDataMediaModel *)convertDictionaryToDataMediaModel:(NSDictionary *)dictionary {
@@ -2330,29 +2167,16 @@
     [currentUploadTask cancel];
     
     //Remove from queue array
-    if ([uploadQueueRoomArray count] != 0 && uploadQueueRoomArray != nil) {
+    if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
         [uploadQueueRoomArray removeObjectAtIndex:currentUploadedIndex];
         [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:currentRoomID];
     }
     
+    [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:message.localID];
+    
     if (currentUploadedIndex == 0) {
         //Run next upload image when deleted image is still uploading
-        
-        if ([uploadQueueRoomArray count] > 0) {
-            TAPMessageModel *toBeUploadedMessage = (TAPMessageModel *)[uploadQueueRoomArray firstObject];
-            if (message.type == TAPChatMessageTypeImage) {
-                //Upload image
-                [self runUploadImageWithRoomID:currentRoomID];
-            }
-            else if (message.type == TAPChatMessageTypeFile) {
-                //Upload File
-                [self runUploadFileWithRoomID:currentRoomID];
-            }
-            else if (message.type == TAPChatMessageTypeVideo) {
-                //Upload File
-                [self runUploadVideoAsAssetWithRoomID:currentRoomID];
-            }
-        }
+        [self runNextUploadQueue:uploadQueueRoomArray];
     }
 }
 
@@ -2405,17 +2229,20 @@
     return NO;
 }
 
-- (void)callAPICreateScheduleMessage:(TAPMessageModel *)message {
+- (void)callAPICreateScheduleMessage:(TAPMessageModel *)message scheduledTime:(NSNumber *)scheduledTime {
     NSDictionary *encryptedMessage = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
     //[[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:message.localID];
     
     TAPScheduledMessageModel *scheduleMessage = [TAPScheduledMessageModel new];
     scheduleMessage.message = message;
-    scheduleMessage.scheduleTime = self.scheduleTime;
-   // [[TAPChatManager sharedManager] saveScheduleMessageToPendingMessageArray:scheduleMessage];
+    scheduleMessage.scheduleTime = scheduledTime;
     
-    [TAPDataManager callAPICreateScheduleMessage:encryptedMessage scheduledTime:self.scheduleTime success:^(TAPMessageModel *scheduledMessage) {
-        //[[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:scheduledMessage.localID];
+    [TAPDataManager callAPICreateScheduleMessage:encryptedMessage scheduledTime:scheduledTime success:^(TAPMessageModel *scheduledMessage) {
+        [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:message.localID];
+        message.isSending = NO;
+        NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+        [objectDictionary setObject:message forKey:@"message"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_CREATE_MEDIA_SCHEDULED_MESSAGE_COMPLETE object:objectDictionary];
     } failure:^(NSError *error) {
         
     }];
@@ -2508,11 +2335,20 @@
             [TAPImageView saveImageToCache:thumbnailVideoImage withKey:resultMessage.localID];
         }
         
-        //Send emit
-        [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+        NSNumber *scheduledTime = [TAPUtil nullToEmptyNumber:[self.uploadQueueScheduledTimeDictionary objectForKey:currentMessage.localID]];
+        if (scheduledTime.longValue > [TAPUtil currentTimeInMillis].longValue) {
+            // Create scheduled message
+            [self callAPICreateScheduleMessage:currentMessage scheduledTime:scheduledTime];
+        }
+        else {
+            // Send emit
+            [[TAPChatManager sharedManager] sendEmitFileMessage:resultMessage];
+        }
         
         //Remove first object
-        [uploadQueueRoomArray removeObjectAtIndex:0];
+        if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
+            [uploadQueueRoomArray removeObjectAtIndex:0];
+        }
 
         if ([uploadQueueRoomArray count] == 0) {
             [self.uploadQueueDictionary removeObjectForKey:resultMessage.room.roomID];
@@ -2532,35 +2368,7 @@
         
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FINISH object:objectDictionary];
         
-        // Check if queue array is exist, run upload again
-        if ([uploadQueueRoomArray count] > 0) {
-            TAPMessageModel *nextUploadMessage = [uploadQueueRoomArray firstObject];
-            NSString *nextRoomID = nextUploadMessage.room.roomID;
-            
-            if (nextUploadMessage.type == TAPChatMessageTypeImage) {
-                NSDictionary *dataDictionary = [NSDictionary dictionary];
-                dataDictionary = nextUploadMessage.data;
-                
-                //Convert data dictionary to model
-                TAPDataMediaModel *mediaData = [TAPDataMediaModel new];
-                mediaData = [self convertDictionaryToDataMediaModel:dataDictionary];
-                
-                if (mediaData.asset == nil) {
-                    //upload UIImage
-                    [self runUploadImageWithRoomID:nextRoomID];
-                }
-                else {
-                    //Upload PHAsset
-                    [self runUploadImageAsAssetWithRoomID:nextRoomID];
-                }
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeVideo) {
-                [self runUploadVideoAsAssetWithRoomID:nextRoomID];
-            }
-            else if (nextUploadMessage.type == TAPChatMessageTypeFile) {
-                [self runUploadFileWithRoomID:nextRoomID];
-            }
-        }
+        [self runNextUploadQueue:uploadQueueRoomArray];
     } progressBlock:^(CGFloat progress, CGFloat total) {
         
         //upload image progress is max 80% of total progress (20% for fetch asset)
@@ -2592,7 +2400,7 @@
             //Update isFailedSend to 1 and isSending to 0
             [[TAPChatManager sharedManager] updateMessageToFailedWithLocalID:currentMessage.localID];
             
-            if ([uploadQueueRoomArray count] > 0) {
+            if (![TAPUtil isEmptyArray:uploadQueueRoomArray]) {
                 //Remove first object
                 [uploadQueueRoomArray removeObjectAtIndex:0];
                 
@@ -2603,6 +2411,8 @@
                     [self.uploadQueueDictionary setObject:uploadQueueRoomArray forKey:resultMessage.room.roomID];
                 }
             }
+            
+            [[TAPChatManager sharedManager] removeScheduleMessagesFromPendingMessagesArrayWithLocalID:obtainedMesage.localID];
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_UPLOAD_FILE_FAILURE object:objectDictionary];

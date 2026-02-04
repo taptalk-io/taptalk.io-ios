@@ -297,6 +297,9 @@
     UIImageView *iconImageView = nil;
     if (![TAPUtil isEmptyString:iconName]) {
         iconImage = [UIImage imageNamed:iconName];
+        if (iconImage == nil) {
+            iconImage = [UIImage imageNamed:iconName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
     }
     if (iconImage != nil) {
         iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, 24.0f, 24.0f)];
