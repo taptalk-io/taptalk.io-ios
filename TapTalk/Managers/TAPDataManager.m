@@ -9385,7 +9385,7 @@
             
         }
         
-        success([scheduleMessageArray copy]);
+        success([[scheduleMessageArray reverseObjectEnumerator] allObjects]);
 
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

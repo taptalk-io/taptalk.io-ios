@@ -78,6 +78,7 @@
 #define TAP_NOTIFICATION_DOWNLOAD_FILE_PROGRESS @"Notification.TapTalkDownloadFileProgress"
 #define TAP_NOTIFICATION_DOWNLOAD_FILE_FINISH @"Notification.TapTalkDownloadFileFinish"
 #define TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE @"Notification.TapTalkDownloadFileFailure"
+#define TAP_NOTIFICATION_CREATE_MEDIA_SCHEDULED_MESSAGE_COMPLETE @"Notification.TapTalkCreateMediaScheduledMessageComplete"
 #define TAP_NOTIFICATION_USER_PROFILE_CHANGES @"Notification.TapTalkUserProfileChanges"
 
 #define TAP_NOTIFICATION_USER_LEAVE_GROUP @"Notification.TapTalkUserLeaveGroup"

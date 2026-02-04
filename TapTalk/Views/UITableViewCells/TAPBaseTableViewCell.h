@@ -8,7 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol TAPBaseTableViewCellDelegate <NSObject>
+
+@optional
+
+- (void)baseTableViewCellDidRequestRefreshCellHeight;
+
+@end
+
 @interface TAPBaseTableViewCell : UITableViewCell
+
+@property (weak, nonatomic) id<TAPBaseTableViewCellDelegate> delegate;
 
 - (void)setGrayHighlightColor;
 - (void)setOrangeHighlightColor;

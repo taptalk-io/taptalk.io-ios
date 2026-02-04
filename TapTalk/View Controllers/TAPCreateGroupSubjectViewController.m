@@ -656,6 +656,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     
     if (status == AVAuthorizationStatusAuthorized) {
+        if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [self showSnackBar:TapTalkSnackBarTypeError message:NSLocalizedString(@"Camera not available", @"") iconName:@"TAPIconWarningCircle"];
+            return;
+        }
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         imagePicker.allowsEditing = NO;
         imagePicker.delegate = self;
@@ -700,6 +704,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
+        if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+            [self showSnackBar:TapTalkSnackBarTypeError message:NSLocalizedString(@"Photo Library not available", @"") iconName:@"TAPIconWarningCircle"];
+            return;
+        }
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         imagePicker.allowsEditing = NO;
         imagePicker.delegate = self;
