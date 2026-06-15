@@ -959,7 +959,7 @@
         self.rightBarButton.titleLabel.font = searchBarCancelFont;
         [self.rightBarButton setImage:nil forState:UIControlStateNormal];
         [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+        TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightBarButton];
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
         
         self.searchBarView.frame = CGRectMake(
@@ -1222,7 +1222,7 @@
             );
         }
         
-        UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarView];
+        TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:self.leftBarView];
         [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     }
     else {
@@ -1241,7 +1241,7 @@
         [self.rightBarButton setTitle:nil forState:UIControlStateNormal];
         [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.rightBarView addSubview:self.rightBarButton];
-        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarView];
+        TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightBarView];
         
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     }

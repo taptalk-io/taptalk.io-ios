@@ -14,7 +14,7 @@
 @interface TAPImageSelectViewController () <UICollectionViewDelegate, UICollectionViewDataSource, PHPhotoLibraryChangeObserver, TAPImagePreviewViewControllerDelegate>
 
 @property (strong, nonatomic) TAPImageSelectView *imageSelectView;
-@property (strong, nonatomic) UIBarButtonItem *leftBarButton;
+@property (strong, nonatomic) TapBarButtonItem *leftBarButton;
 
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 
@@ -66,14 +66,14 @@
     if(self.imageSelectViewControllerNavigateType == ImageSelectViewControllerNavigateTypePresent) {
         UIImage *closeImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         closeImage = [closeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
-        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:closeImage style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonDidTapped)];
+        _leftBarButton = [[TapBarButtonItem alloc] initWithImage:closeImage style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonDidTapped)];
         self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton];
         [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     }
     else if(self.imageSelectViewControllerNavigateType == ImageSelectViewControllerNavigateTypePush) {
         UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
-        _leftBarButton = [[UIBarButtonItem alloc] initWithImage:buttonImage style:UIBarButtonItemStylePlain target:self action:@selector(backButtonDidTapped)];
+        _leftBarButton = [[TapBarButtonItem alloc] initWithImage:buttonImage style:UIBarButtonItemStylePlain target:self action:@selector(backButtonDidTapped)];
         self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton];
         [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     }

@@ -103,6 +103,8 @@
 		528613382E694FAF00AE5605 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 5286130E2E694FAF00AE5605 /* README.md */; };
 		528613392E694FAF00AE5605 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 5286130D2E694FAF00AE5605 /* LICENSE */; };
 		5286133A2E694FAF00AE5605 /* TapAFNetworking.debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 528612F22E694FAF00AE5605 /* TapAFNetworking.debug.xcconfig */; };
+		52A06DFA2FDFDC1200261B00 /* TapBarButtonItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 52A06DF82FDFDC1200261B00 /* TapBarButtonItem.h */; };
+		52A06DFB2FDFDC1200261B00 /* TapBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 52A06DF92FDFDC1200261B00 /* TapBarButtonItem.m */; };
 		5DE066A7D583551C76685019 /* libPods-TapTalk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F354A205C0C6E6F7BCA2F7F /* libPods-TapTalk.a */; };
 		A97EC5C925BEF17B0068E2D4 /* TapUI.h in Headers */ = {isa = PBXBuildFile; fileRef = A97EC5C725BEF17B0068E2D4 /* TapUI.h */; };
 		A97EC5CA25BEF17B0068E2D4 /* TapUI.m in Sources */ = {isa = PBXBuildFile; fileRef = A97EC5C825BEF17B0068E2D4 /* TapUI.m */; };
@@ -604,6 +606,8 @@
 		5286130D2E694FAF00AE5605 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		5286130E2E694FAF00AE5605 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5286130F2E694FAF00AE5605 /* TapAFNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapAFNetworking.h; sourceTree = "<group>"; };
+		52A06DF82FDFDC1200261B00 /* TapBarButtonItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapBarButtonItem.h; sourceTree = "<group>"; };
+		52A06DF92FDFDC1200261B00 /* TapBarButtonItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapBarButtonItem.m; sourceTree = "<group>"; };
 		52C64D9C2E41D948006E83A4 /* libJSONModel.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libJSONModel.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A97EC5C725BEF17B0068E2D4 /* TapUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapUI.h; sourceTree = "<group>"; };
 		A97EC5C825BEF17B0068E2D4 /* TapUI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapUI.m; sourceTree = "<group>"; };
@@ -1283,6 +1287,8 @@
 				D79533522450039200C4F90D /* NSBundle+Language.m */,
 				0A94F47B2CBE272300E938F7 /* TapHighlightCustomButtonView.h */,
 				0A94F47C2CBE272300E938F7 /* TapHighlightCustomButtonView.m */,
+				52A06DF82FDFDC1200261B00 /* TapBarButtonItem.h */,
+				52A06DF92FDFDC1200261B00 /* TapBarButtonItem.m */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1819,6 +1825,7 @@
 				D7D081182190255B0037FA57 /* TAPProductListCollectionViewCell.h in Headers */,
 				D795E133222CF1D7008E7B99 /* TAPYourFileBubbleTableViewCell.h in Headers */,
 				0A94F47D2CBE272400E938F7 /* TapHighlightCustomButtonView.h in Headers */,
+				52A06DFA2FDFDC1200261B00 /* TapBarButtonItem.h in Headers */,
 				D77B5F6E2158BBEA00253BDC /* TAPCustomNavigationController.h in Headers */,
 				F5301EF6217A2209007227D2 /* TAPContactRealmModel.h in Headers */,
 				F53288102174A911004E7A25 /* TAPRecentSearchTableViewCell.h in Headers */,
@@ -2152,9 +2159,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TapTalk/Pods-TapTalk-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TapTalk/Pods-TapTalk-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2264,6 +2275,7 @@
 				DFFEFEA82227E66000017739 /* TAPWebViewViewController.m in Sources */,
 				DF2513D421E61C3E000D165A /* TAPQuoteModel.m in Sources */,
 				D77B5F232158BB9500253BDC /* TAPRoomListView.m in Sources */,
+				52A06DFB2FDFDC1200261B00 /* TapBarButtonItem.m in Sources */,
 				0A6956C12893F0BF0090B20A /* TAPBaseTableView.m in Sources */,
 				F5CC1B88218997DC00F39F7D /* TAPImageCollectionViewCell.m in Sources */,
 				D77B5EAC2158BB4000253BDC /* TAPNetworkManager.m in Sources */,

@@ -53,7 +53,7 @@
     leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     leftBarButton.titleLabel.font = navigationBarButtonFont;
     [leftBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     
     self.title = NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"");

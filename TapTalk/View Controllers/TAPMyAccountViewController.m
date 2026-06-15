@@ -26,7 +26,7 @@
 @property (strong, nonatomic) NSString *lastCheckEmailString;
 @property (strong, nonatomic) UIButton *editButton;
 @property (strong, nonatomic) UIButton *saveButton;
-@property (strong, nonatomic) UIBarButtonItem *barButtonRightItem;
+@property (strong, nonatomic) TapBarButtonItem *barButtonRightItem;
 @property (nonatomic) NSInteger lastPageIndicatorIndex;
 @property (strong, nonatomic) NSMutableArray<TAPPhotoListModel *> *photoListArray;
 
@@ -487,7 +487,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [self.editButton setTitle:@"Edit" forState:UIControlStateNormal];
     [self.editButton setTitleColor:buttonLabelColor forState:UIControlStateNormal];
     self.editButton.titleLabel.font = buttonLabelFont;
-    self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.editButton];
+    self.barButtonRightItem = [[TapBarButtonItem alloc] initWithCustomView:self.editButton];
     [self.editButton addTarget:self action:@selector(navigationBarActionButtonEditDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.navigationItem setRightBarButtonItem:self.barButtonRightItem];
     
@@ -504,7 +504,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 

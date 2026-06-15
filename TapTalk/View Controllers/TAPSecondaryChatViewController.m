@@ -552,7 +552,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
             [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
             [rightBarView addSubview:rightBarButton];
             
-            UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarView];
+            TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:rightBarView];
             [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
         }
         
@@ -572,7 +572,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 

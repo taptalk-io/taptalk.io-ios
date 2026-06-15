@@ -179,7 +179,7 @@
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 
@@ -189,13 +189,13 @@
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     button.contentEdgeInsets = UIEdgeInsetsMake(4.0f, 0.0f, 4.0f, 18.0f);
     
-    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *item = [[TapBarButtonItem alloc] initWithCustomView:button];
 
     UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
     [button setImage:buttonImage forState:UIControlStateNormal];
 
-    UIBarButtonItem *positiveSeparator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    TapBarButtonItem *positiveSeparator = [[TapBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     positiveSeparator.width = 6.0f;
     
     self.navigationItem.leftBarButtonItems = @[positiveSeparator, item];
@@ -212,7 +212,7 @@
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setRightBarButtonItem:barButtonItem];
 }
 
@@ -227,7 +227,7 @@
     leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     leftBarButton.titleLabel.font = leftBarButtonItemFont;
     [leftBarButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
 }
 
@@ -242,7 +242,7 @@
     rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     rightBarButton.titleLabel.font = rightBarButtonItemFont;
     [rightBarButton addTarget:self action:@selector(editButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
 }
 
@@ -257,7 +257,7 @@
     rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     rightBarButton.titleLabel.font = rightBarButtonItemFont;
     [rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
 }
 
