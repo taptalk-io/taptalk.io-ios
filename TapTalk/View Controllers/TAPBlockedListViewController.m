@@ -13,7 +13,7 @@
 @interface TAPBlockedListViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (strong, nonatomic) TAPBlockedListView *blockedListView;
 @property (strong, nonatomic) UIButton *rightNavigationButton;
-@property (strong, nonatomic) UIBarButtonItem *barButtonRightItem;
+@property (strong, nonatomic) TapBarButtonItem *barButtonRightItem;
 @property (strong, nonatomic) UIView *loadingView;
 @property (strong, nonatomic) UIImageView *loadingImageView;
 @property (strong, nonatomic) NSMutableArray* blockedUserList;
@@ -75,7 +75,7 @@
         if(self.blockedUserList.count == 0) {
             [self.rightNavigationButton setTitle:@"" forState:UIControlStateNormal];
             self.rightNavigationButton.userInteractionEnabled = NO;
-            self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
+            self.barButtonRightItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
             [self.navigationItem setRightBarButtonItem:self.barButtonRightItem];
             
             return;
@@ -107,7 +107,7 @@
         if(self.blockedUserList.count == 0) {
             [self.rightNavigationButton setTitle:@"" forState:UIControlStateNormal];
             self.rightNavigationButton.userInteractionEnabled = NO;
-            self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
+            self.barButtonRightItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
             [self.navigationItem setRightBarButtonItem:self.barButtonRightItem];
             
             return;
@@ -219,7 +219,7 @@
     if (self.blockedUserList.count == 0) {
         [self.rightNavigationButton setTitle:@"" forState:UIControlStateNormal];
         self.rightNavigationButton.userInteractionEnabled = NO;
-        self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
+        self.barButtonRightItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
         [self.navigationItem setRightBarButtonItem:self.barButtonRightItem];
         
         return;
@@ -235,7 +235,7 @@
         [self.rightNavigationButton setTitle:@"Done" forState:UIControlStateNormal];
     }
     [self.blockedListView.tableView reloadData];
-    self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
+    self.barButtonRightItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
     [self.navigationItem setRightBarButtonItem:self.barButtonRightItem];
 }
 
@@ -285,7 +285,7 @@
     [self.rightNavigationButton setTitle:@"Edit" forState:UIControlStateNormal];
     [self.rightNavigationButton setTitleColor:buttonLabelColor forState:UIControlStateNormal];
     self.rightNavigationButton.titleLabel.font = buttonLabelFont;
-    self.barButtonRightItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
+    self.barButtonRightItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightNavigationButton];
     [self.rightNavigationButton addTarget:self action:@selector(rightNavigationButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.navigationItem setRightBarButtonItem:self.barButtonRightItem];
     
@@ -296,7 +296,7 @@
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 

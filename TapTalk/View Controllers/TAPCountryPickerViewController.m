@@ -53,7 +53,7 @@
     [self.leftBarButton setTitleColor:navigationBarButtonColor forState:UIControlStateNormal];
     self.leftBarButton.titleLabel.font = navigationBarButtonFont;
     [self.leftBarButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
+    TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:self.leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     
     [self.countryPickerView.searchBarCancelButton addTarget:self action:@selector(searchBarCancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];

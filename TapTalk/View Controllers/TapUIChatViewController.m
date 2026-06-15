@@ -7056,7 +7056,7 @@ CGPoint center;
 - (void)setupNavigationLeftBarButtonItemsWithImage:(NSString *)imageName {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    NSArray<UIBarButtonItem *> *customLeftBarButtonItems = nil;
+    NSArray<TapBarButtonItem *> *customLeftBarButtonItems = nil;
     id<TapUIChatRoomCustomNavigationBarDelegate> customNavbarDelegate = [TapUI sharedInstance].chatRoomCustomNavigationBarDelegate;
     if ([customNavbarDelegate respondsToSelector:@selector(setCustomChatRoomNavigationBarLeftBarButtonItems:currentNavigationController:room:activeUser:recipientUser:)]) {
         customLeftBarButtonItems = [customNavbarDelegate setCustomChatRoomNavigationBarLeftBarButtonItems:self
@@ -7074,7 +7074,7 @@ CGPoint center;
         UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30.0f, 30.0f)];
         [button setImage:backButtonImage forState:UIControlStateNormal];
         [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
         [self.navigationItem setLeftBarButtonItems:@[barButtonItem]];
     }
 }
@@ -7082,7 +7082,7 @@ CGPoint center;
 - (void)setupNavigationRightBarButtonItems {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
     
-    NSArray<UIBarButtonItem *> *customRightBarButtonItems = nil;
+    NSArray<TapBarButtonItem *> *customRightBarButtonItems = nil;
     id<TapUIChatRoomCustomNavigationBarDelegate> customNavbarDelegate = [TapUI sharedInstance].chatRoomCustomNavigationBarDelegate;
     if ([customNavbarDelegate respondsToSelector:@selector(setCustomChatRoomNavigationBarRightBarButtonItems:currentNavigationController:room:activeUser:recipientUser:)]) {
         customRightBarButtonItems = [customNavbarDelegate setCustomChatRoomNavigationBarRightBarButtonItems:self
@@ -7171,7 +7171,7 @@ CGPoint center;
             [rightBarButton addTarget:self action:@selector(profileImageDidTapped) forControlEvents:UIControlEventTouchUpInside];
             [rightBarView addSubview:rightBarButton];
             
-            UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarView];
+            TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:rightBarView];
             [self.navigationItem setRightBarButtonItems:@[rightBarButtonItem]];
         }
     }

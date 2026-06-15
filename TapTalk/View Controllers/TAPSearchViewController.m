@@ -82,7 +82,7 @@
     self.rightBarButton.titleLabel.font = searchBarCancelFont;
     [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.rightBarView addSubview:self.rightBarButton];
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarView];
+    TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:self.rightBarView];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     
     //TitleView

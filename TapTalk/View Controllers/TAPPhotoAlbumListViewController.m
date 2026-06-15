@@ -16,7 +16,7 @@
 @interface TAPPhotoAlbumListViewController () <UITableViewDelegate, UITableViewDataSource, PHPhotoLibraryChangeObserver, TAPImageSelectViewControllerDelegate>
 
 @property (strong, nonatomic) TAPPhotoAlbumListView *photoAlbumListView;
-@property (strong, nonatomic) UIBarButtonItem *leftBarButton;
+@property (strong, nonatomic) TapBarButtonItem *leftBarButton;
 
 //Get Camera Roll Image
 @property (strong, nonatomic) PHFetchResult<PHAssetCollection *> *smartAlbums;
@@ -48,7 +48,7 @@
     // Do any additional setup after loading the view.
     UIImage *closeImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     closeImage = [closeImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
-    _leftBarButton = [[UIBarButtonItem alloc] initWithImage:closeImage style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonDidTapped)];
+    _leftBarButton = [[TapBarButtonItem alloc] initWithImage:closeImage style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonDidTapped)];
     self.leftBarButton.tintColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton];
     [self.navigationItem setLeftBarButtonItem:self.leftBarButton];
     
