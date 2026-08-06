@@ -7,7 +7,7 @@
 //
 
 #import "TAPDataManager.h"
-#import "TAPAPIManager.h"
+#import "PowerTalk.h"
 
 #define kDatabaseTableMessage @"TAPMessageRealmModel"
 #define kDatabaseTableRecentSearch @"TAPRecentSearchRealmModel"
@@ -610,6 +610,9 @@
 + (TAPUserModel *)userModelFromDictionary:(NSDictionary *)dictionary {
     dictionary = [TAPUtil nullToEmptyDictionary:dictionary];
     TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:dictionary error:nil];
+    if (user == nil) {
+        user = [TAPUserModel new];
+    }
     
     NSString *userID = [dictionary objectForKey:@"userID"];
     userID = [TAPUtil nullToEmptyString:userID];

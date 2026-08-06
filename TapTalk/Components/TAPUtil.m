@@ -7,8 +7,9 @@
 //
 
 #import "TAPUtil.h"
-#import "SDWebImageDownloader.h"
-#import "SDImageCache.h"
+#import "PowerTalk.h"
+#import <SDWebImage/SDWebImageDownloader.h>
+#import <SDWebImage/SDImageCache.h>
 #import <CoreServices/UTType.h>
 #import <CoreServices/UTCoreTypes.h>
 #import <objc/runtime.h>
@@ -17,6 +18,7 @@
 #import <LinkPresentation/LPFoundation.h>
 #import <LinkPresentation/LPLinkView.h>
 #import <LinkPresentation/LinkPresentation.h>
+#import <AVFoundation/AVAssetImageGenerator.h>
 
 static const char kBundleKey = 0;
 
@@ -920,6 +922,144 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     [feedbackGenerator notificationOccurred:type];
 }
 
+#pragma mark - PodAsset
+
++ (NSURL *)urlForFilename:(NSString *)filename pod:(NSString *)podName {
+    NSString *bundlePath = [self bundlePathForPod:podName];
+    if (!bundlePath) {
+        return nil;
+    }
+
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSString *extension = [filename pathExtension];
+    NSString *withoutExtension = [[filename lastPathComponent] stringByDeletingPathExtension];
+    NSURL *url = [bundle URLForResource:withoutExtension withExtension:extension];
+    
+    return url;
+}
+
++ (NSString *)pathForFilename:(NSString *)filename pod:(NSString *)podName {
+    NSString *bundlePath = [self bundlePathForPod:podName];
+    if (!bundlePath) {
+        return nil;
+    }
+
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSString *extension = [filename pathExtension];
+    NSString *withoutExtension = [[filename lastPathComponent] stringByDeletingPathExtension];
+    NSString *path = [bundle pathForResource:withoutExtension ofType:extension];
+
+    return path;
+}
+
++ (NSString *)stringForFilename:(NSString *)filename pod:(NSString *)podName {
+    NSString *bundlePath = [self bundlePathForPod:podName];
+    if (!bundlePath) {
+        return nil;
+    }
+
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSString *extension = [filename pathExtension];
+    NSString *withoutExtension = [[filename lastPathComponent] stringByDeletingPathExtension];
+    NSString *path = [bundle pathForResource:withoutExtension ofType:extension];
+
+    if (path) {
+        return [NSString stringWithContentsOfFile:path
+                                         encoding:NSUTF8StringEncoding
+                                            error:nil];
+    }
+    return nil;
+}
+
++ (NSData *)dataForFilename:(NSString *)filename pod:(NSString *)podName {
+    NSString *bundlePath = [self bundlePathForPod:podName];
+    if (!bundlePath) {
+        return nil;
+    }
+
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSString *extension = [filename pathExtension];
+    NSString *withoutExtension = [[filename lastPathComponent] stringByDeletingPathExtension];
+    NSString *path = [bundle pathForResource:withoutExtension ofType:extension];
+
+    if (path) {
+        return [NSData dataWithContentsOfFile:path options:0 error:nil];
+    }
+    return nil;
+}
+
++ (NSArray *)assetsInPod:(NSString *)podName {
+    NSBundle *bundle  = [self bundleContainsPod:podName];
+    if (!bundle) {
+        return nil;
+    }
+
+    NSString *bundleRoot = [bundle bundlePath];
+    NSArray *paths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:bundleRoot error:nil];
+    return paths;
+}
+
++ (NSBundle *)bundleForPod:(NSString *)podName {
+    NSString *bundlePath = [self bundlePathForPod:podName];
+    if (bundlePath) {
+        return [NSBundle bundleWithPath:bundlePath];
+    }
+    return nil;
+}
+
++ (NSArray *)recursivePathsForResourcesOfType:(NSString *)type name:(NSString *)name inDirectory:(NSString *)directoryPath {
+    NSMutableArray *filePaths = [[NSMutableArray alloc] init];
+    NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager] enumeratorAtPath:directoryPath];
+
+    NSString *filePath;
+
+    while ((filePath = [enumerator nextObject]) != nil) {
+        if (!type || [[filePath pathExtension] isEqualToString:type]) {
+            if (!name || [[[filePath lastPathComponent] stringByDeletingPathExtension] isEqualToString:name]) {
+                [filePaths addObject:[directoryPath stringByAppendingPathComponent:filePath]];
+            }
+        }
+    }
+
+    return filePaths;
+}
+
++ (NSBundle *)bundleContainsPod:(NSString *)podName {
+    for (NSBundle *bundle in [NSBundle allBundles]) {
+        NSString *bundlePath = [bundle pathForResource:podName ofType:@"bundle"];
+        if (bundlePath) {
+            return bundle;
+        }
+    }
+
+    for (NSBundle *bundle in [NSBundle allFrameworks]) {
+        NSString *bundlePath = [bundle pathForResource:podName ofType:@"bundle"];
+        if (bundlePath) {
+            return bundle;
+        }
+    }
+    
+    return nil;
+}
+
++ (NSString *)bundlePathForPod:(NSString *)podName {
+    for (NSBundle *bundle in [NSBundle allBundles]) {
+        NSString *bundlePath = [bundle pathForResource:podName ofType:@"bundle"];
+        if (bundlePath) {
+            return bundlePath;
+        }
+    }
+
+    for (NSBundle *bundle in [NSBundle allFrameworks]) {
+        NSString *bundlePath = [bundle pathForResource:podName ofType:@"bundle"];
+        if (bundlePath) {
+            return bundlePath;
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark - Validation
 + (BOOL)isAlphabetCharactersOnlyFromText:(NSString *)text {
     NSString *letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -1614,7 +1754,14 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle {
-    NSBundle *resourceBundle = [PodAsset bundleForPod:@"TapTalk"];
+    NSBundle *resourceBundle = [TAPUtil bundleForPod:@"TapTalk"];
+    if (resourceBundle == nil) {
+#ifndef SWIFTPM_MODULE_BUNDLE
+        extern NSBundle* TapTalk_TapTalk_SWIFTPM_MODULE_BUNDLE(void);
+        #define SWIFTPM_MODULE_BUNDLE [NSBundle bundleForClass:[TAPUtil class]]
+#endif
+        resourceBundle = SWIFTPM_MODULE_BUNDLE;
+    }
     return resourceBundle;
 }
 

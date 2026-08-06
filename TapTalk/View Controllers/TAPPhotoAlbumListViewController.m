@@ -10,8 +10,7 @@
 #import "TAPPhotoAlbumListView.h"
 #import "TAPPhotoAlbumListItemTableViewCell.h"
 #import "TAPImageSelectViewController.h"
-
-#import <Photos/Photos.h>
+#import "PowerTalk.h"
 
 @interface TAPPhotoAlbumListViewController () <UITableViewDelegate, UITableViewDataSource, PHPhotoLibraryChangeObserver, TAPImageSelectViewControllerDelegate>
 

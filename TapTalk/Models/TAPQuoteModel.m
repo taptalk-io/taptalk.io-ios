@@ -7,6 +7,7 @@
 //
 
 #import "TAPQuoteModel.h"
+#import "PowerTalk.h"
 
 @implementation TAPQuoteModel
 

@@ -7,6 +7,7 @@
 //
 
 #import "TAPSearchView.h"
+#import "PowerTalk.h"
 
 @interface TAPSearchView ()
 

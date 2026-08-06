@@ -7,6 +7,7 @@
 //
 
 #import "TAPCountryPickerTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPCountryPickerTableViewCell ()
 

@@ -8,8 +8,9 @@
 
 #import "TAPMyAccountViewController.h"
 #import "TAPMyAccountView.h"
-#import "TAPImagePreviewCollectionViewCell.h"
 #import "TAPBlockedListViewController.h"
+#import "TAPImagePreviewCollectionViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPMyAccountViewController () <TAPCustomTextFieldViewDelegate, UIScrollViewDelegate, TAPCustomButtonViewDelegate, UIImagePickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate, TAPCustomGrowingTextViewDelegate>
 

@@ -9,6 +9,7 @@
 #import "TAPCountryPickerViewController.h"
 #import "TAPCountryPickerView.h"
 #import "TAPCountryPickerTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPCountryPickerViewController () <UITableViewDelegate, UITableViewDataSource, TAPSearchBarViewDelegate>
 

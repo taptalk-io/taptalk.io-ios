@@ -7,7 +7,7 @@
 
 #import "TAPConnectionStatusViewController.h"
 #import "TAPConnectionStatusView.h"
-#import "TapAFNetworking.h"
+#import "PowerTalk.h"
 
 @interface TAPConnectionStatusViewController ()
 

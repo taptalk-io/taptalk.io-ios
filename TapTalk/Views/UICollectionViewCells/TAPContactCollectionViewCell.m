@@ -7,6 +7,7 @@
 //
 
 #import "TAPContactCollectionViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPContactCollectionViewCell()
 @property (strong, nonatomic) UIView *bgView;

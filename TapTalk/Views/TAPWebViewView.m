@@ -7,6 +7,7 @@
 //
 
 #import "TAPWebViewView.h"
+#import "PowerTalk.h"
 
 @interface TAPWebViewView()
 

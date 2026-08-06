@@ -8,6 +8,7 @@
 //
 
 #import "TAPSearchResultMessageTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPSearchResultMessageTableViewCell ()
 

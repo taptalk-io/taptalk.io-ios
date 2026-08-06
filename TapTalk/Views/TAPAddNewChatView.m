@@ -7,6 +7,7 @@
 //
 
 #import "TAPAddNewChatView.h"
+#import "PowerTalk.h"
 
 @interface TAPAddNewChatView()
 @property (strong, nonatomic) UIView *bgView;

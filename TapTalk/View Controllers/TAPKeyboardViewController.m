@@ -8,6 +8,7 @@
 
 #import "TAPKeyboardViewController.h"
 #import "TAPKeyboardTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPKeyboardViewController () <UITableViewDataSource, UITableViewDelegate>
 

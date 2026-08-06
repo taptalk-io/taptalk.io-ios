@@ -7,7 +7,7 @@
 //
 
 #import "TAPRoomListTableViewCell.h"
-#import "TAPImageView.h"
+#import "PowerTalk.h"
 
 @interface TAPRoomListTableViewCell()
 

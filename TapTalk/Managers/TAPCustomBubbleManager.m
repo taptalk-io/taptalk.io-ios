@@ -7,6 +7,7 @@
 //
 
 #import "TAPCustomBubbleManager.h"
+#import "PowerTalk.h"
 
 @interface TAPCustomBubbleManager ()
 

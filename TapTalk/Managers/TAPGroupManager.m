@@ -7,6 +7,7 @@
 //
 
 #import "TAPGroupManager.h"
+#import "PowerTalk.h"
 
 @interface TAPGroupManager()
 

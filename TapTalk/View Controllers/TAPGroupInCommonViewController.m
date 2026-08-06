@@ -7,6 +7,7 @@
 
 #import "TAPGroupInCommonViewController.h"
 #import "TAPContactTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPGroupInCommonViewController () <UITableViewDataSource, UITableViewDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;

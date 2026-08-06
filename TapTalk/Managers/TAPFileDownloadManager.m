@@ -6,9 +6,8 @@
 //  Copyright © 2019 Moselo. All rights reserved.
 //
 
-#import "TapAFURLSessionManager.h"
 #import "TAPFileDownloadManager.h"
-#import <TapTalk/Base64.h>
+#import "PowerTalk.h"
 
 @interface TAPFileDownloadManager ()
 

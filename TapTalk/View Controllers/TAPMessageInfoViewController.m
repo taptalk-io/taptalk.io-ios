@@ -22,10 +22,9 @@
 #import "TAPMentionListXIBTableViewCell.h"
 #import "TAPMyVoiceNoteBubbleTableViewCell.h"
 #import "TAPYourVoiceNoteBubbleTableViewCell.h"
-#import "TapMessageRecipientModel.h"
-#import "TAPAudioManager.h"
 #import "TAPMediaDetailViewController.h"
 #import "TAPWebViewViewController.h"
+#import "PowerTalk.h"
 
 @import QuickLook;
 
@@ -753,27 +752,29 @@
 #pragma mark TAPMyImageBubbleTableViewCellDelegate
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
-    CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
-    
-    TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
-    [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
-    mediaDetailViewController.delegate = self;
-    mediaDetailViewController.message = myImageBubbleCell.message;
-    
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
-    NSArray *imageSliderImage = [NSArray array];
     if (cellImage != nil) {
+        CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
+        NSArray *imageSliderImage = [NSArray array];
         imageSliderImage = @[cellImage];
         
+        TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+        [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+        mediaDetailViewController.delegate = self;
+        mediaDetailViewController.message = myImageBubbleCell.message;
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
         [mediaDetailViewController setImageArray:@[cellImage]];
-        
         [mediaDetailViewController setActiveIndex:0];
         
         NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
         CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
-        CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        CGRect imageRectInView = CGRectMake(
+            CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO],
+            myImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            myImageBubbleCell.bubbleImageViewHeightConstraint.constant
+        );
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
 //        myImageBubbleCell.bubbleImageView.alpha = 0.0f;

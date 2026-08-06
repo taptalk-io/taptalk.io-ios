@@ -7,6 +7,7 @@
 //
 
 #import "TAPCustomGrowingTextView.h"
+#import "PowerTalk.h"
 
 @interface TAPCustomGrowingTextView () <UITextViewDelegate>
 

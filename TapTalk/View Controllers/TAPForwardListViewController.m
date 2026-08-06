@@ -13,6 +13,8 @@
 #import "TAPContactTableViewCell.h"
 #import "TAPSearchResultMessageTableViewCell.h"
 
+#import "PowerTalk.h"
+
 @interface TAPForwardListViewController () <UITableViewDataSource, UITableViewDelegate, TAPSearchBarViewDelegate>
 
 @property (strong, nonatomic) TAPForwardListView *forwardListView;
@@ -50,7 +52,7 @@
     UIButton* leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [leftBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [leftBarButton setTitleColor:navigationBarButtonColor forState:UIControlStateNormal];
-    leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+    leftBarButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     leftBarButton.titleLabel.font = navigationBarButtonFont;
     [leftBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:leftBarButton];

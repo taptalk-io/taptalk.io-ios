@@ -3,14 +3,14 @@ platform :ios, '12.0'
 inhibit_all_warnings!
 
 def tapTalk_pods
-    pod 'SocketRocket'
-    pod 'JSONModel', '1.8.0', :modular_headers => true
-    pod 'Realm', '10.54.5'
-    pod 'PodAsset'
-    pod 'SDWebImage'
-    pod 'GooglePlaces'
-    pod 'GoogleMaps', '5.2.0'
-    pod 'ZSWTappableLabel', '2.0'
+#    pod 'SocketRocket'
+#    pod 'JSONModel', '1.8.0', :modular_headers => true
+#    pod 'Realm', '20.0.4'
+#    pod 'PodAsset'
+#    pod 'SDWebImage'
+#    pod 'GooglePlaces'
+#    pod 'GoogleMaps', '5.2.0'
+#    pod 'ZSWTappableLabel', '2.0'
 end
 
 target "TapTalk" do

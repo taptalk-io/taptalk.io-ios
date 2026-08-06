@@ -7,7 +7,7 @@
 //
 
 #import "TAPYourImageBubbleTableViewCell.h"
-#import "ZSWTappableLabel.h"
+#import "PowerTalk.h"
 
 @interface TAPYourImageBubbleTableViewCell () <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate, UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
@@ -42,7 +42,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *imageTimestampLabel;
-@property (strong, nonatomic) IBOutlet ZSWTappableLabel *captionLabel;
+@property (strong, nonatomic) IBOutlet TappableLabel *captionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
@@ -490,7 +490,7 @@
 }
 
 #pragma mark - ZSWTappedLabelDelegate
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+- (void)tappableLabel:(TappableLabel *)tappableLabel
         tappedAtIndex:(NSInteger)idx
        withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
     
@@ -543,7 +543,7 @@
     }
 }
 
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+- (void)tappableLabel:(TappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
     //get selected word by tapped/selected index
     NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
     NSInteger currentWordLength = 0;
@@ -1695,6 +1695,7 @@
     self.bubbleImageView.image = image;
     [self getImageSizeFromImage:image];
     self.bubbleImageView.alpha = 1.0f;
+    self.openImageButton.alpha = 1.0f;
     self.thumbnailBubbleImageView.alpha = 0.0f;
 //    [self refreshCellHeight];
 //    [self.contentView layoutIfNeeded];

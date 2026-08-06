@@ -7,6 +7,7 @@
 //
 
 #import "TAPNewChatAddNewContactTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPNewChatAddNewContactTableViewCell()
 @property (strong, nonatomic) UIView *bgView;

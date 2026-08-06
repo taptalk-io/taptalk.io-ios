@@ -7,6 +7,7 @@
 //
 
 #import "TAPYourChatDeletedBubbleTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPYourChatDeletedBubbleTableViewCell ()
 

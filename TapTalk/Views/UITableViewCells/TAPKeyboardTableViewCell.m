@@ -7,6 +7,7 @@
 //
 
 #import "TAPKeyboardTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPKeyboardTableViewCell ()
 

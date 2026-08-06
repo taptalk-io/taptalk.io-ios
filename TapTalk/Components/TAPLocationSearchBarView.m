@@ -7,6 +7,7 @@
 //
 
 #import "TAPLocationSearchBarView.h"
+#import "PowerTalk.h"
 
 @interface TAPLocationSearchBarView () <UITextFieldDelegate>
 

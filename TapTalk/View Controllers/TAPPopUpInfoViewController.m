@@ -7,6 +7,7 @@
 //
 
 #import "TAPPopUpInfoViewController.h"
+#import "TAPUtil.h"
 
 @interface TAPPopUpInfoViewController ()
 

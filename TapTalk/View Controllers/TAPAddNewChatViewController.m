@@ -13,8 +13,7 @@
 #import "TAPAddNewContactViewController.h"
 #import "TAPCreateGroupViewController.h"
 #import "TapUIChatViewController.h"
-#import "TapHighlightCustomButtonView.h"
-#import <Photos/Photos.h>
+#import "PowerTalk.h"
 #import <Contacts/Contacts.h>
 
 //WK Note - addNewChatView.contactsTableView tableViewCell
@@ -25,7 +24,7 @@
 //WK Note - addNewChatView.searchResultTableView tableViewCell
 #import "TAPNewChatAddNewContactTableViewCell.h"
 
-@interface TAPAddNewChatViewController () <UITableViewDelegate, UITableViewDataSource, TAPAddNewContactViewControllerDelegate, TAPCustomButtonViewDelegate, TAPSearchBarViewDelegate>
+@interface TAPAddNewChatViewController () <UITableViewDelegate, UITableViewDataSource, TAPAddNewContactViewControllerDelegate, TAPSearchBarViewDelegate, TapHighlightCustomButtonViewDelegate>
 
 @property (strong, nonatomic) TAPAddNewChatView *addNewChatView;
 
@@ -569,7 +568,7 @@
         NSString *trimmedString = [self.updatedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         
         [TAPDataManager getDatabaseContactSearchKeyword:trimmedString sortBy:@"fullname" success:^(NSArray *resultArray) {
-            self.searchResultUserMutableArray = resultArray;
+            self.searchResultUserMutableArray = [resultArray mutableCopy];
             
             [self.addNewChatView.searchResultTableView reloadData];
             
@@ -662,7 +661,7 @@
         _contactListArray = [NSMutableArray array];
         _indexSectionDictionary = [NSMutableDictionary dictionary];
         _contactListDictionary = [NSMutableDictionary dictionary];
-        self.contactListArray = resultArray;
+        self.contactListArray = [resultArray mutableCopy];
         NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
         for (TAPUserModel *user in self.contactListArray) {
             if([blockedUserIDs containsObject:user.userID]) {

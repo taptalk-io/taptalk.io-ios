@@ -7,6 +7,7 @@
 //
 
 #import "TAPRoomListView.h"
+#import "PowerTalk.h"
 
 @interface TAPRoomListView()
 @property (strong, nonatomic) UIView *bgView;

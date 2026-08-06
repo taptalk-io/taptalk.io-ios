@@ -7,6 +7,7 @@
 //
 
 #import "TAPPhotoAlbumListView.h"
+#import "PowerTalk.h"
 
 @interface TAPPhotoAlbumListView ()
 

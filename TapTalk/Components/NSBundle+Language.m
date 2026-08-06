@@ -8,6 +8,7 @@
 
 #import "NSBundle+Language.h"
 #import "TAPLanguageManager.h"
+#import "TAPUtil.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 

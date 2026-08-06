@@ -6,6 +6,10 @@
 //
 
 #import "TAPSecondaryChatViewController.h"
+#import "TAPImagePreviewViewController.h"
+#import "TAPMediaDetailViewController.h"
+#import "TAPPhotoAlbumListViewController.h"
+#import "TAPPickLocationViewController.h"
 #import "TAPMyChatBubbleTableViewCell.h"
 #import "TAPYourChatBubbleTableViewCell.h"
 #import "TAPMyFileBubbleTableViewCell.h"
@@ -20,19 +24,7 @@
 #import "TAPYourVoiceNoteBubbleTableViewCell.h"
 #import "TAPMyChatDeletedBubbleTableViewCell.h"
 #import "TAPYourChatDeletedBubbleTableViewCell.h"
-#import "TAPMentionListXIBTableViewCell.h"
-
-#import "TAPCustomAccessoryView.h"
-#import "TAPPickLocationViewController.h"
-#import "TAPImagePreviewViewController.h"
-#import "TAPPhotoAlbumListViewController.h"
-#import "TAPPickLocationViewController.h"
-#import "TAPForwardListViewController.h"
-#import "TAPWebViewViewController.h"
-#import "TAPMediaDetailViewController.h"
-#import "TapHighlightCustomButtonView.h"
-
-#import <TapTalk/Base64.h>
+#import "PowerTalk.h"
 
 @import QuickLook;
 
@@ -1349,16 +1341,13 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
-    CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
     
-    TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
-    [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
-    mediaDetailViewController.delegate = self;
-    mediaDetailViewController.message = myImageBubbleCell.message;
     
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
-    NSArray *imageSliderImage = [NSArray array];
-    if(cellImage != nil) {
+    if (cellImage != nil) {
+        CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
+        NSArray *imageSliderImage = [NSArray array];
+        
         [self.messageTextView resignFirstResponder];
         [self keyboardWillHideWithHeight:0.0f];
         
@@ -1367,16 +1356,24 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         
         imageSliderImage = @[cellImage];
         
+        TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+        [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+        mediaDetailViewController.delegate = self;
+        mediaDetailViewController.message = myImageBubbleCell.message;
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
         [mediaDetailViewController setImageArray:@[cellImage]];
-        
         [mediaDetailViewController setActiveIndex:0];
         
         NSInteger selectedRow = [[self.messageArray copy] indexOfObject:myImageBubbleCell.message];
         NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
         CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
-        CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        CGRect imageRectInView = CGRectMake(
+            CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO],
+            myImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            myImageBubbleCell.bubbleImageViewHeightConstraint.constant
+        );
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
 //        _currentPresentedViewController = mediaDetailViewController;

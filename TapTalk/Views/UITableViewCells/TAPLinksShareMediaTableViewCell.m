@@ -6,11 +6,11 @@
 //
 
 #import "TAPLinksShareMediaTableViewCell.h"
-#import "ZSWTappableLabel.h"
+#import "PowerTalk.h"
 
 @interface TAPLinksShareMediaTableViewCell () <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
-@property (weak, nonatomic) IBOutlet ZSWTappableLabel *linkLabel;
+@property (weak, nonatomic) IBOutlet TappableLabel *linkLabel;
 @property (weak, nonatomic) IBOutlet UIView *linkIconView;
 @property (weak, nonatomic) IBOutlet UIImageView *linkIcomImageView;
 
@@ -39,7 +39,7 @@
 
 #pragma mark - ZSWTappedLabelDelegate
 
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+- (void)tappableLabel:(TappableLabel *)tappableLabel
         tappedAtIndex:(NSInteger)idx
        withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
     
@@ -69,7 +69,7 @@
     }
 }
 
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel 
+- (void)tappableLabel:(TappableLabel *)tappableLabel 
    longPressedAtIndex:(NSInteger)idx
        withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
     

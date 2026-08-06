@@ -7,6 +7,7 @@
 //
 
 #import "TAPNumericKeyboardAccessoryView.h"
+#import "PowerTalk.h"
 
 @implementation TAPNumericKeyboardAccessoryView
 

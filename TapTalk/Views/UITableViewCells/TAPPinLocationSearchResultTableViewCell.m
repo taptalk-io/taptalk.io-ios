@@ -7,6 +7,7 @@
 //
 
 #import "TAPPinLocationSearchResultTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPPinLocationSearchResultTableViewCell ()
 

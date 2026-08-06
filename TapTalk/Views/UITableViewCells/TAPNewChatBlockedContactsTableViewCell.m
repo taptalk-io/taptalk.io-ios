@@ -7,6 +7,7 @@
 //
 
 #import "TAPNewChatBlockedContactsTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPNewChatBlockedContactsTableViewCell()
 

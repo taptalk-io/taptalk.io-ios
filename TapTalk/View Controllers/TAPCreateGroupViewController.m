@@ -17,6 +17,8 @@
 #import "TAPContactCollectionViewCell.h"
 #import "TAPPlainInfoLabelTableViewCell.h"
 
+#import "PowerTalk.h"
+
 @interface TAPCreateGroupViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, TAPSearchBarViewDelegate, TAPCreateGroupViewControllerDelegate, TAPProfileViewControllerDelegate>
 @property (strong, nonatomic) TAPCreateGroupView *createGroupView;
 

@@ -1,0 +1,160 @@
+//
+//  PowerTalk.h
+//  PowerTalk
+//
+//  Created by Kevin on 22/07/26.
+//
+
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <AVKit/AVKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <Photos/Photos.h>
+#import <UserNotifications/UserNotifications.h>
+
+// Helper
+#import "Configs.h"
+#import "TAPStyle.h"
+#import "TAPUtil.h"
+
+// Component
+#import "TapAFNetworking.h"
+#import "TapAFNetworkActivityIndicatorManager.h"
+#import "TapAFNetworkReachabilityManager.h"
+#import "TapAFHTTPSessionManager.h"
+#import "TapAFURLSessionManager.h"
+#import "TapAFSecurityPolicy.h"
+#import "NSUserDefaults+MPSecureUserDefaults.h"
+#import "TapJSONModel.h"
+#import "TappableLabel.h"
+#import "TapSRWebSocket.h"
+#import "Base64.h"
+#import "TapBarButtonItem.h"
+#import "NSBundle+Language.h"
+#import "UIImage+Color.h"
+
+// Manager
+#import "TapTalk.h"
+#import "TAPAPIManager.h"
+#import "TAPAudioManager.h"
+#import "TapBaseChatRoomCustomNavigationBarManager.h"
+#import "TAPChatManager.h"
+#import "TAPConnectionManager.h"
+#import "TAPContactManager.h"
+#import "TAPContactCacheManager.h"
+#import "TAPCustomBubbleManager.h"
+#import "TAPDataManager.h"
+#import "TAPDatabaseManager.h"
+#import "TAPEncryptorManager.h"
+#import "TAPFetchMediaManager.h"
+#import "TAPFileDownloadManager.h"
+#import "TAPFileUploadManager.h"
+#import "TAPGroupManager.h"
+#import "TAPLanguageManager.h"
+#import "TAPLocationManager.h"
+#import "TAPMessageStatusManager.h"
+#import "TAPNetworkManager.h"
+#import "TAPNotificationManager.h"
+#import "TAPOldDataManager.h"
+#import "TAPStyleManager.h"
+
+// UI & Core Manager
+#import "TapUI.h"
+#import "TAPCoreChatRoomManager.h"
+#import "TAPCoreContactManager.h"
+#import "TAPCoreErrorManager.h"
+#import "TAPCoreMessageManager.h"
+#import "TAPCoreRoomListManager.h"
+
+// Model
+#import "TAPBaseModel.h"
+#import "TAPBaseRealmModel.h"
+#import "TAPClearedRoomModel.h"
+#import "TAPCoreConfigsModel.h"
+#import "TAPCountryModel.h"
+#import "TAPCustomKeyboardItemModel.h"
+#import "TAPDataFileModel.h"
+#import "TAPDataMediaModel.h"
+#import "TAPForwardFromModel.h"
+#import "TAPGroupModel.h"
+#import "TAPGroupTargetModel.h"
+#import "TAPImageURLModel.h"
+#import "TAPMediaPreviewModel.h"
+#import "TAPMessageModel.h"
+#import "TapMessageRecipientModel.h"
+#import "TAPMutedRoomModel.h"
+#import "TAPOnlineStatusModel.h"
+#import "TAPPhotoListModel.h"
+#import "TAPProductModel.h"
+#import "TAPProjectConfigsModel.h"
+#import "TAPQuoteModel.h"
+#import "TAPRecentSearchModel.h"
+#import "TAPReplyToModel.h"
+#import "TAPRoomListModel.h"
+#import "TAPRoomModel.h"
+#import "TAPScheduledMessageModel.h"
+#import "TAPTypingModel.h"
+#import "TAPUserModel.h"
+#import "TAPUserRoleModel.h"
+
+// View
+#import "TAPBaseView.h"
+#import "TAPConnectionStatusView.h"
+#import "TAPCustomButtonView.h"
+#import "TAPCustomGrowingTextView.h"
+#import "TAPCustomLabelView.h"
+#import "TAPCustomPhoneNumberPickerView.h"
+#import "TAPCustomTextFieldView.h"
+#import "TAPCustomTextView.h"
+#import "TAPGradientView.h"
+#import "TAPGrowingTextView.h"
+#import "TapHighlightCustomButtonView.h"
+#import "TAPImageView.h"
+#import "TAPLocationSearchBarView.h"
+#import "TAPNumericKeyboardAccessoryView.h"
+#import "TAPSearchBarView.h"
+#import "TAPBaseTableView.h"
+#import "TapCustomNavigationBarButton.h"
+#import "TAPCustomAccessoryView.h"
+#import "TAPImageSelectView.h"
+#import "TAPPhotoAlbumListView.h"
+#import "TAPLeftCustomNavigationButton.h"
+
+// Table View Cell
+#import "TAPBaseTableViewCell.h"
+#import "TAPBaseGeneralBubbleTableViewCell.h"
+#import "TAPBaseMyBubbleTableViewCell.h"
+#import "TAPBaseXIBTableViewCell.h"
+#import "TAPBaseXIBRotatedTableViewCell.h"
+#import "TAPBaseMyBubbleTableViewCell.h"
+#import "TAPLoadingTableViewCell.h"
+#import "TAPPhotoAlbumListItemTableViewCell.h"
+#import "TAPMyChatDeletedBubbleTableViewCell.h"
+#import "TAPYourChatDeletedBubbleTableViewCell.h"
+#import "TAPMentionListXIBTableViewCell.h"
+#import "TAPProductListBubbleTableViewCell.h"
+#import "TAPUnreadMessagesBubbleTableViewCell.h"
+#import "TAPSystemMessageTableViewCell.h"
+
+// Collection View Cell
+#import "TAPBaseCollectionViewCell.h"
+#import "TAPThumbnailImagePreviewCollectionViewCell.h"
+#import "TAPImagePreviewCollectionViewCell.h"
+#import "TAPMentionListTableViewCell.h"
+#import "TAPImageSelectCollectionViewCell.h"
+
+// View Controller
+#import "TAPBaseViewController.h"
+#import "TapUIRoomListViewController.h"
+#import "TapUIChatViewController.h"
+#import "TAPConnectionStatusViewController.h"
+#import "TAPCountryPickerViewController.h"
+#import "TAPCustomNotificationAlertViewController.h"
+#import "TAPForwardListViewController.h"
+#import "TAPKeyboardViewController.h"
+#import "TAPMediaDetailViewController.h"
+#import "TAPPickLocationViewController.h"
+#import "TAPPopUpInfoViewController.h"
+#import "TAPProfileViewController.h"
+#import "TAPSharedMediaViewController.h"
+#import "TAPWebViewViewController.h"

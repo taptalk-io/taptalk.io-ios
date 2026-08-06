@@ -7,6 +7,7 @@
 //
 
 #import "TAPCoreContactManager.h"
+#import "PowerTalk.h"
 
 @interface TAPCoreContactManager () <TAPChatManagerDelegate>
 

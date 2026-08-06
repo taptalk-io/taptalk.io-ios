@@ -7,6 +7,7 @@
 //
 
 #import "TAPProfileView.h"
+#import "PowerTalk.h"
 
 @interface TAPProfileView ()
 
@@ -152,14 +153,14 @@
         UIImage *navigationBackButtonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         navigationBackButtonImage = [navigationBackButtonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
         [self.navigationBackButton setImage:navigationBackButtonImage forState:UIControlStateNormal];
-        self.navigationBackButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+        self.navigationBackButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
         self.navigationBackButton.alpha = 0.0f;
         [self.navigationBarView addSubview:self.navigationBackButton];
         
         _navigationEditButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 40.0f - 16.0f, CGRectGetHeight(self.navigationBarView.frame) - navigationBackButtonBottomGap - 40.0f, 40.0f, 40.0f)];
         UIImage *navigationEditButtonImage = [UIImage imageNamed:@"TAPIconEditOrange" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.navigationEditButton setImage:navigationEditButtonImage forState:UIControlStateNormal];
-        self.navigationEditButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+        self.navigationEditButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
         self.navigationEditButton.alpha = 0.0f;
         [self.navigationBarView addSubview:self.navigationEditButton];
         
@@ -179,13 +180,13 @@
         UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconTransparentBackgroundBackButton]];
         [self.backButton setImage:buttonImage forState:UIControlStateNormal];
-        self.backButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+        self.backButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
         //[self addSubview:self.backButton];
         
         _editButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 40.0f - 16.0f, self.navigationBarHeight - navigationBackButtonBottomGap - 40.0f, 40.0f, 40.0f)];
         UIImage *editButtonImage = [UIImage imageNamed:@"TAPIconEdit" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         [self.editButton setImage:editButtonImage forState:UIControlStateNormal];
-        self.editButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+        self.editButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
         //[self addSubview:self.editButton];
         
         //Save Loading View

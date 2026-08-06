@@ -7,8 +7,7 @@
 //
 
 #import "TAPChatManager.h"
-#import "TAPConnectionManager.h"
-#import <TapTalk/Base64.h>
+#import "PowerTalk.h"
 #import <CoreServices/UTType.h>
 
 #import <LinkPresentation/LPMetadataProvider.h>

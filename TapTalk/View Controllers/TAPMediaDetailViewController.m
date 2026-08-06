@@ -9,7 +9,7 @@
 #import "TAPMediaDetailPreviewViewController.h"
 #import "TAPMediaDetailView.h"
 #import "TAPMediaDetailPreviewView.h"
-//#import "AppDelegate.h"
+#import "PowerTalk.h"
 
 @interface TAPMediaDetailViewController () <UIPageViewControllerDataSource, UIPageViewControllerDelegate, TAPMediaDetailViewDelegate, TAPMediaDetailPreviewViewControllerDelegate, UIScrollViewDelegate>
 

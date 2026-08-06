@@ -7,6 +7,7 @@
 //
 
 #import "TAPBlockedListView.h"
+#import "PowerTalk.h"
 
 @interface TAPBlockedListView()
 

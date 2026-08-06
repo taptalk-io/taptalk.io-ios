@@ -8,8 +8,8 @@
 
 #import "TAPCreateGroupSubjectViewController.h"
 #import "TAPCreateGroupSubjectView.h"
-
 #import "TAPContactCollectionViewCell.h"
+#import "PowerTalk.h"
 
 #define GROUP_NAME_MAX_LENGTH 100
 

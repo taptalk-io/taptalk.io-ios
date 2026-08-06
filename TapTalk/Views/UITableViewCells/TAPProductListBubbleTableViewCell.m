@@ -8,6 +8,7 @@
 
 #import "TAPProductListBubbleTableViewCell.h"
 #import "TAPProductListCollectionViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPProductListBubbleTableViewCell () <UICollectionViewDelegate, UICollectionViewDataSource, TAPProductListCollectionViewCellDelegate>
 

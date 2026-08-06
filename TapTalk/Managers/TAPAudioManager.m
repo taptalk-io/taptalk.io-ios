@@ -6,7 +6,6 @@
 //
 
 #import "TAPAudioManager.h"
-#import <AVFoundation/AVFoundation.h>
 
 @interface TAPAudioManager ()<AVAudioRecorderDelegate, AVAudioPlayerDelegate>
 @property (strong, nonatomic) AVAudioRecorder *recorder;

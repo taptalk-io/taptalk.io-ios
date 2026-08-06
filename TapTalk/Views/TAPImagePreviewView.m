@@ -7,6 +7,7 @@
 //
 
 #import "TAPImagePreviewView.h"
+#import "PowerTalk.h"
 
 @interface TAPImagePreviewView ()
 

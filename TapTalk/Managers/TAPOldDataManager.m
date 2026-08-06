@@ -7,8 +7,7 @@
 //
 
 #import "TAPOldDataManager.h"
-#import "TAPFileDownloadManager.h"
-#import "TAPDataManager.h"
+#import "PowerTalk.h"
 
 #define kExecuteCountdown 7*24*60*60*1000.0f //7 days in miliseconds
 #define kOneMonthTimeIntervalInMilliseconds 30*24*60*60*1000.0f //30 days in miliseconds

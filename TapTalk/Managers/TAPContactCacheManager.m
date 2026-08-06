@@ -7,6 +7,8 @@
 //
 
 #import "TAPContactCacheManager.h"
+#import "TAPDataManager.h"
+#import "TAPUtil.h"
 
 @interface TAPContactCacheManager ()
 

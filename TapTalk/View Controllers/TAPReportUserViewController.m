@@ -6,7 +6,8 @@
 //
 
 #import "TAPReportUserViewController.h"
-#import "TapHighlightCustomButtonView.h"
+#import "TAPPopUpInfoViewController.h"
+#import "PowerTalk.h"
 
 @interface TAPReportUserViewController ()<UITextFieldDelegate, UITextViewDelegate, TAPPopUpInfoViewControllerDelegate>
 @property (strong, nonatomic) IBOutlet UIButton *reportReasonSendingFalseButton;

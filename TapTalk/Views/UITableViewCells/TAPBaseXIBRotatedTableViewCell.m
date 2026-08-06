@@ -7,6 +7,7 @@
 //
 
 #import "TAPBaseXIBRotatedTableViewCell.h"
+#import "TAPUtil.h"
 
 @implementation TAPBaseXIBRotatedTableViewCell
 

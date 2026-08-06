@@ -7,10 +7,7 @@
 //
 
 #import "TAPMyVideoBubbleTableViewCell.h"
-#import "ZSWTappableLabel.h"
-
-#import <AVKit/AVKit.h>
-#import <Photos/Photos.h>
+#import "PowerTalk.h"
 
 @interface TAPMyVideoBubbleTableViewCell () <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate, UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
@@ -26,7 +23,7 @@
 @property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
-@property (strong, nonatomic) IBOutlet ZSWTappableLabel *captionLabel;
+@property (strong, nonatomic) IBOutlet TappableLabel *captionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
@@ -354,7 +351,7 @@
 }
 
 #pragma mark - ZSWTappedLabelDelegate
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+- (void)tappableLabel:(TappableLabel *)tappableLabel
         tappedAtIndex:(NSInteger)idx
        withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
     
@@ -407,7 +404,7 @@
     }
 }
 
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+- (void)tappableLabel:(TappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
     //get selected word by tapped/selected index
     NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
     NSInteger currentWordLength = 0;

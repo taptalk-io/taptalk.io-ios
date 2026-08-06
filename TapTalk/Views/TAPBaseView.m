@@ -7,6 +7,7 @@
 //
 
 #import "TAPBaseView.h"
+#import "TAPUtil.h"
 
 @implementation TAPBaseView
 

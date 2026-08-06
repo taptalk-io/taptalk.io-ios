@@ -7,6 +7,7 @@
 //
 
 #import "TAPSearchBarView.h"
+#import "PowerTalk.h"
 
 @interface TAPSearchBarView() <UITextFieldDelegate>
 

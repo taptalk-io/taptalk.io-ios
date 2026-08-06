@@ -4511,20 +4511,15 @@ CGPoint center;
 }
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
-    if(myImageBubbleCell.message.room.type != RoomTypePersonal) {
+    if (myImageBubbleCell.message.room.type != RoomTypePersonal) {
         [self loadTotalReadMessage:myImageBubbleCell.message];
     }
     
-    CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
-    
-    TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
-    [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
-    mediaDetailViewController.delegate = self;
-    mediaDetailViewController.message = myImageBubbleCell.message;
-    
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
-    NSArray *imageSliderImage = [NSArray array];
-    if(cellImage != nil) {
+    if (cellImage != nil) {
+        CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame) + 12.0f;
+        NSArray *imageSliderImage = [NSArray array];
+        
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
         [self keyboardWillHideWithHeight:0.0f];
@@ -4534,16 +4529,24 @@ CGPoint center;
         
         imageSliderImage = @[cellImage];
         
+        TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+        [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+        mediaDetailViewController.delegate = self;
+        mediaDetailViewController.message = myImageBubbleCell.message;
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
         [mediaDetailViewController setImageArray:@[cellImage]];
-        
         [mediaDetailViewController setActiveIndex:0];
         
         NSInteger selectedRow = [[self.messageArray copy] indexOfObject:myImageBubbleCell.message];
         NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:selectedRow inSection:0];
         CGRect cellRectInTableView = [self.tableView rectForRowAtIndexPath:selectedIndexPath];
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
-        CGRect imageRectInView = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], myImageBubbleCell.bubbleImageViewWidthConstraint.constant, myImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        CGRect imageRectInView = CGRectMake(
+            CGRectGetWidth([UIScreen mainScreen].bounds) - 26.0f - myImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO],
+            myImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            myImageBubbleCell.bubbleImageViewHeightConstraint.constant
+        );
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
         _currentPresentedViewController = mediaDetailViewController;
@@ -5790,16 +5793,11 @@ CGPoint center;
         [self loadTotalReadMessage:yourImageBubbleCell.message];
     }
     
-    CGFloat bubbleImageViewMinY = CGRectGetMinY(yourImageBubbleCell.bubbleImageView.frame);
-    
-    TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
-    [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
-    mediaDetailViewController.delegate = self;
-    mediaDetailViewController.message = yourImageBubbleCell.message;
-    
     UIImage *cellImage = yourImageBubbleCell.bubbleImageView.image;
-    NSArray *imageSliderImage = [NSArray array];
-    if(cellImage != nil) {
+    if (cellImage != nil) {
+        CGFloat bubbleImageViewMinY = CGRectGetMinY(yourImageBubbleCell.bubbleImageView.frame) + 12.0f;
+        NSArray *imageSliderImage = [NSArray array];
+        
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
         [self keyboardWillHideWithHeight:0.0f];
@@ -5810,9 +5808,12 @@ CGPoint center;
         imageSliderImage = @[cellImage];
         TAPMessageModel *currentMessage = yourImageBubbleCell.message;
         
+        TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+        [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+        mediaDetailViewController.delegate = self;
+        mediaDetailViewController.message = yourImageBubbleCell.message;
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
         [mediaDetailViewController setImageArray:@[cellImage]];
-        
         [mediaDetailViewController setActiveIndex:0];
         
         NSInteger selectedRow = [[self.messageArray copy] indexOfObject:yourImageBubbleCell.message];
@@ -5821,13 +5822,18 @@ CGPoint center;
         CGRect cellRectInView = [self.tableView convertRect:cellRectInTableView toView:self.view];
         
         //Default left gap for personal chat
-        CGFloat xPosition = 16.0f;
+        CGFloat xPosition = 26.0f;
         if (currentMessage.room.type == RoomTypeGroup || currentMessage.room.type == RoomTypeChannel || currentMessage.room.type == RoomTypeTransaction) {
             //left gap + image width + gap between image and bubble view + bubble view border
             xPosition = 16.0f + 30.0f + 4.0f + 10.0f;
         }
         
-        CGRect imageRectInView = CGRectMake(xPosition, CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO], yourImageBubbleCell.bubbleImageViewWidthConstraint.constant, yourImageBubbleCell.bubbleImageViewHeightConstraint.constant);
+        CGRect imageRectInView = CGRectMake(
+            xPosition,
+            CGRectGetMinY(cellRectInView) + bubbleImageViewMinY + [TAPUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO],
+            yourImageBubbleCell.bubbleImageViewWidthConstraint.constant,
+            yourImageBubbleCell.bubbleImageViewHeightConstraint.constant
+        );
         
         [mediaDetailViewController showToViewController:self.navigationController thumbnailImage:cellImage thumbnailFrame:imageRectInView];
         _currentPresentedViewController = mediaDetailViewController;

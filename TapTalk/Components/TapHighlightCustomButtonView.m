@@ -7,6 +7,7 @@
 //
 
 #import "TapHighlightCustomButtonView.h"
+#import "PowerTalk.h"
 
 @implementation TapHighlightCustomButtonView
 

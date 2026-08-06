@@ -7,7 +7,7 @@
 //
 
 #import "TAPCoreRoomListManager.h"
-#import "TAPRoomListModel.h"
+#import "PowerTalk.h"
 
 @interface TAPCoreRoomListManager () <TAPChatManagerDelegate>
 

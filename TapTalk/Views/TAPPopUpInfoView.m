@@ -7,6 +7,7 @@
 //
 
 #import "TAPPopUpInfoView.h"
+#import "PowerTalk.h"
 
 @interface TAPPopUpInfoView ()
 

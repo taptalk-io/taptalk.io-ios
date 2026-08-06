@@ -7,7 +7,8 @@
 //
 
 #import "TAPSearchResultChatTableViewCell.h"
-#import "TAPRoomListModel.h"
+#import "PowerTalk.h"
+
 @interface TAPSearchResultChatTableViewCell()
 
 @property (strong, nonatomic) UIView *bgView;

@@ -8,6 +8,7 @@
 
 #import "TAPWebViewViewController.h"
 #import "TAPWebViewView.h"
+#import "PowerTalk.h"
 
 @interface TAPWebViewViewController () <WKNavigationDelegate, WKUIDelegate, UIScrollViewDelegate>
 
