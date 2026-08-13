@@ -1802,6 +1802,7 @@
     self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
     [self.bubbleImageView setImage:image];
     self.bubbleImageView.alpha = 1.0f;
+    self.openImageButton.alpha = 1.0f;
     self.thumbnailBubbleImageView.alpha = 0.0f;
 //    [self refreshCellHeight];
 //    [self.contentView layoutIfNeeded];
