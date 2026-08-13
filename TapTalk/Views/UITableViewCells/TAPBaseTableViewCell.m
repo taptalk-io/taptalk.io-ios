@@ -66,7 +66,10 @@
     UITableView *tableView = [self getTableView];
     if (tableView != nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [tableView reloadData];
+//            [tableView reloadData];
+            [tableView beginUpdates];
+            [tableView endUpdates];
+
         });
     }
 }
