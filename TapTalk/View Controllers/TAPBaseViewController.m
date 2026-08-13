@@ -7,9 +7,9 @@
 //
 
 #import "TAPBaseViewController.h"
-#import "TapAFNetworking.h"
 #import "TAPPopUpInfoViewController.h"
 #import "TAPLeftCustomNavigationButton.h"
+#import "PowerTalk.h"
 
 @interface TAPBaseViewController () <TAPPopUpInfoViewControllerDelegate>
 
@@ -176,7 +176,7 @@
     UIImage *buttonImage = [UIImage imageNamed:@"TAPIconBackArrow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarBackButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+    button.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
@@ -187,7 +187,7 @@
     TAPLeftCustomNavigationButton *button = [TAPLeftCustomNavigationButton buttonWithType:UIButtonTypeCustom];
     button.translatesAutoresizingMaskIntoConstraints = NO;
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    button.contentEdgeInsets = UIEdgeInsetsMake(4.0f, 0.0f, 4.0f, 18.0f);
+    button.configuration.contentInsets = NSDirectionalEdgeInsetsMake(4.0f, 0.0f, 4.0f, 18.0f);
     
     TapBarButtonItem *item = [[TapBarButtonItem alloc] initWithCustomView:button];
 
@@ -209,7 +209,7 @@
     UIImage *buttonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    button.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
@@ -224,7 +224,7 @@
     UIButton* leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [leftBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [leftBarButton setTitleColor:leftBarButtonItemColor forState:UIControlStateNormal];
-    leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+    leftBarButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     leftBarButton.titleLabel.font = leftBarButtonItemFont;
     [leftBarButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:leftBarButton];
@@ -239,7 +239,7 @@
     UIButton* rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Edit", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [rightBarButton setTitleColor:rightBarButtonItemColor forState:UIControlStateNormal];
-    rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    rightBarButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     rightBarButton.titleLabel.font = rightBarButtonItemFont;
     [rightBarButton addTarget:self action:@selector(editButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:rightBarButton];
@@ -254,7 +254,7 @@
     UIButton* rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 0.0f)];
     [rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
     [rightBarButton setTitleColor:rightBarButtonItemColor forState:UIControlStateNormal];
-    rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    rightBarButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     rightBarButton.titleLabel.font = rightBarButtonItemFont;
     [rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *rightBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:rightBarButton];

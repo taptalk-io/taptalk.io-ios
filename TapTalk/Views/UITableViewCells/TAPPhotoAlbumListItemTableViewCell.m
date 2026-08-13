@@ -7,6 +7,7 @@
 //
 
 #import "TAPPhotoAlbumListItemTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPPhotoAlbumListItemTableViewCell()
 

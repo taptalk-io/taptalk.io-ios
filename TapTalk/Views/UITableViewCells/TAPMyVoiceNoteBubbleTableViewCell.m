@@ -6,6 +6,7 @@
 //
 
 #import "TAPMyVoiceNoteBubbleTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPMyVoiceNoteBubbleTableViewCell ()
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;

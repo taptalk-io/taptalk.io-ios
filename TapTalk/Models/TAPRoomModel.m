@@ -7,6 +7,7 @@
 //
 
 #import "TAPRoomModel.h"
+#import "TAPChatManager.h"
 
 @implementation TAPRoomModel
 

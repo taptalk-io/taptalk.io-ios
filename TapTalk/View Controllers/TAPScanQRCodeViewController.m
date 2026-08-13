@@ -9,7 +9,7 @@
 #import "TAPScanQRCodeViewController.h"
 #import "TAPScanQRCodeView.h"
 #import "TAPScanQRCodePopupViewController.h"
-#import <AVFoundation/AVFoundation.h>
+#import "PowerTalk.h"
 
 @interface TAPScanQRCodeViewController () <AVCaptureMetadataOutputObjectsDelegate>
 

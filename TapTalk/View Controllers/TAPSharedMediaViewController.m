@@ -11,6 +11,7 @@
 #import "TAPDocumentShareMediaTableViewCell.h"
 #import "TAPImageCollectionViewCell.h"
 #import "TAPMediaDetailViewController.h"
+#import "PowerTalk.h"
 
 @import QuickLook;
 
@@ -524,16 +525,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
     
     if (selectedMessage.type == TAPChatMessageTypeImage) {
-        CGFloat bubbleImageViewMinY = 0.0f;
-        
-        TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
-        [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
-        mediaDetailViewController.delegate = self;
-        mediaDetailViewController.message = cell.currentMessage;
-        
         UIImage *cellImage = cell.imageView.image;
-        NSArray *imageSliderImage = [NSArray array];
         if (cellImage != nil) {
+            CGFloat bubbleImageViewMinY = 0.0f;
+            NSArray *imageSliderImage = [NSArray array];
             imageSliderImage = @[cellImage];
             TAPMessageModel *currentMessage = cell.currentMessage;
             NSString *cellImageURLString = [TAPUtil nullToEmptyString:[cell.currentMessage.data objectForKey:@"fileID"]];
@@ -541,9 +536,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSString *fileID = [cell.currentMessage.data objectForKey:@"fileID"];
             fileID = [TAPUtil nullToEmptyString:fileID];
             
+            TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
+            [mediaDetailViewController setMediaDetailViewControllerType:TAPMediaDetailViewControllerTypeImage];
+            mediaDetailViewController.delegate = self;
+            mediaDetailViewController.message = cell.currentMessage;
             [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
             [mediaDetailViewController setImageArray:@[cellImage]];
-            
             [mediaDetailViewController setActiveIndex:0];
             
             NSInteger selectedRow = [sectionArray indexOfObject:cell.currentMessage];
@@ -560,7 +558,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             cell.thumbnailImageView.alpha = 0.0f;
             _openedBubbleCell = cell;
         }
-
     }
     if (selectedMessage.type == TAPChatMessageTypeVideo) {
         NSDictionary *dataDictionary = selectedMessage.data;

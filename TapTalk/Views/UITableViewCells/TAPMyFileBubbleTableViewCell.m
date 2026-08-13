@@ -7,6 +7,7 @@
 //
 
 #import "TAPMyFileBubbleTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPMyFileBubbleTableViewCell () <UIGestureRecognizerDelegate, TAPImageViewDelegate>
 

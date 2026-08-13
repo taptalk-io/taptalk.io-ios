@@ -7,9 +7,8 @@
 //
 
 #import "TAPYourChatBubbleTableViewCell.h"
-#import "TAPQuoteModel.h"
-#import "ZSWTappableLabel.h"
 #import "TAPProfileViewController.h"
+#import "PowerTalk.h"
 
 @interface TAPYourChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate, UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
@@ -21,7 +20,7 @@
 @property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
 @property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
 @property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
-@property (strong, nonatomic) IBOutlet ZSWTappableLabel *bubbleLabel;
+@property (strong, nonatomic) IBOutlet TappableLabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
@@ -256,7 +255,7 @@
 }
 
 #pragma mark - ZSWTappedLabelDelegate
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+- (void)tappableLabel:(TappableLabel *)tappableLabel
         tappedAtIndex:(NSInteger)idx
        withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
     
@@ -309,7 +308,7 @@
     }
 }
 
-- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+- (void)tappableLabel:(TappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
     //get selected word by tapped/selected index
     NSArray *wordArray = [tappableLabel.text componentsSeparatedByString:@" "];
     NSInteger currentWordLength = 0;

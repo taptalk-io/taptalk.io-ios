@@ -7,6 +7,7 @@
 //
 
 #import "TAPStyleManager.h"
+#import "PowerTalk.h"
 
 @interface TAPStyleManager ()
 

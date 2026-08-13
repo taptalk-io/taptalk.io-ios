@@ -7,7 +7,7 @@
 //
 
 #import "TAPCoreMessageManager.h"
-#import <TapTalk/Base64.h>
+#import "PowerTalk.h"
 
 @interface TAPCoreMessageManager () <TAPChatManagerDelegate>
 

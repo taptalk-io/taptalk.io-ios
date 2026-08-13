@@ -7,6 +7,7 @@
 //
 
 #import "TAPCustomButtonView.h"
+#import "PowerTalk.h"
 
 @interface TAPCustomButtonView ()
 

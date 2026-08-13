@@ -7,6 +7,7 @@
 //
 
 #import "TAPPlainInfoLabelTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPPlainInfoLabelTableViewCell()
 

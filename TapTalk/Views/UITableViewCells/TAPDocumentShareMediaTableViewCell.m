@@ -6,6 +6,7 @@
 //
 
 #import "TAPDocumentShareMediaTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPDocumentShareMediaTableViewCell ()
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *documentTitleLabel;

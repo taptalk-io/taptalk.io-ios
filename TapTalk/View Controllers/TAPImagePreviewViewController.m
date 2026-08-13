@@ -8,17 +8,14 @@
 
 #import "TAPImagePreviewViewController.h"
 #import "TAPImagePreviewView.h"
-#import <Photos/Photos.h>
-#import <AVKit/AVKit.h>
 
 #import "TAPPhotoAlbumListViewController.h"
-#import "TAPCustomGrowingTextView.h"
 
 #import "TAPThumbnailImagePreviewCollectionViewCell.h"
 #import "TAPImagePreviewCollectionViewCell.h"
 #import "TAPMentionListTableViewCell.h"
 
-#import "TAPMediaPreviewModel.h"
+#import "PowerTalk.h"
 
 @interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, AVPlayerViewControllerDelegate, UITableViewDelegate, UITableViewDataSource>
 

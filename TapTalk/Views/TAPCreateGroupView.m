@@ -7,8 +7,10 @@
 //
 
 #import "TAPCreateGroupView.h"
+#import "PowerTalk.h"
 
 @interface TAPCreateGroupView()
+
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *overlayView;
 @property (strong, nonatomic) UIButton *overlayButton;

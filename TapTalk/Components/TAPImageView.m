@@ -5,8 +5,9 @@
 //
 
 #import "TAPImageView.h"
-#import "SDWebImageDownloader.h"
-#import "SDImageCache.h"
+#import "TAPUtil.h"
+#import <SDWebImage/SDWebImageDownloader.h>
+#import <SDWebImage/SDImageCache.h>
 
 @interface TAPImageView ()
 

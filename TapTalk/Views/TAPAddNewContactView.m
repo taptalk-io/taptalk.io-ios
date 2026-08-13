@@ -7,7 +7,7 @@
 //
 
 #import "TAPAddNewContactView.h"
-#import "TapHighlightCustomButtonView.h"
+#import "PowerTalk.h"
 
 @interface TAPAddNewContactView ()
 
@@ -193,7 +193,7 @@
         self.expertImageView.layer.borderWidth = 4.0f;
         [self.searchExpertView addSubview:self.expertImageView];
         
-        _expertVerifiedImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.expertImageView.frame) - 22.0f, CGRectGetMaxY(self.expertImageView.frame) - 22.0f, 22.0f, 22.0f)];
+        _expertVerifiedImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.expertImageView.frame) - 22.0f, CGRectGetMaxY(self.expertImageView.frame) - 22.0f, 22.0f, 22.0f)];
         self.expertVerifiedImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.searchExpertView addSubview:self.expertVerifiedImageView];
         

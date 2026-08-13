@@ -7,6 +7,7 @@
 //
 
 #import "TAPCreateGroupSubjectView.h"
+#import "PowerTalk.h"
 
 @interface TAPCreateGroupSubjectView()
 

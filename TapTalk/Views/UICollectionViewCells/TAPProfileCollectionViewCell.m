@@ -7,6 +7,7 @@
 //
 
 #import "TAPProfileCollectionViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPProfileCollectionViewCell ()
 

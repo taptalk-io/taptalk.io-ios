@@ -7,6 +7,8 @@
 //
 
 #import "TAPMessageModel.h"
+#import "TAPUtil.h"
+#import "TAPDataManager.h"
 
 @implementation TAPMessageModel
 

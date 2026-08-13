@@ -6,6 +6,7 @@
 //
 
 #import "TAPYourVoiceNoteBubbleTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPYourVoiceNoteBubbleTableViewCell () <UIGestureRecognizerDelegate, TAPImageViewDelegate>
 

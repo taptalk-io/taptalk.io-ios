@@ -1,0 +1,68 @@
+//
+//  TAPMyFileBubbleTableViewCell.h
+//  TapTalk
+//
+//  Created by Dominic Vedericho on 04/03/19.
+//  Copyright © 2019 Moselo. All rights reserved.
+//
+
+#import "TAPBaseMyBubbleTableViewCell.h"
+#import "TAPMessageModel.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSInteger, TAPMyFileBubbleTableViewCellStateType) {
+    TAPMyFileBubbleTableViewCellStateTypeDoneDownloadedUploaded = 0,
+    TAPMyFileBubbleTableViewCellStateTypeNotDownloaded = 1,
+    TAPMyFileBubbleTableViewCellStateTypeUploading = 2,
+    TAPMyFileBubbleTableViewCellStateTypeDownloading = 3,
+    TAPMyFileBubbleTableViewCellStateTypeRetryDownload = 4,
+    TAPMyFileBubbleTableViewCellStateTypeRetryUpload = 5
+};
+
+@protocol TAPMyFileBubbleTableViewCellDelegate <NSObject>
+
+- (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileReplyDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileCheckmarkDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
+- (void)myFileBubbleTappedWithMessage:(TAPMessageModel *)message;
+- (void)myFileRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage;
+- (void)myFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
+- (void)myFileBubbleDidTriggerSwipeInfoWithMessage:(TAPMessageModel *)message;
+
+@end
+
+@interface TAPMyFileBubbleTableViewCell : TAPBaseMyBubbleTableViewCell
+
+@property (weak, nonatomic) id<TAPMyFileBubbleTableViewCellDelegate> delegate;
+@property (weak, nonatomic) TAPMessageModel *message;
+@property (nonatomic) TAPMyFileBubbleTableViewCellStateType myFileBubbleTableViewCellStateType;
+
+- (void)setMessage:(TAPMessageModel *)message;
+- (void)receiveSentEvent;
+- (void)receiveDeliveredEvent;
+- (void)receiveReadEvent;
+- (void)showDownloadedState:(BOOL)isShow;
+- (void)animateFinishedUploadFile;
+- (void)animateFinishedDownloadFile;
+- (void)animateCancelDownloadFile;
+- (void)animateFailedUploadFile;
+- (void)animateFailedDownloadFile;
+- (void)animateProgressUploadingFileWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)animateProgressDownloadingFileWithProgress:(CGFloat)progress total:(CGFloat)total;
+- (void)showFileBubbleStatusWithType:(TAPMyFileBubbleTableViewCellStateType)type;
+- (void)showBubbleHighlight;
+- (void)showStarMessageView;
+- (void)showSeperator;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
+- (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
+- (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount;
+@end
+
+NS_ASSUME_NONNULL_END

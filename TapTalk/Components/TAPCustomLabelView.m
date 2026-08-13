@@ -6,6 +6,7 @@
 //
 
 #import "TAPCustomLabelView.h"
+#import "PowerTalk.h"
 
 @interface TAPCustomLabelView ()
 

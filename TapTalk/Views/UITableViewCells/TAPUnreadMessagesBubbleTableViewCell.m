@@ -7,6 +7,7 @@
 //
 
 #import "TAPUnreadMessagesBubbleTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPUnreadMessagesBubbleTableViewCell ()
 

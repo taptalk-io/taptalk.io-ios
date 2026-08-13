@@ -7,8 +7,7 @@
 //
 
 #import "TAPNetworkManager.h"
-#import "TapAFHTTPSessionManager.h"
-#import "TapAFNetworkReachabilityManager.h"
+#import "PowerTalk.h"
 
 static const NSInteger kAPITimeOut = 60;
 

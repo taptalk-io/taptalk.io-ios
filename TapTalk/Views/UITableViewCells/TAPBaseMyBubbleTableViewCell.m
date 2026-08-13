@@ -7,7 +7,7 @@
 //
 
 #import "TAPBaseMyBubbleTableViewCell.h"
-#import "TAPGradientView.h"
+#import "PowerTalk.h"
 
 @interface TAPBaseMyBubbleTableViewCell ()
 
@@ -41,8 +41,6 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *replyMessageLabelTrailingConstraint;
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
-
-@property (strong, nonatomic) TAPGradientView *gradientView;
 
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;

@@ -7,6 +7,7 @@
 //
 
 #import "TAPPickLocationView.h"
+#import "PowerTalk.h"
 
 @interface TAPPickLocationView ()
 

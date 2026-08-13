@@ -7,6 +7,7 @@
 //
 
 #import "TAPScanQRCodePopupView.h"
+#import "PowerTalk.h"
 
 @interface TAPScanQRCodePopupView ()
 

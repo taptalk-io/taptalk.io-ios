@@ -7,6 +7,7 @@
 //
 
 #import "TAPMyAccountView.h"
+#import "PowerTalk.h"
 
 @interface TAPMyAccountView ()
 

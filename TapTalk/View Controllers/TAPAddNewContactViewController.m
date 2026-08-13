@@ -9,7 +9,7 @@
 #import "TAPAddNewContactViewController.h"
 #import "TAPAddNewContactView.h"
 #import "TAPScanQRCodePopupView.h"
-#import "TapAFNetworking.h"
+#import "PowerTalk.h"
 
 @interface TAPAddNewContactViewController () <TAPSearchBarViewDelegate>
 

@@ -6,6 +6,7 @@
 //
 
 #import "TAPMediaDetailView.h"
+#import "PowerTalk.h"
 
 #define kMaxCaptionHeight 190.0f
 #define kMinCaptionHeight 58.0f

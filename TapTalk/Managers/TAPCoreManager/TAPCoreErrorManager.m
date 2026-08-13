@@ -7,6 +7,7 @@
 //
 
 #import "TAPCoreErrorManager.h"
+#import "PowerTalk.h"
 
 @implementation TAPCoreErrorManager
 

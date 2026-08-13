@@ -7,6 +7,7 @@
 //
 
 #import "TAPNewChatOptionTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPNewChatOptionTableViewCell()
 

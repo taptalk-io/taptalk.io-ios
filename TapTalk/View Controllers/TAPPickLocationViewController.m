@@ -9,14 +9,14 @@
 #import "TAPPickLocationViewController.h"
 #import "TAPPickLocationView.h"
 #import "TAPPinLocationSearchResultTableViewCell.h"
-#import "TapHighlightCustomButtonView.h"
+#import "PowerTalk.h"
 #import <MapKit/MapKit.h>
 #import <Contacts/CNPostalAddressFormatter.h>
 
 @import GooglePlaces;
 @import GoogleMaps;
 
-@interface TAPPickLocationViewController () <TAPLocationSearchBarViewDelegate, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, TAPCustomButtonViewDelegate>
+@interface TAPPickLocationViewController () <TAPLocationSearchBarViewDelegate, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) TAPPickLocationView *pickLocationView;
 
@@ -61,7 +61,7 @@
     UIButton *leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
     [leftBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [leftBarButton setTitleColor:navigationBarButtonColor forState:UIControlStateNormal];
-    leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
+    leftBarButton.configuration.contentInsets = NSDirectionalEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
     leftBarButton.titleLabel.font = navigationBarButtonFont;
     [leftBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:leftBarButton];
@@ -129,8 +129,8 @@
                                                                   reuseIdentifier:cellID];
         }
         
-        GMSAutocompletePrediction *prediction = [self.searchResultArray objectAtIndex:indexPath.row];
-        NSString *addressString = prediction.attributedFullText.string;
+        GMSAutocompleteSuggestion *prediction = [self.searchResultArray objectAtIndex:indexPath.row];
+        NSString *addressString = prediction.placeSuggestion.attributedFullText.string;
         
         [cell setSearchResult:addressString];
         
@@ -179,17 +179,22 @@
     _hideSearchResult = YES;
     
     if (indexPath.row <= [self.searchResultArray count] - 1) {
-        GMSAutocompletePrediction *prediction = [self.searchResultArray objectAtIndex:indexPath.row];
+        GMSAutocompleteSuggestion *prediction = [self.searchResultArray objectAtIndex:indexPath.row];
         
         
-        NSString *placeName = prediction.attributedPrimaryText.string;
+        NSString *placeName = prediction.placeSuggestion.attributedPrimaryText.string;
         self.pickLocationView.searchBarView.text = placeName;
         _searchKeyword = placeName;
         
         [self searchLocationByKeyword];
         [self.view endEditing:YES];
         
-        [[GMSPlacesClient sharedClient]lookUpPlaceID:prediction.placeID callback:^(GMSPlace * _Nullable result, NSError * _Nullable error) {
+        NSArray<NSString *> *properties = @[GMSPlacePropertyCoordinate];
+        GMSFetchPlaceRequest *request = [[GMSFetchPlaceRequest alloc] initWithPlaceID:prediction.placeSuggestion.placeID
+                                                                      placeProperties:properties
+                                                                         sessionToken:nil];
+        [[GMSPlacesClient sharedClient] fetchPlaceWithRequest:request
+                                                     callback:^(GMSPlace * _Nullable result, NSError * _Nullable error) {
             [self centerMapToLocationWithLatitude:result.coordinate.latitude Longitude:result.coordinate.longitude Radius:1000];
         }];
     }
@@ -438,7 +443,7 @@
     
     GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc] initWithCoordinate:CLLocationCoordinate2DMake(-90.0, 90.0) coordinate:CLLocationCoordinate2DMake(-180.0, 180.0)];
     GMSAutocompleteFilter *filter = [[GMSAutocompleteFilter alloc] init];
-    filter.country = @"ID";
+    filter.countries = @[@"ID"];
     
     GMSAutocompleteSessionToken *googlePlacesAutocompleteToken = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_GOOGLE_PLACES_TOKEN valid:nil];
     if (googlePlacesAutocompleteToken == nil) {
@@ -448,7 +453,11 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
-    [[GMSPlacesClient sharedClient] findAutocompletePredictionsFromQuery:keyword filter:filter sessionToken:googlePlacesAutocompleteToken callback:^(NSArray<GMSAutocompletePrediction *> * _Nullable results, NSError * _Nullable error) {
+    GMSAutocompleteRequest *request = [[GMSAutocompleteRequest alloc] initWithQuery:keyword];
+    request.filter = filter;
+    request.sessionToken = googlePlacesAutocompleteToken;
+    [[GMSPlacesClient sharedClient] fetchAutocompleteSuggestionsFromRequest:request
+                                                                   callback:^(NSArray<GMSAutocompleteSuggestion *> * _Nullable results, NSError * _Nullable error) {
         _searchResultArray = [results mutableCopy];
         CGFloat heightCounter = 0.0f;
         if ([self.searchResultArray count] > 3) {
@@ -481,45 +490,6 @@
             }];
         }
     }];
-           
-//DV Note - 6 Nov 2020
-//Deprecated usage of GooglePlaces
-    
-//    if ([keyword length] > 1) {
-//        [[GMSPlacesClient sharedClient] autocompleteQuery:keyword bounds:bounds filter:filter callback:^(NSArray *result, NSError *error) {
-//            _searchResultArray = [result mutableCopy];
-//            CGFloat heightCounter = 0.0f;
-//            if ([self.searchResultArray count] > 3) {
-//                heightCounter = 3.5f;
-//            }
-//            else {
-//                heightCounter = [self.searchResultArray count];
-//            }
-//
-//            if (self.hideSearchResult) {
-//                _hideSearchResult = NO;
-//                [UIView animateWithDuration:0.2f animations:^{
-//                    self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 0.0f);
-//                    self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
-//                } completion:^(BOOL finished) {
-//                    [self.pickLocationView.searchTableView reloadData];
-//
-//
-//                }];
-//            }
-//            else {
-//                [self.pickLocationView.searchTableView reloadData];
-//                [UIView animateWithDuration:0.2f animations:^{
-//                    self.pickLocationView.searchTableView.frame = CGRectMake(CGRectGetMinX(self.pickLocationView.searchTableView.frame), CGRectGetMinY(self.pickLocationView.searchTableView.frame), CGRectGetWidth(self.pickLocationView.searchTableView.frame), 36.0f * heightCounter);
-//                    self.pickLocationView.searchTableViewShadowView.frame = self.pickLocationView.searchTableView.frame;
-//                } completion:^(BOOL finished) {
-//                    if (YES) {
-//                        [self.pickLocationView.searchBarView becomeFirstResponder];
-//                    }
-//                }];
-//            }
-//        }];
-//    }
 }
 
 - (void)setLocationButtonDidTapped {    

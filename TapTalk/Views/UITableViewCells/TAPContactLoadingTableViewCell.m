@@ -7,6 +7,7 @@
 //
 
 #import "TAPContactLoadingTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPContactLoadingTableViewCell ()
 

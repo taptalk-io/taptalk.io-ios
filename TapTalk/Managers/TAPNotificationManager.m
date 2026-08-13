@@ -7,6 +7,7 @@
 //
 
 #import "TAPNotificationManager.h"
+#import "PowerTalk.h"
 
 #define NOTIFICATION_SOUND_NAME @"moselo-notification.caf"
 

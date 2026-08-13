@@ -10,6 +10,7 @@
 #import "TAPImageSelectView.h"
 #import "TAPImageSelectCollectionViewCell.h"
 #import "TAPImagePreviewViewController.h"
+#import "PowerTalk.h"
 
 @interface TAPImageSelectViewController () <UICollectionViewDelegate, UICollectionViewDataSource, PHPhotoLibraryChangeObserver, TAPImagePreviewViewControllerDelegate>
 

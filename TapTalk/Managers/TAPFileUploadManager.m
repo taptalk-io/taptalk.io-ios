@@ -7,13 +7,7 @@
 //
 
 #import "TAPFileUploadManager.h"
-#import "TAPFetchMediaManager.h"
-#import "TAPDataMediaModel.h"
-#import "TAPDataFileModel.h"
-
-#import <TapTalk/Base64.h>
-#import <AVKit/AVKit.h>
-#import <Photos/Photos.h>
+#import "PowerTalk.h"
 #import <CoreServices/UTType.h>
 
 //@import AFNetworking;

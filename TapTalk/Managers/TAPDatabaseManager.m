@@ -7,8 +7,10 @@
 //
 
 #import "TAPDatabaseManager.h"
-#import <Realm/Realm.h>
+#import "TAPChatManager.h"
+#import "TAPMessageStatusManager.h"
 #import "TAPMessageRealmModel.h"
+#import <Realm/Realm.h>
 
 @interface TAPDatabaseManager ()
 
@@ -491,7 +493,7 @@
             [realm commitWriteTransaction];
             
             if ([dataArray count] > count) {
-                NSMutableArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
+                NSArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
                 [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:remainingArray tableName:tableName success:success failure:failure];
                 return;
             }
@@ -532,7 +534,7 @@
     [realm commitWriteTransaction];
     
     if ([dataArray count] > count) {
-        NSMutableArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
+        NSArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
         [TAPDatabaseManager updateOrInsertDataToDatabaseInMainThreadWithData:remainingArray tableName:tableName success:success failure:failure];
         return;
     }
@@ -624,7 +626,7 @@
             [realm commitWriteTransaction];
             
             if ([dataArray count] > count) {
-                NSMutableArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
+                NSArray *remainingArray = [dataArray subarrayWithRange:NSMakeRange(count, [dataArray count] - count)];
                 [TAPDatabaseManager deleteDataInDatabaseWithData:remainingArray tableName:tableName success:success failure:failure];
                 return;
             }

@@ -7,6 +7,7 @@
 //
 
 #import "TAPThumbnailImagePreviewCollectionViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPThumbnailImagePreviewCollectionViewCell ()
 

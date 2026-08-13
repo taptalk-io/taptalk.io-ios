@@ -7,6 +7,7 @@
 //
 
 #import "TAPMyLocationBubbleTableViewCell.h"
+#import "PowerTalk.h"
 #import <MapKit/MapKit.h>
 
 @interface TAPMyLocationBubbleTableViewCell () <UIGestureRecognizerDelegate, TAPImageViewDelegate>

@@ -7,6 +7,7 @@
 //
 
 #import "TAPSetupRoomListView.h"
+#import "PowerTalk.h"
 
 @interface TAPSetupRoomListView ()
 

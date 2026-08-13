@@ -8,6 +8,7 @@
 
 #import "TAPCustomNotificationAlertViewController.h"
 #import "TAPCustomNotificationAlertView.h"
+#import "PowerTalk.h"
 
 @interface TAPCustomNotificationAlertViewController ()
 

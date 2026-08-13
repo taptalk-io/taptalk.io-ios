@@ -7,7 +7,7 @@
 //
 
 #import "TAPConnectionManager.h"
-#import "TapAFNetworking.h"
+#import "PowerTalk.h"
 
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f
@@ -15,7 +15,7 @@
 
 @interface TAPConnectionManager () <SRWebSocketDelegate>
 
-@property (strong, nonatomic) SRWebSocket *webSocket;
+@property (strong, nonatomic) TapSRWebSocket *webSocket;
 @property (strong, nonatomic) NSString *socketURL;
 @property (nonatomic) NSInteger reconnectAttempt;
 @property (nonatomic) BOOL isShouldReconnect;
@@ -66,7 +66,7 @@
 
 #pragma mark - Delegate
 #pragma mark SRWebSocket
-- (void)webSocketDidOpen:(SRWebSocket *)webSocket {
+- (void)webSocketDidOpen:(TapSRWebSocket *)webSocket {
 #ifdef DEBUG
     NSLog(@"Socket Open");
 #endif
@@ -84,7 +84,7 @@
     }
 }
 
-- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message {
+- (void)webSocket:(TapSRWebSocket *)webSocket didReceiveMessage:(id)message {
 #ifdef DEBUG
     NSLog(@"Socket Receive Emit");
 #endif
@@ -109,7 +109,7 @@
     }
 }
 
-- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error {
+- (void)webSocket:(TapSRWebSocket *)webSocket didFailWithError:(NSError *)error {
 #ifdef DEBUG
     NSLog(@"Socket Fail with Error: %@", [error description]);
 #endif
@@ -127,7 +127,7 @@
     [self tryToReconnect];
 }
 
-- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(nullable NSString *)reason wasClean:(BOOL)wasClean {
+- (void)webSocket:(TapSRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(nullable NSString *)reason wasClean:(BOOL)wasClean {
 #ifdef DEBUG
     NSLog(@"Socket Close with Code: %li Reason:%@ Clean:%@", code, reason, STRING_FROM_BOOL(wasClean));
 #endif
@@ -204,7 +204,7 @@
         [urlRequest addValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
         [urlRequest addValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
         
-        SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];
+        TapSRWebSocket *webSocket = [[TapSRWebSocket alloc] initWithURLRequest:urlRequest];
         webSocket.delegate = self;
         [webSocket open];
     } failure:^(NSError *error) {

@@ -6,6 +6,7 @@
 //
 
 #import "TAPMediaDetailPreviewView.h"
+#import "TAPUtil.h"
 
 @interface TAPMediaDetailPreviewView ()
 

@@ -7,6 +7,7 @@
 //
 
 #import "TAPImageSelectCollectionViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPImageSelectCollectionViewCell ()
 

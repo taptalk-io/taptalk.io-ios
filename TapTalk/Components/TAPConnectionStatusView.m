@@ -7,6 +7,7 @@
 //
 
 #import "TAPConnectionStatusView.h"
+#import "PowerTalk.h"
 
 @interface TAPConnectionStatusView()
 @property (strong, nonatomic) UIView *connectionStatusView;

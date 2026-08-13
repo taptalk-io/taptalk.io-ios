@@ -9,6 +9,7 @@
 #import "TAPBlockedListViewController.h"
 #import "TAPBlockedListView.h"
 #import "TAPContactTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPBlockedListViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (strong, nonatomic) TAPBlockedListView *blockedListView;

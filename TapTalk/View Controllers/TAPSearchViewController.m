@@ -8,6 +8,7 @@
 
 #import "TAPSearchViewController.h"
 #import "TAPSearchView.h"
+#import "PowerTalk.h"
 
 //TableViewCell for SearchResultTableView
 #import "TAPSearchResultChatTableViewCell.h"

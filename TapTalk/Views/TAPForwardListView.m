@@ -7,6 +7,7 @@
 //
 
 #import "TAPForwardListView.h"
+#import "PowerTalk.h"
 
 @interface TAPForwardListView ()
 

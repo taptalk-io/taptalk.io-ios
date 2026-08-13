@@ -7,6 +7,7 @@
 //
 
 #import "TAPBaseXIBTableViewCell.h"
+#import "PowerTalk.h"
 
 @implementation TAPBaseXIBTableViewCell
 

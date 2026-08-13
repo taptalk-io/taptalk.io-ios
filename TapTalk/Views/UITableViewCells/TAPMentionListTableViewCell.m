@@ -7,6 +7,7 @@
 //
 
 #import "TAPMentionListTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPMentionListTableViewCell()
 

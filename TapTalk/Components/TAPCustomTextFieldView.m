@@ -8,6 +8,7 @@
 
 #import "TAPCustomTextFieldView.h"
 #import "TAPCustomPhoneNumberPickerView.h"
+#import "PowerTalk.h"
 
 @interface TAPCustomTextFieldView () <UITextFieldDelegate, TAPCustomPhoneNumberPickerViewDelegate>
 

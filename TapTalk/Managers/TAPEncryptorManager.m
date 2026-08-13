@@ -7,6 +7,7 @@
 //
 
 #import "TAPEncryptorManager.h"
+#import "TAPUtil.h"
 
 static NSString * const kKeyPasswordEncryptor = @"kHT0sVGIKKpnlJE5BNkINYtuf19u6+Kk811iMuWQ5tM";
 

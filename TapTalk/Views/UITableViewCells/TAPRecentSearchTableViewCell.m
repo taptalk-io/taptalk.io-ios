@@ -7,6 +7,7 @@
 //
 
 #import "TAPRecentSearchTableViewCell.h"
+#import "PowerTalk.h"
 
 @interface TAPRecentSearchTableViewCell ()
 
