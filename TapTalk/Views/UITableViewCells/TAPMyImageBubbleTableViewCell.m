@@ -588,30 +588,8 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
-                    [TAPImageView imageFromCacheWithMessage:self.message
-                    start:^(TAPMessageModel *resultMessage) {
-                        
-                    }
-                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
-                        
-                    }
-                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                        if (savedImage != nil) {
-                            [self.quoteImageView setImage:savedImage];
-                            [self showReplyView:NO withMessage:nil];
-                            [self showQuoteView:YES];
-                        }
-                    }
-                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
-                        [self showQuoteView:NO];
-                        [self showReplyView:YES withMessage:self.message];
-                    }];
-            }
-            else {
-                [self showQuoteView:NO];
-                [self showReplyView:YES withMessage:self.message];
-            }
+            [self showQuoteView:NO];
+            [self showReplyView:YES withMessage:self.message];
         }
     }
 }
@@ -1947,7 +1925,31 @@
     }
     else {
         if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
-            [self.quoteImageView setImageWithURLString:quote.imageURL];
+            if (![TAPUtil isEmptyString:quote.fileType] && [quote.fileType isEqualToString:@"video"]) {
+                [TAPImageView imageFromCacheWithKey:quote.imageURL
+                                            message:self.message
+                                            success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                    [self.quoteImageView setImage:savedImage];
+                    [self showReplyView:NO withMessage:nil];
+                    [self showQuoteView:YES];
+                }
+                failure:^(TAPMessageModel *resultMessage) {
+                    [TAPUtil fetchVideoThumbnailWithRemoteURL:quote.imageURL
+                    success:^(UIImage *thumbnail) {
+                        [TAPImageView saveImageToCache:thumbnail withKey:quote.imageURL];
+                        [self.quoteImageView setImage:thumbnail];
+                        [self showReplyView:NO withMessage:nil];
+                        [self showQuoteView:YES];
+                    }
+                    failure:^(NSError *error) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+                }];
+            }
+            else {
+                [self.quoteImageView setImageWithURLString:quote.imageURL];
+            }
         }
         else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];

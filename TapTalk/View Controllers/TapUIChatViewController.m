@@ -49,6 +49,7 @@
 #import "TAPLoadingTableViewCell.h"
 #import "TAPSystemMessageTableViewCell.h"
 #import "TAPAudioManager.h"
+#import "TAPFetchMediaManager.h"
 #import "TAPMessageInfoViewController.h"
 #import "TAPReportUserViewController.h"
 #import "TAPSecondaryChatViewController.h"
@@ -699,6 +700,7 @@ CGPoint center;
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     [UIView commitAnimations];
     
+    self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractiveWithAccessory;
     self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 58.0f, 0.0f);
     self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
     
@@ -1892,16 +1894,10 @@ CGPoint center;
                             if ([self.bubbleImageDataDictionary objectForKey:message.localID] != nil) {
                                 if (cell.bubbleImageView.image == nil) {
                                     [cell setFullImage:[self.bubbleImageDataDictionary objectForKey:message.localID]];
-                                    NSLog(@">>>>>> setFullImage dict %@", message.messageID);
-                                }
-                                else {
-                                    
-                                    NSLog(@">>>>>> has Full Image %@", message.messageID);
                                 }
                             }
                             else {
                                 // Fetch image data, get from cache or download if needed
-                                NSLog(@">>>>>> fetchImageDataWithMessage %@", message.messageID);
                                 [self fetchImageDataWithMessage:message];
                             }
                         }
@@ -3259,6 +3255,10 @@ CGPoint center;
     
     _isScrollViewDragged = YES;
     
+    // Immediately dismiss keyboard to prevent app freeze when accessory view is dragged down
+    [self.view endEditing:YES];
+    [self.messageTextView resignFirstResponder];
+    
     //Hide unread message indicator top view
     if (self.topFloatingIndicatorViewType == TopFloatingIndicatorViewTypeUnreadMessage && self.topFloatingIndicatorView.alpha == 1.0f) {
         [TAPUtil performBlock:^{
@@ -3297,6 +3297,9 @@ CGPoint center;
             currentKeyboardHeight = self.hiddenKeyboardHeight;
         }
         CGFloat tableViewYContentInset = currentKeyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        if (tableViewYContentInset < 0.0f) {
+            tableViewYContentInset = 0.0f;
+        }
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
@@ -3306,6 +3309,17 @@ CGPoint center;
         if (tableViewYContentInset <= self.safeAreaBottomPadding + kInputMessageAccessoryViewHeight) {
             //set keyboard state to default
             [self setKeyboardStateDefault];
+        }
+        
+        if (CGRectGetMinY(self.inputMessageAccessoryView.frame) < 0.0f) {
+            // Fix chat composer floating above hidden keyboard height after dragged to bottom
+            [TAPUtil performBlock:^{
+                [self.messageTextView becameFirstResponder];
+                [self.messageTextView resignFirstResponder];
+                [TAPUtil performBlock:^{
+                    [self keyboardWillHideWithHeight:0.0f];
+                } afterDelay:0.0f];
+            } afterDelay:0.0f];
         }
     }];
 }
@@ -4517,7 +4531,7 @@ CGPoint center;
     
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
     if (cellImage != nil) {
-        CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame) + 12.0f;
+        CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame) + 26.0f;
         NSArray *imageSliderImage = [NSArray array];
         
         [self.messageTextView resignFirstResponder];
@@ -5795,7 +5809,7 @@ CGPoint center;
     
     UIImage *cellImage = yourImageBubbleCell.bubbleImageView.image;
     if (cellImage != nil) {
-        CGFloat bubbleImageViewMinY = CGRectGetMinY(yourImageBubbleCell.bubbleImageView.frame) + 12.0f;
+        CGFloat bubbleImageViewMinY = CGRectGetMinY(yourImageBubbleCell.bubbleImageView.frame) + 26.0f;
         NSArray *imageSliderImage = [NSArray array];
         
         [self.messageTextView resignFirstResponder];
@@ -6633,7 +6647,12 @@ CGPoint center;
         self.messageTextViewHeightConstraint.constant = height;
         self.messageViewHeightConstraint.constant = self.messageTextViewHeight + 16.0f + 4.0f;
         // Added for smoother composer resizing
-        self.inputMessageAccessoryView.frame = CGRectMake(CGRectGetMinX(self.inputMessageAccessoryView.frame), CGRectGetMinY(self.inputMessageAccessoryView.frame) - height + previousHeight, CGRectGetWidth(self.inputMessageAccessoryView.frame), CGRectGetHeight(self.inputMessageAccessoryView.frame) + height - previousHeight);
+        self.inputMessageAccessoryView.frame = CGRectMake(
+            CGRectGetMinX(self.inputMessageAccessoryView.frame),
+            CGRectGetMinY(self.inputMessageAccessoryView.frame) - height + previousHeight,
+            CGRectGetWidth(self.inputMessageAccessoryView.frame),
+            CGRectGetHeight(self.inputMessageAccessoryView.frame) + height - previousHeight
+        );
         [self showInputAccessoryExtensionView:self.isShowingExtensionView];
         [self.inputMessageAccessoryView layoutIfNeeded];
     }];
@@ -6803,6 +6822,9 @@ CGPoint center;
 //        }
         
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        if (tableViewYContentInset < 0.0f) {
+            tableViewYContentInset = 0.0f;
+        }
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
@@ -6883,6 +6905,9 @@ CGPoint center;
 //        }
         
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        if (tableViewYContentInset < 0.0f) {
+            tableViewYContentInset = 0.0f;
+        }
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
@@ -8689,12 +8714,7 @@ CGPoint center;
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-            }
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
         }];
         [alertController addAction:settingsAction];
         
@@ -8737,12 +8757,7 @@ CGPoint center;
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-            }
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
         }];
         [alertController addAction:settingsAction];
         
@@ -8847,10 +8862,16 @@ CGPoint center;
     
     if ([[UIApplication sharedApplication] canOpenURL:googleMapsURL]) {
         NSString *urlString = [NSString stringWithFormat:@"comgooglemaps://?center=%f,%f&zoom=14&q=%f,%f",latitude, longitude, latitude, longitude];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-    } else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
+                                           options:[NSDictionary dictionary]
+                                 completionHandler:nil];
+    }
+    else {
         // GoogleMaps is not installed. Launch AppStore to install GoogleMaps app
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/id/app/id585027354"]];
+        NSString *urlString = @"https://apps.apple.com/us/app/google-maps/id585027354";
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
+                                           options:[NSDictionary dictionary]
+                                 completionHandler:nil];
     }
 }
 
@@ -8865,8 +8886,11 @@ CGPoint center;
     
     if ([[UIApplication sharedApplication] canOpenURL:appleMapsURL]) {
         NSString *urlString = [NSString stringWithFormat:@"maps://?ll=%f,%f&q=%@", latitude, longitude, address];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-    } else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
+                                           options:[NSDictionary dictionary]
+                                 completionHandler:nil];
+    }
+    else {
         NSLog(@"Can't use maps://");
     }
 }
@@ -8964,13 +8988,8 @@ CGPoint center;
                                         style:UIAlertActionStyleDefault
                                         handler:^(UIAlertAction * action) {
                                             [self checkAndShowInputAccessoryView];
-                                            if([[UIApplication sharedApplication] canOpenURL:url]) {
-                                                if(IS_IOS_11_OR_ABOVE) {
-                                                    [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-                                                }
-                                                else {
-                                                    [[UIApplication sharedApplication] openURL:url];
-                                                }
+                                            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                                                [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
                                             }
                                         }];
         
@@ -9044,13 +9063,8 @@ CGPoint center;
                                      handler:^(UIAlertAction * action) {
                                          //CS TEMP - temporary open safari
                                          [self checkAndShowInputAccessoryView];
-                                         if([[UIApplication sharedApplication] canOpenURL:url]) {
-                                             if(IS_IOS_11_OR_ABOVE) {
-                                                 [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-                                             }
-                                             else {
-                                                 [[UIApplication sharedApplication] openURL:url];
-                                             }
+                                         if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                                             [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
                                          }
                                      }];
         
@@ -9127,13 +9141,8 @@ CGPoint center;
                                  handler:^(UIAlertAction * action) {
                                      [self checkAndShowInputAccessoryView];
                                      NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
-                                     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-                                         if(IS_IOS_11_OR_ABOVE) {
-                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
-                                         }
-                                         else {
-                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
-                                         }
+                                     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+                                         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
                                      }
                                  }];
     
@@ -9143,13 +9152,8 @@ CGPoint center;
                                 handler:^(UIAlertAction * action) {
                                     [self checkAndShowInputAccessoryView];
                                     NSString *stringURL = [NSString stringWithFormat:@"sms:%@", phoneNumber];
-                                    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-                                        if(IS_IOS_11_OR_ABOVE) {
-                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
-                                        }
-                                        else {
-                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
-                                        }
+                                    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+                                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
                                     }
                                 }];
     
@@ -9227,38 +9231,28 @@ CGPoint center;
     if ([url.scheme isEqualToString:@"mailto"]) {
         //handle email address
         //open mail app
-        if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:url];
-            }
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
         }
     }
     else {
         //handle link
         //open webview
-        if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:url
-                                                   options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
-                                         completionHandler:^(BOOL success){
-                                             if(!success) {
-                                                 // present in app web view, the app is not installed
-                                                 TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
-                                                 webViewController.urlString = url.absoluteString;
-                                                 //CS NOTE - add resign first responder before every pushVC to handle keyboard height
-                                                 [self.messageTextView resignFirstResponder];
-                                                 [self.secondaryTextField resignFirstResponder];
-                                                 [self keyboardWillHideWithHeight:0.0f];
-                                                 [self pushViewController:webViewController animated:YES];
-                                             }
-                                         }];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:url];
-            }
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url
+                                               options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
+                                     completionHandler:^(BOOL success){
+                                         if (!success) {
+                                             // present in app web view, the app is not installed
+                                             TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
+                                             webViewController.urlString = url.absoluteString;
+                                             //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+                                             [self.messageTextView resignFirstResponder];
+                                             [self.secondaryTextField resignFirstResponder];
+                                             [self keyboardWillHideWithHeight:0.0f];
+                                             [self pushViewController:webViewController animated:YES];
+                                         }
+            }];
         }
     }
 }
@@ -9266,13 +9260,8 @@ CGPoint center;
 - (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString {
     phoneNumber = [phoneNumber stringByReplacingOccurrencesOfString:@" " withString:@""];
     NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
-    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-        if(IS_IOS_11_OR_ABOVE) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
-        }
-        else {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
-        }
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
     }
 }
 
@@ -10256,6 +10245,7 @@ CGPoint center;
     key = [TAPUtil nullToEmptyString:key];
     
     NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+    NSString *assetIdentifier = [[TAPFileDownloadManager sharedManager] getAssetIdentifierWithKey:key];
     
     if (filePath == nil || [filePath isEqualToString:@""]) {
         NSString *fileURL = [dataDictionary objectForKey:@"url"];
@@ -10270,6 +10260,9 @@ CGPoint center;
         }
         
         filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+        if ([TAPUtil isEmptyString:assetIdentifier]) {
+            assetIdentifier = [[TAPFileDownloadManager sharedManager] getAssetIdentifierWithKey:key];
+        }
     }
     
     if (filePath == nil || [filePath isEqualToString:@""]
@@ -10278,20 +10271,44 @@ CGPoint center;
         [self showFileNotFoundPopUpWithMessage:message];
         return;
     }
-    
-    NSURL *url = [NSURL fileURLWithPath:filePath];
-    AVAsset *asset = [AVAsset assetWithURL:url];
-    
-    if (asset == nil) {
-        [self showFileNotFoundPopUpWithMessage:message];
+    if (![TAPUtil isEmptyString:assetIdentifier]) {
+        NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+        PHAsset *videoAsset = [fetchResult firstObject];
+        if (videoAsset != nil) {
+            [[TAPFetchMediaManager sharedManager] fetchVideoDataForAsset:videoAsset
+            progressHandler:^(double progress, NSError * _Nonnull error, BOOL * _Nonnull stop, NSDictionary * _Nonnull dictionary) {
+                
+            }
+            resultHandler:^(AVAsset * _Nonnull resultVideoAsset) {
+                [self playVideoWithAVAsset:resultVideoAsset];
+            }
+            failureHandler:^{
+                AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:filePath]];
+                if (asset == nil) {
+                    [self showFileNotFoundPopUpWithMessage:message];
+                }
+                else {
+                    [self playVideoWithAVAsset:asset];
+                }
+            }];
+        }
         return;
     }
-    
+            
+    AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:filePath]];
+    if (asset == nil) {
+        [self showFileNotFoundPopUpWithMessage:message];
+    }
+    else {
+        [self playVideoWithAVAsset:asset];
+    }
+}
+
+- (void)playVideoWithAVAsset:(AVAsset *)videoAsset {
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-    
-    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:videoAsset];
     AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-    
     AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
     controller.delegate = self;
     controller.showsPlaybackControls = YES;
@@ -10993,9 +11010,6 @@ CGPoint center;
                //Update message data
                [self updateMessageModelValueWithMessage:message];
                
-               //Check need to update profile data or not
-               [self checkUpdatedUserProfileWithMessage:message];
-               
                //Update view
                NSInteger indexInArray = [[self.messageArray copy] indexOfObject:currentMessage];
                NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:indexInArray inSection:0];
@@ -11364,6 +11378,9 @@ CGPoint center;
                }
            }
            [self checkEmptyState];
+        
+            //Check need to update profile data or not
+            [self checkUpdatedUserProfileWithMessage:message];
        });
 }
 
@@ -11944,15 +11961,18 @@ CGPoint center;
     }
     
     // Commented to prevent incorrectly reassigned keyboardHeight value if this method is called after growing text view had changed height
-        keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
+//        keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
     
-    if (keyboardHeight < 0) {
+    if (keyboardHeight <= 0.0f) {
         return;
     }
     
     if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
         _keyboardHeight = keyboardHeight;
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        if (tableViewYContentInset < 0.0f) {
+            tableViewYContentInset = 0.0f;
+        }
         
         [UIView animateWithDuration:0.2f animations:^{
             self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.keyboardHeight - kInputMessageAccessoryViewHeight;
@@ -11990,6 +12010,9 @@ CGPoint center;
     //set initial keyboard height to prevent wrong keyboard height usage
     if (self.initialKeyboardHeight == 0.0f && keyboardHeight !=  accessoryViewAndSafeAreaHeight && keyboardHeight != kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding && keyboardHeight != kInputMessageAccessoryViewHeight) {
         _initialKeyboardHeight = keyboardHeight - self.currentInputAccessoryExtensionHeight;
+        if (self.initialKeyboardHeight < 0.0f) {
+            _initialKeyboardHeight = 0.0f;
+        }
     }
     
     if (self.keyboardHeight == 0.0f) {
@@ -12039,6 +12062,9 @@ CGPoint center;
     }
     
     CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+    if (tableViewYContentInset < 0.0f) {
+        tableViewYContentInset = 0.0f;
+    }
     
     CGFloat lastTableViewYContentInset = self.tableView.contentInset.top;
     
@@ -14790,6 +14816,7 @@ CGPoint center;
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedStringFromTableInBundle(@"Could not find message.", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [self checkAndShowRoomViewState];
             }];
 
             [alertController addAction:okAction];
@@ -14910,12 +14937,7 @@ CGPoint center;
             [alertController addAction:cancelAction];
             
             UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                if (IS_IOS_11_OR_ABOVE) {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-                }
-                else {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }];
             [alertController addAction:settingsAction];
             
@@ -14942,12 +14964,7 @@ CGPoint center;
             [alertController addAction:cancelAction];
             
             UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                if (IS_IOS_11_OR_ABOVE) {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-                }
-                else {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }];
             [alertController addAction:settingsAction];
             
@@ -15625,56 +15642,53 @@ CGPoint center;
 }
 
 - (void)checkUpdatedUserProfileWithMessage:(TAPMessageModel *)message {
+    if (![message.room.roomID isEqualToString:self.currentRoom.roomID] ||
+        message.type != TAPChatMessageTypeSystemMessage ||
+        (![message.action isEqualToString:@"user/update"] && ![message.action isEqualToString:@"room/update"])
+    ) {
+        return;
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        if(![message.room.roomID isEqualToString:self.currentRoom.roomID]) {
-            return;
+        NSString *updatedRoomName = message.room.name;
+        NSString *updatedImageURLString;
+        if ([message.action isEqualToString:@"room/update"]) {
+            updatedImageURLString = message.room.imageURL.thumbnail;
         }
-        if (message.type == TAPChatMessageTypeSystemMessage && ([message.action isEqualToString:@"user/update"] || [message.action isEqualToString:@"room/update"])) {
-            NSString *updatedImageURLString;
-            if([message.action isEqualToString:@"room/update"]) {
-                updatedImageURLString = message.room.imageURL.thumbnail;
+        else if ([message.action isEqualToString:@"user/update"] && ![message.user.userID isEqual:[TAPDataManager getActiveUser].userID]) {
+            updatedImageURLString = message.user.imageURL.thumbnail;
+            [self updateLastSeenWithTimestamp:[message.user.lastActivity longValue]];
+        }
+        else {
+            updatedImageURLString =  self.currentRoom.imageURL.thumbnail;
+        }
+            
+        NSString *currentRoomName = self.currentRoom.name;
+        NSString *currentImageURLString = self.currentRoom.imageURL.thumbnail;
+        if (![updatedRoomName isEqualToString:currentRoomName] ||
+            ![updatedImageURLString isEqualToString:currentImageURLString]
+        ) {
+            if (message.room.deleted.longValue > 0) {
+                self.rightBarInitialNameView.alpha = 1.0f;
+                self.rightBarImageView.alpha = 0.0f;
+                self.deletedUserImageView.alpha = 1.0f;
+                self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                self.rightBarInitialNameLabel.text = @"";
             }
-            else if ([message.action isEqualToString:@"user/update"] && ![message.user.userID isEqual:[TAPDataManager getActiveUser].userID]) {
-                updatedImageURLString = message.user.imageURL.thumbnail;
-                [self updateLastSeenWithTimestamp:[message.user.lastActivity longValue]];
-                
+            else if (updatedImageURLString == nil || [updatedImageURLString isEqualToString:@""]) {
+                BOOL isGroup = message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction;
+                self.rightBarInitialNameView.alpha = 1.0f;
+                self.rightBarImageView.alpha = 0.0f;
+                self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:message.room.name];
+                self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:message.room.name isGroup:isGroup];
             }
             else {
-                updatedImageURLString =  self.currentRoom.imageURL.thumbnail;
+                self.rightBarInitialNameView.alpha = 0.0f;
+                self.rightBarImageView.alpha = 1.0f;
+                [self.rightBarImageView setImageWithURLString:updatedImageURLString];
             }
-            
-             NSString *currentImageURLString = self.currentRoom.imageURL.thumbnail;
-            
-            
-            
-             if (![updatedImageURLString isEqualToString:currentImageURLString]) {
-                 if(message.room.deleted.longValue > 0){
-                     self.rightBarInitialNameView.alpha = 1.0f;
-                     self.rightBarImageView.alpha = 0.0f;
-                     self.deletedUserImageView.alpha = 1.0f;
-                     self.rightBarInitialNameView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
-                     self.rightBarInitialNameLabel.text =@"";
-                 }
-                 else if (updatedImageURLString == nil || [updatedImageURLString isEqualToString:@""]) {
-                     BOOL isGroup = NO;
-                     if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
-                         isGroup = YES;
-                     }
-                     
-                     self.rightBarInitialNameView.alpha = 1.0f;
-                     self.rightBarImageView.alpha = 0.0f;
-                     self.rightBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:message.room.name];
-                     self.rightBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:message.room.name isGroup:isGroup];
-                 }
-                 else {
-                     self.rightBarInitialNameView.alpha = 0.0f;
-                     self.rightBarImageView.alpha = 1.0f;
-                     [self.rightBarImageView setImageWithURLString:updatedImageURLString];
-                 }
-                 
-                 self.nameLabel.text = message.room.name;
-             }
-            
+
+            self.nameLabel.text = message.room.name;
             self.currentRoom.name = message.room.name;
             self.currentRoom.imageURL = message.room.imageURL;
             
@@ -15686,7 +15700,7 @@ CGPoint center;
             if ([chatRoomDelegate respondsToSelector:@selector(tapTalkDidReceiveUpdatedChatRoomData:recipientUser:)]) {
                 [chatRoomDelegate tapTalkDidReceiveUpdatedChatRoomData:self.currentRoom recipientUser:recipientUser];
             }
-         }
+        }
     });
 }
 

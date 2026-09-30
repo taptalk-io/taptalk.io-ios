@@ -183,7 +183,7 @@
 }
 
 #pragma mark - AppDelegate Handling
-- (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nonnull)launchOptions {
+- (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nullable)launchOptions {
     // Override point for customization after application launch.
     
     [self firstRunSetupWithApplication:application launchOptions:launchOptions];
@@ -198,6 +198,7 @@
     
     //Obtain downloaded file path from preference
     [[TAPFileDownloadManager sharedManager] fetchDownloadedFilePathFromPreference];
+    [[TAPFileDownloadManager sharedManager] fetchAssetIdentifierDictionaryFromPreference];
     
     //Clean database message that is more than 1 month old every 1 week.
     [TAPOldDataManager runCleaningOldDataSequence];
@@ -290,6 +291,7 @@
     
     //Obtain downloaded file path from preference
     [[TAPFileDownloadManager sharedManager] fetchDownloadedFilePathFromPreference];
+    [[TAPFileDownloadManager sharedManager] fetchAssetIdentifierDictionaryFromPreference];
 }
 
 - (void)applicationWillTerminate:(UIApplication *_Nonnull)application {

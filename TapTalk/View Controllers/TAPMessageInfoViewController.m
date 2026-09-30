@@ -1091,13 +1091,8 @@
                                         actionWithTitle:NSLocalizedStringFromTableInBundle(@"Compose", nil, [TAPUtil currentBundle], @"")
                                         style:UIAlertActionStyleDefault
                                         handler:^(UIAlertAction * action) {
-                                            if([[UIApplication sharedApplication] canOpenURL:url]) {
-                                                if(IS_IOS_11_OR_ABOVE) {
-                                                    [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-                                                }
-                                                else {
-                                                    [[UIApplication sharedApplication] openURL:url];
-                                                }
+                                            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                                                [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
                                             }
                                         }];
         
@@ -1158,13 +1153,8 @@
                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Open", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
-                                         if([[UIApplication sharedApplication] canOpenURL:url]) {
-                                             if(IS_IOS_11_OR_ABOVE) {
-                                                 [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-                                             }
-                                             else {
-                                                 [[UIApplication sharedApplication] openURL:url];
-                                             }
+                                         if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                                             [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
                                          }
                                      }];
         
@@ -1229,13 +1219,8 @@
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
                                      NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
-                                     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-                                         if(IS_IOS_11_OR_ABOVE) {
-                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
-                                         }
-                                         else {
-                                             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
-                                         }
+                                     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+                                         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
                                      }
                                  }];
     
@@ -1244,13 +1229,8 @@
                                 style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction * action) {
                                     NSString *stringURL = [NSString stringWithFormat:@"sms:%@", phoneNumber];
-                                    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-                                        if(IS_IOS_11_OR_ABOVE) {
-                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
-                                        }
-                                        else {
-                                            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
-                                        }
+                                    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+                                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
                                     }
                                 }];
     
@@ -1316,35 +1296,25 @@
     if ([url.scheme isEqualToString:@"mailto"]) {
         //handle email address
         //open mail app
-        if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:url];
-            }
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
         }
     }
     else {
         //handle link
         //open webview
-        if([[UIApplication sharedApplication] canOpenURL:url]) {
-            if(IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:url
-                                                   options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
-                                         completionHandler:^(BOOL success){
-                                             if(!success) {
-                                                 // present in app web view, the app is not installed
-                                                 TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
-                                                 webViewController.urlString = url.absoluteString;
-                                                 [self keyboardWillHideWithHeight:0.0f];
-                                                 [self.navigationController pushViewController:webViewController animated:YES];
-                                             }
-                                         }];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:url];
-            }
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url
+                                               options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
+                                     completionHandler:^(BOOL success){
+                                         if (!success) {
+                                             // present in app web view, the app is not installed
+                                             TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
+                                             webViewController.urlString = url.absoluteString;
+                                             [self keyboardWillHideWithHeight:0.0f];
+                                             [self.navigationController pushViewController:webViewController animated:YES];
+                                         }
+            }];
         }
     }
 }
@@ -1352,13 +1322,8 @@
 - (void)handleTappedWithPhoneNumber:(NSString *)phoneNumber originalString:(NSString *)originalString {
     phoneNumber = [phoneNumber stringByReplacingOccurrencesOfString:@" " withString:@""];
     NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
-    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
-        if(IS_IOS_11_OR_ABOVE) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
-        }
-        else {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
-        }
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL] options:[NSDictionary dictionary] completionHandler:nil];
     }
 }
 
@@ -1729,10 +1694,15 @@
     
     if ([[UIApplication sharedApplication] canOpenURL:googleMapsURL]) {
         NSString *urlString = [NSString stringWithFormat:@"comgooglemaps://?center=%f,%f&zoom=14&q=%f,%f",latitude, longitude, latitude, longitude];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-    } else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
+                                           options:[NSDictionary dictionary]
+                                 completionHandler:nil];
+    }
+    else {
         // GoogleMaps is not installed. Launch AppStore to install GoogleMaps app
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/id/app/id585027354"]];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/id/app/id585027354"]
+                                           options:[NSDictionary dictionary]
+                                 completionHandler:nil];
     }
 }
 
@@ -1746,8 +1716,11 @@
     
     if ([[UIApplication sharedApplication] canOpenURL:appleMapsURL]) {
         NSString *urlString = [NSString stringWithFormat:@"maps://?ll=%f,%f&q=%@", latitude, longitude, address];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-    } else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
+                                           options:[NSDictionary dictionary]
+                                 completionHandler:nil];
+    }
+    else {
         NSLog(@"Can't use maps://");
     }
 }

@@ -38,6 +38,7 @@
 #define TAP_PREFS_LAST_UPDATED_CHAT_ROOM @"Prefs.TapTalkLastUpdatedChatRoom"
 #define TAP_PREFS_LAST_DELETED_OLD_MESSAGE_TIMESTAMP @"Prefs.TapTalkLastDeletedOldMessageTimestamp"
 #define TAP_PREFS_FILE_PATH_DICTIONARY @"Prefs.TapTalkFilePathDictionary"
+#define TAP_PREFS_ASSET_IDENTIFIER_DICTIONARY @"Prefs.TapTalkAssetIdentifierDictionary"
 #define TAP_PREFS_COUNTRY_LIST_ARRAY @"Prefs.TapTalkCountryListArray"
 #define TAP_PREFS_COUNTRY_LIST_DICTIONARY @"Prefs.TapTalkCountryListDictionary"
 #define TAP_PREFS_LAST_UPDATED_COUNTRY_LIST_TIMESTAMP @"Prefs.TapTalkLastUpdatedCountryListTimestamp"

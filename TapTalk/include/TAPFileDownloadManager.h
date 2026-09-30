@@ -40,6 +40,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)getDownloadedFilePathWithRoomID:(NSString *)roomID fileID:(NSString *)fileID;
 - (void)fetchDownloadedFilePathFromPreference;
 - (void)saveDownloadedFilePathToPreference;
+- (void)saveAssetIdentifier:(NSString *)assetIdentifier withKey:(NSString *)key;
+- (NSString *)getAssetIdentifierWithKey:(NSString *)key;
+- (void)fetchAssetIdentifierDictionaryFromPreference;
+- (void)saveAssetIdentifierDictionaryToPreference;
 - (void)cancelDownloadWithMessage:(TAPMessageModel *)message;
 - (BOOL)checkFailedDownloadWithLocalID:(NSString *)localID;
 - (void)saveVideoToLocalDirectoryWithAsset:(AVAsset *)videoAsset message:(TAPMessageModel *)message;

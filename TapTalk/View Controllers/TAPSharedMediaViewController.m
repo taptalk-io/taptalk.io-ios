@@ -1766,24 +1766,19 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         return;
     }
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        if (IS_IOS_11_OR_ABOVE) {
-            [[UIApplication sharedApplication] openURL:url
-                                               options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
-                                     completionHandler:^(BOOL success) {
-                                         if (!success) {
-                                             // present in app web view, the app is not installed
-                                             TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
-                                             webViewController.urlString = url.absoluteString;
-                                             //CS NOTE - add resign first responder before every pushVC to handle keyboard height
-                                             
-                                             [self keyboardWillHideWithHeight:0.0f];
-                                             [self.navigationController pushViewController:webViewController animated:YES];
-                                         }
-                                     }];
-        }
-        else {
-            [[UIApplication sharedApplication] openURL:url];
-        }
+        [[UIApplication sharedApplication] openURL:url
+                                           options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
+                                 completionHandler:^(BOOL success) {
+                                     if (!success) {
+                                         // present in app web view, the app is not installed
+                                         TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
+                                         webViewController.urlString = url.absoluteString;
+                                         //CS NOTE - add resign first responder before every pushVC to handle keyboard height
+                                         
+                                         [self keyboardWillHideWithHeight:0.0f];
+                                         [self.navigationController pushViewController:webViewController animated:YES];
+                                     }
+        }];
     }
 }
 
