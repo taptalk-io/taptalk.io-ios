@@ -15,6 +15,7 @@
 @property (strong, nonatomic) NSMutableDictionary *downloadProgressDictionary;
 @property (strong, nonatomic) NSMutableDictionary *currentDownloadingDictionary;
 @property (strong, nonatomic) NSMutableDictionary *downloadedFilePathDictionary;
+@property (strong, nonatomic) NSMutableDictionary *assetIdentifierDictionary;
 @property (strong, nonatomic) NSMutableDictionary *failedDownloadDictionary;
 @property (strong, nonatomic) NSMutableDictionary<NSString *, NSURLSessionDownloadTask*> *urlDownloadTaskDictionary;
 
@@ -774,7 +775,7 @@
             }
     }
     
-    if (filePath == nil || [filePath isEqualToString:@""]){
+    if (filePath == nil || [filePath isEqualToString:@""]) {
         return @"";
     }
     
@@ -829,6 +830,32 @@
     NSDictionary *savedDictionary = [self.downloadedFilePathDictionary copy];
     
     [[NSUserDefaults standardUserDefaults] setSecureObject:savedDictionary forKey:TAP_PREFS_FILE_PATH_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)saveAssetIdentifier:(NSString *)assetIdentifier withKey:(NSString *)key {
+    if (self.assetIdentifierDictionary == nil) {
+        _assetIdentifierDictionary = [[NSMutableDictionary alloc] init];
+    }
+    [self.assetIdentifierDictionary setObject:assetIdentifier forKey:key];
+    [self saveAssetIdentifierDictionaryToPreference];
+}
+
+- (NSString *)getAssetIdentifierWithKey:(NSString *)key {
+    if (self.assetIdentifierDictionary != nil) {
+        return [TAPUtil nullToEmptyString:[self.assetIdentifierDictionary objectForKey:key]];
+    }
+    return @"";
+}
+
+- (void)fetchAssetIdentifierDictionaryFromPreference {
+    NSDictionary *savedDictionary = [[NSUserDefaults standardUserDefaults] secureDictionaryForKey:TAP_PREFS_ASSET_IDENTIFIER_DICTIONARY valid:nil];
+    _assetIdentifierDictionary = [[TAPUtil nullToEmptyDictionary:savedDictionary] mutableCopy];
+}
+
+- (void)saveAssetIdentifierDictionaryToPreference {
+    NSDictionary *savedDictionary = [self.assetIdentifierDictionary copy];
+    [[NSUserDefaults standardUserDefaults] setSecureObject:savedDictionary forKey:TAP_PREFS_ASSET_IDENTIFIER_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

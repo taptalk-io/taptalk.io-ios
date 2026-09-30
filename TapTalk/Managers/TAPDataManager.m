@@ -5374,8 +5374,8 @@
         NSString *OTPKey = [dataDictionary objectForKey:@"otpKey"];
         OTPKey = [TAPUtil nullToEmptyString:OTPKey];
         
-        NSString *OTPID = [dataDictionary objectForKey:@"otpID"];
-        OTPID = [TAPUtil nullToEmptyString:OTPID];
+        NSNumber *OTPID = [dataDictionary objectForKey:@"otpID"];
+        OTPID = [TAPUtil nullToEmptyNumber:OTPID];
         
         NSString *isSuccessString = [dataDictionary objectForKey:@"success"];
         isSuccessString = [TAPUtil nullToEmptyString:isSuccessString];
@@ -5395,7 +5395,7 @@
         nextRequestSecondsRaw = [TAPUtil nullToEmptyString:nextRequestSecondsRaw];
         NSInteger nextRequestSeconds = [nextRequestSecondsRaw integerValue];
         
-        success(OTPKey, OTPID, isSuccessBoolean,channelString, whatsAppFailureReason, nextRequestSeconds, successMessage);
+        success(OTPKey, [OTPID stringValue], isSuccessBoolean,channelString, whatsAppFailureReason, nextRequestSeconds, successMessage);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];

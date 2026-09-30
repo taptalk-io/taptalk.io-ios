@@ -15,6 +15,7 @@
 // Helper
 #import "Configs.h"
 #import "TAPStyle.h"
+#import "TAPTypes.h"
 #import "TAPUtil.h"
 
 // Component

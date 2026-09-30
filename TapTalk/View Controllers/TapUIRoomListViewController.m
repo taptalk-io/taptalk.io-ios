@@ -116,7 +116,7 @@
     self.pinnedRoomIDs = [TAPDataManager getPinnedRoomIDs];
     self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
     
-    if(self.mutedRoomDictionary == nil){
+    if (self.mutedRoomDictionary == nil) {
         _mutedRoomDictionary = [NSMutableDictionary dictionary];
     }
     
@@ -429,7 +429,7 @@
     TAPMessageModel *selectedMessage = roomList.lastMessage;
     TAPRoomModel *selectedRoom = selectedMessage.room;
     
-    if([self.pinnedRoomIDs containsObject:selectedRoom.roomID]){
+    if ([self.pinnedRoomIDs containsObject:selectedRoom.roomID]) {
         isPinnedRoom = YES;
     }
     
@@ -441,7 +441,7 @@
         TAPMessageModel *selectedMessage = roomList.lastMessage;
         TAPRoomModel *selectedRoom = selectedMessage.room;
         
-        if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
+        if (roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
             roomList.numberOfUnreadMessages = 0;
             roomList.isMarkedAsUnread = NO;
             [self.unreadRoomIDs removeObject:selectedRoom.roomID];
@@ -453,7 +453,7 @@
             
             [[TAPCoreMessageManager sharedManager] markAllMessagesInRoomAsReadWithRoomID:selectedRoom.roomID];
         }
-        else{
+        else {
             [self.unreadRoomIDs addObject:selectedRoom.roomID];
             roomList.isMarkedAsUnread = YES;
             [[TAPCoreRoomListManager sharedManager] markChatRoomAsUnreadWithRoomID:selectedRoom.roomID success:^{
@@ -480,16 +480,16 @@
         [self.view endEditing:YES];
         completionHandler(YES);
         
-        if(isPinnedRoom) {
+        if (isPinnedRoom) {
             [self.pinnedRoomIDs removeObject:selectedRoom.roomID];
             [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
                 
             [self showPinRoom:NO roomID:selectedRoom.roomID];
-            [TAPDataManager callAPIUnpinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs){
+            [TAPDataManager callAPIUnpinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs) {
                 
                 
                 
-            } failure:^(NSError *error){
+            } failure:^(NSError *error) {
                     
             }];
             
@@ -498,19 +498,19 @@
         else {
             NSInteger roomMaxPinned = [[TAPCoreRoomListManager sharedManager] getMaxPinnedRoom];
             
-            if([self.pinnedRoomIDs count] < roomMaxPinned){
+            if ([self.pinnedRoomIDs count] < roomMaxPinned) {
                 [self.pinnedRoomIDs insertObject:selectedRoom.roomID atIndex:0];
                 [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
                 
                 [self showPinRoom:YES roomID:selectedRoom.roomID];
-                [TAPDataManager callAPIPinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs){
+                [TAPDataManager callAPIPinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs) {
                     
-                } failure:^(NSError *error){
+                } failure:^(NSError *error) {
                     
                 }];
                 
             }
-            else{
+            else {
                 [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:@"You have reached the maximum of pinned chat rooms." leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
             }
         }
@@ -518,9 +518,9 @@
     }];
     
 
-    if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+    if (roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
         /**
-        if(![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+        if (![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]) {
             return nil;
        
         }
@@ -528,9 +528,9 @@
         self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Read", nil, [TAPUtil currentBundle], @"");
         self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
-    else{
+    else {
         /**
-        if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
+        if (![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]) {
             return nil;
             
         }
@@ -545,7 +545,7 @@
     
     UIImage *pinUnpinImageRendered = nil;
     
-    if(isPinnedRoom) {
+    if (isPinnedRoom) {
         pinUnpinImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconUnpinRoom" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Unpin"]];
     }
     else {
@@ -560,19 +560,19 @@
     NSMutableArray *rowActionArray = [NSMutableArray array];
     
     
-    if([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+    if ([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]) {
         [rowActionArray addObject:readUnreadAction];
     }
     else {
-        if((roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+        if ((roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]) {
             [rowActionArray addObject:readUnreadAction];
         }
-        else if([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
+        else if ([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]) {
             [rowActionArray addObject:readUnreadAction];
         }
     }
     
-    if([[TapUI sharedInstance] getPinRoomListSwipeMenuEnabled]){
+    if ([[TapUI sharedInstance] getPinRoomListSwipeMenuEnabled]) {
         [rowActionArray addObject:pinUnpinAction];
     }
     
@@ -586,7 +586,7 @@
     
     BOOL isMutedRoom = NO;
     NSNumber *mutedExpired = [self.mutedRoomDictionary objectForKey:selectedRoom.roomID];
-    if(mutedExpired != nil){
+    if (mutedExpired != nil) {
         isMutedRoom = YES;
     }
     
@@ -594,7 +594,7 @@
         [self.view endEditing:YES];
         completionHandler(YES);
         
-        if(isMutedRoom) {
+        if (isMutedRoom) {
             [self callApiUnmuteRoom:selectedRoom.roomID];
         }
         else {
@@ -683,7 +683,7 @@
         
         BOOL isPinnedRoom = NO;
         
-        if([self.pinnedRoomIDs containsObject:selectedRoom.roomID]) {
+        if ([self.pinnedRoomIDs containsObject:selectedRoom.roomID]) {
             deleteDescriptionString = NSLocalizedStringFromTableInBundle(@"Are you sure you want to unpin and delete this conversation?", nil, [TAPUtil currentBundle], @"");
             isPinnedRoom = YES;
         }
@@ -697,7 +697,7 @@
             [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeLoading];
             [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeLoading];
             
-            if(isPinnedRoom) {
+            if (isPinnedRoom) {
                 [self.pinnedRoomIDs removeObject:selectedRoom.roomID];
                 [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
             }
@@ -750,11 +750,29 @@
         
     }];
     
+    
+//    let customSize = CGSize(width: 80, height: 80) // Set your desired proportions
+//    let renderer = UIGraphicsImageRenderer(size: customSize)
+//
+//    let actionImage = renderer.image { context in
+//        // Draw your icon or text inside a fixed rectangular frame
+//        let originalImage = UIImage(named: "your_icon")
+//        originalImage?.draw(in: CGRect(x: 25, y: 25, width: 30, height: 30))
+//    }
+//
+//    action.image = actionImage
+
+    
+    CGSize buttonSize = CGSizeMake(74.0f, 74.0f);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:buttonSize];
     UIImage *muteUnmuteImageRendered = nil;
-    if(!isMutedRoom){
+    if (!isMutedRoom) {
         muteUnmuteImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Mute"]];
+//        muteUnmuteImageRendered = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+//            
+//        }];
     }
-    else{
+    else {
         muteUnmuteImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconUnmute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Unmute"]];
     }
     
@@ -768,11 +786,11 @@
     
     NSMutableArray *rowActionArray = [[NSMutableArray alloc] init];
     
-    if([[TapUI sharedInstance] getMuteRoomListSwipeMenuEnabled]){
+    if ([[TapUI sharedInstance] getMuteRoomListSwipeMenuEnabled]) {
         [rowActionArray addObject:muteUnmuteAction];
     }
     
-    if([[TapUI sharedInstance] getDeleteRoomListSwipeMenuEnabled]){
+    if ([[TapUI sharedInstance] getDeleteRoomListSwipeMenuEnabled]) {
         [rowActionArray addObject:deleteChatRoomAction];
     }
     
@@ -798,21 +816,21 @@
     NSString *roomID = [room objectForKey:@"roomID"];
     NSMutableArray *pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
     NSMutableArray *blockedUserIDs = [[TAPDataManager getBlockedUserIDs] mutableCopy];
-    if([eventName isEqualToString:@"room/clearChat"]) {
+    if ([eventName isEqualToString:@"room/clearChat"]) {
         TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
-        if([pinnedRoomIDs containsObject:roomID]) {
+        if ([pinnedRoomIDs containsObject:roomID]) {
             [pinnedRoomIDs removeObject:roomID];
             [TAPDataManager setPinnedRoomIDs:[pinnedRoomIDs copy]];
             self.pinnedRoomIDs = pinnedRoomIDs;
         }
         
-        if(roomList != nil) {
+        if (roomList != nil) {
             [self deleteChatRoomLocally:roomID];
         }
     }
-    else if([eventName isEqualToString:@"room/pin"]) {
-        if([pinnedRoomIDs containsObject:roomID]){
+    else if ([eventName isEqualToString:@"room/pin"]) {
+        if ([pinnedRoomIDs containsObject:roomID]) {
             return;
         }
         
@@ -821,8 +839,8 @@
         self.pinnedRoomIDs = pinnedRoomIDs;
         [self showPinRoom:YES roomID:roomID];
     }
-    else if([eventName isEqualToString:@"room/unpin"]) {
-        if(![pinnedRoomIDs containsObject:roomID]){
+    else if ([eventName isEqualToString:@"room/unpin"]) {
+        if (![pinnedRoomIDs containsObject:roomID]) {
             return;
         }
         
@@ -831,10 +849,10 @@
         self.pinnedRoomIDs = pinnedRoomIDs;
         [self showPinRoom:NO roomID:roomID];
     }
-    else if([eventName isEqualToString:@"room/mute"]) {
+    else if ([eventName isEqualToString:@"room/mute"]) {
         NSNumber *expired = [self.mutedRoomDictionary objectForKey:roomID];
         
-        if(expired != nil) {
+        if (expired != nil) {
             return;
         }
         
@@ -843,7 +861,7 @@
         [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
         TAPRoomModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
-        if(roomList == nil) {
+        if (roomList == nil) {
             return;
         }
         
@@ -863,10 +881,10 @@
             [self.roomListView.roomListTableView reloadData];
         }
     }
-    else if([eventName isEqualToString:@"room/unmute"]) {
+    else if ([eventName isEqualToString:@"room/unmute"]) {
         NSNumber *expired = [self.mutedRoomDictionary objectForKey:roomID];
         
-        if(expired == nil) {
+        if (expired == nil) {
             return;
         }
         
@@ -874,7 +892,7 @@
         [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
         TAPRoomModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
-        if(roomList == nil) {
+        if (roomList == nil) {
             return;
         }
         
@@ -894,14 +912,14 @@
             [self.roomListView.roomListTableView reloadData];
         }
     }
-    else if([eventName isEqualToString:@"user/block"]) {
+    else if ([eventName isEqualToString:@"user/block"]) {
         TAPUserModel *user = [TAPDataManager userModelFromDictionary:userDict];
         [blockedUserIDs addObject:user.userID];
         [TAPDataManager setBlockedUserIDs:blockedUserIDs];
     }
-    else if([eventName isEqualToString:@"user/unblock"]) {
+    else if ([eventName isEqualToString:@"user/unblock"]) {
         TAPUserModel *user = [TAPDataManager userModelFromDictionary:userDict];
-        if([blockedUserIDs containsObject:user.userID]) {
+        if ([blockedUserIDs containsObject:user.userID]) {
             [blockedUserIDs removeObject:user.userID];
         }
         [TAPDataManager setBlockedUserIDs:blockedUserIDs];
@@ -1033,11 +1051,11 @@
     roomList.numberOfUnreadMessages = roomList.numberOfUnreadMessages - readCount;
     roomList.numberOfUnreadMentions = roomList.numberOfUnreadMentions - readMentionCount;
     
-    if(roomList.numberOfUnreadMessages < 0) {
+    if (roomList.numberOfUnreadMessages < 0) {
         roomList.numberOfUnreadMessages = 0;
     }
     
-    if(roomList.numberOfUnreadMentions < 0) {
+    if (roomList.numberOfUnreadMentions < 0) {
         roomList.numberOfUnreadMentions = 0;
     }
     
@@ -1056,8 +1074,8 @@
     BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
     
     
-    if(isSavedMessageRoom){
-        if(lastMessage != nil) {
+    if (isSavedMessageRoom) {
+        if (lastMessage != nil) {
             TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
             
             roomList.lastMessage = lastMessage;
@@ -1069,7 +1087,7 @@
         else {
             TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
             
-            if(roomList != nil){
+            if (roomList != nil) {
                 NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
                 NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
                 
@@ -1336,7 +1354,7 @@
         
         TAPRoomListModel *roomList = [TAPRoomListModel new];
         roomList.lastMessage = message;
-        if([unreadRoomArray containsObject:room.roomID]){
+        if ([unreadRoomArray containsObject:room.roomID]) {
             roomList.isMarkedAsUnread = YES;
         }
         
@@ -1357,24 +1375,24 @@
 - (NSArray *)sortPinnedRoomToTop:(NSArray *)resultArray {
     NSMutableArray *newArray = [resultArray mutableCopy];
     
-    if(resultArray == nil || [resultArray count] == 0){
+    if (resultArray == nil || [resultArray count] == 0) {
         return [newArray copy];
     }
     
     NSInteger pinIndexCounter = 0;
     NSArray *pinRoomIDs = [TAPDataManager getPinnedRoomIDs];
     
-    if(pinRoomIDs == nil || [pinRoomIDs count] == 0){
+    if (pinRoomIDs == nil || [pinRoomIDs count] == 0) {
         return resultArray;
     }
     
     for(TAPRoomListModel *roomList in resultArray) {
         TAPMessageModel *message = roomList.lastMessage;
         BOOL isPinRoom = [pinRoomIDs containsObject:message.room.roomID];
-        if(pinIndexCounter >= [pinRoomIDs count]){
+        if (pinIndexCounter >= [pinRoomIDs count]) {
             break;
         }
-        if(isPinRoom){
+        if (isPinRoom) {
             //saved room
             //NSInteger pinnedIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
             [newArray removeObject:roomList];
@@ -1388,7 +1406,7 @@
         
         TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
-        if(roomList != nil) {
+        if (roomList != nil) {
             TAPMessageModel *message = roomList.lastMessage;
             
             [newArray removeObject:roomList];
@@ -1406,7 +1424,7 @@
     if ([TAPChatManager sharedManager].activeUser == nil) {
         [[TAPChatManager sharedManager] disconnect];
         
-        if([TapTalk sharedInstance].isAuthenticated) {
+        if ([TapTalk sharedInstance].isAuthenticated) {
     
             BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
             if (!isDoneFirstSetup) {
@@ -1483,7 +1501,7 @@
         [self showLoadingSetupView];
         [TAPDataManager callAPIGetMessageRoomListAndUnreadWithUserID:userID success:^(NSArray *messageArray) {
             //Call API Get Unread Room List
-            [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
+            [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs) {
                 //handle pref
                 [self handleRommlistAndUnreadSuccess:messageArray];
             } failure:^(NSError *error) {
@@ -1503,7 +1521,7 @@
     //Not first setup, get new and updated message
     [TAPDataManager callAPIGetNewAndUpdatedMessageSuccess:^(NSArray *messageArray) {
        
-        [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray<NSString *> *roomIDs){
+        [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray<NSString *> *roomIDs) {
             //handle pref
             [self handleNewAndUpdatedSuccess:messageArray];
         } failure:^(NSError *error) {
@@ -1524,7 +1542,7 @@
 
     self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
     
-    if(self.mutedRoomDictionary == nil){
+    if (self.mutedRoomDictionary == nil) {
         _mutedRoomDictionary = [NSMutableDictionary dictionary];
     }
     
@@ -1548,13 +1566,13 @@
                [self.mutedRoomDictionary setObject:mutedRooom.expired forKey:mutedRooom.roomID];
                
                NSNumber *expiredPref = [mutedDictPref objectForKey:mutedRooom.roomID];
-               if(expiredPref == nil) {
+               if (expiredPref == nil) {
                    self.isMuteRoomDataChange = YES;
                }
                
            }
            
-           if([self.mutedRoomDictionary count] != [mutedDictPref count]) {
+           if ([self.mutedRoomDictionary count] != [mutedDictPref count]) {
                self.isMuteRoomDataChange = YES;
            }
            
@@ -1562,14 +1580,14 @@
            
            //pinned room
            NSArray *pinRoomPref = [TAPDataManager getPinnedRoomIDs];
-           if([pinRoomPref count] != [pinnedRoomIDsArray count]){
+           if ([pinRoomPref count] != [pinnedRoomIDsArray count]) {
                self.isPinRoomDataChange = YES;
            }
            else {
                NSInteger counter = 0;
                for(NSString *roomID in pinnedRoomIDsArray) {
                    NSString *roomIDPref = [pinRoomPref objectAtIndex:counter];
-                   if(![roomID isEqualToString:roomIDPref]) {
+                   if (![roomID isEqualToString:roomIDPref]) {
                        self.isPinRoomDataChange = YES;
                        break;
                    }
@@ -1582,7 +1600,7 @@
            NSInteger counter = 0;
            self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
            
-           if(self.isMuteRoomDataChange || self.isPinRoomDataChange) {
+           if (self.isMuteRoomDataChange || self.isPinRoomDataChange) {
                [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
                    [self.roomListView.roomListTableView reloadData];
                    [self.roomListView.roomListTableView layoutIfNeeded];
@@ -1630,7 +1648,7 @@
 
     self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
     
-    if(self.mutedRoomDictionary == nil){
+    if (self.mutedRoomDictionary == nil) {
         _mutedRoomDictionary = [NSMutableDictionary dictionary];
     }
     
@@ -1652,13 +1670,13 @@
                 [self.mutedRoomDictionary setObject:mutedRooom.expired forKey:mutedRooom.roomID];
                 
                 NSNumber *expiredPref = [mutedDictPref objectForKey:mutedRooom.roomID];
-                if(expiredPref == nil) {
+                if (expiredPref == nil) {
                     self.isMuteRoomDataChange = YES;
                 }
                 
             }
             
-            if([self.mutedRoomDictionary count] != [mutedDictPref count]) {
+            if ([self.mutedRoomDictionary count] != [mutedDictPref count]) {
                 self.isMuteRoomDataChange = YES;
             }
             
@@ -1666,14 +1684,14 @@
             
             //pinned room
             NSArray *pinRoomPref = [TAPDataManager getPinnedRoomIDs];
-            if([pinRoomPref count] != [pinnedRoomIDsArray count]){
+            if ([pinRoomPref count] != [pinnedRoomIDsArray count]) {
                 self.isPinRoomDataChange = YES;
             }
             else {
                 NSInteger counter = 0;
                 for(NSString *roomID in pinnedRoomIDsArray) {
                     NSString *roomIDPref = [pinRoomPref objectAtIndex:counter];
-                    if(![roomID isEqualToString:roomIDPref]) {
+                    if (![roomID isEqualToString:roomIDPref]) {
                         self.isPinRoomDataChange = YES;
                         break;
                     }
@@ -1686,7 +1704,7 @@
             NSInteger counter = 0;
             self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
             
-            if(self.isMuteRoomDataChange || self.isPinRoomDataChange) {
+            if (self.isMuteRoomDataChange || self.isPinRoomDataChange) {
                 [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
                     [self.roomListView.roomListTableView reloadData];
                     [self.roomListView.roomListTableView layoutIfNeeded];
@@ -1697,7 +1715,7 @@
             long lastRoomDeleteTime = [TAPDataManager getLastRoomMessageDeleteTime];
             for(TAPClearedRoomModel *clearedModel in clearedRoomModelArray) {
                 long clearTime = clearedModel.clearTime.longValue;
-                if(clearTime > lastRoomDeleteTime) {
+                if (clearTime > lastRoomDeleteTime) {
                     [self deleteChatRoomLocally:clearedModel.roomID];
                 }
                 else {
@@ -1836,7 +1854,7 @@
             }
             
             //Handle room insert
-            if([insertIndexArray count] > 0) {
+            if ([insertIndexArray count] > 0) {
                 @try {
                     [self.roomListView.roomListTableView performBatchUpdates:^{
                         //changing beginUpdates and endUpdates with this because of deprecation
@@ -1951,18 +1969,18 @@
                     roomList.numberOfUnreadMessages = numberOfUnreadMessages;
                     roomList.numberOfUnreadMentions = numberOfUnreadMentions;
                     
-                    if(roomList.numberOfUnreadMessages < 0) {
+                    if (roomList.numberOfUnreadMessages < 0) {
                         roomList.numberOfUnreadMessages = 0;
                     }
                     
-                    if(roomList.numberOfUnreadMentions < 0) {
+                    if (roomList.numberOfUnreadMentions < 0) {
                         roomList.numberOfUnreadMentions = 0;
                     }
                     
                     _firstUnreadProcessCount++;
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        if(self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
+                        if (self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
                             [self getAndUpdateNumberOfUnreadToDelegate];
                         }
                         
@@ -2009,11 +2027,11 @@
     
     NSInteger pinnedIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
     
-    if([self.pinnedRoomIDs containsObject:message.room.roomID]){
+    if ([self.pinnedRoomIDs containsObject:message.room.roomID]) {
         isPinnedRoom = YES;
     }
     
-    if(self.pinnedRoomIDs.count > 0) {
+    if (self.pinnedRoomIDs.count > 0) {
         hasPinnedRoom = YES;
     }
     
@@ -2026,7 +2044,7 @@
             return;
         }
         
-        if([roomLastMessage.created integerValue] > [message.created integerValue]) {
+        if ([roomLastMessage.created integerValue] > [message.created integerValue]) {
             //Don't process last message, current last message is newer that the incoming one
             return;
         }
@@ -2070,17 +2088,17 @@
 
             if (currentIndexPath != 0 && isNewMessage) {
                 //Move cell to top
-                if(hasPinnedRoom){
-                    if(isPinnedRoom){
+                if (hasPinnedRoom) {
+                    if (isPinnedRoom) {
                         [self.roomListArray removeObject:roomList];
                         [self.roomListArray insertObject:roomList atIndex:pinnedRoomListIndex];
                     }
-                    else{
+                    else {
                         [self.roomListArray removeObject:roomList];
                         [self.roomListArray insertObject:roomList atIndex:unpinnedRoomListIndex];
                     }
                 }
-                else{
+                else {
                     [self.roomListArray removeObject:roomList];
                     [self.roomListArray insertObject:roomList atIndex:0];
                 }
@@ -2088,15 +2106,15 @@
                 @try {
                     [self.roomListView.roomListTableView performBatchUpdates:^{
                         //changing beginUpdates and endUpdates with this because of deprecation
-                        if(hasPinnedRoom){
-                            if(isPinnedRoom){
+                        if (hasPinnedRoom) {
+                            if (isPinnedRoom) {
                                 [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]];
                             }
-                            else{
+                            else {
                                 [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]];
                             }
                         }
-                        else{
+                        else {
                             [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
                         }
                     } completion:^(BOOL finished) {
@@ -2137,30 +2155,30 @@
             newRoomList.numberOfUnreadMentions = 0;
         }
         
-        if(hasPinnedRoom){
-            if(isPinnedRoom){
+        if (hasPinnedRoom) {
+            if (isPinnedRoom) {
                 [self insertRoomListToArrayAndDictionary:newRoomList atIndex:pinnedRoomListIndex];
             }
-            else{
+            else {
                 [self insertRoomListToArrayAndDictionary:newRoomList atIndex:unpinnedRoomListIndex];
             }
         }
-        else{
+        else {
             [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
         }
         
         @try {
             [self.roomListView.roomListTableView performBatchUpdates:^{
                 //changing beginUpdates and endUpdates with this because of deprecation
-                if(hasPinnedRoom){
-                    if(isPinnedRoom){
+                if (hasPinnedRoom) {
+                    if (isPinnedRoom) {
                         [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                     }
-                    else{
+                    else {
                         [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                     }
                 }
-                else{
+                else {
                     [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                 }
                 
@@ -2245,7 +2263,7 @@
         for(TAPRoomListModel *roomList in self.roomListArray) {
             TAPMessageModel *selectedMessage = roomList.lastMessage;
             TAPRoomModel *room = selectedMessage.room;
-            if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
+            if (roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
                 unreadRoomCount++;
             }
         }
@@ -2335,17 +2353,27 @@
     UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 74.0f, 86.0f)];
     containerView.backgroundColor = [UIColor clearColor];
     
-    UIImageView *iconImageview = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(containerView.frame) - 32.0f) / 2.0f, (CGRectGetHeight(containerView.frame) - 32.0f - 6.0f - 16.0f) / 2.0f, 32.0f, 32.0f)];
+    UIImageView *iconImageview = [[UIImageView alloc] initWithFrame:CGRectMake(
+        (CGRectGetWidth(containerView.frame) - 24.0f) / 2.0f,
+        (CGRectGetHeight(containerView.frame) - 24.0f - 4.0f - 12.0f) / 2.0f,
+        24.0f,
+        24.0f
+    )];
     iconImageview.contentMode = UIViewContentModeScaleAspectFit;
     iconImageview.backgroundColor = [UIColor clearColor];
     iconImageview.image = image;
     [containerView addSubview:iconImageview];
     
-    UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(iconImageview.frame) + 6.0f, CGRectGetWidth(containerView.frame), 16.0f)];
+    UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(
+        0.0f,
+        CGRectGetMaxY(iconImageview.frame) + 4.0f,
+        CGRectGetWidth(containerView.frame),
+        12.0f
+    )];
     descriptionLabel.text = descriptionActionString;
     descriptionLabel.textColor = [UIColor whiteColor]; //AS NOTE - default 793DA0
     UIFont *descriptionLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomListTime];
-    //descriptionLabel.font = descriptionLabelFont;
+    descriptionLabel.font = descriptionLabelFont;
     descriptionLabel.textAlignment = NSTextAlignmentCenter;
     [containerView addSubview:descriptionLabel];
     
@@ -2353,13 +2381,13 @@
 }
 
 - (void)callApiDeleteRoom:(NSString *)roomID {
-    if(roomID == nil) {
+    if (roomID == nil) {
         return;
     }
     
-    [TAPDataManager callAPIDeleteChatroom:@[roomID] success:^(NSArray *deletedRoomIDs){
+    [TAPDataManager callAPIDeleteChatroom:@[roomID] success:^(NSArray *deletedRoomIDs) {
         [self deleteChatRoomLocally:roomID];
-    } failure:^(NSError *error){
+    } failure:^(NSError *error) {
         [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeLoading];
         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
         errorMessage = [TAPUtil nullToEmptyString:errorMessage];
@@ -2368,10 +2396,10 @@
 }
 
 - (void)showPinRoom:(BOOL)isShow roomID:(NSString *)roomID {
-    if(isShow) {
+    if (isShow) {
         TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
-        if(roomList == nil) {
+        if (roomList == nil) {
             return;
         }
         
@@ -2404,7 +2432,7 @@
     else {
         TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
         
-        if(roomList == nil) {
+        if (roomList == nil) {
             return;
         }
             
@@ -2432,7 +2460,7 @@
         NSInteger pinnedCount = [self.pinnedRoomIDs count] - 1;
         for(TAPRoomListModel *roomList in self.roomListArray) {
             long created = roomList.lastMessage.created.longValue;
-            if(counter > pinnedCount && lastMessageCreated > created){
+            if (counter > pinnedCount && lastMessageCreated > created) {
                 unpinnedIndex = counter;
                 break;
             }
@@ -2490,7 +2518,7 @@
 
 
 - (void)callApiGetMarkedUnreadIDs{
-    [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
+    [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs) {
         // Saved to preference
     }
     failure:^(NSError *error) {
@@ -2503,7 +2531,7 @@
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
     
-    if(roomList == nil) {
+    if (roomList == nil) {
         return;
     }
     
@@ -2538,7 +2566,7 @@
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
     
-    if(roomList == nil) {
+    if (roomList == nil) {
         return;
     }
     

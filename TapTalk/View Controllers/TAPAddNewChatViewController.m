@@ -330,7 +330,7 @@
     if (tableView == self.addNewChatView.contactsTableView) {
         if (section <= [[self.indexSectionDictionary allKeys] count] && section != 0) {
             UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 34.0f)];
-            header.backgroundColor = [TAPUtil getColor:@"F8F8F8"];
+//            header.backgroundColor = [TAPUtil getColor:@"F8F8F8"];
             
             NSArray *keysArray = [self.indexSectionDictionary allKeys];
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
@@ -643,12 +643,7 @@
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-            }
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
         }];
         [alertController addAction:settingsAction];
         
@@ -820,12 +815,7 @@
                 [alertController addAction:cancelAction];
                 
                 UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    if (IS_IOS_11_OR_ABOVE) {
-                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-                    }
-                    else {
-                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                    }
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
                 }];
                 [alertController addAction:settingsAction];
                 

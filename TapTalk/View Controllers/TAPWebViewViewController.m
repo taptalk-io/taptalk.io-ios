@@ -155,12 +155,7 @@
 }
 
 - (void)safariButtonDidTapped {
-    if(IS_IOS_11_OR_ABOVE) {
-        [[UIApplication sharedApplication] openURL:self.tapWebViewView.webView.URL options:[NSDictionary dictionary] completionHandler:nil];
-    }
-    else {
-        [[UIApplication sharedApplication] openURL:self.tapWebViewView.webView.URL];
-    }
+    [[UIApplication sharedApplication] openURL:self.tapWebViewView.webView.URL options:[NSDictionary dictionary] completionHandler:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {

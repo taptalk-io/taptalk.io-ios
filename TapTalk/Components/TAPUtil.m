@@ -1554,7 +1554,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         if (result != AVAssetImageGeneratorSucceeded) {
             // Error when generating thumbnail
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSError *error = [NSError errorWithDomain:@"" code:99999 userInfo:nil];
+//                NSError *error = [NSError errorWithDomain:@"" code:99999 userInfo:nil];
                 failure(error);
             });
         }

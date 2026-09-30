@@ -9,7 +9,8 @@
 #import "TAPPopUpInfoViewController.h"
 #import "PowerTalk.h"
 
-@interface TAPReportUserViewController ()<UITextFieldDelegate, UITextViewDelegate, TAPPopUpInfoViewControllerDelegate>
+@interface TAPReportUserViewController () <UITextFieldDelegate, UITextViewDelegate, TAPPopUpInfoViewControllerDelegate>
+
 @property (strong, nonatomic) IBOutlet UIButton *reportReasonSendingFalseButton;
 @property (strong, nonatomic) IBOutlet UILabel *reportReasonSendingFalseLabel;
 @property (strong, nonatomic) IBOutlet UIButton *reportReasonPretendingButton;
@@ -33,11 +34,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *textViewCounterLabel;
 @property (strong, nonatomic) IBOutlet UILabel *errorTextFieldLabel;
 
-
 @property (strong, nonatomic) IBOutlet UIImageView *loadingIconImageView;
 
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
-
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *reportReasonOtherFieldHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *errorTextFieldLabelHeightConstraint;
@@ -50,7 +49,6 @@
 @property (strong, nonatomic) TAPPopUpInfoViewController *backLoadingPopupInfoViewController;
 
 @property (strong, nonatomic) IBOutlet UILabel *reportReasonBottomLabel;
-
 
 @end
 
@@ -113,22 +111,23 @@
 
     [self.view addGestureRecognizer:tap];
     
-    
-    if(self.reportType == TAPReportTypeUser) {
+    if (self.reportType == TAPReportTypeUser) {
         self.optionalArray = @[
             @"Sending false information",
             @"Pretending to be someone else",
             @"Scam or fraud",
             @"Dangerous Organization",
-            @"Others"];
+            @"Others"
+        ];
     }
-    else if(self.reportType == TAPReportTypeMessage) {
+    else if (self.reportType == TAPReportTypeMessage) {
         self.optionalArray = @[
             @"Hate speech",
             @"Nudity or sexual activity",
             @"Bullying or harrasment",
             @"Violence",
-            @"Others"];
+            @"Others"
+        ];
     }
     
     self.reportReasonSendingFalseLabel.text = [self.optionalArray objectAtIndex:0];
@@ -136,7 +135,6 @@
     self.reportReasonScamLabel.text = [self.optionalArray objectAtIndex:2];
     self.reportReasonDangerousLabel.text = [self.optionalArray objectAtIndex:3];
     self.reportReasonOtherLabel.text = [self.optionalArray objectAtIndex:4];
-    
     
     self.reportReasonBottomLabel.font = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontDeleteAccountTitleLabel];
     
@@ -192,6 +190,7 @@
 #pragma mark Delegates
 
 #pragma mark TextField Delegate
+
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
@@ -209,6 +208,7 @@
 }
 
 #pragma mark TextView Delegate
+
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     [self setTextViewState:YES];
 }
@@ -220,7 +220,7 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
     
-    if(newString.length == 0){
+    if (newString.length == 0) {
         self.reasonFieldPlaceholderLabel.alpha = 1.0f;
     }
     else {
@@ -242,6 +242,7 @@
 }
 
 #pragma mark Popup Delegate
+
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
    
 }
@@ -249,7 +250,7 @@
 - (void)popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)identifier {
     NSString *category = @"";
     BOOL isOtherSelected = NO;
-    if(self.selectedReasonIndex >= 0) {
+    if (self.selectedReasonIndex >= 0) {
         category = [self.optionalArray objectAtIndex:self.selectedReasonIndex];
     }
     else {
@@ -260,11 +261,11 @@
     NSString *reason = self.reportReasonTextView.text;
     reason = [TAPUtil nullToEmptyString:reason];
     
-    if([identifier isEqualToString:@"Report Confirmation"] && self.reportType == TAPReportTypeMessage) {
+    if ([identifier isEqualToString:@"Report Confirmation"] && self.reportType == TAPReportTypeMessage) {
         [self showLoadingState:YES];
         self.isLoadingState = YES;
         [TAPDataManager callAPIReportMessage:self.messageID roomID:self.roomID category:category isOtherCategory:isOtherSelected reason:reason success:^(BOOL success) {
-            if(self.isSubmitCanceled) {
+            if (self.isSubmitCanceled) {
                 return;
             }
             [self.backLoadingPopupInfoViewController dismissViewControllerAnimated:NO completion:^{
@@ -286,11 +287,11 @@
             self.isLoadingState = NO;
         }];
     }
-    else if([identifier isEqualToString:@"Report Confirmation"] && self.reportType == TAPReportTypeUser) {
+    else if ([identifier isEqualToString:@"Report Confirmation"] && self.reportType == TAPReportTypeUser) {
         [self showLoadingState:YES];
         self.isLoadingState = YES;
         [TAPDataManager callAPIReportUser:self.userID category:category isOtherCategory:isOtherSelected reason:reason success:^(BOOL success) {
-            if(self.isSubmitCanceled) {
+            if (self.isSubmitCanceled) {
                 return;
             }
             [self.backLoadingPopupInfoViewController dismissViewControllerAnimated:NO completion:^{
@@ -312,16 +313,16 @@
             self.isLoadingState = NO;
         }];
     }
-    else if([identifier isEqualToString:@"Report Success"]) {
+    else if ([identifier isEqualToString:@"Report Success"]) {
         [self.navigationController popViewControllerAnimated:YES];
     }
-    else if([identifier isEqualToString:@"Report Failed"]) {
+    else if ([identifier isEqualToString:@"Report Failed"]) {
         
     }
-    else if([identifier isEqualToString:@"Back Confirmation"]) {
+    else if ([identifier isEqualToString:@"Back Confirmation"]) {
         [self.navigationController popViewControllerAnimated:YES];
     }
-    else if([identifier isEqualToString:@"Cancel Submit Confirmation"]) {
+    else if ([identifier isEqualToString:@"Cancel Submit Confirmation"]) {
         [self.navigationController popViewControllerAnimated:YES];
         self.isSubmitCanceled = YES;
     }
@@ -359,7 +360,7 @@
 }
 
 - (void)backButtonDidTapped {
-    if(self.isLoadingState) {
+    if (self.isLoadingState) {
         self.backLoadingPopupInfoViewController = [[TAPPopUpInfoViewController alloc] init];
         self.backLoadingPopupInfoViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         self.backLoadingPopupInfoViewController.popupIdentifier = @"Cancel Submit Confirmation";
@@ -370,10 +371,8 @@
         }];
         
        // [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Back Confirmation" title:NSLocalizedStringFromTableInBundle(@"Your report might have not been submitted", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Your report might have not been submitted because you clicked back while we are trying to submit your report, are you sure you want to go back?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Yes", nil, [TAPUtil currentBundle], @"")];
-        
-        
     }
-    else if(self.selectedReasonIndex >= 0 || (self.reportReasonOtherTextField.alpha == 1 && self.reportReasonOtherTextField.text.length > 0)) {
+    else if (self.selectedReasonIndex >= 0 || (self.reportReasonOtherTextField.alpha == 1 && self.reportReasonOtherTextField.text.length > 0)) {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Back Confirmation" title:NSLocalizedStringFromTableInBundle(@"You haven’t submitted your report", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Your report has not been submitted, are you sure you want to cancel and discard the report?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Yes", nil, [TAPUtil currentBundle], @"")];
     }
     else {
@@ -427,7 +426,7 @@
     NSString *body = @"";
     NSString *identifier = @"";
     
-    if(success) {
+    if (success) {
         title = @"Report has been submitted";
         body = @"Thank you for reporting!";
         identifier = @"Report Success";
@@ -451,24 +450,25 @@
     
     UIImage *selectedIconImage = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     
-    if(reasonButton == self.reportReasonSendingFalseButton) {
+    if (reasonButton == self.reportReasonSendingFalseButton) {
         [self.reportReasonSendingFalseButton setImage:selectedIconImage forState:UIControlStateNormal];
         self.selectedReasonIndex = 0;
     }
-    else if(reasonButton == self.reportReasonPretendingButton) {
+    else if (reasonButton == self.reportReasonPretendingButton) {
         [self.reportReasonPretendingButton setImage:selectedIconImage forState:UIControlStateNormal];
         self.selectedReasonIndex = 1;
     }
-    else if(reasonButton == self.reportReasonScamButton) {
+    else if (reasonButton == self.reportReasonScamButton) {
         [self.reportReasonScamButton setImage:selectedIconImage forState:UIControlStateNormal];
         self.selectedReasonIndex = 2;
     }
-    else if(reasonButton == self.reportReasonDangerousButton) {
+    else if (reasonButton == self.reportReasonDangerousButton) {
         [self.reportReasonDangerousButton setImage:selectedIconImage forState:UIControlStateNormal];
         self.selectedReasonIndex = 3;
     }
-    else if(reasonButton == self.reportReasonOtherButton) {
+    else if (reasonButton == self.reportReasonOtherButton) {
         [self.reportReasonOtherButton setImage:selectedIconImage forState:UIControlStateNormal];
+        self.selectedReasonIndex = 4;
         
         self.reportReasonOtherFieldHeightConstraint.constant = 38.0f;
         self.reportReasonOtherTextField.alpha = 1.0f;
@@ -478,7 +478,7 @@
 }
 
 - (void)setTextFieldToError:(BOOL)isError {
-    if(isError) {
+    if (isError) {
         self.reportReasonOtherTextField.layer.borderWidth = 1.0f;
         self.reportReasonOtherTextField.layer.cornerRadius = 8.0f;
         self.reportReasonOtherTextField.layer.borderColor = [UIColor redColor].CGColor;
@@ -491,7 +491,7 @@
 }
 
 - (void)setTextViewState:(BOOL)isActive {
-    if(isActive) {
+    if (isActive) {
         self.reportReasonFieldView.layer.borderColor = [TAPUtil getColor:@"FF7E00"].CGColor;
     }
     else {
@@ -502,37 +502,37 @@
 - (void)radioButtonLoadingState:(BOOL)isLoading {
     UIImage *selectedIconImageGray = [UIImage imageNamed:@"TAPIconSelectedGray" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     UIImage *selectedIconImage = [UIImage imageNamed:@"TAPIconSelected" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    if(isLoading) {
-        if(self.selectedReasonIndex == 0) {
+    if (isLoading) {
+        if (self.selectedReasonIndex == 0) {
             [self.reportReasonSendingFalseButton setImage:selectedIconImageGray forState:UIControlStateNormal];
         }
-        else if(self.selectedReasonIndex == 1) {
+        else if (self.selectedReasonIndex == 1) {
             [self.reportReasonPretendingButton setImage:selectedIconImageGray forState:UIControlStateNormal];
         }
-        else if(self.selectedReasonIndex == 2) {
+        else if (self.selectedReasonIndex == 2) {
             [self.reportReasonScamButton setImage:selectedIconImageGray forState:UIControlStateNormal];
         }
-        else if(self.selectedReasonIndex == 3) {
+        else if (self.selectedReasonIndex == 3) {
             [self.reportReasonDangerousButton setImage:selectedIconImageGray forState:UIControlStateNormal];
         }
-        else if(self.reportReasonOtherButton.imageView.image == selectedIconImage){
+        else if (self.selectedReasonIndex == 4) {
             [self.reportReasonOtherButton setImage:selectedIconImageGray forState:UIControlStateNormal];
         }
     }
     else {
-        if(self.selectedReasonIndex == 0) {
+        if (self.selectedReasonIndex == 0) {
             [self.reportReasonSendingFalseButton setImage:selectedIconImage forState:UIControlStateNormal];
         }
-        else if(self.selectedReasonIndex == 1) {
+        else if (self.selectedReasonIndex == 1) {
             [self.reportReasonPretendingButton setImage:selectedIconImage forState:UIControlStateNormal];
         }
-        else if(self.selectedReasonIndex == 2) {
+        else if (self.selectedReasonIndex == 2) {
             [self.reportReasonScamButton setImage:selectedIconImage forState:UIControlStateNormal];
         }
-        else if(self.selectedReasonIndex == 3) {
+        else if (self.selectedReasonIndex == 3) {
             [self.reportReasonDangerousButton setImage:selectedIconImage forState:UIControlStateNormal];
         }
-        else if(self.reportReasonOtherButton.imageView.image == selectedIconImageGray){
+        else if (self.selectedReasonIndex == 4) {
             [self.reportReasonOtherButton setImage:selectedIconImage forState:UIControlStateNormal];
         }
     }
@@ -615,7 +615,7 @@
     UIColor *chatRoomNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatRoomNameLabel];
     
     
-    if(self.reportType == TAPReportTypeUser) {
+    if (self.reportType == TAPReportTypeUser) {
         nameLabel.text = NSLocalizedStringFromTableInBundle(@"Report User", nil, [TAPUtil currentBundle], @"");
     }
     else {
@@ -641,7 +641,7 @@
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 
--(void)dismissKeyboard {
+- (void)dismissKeyboard {
     [self.reportReasonOtherTextField resignFirstResponder];
     [self.reportReasonTextView resignFirstResponder];
 }

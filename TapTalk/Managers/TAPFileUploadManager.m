@@ -438,6 +438,9 @@
     NSString *filePath = [url absoluteString];
     NSString *encodedFileName = [filePath lastPathComponent];
     NSString *decodedFileName = [encodedFileName stringByRemovingPercentEncoding];
+    if ([decodedFileName containsString:@"#"]) {
+        decodedFileName = [[decodedFileName componentsSeparatedByString:@"#"] firstObject];
+    }
     
     //Get Mimetype
     NSString *fileExtension = [url pathExtension];
@@ -1032,6 +1035,9 @@
                 NSURL *fileURL = [(AVURLAsset *)resultVideoAsset URL];
                 NSString *filePathString = [fileURL absoluteString];
                 NSString *fileName = [filePathString lastPathComponent];
+                if ([fileName containsString:@"#"]) {
+                    fileName = [[fileName componentsSeparatedByString:@"#"] firstObject];
+                }
                 
                 __block NSData *assetData = nil;
                 AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:resultVideoAsset presetName:AVAssetExportPresetHighestQuality];
@@ -1047,7 +1053,7 @@
                                                       resultMessage:resultMessage
                                                        resizedImage:resizedImage
                                                      filePathString:filePathString
-                                                          AssetData:assetData
+                                                          assetData:assetData
                                                        roomIDString:resultMessage.room.roomID
                                                            fileName:fileName
                                                      fileTypeString:@"video"
@@ -1253,6 +1259,9 @@
             
             NSString *fileName = [filePathString lastPathComponent];
             fileName = [TAPUtil nullToEmptyString:fileName];
+            if ([fileName containsString:@"#"]) {
+                fileName = [[fileName componentsSeparatedByString:@"#"] firstObject];
+            }
             
             //AS NOTE - GET MIME TYPE
             NSString *mimeType = @"video/quicktime"; //AS NOTE - DEFAULT mimeType
@@ -1278,7 +1287,7 @@
                                                   resultMessage:resultMessage
                                                    resizedImage:resizedImage
                                                  filePathString:filePathString
-                                                      AssetData:assetData
+                                                      assetData:assetData
                                                    roomIDString:resultMessage.room.roomID
                                                        fileName:fileName
                                                  fileTypeString:@"video"
@@ -1660,7 +1669,7 @@
                                                   resultMessage:currentMessage
                                                    resizedImage:nil
                                                  filePathString:filePathString
-                                                      AssetData:assetData
+                                                      assetData:assetData
                                                    roomIDString:currentMessage.room.roomID
                                                        fileName:fileName
                                                  fileTypeString:@"audio"
@@ -2247,7 +2256,7 @@
                                     resultMessage:(TAPMessageModel *)resultMessage
                                      resizedImage:(UIImage *)resizedImage
                                    filePathString:(NSString *)filePathString
-                                        AssetData:(NSData *)assetData
+                                        assetData:(NSData *)assetData
                                      roomIDString:(NSString *)roomIDString
                                          fileName:(NSString *)fileName
                                    fileTypeString:(NSString *)fileTypeString
@@ -2298,6 +2307,9 @@
         NSMutableDictionary *appendedDataDictionary = [[NSMutableDictionary alloc] init];
         appendedDataDictionary = [resultMessage.data mutableCopy];
         
+        NSString *assetIdentifier = [appendedDataDictionary objectForKey:@"assetIdentifier"];
+        appendedDataDictionary = [TAPUtil nullToEmptyString:appendedDataDictionary];
+        
         NSData *thumbnailImageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
         NSString *thumbnailImageBase64String = [TAPUtil nullToEmptyString:[thumbnailImageData base64EncodedString]];
         
@@ -2318,9 +2330,12 @@
         //Save video file path to cache
         if (![TAPUtil isEmptyString:fileID]) {
             [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:currentMessage.room.roomID fileID:fileID];
+            [[TAPFileDownloadManager sharedManager] saveAssetIdentifier:assetIdentifier withKey:fileID];
         }
         if (![TAPUtil isEmptyString:fileURL]) {
-            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:currentMessage.room.roomID fileID:[[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""]];
+            NSString *key = [[fileURL componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+            [[TAPFileDownloadManager sharedManager] saveDownloadedFilePathToDictionaryWithFilePath:filePathString roomID:currentMessage.room.roomID fileID:key];
+            [[TAPFileDownloadManager sharedManager] saveAssetIdentifier:assetIdentifier withKey:key];
         }
         
         //Save video thumbnail image to cache

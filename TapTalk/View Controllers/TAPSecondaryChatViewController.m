@@ -180,6 +180,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     [UIView commitAnimations];
     
+    self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractiveWithAccessory;
     self.tableView.contentInset = UIEdgeInsetsMake(20.0f, 0.0f, 0.0f, 0.0f);
     self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatRoomBackground];
     
@@ -1341,8 +1342,6 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
-    
-    
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
     if (cellImage != nil) {
         CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
@@ -1955,12 +1954,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-            }
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
         }];
         [alertController addAction:settingsAction];
         
@@ -2004,12 +1998,7 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_11_OR_ABOVE) {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-            }
-            else {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-            }
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
         }];
         [alertController addAction:settingsAction];
         
@@ -2414,13 +2403,16 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     // Commented to prevent incorrectly reassigned keyboardHeight value if this method is called after growing text view had changed height
 //        keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
     
-    if (keyboardHeight < 0) {
+    if (keyboardHeight <= 0) {
         return;
     }
     
     if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
         _keyboardHeight = self.inputAccessoryExtensionHeightConstraint.constant + keyboardHeight;
         CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        if (tableViewYContentInset < 0.0f) {
+            tableViewYContentInset = 0.0f;
+        }
         
         [UIView animateWithDuration:0.2f animations:^{
             
@@ -2504,6 +2496,9 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     }
     
     CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+    if (tableViewYContentInset < 0.0f) {
+        tableViewYContentInset = 0.0f;
+    }
     
     CGFloat lastTableViewYContentInset = self.tableView.contentInset.top;
     
@@ -2869,18 +2864,22 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 }
 
 - (void)goBackToMessage:(TAPMessageModel *)message {
-    if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
-        [self.navigationController popViewControllerAnimated:NO];
+    TAPRoomModel *activeRoom = [TAPChatManager sharedManager].activeRoom;
+    if (activeRoom != nil && [activeRoom.roomID isEqualToString:message.room.roomID]) {
+        if (self.messageListType == TAPSecondaryChatTypeStarMessage) {
+            [self.navigationController popViewControllerAnimated:NO];
+        }
+        else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
         if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
             [self.delegate starMessageBubbleCliked:message];
         }
     }
-    else if (self.messageListType == TAPSecondaryChatTypePinMessage) {
-        [self.navigationController popViewControllerAnimated:YES];
-        if ([self.delegate respondsToSelector:@selector(starMessageBubbleCliked:)]) {
-            [self.delegate starMessageBubbleCliked:message];
-        }
-        
+    else {
+        [[TapUI sharedInstance] createRoomWithRoom:message.room scrollToMessageWithLocalID:message.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            [self.navigationController pushViewController:chatViewController animated:YES];
+        }];
     }
 }
 

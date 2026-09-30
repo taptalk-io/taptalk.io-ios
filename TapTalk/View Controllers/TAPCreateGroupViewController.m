@@ -168,6 +168,13 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)backButtonDidTapped {
+    if ([self.delegate respondsToSelector:@selector(createGroupViewControllerUpdatedRoom:)]) {
+        [self.delegate createGroupViewControllerUpdatedRoom:self.room];
+    }
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 #pragma mark - Data Source
 #pragma mark TableView
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -333,15 +340,8 @@
                 else {
                     [cell showSeparatorLine:YES separatorLineType:TAPContactTableViewCellSeparatorTypeDefault];
                 }
-                
-//                //save section and row position to dictionary
-//                if ([self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID] == nil) {
-//                    [self.selectedIndexSectionRowPositionDictionary setObject:[NSString stringWithFormat:@"%ld - %ld", indexPath.section, indexPath.row] forKey:currentUser.userID];
-//                }
                 return cell;
-
-        }
-            
+            }
         }
     }
     else if (tableView == self.createGroupView.searchResultTableView) {
@@ -455,7 +455,7 @@
     if (tableView == self.createGroupView.contactsTableView) {
         if (section <= [[self.indexSectionDictionary allKeys] count]) {
             UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 34.0f)];
-            header.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
+//            header.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
             
             NSArray *keysArray = [self.indexSectionDictionary allKeys];
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
@@ -954,12 +954,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 #pragma mark UICollectionView
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault) {
-        if (indexPath.row != 0) { //WK Note : indexPath.row 0 is group admin
-            
-            TAPUserModel *currentUser = [self.selectedUserModelArray objectAtIndex:indexPath.row - 1];
+    if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault ||
+        self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember
+    ) {
+        BOOL isCreateGroup = self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeDefault;
+        if (indexPath.row != 0 || !isCreateGroup) {
+            // WK Note : indexPath.row 0 is active user for create group
+            TAPUserModel *currentUser = [self.selectedUserModelArray objectAtIndex:indexPath.row - isCreateGroup];
             if (currentUser.isContact == NO) {
-                [self.selectedUserModelArray removeObjectAtIndex:indexPath.row - 1];
+                [self.selectedUserModelArray removeObjectAtIndex:indexPath.row - isCreateGroup];
                 [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
                 
                 NSInteger index = 0;
@@ -975,50 +978,37 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [contactSearchTableViewCell isCellSelected:NO];
             }
             else {
-//                NSString *objectString = [self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID];
-//
-//                if (![TAPUtil isEmptyString:objectString]) {
-//                    NSArray *objectStringSplitArray = [objectString componentsSeparatedByString:@" - "];
-//                    NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:[[objectStringSplitArray objectAtIndex:1] integerValue] inSection:[[objectStringSplitArray objectAtIndex:0] integerValue]];
-//
-                    NSIndexPath *selectedSearchIndexPath = [NSIndexPath indexPathForItem:[[self.selectedIndexRowSearchPositionDictionary objectForKey:currentUser.userID] integerValue] inSection:indexPath.section];
-
-                    [self.selectedUserModelArray removeObjectAtIndex:indexPath.row - 1];
-                    [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
-                    
-//                    TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:selectedIndexPath];
-//                    [contactTableViewCell isCellSelected:NO];
-                    
-                    TAPContactTableViewCell *contactSearchTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:selectedSearchIndexPath];
-                    [contactSearchTableViewCell isCellSelected:NO];
-//                }
-            }
-
-            
-            [self validateselectedUserModelArray];
-        }
-    }
-    else if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
-            TAPUserModel *currentUser = [self.selectedUserModelArray objectAtIndex:indexPath.row];
-
-//            NSString *objectString = [self.selectedIndexSectionRowPositionDictionary objectForKey:currentUser.userID];
-//            if (![TAPUtil isEmptyString:objectString]) {
-//                NSArray *objectStringSplitArray = [objectString componentsSeparatedByString:@" - "];
-//                NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForItem:[[objectStringSplitArray objectAtIndex:1] integerValue] inSection:[[objectStringSplitArray objectAtIndex:0] integerValue]];
-                
                 NSIndexPath *selectedSearchIndexPath = [NSIndexPath indexPathForItem:[[self.selectedIndexRowSearchPositionDictionary objectForKey:currentUser.userID] integerValue] inSection:indexPath.section];
-                
-                [self.selectedUserModelArray removeObjectAtIndex:indexPath.row];
+
+                [self.selectedUserModelArray removeObjectAtIndex:indexPath.row - isCreateGroup];
                 [self.selectedIndexDictionary removeObjectForKey:currentUser.userID];
-                
-//                TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:selectedIndexPath];
-//                [contactTableViewCell isCellSelected:NO];
                 
                 TAPContactTableViewCell *contactSearchTableViewCell = [self.createGroupView.searchResultTableView cellForRowAtIndexPath:selectedSearchIndexPath];
                 [contactSearchTableViewCell isCellSelected:NO];
+            }
+            
+            unichar firstChar = [currentUser.fullname characterAtIndex:0];
+            NSString *indexKey = [[currentUser.fullname substringToIndex:1] uppercaseString];
+            NSCharacterSet *letters = [NSCharacterSet letterCharacterSet];
+            if (![letters characterIsMember:firstChar]) {
+                indexKey = @"#";
+            }
+            NSArray *indexedContactListArray = [self.indexSectionDictionary objectForKey:indexKey];
+            if (![TAPUtil isEmptyArray:indexedContactListArray]) {
+                NSInteger userIndex = [indexedContactListArray indexOfObject:currentUser];
+                if (userIndex != -1) {
+                    NSArray *keysArray = [self.indexSectionDictionary allKeys];
+                    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
+                    keysArray = [keysArray sortedArrayUsingDescriptors:@[sortDescriptor]];
+                    NSInteger keyIndex = [keysArray indexOfObject:indexKey];
+                    NSIndexPath *userIndexPath = [NSIndexPath indexPathForRow:userIndex inSection:keyIndex];
+                    TAPContactTableViewCell *contactTableViewCell = [self.createGroupView.contactsTableView cellForRowAtIndexPath:userIndexPath];
+                    [contactTableViewCell isCellSelected:NO];
+                }
+            }
             
             [self validateselectedUserModelArray];
-//        }
+        }
     }
 }
 
@@ -1357,9 +1347,18 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (self.tapCreateGroupViewControllerType == TAPCreateGroupViewControllerTypeAddMember) {
             //filter added user in group
             NSMutableArray *filteredArray = [NSMutableArray array];
+            NSMutableArray *existingParticipantIDs = [NSMutableArray array];
             NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
+            if (![TAPUtil isEmptyArray:self.room.participants]) {
+                for (TAPUserModel *user in self.room.participants) {
+                    [existingParticipantIDs addObject:user.userID];
+                }
+            }
             for (TAPUserModel *user in resultArray) {
-                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil && ![blockedUserIDs containsObject:user.userID]) {
+                if ([self.roomParticipantsDictionary objectForKey:user.userID] == nil &&
+                    ![existingParticipantIDs containsObject:user.userID] &&
+                    ![blockedUserIDs containsObject:user.userID]
+                ) {
                     [filteredArray addObject:user];
                 }
             }

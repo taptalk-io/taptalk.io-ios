@@ -366,12 +366,7 @@
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Go to Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
             if (url != nil) {
-                if(IS_IOS_11_OR_ABOVE) {
-                    [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
-                }
-                else {
-                    [[UIApplication sharedApplication] openURL:url];
-                }
+                [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
             }
         }];
         

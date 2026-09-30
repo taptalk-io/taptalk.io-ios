@@ -10,7 +10,7 @@ From version 3.0.0 and above, TapTalk.io SDK is available in Swift Package Manag
 
 ### Installation
 1. To add TapTalk.io package to your project, open your project in Xcode, then go to menu bar then select **File -> Add Package Dependencies**, then enter https://github.com/taptalk-io/taptalk.io-ios in the top right search bar.
-2. Specify the version and your project, then click **Add Package**.
+2. Select **taptalk.io-ios**, specify the version and your project, then click **Add Package**.
 3. After the package is resolved, select your project from the Project navigator (folder icon at the top left pane), click the required target, go to **General** tab and make sure **PowerTalk** is added to Frameworks and Libraries, if not, add it with the **+** button, then add PowerTalk from TapTalk Package.
 4. Check out the samples or follow the **Quick Start & Documentation** guide to start using it in your project.
 

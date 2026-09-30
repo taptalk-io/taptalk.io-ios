@@ -138,7 +138,7 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 /**
  Tells the delegate that the launch process is almost done and the app is almost ready to run.
  */
-- (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nonnull)launchOptions;
+- (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nullable)launchOptions;
 
 /**
  Tells the delegate that the app is about to become inactive.
