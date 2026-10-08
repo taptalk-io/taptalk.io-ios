@@ -1018,7 +1018,7 @@ CGPoint center;
   //  panGestureRecognizer.delegate = self;
     //[self.voiceNoteContainerView addGestureRecognizer:panGestureRecognizer];
     
-    if (![[TapUI sharedInstance] isSendVoiceNoteMenuEnabled]){
+    if (![[TapUI sharedInstance] isSendVoiceNoteMenuEnabled]) {
         self.voiceNoteDragView.alpha = 0.0f;
         self.voiceNoteContainerView.alpha = 0.0f;
         self.voiceNoteSpaceContraint.constant = 13.0f;
@@ -1210,6 +1210,7 @@ CGPoint center;
     else {
         _isShowAccessoryView = NO;
     }
+    [self checkAndShowRoomViewState];
     
     [self reloadInputViews];
     
@@ -1300,8 +1301,8 @@ CGPoint center;
     
     [self processVisibleMessageAsRead];
     
-    //check if last message is deleted room
-    [self checkAndShowRoomViewState];
+//    //check if last message is deleted room
+//    [self checkAndShowRoomViewState];
     
     //check if blocked user
     NSArray *blockedUserIDs = [TAPDataManager getBlockedUserIDs];
@@ -9832,11 +9833,11 @@ CGPoint center;
         [alertController addAction:deleteMessageAction];
     }
 
-    if(message.room.type == RoomTypeGroup && [message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+    if (message.room.type == RoomTypeGroup && [message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
         [alertController addAction:messageInfoAction];
     }
     
-    if(![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
+    if ([[TapUI sharedInstance] getReportMessageMenuEnabled] && ![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
         [alertController addAction:reportAction];
     }
     
