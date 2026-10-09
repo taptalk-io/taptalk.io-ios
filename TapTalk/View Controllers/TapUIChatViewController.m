@@ -15495,8 +15495,15 @@ CGPoint center;
 - (void)checkAndShowRoomViewState {
     //check if last message is deleted room
     TAPMessageModel *lastMessage = [self.messageArray firstObject];
+    TAPRoomModel *room;
+    if (lastMessage != nil) {
+        room = lastMessage.room;
+    }
+    else {
+        room = self.currentRoom;
+    }
     
-    if (lastMessage.room.isLocked) {
+    if (room.isLocked) {
         [self showInputAccessoryExtensionView:NO];
         [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
         [self.messageTextView setText:@""];
@@ -15504,7 +15511,7 @@ CGPoint center;
         self.tableViewBottomConstraint.constant = 0.0f;
     }
     else {
-        if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
+        if (room.type == RoomTypePersonal && room.isDeleted) {
             [self.view endEditing:YES];
             [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
         }
@@ -15516,10 +15523,10 @@ CGPoint center;
         }
         else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
             [self.view endEditing:YES];
-            if (lastMessage.room.type == RoomTypePersonal) {
+            if (room.type == RoomTypePersonal) {
                 [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
             }
-            else if (lastMessage.room.type == RoomTypeGroup || lastMessage.room.type == RoomTypeTransaction) {
+            else if (room.type == RoomTypeGroup || room.type == RoomTypeTransaction) {
                 [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
             }
         }
