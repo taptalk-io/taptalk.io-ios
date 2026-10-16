@@ -10963,7 +10963,7 @@ CGPoint center;
            
            //Check if message exist in Message Pointer Dictionary
            TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:message.localID];
-           if(currentMessage != nil) {
+           if (currentMessage != nil) {
                //Message exist in dictionary
                
                //Update message into array and dictionary
@@ -10972,12 +10972,16 @@ CGPoint center;
                TAPUserModel *currentUser = [TAPDataManager getActiveUser];
                
                BOOL isSendingAnimation = NO;
+               BOOL setAsHidden = NO;
                BOOL setAsDelivered = NO;
                BOOL setAsRead = NO;
                BOOL setAsDeleted = NO;
                
-               
-               if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
+               if (!currentMessage.isHidden && message.isHidden) {
+                   // Message updated to hidden
+                   setAsHidden = YES;
+               }
+               else if ([currentMessage.user.userID isEqualToString:currentUser.userID]) {
                    //My Message
                    if (currentMessage.isSending) {
                        //Message was sending
@@ -11020,11 +11024,23 @@ CGPoint center;
                BOOL isForwardedSavedMessage = NO;
             
                
-               if(isSavedMessageRoom && ![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil){
+               if (isSavedMessageRoom && ![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil){
                    isForwardedSavedMessage = YES;
                }
                
-               if (setAsDeleted) {
+               if (setAsHidden) {
+                   @try {
+                       [self.tableView performBatchUpdates:^{
+                           [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+                       } completion:^(BOOL finished) {
+                       }];
+                   }
+                   @catch (NSException *exception) {
+                       NSLog(@"%@", exception.reason);
+                       [self.tableView reloadData];
+                   }
+               }
+               else if (setAsDeleted) {
                    /***
                    if(isSavedMessageRoom){
                        BOOL emptyState = YES;
@@ -11052,16 +11068,16 @@ CGPoint center;
                    
                    NSString *messageID = currentMessage.messageID;
                    
-                   if([self.pinMessageIDArray containsObject:messageID]){
+                   if ([self.pinMessageIDArray containsObject:messageID]){
                        NSInteger index = [self.pinMessageIDArray indexOfObject:currentMessage.messageID];
-                       if(index > self.pinMessageArray.count - 1){
+                       if (index > self.pinMessageArray.count - 1){
                            [self callApiGetPinMessage];
                        }
-                       else{
+                       else {
                            [self.pinMessageArray removeObjectAtIndex:index];
                            [self.pinMessageIDArray removeObject:currentMessage.messageID];
                            
-                           if(self.pinMessageIDArray.count > 0){
+                           if (self.pinMessageIDArray.count > 0){
                                if(self.currentIndexPinned > self.pinMessageArray.count - 1){
                                    self.currentIndexPinned = 0;
                                }
@@ -11070,14 +11086,11 @@ CGPoint center;
                                [self setPinnedView:message index:self.currentIndexPinned];
                                
                            }
-                           else{
+                           else {
                                self.pinMessageView.alpha = 0.0f;
                                self.pinMessageHeightConstraint.constant = 0.0f;
                            }
                        }
-                       
-                       
-                       
                    }
                    
                    //Update cell to deleted message
