@@ -20,6 +20,7 @@ FOUNDATION_EXPORT double TapTalkVersionNumber;
 FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 
 @protocol TapTalkDelegate <NSObject>
+@optional
 
 //Authentication
 /**

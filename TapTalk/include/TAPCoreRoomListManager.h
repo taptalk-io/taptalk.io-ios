@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPCoreRoomListManagerDelegate <NSObject>
 
+@optional
+
 - (void)tapTalkDidDeleteChatRoom:(NSString *)roomID;
 - (void)tapTalkDidPinChatRoom:(NSString *)roomID;
 - (void)tapTalkDidUnpinChatRoom:(NSString *)roomID;
