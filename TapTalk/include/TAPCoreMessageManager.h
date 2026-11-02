@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPCoreMessageManagerDelegate <NSObject>
 
+@optional
+
 - (void)tapTalkDidReceiveNewMessage:(TAPMessageModel *)message;
 - (void)tapTalkDidReceiveNewMessages:(NSArray <TAPMessageModel *> *)messages;
 - (void)tapTalkDidReceiveUpdatedMessage:(TAPMessageModel *)message;

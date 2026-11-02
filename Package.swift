@@ -7,7 +7,7 @@ let package = Package(
     name: "TapTalk",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v16) // Needs to be iOS 16+ for newer Google Maps SDKs
+        .iOS(.v15) // iOS 15 is minimum target for Google Maps SDKs 9.0.0, newer version requires iOS 16+
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -23,11 +23,11 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/googlemaps/ios-maps-sdk",
-            from: "10.15.0"
+            from: "9.0.0"
         ),
         .package(
             url: "https://github.com/googlemaps/ios-places-sdk",
-            from: "10.15.0"
+            from: "9.0.0"
         ),
         .package(
             url: "https://github.com/realm/realm-swift",

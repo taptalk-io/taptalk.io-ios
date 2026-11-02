@@ -13,8 +13,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPCoreContactManagerDelegate <NSObject>
+
+@optional
+
 - (void)tapTalkDidBlockContact:(TAPUserModel *)user;
 - (void)tapTalkDidUnblockContact:(TAPUserModel *)user;
+
 @end
 
 @interface TAPCoreContactManager : NSObject
