@@ -316,7 +316,7 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  Obtain active user data
  return nil if active user data is not found
  */
-- (TAPUserModel *_Nonnull)getTapTalkActiveUser;
+- (TAPUserModel * _Nullable)getTapTalkActiveUser;
 
 /**
  Modify TapTalk's socket connection mode

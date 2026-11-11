@@ -6,18 +6,18 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
+#import <PhotosUI/PhotosUI.h>
+
 #import "TAPImagePreviewViewController.h"
 #import "TAPImagePreviewView.h"
-
 #import "TAPPhotoAlbumListViewController.h"
-
 #import "TAPThumbnailImagePreviewCollectionViewCell.h"
 #import "TAPImagePreviewCollectionViewCell.h"
 #import "TAPMentionListTableViewCell.h"
 
 #import "PowerTalk.h"
 
-@interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, AVPlayerViewControllerDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface TAPImagePreviewViewController () <UICollectionViewDelegate, UICollectionViewDataSource, TAPCustomGrowingTextViewDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPImagePreviewCollectionViewCellDelegate, AVPlayerViewControllerDelegate, UITableViewDelegate, UITableViewDataSource, PHPickerViewControllerDelegate>
 
 @property (strong, nonatomic) TAPImagePreviewView *imagePreviewView;
 
@@ -32,13 +32,6 @@
 @property (nonatomic) NSInteger lastNumberOfWordArrayForShowMention;
 @property (nonatomic) NSInteger lastTypingWordArrayStartIndex;
 @property (strong, nonatomic) NSString *lastTypingWordString;
-
-- (void)cancelButtonDidTapped;
-- (void)morePictureButtonDidTapped;
-- (void)sendButtonDidTapped;
-- (void)openGallery;
-- (BOOL)isAssetSizeExcedeedLimitWithData:(TAPMediaPreviewModel *)mediaPreview;
-- (void)filterAssetSizeExcedeedLimitWithArray:(NSArray *)dataArray;
 
 @end
 
@@ -904,6 +897,72 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [self.imagePreviewView.thumbnailCollectionView reloadData];
 }
 
+#pragma mark PHPickerViewControllerDelegate
+
+- (void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    NSMutableArray<TAPMediaPreviewModel *> *selectedMediasArray = [NSMutableArray array];
+    NSMutableArray<TAPMediaPreviewModel *> *counterArray = [NSMutableArray array];
+    NSMutableArray<NSString *> *assetIdentifiers = [[NSMutableArray alloc] init];
+    for (PHPickerResult *result in results) {
+        if (result.assetIdentifier) {
+            [assetIdentifiers addObject:result.assetIdentifier];
+            [selectedMediasArray addObject:[TAPMediaPreviewModel new]];
+        }
+    }
+    
+    if (assetIdentifiers.count == 0) {
+        return;
+    }
+    
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifiers options:nil];
+    [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        @autoreleasepool {
+            __block UIImage *imageResult;
+            __block NSMutableArray *selectedResultArray = selectedMediasArray;
+            __block NSMutableArray *countArray = counterArray;
+            
+            PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+            requestOptions.synchronous = NO;
+            requestOptions.networkAccessAllowed = YES;
+            requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
+            requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+            
+            CGSize targetSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) / 2, CGRectGetWidth([UIScreen mainScreen].bounds) / 2);
+            
+            PHImageManager *manager = [PHImageManager defaultManager];
+            [manager requestImageForAsset:asset
+                               targetSize:targetSize
+                              contentMode:PHImageContentModeAspectFill
+                                  options:requestOptions
+                            resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                @autoreleasepool {
+                    imageResult = result;
+                    NSError *error = [info objectForKey:PHImageErrorKey];
+                    NSInteger index = [assetIdentifiers indexOfObject:asset.localIdentifier];
+                    if (!error && imageResult != nil && index >= 0 && index < selectedResultArray.count) {
+                        TAPMediaPreviewModel *mediaPreview = [selectedResultArray objectAtIndex:index];
+                        mediaPreview.asset = asset;
+                        mediaPreview.thumbnailImage = imageResult;
+                        if (asset.mediaType == PHAssetMediaTypeImage) {
+                            mediaPreview.mediaType = @"image";
+                        }
+                        else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                            mediaPreview.mediaType = @"video";
+                        }
+                        [countArray addObject:mediaPreview];
+                        
+                        if (countArray.count >= assetIdentifiers.count && ![TAPUtil isEmptyArray:selectedResultArray]) {
+                            [self photoAlbumListViewControllerSelectImageWithDataArray:selectedResultArray];
+                        }
+                    }
+                }
+            }];
+        }
+    }];
+}
+
 #pragma mark TAPImagePreviewCollectionViewCell
 
 - (void)imagePreviewCollectionViewCellDidPlayVideoButtonDidTappedWithMediaPreview:(TAPMediaPreviewModel *)mediaPreview indexPath:(NSIndexPath *)indexPath {
@@ -1035,6 +1094,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         self.mediaDataArray = [[NSMutableArray alloc] init];
     }
     
+    [self.mediaDataArray removeAllObjects];
     [self.mediaDataArray addObjectsFromArray:array];
     
     [self filterAssetSizeExcedeedLimitWithArray:self.mediaDataArray];
@@ -1050,59 +1110,38 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)morePictureButtonDidTapped {
-    
     _showVideoPlayer = NO;
-    
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
-    if (status == PHAuthorizationStatusAuthorized) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
-            photoAlbumListViewController.delegate = self;
-            [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
-            photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
-            [photoAlbumListViewController setParticipantListArray:self.participantListArray];
-            UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
-            photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-            [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
-        });
-    }
-    else if (status == PHAuthorizationStatusNotDetermined) {
-        //request
-        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            [self openGallery];
-        }];
-    }
-    else {
-        //No permission. Trying to normally request it
-        NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
-        [alertController addAction:cancelAction];
-        
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
-        }];
-        [alertController addAction:settingsAction];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
+    [self openGallery];
 }
 
 - (void)openGallery {
-    
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
     if (status == PHAuthorizationStatusAuthorized) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
-            [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
-            photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
-            [photoAlbumListViewController setParticipantListArray:self.participantListArray];
-            photoAlbumListViewController.delegate = self;
-            UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
-            [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+            PHPickerConfiguration *configuration = [[PHPickerConfiguration alloc] initWithPhotoLibrary:[PHPhotoLibrary sharedPhotoLibrary]];
+            configuration.selectionLimit = 0;
+            configuration.selection = PHPickerConfigurationSelectionOrdered;
+            
+            NSMutableArray<NSString *> *assetIdentifiers = [[NSMutableArray alloc] init];
+            for (TAPMediaPreviewModel *media in self.mediaDataArray) {
+                if (media.asset) {
+                    [assetIdentifiers addObject:media.asset.localIdentifier];
+                }
+            }
+            configuration.preselectedAssetIdentifiers = assetIdentifiers;
+            
+            PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:configuration];
+            picker.delegate = self;
+            
+            [self presentViewController:picker animated:YES completion:nil];
+            
+//            TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
+//            [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeAddMore];
+//            photoAlbumListViewController.isNotFromPersonalRoom = self.isNotFromPersonalRoom;
+//            [photoAlbumListViewController setParticipantListArray:self.participantListArray];
+//            photoAlbumListViewController.delegate = self;
+//            UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+//            [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
         });
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
