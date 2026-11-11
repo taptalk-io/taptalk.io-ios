@@ -11,6 +11,7 @@
 typedef NS_ENUM(NSInteger, TapTalkSnackBarType) {
     TapTalkSnackBarTypeDefault,
     TapTalkSnackBarTypeError,
+    TapTalkSnackBarTypeWarning,
     TapTalkSnackBarTypeToast,
 };
 

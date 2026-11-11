@@ -730,6 +730,21 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return [NSString stringWithFormat:@"%@%@", plus, beautifiedPhoneNumber];
 }
 
++ (NSString *)getDefaultMessageFromError:(NSError *)error {
+    NSString *errorMessage;
+    if (error != nil) {
+        errorMessage = [error.userInfo objectForKey:@"message"];
+    }
+    if (error != nil && [TAPUtil isEmptyString:errorMessage]) {
+        errorMessage = error.localizedDescription;
+    }
+    if ([TAPUtil isEmptyString:errorMessage]) {
+        errorMessage = NSLocalizedString(@"Something went wrong, please try again.", @"");
+    }
+    return errorMessage;
+}
+
+
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2 {
     CLLocation *locationA = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];

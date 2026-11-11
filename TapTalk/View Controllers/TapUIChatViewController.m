@@ -8,10 +8,11 @@
 
 #import "TapUIChatViewController.h"
 
-#import "TapAFNetworking.h"
 #import <Photos/Photos.h>
+#import <PhotosUI/PhotosUI.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
+#import "TapAFNetworking.h"
 #import "TAPCustomAccessoryView.h"
 #import "TAPGradientView.h"
 #import "TAPCustomButtonView.h"
@@ -90,7 +91,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     TopFloatingIndicatorViewTypeLoading = 1
 };
 
-@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPBaseTableViewCellDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPOverlayChatRoomViewDelegate>
+@interface TapUIChatViewController () <UIGestureRecognizerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, PHPickerViewControllerDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, UIAdaptivePresentationControllerDelegate, TAPGrowingTextViewDelegate, UITextViewDelegate, TAPChatManagerDelegate, TAPConnectionStatusViewControllerDelegate, TAPImagePreviewViewControllerDelegate, TAPMediaDetailViewControllerDelegate, TAPPhotoAlbumListViewControllerDelegate, TAPPickLocationViewControllerDelegate, TAPBaseTableViewCellDelegate, TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPProductListBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyChatDeletedBubbleTableViewCellDelegate, TAPYourChatDeletedBubbleTableViewCellDelegate, TAPProfileViewControllerDelegate, UIGestureRecognizerDelegate, TAPAudioManagerDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPOverlayChatRoomViewDelegate>
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageTextViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageViewHeightConstraint;
@@ -3593,7 +3594,86 @@ CGPoint center;
     }
 }
 
+#pragma mark PHPickerViewControllerDelegate
+
+- (void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    _currentPresentedViewController = nil;
+    
+    NSMutableArray<TAPMediaPreviewModel *> *selectedMediasArray = [NSMutableArray array];
+    NSMutableArray<TAPMediaPreviewModel *> *counterArray = [NSMutableArray array];
+    NSMutableArray<NSString *> *assetIdentifiers = [[NSMutableArray alloc] init];
+    for (PHPickerResult *result in results) {
+        if (result.assetIdentifier) {
+            [assetIdentifiers addObject:result.assetIdentifier];
+            [selectedMediasArray addObject:[TAPMediaPreviewModel new]];
+        }
+    }
+    
+    if (assetIdentifiers.count == 0) {
+        [self checkAndShowInputAccessoryView];
+        [self checkKeyboard];
+        return;
+    }
+    
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifiers options:nil];
+    [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        @autoreleasepool {
+            __block UIImage *imageResult;
+            __block NSMutableArray *selectedResultArray = selectedMediasArray;
+            __block NSMutableArray *countArray = counterArray;
+            
+            PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+            requestOptions.synchronous = NO;
+            requestOptions.networkAccessAllowed = YES;
+            requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
+            requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+            
+            CGSize targetSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) / 2, CGRectGetWidth([UIScreen mainScreen].bounds) / 2);
+            
+            PHImageManager *manager = [PHImageManager defaultManager];
+            [manager requestImageForAsset:asset
+                               targetSize:targetSize
+                              contentMode:PHImageContentModeAspectFill
+                                  options:requestOptions
+                            resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                @autoreleasepool {
+                    imageResult = result;
+                    NSError *error = [info objectForKey:PHImageErrorKey];
+                    NSInteger index = [assetIdentifiers indexOfObject:asset.localIdentifier];
+                    if (!error && imageResult != nil && index >= 0 && index < selectedResultArray.count) {
+                        TAPMediaPreviewModel *mediaPreview = [selectedResultArray objectAtIndex:index];
+                        mediaPreview.asset = asset;
+                        mediaPreview.thumbnailImage = imageResult;
+                        if (asset.mediaType == PHAssetMediaTypeImage) {
+                            mediaPreview.mediaType = @"image";
+                        }
+                        else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                            mediaPreview.mediaType = @"video";
+                        }
+                        [countArray addObject:mediaPreview];
+                        
+                        if (countArray.count >= assetIdentifiers.count && ![TAPUtil isEmptyArray:selectedResultArray]) {
+                            TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+                            imagePreviewViewController.delegate = self;
+                            imagePreviewViewController.isNotFromPersonalRoom = self.currentRoom.type != RoomTypePersonal;
+                            [imagePreviewViewController setParticipantListArray:self.currentRoom.participants];
+                            [imagePreviewViewController setMediaPreviewDataWithArray:selectedResultArray];
+                            UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
+                            imagePreviewNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+                            [self presentViewController:imagePreviewNavigationController animated:YES completion:^{
+                                
+                            }];
+                        }
+                    }
+                }
+            }];
+        }
+    }];
+}
+
 #pragma mark UIDocumentPicker
+
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     
     NSError *error = nil;
@@ -6772,11 +6852,13 @@ CGPoint center;
 }
 
 - (void)imagePreviewCancelButtonDidTapped {
+    _currentPresentedViewController = nil;
     [self checkAndShowInputAccessoryView];
     [self checkKeyboard];
 }
 
 - (void)imagePreviewDidSendDataAndCompleteDismissView {
+    _currentPresentedViewController = nil;
     [self checkAndShowInputAccessoryView];
     [self checkKeyboard];
 }
@@ -7945,6 +8027,11 @@ CGPoint center;
                 }
             }
         }
+        
+        NSError *error = [notificationParameterDictionary objectForKey:@"error"];
+        if (error != nil) {
+            [self showSnackBar:TapTalkSnackBarTypeError message:[TAPUtil getDefaultMessageFromError:error] iconName:@"TAPIconWarningCircle"];
+        }
     });
 }
 
@@ -8674,10 +8761,18 @@ CGPoint center;
 }
 
 - (void)openGallery {
-    
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
     if (status == PHAuthorizationStatusAuthorized) {
+        PHPickerConfiguration *configuration = [[PHPickerConfiguration alloc] initWithPhotoLibrary:[PHPhotoLibrary sharedPhotoLibrary]];
+    //    configuration.filter = [PHPickerFilter anyFilterMatchingSubfilters:@[[PHPickerFilter imagesFilter], [PHPickerFilter videosFilter]]];
+        configuration.selectionLimit = 0;
+        configuration.selection = PHPickerConfigurationSelectionOrdered;
+        
+        PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:configuration];
+        picker.delegate = self;
+        
+        [self presentViewController:picker animated:YES completion:nil];
+        
         //        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         //        imagePicker.allowsEditing = NO;
         //        imagePicker.delegate = self;
@@ -8686,17 +8781,18 @@ CGPoint center;
         //        [self presentViewController:imagePicker animated:YES completion:^{
         //            //completion
         //        }];
-        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
-        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
-        photoAlbumListViewController.delegate = self;
-        if (self.currentRoom.type != RoomTypeChannel) {
-            photoAlbumListViewController.isNotFromPersonalRoom = YES;
-        }
-        [photoAlbumListViewController setParticipantListArray:self.currentRoom.participants];
-
-        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
-        photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+        
+//        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
+//        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
+//        photoAlbumListViewController.delegate = self;
+//        if (self.currentRoom.type != RoomTypeChannel) {
+//            photoAlbumListViewController.isNotFromPersonalRoom = YES;
+//        }
+//        [photoAlbumListViewController setParticipantListArray:self.currentRoom.participants];
+//
+//        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+//        photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+//        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
         //request
@@ -9591,24 +9687,31 @@ CGPoint center;
         if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
             if (message.type == TAPChatMessageTypeImage) {
                 // Save image to gallery
-                
                 [TAPImageView imageFromCacheWithMessage:message
                 success:^(UIImage *fullImage, TAPMessageModel *receivedMessage) {
                     UIImageWriteToSavedPhotosAlbum(fullImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
                 }
                 failure:^(NSError *error, TAPMessageModel *receivedMessage) {
-                    
+                    [self showSnackBar:TapTalkSnackBarTypeError message:[TAPUtil getDefaultMessageFromError:error] iconName:@"TAPIconWarningCircle"];
                 }];
             }
             else if (message.type == TAPChatMessageTypeVideo) {
-                //Save video to gallery
+                // Save video to gallery
                 NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:urlKey];
                 if ([filePath isEqualToString:@""] || filePath == nil) {
                     filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
                 }
                 if (![filePath isEqualToString:@""] && filePath != nil) {
                     // Video done download, save to gallery
-                    UISaveVideoAtPathToSavedPhotosAlbum(filePath, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
+                    if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(filePath)) {
+                        UISaveVideoAtPathToSavedPhotosAlbum(filePath, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
+                    }
+                    else {
+                        [self showSnackBar:TapTalkSnackBarTypeError message:NSLocalizedStringFromTableInBundle(@"Video is incompatible or already in saved photos album.", nil, [TAPUtil currentBundle], @"") iconName:@"TAPIconWarningCircle"];
+                    }
+                }
+                else {
+                    [self showSnackBar:TapTalkSnackBarTypeError message:NSLocalizedStringFromTableInBundle(@"Could not find file.", nil, [TAPUtil currentBundle], @"") iconName:@"TAPIconWarningCircle"];
                 }
             }
         }
@@ -9788,8 +9891,8 @@ CGPoint center;
             filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
         }
         
-        if (filePath != nil && ![filePath isEqualToString:@""]) {
-            //File exist
+        if (![TAPUtil isEmptyString:filePath] && UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(filePath)) {
+            // Video is compatible
             [alertController addAction:saveToGalleryAction];
         }
     }
@@ -10248,9 +10351,9 @@ CGPoint center;
     NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
     NSString *assetIdentifier = [[TAPFileDownloadManager sharedManager] getAssetIdentifierWithKey:key];
     
-    if (filePath == nil || [filePath isEqualToString:@""]) {
+    if ([TAPUtil isEmptyString:filePath]) {
         NSString *fileURL = [dataDictionary objectForKey:@"url"];
-        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+        if ([TAPUtil isEmptyString:fileURL]) {
             fileURL = [dataDictionary objectForKey:@"fileURL"];
         }
         fileURL = [TAPUtil nullToEmptyString:fileURL];
@@ -10266,12 +10369,11 @@ CGPoint center;
         }
     }
     
-    if (filePath == nil || [filePath isEqualToString:@""]
-        //|| ![[NSFileManager defaultManager] fileExistsAtPath:filePath]
-        ) {
+    if ([TAPUtil isEmptyString:filePath]) {
         [self showFileNotFoundPopUpWithMessage:message];
         return;
     }
+    
     if (![TAPUtil isEmptyString:assetIdentifier]) {
         NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
         PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
@@ -10311,7 +10413,6 @@ CGPoint center;
     AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:videoAsset];
     AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
     AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-    controller.delegate = self;
     controller.showsPlaybackControls = YES;
     [self presentViewController:controller animated:YES completion:nil];
     controller.player = player;
@@ -14936,14 +15037,12 @@ CGPoint center;
     }
 }
 
-//Override completionSelector method of save image to gallery
+// Override completionSelector method of save image to gallery
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
     if (error != nil) {
         if (status == PHAuthorizationStatusDenied) {
-            //No permission. Trying to normally request it
-            
+            // No permission. Trying to normally request it
             NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
             
@@ -14954,23 +15053,29 @@ CGPoint center;
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }];
             [alertController addAction:settingsAction];
-            
             [self presentViewController:alertController animated:YES completion:nil];
+        }
+        else {
+            [self showSnackBar:TapTalkSnackBarTypeError message:[TAPUtil getDefaultMessageFromError:error] iconName:@"TAPIconWarningCircle"];
         }
     }
     else {
-            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"Long Press Save Image"  title:NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Image saved successfully", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showSnackBar:TapTalkSnackBarTypeDefault message:NSLocalizedStringFromTableInBundle(@"Image saved successfully", nil, [TAPUtil currentBundle], @"") iconName:@"TAPIconCheck"];
+//        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage
+//                         popupIdentifier:@"Long Press Save Image"
+//                                   title:NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"")
+//                       detailInformation:NSLocalizedStringFromTableInBundle(@"Image saved successfully", nil, [TAPUtil currentBundle], @"")
+//                   leftOptionButtonTitle:nil
+//          singleOrRightOptionButtonTitle:nil];
     }
 }
 
-//Override completionSelector method of save video to gallery
+// Override completionSelector method of save video to gallery
 - (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
     if (error != nil) {
         if (status == PHAuthorizationStatusDenied) {
-            //No permission. Trying to normally request it
-            
+            // No permission. Trying to normally request it
             NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
             
@@ -14981,12 +15086,20 @@ CGPoint center;
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }];
             [alertController addAction:settingsAction];
-            
             [self presentViewController:alertController animated:YES completion:nil];
+        }
+        else {
+            [self showSnackBar:TapTalkSnackBarTypeError message:[TAPUtil getDefaultMessageFromError:error] iconName:@"TAPIconWarningCircle"];
         }
     }
     else {
-        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"Long Press Save Video"  title:NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Video saved successfully", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showSnackBar:TapTalkSnackBarTypeDefault message:NSLocalizedStringFromTableInBundle(@"Video saved successfully", nil, [TAPUtil currentBundle], @"") iconName:@"TAPIconCheck"];
+//        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeSuccessMessage
+//                         popupIdentifier:@"Long Press Save Video"
+//                                   title:NSLocalizedStringFromTableInBundle(@"Success", nil, [TAPUtil currentBundle], @"")
+//                       detailInformation:NSLocalizedStringFromTableInBundle(@"Video saved successfully", nil, [TAPUtil currentBundle], @"")
+//                   leftOptionButtonTitle:nil
+//          singleOrRightOptionButtonTitle:nil];
     }
 }
 

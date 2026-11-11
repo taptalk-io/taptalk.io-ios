@@ -331,6 +331,15 @@
             iconImageView.image = [iconImageView.image setImageTintColor:[TAPUtil getColor:TAP_COLOR_ERROR]];
         }
     }
+    else if (type == TapTalkSnackBarTypeWarning) {
+        self.snackBarView.backgroundColor = [TAPUtil getColor:@"FFF4B1"];
+        self.snackBarView.layer.borderColor = [TAPUtil getColor:TAP_COLOR_WARNING].CGColor;
+        self.snackBarView.layer.borderWidth = 1.0f;
+        label.textColor = [TAPUtil getColor:TAP_COLOR_WARNING];
+        if (iconImageView != nil && iconImageView.image != nil) {
+            iconImageView.image = [iconImageView.image setImageTintColor:[TAPUtil getColor:TAP_COLOR_WARNING]];
+        }
+    }
     else {
         self.snackBarView.backgroundColor = [TAPUtil getColor:TAP_COLOR_TEXT_DARK];
         self.snackBarView.layer.borderWidth = 0.0f;

@@ -5,6 +5,8 @@
 //  Created by TapTalk.io on 21/03/22.
 //
 
+#import <PhotosUI/PhotosUI.h>
+
 #import "TAPSecondaryChatViewController.h"
 #import "TAPImagePreviewViewController.h"
 #import "TAPMediaDetailViewController.h"
@@ -33,7 +35,7 @@ static const NSInteger kChatAnchorDefaultBottomConstraint = 63.0f;
 static const NSInteger kInputMessageAccessoryViewHeight = 52.0f;
 static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
 
-@interface TAPSecondaryChatViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, UINavigationControllerDelegate, TAPGrowingTextViewDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate,TAPPickLocationViewControllerDelegate, TAPChatManagerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, TAPMediaDetailViewControllerDelegate, TAPImagePreviewViewControllerDelegate>
+@interface TAPSecondaryChatViewController ()<UITableViewDataSource, UITableViewDataSource,TAPMyChatBubbleTableViewCellDelegate, TAPYourChatBubbleTableViewCellDelegate, TAPMyImageBubbleTableViewCellDelegate, TAPYourImageBubbleTableViewCellDelegate, TAPMyLocationBubbleTableViewCellDelegate, TAPYourLocationBubbleTableViewCellDelegate, TAPMyFileBubbleTableViewCellDelegate, TAPYourFileBubbleTableViewCellDelegate, TAPMyVideoBubbleTableViewCellDelegate, TAPYourVideoBubbleTableViewCellDelegate, TAPMyVoiceNoteBubbleTableViewCellDelegate, TAPYourVoiceNoteBubbleTableViewCellDelegate, UINavigationControllerDelegate, TAPGrowingTextViewDelegate, PHPickerViewControllerDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate,TAPPickLocationViewControllerDelegate, TAPChatManagerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource, TAPMediaDetailViewControllerDelegate, TAPImagePreviewViewControllerDelegate>
 
 @property (strong, nonatomic) IBOutlet TAPBaseTableView *tableView;
 @property (strong, atomic) NSMutableDictionary *messageDictionary;
@@ -1917,6 +1919,15 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
     if (status == PHAuthorizationStatusAuthorized) {
+        PHPickerConfiguration *configuration = [[PHPickerConfiguration alloc] initWithPhotoLibrary:[PHPhotoLibrary sharedPhotoLibrary]];
+        configuration.selectionLimit = 0;
+        configuration.selection = PHPickerConfigurationSelectionOrdered;
+        
+        PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:configuration];
+        picker.delegate = self;
+        
+        [self presentViewController:picker animated:YES completion:nil];
+        
         //        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         //        imagePicker.allowsEditing = NO;
         //        imagePicker.delegate = self;
@@ -1925,17 +1936,18 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
         //        [self presentViewController:imagePicker animated:YES completion:^{
         //            //completion
         //        }];
-        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
-        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
-        photoAlbumListViewController.delegate = self;
-        if (self.currentRoom.type != RoomTypeChannel) {
-            photoAlbumListViewController.isNotFromPersonalRoom = YES;
-        }
-        [photoAlbumListViewController setParticipantListArray:self.currentRoom.participants];
-
-        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
-        photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
+        
+//        TAPPhotoAlbumListViewController *photoAlbumListViewController = [[TAPPhotoAlbumListViewController alloc] init];
+//        [photoAlbumListViewController setPhotoAlbumListViewControllerType:TAPPhotoAlbumListViewControllerTypeDefault];
+//        photoAlbumListViewController.delegate = self;
+//        if (self.currentRoom.type != RoomTypeChannel) {
+//            photoAlbumListViewController.isNotFromPersonalRoom = YES;
+//        }
+//        [photoAlbumListViewController setParticipantListArray:self.currentRoom.participants];
+//
+//        UINavigationController *photoAlbumListNavigationController = [[UINavigationController alloc] initWithRootViewController:photoAlbumListViewController];
+//        photoAlbumListNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+//        [self presentViewController:photoAlbumListNavigationController animated:YES completion:nil];
     }
     else if (status == PHAuthorizationStatusNotDetermined) {
         //request
@@ -2027,6 +2039,81 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
     UINavigationController *pickLocationNavigationController = [[UINavigationController alloc] initWithRootViewController:pickLocationViewController];
     pickLocationNavigationController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:pickLocationNavigationController animated:YES completion:nil];
+}
+
+#pragma mark PHPickerViewControllerDelegate
+
+- (void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    NSMutableArray<TAPMediaPreviewModel *> *selectedMediasArray = [NSMutableArray array];
+    NSMutableArray<TAPMediaPreviewModel *> *counterArray = [NSMutableArray array];
+    NSMutableArray<NSString *> *assetIdentifiers = [[NSMutableArray alloc] init];
+    for (PHPickerResult *result in results) {
+        if (result.assetIdentifier) {
+            [assetIdentifiers addObject:result.assetIdentifier];
+            [selectedMediasArray addObject:[TAPMediaPreviewModel new]];
+        }
+    }
+    
+    if (assetIdentifiers.count == 0) {
+        return;
+    }
+    
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifiers options:nil];
+    [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        @autoreleasepool {
+            __block UIImage *imageResult;
+            __block NSMutableArray *selectedResultArray = selectedMediasArray;
+            __block NSMutableArray *countArray = counterArray;
+            
+            PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+            requestOptions.synchronous = NO;
+            requestOptions.networkAccessAllowed = YES;
+            requestOptions.resizeMode   = PHImageRequestOptionsResizeModeNone;
+            requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+            
+            CGSize targetSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) / 2, CGRectGetWidth([UIScreen mainScreen].bounds) / 2);
+            
+            PHImageManager *manager = [PHImageManager defaultManager];
+            [manager requestImageForAsset:asset
+                               targetSize:targetSize
+                              contentMode:PHImageContentModeAspectFill
+                                  options:requestOptions
+                            resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                @autoreleasepool {
+                    imageResult = result;
+                    NSError *error = [info objectForKey:PHImageErrorKey];
+                    NSInteger index = [assetIdentifiers indexOfObject:asset.localIdentifier];
+                    if (!error && imageResult != nil && index >= 0 && index < selectedResultArray.count) {
+                        TAPMediaPreviewModel *mediaPreview = [selectedResultArray objectAtIndex:index];
+                        mediaPreview.asset = asset;
+                        mediaPreview.thumbnailImage = imageResult;
+                        if (asset.mediaType == PHAssetMediaTypeImage) {
+                            mediaPreview.mediaType = @"image";
+                        }
+                        else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                            mediaPreview.mediaType = @"video";
+                        }
+                        [countArray addObject:mediaPreview];
+                        
+                        if (countArray.count >= assetIdentifiers.count && ![TAPUtil isEmptyArray:selectedResultArray]) {
+                            TAPImagePreviewViewController *imagePreviewViewController = [[TAPImagePreviewViewController alloc] init];
+                            imagePreviewViewController.delegate = self;
+                            imagePreviewViewController.isNotFromPersonalRoom = self.currentRoom.type != RoomTypePersonal;
+                            [imagePreviewViewController setParticipantListArray:self.currentRoom.participants];
+                            [imagePreviewViewController setMediaPreviewDataWithArray:selectedResultArray];
+                            UINavigationController *imagePreviewNavigationController = [[UINavigationController alloc] initWithRootViewController:imagePreviewViewController];
+                            imagePreviewNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+                            [self presentViewController:imagePreviewNavigationController animated:YES completion:^{
+                                
+                            }];
+                        }
+                    }
+                }
+            }];
+        }
+    }];
 }
 
 #pragma mark UIDocumentPicker
@@ -3742,6 +3829,11 @@ static const NSInteger kInputMessageAccessoryExtensionViewDefaultHeight = 68.0f;
                 [cell animateFailedUploadVideo];
             } completion:^(BOOL finished) {
             }];
+        }
+        
+        NSError *error = [notificationParameterDictionary objectForKey:@"error"];
+        if (error != nil) {
+            [self showSnackBar:TapTalkSnackBarTypeError message:[TAPUtil getDefaultMessageFromError:error] iconName:@"TAPIconWarningCircle"];
         }
     });
 }

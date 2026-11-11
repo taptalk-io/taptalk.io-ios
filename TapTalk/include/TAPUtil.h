@@ -100,6 +100,7 @@
 + (NSString *)stringByTrimmingTrailingCharactersInSet:(NSCharacterSet *)characterSet withString:(NSString *)string;
 + (NSString *)stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:(NSString *)string;
 + (NSString *)beautifyPhoneNumber:(NSString *)phoneNumber insertPlus:(BOOL)insertPlus;
++ (NSString *)getDefaultMessageFromError:(NSError *)error;
 
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2;

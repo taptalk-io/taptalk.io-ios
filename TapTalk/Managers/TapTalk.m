@@ -688,7 +688,7 @@
     return self.clientCustomUserAgent;
 }
 
-- (TAPUserModel *_Nonnull)getTapTalkActiveUser {
+- (TAPUserModel * _Nullable)getTapTalkActiveUser {
     return [TAPDataManager getActiveUser];
 }
 
